@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #272727;
+  font-family: var(--font-inter);
+}
+
+.text-title {
+  font-family: var(--font-rozha-one);
+}
+
+/* .text-body {
+    font-family: var(--font-inter);
+} */
