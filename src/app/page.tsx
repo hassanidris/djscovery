@@ -4,6 +4,7 @@ import RecentAdded from "@/components/RecentAdded";
 import Image from "next/image";
 import DjsEvents from "@/components/DjsEvents";
 import Subscription from "@/components/Subscription";
+import Footer from "@/components/Footer";
 
 const Homepage = () => {
   return (
@@ -21,7 +22,7 @@ const Homepage = () => {
       <RecentAdded />
       <DjsEvents />
       <Subscription />
-      <section></section>
+      <Footer />
     </>
   );
 };

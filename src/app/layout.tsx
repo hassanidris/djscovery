@@ -23,8 +23,9 @@ const rozhaOne = Rozha_One({
 // Rozha One
 
 export const metadata: Metadata = {
-  title: "Lama Dev Social Media App",
-  description: "Social media app built with Next.js",
+  title: "DJscovery || DJs Directory App",
+  description:
+    "DJscovery is your go-to hub for showcasing your talent and connecting with fans.",
 };
 
 export default function RootLayout({

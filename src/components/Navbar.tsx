@@ -11,7 +11,7 @@ import {
 const Navbar = () => {
   return (
     <div className="fixed top-0 z-50 py-8 w-full bg-black/80">
-      <div className=" h-20 flex items-center justify-between py-1 container mx-auto">
+      <div className=" flex items-center justify-between py-1 w-full px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
         {/* LEFT */}
         <div className="md:hidden lg:block w-[10%]">
           <Link href="/" className="font-bold text-xl text-blue-600">
@@ -26,11 +26,11 @@ const Navbar = () => {
               <span>Browse Djs</span>
             </Link>
           </div>
-          <div className="hidden xl:flex p-2 bg-[#272727] items-center rounded-full ring-1 ring-white/20">
+          <div className="hidden xl:flex p-2 bg-[#272727] items-center justify-between rounded-full ring-1 ring-white/50 w-3/4 focus:ring-purple-600">
             <input
               type="text"
-              placeholder="search..."
-              className="bg-[#272727] outline-none"
+              placeholder="search for DJ..."
+              className="bg-[#272727] outline-none text-white"
             />
             <Image
               src="/search.png"
@@ -60,7 +60,7 @@ const Navbar = () => {
               <UserButton />
             </SignedIn>
             <SignedOut>
-              <div className="flex items-center gap-2 text-sm">
+              <div className="flex items-center gap-2 text-sm text-white">
                 <Image src="/login.png" alt="" width={20} height={20} />
                 <Link href="/sign-in">Login/Register</Link>
               </div>
