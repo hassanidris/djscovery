@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Rozha_One } from "next/font/google";
+import { Inter, Rozha_One, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
@@ -7,6 +7,11 @@ import Navbar from "@/components/Navbar";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+  variable: "--font-roboto-mono",
 });
 
 const rozhaOne = Rozha_One({
@@ -29,7 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${inter.variable} ${rozhaOne.variable}`}>
+      <html
+        lang="en"
+        className={`${inter.variable} ${rozhaOne.variable} ${robotoMono.variable}`}
+      >
         <body className={inter.className}>
           <div className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 z-30">
             <Navbar />

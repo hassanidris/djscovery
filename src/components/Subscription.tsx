@@ -1,10 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const Subscription = () => {
   return (
     <section
-      className="relative text-white py-28 bg-no-repeat bg-right bg-contain bg-scroll"
+      className="mt-16 relative text-white py-28 bg-no-repeat bg-right bg-contain bg-scroll"
       style={{
         backgroundImage: "url('/register-banner.png')",
         backgroundPositionX: "right",
@@ -21,12 +22,12 @@ const Subscription = () => {
             reach a wider audience. Gather all your information in one place and
             inspire others with your beats!
           </p>
-          <a
+          <Link
             href="/register"
-            className="inline-block bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition-colors duration-300"
+            className="inline-block bg-red-600 text-white py-3 px-8 rounded-lg hover:bg-red-700 transition-colors duration-300"
           >
             Register Now
-          </a>
+          </Link>
         </div>
       </div>
     </section>

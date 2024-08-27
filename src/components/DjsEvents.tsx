@@ -2,14 +2,14 @@ import React from "react";
 
 const DjsEvents = () => {
   return (
-    <section className="mt-16 container mx-auto flex flex-col justify-between">
+    <section className="mt-16 container mx-auto flex flex-col justify-between px-4">
       <h2 className=" text-title text-3xl mb-6">Upcoming Events for DJs</h2>
 
       <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {/* today */}
-        <div className="p-6 flex">
+        <div className="p-6 flex justify-between">
           <p className="text-[100px] font-bold flex items-start px-5">
-            <span>27</span>{" "}
+            <span className="number">27</span>
             <span className=" text-base inline font-thin">AUG</span>
           </p>
           <div className=" px-5 border-l-2 border-l-[#8951e6] overscroll-y-auto">
@@ -55,7 +55,7 @@ const DjsEvents = () => {
         {/* tomorrow */}
         <div className="p-6 flex">
           <p className="text-[100px] font-bold flex items-start px-5">
-            <span>28</span>{" "}
+            <span className="number">28</span>
             <span className=" text-base inline font-thin">AUG</span>
           </p>
           <div className=" px-5 border-l-2 border-l-[#8951e6]  overscroll-y-auto">
@@ -101,7 +101,7 @@ const DjsEvents = () => {
         {/* day after tomorrow */}
         <div className="p-6 flex">
           <p className="text-[100px] font-bold flex items-start px-5">
-            <span>29</span>{" "}
+            <span className="number">29</span>{" "}
             <span className=" text-base inline font-thin">AUG</span>
           </p>
           <div className=" px-5 border-l-2 border-l-[#8951e6]  overscroll-y-auto">

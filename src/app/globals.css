@@ -11,6 +11,10 @@ body {
   font-family: var(--font-rozha-one);
 }
 
+.number {
+  font-family: var(--font-roboto-mono);
+}
+
 /* .text-body {
     font-family: var(--font-inter);
 } */
