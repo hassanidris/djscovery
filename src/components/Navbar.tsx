@@ -7,6 +7,8 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
   return (
@@ -61,8 +63,13 @@ const Navbar = () => {
             </SignedIn>
             <SignedOut>
               <div className="flex items-center gap-2 text-sm text-white">
-                <Image src="/login.png" alt="" width={20} height={20} />
-                <Link href="/sign-in">Login/Register</Link>
+                <Link href="/sign-in" className=" flex gap-2">
+                  <FontAwesomeIcon
+                    icon={faRightToBracket}
+                    className=" h-5 w-5"
+                  />
+                  <span>Login/Register</span>
+                </Link>
               </div>
             </SignedOut>
           </ClerkLoaded>

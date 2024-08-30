@@ -61,7 +61,7 @@ const ProfilePage = () => {
               </p>
             </div>
           </div>
-          <div className="w-full md:w-1/4 space-y-8 place-items-end">
+          <div className="w-full md:w-1/4 space-y-8 items-end">
             <div>
               <h3 className="text-xl font-bold">Music Samples</h3>
               <div className="flex space-x-4 mt-4 ">
