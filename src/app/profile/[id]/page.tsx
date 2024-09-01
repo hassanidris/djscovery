@@ -25,7 +25,7 @@ const ProfilePage = () => {
             </h2>
           </div>
         </section>
-        <section className="mt-8 w-full px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 md:flex space-y-8 md:space-y-0 justify-between gap-6">
+        <section className="mt-8 w-full px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 flex space-y-8 md:space-y-0 justify-between gap-6">
           {/* <div className="flex-[5] bg-black grid grid-cols-1 md:grid-cols-2 ">
             <Image
               src="/rated-3.webp"
@@ -37,28 +37,31 @@ const ProfilePage = () => {
             <div className="flex flex-col justify-center items-center space-y-4"></div>
             image and info
           </div> */}
-          <div className="grid grid-cols-1 md:grid-cols-5 w-full md:w-3/4 space-x-4">
-            <div className=" col-span-1">
-              <img
-                src="/rated-3.webp"
-                alt="Dj. Martin Garrix"
-                className="w-full h-full rounded-lg mb-6 object-cover"
-              />
-            </div>
-            <div className=" col-span-3">
-              <h2 className="text-3xl font-bold">Dj. Martin Garrix</h2>
-              <p className="text-gray-400">Real Name: Martin Garrix</p>
-              <p className="text-gray-400">Date of Birth: 01/09/1985</p>
-              <p className="text-gray-400">Location: The Netherlands</p>
-              <p className="text-gray-400">
-                Genres: Progressive House, Big Room, Future Bass, Pop EDM
-              </p>
-              <p className="text-gray-400 mt-4">
-                Bio: Martin Garrix, born Martijn Garritsen, is a Dutch
-                electronic music producer and DJ who has taken the global music
-                scene by storm. At just 17 years old, he released his breakout
-                track "Animals," which catapulted him to international fame.
-              </p>
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-5 w-full md:w-3/4 space-x-4">
+              <div className=" col-span-2">
+                <img
+                  src="/rated-3.webp"
+                  alt="Dj. Martin Garrix"
+                  className="w-full h-full rounded-lg mb-6 object-cover"
+                />
+              </div>
+              <div className=" col-span-3">
+                <h2 className="text-3xl font-bold">Dj. Martin Garrix</h2>
+                <p className="text-gray-400">Real Name: Martin Garrix</p>
+                <p className="text-gray-400">Date of Birth: 01/09/1985</p>
+                <p className="text-gray-400">Location: The Netherlands</p>
+                <p className="text-gray-400">
+                  Genres: Progressive House, Big Room, Future Bass, Pop EDM
+                </p>
+                <p className="text-gray-400 mt-4">
+                  Bio: Martin Garrix, born Martijn Garritsen, is a Dutch
+                  electronic music producer and DJ who has taken the global
+                  music scene by storm. At just 17 years old, he released his
+                  breakout track "Animals," which catapulted him to
+                  international fame.
+                </p>
+              </div>
             </div>
           </div>
           <div className="w-full md:w-1/4 space-y-8 items-end">
@@ -128,24 +131,64 @@ const ProfilePage = () => {
             {/* Gallery */}
             <div className="col-span-2 bg-gray-800 p-6 rounded-lg">
               <h3 className="text-xl font-bold">Gallery</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 overflow-y-scroll h-[400px]">
                 <img
-                  src="/images/gallery1.jpg"
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
                   alt="Gallery Image 1"
                   className="w-full rounded-lg"
                 />
                 <img
-                  src="/images/gallery2.jpg"
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
                   alt="Gallery Image 2"
                   className="w-full rounded-lg"
                 />
                 <img
-                  src="/images/gallery3.jpg"
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
                   alt="Gallery Image 3"
                   className="w-full rounded-lg"
                 />
                 <img
-                  src="/images/gallery4.jpg"
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Gallery Image 4"
+                  className="w-full rounded-lg"
+                />
+                <img
+                  src="https://images.pexels.com/photos/787961/pexels-photo-787961.jpeg?auto=compress&cs=tinysrgb&w=800"
                   alt="Gallery Image 4"
                   className="w-full rounded-lg"
                 />
@@ -161,7 +204,7 @@ const ProfilePage = () => {
               <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="bg-gray-800 p-4 rounded-lg">
                   <img
-                    src="/images/video1.jpg"
+                    src="https://images.pexels.com/photos/3249760/pexels-photo-3249760.jpeg?auto=compress&cs=tinysrgb&w=800"
                     alt="Video 1"
                     className="w-full rounded-lg mb-4"
                   />
@@ -174,7 +217,7 @@ const ProfilePage = () => {
                 </div>
                 <div className="bg-gray-800 p-4 rounded-lg">
                   <img
-                    src="/images/video2.jpg"
+                    src="https://images.pexels.com/photos/3249760/pexels-photo-3249760.jpeg?auto=compress&cs=tinysrgb&w=800"
                     alt="Video 2"
                     className="w-full rounded-lg mb-4"
                   />
@@ -187,7 +230,7 @@ const ProfilePage = () => {
                 </div>
                 <div className="bg-gray-800 p-4 rounded-lg">
                   <img
-                    src="/images/video3.jpg"
+                    src="https://images.pexels.com/photos/3249760/pexels-photo-3249760.jpeg?auto=compress&cs=tinysrgb&w=800"
                     alt="Video 3"
                     className="w-full rounded-lg mb-4"
                   />
