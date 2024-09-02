@@ -5,6 +5,7 @@ import Image from "next/image";
 import DjsEvents from "@/components/DjsEvents";
 import Subscription from "@/components/Subscription";
 import Footer from "@/components/Footer";
+import AddReview from "@/components/profile/AddReview";
 
 const Homepage = () => {
   return (
@@ -20,6 +21,7 @@ const Homepage = () => {
       <Hero />
       <TopRated />
       <RecentAdded />
+      <AddReview />
       <DjsEvents />
       <Subscription />
       <Footer />

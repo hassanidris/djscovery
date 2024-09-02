@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import Subscription from "@/components/Subscription";
 import Image from "next/image";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons/faSpotify";
+import AddReview from "@/components/profile/AddReview";
 
 const ProfilePage = () => {
   return (
@@ -249,25 +250,8 @@ const ProfilePage = () => {
           {/* Reviews Section */}
           <div className="mt-12">
             <h3 className="text-3xl font-bold text-center mb-8">Reviews</h3>
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <textarea
-                className="w-full bg-gray-900 text-white p-4 rounded-lg mb-4"
-                placeholder="Type your review and rate the DJ"
-              ></textarea>
-              <div className="flex justify-end items-center gap-4">
-                <div className="flex space-x-1 ">
-                  {/* Star Rating */}
-                  <FontAwesomeIcon icon={faStar} className=" h-4 w-4" />
-                  <FontAwesomeIcon icon={faStar} className=" h-4 w-4" />
-                  <FontAwesomeIcon icon={faStar} className=" h-4 w-4" />
-                  <FontAwesomeIcon icon={faStar} className=" h-4 w-4" />
-                  <FontAwesomeIcon icon={faStar} className=" h-4 w-4" />
-                </div>
-                <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">
-                  Send
-                </button>
-              </div>
-            </div>
+
+            <AddReview />
             <div className="mt-8 space-y-8">
               {/* Review Item */}
               <div className="bg-gray-800 p-6 rounded-lg flex items-start">

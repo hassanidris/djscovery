@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+ 
+datasource db {
+  provider = "postgresql"
+  // Uses connection pooling
+  url = env("POSTGRES_PRISMA_URL")
+  // Uses direct connection, ⚠️ make sure to keep this to `POSTGRES_URL_NON_POOLING`
+  // or you'll have dangling databases from migrations
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id              String        @id
+  username        String        @unique
+  avatar          String?
+  role            Role
+  fan             Fan?
+  dj              DJ?
+  reviews         Review[]
+  // favorites       Favorite[]
+  createdAt       DateTime      @default(now())
+  //updatedAt       DateTime      @updatedAt
+}
+
+model Fan {
+  id              String        @id @default(cuid())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String        @unique
+  favorites       Favorite[]
+}
+
+model DJ {
+  id              String        @id @default(cuid())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String        @unique
+  stageName       String?
+  realName        String?
+  bio             String?
+  dateOfBirth     DateTime?
+  city            String?
+  country         String?
+  genres          String[]
+  reviews         Review[]
+  favorites       Favorite[]
+  musicSample     MusicSample[]
+  socialMedia     SocialMedia[]
+  events          Event[]
+  gallery         Gallery[]
+  videos          Video[]
+
+}
+
+enum Role {
+  FAN
+  DJ
+}
+
+ model Review {
+   id              String        @id @default(cuid())
+   //rating          Int
+   message         String?
+   user            User          @relation(fields: [userId], references: [id])
+   userId          String        
+   dj              DJ            @relation(fields: [djId], references: [id])
+   djId            String
+   createdAt       DateTime      @default(now())
+
+   @@unique([userId, djId])      // Ensure one review per Fan per DJ
+ }
+
+ model Favorite {
+   id              String        @id @default(cuid())
+   fan             Fan           @relation(fields: [fanId], references: [id])
+   fanId           String
+   dj              DJ        @relation(fields: [djId], references: [id])
+   djId            String
+   createdAt       DateTime      @default(now())
+ }
+
+ model MusicSample {
+   id              String        @id @default(cuid())
+   platform        String
+   url             String
+   dj              DJ        @relation(fields: [djId], references: [id])
+   djId            String
+   createdAt       DateTime       @default(now())
+ }
+
+ model SocialMedia {
+   id              String        @id @default(cuid())
+   platform        String
+   url             String
+   dj              DJ        @relation(fields: [djId], references: [id])
+   djId            String
+   createdAt       DateTime      @default(now())
+ }
+
+ model Event {
+   id              String        @id @default(cuid())
+   title           String
+   date            DateTime
+   location        String
+   dressCode       Boolean
+   entryFees       Int?
+   eventUrl        String?
+   dj              DJ        @relation(fields: [djId], references: [id])
+   djId            String
+   createdAt       DateTime      @default(now())
+ }
+
+ model Gallery {
+   id              String        @id @default(cuid())
+   imageUrl        String
+   dj              DJ            @relation(fields: [djId], references: [id])
+   djId            String
+   createdAt       DateTime      @default(now())
+ }
+
+ model Video {
+   id              String        @id @default(cuid())
+   videoUrl        String
+   dj              DJ        @relation(fields: [djId], references: [id])
+   djId            String
+   createdAt       DateTime      @default(now())
+ }
+
