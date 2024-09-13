@@ -17,14 +17,14 @@ const Subscription = () => {
           <h2 className="text-4xl font-bold mb-6 text-title">
             Inspire and Be Discovered
           </h2>
-          <p className="text-lg mb-8 max-w-3xl leading-loose">
+          <p className="text-lg mb-8 max-w-3xl leading-loose text-white">
             Join our DJ community to showcase your talent, share your story, and
             reach a wider audience. Gather all your information in one place and
             inspire others with your beats!
           </p>
           <Link
             href="/register"
-            className="inline-block bg-red-600 text-white py-3 px-8 rounded-lg hover:bg-red-700 transition-colors duration-300"
+            className="inline-block bg-red-600 text-white hover:text-gray-50 py-3 px-8 rounded-lg hover:bg-red-700 transition-colors duration-300"
           >
             Register Now
           </Link>

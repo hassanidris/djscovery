@@ -5,6 +5,8 @@ import Image from "next/image";
 import DjsEvents from "@/components/DjsEvents";
 import Subscription from "@/components/Subscription";
 import Footer from "@/components/Footer";
+import AddReview from "@/components/profile/AddReview";
+import ProfileCard from "@/components/profile/ProfileCard";
 
 const Homepage = () => {
   return (
@@ -18,11 +20,14 @@ const Homepage = () => {
         </div>
       </section>
       <Hero />
-      <TopRated />
+      {/* <TopRated /> */}
       <RecentAdded />
+      {/* <ProfileCard /> */}
+      <AddReview />
       <DjsEvents />
       <Subscription />
       <Footer />
+      <ProfileCard />
     </>
   );
 };
