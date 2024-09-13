@@ -38,12 +38,26 @@ export default function SignUpPage() {
                 socialButtonsIconButton: "bg-white text-white",
               },
             }}
-            afterSignUpUrl="/select-role"
+            afterSignUpUrl="/"
             signInUrl="/sign-in"
             // socialButtons={[
             //   { provider: "facebook", text: "Sign up with Google" },
             // ]}
           />
+          {/* <SignUp
+            afterSignUpUrl="/complete-profile" // You can redirect DJs to complete more profile details
+            appearance={{
+              elements: {
+                roleField: {
+                  label: "Are you a DJ or a Fan?",
+                  options: [
+                    { label: "DJ", value: "dj" },
+                    { label: "Fan", value: "fan" },
+                  ],
+                },
+              },
+            }}
+          /> */}
         </div>
       </div>
       <Footer />
