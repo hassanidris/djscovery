@@ -111,8 +111,7 @@ const ProfilePage = async ({ params }: { params: { username: string } }) => {
           releases
         </section> */}
         <section className="mt-16 w-full px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-          {/* <Events username={user.username} /> */}
-          <EventsUserList user={user} />
+          <EventsUserList username={user.username} />
         </section>
         <section className="mt-16 ">
           <UserPhotoGallery />

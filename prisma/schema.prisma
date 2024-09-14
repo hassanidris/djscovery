@@ -75,18 +75,18 @@ model SocialMedia {
 }
 
 model Event {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   clubName  String
   eventName String?
   date      DateTime
   location  String?
-  dressCode Boolean
-  entryFees Int
+  dressCode String?
+  entryFees Int?
   eventUrl  String?
   mapUrl    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
   createdAt DateTime @default(now())
-
-  User User[]
 }
 
 model Gallery {

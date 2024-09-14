@@ -1,11 +1,16 @@
 "use client";
+import { useUser } from "@clerk/nextjs";
 import { faSquarePlus, faSquareXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { User } from "@prisma/client";
+
 import Link from "next/link";
 import React, { useState } from "react";
+import AddEventBtn from "./AddEventBtn";
+import { addEvent } from "@/lib/actions";
 
 const AddEvent = () => {
+  const { user, isLoaded } = useUser();
+
   const [open, setOpen] = useState(false);
   const [hasDressCode, setHasDressCode] = useState(false);
   const [hasEntryFee, setHasEntryFee] = useState(false);
@@ -13,11 +18,16 @@ const AddEvent = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+  // console.log(username);
   return (
     <>
       <div>
         <span
-          className="buy_butn flex items-center justify-end gap-1 font-thin text-[#c584f5] hover:text-[#523c90] text-[12px] cursor-pointer "
+          className="buy_butn flex items-center justify-end gap-1 font-thin text-[#c584f5] hover:text-[#523c90] text-[12px] cursor-pointer z-40 "
           onClick={() => setOpen(true)}
         >
           <FontAwesomeIcon icon={faSquarePlus} className=" h-4 w-4" />
@@ -27,7 +37,8 @@ const AddEvent = () => {
       {open && (
         <div className="fixed inset-0 bg-black/65 flex justify-center items-center z-50 overflow-y-scroll">
           <form
-            action=""
+            action={addEvent}
+            // action={(formData) => addEvent(formData)}
             className=" relative p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3"
           >
             <h1 className=" text-2xl text-[#523c90] font-semibold">
@@ -50,7 +61,7 @@ const AddEvent = () => {
                   //       : "1970-01-01"
                   //   }
                   className=" ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800 font-normal"
-                  name="dateOfBirth"
+                  name="eventDate"
                 />
               </div>
 
@@ -63,7 +74,7 @@ const AddEvent = () => {
                   type="text"
                   //   placeholder={user.stageName || "Dj. John"}
                   className=" ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800  font-normal"
-                  name="stageName"
+                  name="clubName"
                 />
               </div>
               {/* INPUT */}
@@ -75,7 +86,7 @@ const AddEvent = () => {
                   type="text"
                   //   placeholder={user.stageName || "Dj. John"}
                   className=" ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800  font-normal"
-                  name="stageName"
+                  name="eventName"
                 />
               </div>
               {/* INPUT */}
@@ -87,7 +98,7 @@ const AddEvent = () => {
                   type="text"
                   //   placeholder={user.stageName || "Dj. John"}
                   className=" ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800  font-normal"
-                  name="stageName"
+                  name="address"
                 />
               </div>
 
@@ -123,7 +134,7 @@ const AddEvent = () => {
                     type="text"
                     placeholder="Specify dress code"
                     className="ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800 font-normal"
-                    name="dressCodeDetails"
+                    name="dressCode"
                   />
                 )}
               </div>
@@ -160,7 +171,7 @@ const AddEvent = () => {
                     type="number"
                     placeholder="Enter fee amount"
                     className="ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800 font-normal"
-                    name="entryFeeAmount"
+                    name="entryFee"
                   />
                 )}
               </div>
@@ -173,7 +184,7 @@ const AddEvent = () => {
                   type="text"
                   //   placeholder={user.stageName || "Dj. John"}
                   className=" ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800 min-w-max"
-                  name="stageName"
+                  name="eventUrl"
                 />
               </div>
 
@@ -186,16 +197,17 @@ const AddEvent = () => {
                   type="text"
                   //   placeholder={user.stageName || "Dj. John"}
                   className=" ring-1 ring-gray-300 p-2 rounded-md text-xs text-gray-800"
-                  name="stageName"
+                  name="mapUrl"
                 />
               </div>
             </div>
-            <button
+            <AddEventBtn />
+            {/* <button
               type="submit"
               className="bg-[#523c90] text-white p-2 mt-8 rounded-md text-sm"
             >
               Add
-            </button>
+            </button> */}
 
             <div
               className=" absolute text-xl right-2 top-3 cursor-pointer"

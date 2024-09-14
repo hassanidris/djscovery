@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import prisma from "./client";
-import { set, z } from "zod";
+import { z } from "zod";
 // import { z } from "zod";
 // import { revalidatePath } from "next/cache";
 
@@ -23,7 +23,7 @@ export const updateInformation = async (formData: FormData) => {
   );
 
   // Log the received fields for debugging purposes
-  console.log("Fields received:", fields);
+  // console.log("Fields received:", fields);
 
   // Parse genres field if present
   if (fields.genres) {
@@ -107,4 +107,96 @@ export const updateInformation = async (formData: FormData) => {
     console.log("Prisma update error:", err);
     return "err";
   }
+};
+
+export const addEvent = async (formData: FormData) => {
+  const fields = Object.fromEntries(formData);
+
+  console.log("Fields event received:", fields);
+
+  const Event = z.object({
+    clubName: z.string().min(1, "Title is required"),
+    eventName: z.string().max(1).optional(),
+    date: z.string().optional(),
+    location: z.string().optional(),
+    dressCode: z.string().optional(),
+    entryFees: z.string().optional(),
+    eventUrl: z.string().optional(),
+    mapUrl: z.string().optional(),
+    // attendees: z.array(z.string()).optional(),
+  });
+
+  const validatedEventFields = Event.safeParse(fields);
+
+  if (!validatedEventFields.success) {
+    console.log(validatedEventFields.error.flatten().fieldErrors);
+  }
+  const { userId } = auth();
+  const event = validatedEventFields.data;
+
+  if (!userId) {
+    return "err";
+  }
+
+  try {
+    await prisma.event.create({
+      data: {
+        ...event, // Spread the validated event data
+        userId: userId, // Associate the event with the user
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+
+  // const filteredEventFields = Object.fromEntries(
+  //   Object.entries(fields).filter(([_, value]) => value !== "")
+  // );
+
+  // // Validate fields with schema
+
+  // if (!validatedEventFields.success) {
+  //   console.log(
+  //     "Validation errors:",
+  //     validatedEventFields.error.flatten().fieldErrors
+  //   );
+  //   return "err";
+  // }
+
+  // const { userId } = auth();
+
+  // if (!userId) throw new Error("User is not authenticated!");
+
+  // // Parse and adjust fields before saving
+  // const eventData = {
+  //   ...validatedEventFields.data,
+  //   userId: userId,
+  //   date: validatedEventFields.data.date
+  //     ? new Date(validatedEventFields.data.date)
+  //     : undefined, // Convert date string to Date object
+  //   entryFees: validatedEventFields.data.entryFees
+  //     ? parseFloat(validatedEventFields.data.entryFees)
+  //     : undefined, // Convert entryFees string to number
+  // };
+
+  // // Remove undefined fields to avoid issues with Prisma
+  // const cleanEventData = Object.fromEntries(
+  //   Object.entries(eventData).filter(([_, value]) => value !== undefined)
+  // );
+
+  // try {
+  //   await prisma.event.create({
+
+  //     data: {
+  //       fields: eventData,
+  //     userId,
+  //     },
+  //     include: {
+  //       user: true,
+  //     }
+  //   });
+  // } catch (err) {
+  //   console.log("Error creating event:", err);
+  //   throw new Error("Failed to create event");
+  // }
 };

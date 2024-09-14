@@ -7,6 +7,7 @@ import Subscription from "@/components/Subscription";
 import Footer from "@/components/Footer";
 import AddReview from "@/components/profile/AddReview";
 import ProfileCard from "@/components/profile/ProfileCard";
+import EventsList from "@/components/profile/EventsUserList";
 
 const Homepage = () => {
   return (
@@ -25,9 +26,10 @@ const Homepage = () => {
       {/* <ProfileCard /> */}
       <AddReview />
       <DjsEvents />
+      <EventsList />
       <Subscription />
       <Footer />
-      <ProfileCard />
+      {/* <ProfileCard /> */}
     </>
   );
 };
