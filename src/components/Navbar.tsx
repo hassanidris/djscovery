@@ -59,7 +59,7 @@ const Navbar = async () => {
             </ClerkLoading>
             <ClerkLoaded>
               <SignedIn>
-                <ViewProfileBtn />
+                {/* <ViewProfileBtn /> */}
                 <UserButton />
               </SignedIn>
               <SignedOut>

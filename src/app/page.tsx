@@ -27,7 +27,7 @@ const Homepage = () => {
       <DjsEvents />
       <Subscription />
       <Footer />
-      <ProfileCard />
+      {/* <ProfileCard /> */}
     </>
   );
 };
