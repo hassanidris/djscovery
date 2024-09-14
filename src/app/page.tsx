@@ -1,34 +1,25 @@
-import Hero from "@/components/Hero";
-import TopRated from "@/components/TopRated";
-import RecentAdded from "@/components/RecentAdded";
-import Image from "next/image";
-import DjsEvents from "@/components/DjsEvents";
-import Subscription from "@/components/Subscription";
-import Footer from "@/components/Footer";
-import AddReview from "@/components/profile/AddReview";
-import ProfileCard from "@/components/profile/ProfileCard";
-
+import AddPost from "@/components/feed/AddPost";
+import Feed from "@/components/feed/Feed";
+import Stories from "@/components/feed/Stories";
+import LeftMenu from "@/components/leftMenu/LeftMenu";
+import RightMenu from "@/components/rightMenu/RightMenu";
 const Homepage = () => {
   return (
-    <>
-      {" "}
-      <section className="relative w-full h-[80vh] bg-[url('/h-hero-img.png')] bg-cover bg-center ">
-        <div className="absolute inset-0 bg-gradient-to-b from-black to-black/10 flex justify-center items-center">
-          <h1 className="text-[80px] text-title text-white">
-            Find the Perfect DJ Near You! 🎧
-          </h1>
+    <div className="flex gap-6 pt-6">
+      <div className="hidden xl:block w-[20%]">
+        <LeftMenu type="home" />
+      </div>
+      <div className="w-full lg:w-[70%] xl:w-[50%]">
+        <div className="flex flex-col gap-6">
+          <Stories />
+          <AddPost />
+          <Feed />
         </div>
-      </section>
-      <Hero />
-      {/* <TopRated /> */}
-      <RecentAdded />
-      {/* <ProfileCard /> */}
-      <AddReview />
-      <DjsEvents />
-      <Subscription />
-      <Footer />
-      <ProfileCard />
-    </>
+      </div>
+      <div className="hidden lg:block w-[30%]">
+        <RightMenu />
+      </div>
+    </div>
   );
 };
 

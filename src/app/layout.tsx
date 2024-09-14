@@ -40,10 +40,12 @@ export default function RootLayout({
         className={`${inter.variable} ${rozhaOne.variable} ${robotoMono.variable}`}
       >
         <body className={inter.className}>
-          <div className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 z-30">
+          <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
             <Navbar />
           </div>
-          <div className=" text-white">{children}</div>
+          <div className=" bg-slate-100 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+            {children}
+          </div>
         </body>
       </html>
     </ClerkProvider>
