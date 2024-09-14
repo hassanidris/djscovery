@@ -1,3 +1,5 @@
+import prisma from "@/lib/client";
+import { auth } from "@clerk/nextjs/server";
 import {
   faBriefcase,
   faCalendar,
@@ -6,69 +8,128 @@ import {
   faSchool,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { User } from "@prisma/client";
 import Link from "next/link";
 import React from "react";
+import UserInfoCardInteraction from "./UserInfoCardInteraction";
+import UpdateUser from "./UpdateUser";
 
-const UserInfoCard = ({ userId }: { userId?: string }) => {
+const UserInfoCard = async ({ user }: { user: User }) => {
+  const createdAtDate = new Date(user.createdAt);
+
+  const formattedDate = createdAtDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  let isUserBlocked = false;
+  let isFollowing = false;
+  let isFollowingSent = false;
+
+  const { userId: currentUserId } = auth();
+
+  if (currentUserId) {
+    const blockRes = await prisma.block.findFirst({
+      where: {
+        blockerId: currentUserId,
+        blockedId: user.id,
+      },
+    });
+
+    blockRes ? (isUserBlocked = true) : (isUserBlocked = false);
+    const followRes = await prisma.follower.findFirst({
+      where: {
+        followerId: currentUserId,
+        followingId: user.id,
+      },
+    });
+
+    followRes ? (isFollowing = true) : (isFollowing = false);
+    const followReqRes = await prisma.followRequest.findFirst({
+      where: {
+        senderId: currentUserId,
+        receiverId: user.id,
+      },
+    });
+
+    followReqRes ? (isFollowingSent = true) : (isFollowingSent = false);
+  }
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4">
       {/* Top */}
       <div className="flex justify-between items-center font-medium">
         <span className="text-gray-500">User Information</span>
-        <Link href="#" className="text-blue-500 text-xs">
-          See all
-        </Link>
+        {currentUserId === user.id ? (
+          <UpdateUser />
+        ) : (
+          <Link href="#" className="text-blue-500 text-xs">
+            See all
+          </Link>
+        )}
       </div>
       {/* Bottom */}
       <div className=" flex flex-col gap-4 text-gray-500">
         <div className=" flex items-center gap-2">
-          <span className=" text-xl text-black">Lloyd Fleming</span>
-          <span className=" text-sm">@lloyd</span>
-        </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi neque
-          odit harum. Quos laborum mollitia cupiditate facilis, dicta omnis.
-        </p>
-        <div className=" flex items-center gap-2">
-          <FontAwesomeIcon icon={faLocationDot} className=" w-4 h-4" />
-          <span>
-            Living in <b>Denver</b>
+          <span className=" text-xl text-black">
+            {user.name && user.surname
+              ? user.name + " " + user.username
+              : user?.username}
           </span>
+          <span className=" text-sm">@{user.username}</span>
         </div>
-        <div className=" flex items-center gap-2">
-          <FontAwesomeIcon icon={faSchool} className=" w-4 h-4" />
-          <span>
-            Went to <b>Arafat</b>
-          </span>
-        </div>
-        <div className=" flex items-center gap-2">
-          <FontAwesomeIcon icon={faBriefcase} className=" w-4 h-4" />
-          <span>
-            Work at <b>Google</b>
-          </span>
-        </div>
-        <div className=" flex items-center justify-between">
+        {user.description && <p>{user.description}</p>}
+        {user.city && (
           <div className=" flex items-center gap-2">
-            <FontAwesomeIcon icon={faLink} className=" w-4 h-4" />
-            <Link
-              href="#"
-              target="_blank"
-              className="text-blue-500 font-medium"
-            >
-              www.google.com
-            </Link>
+            <FontAwesomeIcon icon={faLocationDot} className=" w-4 h-4" />
+            <span>
+              Living in <b>{user.city}</b>
+            </span>
           </div>
-          <div className="flex gap-1 items-center">
+        )}
+        {user.school && (
+          <div className=" flex items-center gap-2">
+            <FontAwesomeIcon icon={faSchool} className=" w-4 h-4" />
+            <span>
+              Went to <b>{user.school}</b>
+            </span>
+          </div>
+        )}
+        {user.work && (
+          <div className=" flex items-center gap-2">
+            <FontAwesomeIcon icon={faBriefcase} className=" w-4 h-4" />
+            <span>
+              Work at <b>{user.work}</b>
+            </span>
+          </div>
+        )}
+        <div className=" flex items-center justify-between">
+          {user.website && (
+            <div className=" flex items-center gap-2">
+              <FontAwesomeIcon icon={faLink} className=" w-4 h-4" />
+              <Link
+                href={user.website}
+                target="_blank"
+                className="text-blue-500 font-medium"
+              >
+                {user.website}
+              </Link>
+            </div>
+          )}
+          <div className="flex gap-1 items-center text-xs">
             <FontAwesomeIcon icon={faCalendar} className=" w-4 h-4" />
-            <span>Joined November 2024</span>
+            <span>Joined {formattedDate}</span>
           </div>
         </div>
-        <button className=" bg-blue-500 text-white text-sm rounded-md p-2">
-          Follow
-        </button>
-        <span className=" text-red-400 self-end text-xs cursor-pointer">
-          Block User
-        </span>
+        {currentUserId && currentUserId !== user.id && (
+          <UserInfoCardInteraction
+            userId={user.id}
+            isUserBlocked={isUserBlocked}
+            isFollowing={isFollowing}
+            isFollowingSent={isFollowingSent}
+          />
+        )}
       </div>
     </div>
   );
