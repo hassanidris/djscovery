@@ -7,8 +7,6 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightToBracket, faSearch } from "@fortawesome/free-solid-svg-icons";
 import ViewProfileBtn from "./ViewProfileBtn";
 
 const Navbar = async () => {
@@ -85,17 +83,9 @@ const Navbar = async () => {
               <UserButton />
             </SignedIn>
             <SignedOut>
-              <div className="flex items-center gap-2 text-sm text-white">
-                <Link
-                  href="/sign-in"
-                  className="flex items-center gap-2 text-sm"
-                >
-                  <FontAwesomeIcon
-                    icon={faRightToBracket}
-                    className=" h-5 w-5"
-                  />
-                  <span>Login/Register</span>
-                </Link>
+              <div className="flex items-center gap-2 text-sm">
+                <Image src="/login.png" alt="" width={20} height={20} />
+                <Link href="/sign-in">Login/Register</Link>
               </div>
             </SignedOut>
           </ClerkLoaded>

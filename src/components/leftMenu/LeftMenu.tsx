@@ -2,23 +2,23 @@ import React from "react";
 import ProfileCard from "./ProfileCard";
 import Link from "next/link";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCalendarDays,
-  faChartLine,
-  faImage,
-  faNewspaper,
-  faShop,
-  faVideo,
-} from "@fortawesome/free-solid-svg-icons";
-import { faViadeo } from "@fortawesome/free-brands-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faCalendarDays,
+//   faChartLine,
+//   faImage,
+//   faNewspaper,
+//   faShop,
+//   faVideo,
+// } from "@fortawesome/free-solid-svg-icons";
+// import { faViadeo } from "@fortawesome/free-brands-svg-icons";
 import Ad from "../rightMenu/Ad";
 
 const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
   return (
     <div className=" flex flex-col gap-6">
       {type === "home" && <ProfileCard />}
-      <div className="p-4 bg-white rounded-lg shadow-md text-sm text-gray-500 flex flex-col gap-2">
+      {/* <div className="p-4 bg-white rounded-lg shadow-md text-sm text-gray-500 flex flex-col gap-2">
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
@@ -74,7 +74,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
           <FontAwesomeIcon icon={faNewspaper} className=" w-5 h-5" />
           <span>News</span>
         </Link>
-      </div>
+      </div> */}
       <Ad size="sm" />
     </div>
   );

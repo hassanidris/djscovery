@@ -1,5 +1,4 @@
 import prisma from "@/lib/client";
-import Image from "next/image";
 import CommentsList from "./CommentsList";
 
 const Comments = async ({ postId }: { postId: number }) => {
