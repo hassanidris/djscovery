@@ -44,7 +44,7 @@ const ProfileCard = async () => {
       <div className="h-20 flex flex-col gap-2 items-center">
         <span className="font-semibold">
           {user.name && user.surname
-            ? user.name + " " + user.username
+            ? user.name + " " + user.surname
             : user.username}
         </span>
         <div className="flex items-center gap-4">

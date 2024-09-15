@@ -90,7 +90,7 @@ const ProfilePage = async ({ params }: { params: { username: string } }) => {
             </div>
           </div>
 
-          <Feed />
+          <Feed username={user.username} />
         </div>
       </div>
       <div className="hidden xl:block w-[30%]">
