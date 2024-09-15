@@ -152,7 +152,11 @@ export const declineFollowRequest = async (userId: string) => {
   }
 };
 
-export const updateProfile = async (formData: FormData, cover: string) => {
+export const updateProfile = async (
+  prevState: { success: boolean; error: boolean },
+  payload: { formData: FormData; cover: string }
+) => {
+  const { formData, cover } = payload;
   const fields = Object.fromEntries(formData);
 
   const filteredFields = Object.fromEntries(
@@ -173,13 +177,13 @@ export const updateProfile = async (formData: FormData, cover: string) => {
   const validatedFields = Profile.safeParse({ cover, ...filteredFields });
   if (!validatedFields.success) {
     console.log(validatedFields.error.flatten().fieldErrors);
-    return "err";
+    return { success: false, error: true };
   }
 
   const { userId } = auth();
 
   if (!userId) {
-    return "err";
+    return { success: false, error: true };
   }
 
   try {
@@ -189,7 +193,9 @@ export const updateProfile = async (formData: FormData, cover: string) => {
       },
       data: validatedFields.data,
     });
+    return { success: true, error: false };
   } catch (err) {
     console.log(err);
+    return { success: false, error: true };
   }
 };

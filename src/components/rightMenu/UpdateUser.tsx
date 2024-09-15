@@ -5,16 +5,27 @@ import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@prisma/client";
 import Image from "next/image";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
+import { useRouter } from "next/navigation";
+import UpdateBtn from "./UpdateBtn";
 
 const UpdateUser = ({ user }: { user: User }) => {
   const [open, setOpen] = useState(false);
   const [cover, setCover] = useState<any>(false);
 
+  const [state, formAction] = useActionState(updateProfile, {
+    success: false,
+    error: false,
+  });
+
+  const router = useRouter();
+
   const handleClose = () => {
     setOpen(false);
+    state.success && router.refresh();
   };
+
   return (
     <div>
       <span
@@ -26,7 +37,9 @@ const UpdateUser = ({ user }: { user: User }) => {
       {open && (
         <div className="absolute w-screen h-screen top-0 left-0 bg-black bg-opacity-65 flex items-center justify-center z-50 ">
           <form
-            action={(formData) => updateProfile(formData, cover?.secure_url)}
+            action={(formData) =>
+              formAction({ formData, cover: cover?.secure_url || "" })
+            }
             className="p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3 relative"
           >
             {/* TITLE */}
@@ -153,16 +166,14 @@ const UpdateUser = ({ user }: { user: User }) => {
                 />
               </div>
             </div>
-            <button className=" bg-blue-500 p-2 mt-2 rounded-md text-white">
-              Update
-            </button>
-            {/* <UpdateButton/>
+
+            <UpdateBtn />
             {state.success && (
               <span className="text-green-500">Profile has been updated!</span>
             )}
             {state.error && (
               <span className="text-red-500">Something went wrong!</span>
-            )} */}
+            )}
             <div
               className="absolute text-xl right-3 top-3 cursor-pointer"
               onClick={handleClose}
