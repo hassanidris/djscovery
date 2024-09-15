@@ -7,7 +7,7 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
-import ViewProfileBtn from "./ViewProfileBtn";
+// import ViewProfileBtn from "./ViewProfileBtn";
 
 const Navbar = async () => {
   return (
