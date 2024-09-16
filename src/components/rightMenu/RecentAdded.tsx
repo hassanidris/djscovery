@@ -32,6 +32,11 @@ const RecentAdded = () => {
             </div>
           </div>
         </Link>
+        <div className="flex gap-3 justify-end">
+          <button className="bg-h_purple hover:bg-h_purpleDark text-white text-xs px-2 py-1 rounded-md">
+            Follow
+          </button>
+        </div>
       </div>
       <hr className="border-t-1 border-gray-800 w-full self-center" />
       <div className=" flex items-center justify-between">
@@ -52,6 +57,11 @@ const RecentAdded = () => {
             </div>
           </div>
         </Link>
+        <div className="flex gap-3 justify-end">
+          <button className="bg-h_purple hover:bg-h_purpleDark text-white text-xs px-2 py-1 rounded-md">
+            Follow
+          </button>
+        </div>
       </div>
       <hr className="border-t-1 border-gray-800 w-full self-center" />
       <div className=" flex items-center justify-between">
@@ -70,6 +80,11 @@ const RecentAdded = () => {
             </div>
           </div>
         </Link>
+        <div className="flex gap-3 justify-end">
+          <button className="bg-h_purple hover:bg-h_purpleDark text-white text-xs px-2 py-1 rounded-md">
+            Follow
+          </button>
+        </div>
       </div>
       <hr className="border-t-1 border-gray-800 w-full self-center" />
       <div className=" flex items-center justify-between">
@@ -88,6 +103,11 @@ const RecentAdded = () => {
             </div>
           </div>
         </Link>
+        <div className="flex gap-3 justify-end">
+          <button className="bg-h_purple hover:bg-h_purpleDark text-white text-xs px-2 py-1 rounded-md">
+            Follow
+          </button>
+        </div>
       </div>
       <hr className="border-t-1 border-gray-800 w-full self-center" />
       <div className=" flex items-center justify-between">
@@ -108,6 +128,11 @@ const RecentAdded = () => {
             </div>
           </div>
         </Link>
+        <div className="flex gap-3 justify-end">
+          <button className="bg-h_purple hover:bg-h_purpleDark text-white text-xs px-2 py-1 rounded-md">
+            Follow
+          </button>
+        </div>
       </div>
     </div>
   );
