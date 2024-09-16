@@ -42,12 +42,10 @@ export default function RootLayout({
       >
         <body className={inter.className}>
           <div className=" flex flex-col min-h-[100vh]">
-            <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+            <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 fixed z-50">
               <Navbar />
             </div>
-            <div className=" bg-slate-100 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-              {children}
-            </div>
+            <div className="w-full  bg-slate-100  mt-28">{children}</div>
             <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-center py-3">
               <Footer />
             </div>
