@@ -33,7 +33,7 @@ const AddPost = () => {
         >
           <textarea
             placeholder="What's on your mind?"
-            className="flex-1 bg-slate-100 rounded-lg p-2"
+            className="flex-1 bg-gray-600 rounded-lg p-2 text-h_white"
             name="desc"
             // onClick={(e) => setDesc(e.target.value)}
           ></textarea>
