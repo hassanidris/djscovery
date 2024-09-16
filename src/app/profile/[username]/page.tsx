@@ -1,3 +1,4 @@
+import AddPost from "@/components/feed/AddPost";
 import Feed from "@/components/feed/Feed";
 import LeftMenu from "@/components/leftMenu/LeftMenu";
 import RightMenu from "@/components/rightMenu/RightMenu";
@@ -90,6 +91,7 @@ const ProfilePage = async ({ params }: { params: { username: string } }) => {
                 </div>
               </div>
             </div>
+            <AddPost />
             <Feed username={user.username} />
           </div>
         </div>

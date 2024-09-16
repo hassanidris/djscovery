@@ -77,7 +77,7 @@ const CommentsList = ({
             <input
               type="text"
               placeholder="Write a comment ..."
-              className=" bg-transparent outline-none flex-1"
+              className=" bg-transparent outline-none flex-1 text-h_white"
               onChange={(e) => setDesc(e.target.value)}
             />
             <Image
