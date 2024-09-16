@@ -47,7 +47,7 @@ const ProfilePage = async ({ params }: { params: { username: string } }) => {
   if (isBlocked) return notFound();
 
   return (
-    <div className=" flex gap-6 pt-6">
+    <div className=" flex gap-6 py-6">
       <div className=" hidden xl:block w-[20%]">
         <LeftMenu type="profile" />
       </div>
