@@ -114,7 +114,7 @@ const CommentsList = ({
                     : comment.user.username}
                 </span>
               </Link>
-              <p>{comment.desc}</p>
+              <p className=" font-normal text-sm">{comment.desc}</p>
               <div className=" flex items-center gap-8 text-xs text-gray-500 mt-2">
                 {/* <div className=" flex items-center gap-4">
                   <Image
