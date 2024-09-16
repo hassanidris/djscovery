@@ -91,7 +91,7 @@ const ProfilePage = async ({ params }: { params: { username: string } }) => {
                 </div>
               </div>
             </div>
-            <AddPost />
+            {currentUserId === user.id ? <AddPost /> : null}
             <Feed username={user.username} />
           </div>
         </div>
