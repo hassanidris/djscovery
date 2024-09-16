@@ -7,6 +7,7 @@ const Feed = async ({ username }: { username?: string }) => {
 
   let posts: any[] = [];
 
+  // If a specific username is provided, fetch only that user's posts
   if (username) {
     posts = await prisma.post.findMany({
       where: {
@@ -33,6 +34,7 @@ const Feed = async ({ username }: { username?: string }) => {
     });
   }
 
+  // If no username is provided, fetch all posts for users i follow
   if (!username && userId) {
     const following = await prisma.follower.findMany({
       where: {
@@ -67,6 +69,28 @@ const Feed = async ({ username }: { username?: string }) => {
       },
       orderBy: {
         createdAt: "desc",
+      },
+    });
+  }
+
+  // If no username is provided, fetch all posts
+  if (!username) {
+    posts = await prisma.post.findMany({
+      include: {
+        user: true,
+        likes: {
+          select: {
+            userId: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc", // Order posts by creation date (most recent first)
       },
     });
   }
