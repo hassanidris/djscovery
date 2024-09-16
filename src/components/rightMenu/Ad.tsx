@@ -22,10 +22,10 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
           }`}
         >
           <Image
-            src="https://images.pexels.com/photos/23193135/pexels-photo-23193135.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
+            src="https://images.pexels.com/photos/63703/pexels-photo-63703.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt=""
             fill
-            className="rounded-lg object-cover right-1 ring-gray-300"
+            className="rounded-lg object-cover ring-1 ring-gray-400"
           />
         </div>
         <div className="flex items-center gap-4">
@@ -34,17 +34,19 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
             alt=""
             width={24}
             height={24}
-            className="rounded-full w-6 h-6 object-cover right-1 ring-gray-300"
+            className="rounded-full w-6 h-6 object-cover ring-1 ring-gray-400"
           />
-          <span className=" text-h_purple font-medium">BigChef Lounge</span>
+          <span className=" text-h_purple font-medium">
+            Dj Controller for Sell
+          </span>
         </div>
         <div className=" text-h_white">
           <p className={size === "sm" ? "text-xs" : "text-sm"}>
             {size === "sm"
-              ? "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+              ? "I'm selling my DJ controller, which is in excellent condition."
               : size === "md"
-              ? "Lorem ipsum dolor sit amet consectetur adipisicing elit.  Lorem ipsum dolor sit amet consectetur adipisicing elit."
-              : "Lorem ipsum dolor sit amet consectetur adipisicing elit.  Lorem ipsum dolor sit amet consectetur adipisicing elit.  Lorem ipsum dolor sit amet consectetur adipisicing elit."}
+              ? "I'm selling my DJ controller, which is in excellent condition. It features a range of built-in effects and is fully compatible with popular DJ software. I've kept it well-maintained and am offering it at a competitive price. Feel free to reach out for more details or to arrange a viewing!"
+              : "I'm selling my DJ controller, which is in excellent condition. It features a range of built-in effects and is fully compatible with popular DJ software. I've kept it well-maintained and am offering it at a competitive price. Feel free to reach out for more details or to arrange a viewing!"}
           </p>
         </div>
         <button className="bg-gray-200 text-gray-500 p-2 text-xs rounded-lg">
