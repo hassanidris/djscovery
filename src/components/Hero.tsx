@@ -38,7 +38,7 @@ const Hero = () => {
               </span>
             </h1>
             <p className=" mt-2 tracking-widest">
-              On the world's first & largest DJ&apos;s Community.
+              On the world&apos;s first & largest DJ&apos;s Community.
             </p>
 
             {/* <h1 class="title text-white word txt_anim">
