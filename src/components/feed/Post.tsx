@@ -26,7 +26,7 @@ const Post = ({ post }: { post: FeedPostType }) => {
               width={40}
               height={40}
               alt=""
-              className="w-10 h-10 rounded-full ring-1 ring-gray-600"
+              className="w-10 h-10 rounded-full ring-1 ring-gray-400"
             />
             <span className="font-medium">
               {post.user.name && post.user.surname

@@ -24,7 +24,7 @@ const Hero = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40 z-10"></div>
         <div className="absolute top-0 left-0 h-full w-full flex justify-center sm:justify-start items-center z-10">
           <div className="flex flex-col px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-white ">
-            <h1 className=" font-bold text-5xl w-3/4">
+            <h1 className=" font-bold text-4xl md:text-6xl w-3/4">
               Find the{" "}
               <span className="font-bold leading-snug text-h_purple">
                 Perfect DJ{" "}

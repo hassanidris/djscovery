@@ -15,14 +15,14 @@ const AddPost = () => {
     return "Loading...";
   }
   return (
-    <div className="p-4 bg-white shadow-md rounded-lg flex gap-4 justify-between text-sm">
+    <div className="p-4 bg-h_blackLight shadow-md rounded-lg flex gap-4 justify-between text-sm">
       {/* Avatar */}
       <Image
         src={user?.imageUrl || "/noAvatar.png"}
         alt=""
         width={48}
         height={48}
-        className="w-12 h-12 object-cover rounded-full"
+        className="w-12 h-12 object-cover rounded-full ring-1 ring-gray-400"
       />
       {/* Post */}
       <div className="flex-1">

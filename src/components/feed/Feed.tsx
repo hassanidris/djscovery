@@ -72,7 +72,7 @@ const Feed = async ({ username }: { username?: string }) => {
   }
 
   return (
-    <div className="p-4 bg-h_blackLight shadow-md rounded-lg flex flex-col divide-y divide-dashed gap-10">
+    <div className="p-4 bg-h_blackLight shadow-md rounded-lg flex flex-col divide-y divide-dashed divide-gray-600 gap-10">
       {posts.length
         ? posts.map((post) => <Post key={post.id} post={post} />)
         : "No posts found!"}

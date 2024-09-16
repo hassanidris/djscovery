@@ -76,7 +76,7 @@ const Navbar = async () => {
               <span>Stories</span>
             </Link>
           </div>
-          <div className="hidden xl:flex p-2 bg-slate-100 items-center rounded-xl">
+          <div className="hidden xl:flex p-2 bg-transparent items-center rounded-xl ring-1 ring-gray-600">
             <input
               type="text"
               placeholder="search..."
