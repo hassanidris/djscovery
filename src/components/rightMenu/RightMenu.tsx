@@ -5,6 +5,7 @@ import Ad from "./Ad";
 import UserInfoCard from "./UserInfoCard";
 import UserMediaCard from "./UserMediaCard";
 import { User } from "@prisma/client";
+import RecentAdded from "./RecentAdded";
 
 const RightMenu = ({ user }: { user?: User }) => {
   return (
@@ -20,7 +21,8 @@ const RightMenu = ({ user }: { user?: User }) => {
         </>
       ) : null}
       <FriendRequests />
-      <Birthdays />
+      <RecentAdded />
+      {/* <Birthdays /> */}
       <Ad size="md" />
     </div>
   );
