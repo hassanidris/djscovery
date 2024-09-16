@@ -8,7 +8,15 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBell,
+  faCirclePlus,
+  faCommentDots,
+  faHouse,
+  faRightToBracket,
+  faUserGroup,
+  faUsers,
+} from "@fortawesome/free-solid-svg-icons";
 // import ViewProfileBtn from "./ViewProfileBtn";
 
 const Navbar = async () => {
@@ -18,41 +26,53 @@ const Navbar = async () => {
         {/* LEFT */}
         <div className="md:hidden lg:block w-[20%]">
           <Link href="/" className="font-bold text-xl text-blue-600">
-            <Image src="/logo-2.svg" alt="" width={100} height={100} />
+            <Image src="/logo.svg" alt="" width={100} height={100} />
           </Link>
         </div>
         {/* CENTER */}
         <div className="hidden md:flex w-[50%] text-sm items-center justify-between">
           {/* LINKS */}
-          <div className="flex gap-6 text-gray-600">
-            <Link href="/" className="flex items-center gap-2">
-              <Image
+          <div className="flex gap-6 text-h_white">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-gray-400 hover:text-h_white "
+            >
+              <FontAwesomeIcon icon={faHouse} className=" h-4 w-4" />
+              {/* <Image
                 src="/home.png"
                 alt="Homepage"
                 width={16}
                 height={16}
                 className="w-4 h-4"
-              />
+              /> */}
               <span>Homepage</span>
             </Link>
-            <Link href="/" className="flex items-center gap-2">
-              <Image
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
+            >
+              <FontAwesomeIcon icon={faUserGroup} className=" h-4 w-4" />
+              {/* <Image
                 src="/friends.png"
                 alt="Friends"
                 width={16}
                 height={16}
                 className="w-4 h-4"
-              />
+              /> */}
               <span>Friends</span>
             </Link>
-            <Link href="/" className="flex items-center gap-2">
-              <Image
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-gray-400 hover:text-h_white "
+            >
+              <FontAwesomeIcon icon={faCirclePlus} className=" h-4 w-4" />
+              {/* <Image
                 src="/stories.png"
                 alt="Stories"
                 width={16}
                 height={16}
                 className="w-4 h-4"
-              />
+              /> */}
               <span>Stories</span>
             </Link>
           </div>
@@ -73,14 +93,14 @@ const Navbar = async () => {
           </ClerkLoading>
           <ClerkLoaded>
             <SignedIn>
-              <div className="cursor-pointer">
-                <Image src="/people.png" alt="" width={24} height={24} />
+              <div className="cursor-pointer text-gray-400 hover:text-h_white">
+                <FontAwesomeIcon icon={faUsers} className=" h-6 w-6" />
               </div>
-              <div className="cursor-pointer">
-                <Image src="/messages.png" alt="" width={20} height={20} />
+              <div className="cursor-pointer text-gray-400 hover:text-h_white">
+                <FontAwesomeIcon icon={faCommentDots} className=" h-6 w-6" />
               </div>
-              <div className="cursor-pointer">
-                <Image src="/notifications.png" alt="" width={20} height={20} />
+              <div className="cursor-pointer text-gray-400 hover:text-h_white">
+                <FontAwesomeIcon icon={faBell} className=" h-6 w-6" />
               </div>
               <UserButton />
             </SignedIn>
@@ -89,7 +109,7 @@ const Navbar = async () => {
                 {/* <Image src="/login.png" alt="" width={20} height={20} /> */}
                 <Link
                   href="/sign-in"
-                  className=" flex justify-center items-center gap-2 border border-black rounded-md py-1.5 px-4 hover:text-white hover:bg-black"
+                  className=" flex justify-center items-center gap-2  ring-1 ring-h_purple text-h_purple rounded-md py-1.5 px-4 hover:text-h_white hover:bg-h_purple"
                 >
                   <FontAwesomeIcon
                     icon={faRightToBracket}

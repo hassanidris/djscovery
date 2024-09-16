@@ -57,22 +57,22 @@ const UserInfoCard = async ({ user }: { user: User }) => {
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4">
+    <div className="p-4 bg-h_blackLight rounded-lg shadow-md text-sm flex flex-col gap-4">
       {/* Top */}
       <div className="flex justify-between items-center font-medium">
-        <span className="text-gray-500">User Information</span>
+        <span className="text-gray-200">User Information</span>
         {currentUserId === user.id ? (
           <UpdateUser user={user} />
         ) : (
-          <Link href="#" className="text-blue-500 text-xs">
+          <Link href="#" className="text-h_purple text-xs">
             See all
           </Link>
         )}
       </div>
       {/* Bottom */}
-      <div className=" flex flex-col gap-4 text-gray-500">
+      <div className=" flex flex-col gap-4 text-h_white">
         <div className=" flex items-center gap-2">
-          <span className=" text-xl text-black">
+          <span className=" text-xl text-h_white font-semibold">
             {user.name && user.surname
               ? user.name + " " + user.surname
               : user.username}

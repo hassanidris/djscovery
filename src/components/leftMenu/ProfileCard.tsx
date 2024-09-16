@@ -25,13 +25,13 @@ const ProfileCard = async () => {
 
   if (!user) return null;
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-6">
+    <div className="p-4 bg-h_blackLight rounded-lg shadow-md text-sm flex flex-col gap-6">
       <div className="h-20 relative">
         <Image
           src={user.cover || "/noCover.png"}
           alt=""
           fill
-          className="rounded-md object-cover"
+          className="rounded-md object-cover ring-1 ring-gray-500"
         />
         <Image
           src={user.avatar || "/noAvatar.png"}
@@ -41,8 +41,8 @@ const ProfileCard = async () => {
           className="rounded-full object-cover w-12 h-12 absolute left-0 right-0 m-auto -bottom-6 ring-1 ring-white z-10"
         />
       </div>
-      <div className="h-20 flex flex-col gap-2 items-center">
-        <span className="font-semibold">
+      <div className="h-20 flex flex-col gap-2 items-center mt-3">
+        <span className="font-semibold text-h_white">
           {user.name && user.surname
             ? user.name + " " + user.surname
             : user.username}
@@ -71,12 +71,12 @@ const ProfileCard = async () => {
               className="rounded-full object-cover w-3 h-3"
             />
           </div>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-300">
             {user._count.followers} Followers
           </span>
         </div>
         <Link href={`/profile/${user.username}`}>
-          <button className="bg-blue-500 text-white text-xs p-2 rounded-md">
+          <button className="bg-h_purple hover:bg-h_purpleDark text-white text-xs p-2 rounded-md">
             My Profile
           </button>
         </Link>

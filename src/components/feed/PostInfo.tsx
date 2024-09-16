@@ -1,6 +1,8 @@
 "use client";
 
 import { deletePost } from "@/lib/actions";
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -10,13 +12,18 @@ const PostInfo = ({ postId }: { postId: number }) => {
   const deletePostWithId = deletePost.bind(null, postId);
   return (
     <div className="relative">
-      <Image
+      {/* <Image
         src="/more.png"
         width={16}
         height={16}
         alt=""
         onClick={() => setOpen((prev) => !prev)}
         className="cursor-pointer"
+      /> */}
+      <FontAwesomeIcon
+        icon={faEllipsis}
+        className=" text-gray-200 w-4 h-4 cursor-pointer"
+        onClick={() => setOpen((prev) => !prev)}
       />
       {open && (
         <div className="absolute top-4 right-0 bg-white p-4 w-32 rounded-lg flex flex-col gap-2 text-xs shadow-lg z-30">

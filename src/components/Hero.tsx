@@ -26,11 +26,11 @@ const Hero = () => {
           <div className="flex flex-col px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-white ">
             <h1 className=" font-bold text-5xl w-3/4">
               Find the{" "}
-              <span className="font-bold leading-snug text-blue-500">
+              <span className="font-bold leading-snug text-h_purple">
                 Perfect DJ{" "}
               </span>
               For You!{" "}
-              <span className="font-bold leading-snug text-blue-500">
+              <span className="font-bold leading-snug text-h_purple">
                 <FontAwesomeIcon
                   icon={faHeadphones}
                   className=" w-12 h-12 inline"

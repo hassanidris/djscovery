@@ -18,11 +18,14 @@ const UserMediaCard = async ({ user }: { user: User }) => {
     },
   });
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4">
+    <div className="p-4 bg-h_blackLight rounded-lg shadow-md text-sm flex flex-col gap-4">
       {/* Top */}
       <div className="flex justify-between items-center font-medium">
-        <span className="text-gray-500">User Media</span>
-        <Link href="#" className="text-blue-500 text-xs">
+        <span className="text-gray-200">User Media</span>
+        <Link
+          href="#"
+          className="text-h_purple hover:text-h_purpleDark text-xs"
+        >
           See all
         </Link>
       </div>
@@ -35,7 +38,7 @@ const UserMediaCard = async ({ user }: { user: User }) => {
                   src={post.img!}
                   alt=""
                   fill
-                  className=" object-cover rounded-md"
+                  className=" object-cover rounded-md ring-1 ring-h_black"
                 />
               </div>
             ))

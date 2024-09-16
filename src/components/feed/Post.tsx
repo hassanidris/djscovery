@@ -20,13 +20,13 @@ const Post = ({ post }: { post: FeedPostType }) => {
       {/* USER */}
       <div className="flex items-center justify-between">
         <Link href={`/profile/${post.user.username}`}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 text-h_white hover:underline">
             <Image
               src={post.user.avatar || "/noAvatar.png"}
               width={40}
               height={40}
               alt=""
-              className="w-10 h-10 rounded-full"
+              className="w-10 h-10 rounded-full ring-1 ring-gray-600"
             />
             <span className="font-medium">
               {post.user.name && post.user.surname
@@ -38,13 +38,13 @@ const Post = ({ post }: { post: FeedPostType }) => {
         {userId === post.user.id && <PostInfo postId={post.id} />}
       </div>
       {/* DESC */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 text-h_white">
         {post.img && (
           <div className="w-full min-h-96 relative">
             <Image
               src={post.img}
               fill
-              className="object-cover rounded-md"
+              className="object-cover rounded-md ring-1 ring-gray-600"
               alt=""
             />
           </div>

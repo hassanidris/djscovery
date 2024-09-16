@@ -68,11 +68,11 @@ const CommentsList = ({
             alt=""
             width={32}
             height={32}
-            className=" w-8 h-8 rounded-full"
+            className=" w-8 h-8 rounded-full ring-1 ring-gray-400"
           />
           <form
             action={add}
-            className=" flex flex-1 items-center justify-between bg-slate-100 rounded-xl text-sm px-6 py-2 w-full"
+            className=" flex flex-1 items-center justify-between bg-transparent ring-1 ring-gray-300 rounded-xl text-sm px-6 py-2 w-full"
           >
             <input
               type="text"
@@ -102,19 +102,21 @@ const CommentsList = ({
                 alt=""
                 width={40}
                 height={40}
-                className=" w-10 h-10 rounded-full"
+                className=" w-10 h-10 rounded-full ring-1 ring-gray-400"
               />
             </Link>
             {/* Desc */}
             <div className=" flex flex-col gap-2 flex-1">
               <Link href={`/profile/${comment.user.username}`}>
-                <span className=" font-medium">
+                <span className=" font-medium text-h_white">
                   {comment.user.name && comment.user.surname
                     ? comment.user.name + " " + comment.user.surname
                     : comment.user.username}
                 </span>
               </Link>
-              <p className=" font-normal text-sm">{comment.desc}</p>
+              <p className=" font-normal text-sm text-h_white">
+                {comment.desc}
+              </p>
               <div className=" flex items-center gap-8 text-xs text-gray-500 mt-2">
                 {/* <div className=" flex items-center gap-4">
                   <Image

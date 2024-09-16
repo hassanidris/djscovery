@@ -2,6 +2,8 @@
 
 import { switchLike } from "@/lib/actions";
 import { useAuth } from "@clerk/nextjs";
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useOptimistic, useState } from "react";
 
@@ -44,7 +46,7 @@ const PostInteraction = ({
   return (
     <div className="flex items-center justify-between text-sm my-4">
       <div className="flex gap-8">
-        <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
+        <div className="flex items-center gap-2 p-2 rounded-xl">
           <form action={likeAction}>
             <button>
               <Image
@@ -56,13 +58,13 @@ const PostInteraction = ({
               />
             </button>
           </form>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">
+          <span className="text-gray-400">|</span>
+          <span className="text-gray-400">
             {optimisticLike.likeCount}
             <span className="hidden md:inline"> Likes</span>
           </span>
         </div>
-        <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
+        <div className="flex items-center gap-2 p-2 rounded-xl">
           <Image
             src="/comment.png"
             width={16}
@@ -70,8 +72,8 @@ const PostInteraction = ({
             alt=""
             className="cursor-pointer"
           />
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">
+          <span className="text-gray-400">|</span>
+          <span className="text-gray-400">
             {commentNumber}
             <span className="hidden md:inline"> Comments</span>
           </span>
