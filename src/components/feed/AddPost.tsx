@@ -37,14 +37,14 @@ const AddPost = () => {
             name="desc"
             // onClick={(e) => setDesc(e.target.value)}
           ></textarea>
-          <div className="">
-            <Image
+          <div className=" self-end">
+            {/* <Image
               src="/emoji.png"
               alt=""
               width={20}
               height={20}
               className="w-5 h-5 cursor-pointer self-end"
-            />
+            /> */}
             <AddPostBtn />
           </div>
         </form>

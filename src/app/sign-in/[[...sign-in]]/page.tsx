@@ -3,11 +3,8 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
   return (
-    <div className=" mt-48 flex flex-col items-center justify-center my-4">
+    <div className="h-[calc(100vh-136px)] flex flex-col items-center justify-center">
       <SignIn />
-      <div className=" mt-36">
-        <Footer />
-      </div>
     </div>
   );
 }

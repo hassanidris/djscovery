@@ -41,14 +41,16 @@ export default function RootLayout({
         className={`${inter.variable} ${rozhaOne.variable} ${robotoMono.variable}`}
       >
         <body className={inter.className}>
-          <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-            <Navbar />
-          </div>
-          <div className=" bg-slate-100 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-            {children}
-          </div>
-          <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-center py-3">
-            <Footer />
+          <div className=" flex flex-col min-h-[100vh]">
+            <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+              <Navbar />
+            </div>
+            <div className=" bg-slate-100 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+              {children}
+            </div>
+            <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-center py-3">
+              <Footer />
+            </div>
           </div>
         </body>
       </html>

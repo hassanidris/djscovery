@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import PostInfo from "./PostInfo";
 import { Suspense } from "react";
 import PostInteraction from "./PostInteraction";
+import Link from "next/link";
 
 type FeedPostType = PostType & { user: User } & {
   likes: [{ userId: string }];
@@ -15,23 +16,25 @@ type FeedPostType = PostType & { user: User } & {
 const Post = ({ post }: { post: FeedPostType }) => {
   const { userId } = auth();
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pt-8 first-of-type:pt-0">
       {/* USER */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Image
-            src={post.user.avatar || "/noAvatar.png"}
-            width={40}
-            height={40}
-            alt=""
-            className="w-10 h-10 rounded-full"
-          />
-          <span className="font-medium">
-            {post.user.name && post.user.surname
-              ? post.user.name + " " + post.user.surname
-              : post.user.username}
-          </span>
-        </div>
+        <Link href={`/profile/${post.user.username}`}>
+          <div className="flex items-center gap-4">
+            <Image
+              src={post.user.avatar || "/noAvatar.png"}
+              width={40}
+              height={40}
+              alt=""
+              className="w-10 h-10 rounded-full"
+            />
+            <span className="font-medium">
+              {post.user.name && post.user.surname
+                ? post.user.name + " " + post.user.surname
+                : post.user.username}
+            </span>
+          </div>
+        </Link>
         {userId === post.user.id && <PostInfo postId={post.id} />}
       </div>
       {/* DESC */}

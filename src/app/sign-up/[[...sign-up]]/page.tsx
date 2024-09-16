@@ -26,9 +26,9 @@ export default function SignUpPage() {
 
   return (
     <>
-      <div className="h-[calc(100vh-96px)] flex items-center justify-center pt-24">
+      <div className="h-[calc(100vh-96px-40px)] flex items-center justify-center">
         <div>
-          <h1 className="text-2xl font-bold mb-6 text-white">Sign Up</h1>
+          {/* <h1 className="text-2xl font-bold mb-6 text-gray-900">Sign Up</h1> */}
           <SignUp
             path="/sign-up"
             routing="path"
@@ -60,7 +60,6 @@ export default function SignUpPage() {
           /> */}
         </div>
       </div>
-      <Footer />
     </>
   );
 }
