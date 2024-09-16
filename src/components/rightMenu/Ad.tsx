@@ -5,7 +5,7 @@ import React from "react";
 
 const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
   return (
-    <div className="p-4 bg-h_blackLight rounded-lg shadow-md text-sm ">
+    <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm ">
       {/* TOP */}
       <div className="flex items-center justify-between text-gray-200 font-medium">
         <span>Sponsored Ads</span>

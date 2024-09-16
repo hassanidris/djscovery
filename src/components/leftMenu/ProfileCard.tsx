@@ -25,7 +25,7 @@ const ProfileCard = async () => {
 
   if (!user) return null;
   return (
-    <div className="p-4 bg-h_blackLight rounded-lg shadow-md text-sm flex flex-col gap-6">
+    <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm flex flex-col gap-6">
       <div className="h-20 relative">
         <Image
           src={user.cover || "/noCover.png"}

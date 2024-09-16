@@ -57,7 +57,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
   }
 
   return (
-    <div className="p-4 bg-h_blackLight rounded-lg shadow-md text-sm flex flex-col gap-4">
+    <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm flex flex-col gap-4">
       {/* Top */}
       <div className="flex justify-between items-center font-medium">
         <span className="text-gray-200">User Information</span>

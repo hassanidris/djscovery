@@ -18,7 +18,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
   return (
     <div className=" flex flex-col gap-6">
       {type === "home" && <ProfileCard />}
-      <div className="p-4 bg-h_blackLight rounded-lg shadow-md text-sm text-h_white flex flex-col gap-2">
+      <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm text-h_white flex flex-col gap-2">
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-600"
@@ -26,7 +26,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
           <FontAwesomeIcon icon={faNewspaper} className=" w-5 h-5" />
           <span>My Posts</span>
         </Link>
-        <hr className="border-t-1 border-gray-600 w-36 self-center" />
+        <hr className="border-t-1 border-gray-600 w-[95%] self-center" />
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-600"
@@ -34,7 +34,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
           <FontAwesomeIcon icon={faChartLine} className=" w-5 h-5" />
           <span>Activity</span>
         </Link>
-        <hr className="border-t-1 border-gray-600 w-36 self-center" />
+        <hr className="border-t-1 border-gray-600 w-[95%] self-center px-3" />
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-600"
@@ -42,7 +42,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
           <FontAwesomeIcon icon={faShop} className=" w-5 h-5" />
           <span>Marketplace</span>
         </Link>
-        <hr className="border-t-1 border-gray-600 w-36 self-center" />
+        <hr className="border-t-1 border-gray-600 w-[95%] self-center" />
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-600"
@@ -50,7 +50,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
           <FontAwesomeIcon icon={faCalendarDays} className=" w-5 h-5" />
           <span>Events</span>
         </Link>
-        <hr className="border-t-1 border-gray-600 w-36 self-center" />
+        <hr className="border-t-1 border-gray-600 w-[95%] self-center" />
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-600"
@@ -58,7 +58,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
           <FontAwesomeIcon icon={faImage} className=" w-5 h-5" />
           <span>Albums</span>
         </Link>
-        <hr className="border-t-1 border-gray-600 w-36 self-center" />
+        <hr className="border-t-1 border-gray-600 w-[95%] self-center" />
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-600"
@@ -66,7 +66,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
           <FontAwesomeIcon icon={faVideo} className=" w-5 h-5" />
           <span>Videos</span>
         </Link>
-        <hr className="border-t-1 border-gray-600 w-36 self-center" />
+        <hr className="border-t-1 border-gray-600 w-[95%] self-center" />
         <Link
           href="/"
           className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-600"

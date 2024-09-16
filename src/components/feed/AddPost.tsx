@@ -14,8 +14,11 @@ const AddPost = () => {
   if (!isLoaded) {
     return "Loading...";
   }
+  if (!user) {
+    return "You must be logged in to post";
+  }
   return (
-    <div className="p-4 bg-h_blackLight shadow-md rounded-lg flex gap-4 justify-between text-sm">
+    <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg flex gap-4 justify-between text-sm">
       {/* Avatar */}
       <Image
         src={user?.imageUrl || "/noAvatar.png"}
