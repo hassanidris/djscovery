@@ -15,7 +15,11 @@ const AddPost = () => {
     return "Loading...";
   }
   if (!user) {
-    return "You must be logged in to post";
+    return (
+      <p className=" text-h_white p-4 ring-1 ring-gray-500 rounded-md">
+        You must be logged in to post
+      </p>
+    );
   }
   return (
     <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg flex gap-4 justify-between text-sm">

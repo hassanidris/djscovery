@@ -31,18 +31,20 @@ const UserMediaCard = async ({ user }: { user: User }) => {
       </div>
       {/* Bottom */}
       <div className=" flex gap-4 justify-between flex-wrap">
-        {PostsWithMedia.length
-          ? PostsWithMedia.map((post) => (
-              <div className="relative w-1/5 h-24" key={post.id}>
-                <Image
-                  src={post.img!}
-                  alt=""
-                  fill
-                  className=" object-cover rounded-md ring-1 ring-h_black"
-                />
-              </div>
-            ))
-          : "No media found!"}
+        {PostsWithMedia.length ? (
+          PostsWithMedia.map((post) => (
+            <div className="relative w-1/5 h-24" key={post.id}>
+              <Image
+                src={post.img!}
+                alt=""
+                fill
+                className=" object-cover rounded-md ring-1 ring-h_black"
+              />
+            </div>
+          ))
+        ) : (
+          <p className=" text-h_white text-xs">No media found!</p>
+        )}
       </div>
     </div>
   );
