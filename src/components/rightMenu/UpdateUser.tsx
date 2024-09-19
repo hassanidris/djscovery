@@ -5,7 +5,7 @@ import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@prisma/client";
 import Image from "next/image";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import UpdateBtn from "./UpdateBtn";
@@ -26,6 +26,20 @@ const UpdateUser = ({ user }: { user: User }) => {
     state.success && router.refresh();
   };
 
+  // Prevent background scrolling when the modal is open
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    // Clean up by removing the class when the component unmounts
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [open]);
+
   return (
     <div>
       <span
@@ -35,16 +49,16 @@ const UpdateUser = ({ user }: { user: User }) => {
         Update
       </span>
       {open && (
-        <div className="absolute w-screen h-screen top-0 left-0 bg-black bg-opacity-65 flex items-center justify-center z-50 ">
+        <div className="absolute w-screen h-screen top-0 left-0 bg-black bg-opacity-65 flex items-center justify-center z-50  ">
           <form
             action={(formData) =>
               formAction({ formData, cover: cover?.secure_url || "" })
             }
-            className="p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3 relative"
+            className="p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3 relative overflow-y-scroll"
           >
             {/* TITLE */}
             <h1 className=" text-2xl font-semibold">Update Profile</h1>
-            <div className="mt-4 text-xs text-gray-500">
+            <div className="mt-4 text-sm text-gray-500">
               Use the navbar profile to change the avatar or username.
             </div>
             {/* COVER PIC UPLOAD */}
@@ -78,9 +92,9 @@ const UpdateUser = ({ user }: { user: User }) => {
             </CldUploadWidget>
 
             {/* WRAPPER */}
-            <div className="flex flex-wrap justify-between gap-2 xl:gap-4">
+            <div className="flex justify-start flex-wrap  gap-2 xl:gap-3">
               {/* INPUT */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full">
                 <label htmlFor="" className="text-xs text-gray-500">
                   Dj Name
                 </label>
@@ -118,14 +132,14 @@ const UpdateUser = ({ user }: { user: User }) => {
                 />
               </div>
               {/* INPUT */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full">
                 <label htmlFor="" className="text-xs text-gray-500">
                   Description
                 </label>
                 <input
                   type="text"
                   placeholder={user.description || "Life is beautiful..."}
-                  className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                  className=" w-full ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
                   name="description"
                 />
               </div>
@@ -182,7 +196,7 @@ const UpdateUser = ({ user }: { user: User }) => {
               </div> */}
 
               {/* INPUT */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full">
                 <label htmlFor="" className="text-xs text-gray-500">
                   Genres
                 </label>
@@ -195,7 +209,7 @@ const UpdateUser = ({ user }: { user: User }) => {
               </div>
 
               {/* INPUT */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full">
                 <label htmlFor="" className="text-xs text-gray-500">
                   Website
                 </label>
