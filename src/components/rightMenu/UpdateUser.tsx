@@ -82,6 +82,19 @@ const UpdateUser = ({ user }: { user: User }) => {
               {/* INPUT */}
               <div className="flex flex-col gap-1">
                 <label htmlFor="" className="text-xs text-gray-500">
+                  Dj Name
+                </label>
+                <input
+                  type="text"
+                  placeholder={user.stageName || "Dj. Echo"}
+                  className=" w-full ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                  name="stageName"
+                />
+              </div>
+
+              {/* INPUT */}
+              <div className="flex flex-col gap-1">
+                <label htmlFor="" className="text-xs text-gray-500">
                   First Name
                 </label>
                 <input
@@ -91,6 +104,8 @@ const UpdateUser = ({ user }: { user: User }) => {
                   name="name"
                 />
               </div>
+
+              {/* INPUT */}
               <div className="flex flex-col gap-1">
                 <label htmlFor="" className="text-xs text-gray-500">
                   Surname
@@ -126,9 +141,22 @@ const UpdateUser = ({ user }: { user: User }) => {
                   name="city"
                 />
               </div>
+
+              {/* INPUT */}
+              <div className="flex flex-col gap-1">
+                <label htmlFor="" className="text-xs text-gray-500">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  placeholder={user.country || "USA"}
+                  className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                  name="country"
+                />
+              </div>
               {/* INPUT */}
 
-              <div className="flex flex-col gap-1">
+              {/* <div className="flex flex-col gap-1">
                 <label htmlFor="" className="text-xs text-gray-500">
                   School
                 </label>
@@ -138,10 +166,10 @@ const UpdateUser = ({ user }: { user: User }) => {
                   className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
                   name="school"
                 />
-              </div>
+              </div> */}
               {/* INPUT */}
 
-              <div className="flex flex-col gap-1">
+              {/* <div className="flex flex-col gap-1">
                 <label htmlFor="" className="text-xs text-gray-500">
                   Work
                 </label>
@@ -151,16 +179,29 @@ const UpdateUser = ({ user }: { user: User }) => {
                   className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
                   name="work"
                 />
-              </div>
-              {/* INPUT */}
+              </div> */}
 
+              {/* INPUT */}
+              <div className="flex flex-col gap-1">
+                <label htmlFor="" className="text-xs text-gray-500">
+                  Genres
+                </label>
+                <input
+                  type="text"
+                  placeholder={user.genres || "Hip hop, RnB, Techno,...."}
+                  className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                  name="genres"
+                />
+              </div>
+
+              {/* INPUT */}
               <div className="flex flex-col gap-1">
                 <label htmlFor="" className="text-xs text-gray-500">
                   Website
                 </label>
                 <input
                   type="text"
-                  placeholder={user.website || "lama.dev"}
+                  placeholder={user.website || "www.djecho.com"}
                   className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
                   name="website"
                 />

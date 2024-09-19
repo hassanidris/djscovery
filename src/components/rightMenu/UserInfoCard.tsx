@@ -5,6 +5,7 @@ import {
   faCalendar,
   faLink,
   faLocationDot,
+  faMusic,
   faSchool,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -73,9 +74,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
       <div className=" flex flex-col gap-4 text-h_white">
         <div className=" flex items-center gap-2">
           <span className=" text-xl text-h_white font-semibold">
-            {user.name && user.surname
-              ? user.name + " " + user.surname
-              : user.username}
+            {user.stageName ? user.stageName : user.username}
           </span>
           <span className=" text-sm text-gray-400">@{user.username}</span>
         </div>
@@ -86,24 +85,40 @@ const UserInfoCard = async ({ user }: { user: User }) => {
             <span>
               Living in <b>{user.city}</b>
             </span>
+            {user.country && (
+              <span>
+                , <b>{user.country}</b>
+              </span>
+            )}
           </div>
         )}
-        {user.school && (
+
+        {user.genres && (
+          <div className=" w-full flex items-center gap-2">
+            <FontAwesomeIcon icon={faMusic} className=" w-4 h-4" />
+            <span>
+              {/* Genres playing  */}
+              <b>{user.genres}</b>
+            </span>
+          </div>
+        )}
+
+        {/* {user.school && (
           <div className=" flex items-center gap-2">
             <FontAwesomeIcon icon={faSchool} className=" w-4 h-4" />
             <span>
               Went to <b>{user.school}</b>
             </span>
           </div>
-        )}
-        {user.work && (
+        )} */}
+        {/* {user.work && (
           <div className=" flex items-center gap-2">
             <FontAwesomeIcon icon={faBriefcase} className=" w-4 h-4" />
             <span>
               Work at <b>{user.work}</b>
             </span>
           </div>
-        )}
+        )} */}
         <div className=" flex items-center justify-between">
           {user.website && (
             <div className=" flex items-center gap-2">
@@ -117,10 +132,10 @@ const UserInfoCard = async ({ user }: { user: User }) => {
               </Link>
             </div>
           )}
-          <div className="flex gap-1 items-center text-xs">
-            <FontAwesomeIcon icon={faCalendar} className=" w-4 h-4" />
-            <span>Joined {formattedDate}</span>
-          </div>
+        </div>
+        <div className="flex gap-1 items-center text-xs justify-end">
+          <FontAwesomeIcon icon={faCalendar} className=" w-4 h-4" />
+          <span>Joined {formattedDate}</span>
         </div>
         {currentUserId && currentUserId !== user.id && (
           <UserInfoCardInteraction

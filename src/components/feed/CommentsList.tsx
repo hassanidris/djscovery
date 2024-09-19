@@ -46,6 +46,9 @@ const CommentsList = ({
         work: "",
         school: "",
         website: "",
+        country: "",
+        stageName: "Dj. Has",
+        genres: "Hip hop, Techno, RnB, ....",
         createdAt: new Date(Date.now()),
       },
     });

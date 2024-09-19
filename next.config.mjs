@@ -3,9 +3,9 @@ const nextConfig = {
   experimental: {
     reactCompiler: true,
     ppr: "incremental",
-    fontLoaders: [
-      { loader: "@next/font/google", options: { subsets: ["latin"] } },
-    ],
+    // fontLoaders: [
+    //   { loader: "@next/font/google", options: { subsets: ["latin"] } },
+    // ],
   },
   images: {
     remotePatterns: [

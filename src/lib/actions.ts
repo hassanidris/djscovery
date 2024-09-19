@@ -173,6 +173,9 @@ export const updateProfile = async (
     school: z.string().max(60).optional(),
     work: z.string().max(60).optional(),
     website: z.string().max(60).optional(),
+    stageName: z.string().max(60).optional(),
+    country: z.string().max(60).optional(),
+    genres: z.string().max(255).optional(),
   });
 
   const validatedFields = Profile.safeParse({ cover, ...filteredFields });
