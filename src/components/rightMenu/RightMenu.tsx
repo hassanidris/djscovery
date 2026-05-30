@@ -20,7 +20,9 @@ const RightMenu = ({ user }: { user?: User }) => {
           </Suspense>
         </>
       ) : null}
-      <FriendRequests />
+      <Suspense fallback="loading...">
+        <FriendRequests />
+      </Suspense>
       <RecentAdded />
       {/* <Birthdays /> */}
       <Ad size="md" />

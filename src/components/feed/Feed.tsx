@@ -73,8 +73,8 @@ const Feed = async ({ username }: { username?: string }) => {
     });
   }
 
-  // If no username is provided, fetch all posts
-  if (!username) {
+  // If no username is provided and user is not authenticated, fetch all posts
+  if (!username && !userId) {
     posts = await prisma.post.findMany({
       include: {
         user: true,

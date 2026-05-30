@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
   if (!WEBHOOK_SECRET) {
     throw new Error(
-      "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local"
+      "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local",
     );
   }
 
@@ -47,33 +47,20 @@ export async function POST(req: Request) {
   const eventType = evt.type;
 
   if (eventType === "user.created") {
+    const data = JSON.parse(body).data;
     try {
-      // Check if the username already exists
-      const existingUser = await prisma.user.findUnique({
-        where: {
-          username: JSON.parse(body).data.username,
-        },
-      });
-
-      if (existingUser) {
-        return new Response("Username already exists!", { status: 400 });
-      }
-
-      await prisma.user.create({
-        data: {
+      await prisma.user.upsert({
+        where: { id: evt.data.id },
+        update: {},
+        create: {
           id: evt.data.id,
-          username: JSON.parse(body).data.username,
-          avatar: JSON.parse(body).data.image_url || "/noAvatar.png",
+          username: data.username,
+          avatar: data.image_url || "/noAvatar.png",
           cover: "/noCover.png",
         },
       });
       return new Response("User has been created!", { status: 200 });
-    } catch (err: any) {
-      if (err.code === "P2002") {
-        return new Response("Duplicate entry for unique field!", {
-          status: 400,
-        });
-      }
+    } catch (err) {
       console.log(err);
       return new Response("Failed to create the user!", { status: 500 });
     }

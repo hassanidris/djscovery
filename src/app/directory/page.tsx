@@ -16,19 +16,18 @@ type SearchParams = {
 const DirectoryPage = async ({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) => {
-  const { genre, country, sort } = searchParams;
+  const { genre, country, sort } = await searchParams;
 
   let djs: DjUser[] = [];
+  let fetchError = false;
 
   try {
     const results = await prisma.user.findMany({
       where: {
         stageName: { not: null },
-        ...(genre
-          ? { genres: { contains: genre, mode: "insensitive" } }
-          : {}),
+        ...(genre ? { genres: { contains: genre, mode: "insensitive" } } : {}),
         ...(country
           ? { country: { contains: country, mode: "insensitive" } }
           : {}),
@@ -50,10 +49,31 @@ const DirectoryPage = async ({
 
     djs = results as DjUser[];
   } catch {
-    djs = [];
+    fetchError = true;
   }
 
-  const displayDjs = djs.length > 0 ? djs : mockDJs;
+  const hasFilters = !!(genre || country || sort);
+  const displayDjs = hasFilters ? djs : fetchError ? mockDJs : djs;
+
+  let availableGenres: string[] = [];
+  try {
+    const genreRows = await prisma.user.findMany({
+      where: { stageName: { not: null }, genres: { not: null } },
+      select: { genres: true },
+    });
+    const parsed = genreRows
+      .flatMap((r) => (r.genres ?? "").split(",").map((g) => g.trim()))
+      .filter(Boolean);
+    availableGenres = [...new Set(parsed)].sort();
+  } catch {
+    availableGenres = [
+      ...new Set(
+        mockDJs
+          .flatMap((dj) => (dj.genres ?? "").split(",").map((g) => g.trim()))
+          .filter(Boolean),
+      ),
+    ].sort();
+  }
 
   return (
     <>
@@ -84,8 +104,12 @@ const DirectoryPage = async ({
         <div className="flex gap-6 py-6">
           {/* Left — Filters */}
           <div className="hidden xl:block w-[20%] shrink-0">
-            <Suspense fallback={<div className="bg-h_blackLight/50 rounded-xl p-4 h-96 animate-pulse" />}>
-              <FilterPanel />
+            <Suspense
+              fallback={
+                <div className="bg-h_blackLight/50 rounded-xl p-4 h-96 animate-pulse" />
+              }
+            >
+              <FilterPanel genres={availableGenres} />
             </Suspense>
           </div>
 

@@ -13,6 +13,18 @@ export const switchFollow = async (userId: string) => {
   }
 
   try {
+    const isBlocked = await prisma.block.findFirst({
+      where: {
+        OR: [
+          { blockerId: currentUserId, blockedId: userId },
+          { blockerId: userId, blockedId: currentUserId },
+        ],
+      },
+    });
+
+    if (isBlocked)
+      throw new Error("Action not allowed due to a block between users.");
+
     const existingFollow = await prisma.follower.findFirst({
       where: {
         followerId: currentUserId,
@@ -77,12 +89,30 @@ export const switchBlock = async (userId: string) => {
         },
       });
     } else {
-      await prisma.block.create({
-        data: {
-          blockerId: currentUserId,
-          blockedId: userId,
-        },
-      });
+      await prisma.$transaction([
+        prisma.block.create({
+          data: {
+            blockerId: currentUserId,
+            blockedId: userId,
+          },
+        }),
+        prisma.follower.deleteMany({
+          where: {
+            OR: [
+              { followerId: currentUserId, followingId: userId },
+              { followerId: userId, followingId: currentUserId },
+            ],
+          },
+        }),
+        prisma.followRequest.deleteMany({
+          where: {
+            OR: [
+              { senderId: currentUserId, receiverId: userId },
+              { senderId: userId, receiverId: currentUserId },
+            ],
+          },
+        }),
+      ]);
     }
   } catch (err) {
     console.log(err);
@@ -111,6 +141,18 @@ export const acceptFollowRequest = async (userId: string) => {
           id: existingFollowRequest.id,
         },
       });
+
+      const isBlocked = await prisma.block.findFirst({
+        where: {
+          OR: [
+            { blockerId: currentUserId, blockedId: userId },
+            { blockerId: userId, blockedId: currentUserId },
+          ],
+        },
+      });
+
+      if (isBlocked)
+        throw new Error("Action not allowed due to a block between users.");
 
       await prisma.follower.create({
         data: {
@@ -155,13 +197,13 @@ export const declineFollowRequest = async (userId: string) => {
 
 export const updateProfile = async (
   prevState: { success: boolean; error: boolean },
-  payload: { formData: FormData; cover: string }
+  payload: { formData: FormData; cover: string },
 ) => {
   const { formData, cover } = payload;
   const fields = Object.fromEntries(formData);
 
   const filteredFields = Object.fromEntries(
-    Object.entries(fields).filter(([_, value]) => value !== "")
+    Object.entries(fields).filter(([_, value]) => value !== ""),
   );
 
   const Profile = z.object({
@@ -210,7 +252,7 @@ export const switchLike = async (postId: number) => {
   if (!userId) throw new Error("User is not authenticated!");
 
   try {
-    const existingLike = await prisma.like.findFirst({
+    const existingLike = await prisma.postLike.findFirst({
       where: {
         postId,
         userId,
@@ -218,13 +260,13 @@ export const switchLike = async (postId: number) => {
     });
 
     if (existingLike) {
-      await prisma.like.delete({
+      await prisma.postLike.delete({
         where: {
           id: existingLike.id,
         },
       });
     } else {
-      await prisma.like.create({
+      await prisma.postLike.create({
         data: {
           postId,
           userId,
@@ -289,6 +331,7 @@ export const addPost = async (formData: FormData, img: string) => {
     revalidatePath("/");
   } catch (err) {
     console.log(err);
+    throw new Error(`addPost failed: ${err}`);
   }
 };
 
@@ -307,5 +350,6 @@ export const deletePost = async (postId: number) => {
     revalidatePath("/");
   } catch (err) {
     console.log(err);
+    throw new Error(`deletePost failed: ${err}`);
   }
 };

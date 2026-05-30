@@ -35,7 +35,7 @@ const FriendRequestList = ({ requests }: { requests: RequestWithUser[] }) => {
 
   const [optimisticRequests, removeOptimisticRequest] = useOptimistic(
     requestState,
-    (state, value: number) => state.filter((req) => req.id !== value)
+    (state, value: number) => state.filter((req) => req.id !== value),
   );
   return (
     <div>
@@ -70,13 +70,15 @@ const FriendRequestList = ({ requests }: { requests: RequestWithUser[] }) => {
               </button>
             </form>
             <form action={() => decline(request.id, request.sender.id)}>
-              <Image
-                src="/reject.png"
-                alt=""
-                width={20}
-                height={20}
-                className=" cursor-pointer"
-              />
+              <button>
+                <Image
+                  src="/reject.png"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className=" cursor-pointer"
+                />
+              </button>
             </form>
           </div>
         </div>

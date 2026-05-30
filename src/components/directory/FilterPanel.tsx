@@ -14,7 +14,7 @@ const GENRES = [
   "Reggaeton",
 ];
 
-const FilterPanel = () => {
+const FilterPanel = ({ genres = GENRES }: { genres?: string[] }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -29,7 +29,7 @@ const FilterPanel = () => {
       }
       router.push(`${pathname}?${params.toString()}`);
     },
-    [searchParams, router, pathname]
+    [searchParams, router, pathname],
   );
 
   const currentGenre = searchParams.get("genre") || "";
@@ -58,8 +58,11 @@ const FilterPanel = () => {
             />
             <span className="text-gray-300 text-xs">All</span>
           </label>
-          {GENRES.map((genre) => (
-            <label key={genre} className="flex items-center gap-2 cursor-pointer">
+          {genres.map((genre) => (
+            <label
+              key={genre}
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <input
                 type="radio"
                 name="genre"

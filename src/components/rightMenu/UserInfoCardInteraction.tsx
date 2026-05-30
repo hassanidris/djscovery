@@ -1,6 +1,6 @@
 "use client";
 
-import { switchFollow } from "@/lib/actions";
+import { switchFollow, switchBlock } from "@/lib/actions";
 import { useOptimistic, useState } from "react";
 
 const UserInfoCardInteraction = ({
@@ -37,12 +37,15 @@ const UserInfoCardInteraction = ({
   const block = async () => {
     switchOptimisticState("block");
     try {
-      await switchFollow(userId);
+      await switchBlock(userId);
       setUserState((prev) => ({
         ...prev,
         blocked: !prev.blocked,
       }));
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+      switchOptimisticState("block");
+    }
   };
 
   const [optimisticState, switchOptimisticState] = useOptimistic(
@@ -55,7 +58,7 @@ const UserInfoCardInteraction = ({
             followingRequestSent:
               !state.following && !state.followingRequestSent ? true : false,
           }
-        : { ...state, blocked: !state.blocked }
+        : { ...state, blocked: !state.blocked },
   );
   return (
     <>
@@ -64,8 +67,8 @@ const UserInfoCardInteraction = ({
           {optimisticState.following
             ? "Following"
             : optimisticState.followingRequestSent
-            ? "Friend Request Sent"
-            : "Follow"}
+              ? "Friend Request Sent"
+              : "Follow"}
         </button>
       </form>
       <form action={block} className=" self-end">

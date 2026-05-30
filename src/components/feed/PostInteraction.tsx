@@ -29,18 +29,20 @@ const PostInteraction = ({
         likeCount: state.isLiked ? state.likeCount - 1 : state.likeCount + 1,
         isLiked: !state.isLiked,
       };
-    }
+    },
   );
 
   const likeAction = async () => {
     switchOptimisticLike("");
     try {
-      switchLike(postId);
+      await switchLike(postId);
       setLikeState((state) => ({
         likeCount: state.isLiked ? state.likeCount - 1 : state.likeCount + 1,
         isLiked: !state.isLiked,
       }));
-    } catch (err) {}
+    } catch (err) {
+      switchOptimisticLike("");
+    }
   };
 
   return (
