@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const headerPayload = headers();
+  const headerPayload = await headers();
   const svix_id = headerPayload.get("svix-id");
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
@@ -23,8 +23,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  const body = await req.text();
 
   const wh = new Webhook(WEBHOOK_SECRET);
 
@@ -48,13 +47,17 @@ export async function POST(req: Request) {
 
   if (eventType === "user.created") {
     const data = JSON.parse(body).data;
+    const emailLocalPart =
+      data.email_addresses?.[0]?.email_address?.split("@")[0];
+    const username =
+      data.username ?? `${emailLocalPart ?? "user"}_${evt.data.id}`;
     try {
       await prisma.user.upsert({
         where: { id: evt.data.id },
         update: {},
         create: {
           id: evt.data.id,
-          username: data.username,
+          username,
           avatar: data.image_url || "/noAvatar.png",
           cover: "/noCover.png",
         },
@@ -98,13 +101,19 @@ export async function POST(req: Request) {
       }
 
       // Proceed with the update if the user exists
+      const updateData = JSON.parse(body).data;
+      const updateEmailLocalPart =
+        updateData.email_addresses?.[0]?.email_address?.split("@")[0];
+      const updateUsername =
+        updateData.username ??
+        `${updateEmailLocalPart ?? "user"}_${evt.data.id}`;
       await prisma.user.update({
         where: {
           id: evt.data.id,
         },
         data: {
-          username: JSON.parse(body).data.username,
-          avatar: JSON.parse(body).data.image_url || "/noAvatar.png",
+          username: updateUsername,
+          avatar: updateData.image_url || "/noAvatar.png",
         },
       });
       return new Response("User has been updated!", { status: 200 });

@@ -32,6 +32,7 @@ const UserInfoCardInteraction = ({
       }));
     } catch (err) {
       console.log(err);
+      switchOptimisticState("follow");
     }
   };
   const block = async () => {
