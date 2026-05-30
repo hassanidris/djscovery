@@ -25,7 +25,7 @@ ORDER BY "userId", "postId", "createdAt"
 ON CONFLICT DO NOTHING;
 
 -- Reset PostLike id sequence to avoid duplicate-key errors on future inserts
-SELECT setval(pg_get_serial_sequence('"PostLike"', 'id'), (SELECT COALESCE(MAX(id), 0) FROM "PostLike"));
+SELECT setval(pg_get_serial_sequence('"PostLike"', 'id'), GREATEST((SELECT COALESCE(MAX(id), 0) FROM "PostLike"), 1));
 
 -- Migrate existing comment likes (only rows where commentId is set)
 INSERT INTO "CommentLike" ("id", "createdAt", "userId", "commentId")
@@ -36,7 +36,7 @@ ORDER BY "userId", "commentId", "createdAt"
 ON CONFLICT DO NOTHING;
 
 -- Reset CommentLike id sequence to avoid duplicate-key errors on future inserts
-SELECT setval(pg_get_serial_sequence('"CommentLike"', 'id'), (SELECT COALESCE(MAX(id), 0) FROM "CommentLike"));
+SELECT setval(pg_get_serial_sequence('"CommentLike"', 'id'), GREATEST((SELECT COALESCE(MAX(id), 0) FROM "CommentLike"), 1));
 
 -- Drop the old polymorphic Like table
 DROP TABLE IF EXISTS "Like";
