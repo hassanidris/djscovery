@@ -16,6 +16,7 @@ import {
   faRightToBracket,
   faUserGroup,
   faUsers,
+  faCompactDisc,
 } from "@fortawesome/free-solid-svg-icons";
 // import ViewProfileBtn from "./ViewProfileBtn";
 
@@ -74,6 +75,13 @@ const Navbar = async () => {
                 className="w-4 h-4"
               /> */}
               <span>Stories</span>
+            </Link>
+            <Link
+              href="/directory"
+              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
+            >
+              <FontAwesomeIcon icon={faCompactDisc} className=" h-4 w-4" />
+              <span>Directory</span>
             </Link>
           </div>
           <div className="hidden xl:flex p-2 bg-transparent items-center rounded-xl ring-1 ring-gray-600">

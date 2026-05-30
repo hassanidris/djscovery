@@ -45,7 +45,7 @@ export default function RootLayout({
             <div className="w-full bg-black px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 fixed z-50">
               <Navbar />
             </div>
-            <div className="w-full  bg-black  mt-24">{children}</div>
+            <div className="w-full flex-1 bg-black  mt-24">{children}</div>
             <div className="w-full bg-h_blackLight/50 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-center py-3">
               <Footer />
             </div>
