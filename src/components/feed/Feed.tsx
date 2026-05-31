@@ -49,7 +49,13 @@ const Feed = async ({ username }: { username?: string }) => {
           <Post key={post.id} post={post} currentUserId={userId} />
         ))
       ) : (
-        <p className="text-h_white">No posts found!</p>
+        <div className="flex flex-col items-center gap-3 py-12 text-center">
+          <div className="text-5xl">🎧</div>
+          <p className="text-h_white font-semibold text-lg">No posts yet</p>
+          <p className="text-gray-400 text-sm">
+            Be the first to share something with the community!
+          </p>
+        </div>
       )}
     </div>
   );

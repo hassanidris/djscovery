@@ -10,19 +10,24 @@ const ProfileCard = async () => {
   } = await supabase.auth.getUser();
   const userId = authUser?.id;
 
-  if (!userId) return null;
+  if (!userId) {
+    return (
+      <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm flex flex-col items-center gap-3 text-center">
+        <div className="text-3xl">👤</div>
+        <p className="text-gray-400 text-xs">Sign in to see your profile</p>
+        <a
+          href="/sign-in"
+          className="bg-h_purple hover:bg-h_purpleDark text-white text-xs py-2 px-4 rounded-md transition-colors"
+        >
+          Sign In
+        </a>
+      </div>
+    );
+  }
 
   const user = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-    include: {
-      _count: {
-        select: {
-          followers: true,
-        },
-      },
-    },
+    where: { id: userId },
+    include: { _count: { select: { followers: true } } },
   });
 
   if (!user) return null;

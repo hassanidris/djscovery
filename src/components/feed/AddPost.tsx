@@ -15,9 +15,17 @@ const AddPost = () => {
   }
   if (!user) {
     return (
-      <p className="text-h_white p-4 ring-1 ring-gray-500 rounded-md">
-        You must be logged in to post
-      </p>
+      <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg flex items-center justify-between gap-4">
+        <p className="text-gray-400 text-sm">
+          Sign in to share posts with the community
+        </p>
+        <a
+          href="/sign-in"
+          className="shrink-0 bg-h_purple hover:bg-h_purpleDark text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+        >
+          Sign In
+        </a>
+      </div>
     );
   }
   return (
