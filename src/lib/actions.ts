@@ -14,6 +14,22 @@ async function getCurrentUserId(): Promise<string> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error("User is not authenticated!");
+
+  // Ensure a matching User row exists (webhook may not have run yet)
+  const emailPrefix = (user.email ?? user.id)
+    .split("@")[0]
+    .replace(/[^a-zA-Z0-9_]/g, "_");
+  const username = `${emailPrefix}_${user.id.slice(0, 6)}`;
+  await prisma.user.upsert({
+    where: { id: user.id },
+    update: {},
+    create: {
+      id: user.id,
+      email: user.email ?? `${user.id}@unknown.local`,
+      username,
+    },
+  });
+
   return user.id;
 }
 
