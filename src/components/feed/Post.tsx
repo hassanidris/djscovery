@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Comments from "./Comments";
-import { Post as PostType, User } from "@prisma/client";
+import { Media, Post as PostType, User } from "@prisma/client";
 import PostInfo from "./PostInfo";
 import { Suspense } from "react";
 import PostInteraction from "./PostInteraction";
@@ -8,6 +8,7 @@ import Link from "next/link";
 
 type FeedPostType = PostType & { user: User } & {
   likes: { userId: string }[];
+  media: Media[];
 } & {
   _count: { comments: number };
 };
@@ -39,7 +40,18 @@ const Post = ({
       </div>
       {/* CONTENT */}
       <div className="flex flex-col gap-4 text-h_white">
-        <p>{post.content}</p>
+        {post.content && <p>{post.content}</p>}
+        {post.media?.[0] && (
+          <div className="relative w-full rounded-lg overflow-hidden">
+            <Image
+              src={post.media[0].url}
+              alt="post image"
+              width={800}
+              height={450}
+              className="w-full object-cover rounded-lg"
+            />
+          </div>
+        )}
       </div>
       {/* INTERACTION */}
       <Suspense fallback="Loading...">

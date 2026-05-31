@@ -5,6 +5,7 @@ import prisma from "@/lib/client";
 const postInclude = {
   user: true,
   likes: { select: { userId: true } },
+  media: true,
   _count: { select: { comments: true } },
 } as const;
 
