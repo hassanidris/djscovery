@@ -2,6 +2,7 @@
 
 import { switchLike } from "@/lib/actions";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useOptimistic, useState } from "react";
 
 const PostInteraction = ({
@@ -15,6 +16,8 @@ const PostInteraction = ({
   commentNumber: number;
   currentUserId?: string;
 }) => {
+  const router = useRouter();
+
   const [likeState, setLikeState] = useState({
     likeCount: likes.length,
     isLiked: currentUserId ? likes.includes(currentUserId) : false,
@@ -31,6 +34,10 @@ const PostInteraction = ({
   );
 
   const likeAction = async () => {
+    if (!currentUserId) {
+      router.push("/sign-in");
+      return;
+    }
     switchOptimisticLike("");
     try {
       await switchLike(postId);
@@ -48,7 +55,7 @@ const PostInteraction = ({
       <div className="flex gap-8">
         <div className="flex items-center gap-2 p-2 rounded-xl">
           <form action={likeAction}>
-            <button>
+            <button title={!currentUserId ? "Sign in to like" : ""}>
               <Image
                 src={optimisticLike.isLiked ? "/liked.png" : "/like.png"}
                 width={16}

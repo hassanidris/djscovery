@@ -58,7 +58,7 @@ const CommentsList = ({
 
   return (
     <>
-      {user && (
+      {user ? (
         <div className="flex items-center gap-4">
           <Image
             src="/noAvatar.png"
@@ -86,6 +86,13 @@ const CommentsList = ({
             />
           </form>
         </div>
+      ) : (
+        <a
+          href="/sign-in"
+          className="text-xs text-gray-500 hover:text-h_purple transition-colors"
+        >
+          Sign in to leave a comment →
+        </a>
       )}
       <div className="">
         {optimisticComments.map((comment) => (
