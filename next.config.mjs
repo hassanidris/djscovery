@@ -3,9 +3,6 @@ const nextConfig = {
   experimental: {
     reactCompiler: true,
     ppr: "incremental",
-    // fontLoaders: [
-    //   { loader: "@next/font/google", options: { subsets: ["latin"] } },
-    // ],
   },
   images: {
     remotePatterns: [
@@ -15,13 +12,17 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "img.clerk.com",
-      },
-      {
-        protocol: "https",
         hostname: "res.cloudinary.com",
       },
     ],
+  },
+  webpack: (config, { isServer }) => {
+    // @opentelemetry/api is an optional peer dep of supabase-js — ignore it
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "@opentelemetry/api": false,
+    };
+    return config;
   },
 };
 
