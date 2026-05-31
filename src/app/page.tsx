@@ -25,8 +25,14 @@ const Homepage = async () => {
           </p>
           <div className="flex gap-4">
             <Link
-              href="/directory"
+              href="/community"
               className="bg-h_purple hover:bg-h_purpleDark text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            >
+              Community
+            </Link>
+            <Link
+              href="/directory"
+              className="ring-1 ring-h_purple text-h_purple hover:bg-h_purple hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
               Browse DJs
             </Link>

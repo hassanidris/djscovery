@@ -54,6 +54,13 @@ const Navbar = async () => {
               <span>Stories</span>
             </Link>
             <Link
+              href="/community"
+              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
+            >
+              <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
+              <span>Community</span>
+            </Link>
+            <Link
               href="/directory"
               className="flex items-center gap-2 text-gray-400 hover:text-h_white"
             >
