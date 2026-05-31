@@ -14,7 +14,7 @@ const CommunityPage = () => {
         <div>
           <h1 className="text-2xl font-bold text-h_white">Community</h1>
           <p className="text-gray-400 text-sm">
-            Share posts and connect with the DJ community
+            Share posts and connect with the DJ community feel at home
           </p>
         </div>
       </div>
