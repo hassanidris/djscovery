@@ -1,85 +1,39 @@
 "use client";
 
-import { switchFollow, switchBlock } from "@/lib/actions";
+import { switchFollow } from "@/lib/actions";
 import { useOptimistic, useState } from "react";
 
 const UserInfoCardInteraction = ({
   userId,
-  isUserBlocked,
   isFollowing,
-  isFollowingSent,
 }: {
   userId: string;
-  isUserBlocked: boolean;
   isFollowing: boolean;
-  isFollowingSent: boolean;
 }) => {
-  const [userState, setUserState] = useState({
-    following: isFollowing,
-    blocked: isUserBlocked,
-    followingRequestSent: isFollowingSent,
-  });
+  const [following, setFollowing] = useState(isFollowing);
+
+  const [optimisticFollowing, toggleOptimistic] = useOptimistic(
+    following,
+    (state) => !state,
+  );
 
   const follow = async () => {
-    switchOptimisticState("follow");
+    toggleOptimistic(null);
     try {
       await switchFollow(userId);
-      setUserState((prev) => ({
-        ...prev,
-        following: prev.following && false,
-        followingRequestSent:
-          !prev.following && !prev.followingRequestSent ? true : false,
-      }));
+      setFollowing((prev) => !prev);
     } catch (err) {
       console.log(err);
-      switchOptimisticState("follow");
-    }
-  };
-  const block = async () => {
-    switchOptimisticState("block");
-    try {
-      await switchBlock(userId);
-      setUserState((prev) => ({
-        ...prev,
-        blocked: !prev.blocked,
-      }));
-    } catch (err) {
-      console.error(err);
-      switchOptimisticState("block");
+      toggleOptimistic(null);
     }
   };
 
-  const [optimisticState, switchOptimisticState] = useOptimistic(
-    userState,
-    (state, value: "follow" | "block") =>
-      value === "follow"
-        ? {
-            ...state,
-            following: state.following && false,
-            followingRequestSent:
-              !state.following && !state.followingRequestSent ? true : false,
-          }
-        : { ...state, blocked: !state.blocked },
-  );
   return (
-    <>
-      <form action={follow}>
-        <button className=" w-full bg-blue-500 text-white text-sm rounded-md p-2">
-          {optimisticState.following
-            ? "Following"
-            : optimisticState.followingRequestSent
-              ? "Friend Request Sent"
-              : "Follow"}
-        </button>
-      </form>
-      <form action={block} className=" self-end">
-        <button>
-          <span className=" text-red-400 text-xs cursor-pointer">
-            {optimisticState.blocked ? "Unblock User" : "Block User"}
-          </span>
-        </button>
-      </form>
-    </>
+    <form action={follow}>
+      <button className="w-full bg-blue-500 text-white text-sm rounded-md p-2">
+        {optimisticFollowing ? "Following" : "Follow"}
+      </button>
+    </form>
   );
 };
 

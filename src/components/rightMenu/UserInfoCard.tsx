@@ -1,13 +1,6 @@
 import prisma from "@/lib/client";
-import { auth } from "@clerk/nextjs/server";
-import {
-  faBriefcase,
-  faCalendar,
-  faLink,
-  faLocationDot,
-  faMusic,
-  faSchool,
-} from "@fortawesome/free-solid-svg-icons";
+import { createClient } from "@/lib/supabase/server";
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@prisma/client";
 import Link from "next/link";
@@ -16,45 +9,30 @@ import UserInfoCardInteraction from "./UserInfoCardInteraction";
 import UpdateUser from "./UpdateUser";
 
 const UserInfoCard = async ({ user }: { user: User }) => {
-  const createdAtDate = new Date(user.createdAt);
-
-  const formattedDate = createdAtDate.toLocaleDateString("en-US", {
+  const formattedDate = new Date(user.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  let isUserBlocked = false;
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+  const currentUserId = authUser?.id;
+
   let isFollowing = false;
-  let isFollowingSent = false;
 
-  const { userId: currentUserId } = auth();
-
-  if (currentUserId) {
-    const blockRes = await prisma.block.findFirst({
+  if (currentUserId && currentUserId !== user.id) {
+    const followRes = await prisma.follower.findUnique({
       where: {
-        blockerId: currentUserId,
-        blockedId: user.id,
+        followerId_followingId: {
+          followerId: currentUserId,
+          followingId: user.id,
+        },
       },
     });
-
-    blockRes ? (isUserBlocked = true) : (isUserBlocked = false);
-    const followRes = await prisma.follower.findFirst({
-      where: {
-        followerId: currentUserId,
-        followingId: user.id,
-      },
-    });
-
-    followRes ? (isFollowing = true) : (isFollowing = false);
-    const followReqRes = await prisma.followRequest.findFirst({
-      where: {
-        senderId: currentUserId,
-        receiverId: user.id,
-      },
-    });
-
-    followReqRes ? (isFollowingSent = true) : (isFollowingSent = false);
+    isFollowing = !!followRes;
   }
 
   return (
@@ -71,79 +49,19 @@ const UserInfoCard = async ({ user }: { user: User }) => {
         )}
       </div>
       {/* Bottom */}
-      <div className=" flex flex-col gap-4 text-h_white">
-        <div className=" flex items-center gap-2">
-          <span className=" text-xl text-h_white font-semibold">
-            {user.stageName ? user.stageName : user.username}
+      <div className="flex flex-col gap-4 text-h_white">
+        <div className="flex items-center gap-2">
+          <span className="text-xl text-h_white font-semibold">
+            {user.username}
           </span>
-          <span className=" text-sm text-gray-400">@{user.username}</span>
-        </div>
-        {user.description && <p>{user.description}</p>}
-        {user.city && (
-          <div className=" flex items-center gap-2">
-            <FontAwesomeIcon icon={faLocationDot} className=" w-4 h-4" />
-            <span>
-              Living in <b>{user.city}</b>
-            </span>
-            {user.country && (
-              <span>
-                , <b>{user.country}</b>
-              </span>
-            )}
-          </div>
-        )}
-
-        {user.genres && (
-          <div className=" w-full flex items-center gap-2">
-            <FontAwesomeIcon icon={faMusic} className=" w-4 h-4" />
-            <span>
-              {/* Genres playing  */}
-              <b>{user.genres}</b>
-            </span>
-          </div>
-        )}
-
-        {/* {user.school && (
-          <div className=" flex items-center gap-2">
-            <FontAwesomeIcon icon={faSchool} className=" w-4 h-4" />
-            <span>
-              Went to <b>{user.school}</b>
-            </span>
-          </div>
-        )} */}
-        {/* {user.work && (
-          <div className=" flex items-center gap-2">
-            <FontAwesomeIcon icon={faBriefcase} className=" w-4 h-4" />
-            <span>
-              Work at <b>{user.work}</b>
-            </span>
-          </div>
-        )} */}
-        <div className=" flex items-center justify-between">
-          {user.website && (
-            <div className=" flex items-center gap-2">
-              <FontAwesomeIcon icon={faLink} className=" w-4 h-4" />
-              <Link
-                href={user.website}
-                target="_blank"
-                className="text-blue-500 font-medium"
-              >
-                {user.website}
-              </Link>
-            </div>
-          )}
+          <span className="text-sm text-gray-400">@{user.username}</span>
         </div>
         <div className="flex gap-1 items-center text-xs justify-end">
-          <FontAwesomeIcon icon={faCalendar} className=" w-4 h-4" />
+          <FontAwesomeIcon icon={faCalendar} className="w-4 h-4" />
           <span>Joined {formattedDate}</span>
         </div>
         {currentUserId && currentUserId !== user.id && (
-          <UserInfoCardInteraction
-            userId={user.id}
-            isUserBlocked={isUserBlocked}
-            isFollowing={isFollowing}
-            isFollowingSent={isFollowingSent}
-          />
+          <UserInfoCardInteraction userId={user.id} isFollowing={isFollowing} />
         )}
       </div>
     </div>

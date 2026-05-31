@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Rozha_One, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -35,23 +34,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${inter.variable} ${rozhaOne.variable} ${robotoMono.variable}`}
-      >
-        <body className={inter.className}>
-          <div className=" flex flex-col min-h-[100vh]">
-            <div className="w-full bg-black px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 fixed z-50">
-              <Navbar />
-            </div>
-            <div className="w-full flex-1 bg-black  mt-24">{children}</div>
-            <div className="w-full bg-h_blackLight/50 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-center py-3">
-              <Footer />
-            </div>
+    <html
+      lang="en"
+      className={`${inter.variable} ${rozhaOne.variable} ${robotoMono.variable}`}
+    >
+      <body className={inter.className}>
+        <div className=" flex flex-col min-h-[100vh]">
+          <div className="w-full bg-black px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 fixed z-50">
+            <Navbar />
           </div>
-        </body>
-      </html>
-    </ClerkProvider>
+          <div className="w-full flex-1 bg-black  mt-24">{children}</div>
+          <div className="w-full bg-h_blackLight/50 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-center py-3">
+            <Footer />
+          </div>
+        </div>
+      </body>
+    </html>
   );
 }

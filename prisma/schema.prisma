@@ -6,119 +6,634 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id                     String          @id
-  username               String          @unique
-  avatar                 String?
-  cover                  String?
-  name                   String?
-  surname                String?
-  description            String?
-  city                   String?
-  school                 String?
-  work                   String?
-  website                String?
-  stageName              String?
-  country                String?
-  genres                 String?
-  createdAt              DateTime        @default(now())
-  posts                  Post[]
-  comments               Comment[]
-  postLikes              PostLike[]
-  commentLikes           CommentLike[]
-  followers              Follower[]      @relation("UserFollowers")
-  followings             Follower[]      @relation("UserFollowings")
-  followRequestsSent     FollowRequest[] @relation("FollowRequestsSent")
-  followRequestsReceived FollowRequest[] @relation("FollowRequestsReceived")
-  blocks                 Block[]         @relation("BlocksSent")
-  blockedBy              Block[]         @relation("BlocksReceived")
-  stories                Story[]
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Role {
+  ADMIN
+  DJ
+  ORGANIZER
+  FAN
 }
 
-model Post {
-  id        Int        @id @default(autoincrement())
-  desc      String
-  img       String?
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum DjProfileStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum PostType {
+  TEXT
+  IMAGE
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum NotificationType {
+  NEW_COMMENT
+  NEW_REPLY
+  NEW_RATING
+  NEW_JOB
+  JOB_APPLICATION
+  APPLICATION_ACCEPTED
+  APPLICATION_REJECTED
+  DJ_REGISTRATION // Admin receives this when a DJ registers
+}
+
+// ============================================================
+// SECTION 1: MVP MODELS
+// ============================================================
+
+// ------ GEOGRAPHY ------
+
+model Country {
+  id                Int                @id @default(autoincrement())
+  name              String             @unique
+  code              String             @unique // ISO 3166-1 alpha-2, e.g. "SE"
+  cities            City[]
+  djProfiles        DjProfile[]
+  organizerProfiles OrganizerProfile[]
+  fanProfiles       FanProfile[]
+  events            Event[]
+
+  @@index([name])
+}
+
+model City {
+  id                Int                @id @default(autoincrement())
+  name              String
+  countryId         Int
+  country           Country            @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  djProfiles        DjProfile[]
+  organizerProfiles OrganizerProfile[]
+  fanProfiles       FanProfile[]
+  events            Event[]
+
+  @@unique([name, countryId])
+  @@index([countryId])
+}
+
+// ------ USER ------
+
+model User {
+  id        String     @id // Must match Supabase Auth user id
+  email     String     @unique
+  username  String     @unique
+  role      Role       @default(FAN)
+  status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  comments  Comment[]
-  likes     PostLike[]
+  deletedAt DateTime?
+
+  djProfile        DjProfile?
+  organizerProfile OrganizerProfile?
+  fanProfile       FanProfile?
+
+  posts            Post[]
+  postComments     PostComment[]
+  postLikes        PostLike[]
+  postCommentLikes PostCommentLike[]
+
+  djComments     DjComment[]
+  djCommentLikes DjCommentLike[]
+  djRatings      DjRating[]
+
+  jobApplications JobApplication[] @relation("ApplicantApplications")
+  jobsPosted      Job[]            @relation("OrganizerJobs")
+
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+  notificationsSent     Notification[] @relation("NotificationSender")
+
+  followers  Follower[] @relation("UserFollowers")
+  followings Follower[] @relation("UserFollowings")
+
+  @@index([role])
+  @@index([status])
+  @@index([deletedAt])
 }
 
-model Comment {
-  id        Int           @id @default(autoincrement())
-  desc      String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+// ------ DJ PROFILE ------
+
+// Admin must approve before profile is publicly visible.
+// DJs can still edit while PENDING_APPROVAL.
+model DjProfile {
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  stageName  String
+  slug       String          @unique // URL-friendly: /djs/[slug]
+  avatar     String? // Supabase Storage URL
+  coverImage String? // Supabase Storage URL
+  bio        String?
+  status     DjProfileStatus @default(PENDING_APPROVAL)
+
+  countryId Int?
+  country   Country? @relation(fields: [countryId], references: [id])
+  cityId    Int?
+  city      City?    @relation(fields: [cityId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  genres      DjGenre[]
+  socialLinks SocialLink[]
+  ratings     DjRating[]
+  comments    DjComment[]
+  media       Media[]
+  events      EventDj[]
+  eventsOwned Event[]      @relation("EventOwner")
+
+  @@index([slug])
+  @@index([status])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+// ------ ORGANIZER PROFILE ------
+
+model OrganizerProfile {
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  businessName String
+  phone        String?
+
+  countryId Int?
+  country   Country? @relation(fields: [countryId], references: [id])
+  cityId    Int?
+  city      City?    @relation(fields: [cityId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs Job[]
+
+  @@index([countryId])
+}
+
+// ------ FAN PROFILE ------
+
+model FanProfile {
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  displayName String
+
+  countryId Int?
+  country   Country? @relation(fields: [countryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  city      City?    @relation(fields: [cityId], references: [id])
+  cityId    Int?
+}
+
+// ------ GENRES ------
+
+// Admin-managed list of genres
+model Genre {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique // e.g. "Afrobeat", "House", "Amapiano"
+  djGenres DjGenre[]
+
+  @@index([name])
+}
+
+model DjGenre {
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  genreId     Int
+  genre       Genre     @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([djProfileId, genreId])
+}
+
+// ------ SOCIAL LINKS ------
+
+// platform values: "instagram" | "tiktok" | "youtube" | "spotify" | "soundcloud" | "mixcloud" | "website"
+// UI renders icon based on platform string
+model SocialLink {
+  id          Int       @id @default(autoincrement())
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  platform    String
+  url         String
+
+  @@unique([djProfileId, platform])
+  @@index([djProfileId])
+}
+
+// ------ MEDIA ------
+
+// MVP: IMAGE only. Schema is ready for VIDEO and AUDIO later.
+// Supabase Storage bucket: "djscovery-media"
+model Media {
+  id     Int       @id @default(autoincrement())
+  type   MediaType @default(IMAGE)
+  url    String // Supabase Storage public URL
+  bucket String // Supabase Storage bucket name
+  path   String // Supabase Storage path within bucket
+
+  djProfileId Int?
+  djProfile   DjProfile? @relation(fields: [djProfileId], references: [id], onDelete: SetNull)
+
+  postId Int?
+  post   Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([djProfileId])
+  @@index([postId])
+  @@index([type])
+}
+
+// ------ DJ RATINGS ------
+
+// One rating per user per DJ; user can update but not duplicate
+model DjRating {
+  id     Int     @id @default(autoincrement())
+  rating Int // 1-5
+  review String?
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, djProfileId])
+  @@index([djProfileId])
+}
+
+// ------ DJ PROFILE COMMENTS ------
+
+// Allowed roles: FAN, DJ, ORGANIZER
+// Self-referencing for replies (parentId)
+model DjComment {
+  id        Int       @id @default(autoincrement())
+  content   String
+  deletedAt DateTime?
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  parentId Int?
+  parent   DjComment?  @relation("DjCommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies  DjComment[] @relation("DjCommentReplies")
+
+  likes DjCommentLike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([djProfileId])
+  @@index([parentId])
+  @@index([userId])
+}
+
+model DjCommentLike {
   userId    String
-  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    Int
-  likes     CommentLike[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId Int
+  comment   DjComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, commentId])
+}
+
+// ------ COMMUNITY FEED ------
+
+// Only DJs can create posts (enforce in app layer)
+model Post {
+  id        Int       @id @default(autoincrement())
+  type      PostType  @default(TEXT)
+  content   String?
+  deletedAt DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  comments PostComment[]
+  likes    PostLike[]
+  media    Media[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Self-referencing for replies
+model PostComment {
+  id        Int       @id @default(autoincrement())
+  content   String
+  deletedAt DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  parentId Int?
+  parent   PostComment?  @relation("PostCommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies  PostComment[] @relation("PostCommentReplies")
+
+  likes PostCommentLike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([parentId])
 }
 
 model PostLike {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    Int
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, postId])
+  @@id([userId, postId])
 }
 
-model CommentLike {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model PostCommentLike {
   userId    String
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   commentId Int
+  comment   PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, commentId])
+  @@id([userId, commentId])
 }
+
+// ------ EVENTS ------
+
+// Only DJs create events. Owner DJ controls the event.
+model Event {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String?
+  image       String? // Supabase Storage URL
+  venue       String?
+  startDate   DateTime
+  endDate     DateTime?
+  status      EventStatus @default(DRAFT)
+  deletedAt   DateTime?
+
+  ownerDjId Int
+  ownerDj   DjProfile @relation("EventOwner", fields: [ownerDjId], references: [id])
+  countryId Int?
+  country   Country?  @relation(fields: [countryId], references: [id])
+  cityId    Int?
+  city      City?     @relation(fields: [cityId], references: [id])
+
+  participants EventDj[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerDjId])
+  @@index([status])
+  @@index([startDate])
+  @@index([countryId])
+}
+
+// Junction: multiple DJs per event
+model EventDj {
+  eventId     Int
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, djProfileId])
+}
+
+// ------ HIRING MARKETPLACE ------
+
+model Job {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  budget      Decimal?
+  status      JobStatus @default(OPEN)
+  deletedAt   DateTime?
+
+  organizerId        String
+  organizer          User             @relation("OrganizerJobs", fields: [organizerId], references: [id])
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id])
+  organizerProfileId Int
+
+  countryId Int?
+  cityId    Int?
+
+  applications JobApplication[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([organizerId])
+}
+
+model JobApplication {
+  id       Int               @id @default(autoincrement())
+  status   ApplicationStatus @default(PENDING)
+  message  String? // DJ's cover message
+  isInvite Boolean           @default(false) // true = organizer invited DJ directly
+
+  jobId       Int
+  job         Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId String
+  applicant   User   @relation("ApplicantApplications", fields: [applicantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([jobId, applicantId])
+  @@index([jobId])
+  @@index([applicantId])
+  @@index([status])
+}
+
+// ------ FOLLOWERS ------
 
 model Follower {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  String
-  following   User     @relation("UserFollowings", fields: [followingId], references: [id], onDelete: Cascade)
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
   followingId String
+  following   User     @relation("UserFollowings", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 
-  @@unique([followerId, followingId])
+  @@id([followerId, followingId])
 }
 
-model FollowRequest {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  sender     User     @relation("FollowRequestsSent", fields: [senderId], references: [id], onDelete: Cascade)
-  senderId   String
-  receiver   User     @relation("FollowRequestsReceived", fields: [receiverId], references: [id], onDelete: Cascade)
-  receiverId String
+// ------ NOTIFICATIONS ------
 
-  @@unique([senderId, receiverId])
+// Database-only for MVP.
+// TODO: Integrate email notifications (e.g. Resend / SendGrid) by adding
+//       a background job that reads unread Notification rows and sends emails.
+//       Add an `emailSentAt DateTime?` column here when ready.
+model Notification {
+  id   Int              @id @default(autoincrement())
+  type NotificationType
+  read Boolean          @default(false)
+  data Json? // flexible payload (postId, djProfileId, jobId, etc.)
+
+  recipientId String
+  recipient   User   @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  // senderId is null for system-generated notifications
+  senderId String?
+  sender   User?   @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([recipientId, read])
+  @@index([recipientId, createdAt])
 }
 
-model Block {
+// ============================================================
+// SECTION 2: PHASE 2 MODELS
+// (Schema defined, development deferred)
+// ============================================================
+
+// ------ DIRECT MESSAGING ------
+
+enum AttendanceStatus {
+  INTERESTED
+  GOING
+  ATTENDED
+}
+
+// Supports DJ <-> Organizer, Fan <-> DJ, DJ <-> DJ
+model Conversation {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  blocker   User     @relation("BlocksSent", fields: [blockerId], references: [id], onDelete: Cascade)
-  blockerId String
-  blocked   User     @relation("BlocksReceived", fields: [blockedId], references: [id], onDelete: Cascade)
-  blockedId String
+  updatedAt DateTime @updatedAt
 
-  @@unique([blockerId, blockedId])
+  participants ConversationParticipant[]
+  messages     Message[]
 }
 
-model Story {
-  id        Int      @id @default(autoincrement())
+model ConversationParticipant {
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id      Int       @id @default(autoincrement())
+  content String
+  readAt  DateTime?
+
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+
   createdAt DateTime @default(now())
-  expiresAt DateTime
-  img       String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @unique
+
+  @@index([conversationId])
+  @@index([senderId])
 }
+
+// ------ EVENT ATTENDANCE ------
+
+model EventAttendance {
+  eventId Int
+  userId  String
+  status  AttendanceStatus
+
+  @@id([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+// ------ HIRE RECORDS ------
+
+// Created automatically when a JobApplication is ACCEPTED
+model Hire {
+  id            Int      @id @default(autoincrement())
+  applicationId Int      @unique
+  agreedRate    Decimal?
+  notes         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([applicationId])
+}
+
+// ============================================================
+// SECTION 3: FUTURE PREMIUM FEATURES
+// (Commented placeholders — do NOT implement yet)
+// ============================================================
+
+// -- SubscriptionPlan --
+// Tiers: FREE | PRO | AGENCY
+// Add `planId Int?` to DjProfile and OrganizerProfile when ready.
+// Gate features (media upload limits, featured slots) via plan.
+
+// -- DjBadge --
+// Verification badge for DJs.
+// Add `verified Boolean @default(false)` to DjProfile.
+// Could be tied to SubscriptionPlan or manual admin action.
+
+// -- FeaturedDj --
+// Paid slot to appear at top of discovery pages.
+// Fields: djProfileId, startsAt, endsAt, position
+// Add `@@index([startsAt, endsAt])` for efficient expiry queries.
+
+// -- FeaturedJob --
+// Organizer pays to boost job listing visibility.
+// Fields: jobId, startsAt, endsAt
+
+// -- SearchRankingBoost --
+// Weight multiplier applied at query time for premium DJs.
+// Can be implemented as a score column on DjProfile:
+// `searchScore Float @default(0)` with @@index([searchScore]).
+
+// -- MediaUploadLimit --
+// FREE tier: 5 images. PRO: unlimited.
+// Track usage in a `MediaUsage` table or via count queries on Media.

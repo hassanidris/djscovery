@@ -1,10 +1,14 @@
 import prisma from "@/lib/client";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
 import Link from "next/link";
 
 const ProfileCard = async () => {
-  const { userId } = auth();
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+  const userId = authUser?.id;
 
   if (!userId) return null;
 
@@ -26,13 +30,13 @@ const ProfileCard = async () => {
     <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm flex flex-col gap-6">
       <div className="h-20 relative">
         <Image
-          src={user.cover || "/noCover.png"}
+          src="/noCover.png"
           alt=""
           fill
           className="rounded-md object-cover ring-1 ring-gray-500"
         />
         <Image
-          src={user.avatar || "/noAvatar.png"}
+          src="/noAvatar.png"
           alt=""
           width={48}
           height={48}
@@ -40,11 +44,7 @@ const ProfileCard = async () => {
         />
       </div>
       <div className="h-20 flex flex-col gap-2 items-center mt-3">
-        <span className="font-semibold text-h_white">
-          {user.name && user.surname
-            ? user.name + " " + user.surname
-            : user.username}
-        </span>
+        <span className="font-semibold text-h_white">{user.username}</span>
         <div className="flex items-center gap-4">
           <div className="flex">
             <Image

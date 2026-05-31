@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/supabase/useUser";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 
@@ -14,7 +14,6 @@ export default function SelectRolePage() {
     if (!role || !user) return;
 
     try {
-      // Make an API call to store the user's role in the database
       const response = await fetch("/api/save-role", {
         method: "POST",
         headers: {
@@ -22,13 +21,12 @@ export default function SelectRolePage() {
         },
         body: JSON.stringify({
           userId: user.id,
-          email: user.primaryEmailAddress?.emailAddress,
+          email: user.email,
           role,
         }),
       });
 
       if (response.ok) {
-        // Redirect to home page after saving the role
         router.push("/");
       } else {
         console.error("Failed to save role");

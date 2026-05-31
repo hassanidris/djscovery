@@ -1,9 +1,6 @@
 "use client";
 
 import { switchLike } from "@/lib/actions";
-import { useAuth } from "@clerk/nextjs";
-import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useOptimistic, useState } from "react";
 
@@ -11,15 +8,16 @@ const PostInteraction = ({
   postId,
   likes,
   commentNumber,
+  currentUserId,
 }: {
   postId: number;
   likes: string[];
   commentNumber: number;
+  currentUserId?: string;
 }) => {
-  const { isLoaded, userId } = useAuth();
   const [likeState, setLikeState] = useState({
     likeCount: likes.length,
-    isLiked: userId ? likes.includes(userId) : false,
+    isLiked: currentUserId ? likes.includes(currentUserId) : false,
   });
 
   const [optimisticLike, switchOptimisticLike] = useOptimistic(

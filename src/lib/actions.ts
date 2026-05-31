@@ -1,163 +1,53 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
 import prisma from "./client";
+import { createClient } from "./supabase/server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
-export const switchFollow = async (userId: string) => {
-  const { userId: currentUserId } = auth();
+// -------------------------------------------------------
+// Auth helper — returns the current Supabase user id
+// -------------------------------------------------------
+async function getCurrentUserId(): Promise<string> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("User is not authenticated!");
+  return user.id;
+}
 
-  if (!currentUserId) {
-    throw new Error("User is not authenticated!");
-  }
+// -------------------------------------------------------
+// FOLLOW
+// -------------------------------------------------------
+
+export const switchFollow = async (targetUserId: string) => {
+  const currentUserId = await getCurrentUserId();
 
   try {
-    const isBlocked = await prisma.block.findFirst({
+    const existingFollow = await prisma.follower.findUnique({
       where: {
-        OR: [
-          { blockerId: currentUserId, blockedId: userId },
-          { blockerId: userId, blockedId: currentUserId },
-        ],
-      },
-    });
-
-    if (isBlocked)
-      throw new Error("Action not allowed due to a block between users.");
-
-    const existingFollow = await prisma.follower.findFirst({
-      where: {
-        followerId: currentUserId,
-        followingId: userId,
+        followerId_followingId: {
+          followerId: currentUserId,
+          followingId: targetUserId,
+        },
       },
     });
 
     if (existingFollow) {
       await prisma.follower.delete({
         where: {
-          id: existingFollow.id,
+          followerId_followingId: {
+            followerId: currentUserId,
+            followingId: targetUserId,
+          },
         },
       });
     } else {
-      const existingFollowRequest = await prisma.followRequest.findFirst({
-        where: {
-          senderId: currentUserId,
-          receiverId: userId,
-        },
-      });
-
-      if (existingFollowRequest) {
-        await prisma.followRequest.delete({
-          where: {
-            id: existingFollowRequest.id,
-          },
-        });
-      } else {
-        await prisma.followRequest.create({
-          data: {
-            senderId: currentUserId,
-            receiverId: userId,
-          },
-        });
-      }
-    }
-  } catch (err) {
-    console.log(err);
-    throw new Error("Something went wrong!");
-  }
-};
-
-export const switchBlock = async (userId: string) => {
-  const { userId: currentUserId } = auth();
-
-  if (!currentUserId) {
-    throw new Error("User is not authenticated!");
-  }
-
-  try {
-    const existingBlock = await prisma.block.findFirst({
-      where: {
-        blockerId: currentUserId,
-        blockedId: userId,
-      },
-    });
-
-    if (existingBlock) {
-      await prisma.block.delete({
-        where: {
-          id: existingBlock.id,
-        },
-      });
-    } else {
-      await prisma.$transaction([
-        prisma.block.create({
-          data: {
-            blockerId: currentUserId,
-            blockedId: userId,
-          },
-        }),
-        prisma.follower.deleteMany({
-          where: {
-            OR: [
-              { followerId: currentUserId, followingId: userId },
-              { followerId: userId, followingId: currentUserId },
-            ],
-          },
-        }),
-        prisma.followRequest.deleteMany({
-          where: {
-            OR: [
-              { senderId: currentUserId, receiverId: userId },
-              { senderId: userId, receiverId: currentUserId },
-            ],
-          },
-        }),
-      ]);
-    }
-  } catch (err) {
-    console.log(err);
-    throw new Error("Something went wrong!");
-  }
-};
-
-export const acceptFollowRequest = async (userId: string) => {
-  const { userId: currentUserId } = auth();
-
-  if (!currentUserId) {
-    throw new Error("User is not authenticated!");
-  }
-
-  try {
-    const existingFollowRequest = await prisma.followRequest.findFirst({
-      where: {
-        senderId: userId,
-        receiverId: currentUserId,
-      },
-    });
-
-    if (existingFollowRequest) {
-      await prisma.followRequest.delete({
-        where: {
-          id: existingFollowRequest.id,
-        },
-      });
-
-      const isBlocked = await prisma.block.findFirst({
-        where: {
-          OR: [
-            { blockerId: currentUserId, blockedId: userId },
-            { blockerId: userId, blockedId: currentUserId },
-          ],
-        },
-      });
-
-      if (isBlocked)
-        throw new Error("Action not allowed due to a block between users.");
-
       await prisma.follower.create({
         data: {
-          followerId: userId,
-          followingId: currentUserId,
+          followerId: currentUserId,
+          followingId: targetUserId,
         },
       });
     }
@@ -167,111 +57,24 @@ export const acceptFollowRequest = async (userId: string) => {
   }
 };
 
-export const declineFollowRequest = async (userId: string) => {
-  const { userId: currentUserId } = auth();
-
-  if (!currentUserId) {
-    throw new Error("User is not Authenticated!!");
-  }
-
-  try {
-    const existingFollowRequest = await prisma.followRequest.findFirst({
-      where: {
-        senderId: userId,
-        receiverId: currentUserId,
-      },
-    });
-
-    if (existingFollowRequest) {
-      await prisma.followRequest.delete({
-        where: {
-          id: existingFollowRequest.id,
-        },
-      });
-    }
-  } catch (err) {
-    console.log(err);
-    throw new Error("Something went wrong!");
-  }
-};
-
-export const updateProfile = async (
-  prevState: { success: boolean; error: boolean },
-  payload: { formData: FormData; cover: string },
-) => {
-  const { formData, cover } = payload;
-  const fields = Object.fromEntries(formData);
-
-  const filteredFields = Object.fromEntries(
-    Object.entries(fields).filter(([_, value]) => value !== ""),
-  );
-
-  const Profile = z.object({
-    cover: z.string().optional(),
-    name: z.string().max(60).optional(),
-    surname: z.string().max(60).optional(),
-    description: z.string().max(255).optional(),
-    city: z.string().max(60).optional(),
-    school: z.string().max(60).optional(),
-    work: z.string().max(60).optional(),
-    website: z.string().max(60).optional(),
-    stageName: z.string().max(60).optional(),
-    country: z.string().max(60).optional(),
-    genres: z.string().max(255).optional(),
-  });
-
-  const validatedFields = Profile.safeParse({ cover, ...filteredFields });
-  if (!validatedFields.success) {
-    console.log(validatedFields.error.flatten().fieldErrors);
-    return { success: false, error: true };
-  }
-
-  const { userId } = auth();
-
-  if (!userId) {
-    return { success: false, error: true };
-  }
-
-  try {
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: validatedFields.data,
-    });
-    return { success: true, error: false };
-  } catch (err) {
-    console.log(err);
-    return { success: false, error: true };
-  }
-};
+// -------------------------------------------------------
+// POST LIKES
+// -------------------------------------------------------
 
 export const switchLike = async (postId: number) => {
-  const { userId } = auth();
-
-  if (!userId) throw new Error("User is not authenticated!");
+  const userId = await getCurrentUserId();
 
   try {
-    const existingLike = await prisma.postLike.findFirst({
-      where: {
-        postId,
-        userId,
-      },
+    const existingLike = await prisma.postLike.findUnique({
+      where: { userId_postId: { userId, postId } },
     });
 
     if (existingLike) {
       await prisma.postLike.delete({
-        where: {
-          id: existingLike.id,
-        },
+        where: { userId_postId: { userId, postId } },
       });
     } else {
-      await prisma.postLike.create({
-        data: {
-          postId,
-          userId,
-        },
-      });
+      await prisma.postLike.create({ data: { postId, userId } });
     }
   } catch (err) {
     console.log(err);
@@ -279,54 +82,76 @@ export const switchLike = async (postId: number) => {
   }
 };
 
-export const addComment = async (postId: number, desc: string) => {
-  const { userId } = auth();
+// -------------------------------------------------------
+// POST COMMENTS
+// -------------------------------------------------------
 
-  if (!userId) throw new Error("User is not authenticated!");
+export const addPostComment = async (
+  postId: number,
+  content: string,
+  parentId?: number,
+) => {
+  const userId = await getCurrentUserId();
 
   try {
-    const createdComment = await prisma.comment.create({
-      data: {
-        desc,
-        userId,
-        postId,
-      },
-      include: {
-        user: true,
-      },
+    const comment = await prisma.postComment.create({
+      data: { content, userId, postId, parentId },
+      include: { user: true },
     });
-
-    return createdComment;
+    return comment;
   } catch (err) {
     console.log(err);
     throw new Error("Something went wrong!");
   }
 };
 
-export const addPost = async (formData: FormData, img: string) => {
-  const desc = formData.get("desc") as string;
-
-  const Desc = z.string().min(1).max(255);
-
-  const validatedDesc = Desc.safeParse(desc);
-
-  if (!validatedDesc.success) {
-    //TODO
-    console.log("description is not valid");
-    return;
-  }
-  const { userId } = auth();
-
-  if (!userId) throw new Error("User is not authenticated!");
+export const deletePostComment = async (commentId: number) => {
+  const userId = await getCurrentUserId();
 
   try {
-    await prisma.post.create({
+    await prisma.postComment.update({
+      where: { id: commentId, userId },
+      data: { deletedAt: new Date() },
+    });
+    revalidatePath("/");
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong!");
+  }
+};
+
+// -------------------------------------------------------
+// POSTS (DJ only — enforced in UI; double-checked here)
+// -------------------------------------------------------
+
+export const addPost = async (formData: FormData, imageUrl?: string) => {
+  const content = formData.get("content") as string;
+
+  const validated = z.string().min(1).max(1000).safeParse(content);
+  if (!validated.success) return;
+
+  const userId = await getCurrentUserId();
+
+  try {
+    const post = await prisma.post.create({
       data: {
-        desc: validatedDesc.data,
+        content: validated.data,
+        type: imageUrl ? "IMAGE" : "TEXT",
         userId,
-        img,
       },
     });
+
+    if (imageUrl) {
+      await prisma.media.create({
+        data: {
+          url: imageUrl,
+          bucket: "djscovery-media",
+          path: imageUrl,
+          type: "IMAGE",
+          postId: post.id,
+        },
+      });
+    }
 
     revalidatePath("/");
   } catch (err) {
@@ -336,20 +161,138 @@ export const addPost = async (formData: FormData, img: string) => {
 };
 
 export const deletePost = async (postId: number) => {
-  const { userId } = auth();
-
-  if (!userId) throw new Error("User is not authenticated!");
+  const userId = await getCurrentUserId();
 
   try {
-    await prisma.post.delete({
-      where: {
-        id: postId,
-        userId,
-      },
+    await prisma.post.update({
+      where: { id: postId, userId },
+      data: { deletedAt: new Date() },
     });
     revalidatePath("/");
   } catch (err) {
     console.log(err);
     throw new Error(`deletePost failed: ${err}`);
+  }
+};
+
+// -------------------------------------------------------
+// DJ PROFILE
+// -------------------------------------------------------
+
+export const updateDjProfile = async (
+  prevState: { success: boolean; error: boolean },
+  payload: { formData: FormData; avatar?: string; coverImage?: string },
+) => {
+  const { formData, avatar, coverImage } = payload;
+  const fields = Object.fromEntries(formData);
+
+  const DjProfileSchema = z.object({
+    stageName: z.string().min(1).max(60).optional(),
+    bio: z.string().max(500).optional(),
+    countryId: z.coerce.number().optional(),
+    cityId: z.coerce.number().optional(),
+  });
+
+  const validated = DjProfileSchema.safeParse(fields);
+  if (!validated.success) {
+    console.log(validated.error.flatten().fieldErrors);
+    return { success: false, error: true };
+  }
+
+  const userId = await getCurrentUserId();
+
+  try {
+    await prisma.djProfile.update({
+      where: { userId },
+      data: {
+        ...validated.data,
+        ...(avatar && { avatar }),
+        ...(coverImage && { coverImage }),
+      },
+    });
+    revalidatePath("/profile");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+// -------------------------------------------------------
+// DJ RATINGS
+// -------------------------------------------------------
+
+export const upsertDjRating = async (
+  djProfileId: number,
+  rating: number,
+  review?: string,
+) => {
+  const userId = await getCurrentUserId();
+
+  try {
+    await prisma.djRating.upsert({
+      where: { userId_djProfileId: { userId, djProfileId } },
+      update: { rating, review },
+      create: { userId, djProfileId, rating, review },
+    });
+    revalidatePath("/");
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong!");
+  }
+};
+
+// -------------------------------------------------------
+// DJ PROFILE COMMENTS
+// -------------------------------------------------------
+
+export const addDjComment = async (
+  djProfileId: number,
+  content: string,
+  parentId?: number,
+) => {
+  const userId = await getCurrentUserId();
+
+  try {
+    const comment = await prisma.djComment.create({
+      data: { content, userId, djProfileId, parentId },
+      include: { user: true },
+    });
+    return comment;
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong!");
+  }
+};
+
+// -------------------------------------------------------
+// NOTIFICATIONS
+// -------------------------------------------------------
+
+export const markNotificationRead = async (notificationId: number) => {
+  const userId = await getCurrentUserId();
+
+  try {
+    await prisma.notification.update({
+      where: { id: notificationId, recipientId: userId },
+      data: { read: true },
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong!");
+  }
+};
+
+export const markAllNotificationsRead = async () => {
+  const userId = await getCurrentUserId();
+
+  try {
+    await prisma.notification.updateMany({
+      where: { recipientId: userId, read: false },
+      data: { read: true },
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong!");
   }
 };

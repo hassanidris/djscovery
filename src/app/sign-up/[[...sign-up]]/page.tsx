@@ -1,65 +1,41 @@
-// import Footer from "@/components/Footer";
-// import { SignUp } from "@clerk/nextjs";
+import { signUp } from "@/lib/actions/auth";
 
-// export default function Page() {
-//   return (
-//     <div className=" mt-48 flex flex-col items-center justify-center my-4">
-//       <SignUp />
-//       <div className=" mt-36">
-//         <Footer />
-//       </div>
-//     </div>
-//   );
-// }
-
-"use client";
-
-import Footer from "@/components/Footer";
-import { SignUp } from "@clerk/nextjs";
-
-export default function SignUpPage() {
-  socialButtons: {
-    provider: "string";
-    text: "string";
-  }
-  [];
-
+export default function Page() {
   return (
-    <>
-      <div className="h-[calc(100vh-96px-40px)] flex items-center justify-center">
-        <div>
-          {/* <h1 className="text-2xl font-bold mb-6 text-gray-900">Sign Up</h1> */}
-          <SignUp
-            path="/sign-up"
-            routing="path"
-            appearance={{
-              elements: {
-                card: "shadow-none",
-                socialButtonsIconButton: "bg-white text-white",
-              },
-            }}
-            afterSignUpUrl="/"
-            signInUrl="/sign-in"
-            // socialButtons={[
-            //   { provider: "facebook", text: "Sign up with Google" },
-            // ]}
-          />
-          {/* <SignUp
-            afterSignUpUrl="/complete-profile" // You can redirect DJs to complete more profile details
-            appearance={{
-              elements: {
-                roleField: {
-                  label: "Are you a DJ or a Fan?",
-                  options: [
-                    { label: "DJ", value: "dj" },
-                    { label: "Fan", value: "fan" },
-                  ],
-                },
-              },
-            }}
-          /> */}
-        </div>
-      </div>
-    </>
+    <div className="h-[calc(100vh-96px-40px)] flex items-center justify-center">
+      <form
+        action={signUp}
+        className="bg-white/5 border border-white/20 rounded-xl p-8 flex flex-col gap-4 w-full max-w-sm"
+      >
+        <h1 className="text-2xl font-bold text-white text-center">Sign Up</h1>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          required
+          className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_purple"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password (min 6 chars)"
+          minLength={6}
+          required
+          className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_purple"
+        />
+        <button
+          type="submit"
+          className="bg-h_purple hover:bg-h_purpleDark text-white font-semibold py-3 rounded-lg transition-colors"
+        >
+          Create Account
+        </button>
+        <p className="text-gray-400 text-sm text-center">
+          Already have an account?{" "}
+          <a href="/sign-in" className="text-h_purple hover:underline">
+            Sign in
+          </a>
+        </p>
+      </form>
+    </div>
   );
 }

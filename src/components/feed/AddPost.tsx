@@ -1,5 +1,5 @@
 "use client";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@/lib/supabase/useUser";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import { useState } from "react";
@@ -8,7 +8,6 @@ import { addPost } from "@/lib/actions";
 
 const AddPost = () => {
   const { isLoaded, user } = useUser();
-  const [desc, setDesc] = useState("");
   const [img, setImg] = useState<any>(null);
 
   if (!isLoaded) {
@@ -16,7 +15,7 @@ const AddPost = () => {
   }
   if (!user) {
     return (
-      <p className=" text-h_white p-4 ring-1 ring-gray-500 rounded-md">
+      <p className="text-h_white p-4 ring-1 ring-gray-500 rounded-md">
         You must be logged in to post
       </p>
     );
@@ -25,7 +24,7 @@ const AddPost = () => {
     <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg flex gap-4 justify-between text-sm">
       {/* Avatar */}
       <Image
-        src={user?.imageUrl || "/noAvatar.png"}
+        src="/noAvatar.png"
         alt=""
         width={48}
         height={48}
@@ -36,13 +35,12 @@ const AddPost = () => {
         {/* Text Input */}
         <form
           action={(formData) => addPost(formData, img?.secure_url || "")}
-          className=" flex gap-4"
+          className="flex gap-4"
         >
           <textarea
             placeholder="What's on your mind?"
             className="flex-1 bg-gray-600 rounded-lg p-2 text-h_white"
-            name="desc"
-            // onClick={(e) => setDesc(e.target.value)}
+            name="content"
           ></textarea>
           <div className=" self-end">
             {/* <Image
