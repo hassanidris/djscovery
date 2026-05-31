@@ -1,4 +1,5 @@
 import { signUp } from "@/lib/actions/auth";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -31,9 +32,9 @@ export default function Page() {
         </button>
         <p className="text-gray-400 text-sm text-center">
           Already have an account?{" "}
-          <a href="/sign-in" className="text-h_purple hover:underline">
+          <Link href="/sign-in" className="text-h_purple hover:underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </form>
     </div>

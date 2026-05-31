@@ -2,6 +2,7 @@
 import { useUser } from "@/lib/supabase/useUser";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import AddPostBtn from "./AddPostBtn";
 import { addPost } from "@/lib/actions";
@@ -19,12 +20,12 @@ const AddPost = () => {
         <p className="text-gray-400 text-sm">
           Sign in to share posts with the community
         </p>
-        <a
+        <Link
           href="/sign-in"
           className="shrink-0 bg-h_purple hover:bg-h_purpleDark text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
         >
           Sign In
-        </a>
+        </Link>
       </div>
     );
   }

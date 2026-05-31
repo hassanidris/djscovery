@@ -1,4 +1,5 @@
 import { signIn } from "@/lib/actions/auth";
+import Link from "next/link";
 
 export default function Page({
   searchParams,
@@ -34,9 +35,9 @@ export default function Page({
         </button>
         <p className="text-gray-400 text-sm text-center">
           No account?{" "}
-          <a href="/sign-up" className="text-h_purple hover:underline">
+          <Link href="/sign-up" className="text-h_purple hover:underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </form>
     </div>

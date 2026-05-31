@@ -87,12 +87,12 @@ const CommentsList = ({
           </form>
         </div>
       ) : (
-        <a
+        <Link
           href="/sign-in"
           className="text-xs text-gray-500 hover:text-h_purple transition-colors"
         >
           Sign in to leave a comment →
-        </a>
+        </Link>
       )}
       <div className="">
         {optimisticComments.map((comment) => (
