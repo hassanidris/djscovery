@@ -24,47 +24,63 @@ const DirectoryPage = async ({
   let fetchError = false;
 
   try {
-    const results = await prisma.user.findMany({
+    const profiles = await prisma.djProfile.findMany({
       where: {
-        stageName: { not: null },
-        ...(genre ? { genres: { contains: genre, mode: "insensitive" } } : {}),
+        deletedAt: null,
+        ...(genre
+          ? {
+              genres: {
+                some: {
+                  genre: { name: { contains: genre, mode: "insensitive" } },
+                },
+              },
+            }
+          : {}),
         ...(country
-          ? { country: { contains: country, mode: "insensitive" } }
+          ? { country: { name: { contains: country, mode: "insensitive" } } }
           : {}),
       },
       orderBy: sort === "a-z" ? { stageName: "asc" } : { createdAt: "desc" },
-      select: {
-        id: true,
-        username: true,
-        stageName: true,
-        avatar: true,
-        genres: true,
-        country: true,
-        city: true,
-        _count: {
-          select: { followers: true },
+      include: {
+        user: {
+          include: { _count: { select: { followers: true } } },
         },
+        country: { select: { name: true } },
+        city: { select: { name: true } },
+        genres: { include: { genre: { select: { name: true } } } },
       },
     });
 
-    djs = results as DjUser[];
+    djs = profiles.map((p) => ({
+      id: p.userId,
+      username: p.user.username,
+      stageName: p.stageName,
+      avatar: p.avatar,
+      genres: p.genres.map((g) => g.genre.name).join(", ") || null,
+      country: p.country?.name ?? null,
+      city: p.city?.name ?? null,
+      _count: { followers: p.user._count.followers },
+    }));
   } catch {
     fetchError = true;
   }
 
   const hasFilters = !!(genre || country || sort);
-  const displayDjs = hasFilters ? djs : fetchError ? mockDJs : djs;
+  const displayDjs = hasFilters
+    ? djs
+    : fetchError
+      ? mockDJs
+      : djs.length
+        ? djs
+        : mockDJs;
 
   let availableGenres: string[] = [];
   try {
-    const genreRows = await prisma.user.findMany({
-      where: { stageName: { not: null }, genres: { not: null } },
-      select: { genres: true },
+    const genres = await prisma.genre.findMany({
+      orderBy: { name: "asc" },
+      select: { name: true },
     });
-    const parsed = genreRows
-      .flatMap((r) => (r.genres ?? "").split(",").map((g) => g.trim()))
-      .filter(Boolean);
-    availableGenres = [...new Set(parsed)].sort();
+    availableGenres = genres.map((g) => g.name);
   } catch {
     availableGenres = [
       ...new Set(
