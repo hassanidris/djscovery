@@ -3,16 +3,16 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
-  faCirclePlus,
   faCommentDots,
   faHouse,
-  faRightToBracket,
-  faUserGroup,
   faUsers,
   faCompactDisc,
+  faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/lib/actions/auth";
+import { Button } from "@/components/ui/button";
+import NavbarAvatar from "@/components/NavbarAvatar";
+import prisma from "@/lib/client";
 
 const Navbar = async () => {
   const supabase = await createClient();
@@ -20,92 +20,119 @@ const Navbar = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const profile = user
+    ? await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          username: true,
+          djProfile: { select: { avatar: true, stageName: true } },
+        },
+      })
+    : null;
+
+  const avatarSrc = profile?.djProfile?.avatar ?? null;
+  const displayName =
+    profile?.djProfile?.stageName ?? profile?.username ?? user?.email ?? "?";
+  const initials = displayName.slice(0, 2).toUpperCase();
+
   return (
     <>
       <div className="h-24 flex items-center justify-between">
-        {/* LEFT */}
-        <div className="md:hidden lg:block w-[20%]">
-          <Link href="/" className="font-bold text-xl text-blue-600">
-            <Image src="/logo.svg" alt="" width={100} height={100} />
+        {/* LEFT — Logo */}
+        <div className="block w-[20%]">
+          <Link href="/">
+            <Image src="/dj-logo.svg" alt="DJscovery" width={65} height={55} />
           </Link>
         </div>
-        {/* CENTER */}
+
+        {/* CENTER — Nav links + Search */}
         <div className="hidden md:flex w-[50%] text-sm items-center justify-between">
-          <div className="flex gap-6 text-h_white">
+          <div className="flex gap-6">
             <Link
               href="/"
-              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <FontAwesomeIcon icon={faHouse} className="h-4 w-4" />
-              <span>Homepage</span>
-            </Link>
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
-            >
-              <FontAwesomeIcon icon={faUserGroup} className="h-4 w-4" />
-              <span>Friends</span>
-            </Link>
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
-            >
-              <FontAwesomeIcon icon={faCirclePlus} className="h-4 w-4" />
-              <span>Stories</span>
-            </Link>
-            <Link
-              href="/community"
-              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
-            >
-              <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
-              <span>Community</span>
+              <span>Home</span>
             </Link>
             <Link
               href="/directory"
-              className="flex items-center gap-2 text-gray-400 hover:text-h_white"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <FontAwesomeIcon icon={faCompactDisc} className="h-4 w-4" />
               <span>Directory</span>
             </Link>
+            <Link
+              href="/community"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
+              <span>Community</span>
+            </Link>
           </div>
-          <div className="hidden xl:flex p-2 bg-transparent items-center rounded-xl ring-1 ring-gray-600">
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-h_blackLight/50 rounded-lg ring-1 ring-white/10 focus-within:ring-h_purple/60 transition-all">
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="h-3.5 w-3.5 text-gray-500 shrink-0"
+            />
             <input
               type="text"
-              placeholder="search..."
-              className="bg-transparent outline-none"
+              placeholder="Search DJs, genres..."
+              className="bg-transparent outline-none text-sm text-white placeholder:text-gray-500 w-36"
             />
-            <Image src="/search.png" alt="" width={14} height={14} />
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="w-[30%] flex items-center gap-4 xl:gap-8 justify-end">
+        {/* RIGHT — Auth actions */}
+        <div className="w-[30%] flex items-center gap-3 xl:gap-5 justify-end">
           {user ? (
             <>
-              <div className="cursor-pointer text-gray-400 hover:text-h_white">
-                <FontAwesomeIcon icon={faUsers} className="h-6 w-6" />
-              </div>
-              <div className="cursor-pointer text-gray-400 hover:text-h_white">
-                <FontAwesomeIcon icon={faCommentDots} className="h-6 w-6" />
-              </div>
-              <div className="cursor-pointer text-gray-400 hover:text-h_white">
-                <FontAwesomeIcon icon={faBell} className="h-6 w-6" />
-              </div>
-              <form action={signOut}>
-                <button className="text-gray-400 hover:text-h_white text-xs ring-1 ring-gray-600 rounded-md py-1.5 px-3">
-                  Sign out
-                </button>
-              </form>
+              <button
+                aria-label="Messages"
+                className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                +{" "}
+                <FontAwesomeIcon
+                  icon={faCommentDots}
+                  className="h-5.5 w-5.5"
+                  aria-hidden
+                />
+              </button>
+              <button
+                aria-label="Notifications"
+                className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                +{" "}
+                <FontAwesomeIcon
+                  icon={faBell}
+                  className="h-5.5 w-5.5"
+                  aria-hidden
+                />
+              </button>
+              <NavbarAvatar
+                avatarSrc={avatarSrc}
+                displayName={displayName}
+                initials={initials}
+                username={profile?.username ?? null}
+              />
             </>
           ) : (
-            <div className="flex items-center gap-2 text-sm">
-              <Link
-                href="/sign-in"
-                className="flex justify-center items-center gap-2 ring-1 ring-h_purple text-h_purple rounded-md py-1.5 px-4 hover:text-h_white hover:bg-h_purple"
+            <div className="flex items-center gap-2">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="border-h_purple/60 text-h_purple hover:bg-h_purple/15 hover:text-h_purple hover:border-h_purple transition-all"
               >
-                <FontAwesomeIcon icon={faRightToBracket} className="h-4 w-4" />
-                Login/Register
-              </Link>
+                <Link href="/sign-in">Sign In</Link>
+              </Button>
+              <Button
+                asChild
+                size="sm"
+                className="bg-h_purple hover:bg-h_purpleDark text-black font-semibold transition-all"
+              >
+                <Link href="/sign-up">Sign Up</Link>
+              </Button>
             </div>
           )}
         </div>

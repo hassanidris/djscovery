@@ -1,6 +1,8 @@
 import { faHeadphones } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 import React from "react";
+import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
@@ -40,6 +42,22 @@ const Hero = () => {
             <p className=" mt-2 tracking-widest">
               On the world&apos;s first & largest DJ&apos;s Community.
             </p>
+
+            <div className="flex gap-4 mt-6">
+              <Button
+                asChild
+                className="bg-h_purple hover:bg-h_purpleDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+              >
+                <Link href="/sign-up?role=dj">Join as DJ</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="border-h_purple text-h_purple hover:bg-h_purple hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+              >
+                <Link href="/sign-up?role=organiser">Join as Organiser</Link>
+              </Button>
+            </div>
 
             {/* <h1 class="title text-white word txt_anim">
                         Find the <span class="color-primary fw-bold"> Perfect DJ </span>   <br>
