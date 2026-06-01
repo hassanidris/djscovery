@@ -2,16 +2,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const GENRES = [
-  { name: "House", emoji: "🏠", gradient: "from-violet-800 to-purple-950" },
-  { name: "Techno", emoji: "⚡", gradient: "from-zinc-700 to-zinc-900" },
-  { name: "Hip-Hop", emoji: "🎤", gradient: "from-yellow-800 to-amber-950" },
-  { name: "Afrobeats", emoji: "🌍", gradient: "from-orange-700 to-orange-950" },
-  { name: "Amapiano", emoji: "🎶", gradient: "from-lime-800 to-green-950" },
-  { name: "R&B", emoji: "🎸", gradient: "from-pink-800 to-rose-950" },
-  { name: "Drum & Bass", emoji: "🥁", gradient: "from-red-800 to-red-950" },
-  { name: "Deep House", emoji: "🌊", gradient: "from-sky-800 to-blue-950" },
-  { name: "Trance", emoji: "✨", gradient: "from-indigo-700 to-indigo-950" },
-  { name: "Reggaeton", emoji: "🔥", gradient: "from-red-700 to-orange-950" },
+  { name: "House", emoji: "🏠" },
+  { name: "Techno", emoji: "⚡" },
+  { name: "Hip-Hop", emoji: "🎤" },
+  { name: "Afrobeats", emoji: "🌍" },
+  { name: "Amapiano", emoji: "🎶" },
+  { name: "R&B", emoji: "🎸" },
+  { name: "Drum & Bass", emoji: "🥁" },
+  { name: "Deep House", emoji: "🌊" },
+  { name: "Trance", emoji: "✨" },
+  { name: "Reggaeton", emoji: "🔥" },
 ];
 
 export default function HomeGenresSection() {
@@ -39,12 +39,21 @@ export default function HomeGenresSection() {
           <Link
             key={genre.name}
             href={`/directory?genre=${encodeURIComponent(genre.name)}`}
-            className={`bg-linear-to-br ${genre.gradient} border border-white/10 rounded-xl px-4 py-5 flex flex-col gap-1 hover:ring-1 hover:ring-h_purple transition-all`}
+            className="group relative bg-h_blackLight/40 ring-1 ring-white/8 hover:ring-h_purple/60 hover:bg-h_purpleDark/20 rounded-xl px-4 py-5 flex flex-col gap-2.5 transition-all duration-200 overflow-hidden"
           >
-            <span className="text-2xl">{genre.emoji}</span>
-            <span className="text-white font-semibold text-sm">
-              {genre.name}
-            </span>
+            {/* Top accent bar */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_purple/0 to-transparent group-hover:via-h_purple/60 transition-all duration-300" />
+
+            <span className="text-3xl leading-none">{genre.emoji}</span>
+
+            <div className="flex flex-col gap-0.5">
+              <span className="text-white font-semibold text-sm leading-tight">
+                {genre.name}
+              </span>
+              <span className="text-h_purple text-xs opacity-0 group-hover:opacity-100 translate-x-0 transition-all duration-200">
+                Explore →
+              </span>
+            </div>
           </Link>
         ))}
       </div>

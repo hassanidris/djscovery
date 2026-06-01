@@ -62,10 +62,10 @@ const Footer = () => {
           <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block w-fit">
               <Image
-                src="/logo.svg"
+                src="/dj-logo.svg"
                 alt="DJscovery"
                 width={130}
-                height={44}
+                height={110}
                 className="brightness-110"
               />
             </Link>

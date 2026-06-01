@@ -7,6 +7,7 @@ import {
   faHouse,
   faUsers,
   faCompactDisc,
+  faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -38,9 +39,9 @@ const Navbar = async () => {
     <>
       <div className="h-24 flex items-center justify-between">
         {/* LEFT — Logo */}
-        <div className="md:hidden lg:block w-[20%]">
+        <div className="block w-[20%]">
           <Link href="/">
-            <Image src="/logo.svg" alt="DJscovery" width={100} height={100} />
+            <Image src="/dj-logo.svg" alt="DJscovery" width={65} height={55} />
           </Link>
         </div>
 
@@ -69,13 +70,16 @@ const Navbar = async () => {
               <span>Community</span>
             </Link>
           </div>
-          <div className="hidden xl:flex p-2 bg-transparent items-center rounded-xl ring-1 ring-gray-600">
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-h_blackLight/50 rounded-lg ring-1 ring-white/10 focus-within:ring-h_purple/60 transition-all">
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="h-3.5 w-3.5 text-gray-500 shrink-0"
+            />
             <input
               type="text"
               placeholder="Search DJs, genres..."
-              className="bg-transparent outline-none text-white placeholder:text-gray-500 w-40"
+              className="bg-transparent outline-none text-sm text-white placeholder:text-gray-500 w-36"
             />
-            <Image src="/search.png" alt="" width={14} height={14} />
           </div>
         </div>
 
@@ -84,10 +88,10 @@ const Navbar = async () => {
           {user ? (
             <>
               <button className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
-                <FontAwesomeIcon icon={faCommentDots} className="h-5.5 w-5.5" />
+                <FontAwesomeIcon icon={faCommentDots} className="h-4 w-4" />
               </button>
               <button className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
-                <FontAwesomeIcon icon={faBell} className="h-5.5 w-5.5" />
+                <FontAwesomeIcon icon={faBell} className="h-4 w-4" />
               </button>
               <NavbarAvatar
                 avatarSrc={avatarSrc}
@@ -100,16 +104,16 @@ const Navbar = async () => {
             <div className="flex items-center gap-2">
               <Button
                 asChild
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="text-gray-400 hover:text-white hover:bg-white/5"
+                className="border-h_purple/60 text-h_purple hover:bg-h_purple/15 hover:text-h_purple hover:border-h_purple transition-all"
               >
                 <Link href="/sign-in">Sign In</Link>
               </Button>
               <Button
                 asChild
                 size="sm"
-                className="bg-h_purple hover:bg-h_purpleDark text-white"
+                className="bg-h_purple hover:bg-h_purpleDark text-black font-semibold transition-all"
               >
                 <Link href="/sign-up">Sign Up</Link>
               </Button>

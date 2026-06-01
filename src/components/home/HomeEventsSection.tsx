@@ -11,7 +11,6 @@ type DemoEvent = {
   country: string;
   date: string;
   dj: string;
-  gradient: string;
 };
 
 const DEMO_EVENTS: DemoEvent[] = [
@@ -23,7 +22,6 @@ const DEMO_EVENTS: DemoEvent[] = [
     country: "Germany",
     date: "2025-07-15",
     dj: "DJ Echo",
-    gradient: "from-purple-900 to-indigo-950",
   },
   {
     id: 2,
@@ -33,7 +31,6 @@ const DEMO_EVENTS: DemoEvent[] = [
     country: "UK",
     date: "2025-07-22",
     dj: "NightOwl",
-    gradient: "from-blue-900 to-slate-950",
   },
   {
     id: 3,
@@ -43,7 +40,6 @@ const DEMO_EVENTS: DemoEvent[] = [
     country: "Spain",
     date: "2025-08-01",
     dj: "Peggy Gou",
-    gradient: "from-rose-900 to-pink-950",
   },
   {
     id: 4,
@@ -53,7 +49,6 @@ const DEMO_EVENTS: DemoEvent[] = [
     country: "Nigeria",
     date: "2025-08-08",
     dj: "Amara Pulse",
-    gradient: "from-orange-900 to-amber-950",
   },
   {
     id: 5,
@@ -63,7 +58,6 @@ const DEMO_EVENTS: DemoEvent[] = [
     country: "France",
     date: "2025-08-14",
     dj: "DJ Storm",
-    gradient: "from-zinc-800 to-zinc-950",
   },
   {
     id: 6,
@@ -73,7 +67,6 @@ const DEMO_EVENTS: DemoEvent[] = [
     country: "Sweden",
     date: "2025-08-20",
     dj: "DJ Nova",
-    gradient: "from-emerald-900 to-teal-950",
   },
 ];
 
@@ -109,12 +102,13 @@ export default function HomeEventsSection() {
         {DEMO_EVENTS.map((event) => (
           <Card
             key={event.id}
-            className="bg-h_blackLight/50 ring-white/5 hover:ring-h_purple transition-all overflow-hidden p-0 gap-0 cursor-pointer"
+            className="group bg-h_blackLight/50 ring-1 ring-white/5 hover:ring-h_purple/50 transition-all duration-200 overflow-hidden p-0 gap-0 cursor-pointer"
           >
-            <div
-              className={`bg-linear-to-br ${event.gradient} h-28 flex items-end p-4`}
-            >
-              <h3 className="text-white text-2xl tracking-widest leading-none">
+            {/* Header */}
+            <div className="relative bg-h_purpleDark/20 h-28 flex items-end p-4 overflow-hidden">
+              <div className="absolute inset-0 bg-linear-to-br from-h_purpleDark/40 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_purple/50 to-transparent" />
+              <h3 className="relative text-white text-2xl tracking-widest leading-none">
                 {event.title}
               </h3>
             </div>

@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -29,7 +28,7 @@ export default function NavbarAvatar({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="outline-none rounded-full focus-visible:ring-2 focus-visible:ring-h_purple">
-          <Avatar className="size-10 ring-2 ring-h_purple hover:ring-h_purpleDark transition-all cursor-pointer">
+          <Avatar className="size-8 ring-2 ring-h_purple hover:ring-h_purpleDark transition-all cursor-pointer">
             <AvatarImage src={avatarSrc ?? "/noAvatar.png"} alt={displayName} />
             <AvatarFallback className="bg-h_purpleDark text-white text-sm font-semibold">
               {initials}
@@ -43,32 +42,19 @@ export default function NavbarAvatar({
         sideOffset={8}
         className="w-52 bg-h_blackLight border border-white/10 text-white"
       >
-        <DropdownMenuLabel className="flex items-center gap-3 py-3 px-3">
-          <Avatar className="size-9 ring-1 ring-h_purple shrink-0">
-            <AvatarImage src={avatarSrc ?? "/noAvatar.png"} alt={displayName} />
-            <AvatarFallback className="bg-h_purpleDark text-white text-xs font-semibold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col min-w-0">
-            <span className="text-white text-sm font-semibold truncate">
-              {displayName}
-            </span>
-            {username && (
-              <span className="text-gray-500 text-xs truncate">@{username}</span>
-            )}
-          </div>
-        </DropdownMenuLabel>
-
-        <DropdownMenuSeparator className="bg-white/10" />
-
         {username && (
-          <DropdownMenuItem asChild className="cursor-pointer text-gray-300 focus:text-white focus:bg-white/5">
+          <DropdownMenuItem
+            asChild
+            className="cursor-pointer text-gray-300 focus:text-white focus:bg-white/5"
+          >
             <Link href={`/profile/${username}`}>My Profile</Link>
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem asChild className="cursor-pointer text-gray-300 focus:text-white focus:bg-white/5">
+        <DropdownMenuItem
+          asChild
+          className="cursor-pointer text-gray-300 focus:text-white focus:bg-white/5"
+        >
           <Link href="/settings">Settings</Link>
         </DropdownMenuItem>
 
