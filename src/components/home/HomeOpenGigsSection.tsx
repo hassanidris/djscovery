@@ -71,7 +71,7 @@ export default function HomeOpenGigsSection() {
         {DEMO_GIGS.map((gig) => (
           <Card
             key={gig.id}
-            className="bg-h_blackLight/50 ring-white/5 hover:ring-h_purple transition-all p-4 gap-0 cursor-pointer"
+            className="bg-h_blackLight/50 ring-white/5 p-4 gap-0"
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="shrink-0 bg-h_purpleDark/40 border border-h_purple/30 rounded-lg px-4 py-3 text-center min-w-22.5">
