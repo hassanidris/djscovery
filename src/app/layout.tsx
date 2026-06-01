@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Rozha_One, Roboto_Mono } from "next/font/google";
+import { Inter, Rozha_One, Roboto_Mono, Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,7 +39,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${rozhaOne.variable} ${robotoMono.variable}`}
+      className={cn(
+        inter.variable,
+        rozhaOne.variable,
+        robotoMono.variable,
+        "font-sans",
+        geist.variable,
+        "dark",
+      )}
     >
       <body className={inter.className}>
         <div className=" flex flex-col min-h-[100vh]">
