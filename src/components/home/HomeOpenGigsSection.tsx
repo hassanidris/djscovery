@@ -74,7 +74,7 @@ export default function HomeOpenGigsSection() {
             className="bg-h_blackLight/50 ring-white/5 hover:ring-h_purple transition-all p-4 gap-0 cursor-pointer"
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="shrink-0 bg-h_purpleDark/40 border border-h_purple/30 rounded-lg px-4 py-3 text-center min-w-[90px]">
+              <div className="shrink-0 bg-h_purpleDark/40 border border-h_purple/30 rounded-lg px-4 py-3 text-center min-w-22.5">
                 <p className="text-h_purple font-bold text-base">
                   {gig.budget}
                 </p>
@@ -102,12 +102,13 @@ export default function HomeOpenGigsSection() {
                 </div>
               </div>
 
-              <Button
+              {/* This will be done with the functionalite of the gig */}
+              {/* <Button
                 size="sm"
                 className="shrink-0 bg-h_purple hover:bg-h_purpleDark text-white"
               >
                 Apply
-              </Button>
+              </Button> */}
             </div>
           </Card>
         ))}

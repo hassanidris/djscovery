@@ -17,6 +17,7 @@ export default async function Page({
         className="bg-white/5 border border-white/20 rounded-xl p-8 flex flex-col gap-4 w-full max-w-sm"
       >
         <h1 className="text-2xl font-bold text-white text-center">Sign Up</h1>
+        {role && <input type="hidden" name="role" value={role} />}
         {roleLabel && (
           <div className="flex items-center justify-center gap-2 bg-h_purple/20 border border-h_purple/40 rounded-lg px-4 py-2">
             <span className="text-gray-400 text-sm">Signing up as:</span>

@@ -87,11 +87,27 @@ const Navbar = async () => {
         <div className="w-[30%] flex items-center gap-3 xl:gap-5 justify-end">
           {user ? (
             <>
-              <button className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
-                <FontAwesomeIcon icon={faCommentDots} className="h-4 w-4" />
+              <button
+                aria-label="Messages"
+                className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                +{" "}
+                <FontAwesomeIcon
+                  icon={faCommentDots}
+                  className="h-5.5 w-5.5"
+                  aria-hidden
+                />
               </button>
-              <button className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
-                <FontAwesomeIcon icon={faBell} className="h-4 w-4" />
+              <button
+                aria-label="Notifications"
+                className="size-10 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                +{" "}
+                <FontAwesomeIcon
+                  icon={faBell}
+                  className="h-5.5 w-5.5"
+                  aria-hidden
+                />
               </button>
               <NavbarAvatar
                 avatarSrc={avatarSrc}

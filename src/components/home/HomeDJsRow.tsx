@@ -65,7 +65,7 @@ export default function HomeDJsRow({
                   <Avatar className="size-20 ring-2 ring-h_purple ring-offset-2 ring-offset-black">
                     <AvatarImage src={dj.avatar} alt={dj.stageName} />
                     <AvatarFallback className="bg-h_purpleDark text-white text-lg">
-                      {dj.stageName[0]}
+                      {dj.stageName[0] || "?"}
                     </AvatarFallback>
                   </Avatar>
                   <div>

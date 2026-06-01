@@ -100,35 +100,35 @@ export default function HomeEventsSection() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {DEMO_EVENTS.map((event) => (
-          <Card
-            key={event.id}
-            className="group bg-h_blackLight/50 ring-1 ring-white/5 hover:ring-h_purple/50 transition-all duration-200 overflow-hidden p-0 gap-0 cursor-pointer"
-          >
-            {/* Header */}
-            <div className="relative bg-h_purpleDark/20 h-28 flex items-end p-4 overflow-hidden">
-              <div className="absolute inset-0 bg-linear-to-br from-h_purpleDark/40 to-transparent" />
-              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_purple/50 to-transparent" />
-              <h3 className="relative text-white text-2xl tracking-widest leading-none">
-                {event.title}
-              </h3>
-            </div>
+          <Link key={event.id} href={`/events/${event.id}`}>
+            +{" "}
+            <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_purple transition-all overflow-hidden p-0 gap-0 cursor-pointer">
+              {/* Header */}
+              <div className="relative bg-h_purpleDark/20 h-28 flex items-end p-4 overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-br from-h_purpleDark/40 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_purple/50 to-transparent" />
+                <h3 className="relative text-white text-2xl tracking-widest leading-none">
+                  {event.title}
+                </h3>
+              </div>
 
-            <div className="p-4 flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span>📅</span>
-                <span>{formatDate(event.date)}</span>
+              <div className="p-4 flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <span>📅</span>
+                  <span>{formatDate(event.date)}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <span>📍</span>
+                  <span className="truncate">
+                    {event.venue} · {event.city}, {event.country}
+                  </span>
+                </div>
+                <Badge className="bg-h_purpleDark/60 text-h_purple border-0 w-fit mt-1">
+                  🎧 {event.dj}
+                </Badge>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span>📍</span>
-                <span className="truncate">
-                  {event.venue} · {event.city}, {event.country}
-                </span>
-              </div>
-              <Badge className="bg-h_purpleDark/60 text-h_purple border-0 w-fit mt-1">
-                🎧 {event.dj}
-              </Badge>
-            </div>
-          </Card>
+            </Card>
+          </Link>
         ))}
       </div>
     </section>
