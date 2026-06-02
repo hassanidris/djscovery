@@ -32,13 +32,13 @@ export default function NavbarAvatar({
       <form ref={signOutFormRef} action={signOut} className="hidden" />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="outline-none rounded-full focus-visible:ring-2 focus-visible:ring-h_purple">
-            <Avatar className="size-8 ring-2 ring-h_purple hover:ring-h_purpleDark transition-all cursor-pointer">
+          <button className="outline-none rounded-full focus-visible:ring-2 focus-visible:ring-h_red">
+            <Avatar className="size-8 ring-2 ring-h_red hover:ring-h_redDark transition-all cursor-pointer">
               <AvatarImage
                 src={avatarSrc ?? "/noAvatar.png"}
                 alt={displayName}
               />
-              <AvatarFallback className="bg-h_purpleDark text-white text-sm font-semibold">
+              <AvatarFallback className="bg-h_redDark text-white text-sm font-semibold">
                 {initials}
               </AvatarFallback>
             </Avatar>

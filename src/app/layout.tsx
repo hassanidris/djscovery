@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, DM_Sans, Geist } from "next/font/google";
+import { Russo_One, Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,15 +7,15 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
-const dmSans = DM_Sans({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-space-grotesk",
 });
 
-const bebasNeue = Bebas_Neue({
+const russoOne = Russo_One({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-bebas-neue",
+  variable: "--font-russo-one",
 });
 
 export const metadata: Metadata = {
@@ -33,17 +33,19 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn(
-        dmSans.variable,
-        bebasNeue.variable,
+        spaceGrotesk.variable,
+        russoOne.variable,
         "font-sans",
         geist.variable,
         "dark",
       )}
     >
-      <body className={dmSans.className}>
+      <body className={spaceGrotesk.className}>
         <div className=" flex flex-col min-h-screen">
-          <div className="w-full bg-black px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 fixed z-50">
-            <Navbar />
+          <div className="w-full bg-black fixed z-50">
+            <div className="max-w-7xl mx-auto px-4 md:px-8">
+              <Navbar />
+            </div>
           </div>
           <div className="w-full flex-1 bg-black  mt-24">{children}</div>
           <div className="w-full">

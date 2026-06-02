@@ -36,7 +36,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
             height={24}
             className="rounded-full w-6 h-6 object-cover ring-1 ring-gray-400"
           />
-          <span className=" text-h_purple font-medium">
+          <span className=" text-h_red font-medium">
             Dj Controller for Sell
           </span>
         </div>

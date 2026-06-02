@@ -194,19 +194,19 @@ const Homepage = async () => {
         {user ? (
           <div className="flex flex-col items-center gap-4">
             <p className="text-gray-300 text-sm">
-              Signed in as <span className="text-h_purple">{user.email}</span>
+              Signed in as <span className="text-h_red">{user.email}</span>
             </p>
             <div className="flex gap-4">
               <Button
                 asChild
-                className="bg-h_purple hover:bg-h_purpleDark text-white font-semibold h-auto py-3 px-6"
+                className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6"
               >
                 <Link href="/community">Community</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="border-h_purple text-h_purple hover:bg-h_purple hover:text-white font-semibold h-auto py-3 px-6"
+                className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6"
               >
                 <Link href="/directory">Browse DJs</Link>
               </Button>
@@ -221,13 +221,13 @@ const Homepage = async () => {
               <Button
                 asChild
                 variant="outline"
-                className="border-h_purple text-h_purple hover:bg-h_purple hover:text-white font-semibold h-auto py-3 px-6"
+                className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6"
               >
                 <Link href="/sign-in">Sign In</Link>
               </Button>
               <Button
                 asChild
-                className="bg-h_purple hover:bg-h_purpleDark text-white font-semibold h-auto py-3 px-6"
+                className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6"
               >
                 <Link href="/sign-up">Get Started</Link>
               </Button>

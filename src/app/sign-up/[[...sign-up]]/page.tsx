@@ -19,9 +19,9 @@ export default async function Page({
         <h1 className="text-2xl font-bold text-white text-center">Sign Up</h1>
         {role && <input type="hidden" name="role" value={role} />}
         {roleLabel && (
-          <div className="flex items-center justify-center gap-2 bg-h_purple/20 border border-h_purple/40 rounded-lg px-4 py-2">
+          <div className="flex items-center justify-center gap-2 bg-h_red/20 border border-h_red/40 rounded-lg px-4 py-2">
             <span className="text-gray-400 text-sm">Signing up as:</span>
-            <span className="text-h_purple font-semibold text-sm">
+            <span className="text-h_red font-semibold text-sm">
               {roleLabel}
             </span>
           </div>
@@ -31,7 +31,7 @@ export default async function Page({
           name="email"
           placeholder="Email"
           required
-          className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_purple"
+          className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red"
         />
         <input
           type="password"
@@ -39,17 +39,17 @@ export default async function Page({
           placeholder="Password (min 6 chars)"
           minLength={6}
           required
-          className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_purple"
+          className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red"
         />
         <button
           type="submit"
-          className="bg-h_purple hover:bg-h_purpleDark text-white font-semibold py-3 rounded-lg transition-colors"
+          className="bg-h_red hover:bg-h_redDark text-white font-semibold py-3 rounded-lg transition-colors"
         >
           Create Account
         </button>
         <p className="text-gray-400 text-sm text-center">
           Already have an account?{" "}
-          <Link href="/sign-in" className="text-h_purple hover:underline">
+          <Link href="/sign-in" className="text-h_red hover:underline">
             Sign in
           </Link>
         </p>

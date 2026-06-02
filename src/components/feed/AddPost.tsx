@@ -22,7 +22,7 @@ const AddPost = () => {
         </p>
         <Link
           href="/sign-in"
-          className="shrink-0 bg-h_purple hover:bg-h_purpleDark text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+          className="shrink-0 bg-h_red hover:bg-h_redDark text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
         >
           Sign In
         </Link>
