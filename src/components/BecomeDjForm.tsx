@@ -76,6 +76,7 @@ export default function BecomeDjForm({
   const [cityId, setCityId] = useState<number | null>(null);
   const [cities, setCities] = useState<City[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
+  const cityRequestId = useRef(0);
 
   // Genres
   const [allGenres, setAllGenres] = useState<Genre[]>(initialGenres);
@@ -123,6 +124,22 @@ export default function BecomeDjForm({
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      setError("Avatar must be a JPG, PNG, or WEBP file.");
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Avatar must be 5 MB or smaller.");
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      e.target.value = "";
+      return;
+    }
+    setError(null);
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   }
@@ -133,10 +150,18 @@ export default function BecomeDjForm({
     setCityId(null);
     setCities([]);
     if (!id) return;
+    const requestId = ++cityRequestId.current;
     setLoadingCities(true);
-    const result = await getCitiesByCountry(id);
-    setCities(result);
-    setLoadingCities(false);
+    try {
+      const result = await getCitiesByCountry(id);
+      if (requestId === cityRequestId.current) {
+        setCities(result);
+      }
+    } finally {
+      if (requestId === cityRequestId.current) {
+        setLoadingCities(false);
+      }
+    }
   }
 
   function toggleGenre(id: number) {
@@ -228,12 +253,32 @@ export default function BecomeDjForm({
     }
 
     startTransition(async () => {
+      const uploadedPaths: { path: string; bucket: string }[] = [];
+
+      async function cleanupUploads() {
+        if (uploadedPaths.length === 0) return;
+        const supabase = createClient();
+        const byBucket = uploadedPaths.reduce<Record<string, string[]>>(
+          (acc, { path, bucket }) => {
+            (acc[bucket] ??= []).push(path);
+            return acc;
+          },
+          {},
+        );
+        await Promise.all(
+          Object.entries(byBucket).map(([bucket, paths]) =>
+            supabase.storage.from(bucket).remove(paths),
+          ),
+        );
+      }
+
       try {
         let avatarUrl: string | undefined;
         if (avatarFile) {
           setUploadProgress("Uploading avatar...");
-          const { url } = await uploadFile(avatarFile, "avatars");
-          avatarUrl = url;
+          const uploaded = await uploadFile(avatarFile, "avatars");
+          uploadedPaths.push({ path: uploaded.path, bucket: uploaded.bucket });
+          avatarUrl = uploaded.url;
         }
 
         const media: {
@@ -248,6 +293,7 @@ export default function BecomeDjForm({
             `Uploading gallery image ${i + 1}/${galleryFiles.length}...`,
           );
           const m = await uploadFile(galleryFiles[i], "gallery");
+          uploadedPaths.push({ path: m.path, bucket: m.bucket });
           media.push({ type: "IMAGE", ...m });
         }
 
@@ -274,6 +320,7 @@ export default function BecomeDjForm({
         });
 
         if (result?.error) {
+          await cleanupUploads();
           setError(result.error);
         }
       } catch (err: unknown) {
@@ -286,6 +333,7 @@ export default function BecomeDjForm({
             "NEXT_REDIRECT",
           );
         if (isRedirect) return;
+        await cleanupUploads();
         setError("Something went wrong. Please try again.");
       } finally {
         setUploadProgress("");

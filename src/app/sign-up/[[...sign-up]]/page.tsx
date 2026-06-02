@@ -17,7 +17,12 @@ export default async function Page({
         <h1 className="text-2xl font-bold text-white text-center">Sign Up</h1>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm text-center">
+          <div
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm text-center"
+          >
             {error}
           </div>
         )}

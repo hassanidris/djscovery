@@ -16,6 +16,7 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
+  const role = (formData.get("role") as string) ?? "";
 
   const { data, error } = await supabase.auth.signUp({
     email: formData.get("email") as string,
@@ -38,11 +39,13 @@ export async function signUp(formData: FormData) {
       create: { id: userId, email, username },
     });
 
-    redirect("/select-role");
+    redirect(`/select-role?role=${encodeURIComponent(role)}`);
   }
 
   // Email confirmation required — auth callback handles redirect to /select-role
-  redirect("/sign-in?message=Check your email to confirm your account");
+  redirect(
+    `/sign-in?message=Check your email to confirm your account&role=${encodeURIComponent(role)}`,
+  );
 }
 
 export async function signOut() {
@@ -57,16 +60,6 @@ export async function assignRole(role: "DJ" | "ORGANIZER") {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/sign-in");
-
-  // DJ role is only granted after the profile form is completed (see createDjProfile).
-  // Assigning it here would leave the user tagged as a DJ even if they abandon the form.
-  if (role === "ORGANIZER") {
-    await prisma.userRole.upsert({
-      where: { userId_role: { userId: user.id, role } },
-      update: {},
-      create: { userId: user.id, role },
-    });
-  }
 
   redirect(role === "DJ" ? "/become-dj" : "/become-organizer");
 }

@@ -28,6 +28,9 @@ export async function getOrCreateGenre(
   name: string,
 ): Promise<{ id: number; name: string }> {
   const trimmed = name.trim();
+  if (!trimmed) {
+    throw new Error("Genre name is required");
+  }
   const existing = await prisma.genre.findFirst({
     where: { name: { equals: trimmed, mode: "insensitive" } },
     select: { id: true, name: true },
@@ -93,64 +96,78 @@ export async function createDjProfile(
     media,
   } = parsed.data;
 
+  if (cityId) {
+    const city = await prisma.city.findFirst({
+      where: { id: cityId, countryId },
+      select: { id: true },
+    });
+    if (!city) {
+      return {
+        error: "The selected city does not belong to the selected country.",
+      };
+    }
+  }
+
   const slug = makeSlug(stageName, user.id);
 
-  const profile = await prisma.djProfile.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: {
-      userId: user.id,
-      stageName,
-      slug,
-      bio: bio ?? null,
-      avatar: avatarUrl ?? null,
-      countryId: countryId ?? null,
-      cityId: cityId ?? null,
-    },
-  });
-
-  if (djTypes.length > 0) {
-    await prisma.djProfileType.createMany({
-      data: djTypes.map((type) => ({ djProfileId: profile.id, type })),
-      skipDuplicates: true,
+  await prisma.$transaction(async (tx) => {
+    const profile = await tx.djProfile.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        stageName,
+        slug,
+        bio: bio ?? null,
+        avatar: avatarUrl ?? null,
+        countryId: countryId ?? null,
+        cityId: cityId ?? null,
+      },
     });
-  }
 
-  if (genreIds.length > 0) {
-    await prisma.djGenre.createMany({
-      data: genreIds.map((genreId) => ({ djProfileId: profile.id, genreId })),
-      skipDuplicates: true,
+    if (djTypes.length > 0) {
+      await tx.djProfileType.createMany({
+        data: djTypes.map((type) => ({ djProfileId: profile.id, type })),
+        skipDuplicates: true,
+      });
+    }
+
+    if (genreIds.length > 0) {
+      await tx.djGenre.createMany({
+        data: genreIds.map((genreId) => ({ djProfileId: profile.id, genreId })),
+        skipDuplicates: true,
+      });
+    }
+
+    if (socialLinks.length > 0) {
+      await tx.socialLink.createMany({
+        data: socialLinks.map((link) => ({
+          djProfileId: profile.id,
+          platform: link.platform,
+          url: link.url,
+        })),
+        skipDuplicates: true,
+      });
+    }
+
+    if (media.length > 0) {
+      await tx.media.createMany({
+        data: media.map((m) => ({
+          type: m.type as "IMAGE" | "VIDEO" | "AUDIO",
+          url: m.url,
+          bucket: m.bucket,
+          path: m.path,
+          djProfileId: profile.id,
+        })),
+      });
+    }
+
+    // Grant DJ role only now — after the profile is fully saved.
+    await tx.userRole.upsert({
+      where: { userId_role: { userId: user.id, role: "DJ" } },
+      update: {},
+      create: { userId: user.id, role: "DJ" },
     });
-  }
-
-  if (socialLinks.length > 0) {
-    await prisma.socialLink.createMany({
-      data: socialLinks.map((link) => ({
-        djProfileId: profile.id,
-        platform: link.platform,
-        url: link.url,
-      })),
-      skipDuplicates: true,
-    });
-  }
-
-  if (media.length > 0) {
-    await prisma.media.createMany({
-      data: media.map((m) => ({
-        type: m.type as "IMAGE" | "VIDEO" | "AUDIO",
-        url: m.url,
-        bucket: m.bucket,
-        path: m.path,
-        djProfileId: profile.id,
-      })),
-    });
-  }
-
-  // Grant DJ role only now — after the profile is fully saved.
-  await prisma.userRole.upsert({
-    where: { userId_role: { userId: user.id, role: "DJ" } },
-    update: {},
-    create: { userId: user.id, role: "DJ" },
   });
 
   redirect("/");
@@ -183,6 +200,13 @@ export async function createOrganizerProfile(formData: FormData) {
       businessName: parsed.data.businessName,
       phone: parsed.data.phone ?? null,
     },
+  });
+
+  // Grant ORGANIZER role only now — after the profile is fully saved.
+  await prisma.userRole.upsert({
+    where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
+    update: {},
+    create: { userId: user.id, role: "ORGANIZER" },
   });
 
   redirect("/");
