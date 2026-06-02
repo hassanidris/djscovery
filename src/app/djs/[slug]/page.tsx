@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
@@ -41,12 +42,12 @@ export default async function DjProfilePage({
       <div className="min-h-screen bg-black">
         <div className="bg-h_red/10 border-b border-h_red/15 text-red-200 text-xs text-center py-2 px-4 font-medium tracking-wide">
           Layout V1 — Tabbed &nbsp;·&nbsp;{" "}
-          <a
+          <Link
             href="/djs/demo-v2"
             className="underline underline-offset-2 opacity-70 hover:opacity-100"
           >
             Switch to V2 (Two-Column) →
-          </a>
+          </Link>
         </div>
         <DjProfileHero {...DEMO_DJ} />
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-10">
@@ -71,12 +72,12 @@ export default async function DjProfilePage({
       <div className="min-h-screen bg-black">
         <div className="bg-h_red/10 border-b border-h_red/15 text-red-200 text-xs text-center py-2 px-4 font-medium tracking-wide">
           Layout V2 — Editorial Two-Column &nbsp;·&nbsp;{" "}
-          <a
+          <Link
             href="/djs/demo"
             className="underline underline-offset-2 opacity-70 hover:opacity-100"
           >
             Switch to V1 (Tabs) →
-          </a>
+          </Link>
         </div>
         <DjProfileHero {...DEMO_DJ} />
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-10">
