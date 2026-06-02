@@ -16,27 +16,31 @@ CREATE TABLE "CommentLike" (
     CONSTRAINT "CommentLike_pkey" PRIMARY KEY ("id")
 );
 
--- Migrate existing post likes (only rows where postId is set)
-INSERT INTO "PostLike" ("id", "createdAt", "userId", "postId")
-SELECT DISTINCT ON ("userId", "postId") "id", "createdAt", "userId", "postId"
-FROM "Like"
-WHERE "postId" IS NOT NULL
-ORDER BY "userId", "postId", "createdAt"
-ON CONFLICT DO NOTHING;
+-- Migrate existing likes only if the old Like table exists (guard for shadow DB)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'Like'
+  ) THEN
+    INSERT INTO "PostLike" ("id", "createdAt", "userId", "postId")
+    SELECT DISTINCT ON ("userId", "postId") "id", "createdAt", "userId", "postId"
+    FROM "Like"
+    WHERE "postId" IS NOT NULL
+    ORDER BY "userId", "postId", "createdAt"
+    ON CONFLICT DO NOTHING;
 
--- Reset PostLike id sequence to avoid duplicate-key errors on future inserts
-SELECT setval(pg_get_serial_sequence('"PostLike"', 'id'), GREATEST((SELECT COALESCE(MAX(id), 0) FROM "PostLike"), 1));
+    PERFORM setval(pg_get_serial_sequence('"PostLike"', 'id'), GREATEST((SELECT COALESCE(MAX(id), 0) FROM "PostLike"), 1));
 
--- Migrate existing comment likes (only rows where commentId is set)
-INSERT INTO "CommentLike" ("id", "createdAt", "userId", "commentId")
-SELECT DISTINCT ON ("userId", "commentId") "id", "createdAt", "userId", "commentId"
-FROM "Like"
-WHERE "commentId" IS NOT NULL
-ORDER BY "userId", "commentId", "createdAt"
-ON CONFLICT DO NOTHING;
+    INSERT INTO "CommentLike" ("id", "createdAt", "userId", "commentId")
+    SELECT DISTINCT ON ("userId", "commentId") "id", "createdAt", "userId", "commentId"
+    FROM "Like"
+    WHERE "commentId" IS NOT NULL
+    ORDER BY "userId", "commentId", "createdAt"
+    ON CONFLICT DO NOTHING;
 
--- Reset CommentLike id sequence to avoid duplicate-key errors on future inserts
-SELECT setval(pg_get_serial_sequence('"CommentLike"', 'id'), GREATEST((SELECT COALESCE(MAX(id), 0) FROM "CommentLike"), 1));
+    PERFORM setval(pg_get_serial_sequence('"CommentLike"', 'id'), GREATEST((SELECT COALESCE(MAX(id), 0) FROM "CommentLike"), 1));
+  END IF;
+END $$;
 
 -- Drop the old polymorphic Like table
 DROP TABLE IF EXISTS "Like";

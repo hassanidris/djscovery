@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/client";
 import { redirect } from "next/navigation";
 
 export async function signIn(formData: FormData) {
@@ -33,5 +34,21 @@ export async function signUp(formData: FormData) {
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  redirect("/");
+}
+
+export async function assignRole(role: "DJ" | "ORGANIZER") {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/sign-in");
+
+  await prisma.userRole.upsert({
+    where: { userId_role: { userId: user.id, role } },
+    update: {},
+    create: { userId: user.id, role },
+  });
+
   redirect("/");
 }

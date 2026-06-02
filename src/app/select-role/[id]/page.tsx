@@ -1,77 +1,78 @@
 "use client";
 
-import { useState } from "react";
-import { useUser } from "@/lib/supabase/useUser";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { assignRole } from "@/lib/actions/auth";
 import Footer from "@/components/Footer";
 
 export default function SelectRolePage() {
-  const [role, setRole] = useState<string | null>(null);
-  const { user } = useUser();
-  const router = useRouter();
+  const [role, setRole] = useState<"DJ" | "ORGANIZER" | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = async () => {
-    if (!role || !user) return;
-
-    try {
-      const response = await fetch("/api/save-role", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          email: user.email,
-          role,
-        }),
-      });
-
-      if (response.ok) {
-        router.push("/");
-      } else {
-        console.error("Failed to save role");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  const handleSubmit = () => {
+    if (!role) return;
+    startTransition(() => assignRole(role));
   };
 
   return (
     <>
       <div className="h-[calc(100vh-96px)] flex items-center justify-center">
-        <div className=" bg-white/5 border border-white/60 p-10 space-y-8 rounded-lg">
-          <h1 className="text-2xl font-bold mb-6 text-white">
-            Select Your Role
-          </h1>
-          <div className="mb-4 text-lg flex justify-center items-center gap-8">
-            <label className="flex items-center">
+        <div className="bg-white/5 border border-white/60 p-10 space-y-8 rounded-lg w-full max-w-sm">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-white">Select Your Role</h1>
+            <p className="text-gray-400 text-sm">
+              All signed-in users can interact as fans by default. Select an
+              additional role if you want to list as a DJ or post gigs as an
+              Organizer.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <label
+              className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
+                role === "DJ"
+                  ? "border-h_red bg-h_red/10 text-white"
+                  : "border-white/20 text-gray-300 hover:border-white/40"
+              }`}
+            >
               <input
                 type="radio"
                 name="role"
-                value="fan"
-                checked={role === "fan"}
-                onChange={(e) => setRole(e.target.value)}
-                className="mr-2 text-xl"
+                value="DJ"
+                checked={role === "DJ"}
+                onChange={() => setRole("DJ")}
+                className="sr-only"
               />
-              <span className="text-white text-xl">Fan</span>
+              <span className="font-semibold text-lg">DJ</span>
+              <span className="text-sm text-gray-400 ml-auto">
+                Public profile · Book gigs
+              </span>
             </label>
-            <label className="flex items-center">
+            <label
+              className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
+                role === "ORGANIZER"
+                  ? "border-h_red bg-h_red/10 text-white"
+                  : "border-white/20 text-gray-300 hover:border-white/40"
+              }`}
+            >
               <input
                 type="radio"
                 name="role"
-                value="dj"
-                checked={role === "dj"}
-                onChange={(e) => setRole(e.target.value)}
-                className="mr-2"
+                value="ORGANIZER"
+                checked={role === "ORGANIZER"}
+                onChange={() => setRole("ORGANIZER")}
+                className="sr-only"
               />
-              <span className="text-white text-xl">DJ</span>
+              <span className="font-semibold text-lg">Organizer</span>
+              <span className="text-sm text-gray-400 ml-auto">
+                Post gigs · Manage events
+              </span>
             </label>
           </div>
           <button
             onClick={handleSubmit}
-            className="w-full bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition-colors duration-300"
+            disabled={!role || isPending}
+            className="w-full bg-h_red hover:bg-h_redDark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg transition-colors"
           >
-            Continue
+            {isPending ? "Saving..." : "Continue"}
           </button>
         </div>
       </div>

@@ -14,7 +14,6 @@ enum Role {
   ADMIN
   DJ
   ORGANIZER
-  FAN
 }
 
 enum UserStatus {
@@ -83,9 +82,9 @@ model Country {
   name              String             @unique
   code              String             @unique // ISO 3166-1 alpha-2, e.g. "SE"
   cities            City[]
+  users             User[]
   djProfiles        DjProfile[]
   organizerProfiles OrganizerProfile[]
-  fanProfiles       FanProfile[]
   events            Event[]
 
   @@index([name])
@@ -96,9 +95,9 @@ model City {
   name              String
   countryId         Int
   country           Country            @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  users             User[]
   djProfiles        DjProfile[]
   organizerProfiles OrganizerProfile[]
-  fanProfiles       FanProfile[]
   events            Event[]
 
   @@unique([name, countryId])
@@ -111,15 +110,21 @@ model User {
   id        String     @id // Must match Supabase Auth user id
   email     String     @unique
   username  String     @unique
-  role      Role       @default(FAN)
+  name      String?
+  image     String?
   status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   deletedAt DateTime?
 
+  countryId Int?
+  country   Country? @relation(fields: [countryId], references: [id])
+  cityId    Int?
+  city      City?    @relation(fields: [cityId], references: [id])
+
+  roles            UserRole[]
   djProfile        DjProfile?
   organizerProfile OrganizerProfile?
-  fanProfile       FanProfile?
 
   posts            Post[]
   postComments     PostComment[]
@@ -139,9 +144,21 @@ model User {
   followers  Follower[] @relation("UserFollowers")
   followings Follower[] @relation("UserFollowings")
 
-  @@index([role])
   @@index([status])
   @@index([deletedAt])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+model UserRole {
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role
+
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
 }
 
 // ------ DJ PROFILE ------
@@ -204,24 +221,6 @@ model OrganizerProfile {
   jobs Job[]
 
   @@index([countryId])
-}
-
-// ------ FAN PROFILE ------
-
-model FanProfile {
-  id     Int    @id @default(autoincrement())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  displayName String
-
-  countryId Int?
-  country   Country? @relation(fields: [countryId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  city      City?    @relation(fields: [cityId], references: [id])
-  cityId    Int?
 }
 
 // ------ GENRES ------
