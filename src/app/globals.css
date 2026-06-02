@@ -36,7 +36,7 @@
   --color-h_blackLight: #2b2b2b;
   --color-h_cyan: #0093d8;
   --color-h_cyanDark: #006fad;
-  --font-sans: var(--font-dm-sans);
+  --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-bebas-neue);
   --radius-sm: calc(var(--radius) - 4px);

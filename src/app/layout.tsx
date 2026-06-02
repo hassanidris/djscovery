@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, DM_Sans, Geist } from "next/font/google";
+import { Bebas_Neue, Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
-const dmSans = DM_Sans({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-space-grotesk",
 });
 
 const bebasNeue = Bebas_Neue({
@@ -33,14 +33,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn(
-        dmSans.variable,
+        spaceGrotesk.variable,
         bebasNeue.variable,
         "font-sans",
         geist.variable,
         "dark",
       )}
     >
-      <body className={dmSans.className}>
+      <body className={spaceGrotesk.className}>
         <div className=" flex flex-col min-h-screen">
           <div className="w-full bg-black fixed z-50">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
