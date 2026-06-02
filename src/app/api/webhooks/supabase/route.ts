@@ -44,7 +44,6 @@ export async function POST(req: Request) {
           id: record.id,
           email,
           username,
-          role: "FAN",
         },
       });
       return new Response("User created", { status: 200 });
