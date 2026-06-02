@@ -85,7 +85,7 @@ export default function HomeDJsRow({
                     {dj.genres.slice(0, 2).map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_redDark/60 text-h_red border-0"
+                        className="bg-h_redDark/60 text-red-100 border-0"
                       >
                         {g}
                       </Badge>

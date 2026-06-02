@@ -109,7 +109,7 @@ export default function HomeFeaturedDJs() {
                     {dj.genres.map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_redDark/60 text-h_red border-0"
+                        className="bg-h_redDark/60 text-red-100 border-0"
                       >
                         {g}
                       </Badge>
