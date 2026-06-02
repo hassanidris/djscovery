@@ -50,5 +50,5 @@ export async function assignRole(role: "DJ" | "ORGANIZER") {
     create: { userId: user.id, role },
   });
 
-  redirect("/");
+  redirect(role === "DJ" ? "/become-dj" : "/become-organizer");
 }
