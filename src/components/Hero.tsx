@@ -24,8 +24,8 @@ const Hero = () => {
           Your browser does not support the video tag.
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40 z-10"></div>
-        <div className="absolute top-0 left-0 h-full w-full flex justify-start items-center z-10">
-          <div className="flex flex-col items-start px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-white">
+        <div className="absolute top-0 left-0 h-full w-full flex items-center z-10">
+          <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-start text-white">
             <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl max-w-xl md:max-w-2xl lg:max-w-3xl leading-tight">
               Find the{" "}
               <span className="font-bold text-h_red/80">Perfect DJ </span>
