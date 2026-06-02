@@ -36,6 +36,8 @@
   --color-h_blackLight: #2b2b2b;
   --color-h_red: #d30101;
   --color-h_redDark: #a80000;
+  --color-h_cyan: #06b6d4;
+  --color-h_cyanDark: #0e7490;
   --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-russo-one);
