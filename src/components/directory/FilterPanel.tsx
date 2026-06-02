@@ -54,7 +54,7 @@ const FilterPanel = ({ genres = GENRES }: { genres?: string[] }) => {
               value=""
               checked={currentGenre === ""}
               onChange={() => updateParam("genre", "")}
-              className="accent-h_purple"
+              className="accent-h_cyan"
             />
             <span className="text-gray-300 text-xs">All</span>
           </label>
@@ -69,7 +69,7 @@ const FilterPanel = ({ genres = GENRES }: { genres?: string[] }) => {
                 value={genre}
                 checked={currentGenre === genre}
                 onChange={() => updateParam("genre", genre)}
-                className="accent-h_purple"
+                className="accent-h_cyan"
               />
               <span className="text-gray-300 text-xs">{genre}</span>
             </label>
@@ -87,7 +87,7 @@ const FilterPanel = ({ genres = GENRES }: { genres?: string[] }) => {
           placeholder="e.g. Sweden"
           value={currentCountry}
           onChange={(e) => updateParam("country", e.target.value)}
-          className="bg-h_black/50 text-gray-300 text-xs rounded-md px-3 py-2 outline-none ring-1 ring-gray-700 focus:ring-h_purple"
+          className="bg-h_black/50 text-gray-300 text-xs rounded-md px-3 py-2 outline-none ring-1 ring-gray-700 focus:ring-h_cyan"
         />
       </div>
 
@@ -99,7 +99,7 @@ const FilterPanel = ({ genres = GENRES }: { genres?: string[] }) => {
         <select
           value={currentSort}
           onChange={(e) => updateParam("sort", e.target.value)}
-          className="bg-h_black/50 text-gray-300 text-xs rounded-md px-3 py-2 outline-none ring-1 ring-gray-700 focus:ring-h_purple"
+          className="bg-h_black/50 text-gray-300 text-xs rounded-md px-3 py-2 outline-none ring-1 ring-gray-700 focus:ring-h_cyan"
         >
           <option value="">Newest</option>
           <option value="a-z">A — Z</option>
@@ -110,7 +110,7 @@ const FilterPanel = ({ genres = GENRES }: { genres?: string[] }) => {
       {hasFilters && (
         <button
           onClick={() => router.push(pathname)}
-          className="text-xs text-h_purple hover:text-h_purpleDark text-left"
+          className="text-xs text-h_cyan hover:text-h_cyanDark text-left"
         >
           Clear all filters
         </button>

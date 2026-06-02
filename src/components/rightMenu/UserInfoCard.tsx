@@ -43,7 +43,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
         {currentUserId === user.id ? (
           <UpdateUser user={user} />
         ) : (
-          <Link href="#" className="text-h_purple text-xs">
+          <Link href="#" className="text-h_cyan text-xs">
             See all
           </Link>
         )}

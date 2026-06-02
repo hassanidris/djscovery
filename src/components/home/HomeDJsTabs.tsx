@@ -16,58 +16,60 @@ type Props = {
 
 export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
   return (
-    <section className="py-12 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 border-t border-white/5">
-      <Tabs defaultValue="new">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex flex-wrap items-center gap-4">
-            <h2 className="text-white text-3xl md:text-4xl">Discover DJs</h2>
-            <TabsList className="bg-h_blackLight/80 border border-white/10">
-              <TabsTrigger
-                value="new"
-                className="data-[state=active]:bg-h_purple data-[state=active]:text-black"
-              >
-                Just Joined
-              </TabsTrigger>
-              <TabsTrigger
-                value="trending"
-                className="data-[state=active]:bg-h_purple data-[state=active]:text-black"
-              >
-                Trending
-              </TabsTrigger>
-            </TabsList>
+    <section className="py-12 px-4 md:px-8 border-t border-white/5">
+      <div className="max-w-7xl mx-auto">
+        <Tabs defaultValue="new">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-wrap items-center gap-4">
+              <h2 className="text-white text-3xl md:text-4xl">Discover DJs</h2>
+              <TabsList className="bg-h_blackLight/80 border border-white/10">
+                <TabsTrigger
+                  value="new"
+                  className="data-[state=active]:bg-h_cyan data-[state=active]:text-black"
+                >
+                  Just Joined
+                </TabsTrigger>
+                <TabsTrigger
+                  value="trending"
+                  className="data-[state=active]:bg-h_cyan data-[state=active]:text-black"
+                >
+                  Trending
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-h_cyan hover:text-h_cyan hover:bg-white/5"
+            >
+              <Link href="/directory">View all →</Link>
+            </Button>
           </div>
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="text-h_purple hover:text-h_purple hover:bg-white/5"
-          >
-            <Link href="/directory">View all →</Link>
-          </Button>
-        </div>
 
-        <TabsContent value="new">
-          <ScrollArea className="w-full">
-            <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
-              {newDJs.map((dj) => (
-                <DJCard key={dj.id} dj={dj} showNew />
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </TabsContent>
+          <TabsContent value="new">
+            <ScrollArea className="w-full">
+              <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
+                {newDJs.map((dj) => (
+                  <DJCard key={dj.id} dj={dj} showNew />
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </TabsContent>
 
-        <TabsContent value="trending">
-          <ScrollArea className="w-full">
-            <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
-              {trendingDJs.map((dj, index) => (
-                <DJCard key={dj.id} dj={dj} rank={index + 1} />
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="trending">
+            <ScrollArea className="w-full">
+              <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
+                {trendingDJs.map((dj, index) => (
+                  <DJCard key={dj.id} dj={dj} rank={index + 1} />
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
+      </div>
     </section>
   );
 }
@@ -83,22 +85,22 @@ function DJCard({
 }) {
   return (
     <Link href="/directory" className="block h-full">
-      <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_purple gap-3 p-4 cursor-pointer transition-all overflow-visible">
+      <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_cyan gap-3 p-4 cursor-pointer transition-all overflow-visible">
         {rank !== undefined && (
-          <Badge className="absolute top-2 left-2 bg-h_purpleDark/50 text-h_purple border-0">
+          <Badge className="absolute top-2 left-2 bg-h_cyanDark/50 text-h_cyan border-0">
             #{rank}
           </Badge>
         )}
         {showNew && (
-          <Badge className="absolute top-2 right-2 bg-h_purple text-black border-0">
+          <Badge className="absolute top-2 right-2 bg-h_cyan text-black border-0">
             NEW
           </Badge>
         )}
 
         <div className="flex flex-col items-center gap-2 text-center pt-2">
-          <Avatar className="size-20 ring-2 ring-h_purple ring-offset-2 ring-offset-black">
+          <Avatar className="size-20 ring-2 ring-h_cyan ring-offset-2 ring-offset-black">
             <AvatarImage src={dj.avatar} alt={dj.stageName} />
-            <AvatarFallback className="bg-h_purpleDark text-white text-lg">
+            <AvatarFallback className="bg-h_cyanDark text-black text-lg">
               {dj.stageName[0] || "?"}
             </AvatarFallback>
           </Avatar>
@@ -116,7 +118,7 @@ function DJCard({
           {dj.genres.slice(0, 2).map((g) => (
             <Badge
               key={g}
-              className="bg-h_purpleDark/60 text-h_purple border-0"
+              className="bg-h_cyanDark/60 text-h_cyan border-0"
             >
               {g}
             </Badge>

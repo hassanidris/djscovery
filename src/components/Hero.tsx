@@ -28,11 +28,11 @@ const Hero = () => {
           <div className="flex flex-col px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-white ">
             <h1 className=" font-bold text-4xl md:text-7xl w-3/4">
               Find the{" "}
-              <span className="font-bold leading-snug text-h_purple">
+              <span className="font-bold leading-snug text-h_cyan">
                 Perfect DJ{" "}
               </span>
               For You!{" "}
-              <span className="font-bold leading-snug text-h_purple">
+              <span className="font-bold leading-snug text-h_cyan">
                 <FontAwesomeIcon
                   icon={faHeadphones}
                   className=" w-16 h-16 inline"
@@ -46,14 +46,14 @@ const Hero = () => {
             <div className="flex gap-4 mt-6">
               <Button
                 asChild
-                className="bg-h_purple hover:bg-h_purpleDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                className="bg-h_cyan hover:bg-h_cyanDark text-black font-semibold h-auto py-3 px-6 text-sm md:text-base"
               >
                 <Link href="/sign-up?role=dj">Join as DJ</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="border-h_purple text-h_purple hover:bg-h_purple hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                className="border-h_cyan text-h_cyan hover:bg-h_cyan hover:text-black font-semibold h-auto py-3 px-6 text-sm md:text-base"
               >
                 <Link href="/sign-up?role=organiser">Join as Organiser</Link>
               </Button>

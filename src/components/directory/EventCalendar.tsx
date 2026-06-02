@@ -107,9 +107,9 @@ const EventCalendar = () => {
               className={`relative flex flex-col items-center justify-center h-8 w-8 mx-auto rounded-full text-xs transition-colors
                 ${
                   isSelected
-                    ? "bg-h_purple text-black font-bold"
+                    ? "bg-h_cyan text-black font-bold"
                     : isToday
-                    ? "ring-1 ring-h_purple text-h_purple"
+                    ? "ring-1 ring-h_cyan text-h_cyan"
                     : "text-gray-300 hover:bg-h_blackLight"
                 }`}
             >
@@ -117,7 +117,7 @@ const EventCalendar = () => {
               {hasEvent && (
                 <span
                   className={`absolute bottom-0.5 w-1 h-1 rounded-full ${
-                    isSelected ? "bg-black" : "bg-h_purple"
+                    isSelected ? "bg-black" : "bg-h_cyan"
                   }`}
                 />
               )}
@@ -128,7 +128,7 @@ const EventCalendar = () => {
 
       {/* Legend */}
       <div className="flex items-center gap-2 text-xs text-gray-500">
-        <span className="w-2 h-2 rounded-full bg-h_purple inline-block" />
+        <span className="w-2 h-2 rounded-full bg-h_cyan inline-block" />
         <span>Event day — click to view</span>
       </div>
 
@@ -143,7 +143,7 @@ const EventCalendar = () => {
           {selectedEvents.map((event) => (
             <div
               key={event.id}
-              className="bg-h_black/60 rounded-lg p-3 border-l-2 border-h_purple"
+              className="bg-h_black/60 rounded-lg p-3 border-l-2 border-h_cyan"
             >
               <p className="text-h_white text-sm font-semibold">{event.djName}</p>
               <p className="text-gray-400 text-xs mt-0.5">{event.venue}</p>

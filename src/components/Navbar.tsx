@@ -41,7 +41,12 @@ const Navbar = async () => {
         {/* LEFT — Logo */}
         <div className="block w-[20%]">
           <Link href="/">
-            <Image src="/dj-logo.svg" alt="DJscovery" width={65} height={55} />
+            <Image
+              src="/dj-logo-blue.svg"
+              alt="DJscovery"
+              width={65}
+              height={55}
+            />
           </Link>
         </div>
 
@@ -70,7 +75,7 @@ const Navbar = async () => {
               <span>Community</span>
             </Link>
           </div>
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-h_blackLight/50 rounded-lg ring-1 ring-white/10 focus-within:ring-h_purple/60 transition-all">
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-h_blackLight/50 rounded-lg ring-1 ring-white/10 focus-within:ring-h_cyan/60 transition-all">
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
               className="h-3.5 w-3.5 text-gray-500 shrink-0"
@@ -122,14 +127,14 @@ const Navbar = async () => {
                 asChild
                 variant="outline"
                 size="sm"
-                className="border-h_purple/60 text-h_purple hover:bg-h_purple/15 hover:text-h_purple hover:border-h_purple transition-all"
+                className="border-h_cyan/60 text-h_cyan hover:bg-h_cyan/15 hover:text-h_cyan hover:border-h_cyan transition-all"
               >
                 <Link href="/sign-in">Sign In</Link>
               </Button>
               <Button
                 asChild
                 size="sm"
-                className="bg-h_purple hover:bg-h_purpleDark text-black font-semibold transition-all"
+                className="bg-h_cyan hover:bg-h_cyanDark text-black font-semibold transition-all"
               >
                 <Link href="/sign-up">Sign Up</Link>
               </Button>

@@ -22,7 +22,7 @@ const Birthdays = () => {
           <span className="font-semibol text-h_white">Wayne Burton</span>
         </div>
         <div className="flex gap-3 justify-end">
-          <button className="bg-h_purple hover:bg-h_purpleDark text-white text-xs px-2 py-1 rounded-md">
+          <button className="bg-h_cyan hover:bg-h_cyanDark text-black text-xs px-2 py-1 rounded-md">
             Celebrate
           </button>
         </div>

@@ -42,8 +42,10 @@ export default function RootLayout({
     >
       <body className={dmSans.className}>
         <div className=" flex flex-col min-h-screen">
-          <div className="w-full bg-black px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 fixed z-50">
-            <Navbar />
+          <div className="w-full bg-black fixed z-50">
+            <div className="max-w-7xl mx-auto px-4 md:px-8">
+              <Navbar />
+            </div>
           </div>
           <div className="w-full flex-1 bg-black  mt-24">{children}</div>
           <div className="w-full">
