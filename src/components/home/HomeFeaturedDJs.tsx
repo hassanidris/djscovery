@@ -77,7 +77,7 @@ export default function HomeFeaturedDJs() {
           {FEATURED_DJS.map((dj) => (
             <Link key={dj.id} href="/directory">
               <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all overflow-hidden p-0 gap-0">
-                <div className="relative h-24 bg-linear-to-r from-h_redDark to-black">
+                <div className="relative h-24 bg-linear-to-r from-h_cyanDark to-black">
                   <div className="absolute -bottom-8 left-4">
                     <Avatar className="size-16 ring-2 ring-h_red ring-offset-2 ring-offset-black">
                       <AvatarImage src={dj.avatar} alt={dj.stageName} />

@@ -43,7 +43,7 @@ export default function HomeGenresSection() {
               className="group relative bg-h_blackLight/40 ring-1 ring-white/8 hover:ring-h_red/60 hover:bg-h_redDark/20 rounded-xl px-4 py-5 flex flex-col gap-2.5 transition-all duration-200 overflow-hidden"
             >
               {/* Top accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_red/0 to-transparent group-hover:via-h_red/60 transition-all duration-300" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_cyan/0 to-transparent group-hover:via-h_cyan/60 transition-all duration-300" />
 
               <span className="text-3xl leading-none">{genre.emoji}</span>
 

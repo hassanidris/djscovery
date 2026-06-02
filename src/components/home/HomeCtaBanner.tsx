@@ -5,7 +5,7 @@ export default function HomeCtaBanner() {
   return (
     <section className="py-16 px-4 md:px-8 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
-        <div className="relative rounded-2xl overflow-hidden bg-linear-to-br from-h_redDark via-[#3b1f6e] to-black border border-h_red/50 shadow-[0_0_40px_-8px_rgba(197,132,245,0.25)] px-8 py-12 md:px-16">
+        <div className="relative rounded-2xl overflow-hidden bg-linear-to-br from-h_redDark via-h_red/20 to-black border border-h_red/50 shadow-[0_0_40px_-8px_rgba(211,1,1,0.25)] px-8 py-12 md:px-16">
           {/* Decorative blobs */}
           <div className="absolute -top-16 -right-16 w-64 h-64 bg-h_red/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-h_redDark/30 rounded-full blur-3xl pointer-events-none" />
