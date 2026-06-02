@@ -6,7 +6,12 @@ import { useState } from "react";
 
 type Role = "" | "dj" | "organiser";
 
-const ROLES: { value: Role; label: string; icon: string; description: string }[] = [
+const ROLES: {
+  value: Role;
+  label: string;
+  icon: string;
+  description: string;
+}[] = [
   {
     value: "",
     label: "Fan",
@@ -35,7 +40,9 @@ export default function SignUpForm({ error }: { error?: string }) {
       action={signUp}
       className="bg-white/5 border border-white/20 rounded-xl p-8 flex flex-col gap-5 w-full max-w-sm"
     >
-      <h1 className="text-2xl font-bold text-white text-center">Create Account</h1>
+      <h1 className="text-2xl font-bold text-white text-center">
+        Create Account
+      </h1>
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm text-center">
@@ -45,7 +52,9 @@ export default function SignUpForm({ error }: { error?: string }) {
 
       {/* Role selector */}
       <div className="flex flex-col gap-2">
-        <p className="text-gray-400 text-xs text-center">I'm joining as a…</p>
+        <p className="text-gray-400 text-xs text-center">
+          I&apos;m joining as a…
+        </p>
         <div className="grid grid-cols-3 gap-2">
           {ROLES.map((r) => (
             <button
