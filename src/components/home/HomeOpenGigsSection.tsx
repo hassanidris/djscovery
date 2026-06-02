@@ -62,7 +62,7 @@ export default function HomeOpenGigsSection() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_cyan hover:text-h_cyan hover:bg-white/5"
+            className="text-h_red hover:text-h_red hover:bg-white/5"
           >
             <Link href="/community">View all →</Link>
           </Button>
@@ -75,8 +75,8 @@ export default function HomeOpenGigsSection() {
               className="bg-h_blackLight/50 ring-white/5 p-4 gap-0"
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="shrink-0 bg-h_cyanDark/40 border border-h_cyan/30 rounded-lg px-4 py-3 text-center min-w-22.5">
-                  <p className="text-h_cyan font-bold text-base">
+                <div className="shrink-0 bg-h_redDark/40 border border-h_red/30 rounded-lg px-4 py-3 text-center min-w-22.5">
+                  <p className="text-h_red font-bold text-base">
                     {gig.budget}
                   </p>
                   <p className="text-gray-500 text-xs">budget</p>
@@ -95,7 +95,7 @@ export default function HomeOpenGigsSection() {
                     {gig.genres.map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_cyanDark/60 text-h_cyan border-0"
+                        className="bg-h_redDark/60 text-h_red border-0"
                       >
                         {g}
                       </Badge>
@@ -106,7 +106,7 @@ export default function HomeOpenGigsSection() {
                 {/* This will be done with the functionalite of the gig */}
                 {/* <Button
                 size="sm"
-                className="shrink-0 bg-h_cyan hover:bg-h_cyanDark text-black"
+                className="shrink-0 bg-h_red hover:bg-h_redDark text-white"
               >
                 Apply
               </Button> */}

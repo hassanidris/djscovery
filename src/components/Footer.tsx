@@ -53,7 +53,7 @@ const Footer = () => {
   return (
     <footer className="w-full bg-black border-t border-white/5">
       {/* Top accent bar */}
-      <div className="h-px w-full bg-linear-to-r from-transparent via-h_cyan/40 to-transparent" />
+      <div className="h-px w-full bg-linear-to-r from-transparent via-h_red/40 to-transparent" />
 
       {/* Main footer body */}
       <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 py-14">
@@ -89,7 +89,7 @@ const Footer = () => {
                   className="bg-transparent text-sm text-white placeholder:text-gray-500 outline-none w-full"
                 />
               </div>
-              <button className="shrink-0 px-3 py-2.5 rounded-lg bg-h_cyan hover:bg-h_cyanDark text-black text-xs font-semibold transition-colors">
+              <button className="shrink-0 px-3 py-2.5 rounded-lg bg-h_red hover:bg-h_redDark text-white text-xs font-semibold transition-colors">
                 Subscribe
               </button>
             </div>
@@ -101,7 +101,7 @@ const Footer = () => {
                   key={social.label}
                   href={social.href}
                   aria-label={social.label}
-                  className="size-9 flex items-center justify-center rounded-full bg-h_blackLight/60 ring-1 ring-white/10 text-gray-400 hover:bg-h_cyan hover:text-black hover:ring-h_cyan transition-all"
+                  className="size-9 flex items-center justify-center rounded-full bg-h_blackLight/60 ring-1 ring-white/10 text-gray-400 hover:bg-h_red hover:text-white hover:ring-h_red transition-all"
                 >
                   <FontAwesomeIcon icon={social.icon} className="h-3.5 w-3.5" />
                 </a>
@@ -119,11 +119,11 @@ const Footer = () => {
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_cyan transition-colors group"
+                    className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_red transition-colors group"
                   >
                     <FontAwesomeIcon
                       icon={link.icon}
-                      className="h-3.5 w-3.5 text-h_cyanDark group-hover:text-h_cyan transition-colors"
+                      className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors"
                     />
                     {link.label}
                   </Link>
@@ -142,11 +142,11 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_cyan transition-colors group"
+                    className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_red transition-colors group"
                   >
                     <FontAwesomeIcon
                       icon={faMicrophone}
-                      className="h-3.5 w-3.5 text-h_cyanDark group-hover:text-h_cyan transition-colors"
+                      className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors"
                     />
                     {link.label}
                   </Link>
@@ -165,7 +165,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 text-sm hover:text-h_cyan transition-colors"
+                    className="text-gray-400 text-sm hover:text-h_red transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -199,15 +199,15 @@ const Footer = () => {
             Built for the culture.
           </span>
           <div className="flex items-center gap-5">
-            <Link href="/" className="hover:text-h_cyan transition-colors">
+            <Link href="/" className="hover:text-h_red transition-colors">
               Privacy
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/" className="hover:text-h_cyan transition-colors">
+            <Link href="/" className="hover:text-h_red transition-colors">
               Terms
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/" className="hover:text-h_cyan transition-colors">
+            <Link href="/" className="hover:text-h_red transition-colors">
               Contact
             </Link>
           </div>

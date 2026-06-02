@@ -93,7 +93,7 @@ export default function HomeEventsSection() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_cyan hover:text-h_cyan hover:bg-white/5"
+            className="text-h_red hover:text-h_red hover:bg-white/5"
           >
             <Link href="/directory">View all →</Link>
           </Button>
@@ -103,11 +103,11 @@ export default function HomeEventsSection() {
           {DEMO_EVENTS.map((event) => (
             <Link key={event.id} href={`/events/${event.id}`}>
               +{" "}
-              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_cyan transition-all overflow-hidden p-0 gap-0 cursor-pointer">
+              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all overflow-hidden p-0 gap-0 cursor-pointer">
                 {/* Header */}
-                <div className="relative bg-h_cyanDark/20 h-28 flex items-end p-4 overflow-hidden">
-                  <div className="absolute inset-0 bg-linear-to-br from-h_cyanDark/40 to-transparent" />
-                  <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_cyan/50 to-transparent" />
+                <div className="relative bg-h_redDark/20 h-28 flex items-end p-4 overflow-hidden">
+                  <div className="absolute inset-0 bg-linear-to-br from-h_redDark/40 to-transparent" />
+                  <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_red/50 to-transparent" />
                   <h3 className="relative text-white text-2xl tracking-widest leading-none">
                     {event.title}
                   </h3>
@@ -124,7 +124,7 @@ export default function HomeEventsSection() {
                       {event.venue} · {event.city}, {event.country}
                     </span>
                   </div>
-                  <Badge className="bg-h_cyanDark/60 text-h_cyan border-0 w-fit mt-1">
+                  <Badge className="bg-h_redDark/60 text-h_red border-0 w-fit mt-1">
                     🎧 {event.dj}
                   </Badge>
                 </div>

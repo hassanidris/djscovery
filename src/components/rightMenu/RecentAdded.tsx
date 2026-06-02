@@ -36,7 +36,7 @@ const RecentAdded = () => {
       {/* Top */}
       <div className="flex justify-between items-center font-medium">
         <span className="text-gray-200">Recent Added Djs</span>
-        <Link href="#" className="text-h_cyan text-xs">
+        <Link href="#" className="text-h_red text-xs">
           See all
         </Link>
       </div>
@@ -60,7 +60,7 @@ const RecentAdded = () => {
               </div>
             </Link>
             <div className="flex gap-3 justify-end">
-              <button className="bg-h_cyan hover:bg-h_cyanDark text-black text-xs px-2 py-1 rounded-md">
+              <button className="bg-h_red hover:bg-h_redDark text-white text-xs px-2 py-1 rounded-md">
                 Follow
               </button>
             </div>

@@ -98,7 +98,7 @@ const DirectoryPage = async ({
         <div className="flex flex-col gap-2">
           <h1 className="text-h_white font-bold text-3xl md:text-5xl">
             DJ{" "}
-            <span className="text-h_cyan">
+            <span className="text-h_red/80">
               Directory{" "}
               <FontAwesomeIcon
                 icon={faHeadphones}

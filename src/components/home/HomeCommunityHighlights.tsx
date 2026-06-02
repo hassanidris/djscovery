@@ -71,7 +71,7 @@ export default function HomeCommunityHighlights() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_cyan hover:text-h_cyan hover:bg-white/5"
+            className="text-h_red hover:text-h_red hover:bg-white/5"
           >
             <Link href="/community">View all →</Link>
           </Button>
@@ -80,11 +80,11 @@ export default function HomeCommunityHighlights() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {DEMO_POSTS.map((post) => (
             <Link key={post.id} href="/community">
-              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_cyan transition-all p-4 gap-3">
+              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all p-4 gap-3">
                 <div className="flex items-center gap-3">
-                  <Avatar className="size-11 ring-2 ring-h_cyan shrink-0">
+                  <Avatar className="size-11 ring-2 ring-h_red shrink-0">
                     <AvatarImage src={post.avatar} alt={post.dj} />
-                    <AvatarFallback className="bg-h_cyanDark text-black">
+                    <AvatarFallback className="bg-h_redDark text-white">
                       {post.dj[0]}
                     </AvatarFallback>
                   </Avatar>

@@ -10,7 +10,7 @@ const CommunityPage = () => {
     <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
       {/* Page Header */}
       <div className="py-6 border-b border-gray-800 flex items-center gap-3">
-        <FontAwesomeIcon icon={faUsers} className="text-h_cyan w-6 h-6" />
+        <FontAwesomeIcon icon={faUsers} className="text-h_red/80 w-6 h-6" />
         <div>
           <h1 className="text-2xl font-bold text-h_white">Community</h1>
           <p className="text-gray-400 text-sm">

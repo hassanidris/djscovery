@@ -19,14 +19,14 @@ const DjCard = ({
     : [];
 
   return (
-    <div className="bg-h_blackLight/50 rounded-xl p-4 flex flex-col gap-3 hover:ring-1 hover:ring-h_cyan transition-all">
+    <div className="bg-h_blackLight/50 rounded-xl p-4 flex flex-col gap-3 hover:ring-1 hover:ring-h_red transition-all">
       <Link href={`/profile/${username}`} className="flex items-center gap-3">
         <Image
           src={avatar || "/noAvatar.png"}
           alt={stageName || username}
           width={56}
           height={56}
-          className="w-14 h-14 object-cover rounded-full ring-2 ring-h_cyan shrink-0"
+          className="w-14 h-14 object-cover rounded-full ring-2 ring-h_red shrink-0"
         />
         <div className="min-w-0">
           <h3 className="text-h_white font-semibold text-sm truncate">
@@ -50,7 +50,7 @@ const DjCard = ({
           {genreList.slice(0, 3).map((genre) => (
             <span
               key={genre}
-              className="text-xs bg-h_cyanDark/60 text-h_cyan px-2 py-0.5 rounded-full"
+              className="text-xs bg-h_red/10 text-h_red/90 px-2 py-0.5 rounded-full"
             >
               {genre}
             </span>
@@ -58,7 +58,7 @@ const DjCard = ({
         </div>
       )}
 
-      <button className="mt-auto bg-h_cyan hover:bg-h_cyanDark text-black text-xs px-3 py-1.5 rounded-md w-full transition-colors">
+      <button className="mt-auto bg-h_red hover:bg-h_redDark text-white text-xs px-3 py-1.5 rounded-md w-full transition-colors">
         Follow
       </button>
     </div>

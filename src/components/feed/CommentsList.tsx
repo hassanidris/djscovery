@@ -89,7 +89,7 @@ const CommentsList = ({
       ) : (
         <Link
           href="/sign-in"
-          className="text-xs text-gray-500 hover:text-h_cyan transition-colors"
+          className="text-xs text-gray-500 hover:text-h_red transition-colors"
         >
           Sign in to leave a comment →
         </Link>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Space_Grotesk, Geist } from "next/font/google";
+import { Russo_One, Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -12,10 +12,10 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
 });
 
-const bebasNeue = Bebas_Neue({
+const russoOne = Russo_One({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-bebas-neue",
+  variable: "--font-russo-one",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function RootLayout({
       lang="en"
       className={cn(
         spaceGrotesk.variable,
-        bebasNeue.variable,
+        russoOne.variable,
         "font-sans",
         geist.variable,
         "dark",

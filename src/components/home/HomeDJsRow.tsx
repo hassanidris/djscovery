@@ -43,7 +43,7 @@ export default function HomeDJsRow({
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_cyan hover:text-h_cyan hover:bg-white/5"
+            className="text-h_red hover:text-h_red hover:bg-white/5"
           >
             <Link href="/directory">View all →</Link>
           </Button>
@@ -53,21 +53,21 @@ export default function HomeDJsRow({
           <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
             {djs.map((dj, index) => (
               <Link key={dj.id} href="/directory" className="block h-full">
-                <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_cyan gap-3 p-4 cursor-pointer transition-all overflow-visible">
+                <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red gap-3 p-4 cursor-pointer transition-all overflow-visible">
                   {variant === "trending" ? (
-                    <Badge className="absolute top-2 left-2 bg-h_cyanDark/50 text-h_cyan border-0">
+                    <Badge className="absolute top-2 left-2 bg-h_redDark/50 text-h_red border-0">
                       #{index + 1}
                     </Badge>
                   ) : (
-                    <Badge className="absolute top-2 right-2 bg-h_cyan text-black border-0">
+                    <Badge className="absolute top-2 right-2 bg-h_red text-white border-0">
                       NEW
                     </Badge>
                   )}
 
                   <div className="flex flex-col items-center gap-2 text-center pt-2">
-                    <Avatar className="size-20 ring-2 ring-h_cyan ring-offset-2 ring-offset-black">
+                    <Avatar className="size-20 ring-2 ring-h_red ring-offset-2 ring-offset-black">
                       <AvatarImage src={dj.avatar} alt={dj.stageName} />
-                      <AvatarFallback className="bg-h_cyanDark text-black text-lg">
+                      <AvatarFallback className="bg-h_redDark text-white text-lg">
                         {dj.stageName[0] || "?"}
                       </AvatarFallback>
                     </Avatar>
@@ -85,7 +85,7 @@ export default function HomeDJsRow({
                     {dj.genres.slice(0, 2).map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_cyanDark/60 text-h_cyan border-0"
+                        className="bg-h_redDark/60 text-h_red border-0"
                       >
                         {g}
                       </Badge>

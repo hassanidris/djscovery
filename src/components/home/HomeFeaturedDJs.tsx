@@ -67,7 +67,7 @@ export default function HomeFeaturedDJs() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_cyan hover:text-h_cyan hover:bg-white/5"
+            className="text-h_red hover:text-h_red hover:bg-white/5"
           >
             <Link href="/directory">View all →</Link>
           </Button>
@@ -76,17 +76,17 @@ export default function HomeFeaturedDJs() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {FEATURED_DJS.map((dj) => (
             <Link key={dj.id} href="/directory">
-              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_cyan transition-all overflow-hidden p-0 gap-0">
-                <div className="relative h-24 bg-linear-to-r from-h_cyanDark to-black">
+              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all overflow-hidden p-0 gap-0">
+                <div className="relative h-24 bg-linear-to-r from-h_redDark to-black">
                   <div className="absolute -bottom-8 left-4">
-                    <Avatar className="size-16 ring-2 ring-h_cyan ring-offset-2 ring-offset-black">
+                    <Avatar className="size-16 ring-2 ring-h_red ring-offset-2 ring-offset-black">
                       <AvatarImage src={dj.avatar} alt={dj.stageName} />
-                      <AvatarFallback className="bg-h_cyanDark text-black text-lg">
+                      <AvatarFallback className="bg-h_redDark text-white text-lg">
                         {dj.stageName[0]}
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  <Badge className="absolute top-3 right-3 bg-h_cyan text-black border-0">
+                  <Badge className="absolute top-3 right-3 bg-h_red text-white border-0">
                     ✦ FEATURED
                   </Badge>
                 </div>
@@ -109,7 +109,7 @@ export default function HomeFeaturedDJs() {
                     {dj.genres.map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_cyanDark/60 text-h_cyan border-0"
+                        className="bg-h_redDark/60 text-h_red border-0"
                       >
                         {g}
                       </Badge>

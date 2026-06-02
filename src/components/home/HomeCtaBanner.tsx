@@ -5,13 +5,13 @@ export default function HomeCtaBanner() {
   return (
     <section className="py-16 px-4 md:px-8 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
-        <div className="relative rounded-2xl overflow-hidden bg-linear-to-br from-h_cyanDark via-[#3b1f6e] to-black border border-h_cyan/50 shadow-[0_0_40px_-8px_rgba(197,132,245,0.25)] px-8 py-12 md:px-16">
+        <div className="relative rounded-2xl overflow-hidden bg-linear-to-br from-h_redDark via-[#3b1f6e] to-black border border-h_red/50 shadow-[0_0_40px_-8px_rgba(197,132,245,0.25)] px-8 py-12 md:px-16">
           {/* Decorative blobs */}
-          <div className="absolute -top-16 -right-16 w-64 h-64 bg-h_cyan/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-h_cyanDark/30 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-16 -right-16 w-64 h-64 bg-h_red/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-h_redDark/30 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center text-center gap-4 mb-10">
-            <span className="text-h_cyan text-sm font-semibold tracking-widest uppercase">
+            <span className="text-h_red text-sm font-semibold tracking-widest uppercase">
               Join the Community
             </span>
             <h2 className="text-white text-4xl md:text-5xl leading-tight">
@@ -41,7 +41,7 @@ export default function HomeCtaBanner() {
               </ul>
               <Button
                 asChild
-                className="mt-auto bg-h_cyan hover:bg-h_cyanDark text-black font-semibold w-full"
+                className="mt-auto bg-h_red hover:bg-h_redDark text-white font-semibold w-full"
               >
                 <Link href="/sign-up?role=dj">Join as DJ</Link>
               </Button>
@@ -65,7 +65,7 @@ export default function HomeCtaBanner() {
               <Button
                 asChild
                 variant="outline"
-                className="mt-auto border-h_cyan text-h_cyan hover:bg-h_cyan hover:text-black font-semibold w-full"
+                className="mt-auto border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold w-full"
               >
                 <Link href="/sign-up?role=organiser">Join as Organiser</Link>
               </Button>

@@ -29,7 +29,7 @@ export default function HomeGenresSection() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_cyan hover:text-h_cyan hover:bg-white/5"
+            className="text-h_red hover:text-h_red hover:bg-white/5"
           >
             <Link href="/directory">View all genres →</Link>
           </Button>
@@ -40,10 +40,10 @@ export default function HomeGenresSection() {
             <Link
               key={genre.name}
               href={`/directory?genre=${encodeURIComponent(genre.name)}`}
-              className="group relative bg-h_blackLight/40 ring-1 ring-white/8 hover:ring-h_cyan/60 hover:bg-h_cyanDark/20 rounded-xl px-4 py-5 flex flex-col gap-2.5 transition-all duration-200 overflow-hidden"
+              className="group relative bg-h_blackLight/40 ring-1 ring-white/8 hover:ring-h_red/60 hover:bg-h_redDark/20 rounded-xl px-4 py-5 flex flex-col gap-2.5 transition-all duration-200 overflow-hidden"
             >
               {/* Top accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_cyan/0 to-transparent group-hover:via-h_cyan/60 transition-all duration-300" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_red/0 to-transparent group-hover:via-h_red/60 transition-all duration-300" />
 
               <span className="text-3xl leading-none">{genre.emoji}</span>
 
@@ -51,7 +51,7 @@ export default function HomeGenresSection() {
                 <span className="text-white font-semibold text-sm leading-tight">
                   {genre.name}
                 </span>
-                <span className="text-h_cyan text-xs opacity-0 group-hover:opacity-100 translate-x-0 transition-all duration-200">
+                <span className="text-h_red text-xs opacity-0 group-hover:opacity-100 translate-x-0 transition-all duration-200">
                   Explore →
                 </span>
               </div>

@@ -24,36 +24,34 @@ const Hero = () => {
           Your browser does not support the video tag.
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40 z-10"></div>
-        <div className="absolute top-0 left-0 h-full w-full flex justify-center sm:justify-start items-center z-10">
-          <div className="flex flex-col px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-white ">
-            <h1 className=" font-bold text-4xl md:text-7xl w-3/4">
+        <div className="absolute top-0 left-0 h-full w-full flex justify-start items-center z-10">
+          <div className="flex flex-col items-start px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 text-white">
+            <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl max-w-xl md:max-w-2xl lg:max-w-3xl leading-tight">
               Find the{" "}
-              <span className="font-bold leading-snug text-h_cyan">
-                Perfect DJ{" "}
-              </span>
+              <span className="font-bold text-h_red/80">Perfect DJ </span>
               For You!{" "}
-              <span className="font-bold leading-snug text-h_cyan">
+              <span className="font-bold text-h_red/80">
                 <FontAwesomeIcon
                   icon={faHeadphones}
-                  className=" w-16 h-16 inline"
+                  className="w-10 h-10 md:w-14 md:h-14 inline"
                 />
               </span>
             </h1>
-            <p className=" mt-2 tracking-widest">
+            <p className="mt-3 text-sm md:text-base text-white/80 tracking-wide">
               On the world&apos;s first & largest DJ&apos;s Community.
             </p>
 
             <div className="flex gap-4 mt-6">
               <Button
                 asChild
-                className="bg-h_cyan hover:bg-h_cyanDark text-black font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
               >
                 <Link href="/sign-up?role=dj">Join as DJ</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="border-h_cyan text-h_cyan hover:bg-h_cyan hover:text-black font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
               >
                 <Link href="/sign-up?role=organiser">Join as Organiser</Link>
               </Button>

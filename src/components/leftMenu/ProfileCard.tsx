@@ -17,7 +17,7 @@ const ProfileCard = async () => {
         <p className="text-gray-400 text-xs">Sign in to see your profile</p>
         <Link
           href="/sign-in"
-          className="bg-h_cyan hover:bg-h_cyanDark text-black text-xs py-2 px-4 rounded-md transition-colors"
+          className="bg-h_red hover:bg-h_redDark text-white text-xs py-2 px-4 rounded-md transition-colors"
         >
           Sign In
         </Link>
@@ -79,7 +79,7 @@ const ProfileCard = async () => {
           </span>
         </div>
         <Link href={`/profile/${user.username}`}>
-          <button className="bg-h_cyan hover:bg-h_cyanDark text-black text-xs p-2 rounded-md">
+          <button className="bg-h_red hover:bg-h_redDark text-white text-xs p-2 rounded-md">
             My Profile
           </button>
         </Link>
