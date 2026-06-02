@@ -3,8 +3,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/client";
 
-const Hero = () => {
+const Hero = async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const userRole = user
+    ? await prisma.userRole.findFirst({
+        where: { userId: user.id, role: { in: ["DJ", "ORGANIZER"] } },
+      })
+    : null;
+
+  const joinHref = user ? "/select-role" : "/sign-up";
   return (
     <>
       <section className="bg-zinc-800 h-[40vh] lg:h-[50vh] w-full relative">
@@ -42,19 +55,55 @@ const Hero = () => {
             </p>
 
             <div className="flex gap-4 mt-6">
-              <Button
-                asChild
-                className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
-              >
-                <Link href="/sign-up?role=dj">Join as DJ</Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
-              >
-                <Link href="/sign-up?role=organiser">Join as Organiser</Link>
-              </Button>
+              {userRole?.role === "DJ" ? (
+                <>
+                  <Button
+                    asChild
+                    className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                  >
+                    <Link href="/dj/dashboard">My DJ Dashboard</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                  >
+                    <Link href="/directory">Browse Open Gigs</Link>
+                  </Button>
+                </>
+              ) : userRole?.role === "ORGANIZER" ? (
+                <>
+                  <Button
+                    asChild
+                    className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                  >
+                    <Link href="/organizer/dashboard">Post a Gig</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                  >
+                    <Link href="/directory">Find DJs</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    asChild
+                    className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                  >
+                    <Link href={joinHref}>Join as DJ</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                  >
+                    <Link href={joinHref}>Join as Organiser</Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* <h1 class="title text-white word txt_anim">

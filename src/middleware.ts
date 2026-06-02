@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
   // Protected routes — redirect to /sign-in if not authenticated
   const protectedPaths = [
     "/dashboard",
+    "/select-role",
     "/become-dj",
     "/become-organizer",
     "/dj/dashboard",

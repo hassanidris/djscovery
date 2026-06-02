@@ -90,12 +90,26 @@ const CommentsList = ({
           </form>
         </div>
       ) : (
-        <Link
-          href="/sign-in"
-          className="text-xs text-gray-500 hover:text-h_red transition-colors"
-        >
-          Sign in to leave a comment →
-        </Link>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/noAvatar.png"
+            alt=""
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-full ring-1 ring-gray-600 opacity-40 shrink-0"
+          />
+          <Link
+            href="/sign-up"
+            className="flex-1 flex items-center justify-between bg-transparent ring-1 ring-gray-700 rounded-xl px-4 py-2 group hover:ring-h_red/50 transition-all"
+          >
+            <span className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors">
+              Sign up to join the conversation...
+            </span>
+            <span className="text-xs text-h_red font-semibold shrink-0 ml-3">
+              Sign Up →
+            </span>
+          </Link>
+        </div>
       )}
       <div className="">
         {optimisticComments.map((comment) => (

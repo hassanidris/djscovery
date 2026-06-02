@@ -1,11 +1,13 @@
 import { signIn } from "@/lib/actions/auth";
 import Link from "next/link";
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; message?: string }>;
 }) {
+  const { error, message } = await searchParams;
+
   return (
     <div className="h-[calc(100vh-136px)] flex flex-col items-center justify-center">
       <form
@@ -13,6 +15,28 @@ export default function Page({
         className="bg-white/5 border border-white/20 rounded-xl p-8 flex flex-col gap-4 w-full max-w-sm"
       >
         <h1 className="text-2xl font-bold text-white text-center">Sign In</h1>
+
+        {message && (
+          <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-3 text-green-400 text-sm text-center"
+          >
+            {message}
+          </div>
+        )}
+        {error && (
+          <div
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm text-center"
+          >
+            {error}
+          </div>
+        )}
+
         <input
           type="email"
           name="email"
