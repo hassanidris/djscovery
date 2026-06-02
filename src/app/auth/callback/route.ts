@@ -28,20 +28,11 @@ export async function GET(request: Request) {
           update: { email },
           create: { id: user.id, email, username },
         });
-
-        // Assign extra role if provided at sign-up (dj or organiser)
-        const rawRole = user.user_metadata?.role as string | undefined;
-        if (rawRole === "dj" || rawRole === "organiser") {
-          const role = rawRole === "dj" ? "DJ" : "ORGANIZER";
-          await prisma.userRole.upsert({
-            where: { userId_role: { userId: user.id, role } },
-            update: {},
-            create: { userId: user.id, role },
-          });
-        }
       }
 
-      return NextResponse.redirect(`${origin}${next}`);
+      // Always send newly confirmed users to role selection
+      const destination = next !== "/" ? next : "/select-role";
+      return NextResponse.redirect(`${origin}${destination}`);
     }
   }
 

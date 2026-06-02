@@ -15,36 +15,142 @@ function makeSlug(stageName: string, userId: string) {
   return `${base}-${userId.slice(0, 8)}`;
 }
 
-export async function createDjProfile(formData: FormData) {
+export async function getCitiesByCountry(countryId: number) {
+  const cities = await prisma.city.findMany({
+    where: { countryId },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+  return cities;
+}
+
+export async function getOrCreateGenre(
+  name: string,
+): Promise<{ id: number; name: string }> {
+  const trimmed = name.trim();
+  const existing = await prisma.genre.findFirst({
+    where: { name: { equals: trimmed, mode: "insensitive" } },
+    select: { id: true, name: true },
+  });
+  if (existing) return existing;
+  return await prisma.genre.create({
+    data: { name: trimmed },
+    select: { id: true, name: true },
+  });
+}
+
+const DjProfileInputSchema = z.object({
+  stageName: z.string().min(2).max(60),
+  bio: z.string().max(500).optional(),
+  avatarUrl: z.string().url().optional(),
+  countryId: z.number().int().positive({ message: "Country is required" }),
+  cityId: z.number().int().positive().optional(),
+  genreIds: z
+    .array(z.number().int().positive())
+    .min(1, "Select at least one genre"),
+  socialLinks: z
+    .array(z.object({ platform: z.string(), url: z.string().url() }))
+    .min(1, "Add at least one social media link"),
+  djTypes: z
+    .array(z.enum(["CLUB", "WEDDING", "FESTIVAL", "CORPORATE", "BAR_LOUNGE"]))
+    .min(1, "Select at least one DJ type"),
+  media: z.array(
+    z.object({
+      type: z.enum(["IMAGE", "VIDEO", "AUDIO"]),
+      url: z.string().url(),
+      path: z.string(),
+      bucket: z.string(),
+    }),
+  ),
+});
+
+export async function createDjProfile(
+  input: unknown,
+): Promise<{ error: string } | void> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/sign-in");
+  if (!user) return { error: "Not authenticated" };
 
-  const Schema = z.object({
-    stageName: z.string().min(2).max(60),
-    bio: z.string().max(500).optional(),
-  });
+  const parsed = DjProfileInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      error:
+        "Invalid data: " + parsed.error.issues.map((i) => i.message).join(", "),
+    };
+  }
 
-  const parsed = Schema.safeParse({
-    stageName: formData.get("stageName"),
-    bio: formData.get("bio") || undefined,
-  });
+  const {
+    stageName,
+    bio,
+    avatarUrl,
+    countryId,
+    cityId,
+    genreIds,
+    socialLinks,
+    djTypes,
+    media,
+  } = parsed.data;
 
-  if (!parsed.success) return;
+  const slug = makeSlug(stageName, user.id);
 
-  const slug = makeSlug(parsed.data.stageName, user.id);
-
-  await prisma.djProfile.upsert({
+  const profile = await prisma.djProfile.upsert({
     where: { userId: user.id },
     update: {},
     create: {
       userId: user.id,
-      stageName: parsed.data.stageName,
+      stageName,
       slug,
-      bio: parsed.data.bio ?? null,
+      bio: bio ?? null,
+      avatar: avatarUrl ?? null,
+      countryId: countryId ?? null,
+      cityId: cityId ?? null,
     },
+  });
+
+  if (djTypes.length > 0) {
+    await prisma.djProfileType.createMany({
+      data: djTypes.map((type) => ({ djProfileId: profile.id, type })),
+      skipDuplicates: true,
+    });
+  }
+
+  if (genreIds.length > 0) {
+    await prisma.djGenre.createMany({
+      data: genreIds.map((genreId) => ({ djProfileId: profile.id, genreId })),
+      skipDuplicates: true,
+    });
+  }
+
+  if (socialLinks.length > 0) {
+    await prisma.socialLink.createMany({
+      data: socialLinks.map((link) => ({
+        djProfileId: profile.id,
+        platform: link.platform,
+        url: link.url,
+      })),
+      skipDuplicates: true,
+    });
+  }
+
+  if (media.length > 0) {
+    await prisma.media.createMany({
+      data: media.map((m) => ({
+        type: m.type as "IMAGE" | "VIDEO" | "AUDIO",
+        url: m.url,
+        bucket: m.bucket,
+        path: m.path,
+        djProfileId: profile.id,
+      })),
+    });
+  }
+
+  // Grant DJ role only now — after the profile is fully saved.
+  await prisma.userRole.upsert({
+    where: { userId_role: { userId: user.id, role: "DJ" } },
+    update: {},
+    create: { userId: user.id, role: "DJ" },
   });
 
   redirect("/");

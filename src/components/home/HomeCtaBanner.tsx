@@ -1,7 +1,22 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/client";
 
-export default function HomeCtaBanner() {
+export default async function HomeCtaBanner() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const hasUpgradeableRole = user
+    ? !!(await prisma.userRole.findFirst({
+        where: { userId: user.id, role: { in: ["DJ", "ORGANIZER"] } },
+      }))
+    : false;
+
+  if (hasUpgradeableRole) return null;
+
+  const joinHref = user ? "/select-role" : "/sign-up";
   return (
     <section className="py-16 px-4 md:px-8 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
@@ -43,7 +58,7 @@ export default function HomeCtaBanner() {
                 asChild
                 className="mt-auto bg-h_red hover:bg-h_redDark text-white font-semibold w-full"
               >
-                <Link href="/sign-up?role=dj">Join as DJ</Link>
+                <Link href={joinHref}>Join as DJ</Link>
               </Button>
             </div>
 
@@ -67,7 +82,7 @@ export default function HomeCtaBanner() {
                 variant="outline"
                 className="mt-auto border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold w-full"
               >
-                <Link href="/sign-up?role=organiser">Join as Organiser</Link>
+                <Link href={joinHref}>Join as Organiser</Link>
               </Button>
             </div>
           </div>

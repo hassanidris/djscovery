@@ -71,6 +71,14 @@ enum NotificationType {
   DJ_REGISTRATION // Admin receives this when a DJ registers
 }
 
+enum DjType {
+  CLUB
+  WEDDING
+  FESTIVAL
+  CORPORATE
+  BAR_LOUNGE
+}
+
 // ============================================================
 // SECTION 1: MVP MODELS
 // ============================================================
@@ -187,12 +195,13 @@ model DjProfile {
   deletedAt DateTime?
 
   genres      DjGenre[]
+  djTypes     DjProfileType[]
   socialLinks SocialLink[]
   ratings     DjRating[]
   comments    DjComment[]
   media       Media[]
   events      EventDj[]
-  eventsOwned Event[]      @relation("EventOwner")
+  eventsOwned Event[]         @relation("EventOwner")
 
   @@index([slug])
   @@index([status])
@@ -241,6 +250,14 @@ model DjGenre {
   genre       Genre     @relation(fields: [genreId], references: [id], onDelete: Cascade)
 
   @@id([djProfileId, genreId])
+}
+
+model DjProfileType {
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  type        DjType
+
+  @@id([djProfileId, type])
 }
 
 // ------ SOCIAL LINKS ------

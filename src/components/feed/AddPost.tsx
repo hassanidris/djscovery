@@ -18,13 +18,13 @@ const AddPost = () => {
     return (
       <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg flex items-center justify-between gap-4">
         <p className="text-gray-400 text-sm">
-          Sign in to share posts with the community
+          Join the community to share posts and connect with DJs
         </p>
         <Link
-          href="/sign-in"
+          href="/sign-up"
           className="shrink-0 bg-h_red hover:bg-h_redDark text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
         >
-          Sign In
+          Sign Up
         </Link>
       </div>
     );
