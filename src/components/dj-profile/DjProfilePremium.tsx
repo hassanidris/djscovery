@@ -61,7 +61,7 @@ import { format } from "date-fns";
 const DJ = {
   stageName: "Amara Pulse",
   avatar: "/rated-6.webp",
-  coverImage: "/noCover.png",
+  coverImage: "/noCover-2.png",
   bio: "Bringing the pulse of Lagos to the world stage. Amara blends Afrobeats and Amapiano into euphoric, floor-filling sets that transcend borders. With residencies across London, Paris, and Dubai — and festival credits spanning 3 continents — she's one of the fastest-rising names in global club culture. Her sound bridges African heritage with contemporary dance music, creating a signature energy that transcends genre borders.",
   city: "Lagos",
   country: "Nigeria",
