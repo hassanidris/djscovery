@@ -135,9 +135,9 @@ const DirectoryPage = async ({
           </div>
 
           {/* Right — Events Calendar */}
-          <div className="hidden lg:block w-[30%] shrink-0">
+          {/* <div className="hidden lg:block w-[30%] shrink-0">
             <EventCalendar />
-          </div>
+          </div> */}
         </div>
       </div>
     </>
