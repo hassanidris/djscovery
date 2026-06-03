@@ -23,7 +23,7 @@ import Link from "next/link";
   4. Include their DjProfile for the stage name + first genre
 
   Falls back gracefully:
-  - Not logged in → shows a sign-in prompt
+  - Not logged in → returns null (ProfileCard already shows the sign-in prompt)
   - No suggestions found → returns null (hides the widget)
 */
 

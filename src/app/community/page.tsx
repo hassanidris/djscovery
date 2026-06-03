@@ -5,7 +5,14 @@ import FeedTabs from "@/components/feed/FeedTabs";
 import Stories from "@/components/feed/Stories";
 import LeftMenu from "@/components/leftMenu/LeftMenu";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Flame, Headphones, Users, Zap } from "lucide-react";
+import {
+  CalendarDays,
+  Flame,
+  Headphones,
+  Music2,
+  Users,
+  Zap,
+} from "lucide-react";
 
 const CommunityPage = () => {
   return (
@@ -72,9 +79,9 @@ const CommunityPage = () => {
         gives it prominence without being tied to one column.
         It sets the social/live tone before the user hits the feed.
       */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <Stories />
-      </div>
+      </div> */}
 
       {/*
         ── Responsive 3-column layout ──
@@ -112,9 +119,15 @@ const CommunityPage = () => {
               </div>
             }
             followingContent={
-              <div className="flex flex-col gap-6">
-                <AddPostWrapper />
-                <Feed />
+              <div className="p-8 bg-h_blackLight/50 rounded-lg border border-gray-800 flex flex-col items-center gap-3 text-center">
+                <Music2 className="w-10 h-10 text-h_red/60" />
+                <p className="text-h_white font-semibold">
+                  Following feed coming soon
+                </p>
+                <p className="text-gray-400 text-sm max-w-xs">
+                  Posts from DJs you follow will appear here once the filtered
+                  feed is implemented.
+                </p>
               </div>
             }
             trendingContent={
