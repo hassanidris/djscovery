@@ -13,57 +13,29 @@ const GENRES = [
   "Deep House",
   "Tech House",
   "Progressive House",
-  "Electro House",
-  "Future House",
-  "Acid House",
   "Afro House",
-  "Bass House",
-  "Funky House",
-  "Soulful House",
-  "Tribal House",
-  "Organic House",
-  "Melodic House & Techno",
   // ── Techno ─────────────────────────────────────────────
   "Techno",
   "Melodic Techno",
-  "Industrial Techno",
   "Minimal Techno",
-  "Detroit Techno",
   // ── Trance ─────────────────────────────────────────────
   "Trance",
   "Progressive Trance",
   "Psytrance",
-  "Hard Trance",
   // ── Drum & Bass / Jungle ───────────────────────────────
   "Drum & Bass",
   "Liquid DnB",
-  "Neurofunk",
   "Jungle",
   // ── Bass / Future ──────────────────────────────────────
   "Dubstep",
   "Future Bass",
-  "Trap",
-  "Grime",
   "UK Garage",
-  "Breakbeat",
   // ── Hard Dance ─────────────────────────────────────────
   "Hardstyle",
   "Hardcore",
-  "Big Room",
   // ── Disco / Funk ───────────────────────────────────────
   "Disco",
   "Nu-Disco",
-  "Funk",
-  "Soul",
-  // ── Electronica / Ambient ──────────────────────────────
-  "EDM",
-  "Electro",
-  "Ambient",
-  "Downtempo",
-  "Lo-fi",
-  "Chillout",
-  "Lounge",
-  "Indie Dance",
   // ── Urban / Hip-Hop ────────────────────────────────────
   "Hip-Hop",
   "R&B",
@@ -72,13 +44,35 @@ const GENRES = [
   "Reggaeton",
   "Reggae",
   // ── Latin ──────────────────────────────────────────────
-  "Latin",
-  "Salsa",
-  "Bachata",
+  "Latin Pop",
+  // ── Afro & Global ──────────────────────────────────────
+  "Amapiano",
+  "Kizomba",
+  "Gqom",
+  // ── Middle Eastern & African ───────────────────────────
+  "Arabic",
+  "Khaleeji",
+  "Eritrean",
+  "Ethiopian",
+  "Somali",
+  // ── Rock / Alternative ─────────────────────────────────
+  "Rock",
+  "Alternative",
+  // ── Cultural / Regional ────────────────────────────────
+  "Bollywood",
+  "Bhangra",
+  "Scandinavian",
   // ── Other ──────────────────────────────────────────────
   "Pop",
   "Commercial",
   "Open Format",
+  "Wedding",
+  "Corporate Events",
+  "Top 40",
+  "Throwback",
+  "80s",
+  "90s",
+  "2000s",
 ];
 
 async function main() {
