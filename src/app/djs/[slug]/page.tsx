@@ -6,6 +6,8 @@ import DjProfileHero from "@/components/dj-profile/DjProfileHero";
 import DjProfileTabs from "@/components/dj-profile/DjProfileTabs";
 import DjProfileContent from "@/components/dj-profile/DjProfileContent";
 import DjProfileSidebar from "@/components/dj-profile/DjProfileSidebar";
+import DjProfileFree from "@/components/dj-profile/DjProfileFree";
+import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
 import type { DjType } from "@prisma/client";
 
 const DEMO_DJ = {
@@ -36,6 +38,42 @@ export default async function DjProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+
+  if (slug === "demo-free") {
+    return (
+      <div>
+        <div className="bg-h_blackLight/60 border-b border-white/8 text-gray-300 text-xs text-center py-2 px-4 font-medium tracking-wide flex items-center justify-center gap-4">
+          <span className="opacity-60">Version 1 — Free DJ Profile</span>
+          <span className="opacity-30">·</span>
+          <Link
+            href="/djs/demo-premium"
+            className="text-amber-400 underline underline-offset-2 hover:text-amber-300"
+          >
+            Switch to Premium Version →
+          </Link>
+        </div>
+        <DjProfileFree />
+      </div>
+    );
+  }
+
+  if (slug === "demo-premium") {
+    return (
+      <div>
+        <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-300 text-xs text-center py-2 px-4 font-medium tracking-wide flex items-center justify-center gap-4">
+          <span className="opacity-80">Version 2 — Premium DJ Profile</span>
+          <span className="opacity-30">·</span>
+          <Link
+            href="/djs/demo-free"
+            className="text-gray-400 underline underline-offset-2 hover:text-gray-200"
+          >
+            ← Switch to Free Version
+          </Link>
+        </div>
+        <DjProfilePremium />
+      </div>
+    );
+  }
 
   if (slug === "demo") {
     return (
