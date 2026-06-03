@@ -1,0 +1,72 @@
+import prisma from "@/lib/client";
+import { createClient } from "@/lib/supabase/server";
+import { Role } from "@prisma/client";
+import { Heart, MessageCircle, Music2 } from "lucide-react";
+import AddPost from "./AddPost";
+
+/*
+  WHY a server wrapper instead of modifying AddPost directly:
+  AddPost is a "use client" component — it can't query the DB.
+  This wrapper runs on the server, checks the DJ role, and decides
+  which UI to render before the client bundle even loads.
+
+  ROLE LOGIC:
+  - Not logged in    → AddPost renders its own "Sign Up" prompt
+  - Logged in as DJ  → AddPost renders the full compose form
+  - Logged in as Fan → show a clear, friendly explanation card
+                       (fans can like, comment, and reply — just not post)
+
+  WHY fans can't post:
+  DJscovery is a platform where DJs are the content creators.
+  Letting everyone post would dilute the feed and make it a generic
+  social network. Fans engage through reactions, which still keeps
+  them active and connected without blurring that distinction.
+*/
+
+const AddPostWrapper = async () => {
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+  const userId = authUser?.id;
+
+  // Not logged in — AddPost handles the sign-up prompt itself
+  if (!userId) return <AddPost />;
+
+  // Check if the user has the DJ role
+  const djRole = await prisma.userRole.findFirst({
+    where: { userId, role: Role.DJ },
+  });
+
+  // DJ — show the full compose form
+  if (djRole) return <AddPost />;
+
+  // Fan (logged in, not a DJ) — show engagement info card
+  return (
+    <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg flex items-center gap-4 border border-gray-800/60">
+      {/* Icons hint at what fans CAN do */}
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-h_red/10 border border-h_red/20 flex items-center justify-center">
+          <Music2 className="w-4 h-4 text-h_red" />
+        </div>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-h_white text-sm font-medium">Only DJs can post</p>
+        <p className="text-gray-400 text-xs mt-0.5">
+          You can{" "}
+          <span className="inline-flex items-center gap-1 text-gray-300">
+            <Heart className="w-3 h-3 text-h_red" /> like
+          </span>
+          ,{" "}
+          <span className="inline-flex items-center gap-1 text-gray-300">
+            <MessageCircle className="w-3 h-3 text-blue-400" /> comment
+          </span>{" "}
+          and reply to any post.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default AddPostWrapper;
