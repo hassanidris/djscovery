@@ -16,7 +16,7 @@ import {
 
 const CommunityPage = () => {
   return (
-    <div className="px-3 sm:px-6 lg:px-12 xl:px-24 2xl:px-48">
+    <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
       {/* ── Step 1: Immersive Header Banner ── */}
       {/*
         WHY: The old header was just an icon + two lines of text.
