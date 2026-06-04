@@ -95,7 +95,7 @@ const DirectoryPage = async ({
     <>
       {/* Hero Banner */}
       <section className="bg-h_blackLight/30 border-b border-gray-800 py-10 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 max-w-7xl w-full mx-auto px-4 md:px-8">
           <h1 className="text-h_white font-bold text-3xl md:text-5xl">
             DJ{" "}
             <span className="text-h_red/80">
@@ -116,7 +116,7 @@ const DirectoryPage = async ({
       </section>
 
       {/* 3-Column Layout */}
-      <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+      <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
         <div className="flex gap-6 py-6">
           {/* Left — Filters */}
           <div className="hidden xl:block w-[20%] shrink-0">
@@ -130,7 +130,7 @@ const DirectoryPage = async ({
           </div>
 
           {/* Center — DJ Grid */}
-          <div className="w-full xl:w-[55%]">
+          <div className="w-full">
             <DjGrid djs={displayDjs} />
           </div>
 
