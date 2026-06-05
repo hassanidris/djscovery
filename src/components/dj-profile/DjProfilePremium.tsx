@@ -450,10 +450,12 @@ function mapDjToProps(d: DjDemoData) {
 }
 
 function mapEventsFromData(d: DjDemoData) {
+  const normalizeEventDate = (value: string) =>
+    value.includes("T") ? value : `${value}T20:00:00Z`;
   return d.upcomingEvents.map((e, i) => ({
     id: i + 1,
     title: e.title,
-    date: `${e.date}T20:00:00Z`,
+    date: normalizeEventDate(e.date),
     venue: e.venue,
     city: e.city,
     country: "",

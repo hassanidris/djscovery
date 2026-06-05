@@ -29,9 +29,11 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
     <>
       <div className={`grid grid-cols-3 gap-2 ${className ?? ""}`}>
         {photos.map((m, i) => (
-          <div
+          <button
+            type="button"
             key={m.id}
             onClick={() => open(i)}
+            aria-label={`Open photo ${i + 1}`}
             className="relative aspect-square rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-h_red/40 transition-all cursor-pointer group"
           >
             <Image
@@ -40,7 +42,7 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
-          </div>
+          </button>
         ))}
       </div>
 
@@ -51,6 +53,7 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
         >
           <button
             onClick={close}
+            aria-label="Close lightbox"
             className="absolute top-4 right-4 size-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
           >
             <X className="w-5 h-5" />
@@ -62,6 +65,7 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
 
           <button
             onClick={prev}
+            aria-label="Previous photo"
             className="absolute left-3 sm:left-6 size-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -82,6 +86,7 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
 
           <button
             onClick={next}
+            aria-label="Next photo"
             className="absolute right-3 sm:right-6 size-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10"
           >
             <ChevronRight className="w-5 h-5" />

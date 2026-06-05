@@ -20,12 +20,7 @@
       "url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
       "alt": "Amara Pulse live performance cover"
     },
-    "genres": [
-      "Afrobeats",
-      "Amapiano",
-      "House",
-      "Afro-Tech"
-    ],
+    "genres": ["Afrobeats", "Amapiano", "House", "Afro-Tech"],
     "socials": {
       "instagram": "https://www.instagram.com/amara.musicc/",
       "soundcloud": "https://soundcloud.com/felipe-clavero/pulse-original-mix-amara",
@@ -48,10 +43,7 @@
         "title": "Afrobeats Sessions Vol.5",
         "duration": "80m",
         "plays": 51339,
-        "genres": [
-          "Afrobeats",
-          "Amapiano"
-        ],
+        "genres": ["Afrobeats", "Amapiano"],
         "audioUrl": "https://soundcloud.com/amara-pulse/afrobeats-sessions",
         "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
       },
@@ -140,38 +132,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -213,12 +176,7 @@
       }
     ],
     "bio": "Amara Pulse brings the sound of Lagos to international dancefloors, blending Afrobeats, Amapiano with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Amara Pulse has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
@@ -404,11 +362,7 @@
       "url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
       "alt": "Marcus Groove live performance cover"
     },
-    "genres": [
-      "Hip-Hop",
-      "R&B",
-      "Open Format"
-    ],
+    "genres": ["Hip-Hop", "R&B", "Open Format"],
     "socials": {
       "instagram": "https://www.instagram.com/marcus_techno/",
       "soundcloud": "https://soundcloud.com/reagancooper97/mc-marcus-dj-topgroove",
@@ -429,10 +383,7 @@
         "title": "Hip-Hop Sessions Vol.6",
         "duration": "76m",
         "plays": 147492,
-        "genres": [
-          "Hip-Hop",
-          "R&B"
-        ],
+        "genres": ["Hip-Hop", "R&B"],
         "audioUrl": "https://soundcloud.com/marcus-groove/hip-hop-sessions",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
@@ -521,38 +472,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -594,12 +516,7 @@
       }
     ],
     "bio": "Marcus Groove brings the sound of New York to international dancefloors, blending Hip-Hop, R&B with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Marcus Groove has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
@@ -785,11 +702,7 @@
       "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
       "alt": "DJ Nova live performance cover"
     },
-    "genres": [
-      "House",
-      "Techno",
-      "Progressive House"
-    ],
+    "genres": ["House", "Techno", "Progressive House"],
     "socials": {
       "instagram": "https://www.instagram.com/dj_nova/?hl=en",
       "soundcloud": "https://soundcloud.com/djnovanyc",
@@ -813,10 +726,7 @@
         "title": "House Sessions Vol.8",
         "duration": "86m",
         "plays": 28773,
-        "genres": [
-          "House",
-          "Techno"
-        ],
+        "genres": ["House", "Techno"],
         "audioUrl": "https://soundcloud.com/dj-nova/house-sessions",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
@@ -905,38 +815,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -978,12 +859,7 @@
       }
     ],
     "bio": "DJ Nova brings the sound of Stockholm to international dancefloors, blending House, Techno with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, DJ Nova has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
@@ -1169,11 +1045,7 @@
       "url": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
       "alt": "Elena Vibes live performance cover"
     },
-    "genres": [
-      "Reggaeton",
-      "Latin House",
-      "Commercial"
-    ],
+    "genres": ["Reggaeton", "Latin House", "Commercial"],
     "socials": {
       "instagram": "https://www.instagram.com/dj.elena.party/?hl=en"
     },
@@ -1191,10 +1063,7 @@
         "title": "Reggaeton Sessions Vol.2",
         "duration": "81m",
         "plays": 161716,
-        "genres": [
-          "Reggaeton",
-          "Latin House"
-        ],
+        "genres": ["Reggaeton", "Latin House"],
         "audioUrl": "https://soundcloud.com/elena-vibes/reggaeton-sessions",
         "coverImage": "https://images.unsplash.com/photo-1506157786151-b8491531f063"
       },
@@ -1283,38 +1152,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -1356,12 +1196,7 @@
       }
     ],
     "bio": "Elena Vibes brings the sound of Barcelona to international dancefloors, blending Reggaeton, Latin House with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Elena Vibes has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
@@ -1547,11 +1382,7 @@
       "url": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
       "alt": "Ayla Moon live performance cover"
     },
-    "genres": [
-      "Organic House",
-      "Melodic Techno",
-      "Deep House"
-    ],
+    "genres": ["Organic House", "Melodic Techno", "Deep House"],
     "socials": {
       "instagram": "https://www.instagram.com/dj_ayla_/",
       "soundcloud": "https://soundcloud.com/dj-ayla-402039174",
@@ -1571,10 +1402,7 @@
         "title": "Organic House Sessions Vol.3",
         "duration": "83m",
         "plays": 144936,
-        "genres": [
-          "Organic House",
-          "Melodic Techno"
-        ],
+        "genres": ["Organic House", "Melodic Techno"],
         "audioUrl": "https://soundcloud.com/ayla-moon/organic-house-sessions",
         "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
       },
@@ -1663,38 +1491,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -1736,12 +1535,7 @@
       }
     ],
     "bio": "Ayla Moon brings the sound of Istanbul to international dancefloors, blending Organic House, Melodic Techno with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Ayla Moon has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1506157786151-b8491531f063",
@@ -1927,11 +1721,7 @@
       "url": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
       "alt": "Martin Garrix live performance cover"
     },
-    "genres": [
-      "EDM",
-      "Progressive House",
-      "Electro House"
-    ],
+    "genres": ["EDM", "Progressive House", "Electro House"],
     "socials": {
       "instagram": "https://www.instagram.com/martingarrix/?hl=en",
       "soundcloud": "https://soundcloud.com/martingarrix",
@@ -1952,10 +1742,7 @@
         "title": "EDM Sessions Vol.2",
         "duration": "89m",
         "plays": 167264,
-        "genres": [
-          "EDM",
-          "Progressive House"
-        ],
+        "genres": ["EDM", "Progressive House"],
         "audioUrl": "https://soundcloud.com/martin-garrix/edm-sessions",
         "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
       },
@@ -2044,38 +1831,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -2117,12 +1875,7 @@
       }
     ],
     "bio": "Martin Garrix brings the sound of Amsterdam to international dancefloors, blending EDM, Progressive House with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Martin Garrix has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
@@ -2308,11 +2061,7 @@
       "url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
       "alt": "Peggy Gou live performance cover"
     },
-    "genres": [
-      "House",
-      "Techno",
-      "Deep House"
-    ],
+    "genres": ["House", "Techno", "Deep House"],
     "socials": {
       "instagram": "https://www.instagram.com/peggygou_/?hl=en",
       "soundcloud": "https://soundcloud.com/PEGGYGOU",
@@ -2334,10 +2083,7 @@
         "title": "House Sessions Vol.2",
         "duration": "78m",
         "plays": 44891,
-        "genres": [
-          "House",
-          "Techno"
-        ],
+        "genres": ["House", "Techno"],
         "audioUrl": "https://soundcloud.com/peggy-gou/house-sessions",
         "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
       },
@@ -2347,7 +2093,7 @@
         "duration": "59 min",
         "views": 349962,
         "thumbnail": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/r_wwmmo6UGY?si=0eegIFCGGBAQ8kOJ"
       }
     },
     "analytics": {
@@ -2426,38 +2172,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -2499,12 +2216,7 @@
       }
     ],
     "bio": "Peggy Gou brings the sound of Berlin to international dancefloors, blending House, Techno with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Peggy Gou has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
@@ -2517,11 +2229,11 @@
       "videos": [
         {
           "title": "Live @ DC-10",
-          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+          "url": "https://youtu.be/d1gmuWdZzkw?si=CdgdizJkqD4MQUPM"
         },
         {
           "title": "Live @ Rex Club",
-          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+          "url": "https://youtu.be/ud8_RJzER8o?si=QKE6dJE3CNLr4m2f"
         }
       ],
       "mixes": [
@@ -2690,11 +2402,7 @@
       "url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
       "alt": "Black Coffee live performance cover"
     },
-    "genres": [
-      "Afro House",
-      "Deep House",
-      "House"
-    ],
+    "genres": ["Afro House", "Deep House", "House"],
     "socials": {
       "instagram": "https://www.instagram.com/realblackcoffee/?hl=en",
       "spotify": "https://open.spotify.com/artist/6wMr4zKPrrR0UVz08WtUWc",
@@ -2715,10 +2423,7 @@
         "title": "Afro House Sessions Vol.5",
         "duration": "88m",
         "plays": 153128,
-        "genres": [
-          "Afro House",
-          "Deep House"
-        ],
+        "genres": ["Afro House", "Deep House"],
         "audioUrl": "https://soundcloud.com/black-coffee/afro-house-sessions",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
@@ -2807,38 +2512,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -2880,12 +2556,7 @@
       }
     ],
     "bio": "Black Coffee brings the sound of Johannesburg to international dancefloors, blending Afro House, Deep House with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Black Coffee has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
@@ -3071,11 +2742,7 @@
       "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
       "alt": "Charlotte de Witte live performance cover"
     },
-    "genres": [
-      "Techno",
-      "Acid Techno",
-      "Industrial Techno"
-    ],
+    "genres": ["Techno", "Acid Techno", "Industrial Techno"],
     "socials": {
       "instagram": "https://www.instagram.com/charlottedewittemusic/?hl=en",
       "soundcloud": "https://soundcloud.com/charlottedewittemusic",
@@ -3098,10 +2765,7 @@
         "title": "Techno Sessions Vol.2",
         "duration": "70m",
         "plays": 145754,
-        "genres": [
-          "Techno",
-          "Acid Techno"
-        ],
+        "genres": ["Techno", "Acid Techno"],
         "audioUrl": "https://soundcloud.com/charlotte-de-witte/techno-sessions",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
@@ -3190,38 +2854,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -3263,12 +2898,7 @@
       }
     ],
     "bio": "Charlotte de Witte brings the sound of Ghent to international dancefloors, blending Techno, Acid Techno with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Charlotte de Witte has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
@@ -3454,11 +3084,7 @@
       "url": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
       "alt": "DJ Snake live performance cover"
     },
-    "genres": [
-      "EDM",
-      "Trap",
-      "Hip-Hop"
-    ],
+    "genres": ["EDM", "Trap", "Hip-Hop"],
     "socials": {
       "instagram": "https://www.instagram.com/djsnake/?hl=en",
       "soundcloud": "https://soundcloud.com/djsnake",
@@ -3481,10 +3107,7 @@
         "title": "EDM Sessions Vol.3",
         "duration": "53m",
         "plays": 166265,
-        "genres": [
-          "EDM",
-          "Trap"
-        ],
+        "genres": ["EDM", "Trap"],
         "audioUrl": "https://soundcloud.com/dj-snake/edm-sessions",
         "coverImage": "https://images.unsplash.com/photo-1506157786151-b8491531f063"
       },
@@ -3573,38 +3196,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -3646,12 +3240,7 @@
       }
     ],
     "bio": "DJ Snake brings the sound of Paris to international dancefloors, blending EDM, Trap with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, DJ Snake has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
@@ -3837,11 +3426,7 @@
       "url": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
       "alt": "Carl Cox live performance cover"
     },
-    "genres": [
-      "Techno",
-      "House",
-      "Classic House"
-    ],
+    "genres": ["Techno", "House", "Classic House"],
     "socials": {
       "instagram": "https://www.instagram.com/carlcoxofficial/?hl=en",
       "soundcloud": "https://soundcloud.com/carl-cox",
@@ -3862,10 +3447,7 @@
         "title": "Techno Sessions Vol.2",
         "duration": "65m",
         "plays": 96873,
-        "genres": [
-          "Techno",
-          "House"
-        ],
+        "genres": ["Techno", "House"],
         "audioUrl": "https://soundcloud.com/carl-cox/techno-sessions",
         "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
       },
@@ -3954,38 +3536,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -4027,12 +3580,7 @@
       }
     ],
     "bio": "Carl Cox brings the sound of London to international dancefloors, blending Techno, House with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Carl Cox has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1506157786151-b8491531f063",
@@ -4218,11 +3766,7 @@
       "url": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
       "alt": "Amelie Lens live performance cover"
     },
-    "genres": [
-      "Techno",
-      "Minimal Techno",
-      "Acid Techno"
-    ],
+    "genres": ["Techno", "Minimal Techno", "Acid Techno"],
     "socials": {
       "instagram": "https://www.instagram.com/amelie_lens/?hl=en",
       "soundcloud": "https://soundcloud.com/AMELIELENS",
@@ -4243,10 +3787,7 @@
         "title": "Techno Sessions Vol.3",
         "duration": "80m",
         "plays": 134929,
-        "genres": [
-          "Techno",
-          "Minimal Techno"
-        ],
+        "genres": ["Techno", "Minimal Techno"],
         "audioUrl": "https://soundcloud.com/amelie-lens/techno-sessions",
         "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
       },
@@ -4335,38 +3876,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -4408,12 +3920,7 @@
       }
     ],
     "bio": "Amelie Lens brings the sound of Brussels to international dancefloors, blending Techno, Minimal Techno with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Amelie Lens has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
@@ -4599,10 +4106,7 @@
       "url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
       "alt": "FISHER live performance cover"
     },
-    "genres": [
-      "Tech House",
-      "House"
-    ],
+    "genres": ["Tech House", "House"],
     "socials": {
       "instagram": "https://www.instagram.com/followthefishtv/?hl=en",
       "soundcloud": "https://soundcloud.com/fish-tales",
@@ -4623,10 +4127,7 @@
         "title": "Tech House Sessions Vol.2",
         "duration": "79m",
         "plays": 22021,
-        "genres": [
-          "Tech House",
-          "House"
-        ],
+        "genres": ["Tech House", "House"],
         "audioUrl": "https://soundcloud.com/fisher/tech-house-sessions",
         "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
       },
@@ -4715,38 +4216,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -4788,12 +4260,7 @@
       }
     ],
     "bio": "FISHER brings the sound of Gold Coast to international dancefloors, blending Tech House, House with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, FISHER has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
@@ -4979,11 +4446,7 @@
       "url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
       "alt": "Steve Aoki live performance cover"
     },
-    "genres": [
-      "EDM",
-      "Electro House",
-      "Big Room"
-    ],
+    "genres": ["EDM", "Electro House", "Big Room"],
     "socials": {
       "instagram": "https://www.instagram.com/steveaoki/?hl=en",
       "soundcloud": "https://soundcloud.com/steveaoki",
@@ -5007,10 +4470,7 @@
         "title": "EDM Sessions Vol.2",
         "duration": "86m",
         "plays": 166315,
-        "genres": [
-          "EDM",
-          "Electro House"
-        ],
+        "genres": ["EDM", "Electro House"],
         "audioUrl": "https://soundcloud.com/steve-aoki/edm-sessions",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
@@ -5099,38 +4559,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -5172,12 +4603,7 @@
       }
     ],
     "bio": "Steve Aoki brings the sound of Las Vegas to international dancefloors, blending EDM, Electro House with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Steve Aoki has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
@@ -5363,11 +4789,7 @@
       "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
       "alt": "Lost Frequencies live performance cover"
     },
-    "genres": [
-      "Deep House",
-      "Tropical House",
-      "Melodic House"
-    ],
+    "genres": ["Deep House", "Tropical House", "Melodic House"],
     "socials": {
       "instagram": "https://www.instagram.com/lostfrequencies/?hl=en",
       "soundcloud": "https://soundcloud.com/lo-freq-1",
@@ -5389,10 +4811,7 @@
         "title": "Deep House Sessions Vol.8",
         "duration": "55m",
         "plays": 54659,
-        "genres": [
-          "Deep House",
-          "Tropical House"
-        ],
+        "genres": ["Deep House", "Tropical House"],
         "audioUrl": "https://soundcloud.com/lost-frequencies/deep-house-sessions",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
@@ -5481,38 +4900,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -5554,12 +4944,7 @@
       }
     ],
     "bio": "Lost Frequencies brings the sound of Brussels to international dancefloors, blending Deep House, Tropical House with high-energy storytelling. Known for sharp transitions, crowd reading, and memorable peak-time moments, Lost Frequencies has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",

@@ -19,7 +19,18 @@ export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
 
   return (
     <>
-      <div onClick={() => setOpen(true)} className="cursor-pointer">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+        className="cursor-pointer"
+      >
         {children}
       </div>
 
@@ -38,6 +49,7 @@ export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
               </p>
               <button
                 onClick={() => setOpen(false)}
+                aria-label="Close audio player"
                 className="size-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0"
               >
                 <X className="w-4 h-4" />
@@ -53,6 +65,7 @@ export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
                   frameBorder="no"
                   allow="autoplay"
                   src={embedUrl}
+                  title={title}
                   className="rounded-lg w-full"
                 />
               ) : (

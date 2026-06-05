@@ -207,10 +207,12 @@ function mapFreeDjToProps(d: DjDemoData) {
 }
 
 function mapFreeEventsFromData(d: DjDemoData) {
+  const normalizeEventDate = (value: string) =>
+    value.includes("T") ? value : `${value}T20:00:00Z`;
   return d.upcomingEvents.map((e, i) => ({
     id: i + 1,
     title: e.title,
-    date: `${e.date}T20:00:00Z`,
+    date: normalizeEventDate(e.date),
     venue: e.venue,
     city: e.city,
     country: "",
@@ -695,7 +697,7 @@ export default function DjProfileFree({
                 </Card>
               </MediaAudioPlayer>
               {/* Locked more mixes */}
-              <div className="mt-3 p-3 rounded-lg border border-dashed border-white/10 flex items-center gap-3">
+              {/* <div className="mt-3 p-3 rounded-lg border border-dashed border-white/10 flex items-center gap-3">
                 <FontAwesomeIcon
                   icon={faLock}
                   className="h-3.5 w-3.5 text-amber-500 shrink-0"
@@ -709,7 +711,7 @@ export default function DjProfileFree({
                 <Badge className="ml-auto shrink-0 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs cursor-pointer hover:bg-amber-500/20 transition-colors">
                   Upgrade
                 </Badge>
-              </div>
+              </div> */}
             </section>
 
             <Separator className="bg-white/8" />
@@ -721,7 +723,7 @@ export default function DjProfileFree({
               </SectionHeading>
               <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
               {/* Locked video */}
-              <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden gap-0">
+              {/* <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden gap-0">
                 <div className="relative h-44 bg-linear-to-br from-slate-900 to-black">
                   <Image
                     src={videoThumb}
@@ -751,7 +753,7 @@ export default function DjProfileFree({
                     </Badge>
                   </div>
                 </div>
-              </Card>
+              </Card> */}
             </section>
 
             <Separator className="bg-white/8" />
@@ -873,7 +875,7 @@ export default function DjProfileFree({
             <Separator className="bg-white/8" />
 
             {/* ── BOOKING DETAILS ── */}
-            <section>
+            {/* <section>
               <SectionHeading>Booking Details</SectionHeading>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
@@ -931,10 +933,10 @@ export default function DjProfileFree({
                   </Button>
                 </Card>
               </div>
-            </section>
+            </section> */}
 
             {/* ── LOCKED PREMIUM TEASERS ── */}
-            <section>
+            {/* <section>
               <div className="flex items-center gap-2 mb-5">
                 <h2 className="font-heading text-xl text-white">
                   Unlock More with Premium
@@ -988,7 +990,7 @@ export default function DjProfileFree({
                   </Button>
                 </div>
               </div>
-            </section>
+            </section> */}
           </div>
 
           {/* ── SIDEBAR ── */}
@@ -1079,7 +1081,7 @@ export default function DjProfileFree({
             <Separator className="bg-white/8" />
 
             {/* Locked Analytics teaser */}
-            <div className="p-4 rounded-xl border border-white/8 bg-white/2">
+            {/* <div className="p-4 rounded-xl border border-white/8 bg-white/2">
               <div className="flex items-center gap-2 mb-3">
                 <FontAwesomeIcon
                   icon={faLock}
@@ -1107,7 +1109,7 @@ export default function DjProfileFree({
                   ),
                 )}
               </div>
-            </div>
+            </div> */}
 
             {/* Profile completion prompt */}
             <div>
