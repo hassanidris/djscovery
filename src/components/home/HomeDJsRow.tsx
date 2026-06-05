@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export type DemoDJ = {
-  id: number;
+  id: number | string;
   stageName: string;
   avatar: string;
   genres: string[];
@@ -14,6 +14,8 @@ export type DemoDJ = {
   country: string;
   rating: number;
   followers: number;
+  slug?: string;
+  isPremium?: boolean;
 };
 
 type Props = {
@@ -52,7 +54,11 @@ export default function HomeDJsRow({
         <ScrollArea className="w-full">
           <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
             {djs.map((dj, index) => (
-              <Link key={dj.id} href="/directory" className="block h-full">
+              <Link
+                key={dj.id}
+                href={dj.slug ? `/djs/${dj.slug}` : "/directory"}
+                className="block h-full"
+              >
                 <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red gap-3 p-4 cursor-pointer transition-all overflow-visible">
                   {variant === "trending" ? (
                     <Badge className="absolute top-2 left-2 bg-h_redDark/50 text-h_red border-0">

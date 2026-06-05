@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CalendarDays, Hash, TrendingUp } from "lucide-react";
+import { ALL_DEMO_DJS } from "@/data/djs";
 
 /*
   WHY a separate component instead of modifying RightMenu:
@@ -25,48 +26,20 @@ import { CalendarDays, Hash, TrendingUp } from "lucide-react";
       margin-heavy padding
 */
 
-const trendingDJs = [
-  {
-    id: 1,
-    name: "Amara Pulse",
-    genre: "Techno",
-    followers: "12.4k",
-    img: "",
-    rank: 1,
-  },
-  {
-    id: 2,
-    name: "DJ Nexus",
-    genre: "House",
-    followers: "9.8k",
-    img: "",
-    rank: 2,
-  },
-  {
-    id: 3,
-    name: "Blaze Kova",
-    genre: "Minimal",
-    followers: "7.2k",
-    img: "",
-    rank: 3,
-  },
-  {
-    id: 4,
-    name: "Luna Haze",
-    genre: "Deep House",
-    followers: "5.6k",
-    img: "",
-    rank: 4,
-  },
-  {
-    id: 5,
-    name: "Echosphere",
-    genre: "Ambient",
-    followers: "4.1k",
-    img: "",
-    rank: 5,
-  },
-];
+const trendingDJs = [...ALL_DEMO_DJS]
+  .sort((a, b) => b.stats.followers - a.stats.followers)
+  .slice(0, 5)
+  .map((dj, i) => ({
+    slug: dj.slug,
+    name: dj.stageName,
+    genre: dj.genres[0] ?? "",
+    followers:
+      dj.stats.followers >= 1000
+        ? `${(dj.stats.followers / 1000).toFixed(1)}k`
+        : String(dj.stats.followers),
+    img: dj.avatar.url,
+    rank: i + 1,
+  }));
 
 const upcomingEvents = [
   {
@@ -92,16 +65,9 @@ const upcomingEvents = [
   },
 ];
 
-const hotTags = [
-  "#techno",
-  "#house",
-  "#berlin",
-  "#minimal",
-  "#trance",
-  "#bassline",
-  "#ibiza",
-  "#deephouse",
-];
+const hotTags = [...new Set(ALL_DEMO_DJS.flatMap((dj) => dj.genres))]
+  .slice(0, 8)
+  .map((g) => `#${g.toLowerCase().replace(/\s+/g, "")}`);
 
 const CommunityRightPanel = () => {
   return (
@@ -122,7 +88,7 @@ const CommunityRightPanel = () => {
 
         <CardContent className="px-4 py-3 flex flex-col gap-0">
           {trendingDJs.map((dj, index) => (
-            <div key={dj.id}>
+            <div key={dj.slug}>
               <div className="flex items-center gap-3 py-2.5">
                 {/* Rank number */}
                 <span
@@ -143,9 +109,11 @@ const CommunityRightPanel = () => {
 
                 {/* Name + followers */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-h_white font-medium truncate">
-                    {dj.name}
-                  </p>
+                  <Link href={`/djs/${dj.slug}`} className="hover:underline">
+                    <p className="text-sm text-h_white font-medium truncate">
+                      {dj.name}
+                    </p>
+                  </Link>
                   <p className="text-xs text-gray-500">
                     {dj.followers} followers
                   </p>

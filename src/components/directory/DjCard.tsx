@@ -9,8 +9,10 @@ const DjCard = ({
   genres,
   country,
   city,
+  slug,
   _count,
 }: DjUser) => {
+  const profileHref = slug ? `/djs/${slug}` : `/profile/${username}`;
   const genreList = genres
     ? genres
         .split(",")
@@ -20,7 +22,7 @@ const DjCard = ({
 
   return (
     <div className="bg-h_blackLight/50 rounded-xl p-4 flex flex-col gap-3 hover:ring-1 hover:ring-h_red transition-all">
-      <Link href={`/profile/${username}`} className="flex items-center gap-3">
+      <Link href={profileHref} className="flex items-center gap-3">
         <Image
           src={avatar || "/noAvatar.png"}
           alt={stageName || username}

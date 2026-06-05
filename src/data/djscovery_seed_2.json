@@ -1,0 +1,5736 @@
+[
+  {
+    "id": "dj_mira_sol",
+    "slug": "mira-sol",
+    "type": "fictional_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": true,
+    "name": "Mira Sol",
+    "stageName": "Mira Sol",
+    "location": {
+      "city": "Lisbon",
+      "country": "Portugal"
+    },
+    "avatar": {
+      "url": "https://i.scdn.co/image/ab6761610000517468515863ad40666e4562b8a3",
+      "alt": "Mira Sol"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+      "alt": "Mira Sol live performance cover"
+    },
+    "genres": [
+      "Deep House",
+      "Organic House",
+      "Downtempo",
+      "Melodic House"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/mirasolmusic/",
+      "soundcloud": "https://soundcloud.com/user-635857713",
+      "spotify": "https://open.spotify.com/artist/6infUk62cR4BwlGy0O7b55",
+      "youtube": "https://www.youtube.com/channel/UCSd3gUhdtyIcz0VJjOPTe3A",
+      "apple": "https://music.apple.com/us/artist/mira-sol/1759446839"
+    },
+    "stats": {
+      "followers": 23400,
+      "rating": 4.7,
+      "reviews": 53,
+      "events": 25,
+      "responseRate": 88,
+      "bookingRate": 74,
+      "monthlyViews": 2220
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Deep House Sessions Vol.4",
+        "duration": "59m",
+        "plays": 48345,
+        "genres": [
+          "Deep House",
+          "Organic House"
+        ],
+        "audioUrl": "https://soundcloud.com/mira-sol/deep-house-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
+      },
+      "featuredVideo": {
+        "title": "Live @ Fabric London 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "43 min",
+        "views": 105000,
+        "thumbnail": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 2220,
+        "growth": 9
+      },
+      "bookingRequests": {
+        "value": 21,
+        "growth": 7
+      },
+      "newFollowers": {
+        "value": 187,
+        "growth": 6
+      },
+      "bookingRate": 74,
+      "topCities": [
+        {
+          "city": "Berlin",
+          "percentage": 28
+        },
+        {
+          "city": "Paris",
+          "percentage": 22
+        },
+        {
+          "city": "Stockholm",
+          "percentage": 17
+        },
+        {
+          "city": "Dubai",
+          "percentage": 13
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 1560,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 5620,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 3020,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Mira Sol brings sunset-driven deep house and organic grooves to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Mira Sol has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Fabric London",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Club Space",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Deep House Mix 1",
+          "url": "https://soundcloud.com/mira-sol/mix-1"
+        },
+        {
+          "title": "Organic House Mix 2",
+          "url": "https://soundcloud.com/mira-sol/mix-2"
+        },
+        {
+          "title": "Downtempo Mix 3",
+          "url": "https://soundcloud.com/mira-sol/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Sunset Sessions — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Fabric London Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Mira Sol brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "DJ Mag",
+        "type": "Feature",
+        "title": "The Rise of Mira Sol",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Mixmag",
+        "type": "Interview",
+        "title": "Mira Sol: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Fabric London",
+        "city": "London",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "Club Space",
+        "city": "Miami",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "timesPlayed": 4
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Elena Novak",
+        "email": "manager@mira-sol.com"
+      },
+      "bookingAgent": {
+        "name": "Victor Hayes",
+        "agency": "Pulse Bookings",
+        "email": "bookings@mira-sol.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@mira-sol.com",
+      "phone": "+44 7700 900123",
+      "website": "https://mira-sol.com",
+      "feeRange": {
+        "min": 1000,
+        "max": 15000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Warehouse Sessions",
+        "venue": "Fabric London",
+        "city": "London",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Deep Pulse",
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Neon Nights",
+        "venue": "Club Space",
+        "city": "Miami",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_kai_frequency",
+    "slug": "kai-frequency",
+    "type": "fictional_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": true,
+    "name": "Kai Frequency",
+    "stageName": "Kai Frequency",
+    "location": {
+      "city": "Seoul",
+      "country": "South Korea"
+    },
+    "avatar": {
+      "url": "https://res.cloudinary.com/shotgun/image/upload/v1706642637/production/artworks/artists/dj_kai_song.jpg",
+      "alt": "Kai Frequency"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+      "alt": "Kai Frequency live performance cover"
+    },
+    "genres": [
+      "Techno",
+      "Melodic Techno",
+      "House",
+      "Electronica"
+    ],
+    "socials": {
+      "spotify": "https://open.spotify.com/track/5D7zgku43yFawUZ0Rpbn8H",
+      "apple": "https://music.apple.com/fj/artist/dj-kai/1815815836"
+    },
+    "stats": {
+      "followers": 28800,
+      "rating": 4.8,
+      "reviews": 61,
+      "events": 30,
+      "responseRate": 89,
+      "bookingRate": 75,
+      "monthlyViews": 2640
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Techno Sessions Vol.5",
+        "duration": "60m",
+        "plays": 60690,
+        "genres": [
+          "Techno",
+          "Melodic Techno"
+        ],
+        "audioUrl": "https://soundcloud.com/kai-frequency/techno-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
+      },
+      "featuredVideo": {
+        "title": "Live @ Pacha 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "44 min",
+        "views": 132000,
+        "thumbnail": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 2640,
+        "growth": 10
+      },
+      "bookingRequests": {
+        "value": 24,
+        "growth": 8
+      },
+      "newFollowers": {
+        "value": 234,
+        "growth": 7
+      },
+      "bookingRate": 75,
+      "topCities": [
+        {
+          "city": "Paris",
+          "percentage": 28
+        },
+        {
+          "city": "Stockholm",
+          "percentage": 22
+        },
+        {
+          "city": "Dubai",
+          "percentage": 17
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 13
+        },
+        {
+          "city": "New York",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 1720,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 6040,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 3240,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Kai Frequency brings clean melodic techno with futuristic Seoul club energy to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Kai Frequency has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Pacha",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Printworks",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Techno Mix 1",
+          "url": "https://soundcloud.com/kai-frequency/mix-1"
+        },
+        {
+          "title": "Melodic Techno Mix 2",
+          "url": "https://soundcloud.com/kai-frequency/mix-2"
+        },
+        {
+          "title": "House Mix 3",
+          "url": "https://soundcloud.com/kai-frequency/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Warehouse Sessions — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Pacha Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Kai Frequency brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Mixmag",
+        "type": "Feature",
+        "title": "The Rise of Kai Frequency",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Resident Advisor",
+        "type": "Interview",
+        "title": "Kai Frequency: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Printworks",
+        "city": "London",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Berns",
+        "city": "Stockholm",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Rex Club",
+        "city": "Paris",
+        "timesPlayed": 5
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Daniel Reed",
+        "email": "manager@kai-frequency.com"
+      },
+      "bookingAgent": {
+        "name": "Nadia Silva",
+        "agency": "Global Night Agency",
+        "email": "bookings@kai-frequency.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@kai-frequency.com",
+      "phone": "+44 7700 900123",
+      "website": "https://kai-frequency.com",
+      "feeRange": {
+        "min": 1000,
+        "max": 15000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Deep Pulse",
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Neon Nights",
+        "venue": "Club Space",
+        "city": "Miami",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Global Bass",
+        "venue": "Printworks",
+        "city": "London",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_sahara_beats",
+    "slug": "sahara-beats",
+    "type": "fictional_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Sahara Beats",
+    "stageName": "Sahara Beats",
+    "location": {
+      "city": "Casablanca",
+      "country": "Morocco"
+    },
+    "avatar": {
+      "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuaOjm8lCWdkueF3e185kmyEnnj-2I7aN5yA&s",
+      "alt": "Sahara Beats"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+      "alt": "Sahara Beats live performance cover"
+    },
+    "genres": [
+      "Afro House",
+      "Organic House",
+      "Arab Electronic",
+      "Deep House"
+    ],
+    "socials": {
+      "soundcloud": "https://soundcloud.com/djsahara",
+      "youtube": "https://www.youtube.com/@ArabesqueEcho"
+    },
+    "stats": {
+      "followers": 34200,
+      "rating": 4.9,
+      "reviews": 69,
+      "events": 35,
+      "responseRate": 90,
+      "bookingRate": 76,
+      "monthlyViews": 3060
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Afro House Sessions Vol.6",
+        "duration": "61m",
+        "plays": 73035,
+        "genres": [
+          "Afro House",
+          "Organic House"
+        ],
+        "audioUrl": "https://soundcloud.com/sahara-beats/afro-house-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1506157786151-b8491531f063"
+      },
+      "featuredVideo": {
+        "title": "Live @ Club Space 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "45 min",
+        "views": 159000,
+        "thumbnail": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 3060,
+        "growth": 11
+      },
+      "bookingRequests": {
+        "value": 27,
+        "growth": 9
+      },
+      "newFollowers": {
+        "value": 281,
+        "growth": 8
+      },
+      "bookingRate": 76,
+      "topCities": [
+        {
+          "city": "Stockholm",
+          "percentage": 28
+        },
+        {
+          "city": "Dubai",
+          "percentage": 22
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 17
+        },
+        {
+          "city": "New York",
+          "percentage": 13
+        },
+        {
+          "city": "Amsterdam",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 1880,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 6460,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 3460,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Sahara Beats brings North African rhythms, Afro House, and warm desert-inspired percussion to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Sahara Beats has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Club Space",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Shelter NYC",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Afro House Mix 1",
+          "url": "https://soundcloud.com/sahara-beats/mix-1"
+        },
+        {
+          "title": "Organic House Mix 2",
+          "url": "https://soundcloud.com/sahara-beats/mix-2"
+        },
+        {
+          "title": "Arab Electronic Mix 3",
+          "url": "https://soundcloud.com/sahara-beats/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Global Bass — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Club Space Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Sahara Beats brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Billboard Dance",
+        "type": "Feature",
+        "title": "The Rise of Sahara Beats",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "BBC Music",
+        "type": "Interview",
+        "title": "Sahara Beats: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Club Space",
+        "city": "Miami",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "timesPlayed": 5
+      },
+      {
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Watergate",
+        "city": "Berlin",
+        "timesPlayed": 6
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Maya Laurent",
+        "email": "manager@sahara-beats.com"
+      },
+      "bookingAgent": {
+        "name": "Leo Anders",
+        "agency": "StageLine",
+        "email": "bookings@sahara-beats.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@sahara-beats.com",
+      "phone": "+44 7700 900123",
+      "website": "https://sahara-beats.com",
+      "feeRange": {
+        "min": 1000,
+        "max": 15000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Neon Nights",
+        "venue": "Club Space",
+        "city": "Miami",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Global Bass",
+        "venue": "Printworks",
+        "city": "London",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Rooftop Frequency",
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_rio_noir",
+    "slug": "rio-noir",
+    "type": "fictional_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Rio Noir",
+    "stageName": "Rio Noir",
+    "location": {
+      "city": "Rio de Janeiro",
+      "country": "Brazil"
+    },
+    "avatar": {
+      "url": "https://i1.sndcdn.com/avatars-BHuySKDP9VoF4pK2-5hSu0g-t1080x1080.jpg",
+      "alt": "Rio Noir"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+      "alt": "Rio Noir live performance cover"
+    },
+    "genres": [
+      "Baile Funk",
+      "Latin House",
+      "Tech House",
+      "Bass"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/rionoir/",
+      "soundcloud": "https://soundcloud.com/rionoirmusic",
+      "spotify": "https://open.spotify.com/artist/5HoWySsCKBmdEzegGAUoQg"
+    },
+    "stats": {
+      "followers": 39600,
+      "rating": 4.6,
+      "reviews": 77,
+      "events": 40,
+      "responseRate": 91,
+      "bookingRate": 77,
+      "monthlyViews": 3480
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Baile Funk Sessions Vol.7",
+        "duration": "62m",
+        "plays": 85380,
+        "genres": [
+          "Baile Funk",
+          "Latin House"
+        ],
+        "audioUrl": "https://soundcloud.com/rio-noir/baile-funk-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+      },
+      "featuredVideo": {
+        "title": "Live @ Printworks 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "46 min",
+        "views": 186000,
+        "thumbnail": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 3480,
+        "growth": 12
+      },
+      "bookingRequests": {
+        "value": 30,
+        "growth": 10
+      },
+      "newFollowers": {
+        "value": 328,
+        "growth": 9
+      },
+      "bookingRate": 77,
+      "topCities": [
+        {
+          "city": "Dubai",
+          "percentage": 28
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 22
+        },
+        {
+          "city": "New York",
+          "percentage": 17
+        },
+        {
+          "city": "Amsterdam",
+          "percentage": 13
+        },
+        {
+          "city": "São Paulo",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 2040,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 6880,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 3680,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Rio Noir brings Brazilian street energy mixed with club-ready Latin House to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Rio Noir has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Printworks",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Berns",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Baile Funk Mix 1",
+          "url": "https://soundcloud.com/rio-noir/mix-1"
+        },
+        {
+          "title": "Latin House Mix 2",
+          "url": "https://soundcloud.com/rio-noir/mix-2"
+        },
+        {
+          "title": "Tech House Mix 3",
+          "url": "https://soundcloud.com/rio-noir/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Deep Pulse — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Printworks Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Rio Noir brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Fact Magazine",
+        "type": "Feature",
+        "title": "The Rise of Rio Noir",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Clash",
+        "type": "Interview",
+        "title": "Rio Noir: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Printworks",
+        "city": "London",
+        "timesPlayed": 5
+      },
+      {
+        "venue": "Berns",
+        "city": "Stockholm",
+        "timesPlayed": 6
+      },
+      {
+        "venue": "Rex Club",
+        "city": "Paris",
+        "timesPlayed": 5
+      },
+      {
+        "venue": "Ministry of Sound",
+        "city": "London",
+        "timesPlayed": 3
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Omar Haddad",
+        "email": "manager@rio-noir.com"
+      },
+      "bookingAgent": {
+        "name": "Anika Bauer",
+        "agency": "Bassline Talent",
+        "email": "bookings@rio-noir.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@rio-noir.com",
+      "phone": "+44 7700 900123",
+      "website": "https://rio-noir.com",
+      "feeRange": {
+        "min": 1000,
+        "max": 15000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Global Bass",
+        "venue": "Printworks",
+        "city": "London",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Rooftop Frequency",
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Midnight Circuit",
+        "venue": "Berns",
+        "city": "Stockholm",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_zara_luxe",
+    "slug": "zara-luxe",
+    "type": "fictional_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Zara Luxe",
+    "stageName": "Zara Luxe",
+    "location": {
+      "city": "Dubai",
+      "country": "UAE"
+    },
+    "avatar": {
+      "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCOz64cNvsJg5f-dOancZ-kKxIKUQAe7XksQ&s",
+      "alt": "Zara Luxe"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+      "alt": "Zara Luxe live performance cover"
+    },
+    "genres": [
+      "Open Format",
+      "Commercial",
+      "Afro House",
+      "R&B"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/zaradj_/?hl=en",
+      "soundcloud": "https://soundcloud.com/dj-zara-1",
+      "spotify": "https://open.spotify.com/artist/5ofFEnvjHerUAdec4oDH7J",
+      "youtube": "https://www.youtube.com/channel/UCiSo_3eBdWX3lhvwPHYPdeA"
+    },
+    "stats": {
+      "followers": 45000,
+      "rating": 4.7,
+      "reviews": 85,
+      "events": 45,
+      "responseRate": 92,
+      "bookingRate": 78,
+      "monthlyViews": 3900
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Open Format Sessions Vol.8",
+        "duration": "63m",
+        "plays": 97725,
+        "genres": [
+          "Open Format",
+          "Commercial"
+        ],
+        "audioUrl": "https://soundcloud.com/zara-luxe/open-format-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7"
+      },
+      "featuredVideo": {
+        "title": "Live @ Shelter NYC 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "47 min",
+        "views": 213000,
+        "thumbnail": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 3900,
+        "growth": 13
+      },
+      "bookingRequests": {
+        "value": 33,
+        "growth": 11
+      },
+      "newFollowers": {
+        "value": 375,
+        "growth": 10
+      },
+      "bookingRate": 78,
+      "topCities": [
+        {
+          "city": "Ibiza",
+          "percentage": 28
+        },
+        {
+          "city": "New York",
+          "percentage": 22
+        },
+        {
+          "city": "Amsterdam",
+          "percentage": 17
+        },
+        {
+          "city": "São Paulo",
+          "percentage": 13
+        },
+        {
+          "city": "Tokyo",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 2200,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 7300,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 3900,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Zara Luxe brings luxury event energy, open-format transitions, and premium club selections to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Zara Luxe has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Shelter NYC",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ DC-10",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Open Format Mix 1",
+          "url": "https://soundcloud.com/zara-luxe/mix-1"
+        },
+        {
+          "title": "Commercial Mix 2",
+          "url": "https://soundcloud.com/zara-luxe/mix-2"
+        },
+        {
+          "title": "Afro House Mix 3",
+          "url": "https://soundcloud.com/zara-luxe/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Neon Nights — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Shelter NYC Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Zara Luxe brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Resident Advisor",
+        "type": "Feature",
+        "title": "The Rise of Zara Luxe",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "DJ Mag",
+        "type": "Interview",
+        "title": "Zara Luxe: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "timesPlayed": 6
+      },
+      {
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "Watergate",
+        "city": "Berlin",
+        "timesPlayed": 6
+      },
+      {
+        "venue": "Amnesia",
+        "city": "Ibiza",
+        "timesPlayed": 4
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Marcus Osei",
+        "email": "manager@zara-luxe.com"
+      },
+      "bookingAgent": {
+        "name": "Sophie Laurent",
+        "agency": "Rhythm Agency",
+        "email": "bookings@zara-luxe.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@zara-luxe.com",
+      "phone": "+44 7700 900123",
+      "website": "https://zara-luxe.com",
+      "feeRange": {
+        "min": 1000,
+        "max": 15000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Sunset Sessions",
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Warehouse Sessions",
+        "venue": "Berns",
+        "city": "Stockholm",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Deep Pulse",
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_armin_van_buuren",
+    "slug": "armin-van-buuren",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": true,
+    "name": "Armin van Buuren",
+    "stageName": "Armin van Buuren",
+    "location": {
+      "city": "Amsterdam",
+      "country": "Netherlands"
+    },
+    "avatar": {
+      "url": "https://theplayground.co.uk/wp-content/uploads/2024/10/SNDR_2023-06-09-Armin-van-Buuren-1-scaled-1.jpg",
+      "alt": "Armin van Buuren"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+      "alt": "Armin van Buuren live performance cover"
+    },
+    "genres": [
+      "Trance",
+      "Progressive Trance",
+      "EDM",
+      "Progressive House"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/arminvanbuuren/?hl=en",
+      "soundcloud": "https://soundcloud.com/arminvanbuuren",
+      "spotify": "https://open.spotify.com/artist/0SfsnGyD8FpIN4U4WCkBZ5",
+      "youtube": "https://www.youtube.com/@arminvanbuuren",
+      "website": "https://www.arminvanbuuren.com/"
+    },
+    "stats": {
+      "followers": 263000,
+      "rating": 4.8,
+      "reviews": 394,
+      "events": 218,
+      "responseRate": 93,
+      "bookingRate": 79,
+      "monthlyViews": 16800
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Trance Sessions Vol.3",
+        "duration": "64m",
+        "plays": 110070,
+        "genres": [
+          "Trance",
+          "Progressive Trance"
+        ],
+        "audioUrl": "https://soundcloud.com/armin-van-buuren/trance-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14"
+      },
+      "featuredVideo": {
+        "title": "Live @ Berns 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "48 min",
+        "views": 240000,
+        "thumbnail": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 16800,
+        "growth": 14
+      },
+      "bookingRequests": {
+        "value": 36,
+        "growth": 12
+      },
+      "newFollowers": {
+        "value": 422,
+        "growth": 11
+      },
+      "bookingRate": 79,
+      "topCities": [
+        {
+          "city": "New York",
+          "percentage": 28
+        },
+        {
+          "city": "Amsterdam",
+          "percentage": 22
+        },
+        {
+          "city": "São Paulo",
+          "percentage": 17
+        },
+        {
+          "city": "Tokyo",
+          "percentage": 13
+        },
+        {
+          "city": "London",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 7600,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 25200,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 13400,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Armin van Buuren brings uplifting trance, emotional builds, and festival-scale energy to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Armin van Buuren has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Berns",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Rex Club",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Trance Mix 1",
+          "url": "https://soundcloud.com/armin-van-buuren/mix-1"
+        },
+        {
+          "title": "Progressive Trance Mix 2",
+          "url": "https://soundcloud.com/armin-van-buuren/mix-2"
+        },
+        {
+          "title": "EDM Mix 3",
+          "url": "https://soundcloud.com/armin-van-buuren/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Sunset Sessions — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Berns Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Armin van Buuren brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "DJ Mag",
+        "type": "Feature",
+        "title": "The Rise of Armin van Buuren",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Mixmag",
+        "type": "Interview",
+        "title": "Armin van Buuren: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Berns",
+        "city": "Stockholm",
+        "timesPlayed": 7
+      },
+      {
+        "venue": "Rex Club",
+        "city": "Paris",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Ministry of Sound",
+        "city": "London",
+        "timesPlayed": 1
+      },
+      {
+        "venue": "Berghain",
+        "city": "Berlin",
+        "timesPlayed": 5
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Elena Novak",
+        "email": "manager@armin-van-buuren.com"
+      },
+      "bookingAgent": {
+        "name": "Victor Hayes",
+        "agency": "Pulse Bookings",
+        "email": "bookings@armin-van-buuren.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@armin-van-buuren.com",
+      "phone": "+44 7700 900123",
+      "website": "https://armin-van-buuren.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Warehouse Sessions",
+        "venue": "Berns",
+        "city": "Stockholm",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Deep Pulse",
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Neon Nights",
+        "venue": "Rex Club",
+        "city": "Paris",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_tiesto",
+    "slug": "tiesto",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": true,
+    "name": "Tiësto",
+    "stageName": "Tiësto",
+    "location": {
+      "city": "Breda",
+      "country": "Netherlands"
+    },
+    "avatar": {
+      "url": "https://www.discoverbenelux.com/wp-content/uploads/2015/08/Tiesto.jpg",
+      "alt": "Tiësto"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+      "alt": "Tiësto live performance cover"
+    },
+    "genres": [
+      "EDM",
+      "House",
+      "Progressive House",
+      "Electro House"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/tiesto/?hl=en",
+      "soundcloud": "https://soundcloud.com/tiesto",
+      "spotify": "https://open.spotify.com/artist/2o5jDhtHVPhrJdv3cEQ99Z",
+      "youtube": "https://www.youtube.com/channel/UCPk3RMMXAfLhMJPFpQhye9g",
+      "website": "https://www.tiesto.com/"
+    },
+    "stats": {
+      "followers": 291000,
+      "rating": 4.9,
+      "reviews": 428,
+      "events": 236,
+      "responseRate": 94,
+      "bookingRate": 80,
+      "monthlyViews": 18100
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "EDM Sessions Vol.4",
+        "duration": "65m",
+        "plays": 122415,
+        "genres": [
+          "EDM",
+          "House"
+        ],
+        "audioUrl": "https://soundcloud.com/tiesto/edm-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
+      },
+      "featuredVideo": {
+        "title": "Live @ DC-10 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "49 min",
+        "views": 267000,
+        "thumbnail": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 18100,
+        "growth": 15
+      },
+      "bookingRequests": {
+        "value": 39,
+        "growth": 13
+      },
+      "newFollowers": {
+        "value": 469,
+        "growth": 12
+      },
+      "bookingRate": 80,
+      "topCities": [
+        {
+          "city": "Amsterdam",
+          "percentage": 28
+        },
+        {
+          "city": "São Paulo",
+          "percentage": 22
+        },
+        {
+          "city": "Tokyo",
+          "percentage": 17
+        },
+        {
+          "city": "London",
+          "percentage": 13
+        },
+        {
+          "city": "Berlin",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 7950,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 26400,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 14050,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Tiësto brings mainstage EDM with polished house and festival impact to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Tiësto has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063"
+      ],
+      "videos": [
+        {
+          "title": "Live @ DC-10",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Watergate",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "EDM Mix 1",
+          "url": "https://soundcloud.com/tiesto/mix-1"
+        },
+        {
+          "title": "House Mix 2",
+          "url": "https://soundcloud.com/tiesto/mix-2"
+        },
+        {
+          "title": "Progressive House Mix 3",
+          "url": "https://soundcloud.com/tiesto/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Warehouse Sessions — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "DC-10 Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Tiësto brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Mixmag",
+        "type": "Feature",
+        "title": "The Rise of Tiësto",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Resident Advisor",
+        "type": "Interview",
+        "title": "Tiësto: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "timesPlayed": 1
+      },
+      {
+        "venue": "Watergate",
+        "city": "Berlin",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Amnesia",
+        "city": "Ibiza",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "Fabric London",
+        "city": "London",
+        "timesPlayed": 6
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Daniel Reed",
+        "email": "manager@tiesto.com"
+      },
+      "bookingAgent": {
+        "name": "Nadia Silva",
+        "agency": "Global Night Agency",
+        "email": "bookings@tiesto.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@tiesto.com",
+      "phone": "+44 7700 900123",
+      "website": "https://tiesto.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Deep Pulse",
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Neon Nights",
+        "venue": "Rex Club",
+        "city": "Paris",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Global Bass",
+        "venue": "Watergate",
+        "city": "Berlin",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_david_guetta",
+    "slug": "david-guetta",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": true,
+    "name": "David Guetta",
+    "stageName": "David Guetta",
+    "location": {
+      "city": "Paris",
+      "country": "France"
+    },
+    "avatar": {
+      "url": "https://www.rollingstone.com/wp-content/uploads/2026/01/david-guetta-RSFrance.jpg",
+      "alt": "David Guetta"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+      "alt": "David Guetta live performance cover"
+    },
+    "genres": [
+      "EDM",
+      "Pop Dance",
+      "Electro House",
+      "Commercial"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/davidguetta/?hl=en",
+      "soundcloud": "https://soundcloud.com/davidguetta",
+      "spotify": "https://open.spotify.com/artist/1Cs0zKBU1kc0i8ypK3B9ai",
+      "youtube": "https://www.youtube.com/channel/UC1l7wYrva1qCH-wgqcHaaRg"
+    },
+    "stats": {
+      "followers": 319000,
+      "rating": 4.6,
+      "reviews": 462,
+      "events": 254,
+      "responseRate": 95,
+      "bookingRate": 81,
+      "monthlyViews": 19400
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "EDM Sessions Vol.5",
+        "duration": "66m",
+        "plays": 134760,
+        "genres": [
+          "EDM",
+          "Pop Dance"
+        ],
+        "audioUrl": "https://soundcloud.com/david-guetta/edm-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
+      },
+      "featuredVideo": {
+        "title": "Live @ Rex Club 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "50 min",
+        "views": 294000,
+        "thumbnail": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 19400,
+        "growth": 16
+      },
+      "bookingRequests": {
+        "value": 42,
+        "growth": 14
+      },
+      "newFollowers": {
+        "value": 516,
+        "growth": 13
+      },
+      "bookingRate": 81,
+      "topCities": [
+        {
+          "city": "São Paulo",
+          "percentage": 28
+        },
+        {
+          "city": "Tokyo",
+          "percentage": 22
+        },
+        {
+          "city": "London",
+          "percentage": 17
+        },
+        {
+          "city": "Berlin",
+          "percentage": 13
+        },
+        {
+          "city": "Paris",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 8300,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 27600,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 14700,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "David Guetta brings global pop-dance energy and radio-ready festival moments to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, David Guetta has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Rex Club",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Ministry of Sound",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "EDM Mix 1",
+          "url": "https://soundcloud.com/david-guetta/mix-1"
+        },
+        {
+          "title": "Pop Dance Mix 2",
+          "url": "https://soundcloud.com/david-guetta/mix-2"
+        },
+        {
+          "title": "Electro House Mix 3",
+          "url": "https://soundcloud.com/david-guetta/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Global Bass — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Rex Club Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "David Guetta brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Billboard Dance",
+        "type": "Feature",
+        "title": "The Rise of David Guetta",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "BBC Music",
+        "type": "Interview",
+        "title": "David Guetta: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Rex Club",
+        "city": "Paris",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "Ministry of Sound",
+        "city": "London",
+        "timesPlayed": 5
+      },
+      {
+        "venue": "Berghain",
+        "city": "Berlin",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "timesPlayed": 3
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Maya Laurent",
+        "email": "manager@david-guetta.com"
+      },
+      "bookingAgent": {
+        "name": "Leo Anders",
+        "agency": "StageLine",
+        "email": "bookings@david-guetta.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@david-guetta.com",
+      "phone": "+44 7700 900123",
+      "website": "https://david-guetta.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Neon Nights",
+        "venue": "Rex Club",
+        "city": "Paris",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Global Bass",
+        "venue": "Watergate",
+        "city": "Berlin",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Rooftop Frequency",
+        "venue": "Ministry of Sound",
+        "city": "London",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_alok",
+    "slug": "alok",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Alok",
+    "stageName": "Alok",
+    "location": {
+      "city": "São Paulo",
+      "country": "Brazil"
+    },
+    "avatar": {
+      "url": "https://cdn.mos.cms.futurecdn.net/hUXjTNnFyyB45LyxV7DE4T.jpg",
+      "alt": "Alok"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+      "alt": "Alok live performance cover"
+    },
+    "genres": [
+      "Brazilian Bass",
+      "House",
+      "Dance Pop",
+      "EDM"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/alok/?hl=en",
+      "soundcloud": "https://soundcloud.com/livealok",
+      "spotify": "https://open.spotify.com/artist/0NGAZxHanS9e0iNHpR8f2W",
+      "youtube": "https://www.youtube.com/channel/UCQlaArsZfebRbb70iXm6usg",
+      "website": "https://aloklive.com.br/us/"
+    },
+    "stats": {
+      "followers": 347000,
+      "rating": 4.7,
+      "reviews": 496,
+      "events": 272,
+      "responseRate": 96,
+      "bookingRate": 82,
+      "monthlyViews": 20700
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Brazilian Bass Sessions Vol.6",
+        "duration": "67m",
+        "plays": 147105,
+        "genres": [
+          "Brazilian Bass",
+          "House"
+        ],
+        "audioUrl": "https://soundcloud.com/alok/brazilian-bass-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
+      },
+      "featuredVideo": {
+        "title": "Live @ Watergate 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "51 min",
+        "views": 321000,
+        "thumbnail": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 20700,
+        "growth": 17
+      },
+      "bookingRequests": {
+        "value": 45,
+        "growth": 15
+      },
+      "newFollowers": {
+        "value": 563,
+        "growth": 14
+      },
+      "bookingRate": 82,
+      "topCities": [
+        {
+          "city": "Tokyo",
+          "percentage": 28
+        },
+        {
+          "city": "London",
+          "percentage": 22
+        },
+        {
+          "city": "Berlin",
+          "percentage": 17
+        },
+        {
+          "city": "Paris",
+          "percentage": 13
+        },
+        {
+          "city": "Stockholm",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 8650,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 28800,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 15350,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Alok brings Brazilian bass, emotional hooks, and modern house production to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Alok has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Watergate",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Amnesia",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Brazilian Bass Mix 1",
+          "url": "https://soundcloud.com/alok/mix-1"
+        },
+        {
+          "title": "House Mix 2",
+          "url": "https://soundcloud.com/alok/mix-2"
+        },
+        {
+          "title": "Dance Pop Mix 3",
+          "url": "https://soundcloud.com/alok/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Deep Pulse — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Watergate Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Alok brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Fact Magazine",
+        "type": "Feature",
+        "title": "The Rise of Alok",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Clash",
+        "type": "Interview",
+        "title": "Alok: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Watergate",
+        "city": "Berlin",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Amnesia",
+        "city": "Ibiza",
+        "timesPlayed": 6
+      },
+      {
+        "venue": "Fabric London",
+        "city": "London",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Club Space",
+        "city": "Miami",
+        "timesPlayed": 4
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Omar Haddad",
+        "email": "manager@alok.com"
+      },
+      "bookingAgent": {
+        "name": "Anika Bauer",
+        "agency": "Bassline Talent",
+        "email": "bookings@alok.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@alok.com",
+      "phone": "+44 7700 900123",
+      "website": "https://alok.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Global Bass",
+        "venue": "Watergate",
+        "city": "Berlin",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Rooftop Frequency",
+        "venue": "Ministry of Sound",
+        "city": "London",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Midnight Circuit",
+        "venue": "Amnesia",
+        "city": "Ibiza",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_don_diablo",
+    "slug": "don-diablo",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Don Diablo",
+    "stageName": "Don Diablo",
+    "location": {
+      "city": "Amsterdam",
+      "country": "Netherlands"
+    },
+    "avatar": {
+      "url": "https://djlifemag.com/wp-content/uploads/2025/08/DD_PRESSPIC_2025-2_PREFERRED_IMAGE.jpeg",
+      "alt": "Don Diablo"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+      "alt": "Don Diablo live performance cover"
+    },
+    "genres": [
+      "Future House",
+      "EDM",
+      "Electro House",
+      "Dance"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/dondiablo/?hl=en",
+      "soundcloud": "https://soundcloud.com/DONDIABLO",
+      "spotify": "https://open.spotify.com/artist/1l2ekx5skC4gJH8djERwh1",
+      "youtube": "https://www.youtube.com/channel/UC8y7Xa0E1Lo6PnVsu2KJbOA"
+    },
+    "stats": {
+      "followers": 375000,
+      "rating": 4.8,
+      "reviews": 530,
+      "events": 290,
+      "responseRate": 87,
+      "bookingRate": 83,
+      "monthlyViews": 22000
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "Future House Sessions Vol.7",
+        "duration": "68m",
+        "plays": 159450,
+        "genres": [
+          "Future House",
+          "EDM"
+        ],
+        "audioUrl": "https://soundcloud.com/don-diablo/future-house-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
+      },
+      "featuredVideo": {
+        "title": "Live @ Ministry of Sound 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "52 min",
+        "views": 348000,
+        "thumbnail": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 22000,
+        "growth": 18
+      },
+      "bookingRequests": {
+        "value": 48,
+        "growth": 16
+      },
+      "newFollowers": {
+        "value": 610,
+        "growth": 15
+      },
+      "bookingRate": 83,
+      "topCities": [
+        {
+          "city": "London",
+          "percentage": 28
+        },
+        {
+          "city": "Berlin",
+          "percentage": 22
+        },
+        {
+          "city": "Paris",
+          "percentage": 17
+        },
+        {
+          "city": "Stockholm",
+          "percentage": 13
+        },
+        {
+          "city": "Dubai",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 9000,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 30000,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 16000,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Don Diablo brings future house, digital aesthetics, and high-energy dancefloor control to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Don Diablo has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Ministry of Sound",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Berghain",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "Future House Mix 1",
+          "url": "https://soundcloud.com/don-diablo/mix-1"
+        },
+        {
+          "title": "EDM Mix 2",
+          "url": "https://soundcloud.com/don-diablo/mix-2"
+        },
+        {
+          "title": "Electro House Mix 3",
+          "url": "https://soundcloud.com/don-diablo/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Neon Nights — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Ministry of Sound Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Don Diablo brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Resident Advisor",
+        "type": "Feature",
+        "title": "The Rise of Don Diablo",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "DJ Mag",
+        "type": "Interview",
+        "title": "Don Diablo: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Ministry of Sound",
+        "city": "London",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Berghain",
+        "city": "Berlin",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "timesPlayed": 5
+      },
+      {
+        "venue": "Printworks",
+        "city": "London",
+        "timesPlayed": 5
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Marcus Osei",
+        "email": "manager@don-diablo.com"
+      },
+      "bookingAgent": {
+        "name": "Sophie Laurent",
+        "agency": "Rhythm Agency",
+        "email": "bookings@don-diablo.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@don-diablo.com",
+      "phone": "+44 7700 900123",
+      "website": "https://don-diablo.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Sunset Sessions",
+        "venue": "Ministry of Sound",
+        "city": "London",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Warehouse Sessions",
+        "venue": "Amnesia",
+        "city": "Ibiza",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Deep Pulse",
+        "venue": "Berghain",
+        "city": "Berlin",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_nervo",
+    "slug": "nervo",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "NERVO",
+    "stageName": "NERVO",
+    "location": {
+      "city": "Melbourne",
+      "country": "Australia"
+    },
+    "avatar": {
+      "url": "https://djmag.com/sites/default/files/styles/djm_23_961x540_jpg/public/2025-09-abcx-m/NERVO.png.jpg?itok=o95RaJ5M",
+      "alt": "NERVO"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+      "alt": "NERVO live performance cover"
+    },
+    "genres": [
+      "EDM",
+      "Electro House",
+      "Progressive House",
+      "Dance Pop"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/nervomusic/?hl=en",
+      "soundcloud": "https://soundcloud.com/marco-dachille",
+      "tiktok": "",
+      "spotify": "https://open.spotify.com/artist/4j5KBTO4tk7up54ZirNGvK",
+      "youtube": "https://www.youtube.com/channel/UCPIq_wSB6DYBtoee4KqSZnw"
+    },
+    "stats": {
+      "followers": 403000,
+      "rating": 4.9,
+      "reviews": 564,
+      "events": 308,
+      "responseRate": 88,
+      "bookingRate": 84,
+      "monthlyViews": 23300
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "EDM Sessions Vol.8",
+        "duration": "69m",
+        "plays": 171795,
+        "genres": [
+          "EDM",
+          "Electro House"
+        ],
+        "audioUrl": "https://soundcloud.com/nervo/edm-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1506157786151-b8491531f063"
+      },
+      "featuredVideo": {
+        "title": "Live @ Amnesia 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "53 min",
+        "views": 375000,
+        "thumbnail": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 23300,
+        "growth": 19
+      },
+      "bookingRequests": {
+        "value": 51,
+        "growth": 17
+      },
+      "newFollowers": {
+        "value": 657,
+        "growth": 16
+      },
+      "bookingRate": 84,
+      "topCities": [
+        {
+          "city": "Berlin",
+          "percentage": 28
+        },
+        {
+          "city": "Paris",
+          "percentage": 22
+        },
+        {
+          "city": "Stockholm",
+          "percentage": 17
+        },
+        {
+          "city": "Dubai",
+          "percentage": 13
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 9350,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 31200,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 16650,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "NERVO brings bright EDM hooks, festival drops, and vocal-driven dance music to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, NERVO has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Amnesia",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Fabric London",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "EDM Mix 1",
+          "url": "https://soundcloud.com/nervo/mix-1"
+        },
+        {
+          "title": "Electro House Mix 2",
+          "url": "https://soundcloud.com/nervo/mix-2"
+        },
+        {
+          "title": "Progressive House Mix 3",
+          "url": "https://soundcloud.com/nervo/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Sunset Sessions — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Amnesia Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "NERVO brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "DJ Mag",
+        "type": "Feature",
+        "title": "The Rise of NERVO",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Mixmag",
+        "type": "Interview",
+        "title": "NERVO: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Amnesia",
+        "city": "Ibiza",
+        "timesPlayed": 5
+      },
+      {
+        "venue": "Fabric London",
+        "city": "London",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Club Space",
+        "city": "Miami",
+        "timesPlayed": 6
+      },
+      {
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "timesPlayed": 6
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Elena Novak",
+        "email": "manager@nervo.com"
+      },
+      "bookingAgent": {
+        "name": "Victor Hayes",
+        "agency": "Pulse Bookings",
+        "email": "bookings@nervo.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@nervo.com",
+      "phone": "+44 7700 900123",
+      "website": "https://nervo.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Warehouse Sessions",
+        "venue": "Amnesia",
+        "city": "Ibiza",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Deep Pulse",
+        "venue": "Berghain",
+        "city": "Berlin",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Neon Nights",
+        "venue": "Fabric London",
+        "city": "London",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_claptone",
+    "slug": "claptone",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Claptone",
+    "stageName": "Claptone",
+    "location": {
+      "city": "Berlin",
+      "country": "Germany"
+    },
+    "avatar": {
+      "url": "https://www.b4l.cz/wp-content/uploads/2025/04/claptone-square_optimized.png",
+      "alt": "Claptone"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+      "alt": "Claptone live performance cover"
+    },
+    "genres": [
+      "House",
+      "Deep House",
+      "Tech House",
+      "Melodic House"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/claptone.official/?hl=en",
+      "soundcloud": "https://soundcloud.com/claptone",
+      "tiktok": "",
+      "spotify": "https://open.spotify.com/artist/4mncDFjVLUa3s025Tct3Ry",
+      "youtube": "https://www.youtube.com/channel/UC7ZRAt7eWXsmanQ3x4EWmZw"
+    },
+    "stats": {
+      "followers": 431000,
+      "rating": 4.6,
+      "reviews": 598,
+      "events": 326,
+      "responseRate": 89,
+      "bookingRate": 85,
+      "monthlyViews": 24600
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "House Sessions Vol.3",
+        "duration": "70m",
+        "plays": 184140,
+        "genres": [
+          "House",
+          "Deep House"
+        ],
+        "audioUrl": "https://soundcloud.com/claptone/house-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+      },
+      "featuredVideo": {
+        "title": "Live @ Berghain 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "54 min",
+        "views": 402000,
+        "thumbnail": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 24600,
+        "growth": 20
+      },
+      "bookingRequests": {
+        "value": 54,
+        "growth": 18
+      },
+      "newFollowers": {
+        "value": 704,
+        "growth": 17
+      },
+      "bookingRate": 85,
+      "topCities": [
+        {
+          "city": "Paris",
+          "percentage": 28
+        },
+        {
+          "city": "Stockholm",
+          "percentage": 22
+        },
+        {
+          "city": "Dubai",
+          "percentage": 17
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 13
+        },
+        {
+          "city": "New York",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 9700,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 32400,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 17300,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Claptone brings mysterious house selections, deep grooves, and refined club storytelling to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Claptone has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Berghain",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Pacha",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "House Mix 1",
+          "url": "https://soundcloud.com/claptone/mix-1"
+        },
+        {
+          "title": "Deep House Mix 2",
+          "url": "https://soundcloud.com/claptone/mix-2"
+        },
+        {
+          "title": "Tech House Mix 3",
+          "url": "https://soundcloud.com/claptone/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Warehouse Sessions — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Berghain Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Claptone brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Mixmag",
+        "type": "Feature",
+        "title": "The Rise of Claptone",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Resident Advisor",
+        "type": "Interview",
+        "title": "Claptone: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Berghain",
+        "city": "Berlin",
+        "timesPlayed": 6
+      },
+      {
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Printworks",
+        "city": "London",
+        "timesPlayed": 1
+      },
+      {
+        "venue": "Berns",
+        "city": "Stockholm",
+        "timesPlayed": 3
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Daniel Reed",
+        "email": "manager@claptone.com"
+      },
+      "bookingAgent": {
+        "name": "Nadia Silva",
+        "agency": "Global Night Agency",
+        "email": "bookings@claptone.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@claptone.com",
+      "phone": "+44 7700 900123",
+      "website": "https://claptone.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Deep Pulse",
+        "venue": "Berghain",
+        "city": "Berlin",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Neon Nights",
+        "venue": "Fabric London",
+        "city": "London",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Global Bass",
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_vintage_culture",
+    "slug": "vintage-culture",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Vintage Culture",
+    "stageName": "Vintage Culture",
+    "location": {
+      "city": "Mundo Novo",
+      "country": "Brazil"
+    },
+    "avatar": {
+      "url": "https://lh3.googleusercontent.com/jeVfK4eWXgyUI2VMblsxnLzLVkpnyN7rHrdDxF3dg_hrin-d5eIuMCcBgarMnNcJXjbsnjGz82yQF9LN=w544-h544-p-l90-rj",
+      "alt": "Vintage Culture"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+      "alt": "Vintage Culture live performance cover"
+    },
+    "genres": [
+      "House",
+      "Deep House",
+      "Tech House",
+      "Melodic House"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/vintageculture/?hl=en",
+      "soundcloud": "https://soundcloud.com/vintageculturemusic",
+      "tiktok": "https://tiktok.com/@vintageculture",
+      "spotify": "https://open.spotify.com/artist/28uJnu5EsrGml2tBd7y8ts",
+      "youtube": "https://www.youtube.com/channel/UC4N1snt2b0d83vOkvaWP6mg"
+    },
+    "stats": {
+      "followers": 459000,
+      "rating": 4.7,
+      "reviews": 632,
+      "events": 344,
+      "responseRate": 90,
+      "bookingRate": 86,
+      "monthlyViews": 25900
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "House Sessions Vol.4",
+        "duration": "71m",
+        "plays": 196485,
+        "genres": [
+          "House",
+          "Deep House"
+        ],
+        "audioUrl": "https://soundcloud.com/vintage-culture/house-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7"
+      },
+      "featuredVideo": {
+        "title": "Live @ Fabric London 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "55 min",
+        "views": 429000,
+        "thumbnail": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 25900,
+        "growth": 21
+      },
+      "bookingRequests": {
+        "value": 57,
+        "growth": 19
+      },
+      "newFollowers": {
+        "value": 751,
+        "growth": 18
+      },
+      "bookingRate": 86,
+      "topCities": [
+        {
+          "city": "Stockholm",
+          "percentage": 28
+        },
+        {
+          "city": "Dubai",
+          "percentage": 22
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 17
+        },
+        {
+          "city": "New York",
+          "percentage": 13
+        },
+        {
+          "city": "Amsterdam",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 10050,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 33600,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 17950,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Vintage Culture brings melodic house, Brazilian warmth, and late-night festival emotion to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Vintage Culture has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Fabric London",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Club Space",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "House Mix 1",
+          "url": "https://soundcloud.com/vintage-culture/mix-1"
+        },
+        {
+          "title": "Deep House Mix 2",
+          "url": "https://soundcloud.com/vintage-culture/mix-2"
+        },
+        {
+          "title": "Tech House Mix 3",
+          "url": "https://soundcloud.com/vintage-culture/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Global Bass — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Fabric London Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Vintage Culture brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Billboard Dance",
+        "type": "Feature",
+        "title": "The Rise of Vintage Culture",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "BBC Music",
+        "type": "Interview",
+        "title": "Vintage Culture: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Fabric London",
+        "city": "London",
+        "timesPlayed": 7
+      },
+      {
+        "venue": "Club Space",
+        "city": "Miami",
+        "timesPlayed": 5
+      },
+      {
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "timesPlayed": 4
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Maya Laurent",
+        "email": "manager@vintage-culture.com"
+      },
+      "bookingAgent": {
+        "name": "Leo Anders",
+        "agency": "StageLine",
+        "email": "bookings@vintage-culture.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@vintage-culture.com",
+      "phone": "+44 7700 900123",
+      "website": "https://vintage-culture.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Neon Nights",
+        "venue": "Fabric London",
+        "city": "London",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Global Bass",
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Rooftop Frequency",
+        "venue": "Club Space",
+        "city": "Miami",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_timmy_trumpet",
+    "slug": "timmy-trumpet",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Timmy Trumpet",
+    "stageName": "Timmy Trumpet",
+    "location": {
+      "city": "Sydney",
+      "country": "Australia"
+    },
+    "avatar": {
+      "url": "https://yt3.googleusercontent.com/EZHNviWwLtHYzcbhq9WLLBGJopDSN5dk9jxprH02tzZx2xbpU4aHuXs-kzqbKfi1ObEXeifo=s900-c-k-c0x00ffffff-no-rj",
+      "alt": "Timmy Trumpet"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+      "alt": "Timmy Trumpet live performance cover"
+    },
+    "genres": [
+      "EDM",
+      "Big Room",
+      "Hard Dance",
+      "Festival"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/timmytrumpet/?hl=en",
+      "soundcloud": "https://soundcloud.com/timmytrumpet",
+      "tiktok": "",
+      "spotify": "https://open.spotify.com/artist/0CbeG1224FS58EUx4tPevZ",
+      "youtube": "https://www.youtube.com/channel/UCd61k-5ykv_4RIbQg-Mpvrg"
+    },
+    "stats": {
+      "followers": 487000,
+      "rating": 4.8,
+      "reviews": 666,
+      "events": 362,
+      "responseRate": 91,
+      "bookingRate": 73,
+      "monthlyViews": 27200
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "EDM Sessions Vol.5",
+        "duration": "72m",
+        "plays": 208830,
+        "genres": [
+          "EDM",
+          "Big Room"
+        ],
+        "audioUrl": "https://soundcloud.com/timmy-trumpet/edm-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14"
+      },
+      "featuredVideo": {
+        "title": "Live @ Pacha 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "56 min",
+        "views": 456000,
+        "thumbnail": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 27200,
+        "growth": 22
+      },
+      "bookingRequests": {
+        "value": 60,
+        "growth": 20
+      },
+      "newFollowers": {
+        "value": 798,
+        "growth": 19
+      },
+      "bookingRate": 73,
+      "topCities": [
+        {
+          "city": "Dubai",
+          "percentage": 28
+        },
+        {
+          "city": "Ibiza",
+          "percentage": 22
+        },
+        {
+          "city": "New York",
+          "percentage": 17
+        },
+        {
+          "city": "Amsterdam",
+          "percentage": 13
+        },
+        {
+          "city": "São Paulo",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 10400,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 34800,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 18600,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Timmy Trumpet brings explosive big-room EDM and live trumpet-led stage energy to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Timmy Trumpet has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Pacha",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Printworks",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "EDM Mix 1",
+          "url": "https://soundcloud.com/timmy-trumpet/mix-1"
+        },
+        {
+          "title": "Big Room Mix 2",
+          "url": "https://soundcloud.com/timmy-trumpet/mix-2"
+        },
+        {
+          "title": "Hard Dance Mix 3",
+          "url": "https://soundcloud.com/timmy-trumpet/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Deep Pulse — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Pacha Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Timmy Trumpet brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Fact Magazine",
+        "type": "Feature",
+        "title": "The Rise of Timmy Trumpet",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "Clash",
+        "type": "Interview",
+        "title": "Timmy Trumpet: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "timesPlayed": 1
+      },
+      {
+        "venue": "Printworks",
+        "city": "London",
+        "timesPlayed": 6
+      },
+      {
+        "venue": "Berns",
+        "city": "Stockholm",
+        "timesPlayed": 3
+      },
+      {
+        "venue": "Rex Club",
+        "city": "Paris",
+        "timesPlayed": 5
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Omar Haddad",
+        "email": "manager@timmy-trumpet.com"
+      },
+      "bookingAgent": {
+        "name": "Anika Bauer",
+        "agency": "Bassline Talent",
+        "email": "bookings@timmy-trumpet.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@timmy-trumpet.com",
+      "phone": "+44 7700 900123",
+      "website": "https://timmy-trumpet.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Global Bass",
+        "venue": "Pacha",
+        "city": "Ibiza",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Rooftop Frequency",
+        "venue": "Club Space",
+        "city": "Miami",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Midnight Circuit",
+        "venue": "Printworks",
+        "city": "London",
+        "date": "2025-09-20"
+      }
+    ]
+  },
+  {
+    "id": "dj_afrojack",
+    "slug": "afrojack",
+    "type": "famous_demo",
+    "plan": "premium",
+    "verified": true,
+    "featured": false,
+    "name": "Afrojack",
+    "stageName": "Afrojack",
+    "location": {
+      "city": "Spijkenisse",
+      "country": "Netherlands"
+    },
+    "avatar": {
+      "url": "https://d3vhc53cl8e8km.cloudfront.net/hello-staging/wp-content/uploads/2014/05/16060803/f8214edc-f3af-11ed-b991-0ee6b8365494-972x597.jpg",
+      "alt": "Afrojack"
+    },
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+      "alt": "Afrojack live performance cover"
+    },
+    "genres": [
+      "EDM",
+      "Electro House",
+      "Dutch House",
+      "Big Room"
+    ],
+    "socials": {
+      "instagram": "https://www.instagram.com/afrojack/?hl=en",
+      "soundcloud": "https://soundcloud.com/afrojack",
+      "tiktok": "https://www.tiktok.com/@afrojack",
+      "spotify": "https://open.spotify.com/artist/4D75GcNG95ebPtNvoNVXhz",
+      "youtube": "https://www.youtube.com/channel/UCmKm7HJdOfkWLyml-fzKlVg"
+    },
+    "stats": {
+      "followers": 515000,
+      "rating": 4.9,
+      "reviews": 700,
+      "events": 380,
+      "responseRate": 92,
+      "bookingRate": 74,
+      "monthlyViews": 28500
+    },
+    "spotlight": {
+      "featuredMix": {
+        "title": "EDM Sessions Vol.6",
+        "duration": "73m",
+        "plays": 221175,
+        "genres": [
+          "EDM",
+          "Electro House"
+        ],
+        "audioUrl": "https://soundcloud.com/afrojack/edm-sessions",
+        "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
+      },
+      "featuredVideo": {
+        "title": "Live @ Club Space 2025",
+        "subtitle": "Full headline set recording",
+        "duration": "57 min",
+        "views": 483000,
+        "thumbnail": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+      }
+    },
+    "analytics": {
+      "profileViews": {
+        "value": 28500,
+        "growth": 23
+      },
+      "bookingRequests": {
+        "value": 63,
+        "growth": 21
+      },
+      "newFollowers": {
+        "value": 845,
+        "growth": 20
+      },
+      "bookingRate": 74,
+      "topCities": [
+        {
+          "city": "Ibiza",
+          "percentage": 28
+        },
+        {
+          "city": "New York",
+          "percentage": 22
+        },
+        {
+          "city": "Amsterdam",
+          "percentage": 17
+        },
+        {
+          "city": "São Paulo",
+          "percentage": 13
+        },
+        {
+          "city": "Tokyo",
+          "percentage": 10
+        }
+      ],
+      "audienceAge": [
+        {
+          "range": "18-24",
+          "percentage": 32
+        },
+        {
+          "range": "25-34",
+          "percentage": 45
+        },
+        {
+          "range": "35-44",
+          "percentage": 18
+        },
+        {
+          "range": "45+",
+          "percentage": 5
+        }
+      ],
+      "trafficSources": [
+        {
+          "source": "Direct",
+          "percentage": 40
+        },
+        {
+          "source": "Search",
+          "percentage": 32
+        },
+        {
+          "source": "Social",
+          "percentage": 19
+        },
+        {
+          "source": "Referral",
+          "percentage": 9
+        }
+      ]
+    },
+    "availability": {
+      "timezone": "Europe/Stockholm",
+      "month": "2025-09",
+      "availableDays": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "bookedDays": [
+        5,
+        6,
+        12,
+        13,
+        19,
+        20,
+        26,
+        27
+      ],
+      "tentativeDays": [
+        4,
+        11,
+        18,
+        25
+      ]
+    },
+    "packages": [
+      {
+        "name": "Club Night",
+        "priceFrom": 10750,
+        "currency": "GBP",
+        "features": [
+          "3–4 hour set",
+          "Setup consultation",
+          "Custom setlist",
+          "Social media promotion",
+          "Press kit"
+        ]
+      },
+      {
+        "name": "Festival",
+        "priceFrom": 36000,
+        "currency": "GBP",
+        "popular": true,
+        "features": [
+          "60–90 min set",
+          "Full production rider",
+          "Stage management",
+          "Exclusive promotion",
+          "Post-show content"
+        ]
+      },
+      {
+        "name": "Private Event",
+        "priceFrom": 19250,
+        "currency": "GBP",
+        "features": [
+          "2–3 hour set",
+          "Personalized playlist",
+          "Equipment included",
+          "Event consultation",
+          "Professional PA"
+        ]
+      }
+    ],
+    "bio": "Afrojack brings Dutch house, powerful festival drops, and sharp electro-house production to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Afrojack has built a reputation across clubs, festivals, and private events.",
+    "specialties": [
+      "Festival",
+      "Club",
+      "Corporate",
+      "Private Events"
+    ],
+    "media": {
+      "photos": [
+        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
+        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
+        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        "https://images.unsplash.com/photo-1506157786151-b8491531f063"
+      ],
+      "videos": [
+        {
+          "title": "Live @ Club Space",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "title": "Live @ Shelter NYC",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        }
+      ],
+      "mixes": [
+        {
+          "title": "EDM Mix 1",
+          "url": "https://soundcloud.com/afrojack/mix-1"
+        },
+        {
+          "title": "Electro House Mix 2",
+          "url": "https://soundcloud.com/afrojack/mix-2"
+        },
+        {
+          "title": "Dutch House Mix 3",
+          "url": "https://soundcloud.com/afrojack/mix-3"
+        }
+      ]
+    },
+    "careerHighlights": [
+      {
+        "title": "Neon Nights — Headliner",
+        "year": 2025
+      },
+      {
+        "title": "Club Space Main Room Debut",
+        "year": 2024
+      },
+      {
+        "title": "International Festival Tour",
+        "year": 2024
+      },
+      {
+        "title": "Breakthrough DJ Feature",
+        "year": 2023
+      }
+    ],
+    "endorsements": [
+      {
+        "name": "Marco Bianchini",
+        "role": "Head Booker",
+        "company": "Fabric London",
+        "quote": "Afrojack brings professional energy and understands exactly how to move a room."
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Events Director",
+        "company": "Sunburn Festival",
+        "quote": "Reliable, prepared, and powerful on stage. A strong booking for any serious event."
+      }
+    ],
+    "press": [
+      {
+        "source": "Resident Advisor",
+        "type": "Feature",
+        "title": "The Rise of Afrojack",
+        "date": "2025-03-01"
+      },
+      {
+        "source": "DJ Mag",
+        "type": "Interview",
+        "title": "Afrojack: Building a Global Sound",
+        "date": "2025-01-15"
+      }
+    ],
+    "venuesPlayed": [
+      {
+        "venue": "Club Space",
+        "city": "Miami",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "timesPlayed": 2
+      },
+      {
+        "venue": "DC-10",
+        "city": "Ibiza",
+        "timesPlayed": 4
+      },
+      {
+        "venue": "Watergate",
+        "city": "Berlin",
+        "timesPlayed": 6
+      }
+    ],
+    "reviewsList": [
+      {
+        "name": "Alex K.",
+        "rating": 5,
+        "date": "2025-06-12",
+        "comment": "Absolutely electric set. The crowd energy was strong from the first track."
+      },
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "date": "2025-05-28",
+        "comment": "Incredible mixing skills and perfect track selection for the room."
+      },
+      {
+        "name": "Jay T.",
+        "rating": 4,
+        "date": "2025-04-10",
+        "comment": "Professional, punctual, and delivered exactly the vibe we wanted."
+      }
+    ],
+    "team": {
+      "manager": {
+        "name": "Marcus Osei",
+        "email": "manager@afrojack.com"
+      },
+      "bookingAgent": {
+        "name": "Sophie Laurent",
+        "agency": "Rhythm Agency",
+        "email": "bookings@afrojack.com"
+      }
+    },
+    "booking": {
+      "email": "bookings@afrojack.com",
+      "phone": "+44 7700 900123",
+      "website": "https://afrojack.com",
+      "feeRange": {
+        "min": 5000,
+        "max": 75000,
+        "currency": "GBP"
+      }
+    },
+    "upcomingEvents": [
+      {
+        "title": "Sunset Sessions",
+        "venue": "Club Space",
+        "city": "Miami",
+        "date": "2025-07-10"
+      },
+      {
+        "title": "Warehouse Sessions",
+        "venue": "Printworks",
+        "city": "London",
+        "date": "2025-08-15"
+      },
+      {
+        "title": "Deep Pulse",
+        "venue": "Shelter NYC",
+        "city": "New York",
+        "date": "2025-09-20"
+      }
+    ]
+  }
+]

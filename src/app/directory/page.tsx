@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import prisma from "@/lib/client";
-import { mockDJs, DjUser } from "@/lib/data";
+import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
 import FilterPanel from "@/components/directory/FilterPanel";
 import DjGrid from "@/components/directory/DjGrid";
 import EventCalendar from "@/components/directory/EventCalendar";
@@ -65,14 +65,17 @@ const DirectoryPage = async ({
     fetchError = true;
   }
 
+  const demoDjs = demoDJsAsDjUsers();
   const hasFilters = !!(genre || country || sort);
   const displayDjs = hasFilters
-    ? djs
+    ? djs.length
+      ? djs
+      : demoDjs
     : fetchError
-      ? mockDJs
+      ? demoDjs
       : djs.length
         ? djs
-        : mockDJs;
+        : demoDjs;
 
   let availableGenres: string[] = [];
   try {
@@ -84,7 +87,7 @@ const DirectoryPage = async ({
   } catch {
     availableGenres = [
       ...new Set(
-        mockDJs
+        demoDjs
           .flatMap((dj) => (dj.genres ?? "").split(",").map((g) => g.trim()))
           .filter(Boolean),
       ),

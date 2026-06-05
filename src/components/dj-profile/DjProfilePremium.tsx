@@ -52,13 +52,18 @@ import {
   faYoutube,
   faSoundcloud,
   faSpotify,
+  faApple,
 } from "@fortawesome/free-brands-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { format } from "date-fns";
+import type { DjDemoData, ViewMode } from "@/types/dj-demo";
+import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
+import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
+import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 
 // ── Demo Data ──────────────────────────────────────────────────────────────────
 
-const DJ = {
+const DEFAULT_DJ = {
   stageName: "Amara Pulse",
   avatar: "/rated-6.webp",
   coverImage: "/noCover-2.png",
@@ -98,7 +103,7 @@ const DJ = {
   },
 };
 
-const EVENTS = [
+const DEFAULT_EVENTS = [
   {
     id: 1,
     title: "Afro Nation Portugal",
@@ -137,7 +142,7 @@ const EVENTS = [
   },
 ];
 
-const VENUES = [
+const DEFAULT_VENUES = [
   { name: "Berghain", city: "Berlin", count: 4 },
   { name: "Fabric London", city: "London", count: 6 },
   { name: "DC-10", city: "Ibiza", count: 3 },
@@ -146,7 +151,7 @@ const VENUES = [
   { name: "Shelter NYC", city: "New York", count: 3 },
 ];
 
-const REVIEWS = [
+const DEFAULT_REVIEWS = [
   {
     id: 1,
     rating: 5,
@@ -173,18 +178,38 @@ const REVIEWS = [
   },
 ];
 
-const MEDIA = [
+type MediaItem = {
+  id: number;
+  url: string;
+  type: "photo" | "video";
+  videoUrl?: string;
+  title?: string;
+};
+
+const DEFAULT_MEDIA: MediaItem[] = [
   { id: 1, url: "/gallery-1.png", type: "photo" },
   { id: 2, url: "/gallery-2.png", type: "photo" },
   { id: 3, url: "/gallery-3.png", type: "photo" },
   { id: 4, url: "/gallery-4.png", type: "photo" },
   { id: 5, url: "/rated-9.webp", type: "photo" },
   { id: 6, url: "/rated-10.webp", type: "photo" },
-  { id: 7, url: "/gallery-1.png", type: "video" },
-  { id: 8, url: "/gallery-2.png", type: "video" },
+  {
+    id: 7,
+    url: "/gallery-1.png",
+    videoUrl: "",
+    title: "Video 1",
+    type: "video",
+  },
+  {
+    id: 8,
+    url: "/gallery-2.png",
+    videoUrl: "",
+    title: "Video 2",
+    type: "video",
+  },
 ];
 
-const ENDORSEMENTS = [
+const DEFAULT_ENDORSEMENTS = [
   {
     name: "Marco Bianchini",
     role: "Head Booker, Fabric London",
@@ -208,7 +233,7 @@ const ENDORSEMENTS = [
   },
 ];
 
-const HIGHLIGHTS = [
+const DEFAULT_HIGHLIGHTS = [
   { year: "2025", title: "Afro Nation Portugal — Headliner", icon: faTrophy },
   { year: "2024", title: "DJ Mag Top 100 — #47", icon: faArrowTrendUp },
   {
@@ -224,7 +249,7 @@ const HIGHLIGHTS = [
   },
 ];
 
-const PRESS = [
+const DEFAULT_PRESS = [
   {
     outlet: "Mixmag",
     type: "Feature",
@@ -255,7 +280,7 @@ const PRESS = [
   },
 ];
 
-const PACKAGES = [
+const DEFAULT_PACKAGES = [
   {
     name: "Club Night",
     icon: faMusic,
@@ -304,10 +329,12 @@ const SOCIAL_ICONS: Record<string, IconDefinition> = {
   youtube: faYoutube,
   soundcloud: faSoundcloud,
   spotify: faSpotify,
+  website: faGlobe,
+  apple: faApple,
 };
 
 // Calendar data — Sep 2025
-const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => {
+const DEFAULT_CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => {
   const d = i + 1;
   const status = [5, 12, 20, 28].includes(d)
     ? "booked"
@@ -318,6 +345,248 @@ const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => {
         : "free";
   return { day: d, status };
 });
+
+const DEFAULT_MIXES = [
+  {
+    title: "Afrobeats & Amapiano Vol.3",
+    duration: "1h 24m",
+    plays: "82.4k",
+    platform: "SoundCloud",
+    audioUrl: "",
+  },
+  {
+    title: "Late Night Club Mix 2025",
+    duration: "2h 10m",
+    plays: "41.8k",
+    platform: "Mixcloud",
+    audioUrl: "",
+  },
+  {
+    title: "Afro Nation Pre-Party Live",
+    duration: "1h 45m",
+    plays: "29.2k",
+    platform: "SoundCloud",
+    audioUrl: "",
+  },
+];
+
+// ── JSON → Component mapping helpers ──────────────────────────────────────────
+
+const HIGHLIGHT_ICONS: IconDefinition[] = [
+  faTrophy,
+  faFireFlameCurved,
+  faArrowTrendUp,
+  faBolt,
+  faCircleCheck,
+  faShield,
+  faHandshake,
+];
+
+const PRESS_ICON_MAP: Record<string, IconDefinition> = {
+  Feature: faNewspaper,
+  Interview: faMicrophoneLines,
+  Podcast: faHeadphones,
+};
+
+const PACKAGE_ICON_MAP: Record<string, IconDefinition> = {
+  "Club Night": faMusic,
+  Festival: faFireFlameCurved,
+  "Private Event": faBriefcase,
+};
+
+const REVIEWER_AVATARS = ["/rated-1.webp", "/rated-2.webp", "/rated-3.webp"];
+const ENDORSER_AVATARS = ["/rated-3.webp", "/rated-2.webp", "/rated-1.webp"];
+
+function getPlatformFromUrl(url: string): string {
+  if (url.includes("soundcloud")) return "SoundCloud";
+  if (url.includes("mixcloud")) return "Mixcloud";
+  if (url.includes("spotify")) return "Spotify";
+  if (url.includes("youtube")) return "YouTube";
+  return "External";
+}
+
+function formatPlays(plays: number): string {
+  if (plays >= 1000) return `${(plays / 1000).toFixed(1)}k`;
+  return String(plays);
+}
+
+function mapDjToProps(d: DjDemoData) {
+  const socialLinks = Object.entries(d.socials)
+    .filter(([, url]) => Boolean(url))
+    .map(([platform, url]) => ({ platform, url: url as string }));
+  return {
+    stageName: d.stageName,
+    avatar: d.avatar.url,
+    coverImage: d.coverImage.url,
+    bio: d.bio,
+    city: d.location.city,
+    country: d.location.country,
+    genres: d.genres,
+    socialLinks,
+    avgRating: d.stats.rating,
+    ratingCount: d.stats.reviews,
+    followerCount: d.stats.followers,
+    eventsCount: d.stats.events,
+    responseRate: d.stats.responseRate,
+    bookingSuccessRate: d.stats.bookingRate,
+    profileViews: d.stats.monthlyViews,
+    bookingEmail: d.booking.email,
+    bookingPhone: d.booking.phone,
+    website: d.booking.website,
+    minFee: `${d.booking.feeRange.currency}${d.booking.feeRange.min.toLocaleString()}`,
+    maxFee: `${d.booking.feeRange.currency}${d.booking.feeRange.max.toLocaleString()}`,
+    djTypes: d.specialties,
+    manager: {
+      name: d.team.manager.name,
+      email: d.team.manager.email,
+      phone: "",
+    },
+    agent: {
+      name: d.team.bookingAgent.name,
+      agency: d.team.bookingAgent.agency,
+      email: d.team.bookingAgent.email,
+    },
+  };
+}
+
+function mapEventsFromData(d: DjDemoData) {
+  return d.upcomingEvents.map((e, i) => ({
+    id: i + 1,
+    title: e.title,
+    date: `${e.date}T20:00:00Z`,
+    venue: e.venue,
+    city: e.city,
+    country: "",
+    status: "confirmed" as const,
+  }));
+}
+
+function mapVenuesFromData(d: DjDemoData) {
+  return d.venuesPlayed.map((v) => ({
+    name: v.venue,
+    city: v.city,
+    count: v.timesPlayed,
+  }));
+}
+
+function mapReviewsFromData(d: DjDemoData) {
+  return d.reviewsList.map((r, i) => ({
+    id: i + 1,
+    rating: r.rating,
+    review: r.comment,
+    date: r.date,
+    user: {
+      name: r.name,
+      image: REVIEWER_AVATARS[i % REVIEWER_AVATARS.length],
+    },
+  }));
+}
+
+function mapMediaFromData(d: DjDemoData): MediaItem[] {
+  const photos: MediaItem[] = d.media.photos.map((url, i) => ({
+    id: i + 1,
+    url,
+    type: "photo" as const,
+  }));
+  const videoThumb = d.spotlight.featuredVideo.thumbnail || "/gallery-1.png";
+  const videos: MediaItem[] = d.media.videos.map((v, i) => ({
+    id: photos.length + i + 1,
+    url: videoThumb,
+    videoUrl: v.url,
+    title: v.title,
+    type: "video" as const,
+  }));
+  return [...photos, ...videos];
+}
+
+function mapEndorsementsFromData(d: DjDemoData) {
+  return d.endorsements.map((e, i) => ({
+    name: e.name,
+    role: `${e.role}, ${e.company}`,
+    quote: e.quote,
+    avatar: ENDORSER_AVATARS[i % ENDORSER_AVATARS.length],
+  }));
+}
+
+function mapHighlightsFromData(d: DjDemoData) {
+  return d.careerHighlights.map((h, i) => ({
+    year: String(h.year),
+    title: h.title,
+    icon: HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
+  }));
+}
+
+function mapPressFromData(d: DjDemoData) {
+  return d.press.map((p) => ({
+    outlet: p.source,
+    type: p.type,
+    title: p.title,
+    date: p.date,
+    icon: PRESS_ICON_MAP[p.type] ?? faNewspaper,
+  }));
+}
+
+function mapPackagesFromData(d: DjDemoData) {
+  const PKG_COLORS: Record<string, string> = {
+    "Club Night": "from-h_red/20 to-transparent",
+    Festival: "from-purple-600/20 to-transparent",
+    "Private Event": "from-blue-600/20 to-transparent",
+  };
+  return d.packages.map((pkg, i) => ({
+    name: pkg.name,
+    icon:
+      PACKAGE_ICON_MAP[pkg.name] ?? HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
+    price: `From ${d.booking.feeRange.currency}${pkg.priceFrom.toLocaleString()}`,
+    duration: pkg.features[0] ?? "",
+    includes: pkg.features.slice(1),
+    color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",
+    featured: pkg.popular ?? false,
+  }));
+}
+
+function mapMixesFromData(d: DjDemoData) {
+  const fm = d.spotlight.featuredMix;
+  const featured = {
+    title: fm.title,
+    duration: fm.duration,
+    plays: formatPlays(fm.plays),
+    platform: getPlatformFromUrl(fm.audioUrl),
+    audioUrl: fm.audioUrl,
+  };
+  const rest = d.media.mixes.map((m) => ({
+    title: m.title,
+    duration: "",
+    plays: "",
+    platform: getPlatformFromUrl(m.url),
+    audioUrl: m.url,
+  }));
+  return [featured, ...rest];
+}
+
+function buildCalendarFromData(d: DjDemoData) {
+  const [y, mo] = d.availability.month.split("-").map(Number);
+  const daysInMonth = new Date(y, mo, 0).getDate();
+  const { availableDays, bookedDays, tentativeDays } = d.availability;
+  return Array.from({ length: daysInMonth }, (_, i) => {
+    const day = i + 1;
+    const status = bookedDays.includes(day)
+      ? "booked"
+      : tentativeDays.includes(day)
+        ? "tentative"
+        : availableDays.includes(day)
+          ? "available"
+          : "free";
+    return { day, status };
+  });
+}
+
+function getCalendarMonthLabel(d: DjDemoData): string {
+  const [y, mo] = d.availability.month.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-GB", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date(y, mo - 1, 1));
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -383,11 +652,60 @@ function StatPill({
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
-export default function DjProfilePremium() {
+export default function DjProfilePremium({
+  djData,
+  viewMode = "fan",
+}: {
+  djData?: DjDemoData;
+  viewMode?: ViewMode;
+} = {}) {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [mediaTab, setMediaTab] = useState<"photos" | "videos" | "mixes">(
     "photos",
   );
+
+  // ── Resolve data: JSON prop overrides hardcoded defaults ──────────────────
+  const DJ = djData ? mapDjToProps(djData) : DEFAULT_DJ;
+  const EVENTS = djData ? mapEventsFromData(djData) : DEFAULT_EVENTS;
+  const VENUES = djData ? mapVenuesFromData(djData) : DEFAULT_VENUES;
+  const REVIEWS = djData ? mapReviewsFromData(djData) : DEFAULT_REVIEWS;
+  const MEDIA = djData ? mapMediaFromData(djData) : DEFAULT_MEDIA;
+  const ENDORSEMENTS = djData
+    ? mapEndorsementsFromData(djData)
+    : DEFAULT_ENDORSEMENTS;
+  const HIGHLIGHTS = djData
+    ? mapHighlightsFromData(djData)
+    : DEFAULT_HIGHLIGHTS;
+  const PRESS = djData ? mapPressFromData(djData) : DEFAULT_PRESS;
+  const PACKAGES = djData ? mapPackagesFromData(djData) : DEFAULT_PACKAGES;
+  const CALENDAR_DAYS = djData
+    ? buildCalendarFromData(djData)
+    : DEFAULT_CALENDAR_DAYS;
+  const MIXES = djData ? mapMixesFromData(djData) : DEFAULT_MIXES;
+  const calendarLabel = djData
+    ? getCalendarMonthLabel(djData)
+    : "September 2025";
+  const SPOTLIGHT = djData
+    ? djData.spotlight
+    : {
+        featuredMix: {
+          title: "Afrobeats & Amapiano Fusion Vol.3",
+          duration: "1h 24m",
+          plays: 82400,
+          genres: ["Afrobeats", "Amapiano"],
+          audioUrl: "#",
+          coverImage: "/gallery-1.png",
+        },
+        featuredVideo: {
+          title: "Summer Closing Set — Full Recording",
+          subtitle: "Live @ Berghain 2024",
+          duration: "45 min",
+          views: 211000,
+          thumbnail: "/gallery-1.png",
+          videoUrl: "#",
+        },
+      };
+
   const location = `${DJ.city}, ${DJ.country}`;
 
   return (
@@ -593,171 +911,186 @@ export default function DjProfilePremium() {
                 Spotlight
               </SectionHeading>
               <div className="grid sm:grid-cols-2 gap-4">
-                <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all gap-0">
-                  <div className="relative h-44 bg-linear-to-br from-h_red/20 via-purple-900/20 to-black">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
-                        <FontAwesomeIcon
-                          icon={faPlay}
-                          className="h-5 w-5 text-white ml-0.5"
-                        />
+                <MediaAudioPlayer
+                  audioUrl={SPOTLIGHT.featuredMix.audioUrl}
+                  title={SPOTLIGHT.featuredMix.title}
+                >
+                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all gap-0">
+                    <div className="relative h-44 bg-linear-to-br from-h_red/20 via-purple-900/20 to-black">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
+                          <FontAwesomeIcon
+                            icon={faPlay}
+                            className="h-5 w-5 text-white ml-0.5"
+                          />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-3 left-3">
+                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                          <FontAwesomeIcon
+                            icon={faHeadphones}
+                            className="h-2.5 w-2.5 mr-1"
+                          />
+                          Featured Mix
+                        </Badge>
                       </div>
                     </div>
-                    <div className="absolute bottom-3 left-3">
-                      <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                        <FontAwesomeIcon
-                          icon={faHeadphones}
-                          className="h-2.5 w-2.5 mr-1"
-                        />
-                        Featured Mix
-                      </Badge>
+                    <div className="p-4">
+                      <p className="text-white text-sm font-semibold">
+                        {SPOTLIGHT.featuredMix.title}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        {SPOTLIGHT.featuredMix.duration} ·{" "}
+                        {formatPlays(SPOTLIGHT.featuredMix.plays)} plays
+                      </p>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-white text-sm font-semibold">
-                      Afrobeats & Amapiano Fusion Vol.3
-                    </p>
-                    <p className="text-gray-500 text-xs mt-1">
-                      1h 24m · 82.4k plays
-                    </p>
-                  </div>
-                </Card>
-                <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all gap-0">
-                  <div className="relative h-44 overflow-hidden">
-                    <Image
-                      src="/gallery-1.png"
-                      alt="video"
-                      fill
-                      className="object-cover opacity-60 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                        <FontAwesomeIcon
-                          icon={faPlay}
-                          className="h-5 w-5 text-white ml-0.5"
-                        />
+                  </Card>
+                </MediaAudioPlayer>
+                <MediaVideoModal
+                  videoUrl={SPOTLIGHT.featuredVideo.videoUrl}
+                  thumbnail={SPOTLIGHT.featuredVideo.thumbnail}
+                  title={SPOTLIGHT.featuredVideo.title}
+                >
+                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all gap-0">
+                    <div className="relative h-44 overflow-hidden">
+                      <Image
+                        src={SPOTLIGHT.featuredVideo.thumbnail}
+                        alt="video"
+                        fill
+                        className="object-cover opacity-60 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
+                          <FontAwesomeIcon
+                            icon={faPlay}
+                            className="h-5 w-5 text-white ml-0.5"
+                          />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-3 left-3">
+                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                          <FontAwesomeIcon
+                            icon={faVideo}
+                            className="h-2.5 w-2.5 mr-1"
+                          />
+                          {SPOTLIGHT.featuredVideo.subtitle}
+                        </Badge>
                       </div>
                     </div>
-                    <div className="absolute bottom-3 left-3">
-                      <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                        <FontAwesomeIcon
-                          icon={faVideo}
-                          className="h-2.5 w-2.5 mr-1"
-                        />
-                        Live @ Berghain 2024
-                      </Badge>
+                    <div className="p-4">
+                      <p className="text-white text-sm font-semibold">
+                        {SPOTLIGHT.featuredVideo.title}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        {SPOTLIGHT.featuredVideo.duration} ·{" "}
+                        {formatPlays(SPOTLIGHT.featuredVideo.views)} views
+                      </p>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-white text-sm font-semibold">
-                      Summer Closing Set — Full Recording
-                    </p>
-                    <p className="text-gray-500 text-xs mt-1">
-                      45 min · 211k views
-                    </p>
-                  </div>
-                </Card>
+                  </Card>
+                </MediaVideoModal>
               </div>
             </section>
 
             <Separator className="bg-white/8" />
 
-            {/* ── PERFORMANCE INSIGHTS ── */}
-            <section>
-              <SectionHeading sub="Last 30 days · Premium analytics">
-                Performance Insights
-              </SectionHeading>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                <StatPill value="3,240" label="Profile Views" trend="+24%" />
-                <StatPill value="47" label="Booking Requests" trend="+18%" />
-                <StatPill value="+312" label="New Followers" trend="+9%" />
-                <StatPill value="94%" label="Booking Rate" />
-              </div>
-              <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
-                <h3 className="text-white text-sm font-semibold mb-4">
-                  Top Cities (Audience)
-                </h3>
-                <div className="flex flex-col gap-3">
-                  {[
-                    { city: "London", pct: 28 },
-                    { city: "Lagos", pct: 22 },
-                    { city: "Berlin", pct: 17 },
-                    { city: "New York", pct: 13 },
-                    { city: "Ibiza", pct: 10 },
-                  ].map((c) => (
-                    <div key={c.city} className="flex items-center gap-3">
-                      <span className="text-gray-400 text-xs w-20 shrink-0">
-                        {c.city}
-                      </span>
-                      <Progress
-                        value={c.pct}
-                        className="flex-1 h-1.5 bg-white/8"
-                      />
-                      <span className="text-gray-500 text-xs w-8 text-right">
-                        {c.pct}%
-                      </span>
-                    </div>
-                  ))}
+            {/* ── PERFORMANCE INSIGHTS (owner-only in fan view) ── */}
+            {viewMode !== "fan" && (
+              <section>
+                <SectionHeading sub="Last 30 days · Premium analytics">
+                  Performance Insights
+                </SectionHeading>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                  <StatPill value="3,240" label="Profile Views" trend="+24%" />
+                  <StatPill value="47" label="Booking Requests" trend="+18%" />
+                  <StatPill value="+312" label="New Followers" trend="+9%" />
+                  <StatPill value="94%" label="Booking Rate" />
                 </div>
-              </Card>
-              <div className="grid sm:grid-cols-2 gap-3 mt-3">
-                <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-                  <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">
-                    Audience Age
+                <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
+                  <h3 className="text-white text-sm font-semibold mb-4">
+                    Top Cities (Audience)
                   </h3>
-                  {[
-                    ["18–24", 35],
-                    ["25–34", 44],
-                    ["35–44", 16],
-                    ["45+", 5],
-                  ].map(([g, v]) => (
-                    <div key={g} className="flex items-center gap-2 mb-1.5">
-                      <span className="text-gray-400 text-xs w-12 shrink-0">
-                        {g}
-                      </span>
-                      <Progress
-                        value={Number(v)}
-                        className="flex-1 h-1 bg-white/8"
-                      />
-                      <span className="text-gray-500 text-xs w-7 text-right">
-                        {v}%
-                      </span>
-                    </div>
-                  ))}
+                  <div className="flex flex-col gap-3">
+                    {[
+                      { city: "London", pct: 28 },
+                      { city: "Lagos", pct: 22 },
+                      { city: "Berlin", pct: 17 },
+                      { city: "New York", pct: 13 },
+                      { city: "Ibiza", pct: 10 },
+                    ].map((c) => (
+                      <div key={c.city} className="flex items-center gap-3">
+                        <span className="text-gray-400 text-xs w-20 shrink-0">
+                          {c.city}
+                        </span>
+                        <Progress
+                          value={c.pct}
+                          className="flex-1 h-1.5 bg-white/8"
+                        />
+                        <span className="text-gray-500 text-xs w-8 text-right">
+                          {c.pct}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </Card>
-                <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-                  <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">
-                    Profile Traffic
-                  </h3>
-                  {[
-                    ["Direct", 42],
-                    ["Search", 31],
-                    ["Social", 18],
-                    ["Referral", 9],
-                  ].map(([src, v]) => (
-                    <div key={src} className="flex items-center gap-2 mb-1.5">
-                      <span className="text-gray-400 text-xs w-14 shrink-0">
-                        {src}
-                      </span>
-                      <Progress
-                        value={Number(v)}
-                        className="flex-1 h-1 bg-white/8"
-                      />
-                      <span className="text-gray-500 text-xs w-7 text-right">
-                        {v}%
-                      </span>
-                    </div>
-                  ))}
-                </Card>
-              </div>
-            </section>
+                <div className="grid sm:grid-cols-2 gap-3 mt-3">
+                  <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
+                    <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                      Audience Age
+                    </h3>
+                    {[
+                      ["18–24", 35],
+                      ["25–34", 44],
+                      ["35–44", 16],
+                      ["45+", 5],
+                    ].map(([g, v]) => (
+                      <div key={g} className="flex items-center gap-2 mb-1.5">
+                        <span className="text-gray-400 text-xs w-12 shrink-0">
+                          {g}
+                        </span>
+                        <Progress
+                          value={Number(v)}
+                          className="flex-1 h-1 bg-white/8"
+                        />
+                        <span className="text-gray-500 text-xs w-7 text-right">
+                          {v}%
+                        </span>
+                      </div>
+                    ))}
+                  </Card>
+                  <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
+                    <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                      Profile Traffic
+                    </h3>
+                    {[
+                      ["Direct", 42],
+                      ["Search", 31],
+                      ["Social", 18],
+                      ["Referral", 9],
+                    ].map(([src, v]) => (
+                      <div key={src} className="flex items-center gap-2 mb-1.5">
+                        <span className="text-gray-400 text-xs w-14 shrink-0">
+                          {src}
+                        </span>
+                        <Progress
+                          value={Number(v)}
+                          className="flex-1 h-1 bg-white/8"
+                        />
+                        <span className="text-gray-500 text-xs w-7 text-right">
+                          {v}%
+                        </span>
+                      </div>
+                    ))}
+                  </Card>
+                </div>
+              </section>
+            )}
 
             <Separator className="bg-white/8" />
 
             {/* ── AVAILABILITY CALENDAR ── */}
             <section>
-              <SectionHeading sub="September 2025 availability">
+              <SectionHeading sub={`${calendarLabel} availability`}>
                 Availability Calendar
               </SectionHeading>
               <div className="flex items-center gap-4 mb-4">
@@ -929,98 +1262,70 @@ export default function DjProfilePremium() {
                 ))}
               </div>
               {mediaTab === "photos" && (
-                <div className="grid grid-cols-3 gap-2">
-                  {MEDIA.filter((m) => m.type === "photo").map((m) => (
-                    <div
-                      key={m.id}
-                      className="relative aspect-square rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-h_red/40 transition-all cursor-pointer group"
-                    >
-                      <Image
-                        src={m.url}
-                        alt="media"
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  ))}
-                </div>
+                <MediaGalleryLightbox
+                  photos={MEDIA.filter((m) => m.type === "photo")}
+                />
               )}
               {mediaTab === "videos" && (
                 <div className="grid sm:grid-cols-2 gap-3">
                   {MEDIA.filter((m) => m.type === "video").map((m) => (
-                    <div
+                    <MediaVideoModal
                       key={m.id}
-                      className="relative aspect-video rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-h_red/40 transition-all cursor-pointer group"
+                      videoUrl={m.videoUrl ?? ""}
+                      thumbnail={m.url}
+                      title={m.title ?? "Video"}
                     >
-                      <Image
-                        src={m.url}
-                        alt="video"
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300 opacity-60"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="size-12 rounded-full bg-black/50 border border-white/20 flex items-center justify-center">
-                          <FontAwesomeIcon
-                            icon={faPlay}
-                            className="h-4 w-4 text-white ml-0.5"
-                          />
+                      <div className="relative aspect-video rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-h_red/40 transition-all cursor-pointer group">
+                        <Image
+                          src={m.url}
+                          alt="video"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300 opacity-60"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="size-12 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
+                            <FontAwesomeIcon
+                              icon={faPlay}
+                              className="h-4 w-4 text-white ml-0.5"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </MediaVideoModal>
                   ))}
                 </div>
               )}
               {mediaTab === "mixes" && (
                 <div className="flex flex-col gap-3">
-                  {[
-                    {
-                      title: "Afrobeats & Amapiano Vol.3",
-                      duration: "1h 24m",
-                      plays: "82.4k",
-                      platform: "SoundCloud",
-                    },
-                    {
-                      title: "Late Night Club Mix 2025",
-                      duration: "2h 10m",
-                      plays: "41.8k",
-                      platform: "Mixcloud",
-                    },
-                    {
-                      title: "Afro Nation Pre-Party Live",
-                      duration: "1h 45m",
-                      plays: "29.2k",
-                      platform: "SoundCloud",
-                    },
-                  ].map((mix) => (
-                    <Card
+                  {MIXES.map((mix) => (
+                    <MediaAudioPlayer
                       key={mix.title}
-                      className="bg-h_blackLight/30 border-white/8 p-4 gap-0 flex flex-row items-center"
+                      audioUrl={mix.audioUrl}
+                      title={mix.title}
                     >
-                      <div className="size-12 rounded-lg bg-linear-to-br from-h_red/30 to-purple-900/30 border border-white/8 flex items-center justify-center shrink-0 mr-4">
-                        <FontAwesomeIcon
-                          icon={faMusic}
-                          className="h-4 w-4 text-h_red"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white text-sm font-semibold">
-                          {mix.title}
-                        </p>
-                        <p className="text-gray-500 text-xs mt-0.5">
-                          {mix.platform} · {mix.duration} · {mix.plays} plays
-                        </p>
-                      </div>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="text-gray-400 hover:text-white shrink-0"
-                      >
-                        <FontAwesomeIcon
-                          icon={faPlay}
-                          className="h-3.5 w-3.5"
-                        />
-                      </Button>
-                    </Card>
+                      <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0 flex flex-row items-center cursor-pointer hover:border-white/15 transition-colors">
+                        <div className="size-12 rounded-lg bg-linear-to-br from-h_red/30 to-purple-900/30 border border-white/8 flex items-center justify-center shrink-0 mr-4">
+                          <FontAwesomeIcon
+                            icon={faMusic}
+                            className="h-4 w-4 text-h_red"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-sm font-semibold">
+                            {mix.title}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-0.5">
+                            {mix.platform} · {mix.duration} · {mix.plays} plays
+                          </p>
+                        </div>
+                        <div className="size-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                          <FontAwesomeIcon
+                            icon={faPlay}
+                            className="h-3 w-3 ml-0.5"
+                          />
+                        </div>
+                      </Card>
+                    </MediaAudioPlayer>
                   ))}
                 </div>
               )}
@@ -1421,36 +1726,40 @@ export default function DjProfilePremium() {
               </p>
             </Card>
 
-            {/* Analytics snapshot */}
-            <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-              <div className="flex items-center gap-2 mb-3">
-                <FontAwesomeIcon
-                  icon={faChartLine}
-                  className="h-3.5 w-3.5 text-emerald-400"
-                />
-                <h3 className="text-white text-xs font-semibold">This Month</h3>
-              </div>
-              {[
-                { label: "Profile Views", val: "3,240", trend: "+24%" },
-                { label: "Booking Requests", val: "47", trend: "+18%" },
-                { label: "New Followers", val: "312", trend: "+9%" },
-              ].map((m) => (
-                <div
-                  key={m.label}
-                  className="flex items-center justify-between mb-2"
-                >
-                  <span className="text-gray-400 text-xs">{m.label}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white text-xs font-semibold">
-                      {m.val}
-                    </span>
-                    <span className="text-emerald-400 text-[10px]">
-                      {m.trend}
-                    </span>
-                  </div>
+            {/* Analytics snapshot (owner-only in fan view) */}
+            {viewMode !== "fan" && (
+              <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
+                <div className="flex items-center gap-2 mb-3">
+                  <FontAwesomeIcon
+                    icon={faChartLine}
+                    className="h-3.5 w-3.5 text-emerald-400"
+                  />
+                  <h3 className="text-white text-xs font-semibold">
+                    This Month
+                  </h3>
                 </div>
-              ))}
-            </Card>
+                {[
+                  { label: "Profile Views", val: "3,240", trend: "+24%" },
+                  { label: "Booking Requests", val: "47", trend: "+18%" },
+                  { label: "New Followers", val: "312", trend: "+9%" },
+                ].map((m) => (
+                  <div
+                    key={m.label}
+                    className="flex items-center justify-between mb-2"
+                  >
+                    <span className="text-gray-400 text-xs">{m.label}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-white text-xs font-semibold">
+                        {m.val}
+                      </span>
+                      <span className="text-emerald-400 text-[10px]">
+                        {m.trend}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            )}
           </aside>
         </div>
       </div>
