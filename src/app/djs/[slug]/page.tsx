@@ -9,6 +9,7 @@ import DjProfileSidebar from "@/components/dj-profile/DjProfileSidebar";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
 import type { DjType } from "@prisma/client";
+import { getDemodjBySlug } from "@/data/djs";
 
 const DEMO_DJ = {
   stageName: "Amara Pulse",
@@ -139,6 +140,16 @@ export default async function DjProfilePage({
     );
   }
 
+  // ── JSON demo data lookup (dev/staging) ─────────────────────────────────
+  const demoDj = getDemodjBySlug(slug);
+  if (demoDj) {
+    if (demoDj.plan === "free") {
+      return <DjProfileFree djData={demoDj} viewMode="fan" />;
+    }
+    return <DjProfilePremium djData={demoDj} viewMode="fan" />;
+  }
+
+  // ── Prisma DB lookup (production) ─────────────────────────────────────────
   const dj = await prisma.djProfile.findUnique({
     where: { slug },
     include: {

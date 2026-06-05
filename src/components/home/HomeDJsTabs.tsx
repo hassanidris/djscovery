@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -84,7 +86,10 @@ function DJCard({
   rank?: number;
 }) {
   return (
-    <Link href="/directory" className="block h-full">
+    <Link
+      href={dj.slug ? `/djs/${dj.slug}` : "/directory"}
+      className="block h-full"
+    >
       <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red gap-3 p-4 cursor-pointer transition-all overflow-visible">
         {rank !== undefined && (
           <Badge className="absolute top-2 left-2 bg-h_redDark/50 text-h_red border-0">
@@ -98,12 +103,26 @@ function DJCard({
         )}
 
         <div className="flex flex-col items-center gap-2 text-center pt-2">
-          <Avatar className="size-20 ring-2 ring-h_red ring-offset-2 ring-offset-black">
-            <AvatarImage src={dj.avatar} alt={dj.stageName} />
-            <AvatarFallback className="bg-h_redDark text-white text-lg">
-              {dj.stageName[0] || "?"}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar
+              className={`size-20 ring-2 ring-offset-2 ring-offset-black ${
+                dj.isPremium ? "ring-amber-400" : "ring-h_red"
+              }`}
+            >
+              <AvatarImage src={dj.avatar} alt={dj.stageName} />
+              <AvatarFallback className="bg-h_redDark text-white text-lg">
+                {dj.stageName[0] || "?"}
+              </AvatarFallback>
+            </Avatar>
+            {dj.isPremium && (
+              <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-amber-400 border-2 border-black flex items-center justify-center">
+                <FontAwesomeIcon
+                  icon={faCrown}
+                  className="h-3 w-3 text-black"
+                />
+              </div>
+            )}
+          </div>
           <div>
             <p className="text-white font-semibold text-sm leading-tight truncate w-40 mx-auto">
               {dj.stageName}
