@@ -1,3 +1,5 @@
+import { ALL_DEMO_DJS } from "@/data/djs";
+
 export type DjUser = {
   id: string;
   username: string;
@@ -6,8 +8,23 @@ export type DjUser = {
   genres: string | null;
   country: string | null;
   city: string | null;
+  slug?: string;
   _count?: { followers: number };
 };
+
+export function demoDJsAsDjUsers(): DjUser[] {
+  return ALL_DEMO_DJS.map((dj) => ({
+    id: dj.id,
+    username: dj.slug,
+    stageName: dj.stageName,
+    avatar: dj.avatar.url,
+    genres: dj.genres.join(", "),
+    country: dj.location.country,
+    city: dj.location.city,
+    slug: dj.slug,
+    _count: { followers: dj.stats.followers },
+  }));
+}
 
 export const mockDJs: DjUser[] = [
   {

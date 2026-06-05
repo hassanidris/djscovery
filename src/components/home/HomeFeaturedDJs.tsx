@@ -3,54 +3,27 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCrown } from "@fortawesome/free-solid-svg-icons";
+import { PREMIUM_DEMO_DJS } from "@/data/djs";
 
-type FeaturedDJ = {
-  id: number;
-  stageName: string;
-  avatar: string;
-  bio: string;
-  genres: string[];
-  city: string;
-  country: string;
-  rating: number;
-  followers: number;
-};
-
-const FEATURED_DJS: FeaturedDJ[] = [
-  {
-    id: 1,
-    stageName: "Peggy Gou",
-    avatar: "/rated-9.webp",
-    bio: "Seoul-born Berlin-based DJ and producer. Known for her infectious house and techno sets that blend Eastern and Western influences.",
-    genres: ["House", "Techno"],
-    city: "Berlin",
-    country: "Germany",
-    rating: 4.9,
-    followers: 87000,
-  },
-  {
-    id: 2,
-    stageName: "Marcus Groove",
-    avatar: "/rated-5.webp",
-    bio: "NYC's finest in hip-hop and R&B. Marcus has headlined clubs across North America and Europe bringing raw energy to every set.",
-    genres: ["Hip-Hop", "R&B"],
-    city: "New York",
-    country: "USA",
-    rating: 4.7,
-    followers: 42000,
-  },
-  {
-    id: 3,
-    stageName: "Amara Pulse",
-    avatar: "/rated-6.webp",
-    bio: "Bringing the pulse of Lagos to the world stage. Amara blends Afrobeats and Amapiano into euphoric, floor-filling sets that transcend borders.",
-    genres: ["Afrobeats", "Amapiano"],
-    city: "Lagos",
-    country: "Nigeria",
-    rating: 4.8,
-    followers: 63000,
-  },
-];
+const FEATURED_DJS = [...PREMIUM_DEMO_DJS]
+  .sort(
+    (a, b) =>
+      b.stats.rating - a.stats.rating || b.stats.followers - a.stats.followers,
+  )
+  .slice(0, 3)
+  .map((dj) => ({
+    slug: dj.slug,
+    stageName: dj.stageName,
+    avatar: dj.avatar.url,
+    bio: dj.bio,
+    genres: dj.genres,
+    city: dj.location.city,
+    country: dj.location.country,
+    rating: dj.stats.rating,
+    followers: dj.stats.followers,
+  }));
 
 export default function HomeFeaturedDJs() {
   return (
@@ -75,16 +48,24 @@ export default function HomeFeaturedDJs() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {FEATURED_DJS.map((dj) => (
-            <Link key={dj.id} href="/directory">
+            <Link key={dj.slug} href={`/djs/${dj.slug}`}>
               <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all overflow-hidden p-0 gap-0">
                 <div className="relative h-24 bg-linear-to-r from-h_cyanDark to-black">
                   <div className="absolute -bottom-8 left-4">
-                    <Avatar className="size-16 ring-2 ring-h_red ring-offset-2 ring-offset-black">
-                      <AvatarImage src={dj.avatar} alt={dj.stageName} />
-                      <AvatarFallback className="bg-h_redDark text-white text-lg">
-                        {dj.stageName[0]}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="size-16 ring-2 ring-amber-400 ring-offset-2 ring-offset-black">
+                        <AvatarImage src={dj.avatar} alt={dj.stageName} />
+                        <AvatarFallback className="bg-h_redDark text-white text-lg">
+                          {dj.stageName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-1 -right-1 size-5 rounded-full bg-amber-400 border-2 border-black flex items-center justify-center">
+                        <FontAwesomeIcon
+                          icon={faCrown}
+                          className="h-2.5 w-2.5 text-black"
+                        />
+                      </div>
+                    </div>
                   </div>
                   <Badge className="absolute top-3 right-3 bg-h_red text-white border-0">
                     ✦ FEATURED
