@@ -8,6 +8,8 @@ import {
   faUsers,
   faCompactDisc,
   faMagnifyingGlass,
+  faCalendarDays,
+  faTicket,
 } from "@fortawesome/free-solid-svg-icons";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -53,19 +55,33 @@ const Navbar = async () => {
         {/* CENTER — Nav links + Search */}
         <div className="hidden md:flex w-[50%] text-sm items-center justify-between">
           <div className="flex gap-6">
-            <Link
+            {/* <Link
               href="/"
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <FontAwesomeIcon icon={faHouse} className="h-4 w-4" />
               <span>Home</span>
-            </Link>
+            </Link> */}
             <Link
               href="/directory"
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <FontAwesomeIcon icon={faCompactDisc} className="h-4 w-4" />
               <span>Directory</span>
+            </Link>
+            <Link
+              href="/gigs"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4" />
+              <span>Gigs</span>
+            </Link>
+            <Link
+              href="/events"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <FontAwesomeIcon icon={faTicket} className="h-4 w-4" />
+              <span>Events</span>
             </Link>
             <Link
               href="/community"
