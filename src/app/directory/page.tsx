@@ -208,7 +208,7 @@ const DirectoryPage = async ({
           <div className=" xl:block xl:w-[20%] shrink-0">
             <Suspense
               fallback={
-                <div className="bg-h_blackLight/50 rounded-xl p-4 h-96 animate-pulse" />
+                <div className="bg-h_blackLight/50 rounded-xl p-4 h-96 animate-pulse " />
               }
             >
               <FilterPanel
