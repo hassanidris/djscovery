@@ -26,7 +26,7 @@ export default async function HomeCtaBanner() {
           <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-h_redDark/30 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center text-center gap-4 mb-10">
-            <span className="text-h_red text-sm font-semibold tracking-widest uppercase">
+            <span className="text-red-300 text-sm font-semibold tracking-widest uppercase">
               Join the Community
             </span>
             <h2 className="text-white text-4xl md:text-5xl leading-tight">
@@ -80,7 +80,7 @@ export default async function HomeCtaBanner() {
               <Button
                 asChild
                 variant="outline"
-                className="mt-auto border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold w-full"
+                className="mt-auto border-h_red text-red-200 hover:bg-h_red hover:text-white font-semibold w-full cursor-pointer"
               >
                 <Link href={joinHref}>Join as Organiser</Link>
               </Button>

@@ -52,7 +52,7 @@ const DjCard = ({
           {genreList.slice(0, 3).map((genre) => (
             <span
               key={genre}
-              className="text-xs bg-h_red/10 text-h_red/90 px-2 py-0.5 rounded-full"
+              className="text-xs bg-h_redDark/60 text-red-200 px-2 py-0.5 rounded-full"
             >
               {genre}
             </span>
@@ -60,7 +60,7 @@ const DjCard = ({
         </div>
       )}
 
-      <button className="mt-auto bg-h_red hover:bg-h_redDark text-white text-xs px-3 py-1.5 rounded-md w-full transition-colors">
+      <button className="mt-auto bg-h_red hover:bg-h_redDark text-white text-xs px-3 py-1.5 rounded-md w-full transition-colors cursor-pointer">
         Follow
       </button>
     </div>

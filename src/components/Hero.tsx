@@ -66,7 +66,7 @@ const Hero = async () => {
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="border-h_red text-red-300 hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
                   >
                     <Link href="/directory">Browse Open Gigs</Link>
                   </Button>
@@ -82,7 +82,7 @@ const Hero = async () => {
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="border-h_red text-red-300 hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
                   >
                     <Link href="/directory">Find DJs</Link>
                   </Button>
@@ -98,7 +98,7 @@ const Hero = async () => {
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="border-h_red text-red-300 hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
                   >
                     <Link href={joinHref}>Join as Organiser</Link>
                   </Button>

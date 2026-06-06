@@ -166,7 +166,7 @@ const FilterPanel = ({
         </div>
 
         {/* Country */}
-        <div className="flex flex-col gap-2 w-[calc(50%-6px)] xl:w-full">
+        <div className="flex flex-col gap-2  w-[calc(50%-6px)] xl:w-full">
           <p className="text-gray-400 text-xs font-medium uppercase tracking-wider">
             Country
           </p>
@@ -175,9 +175,15 @@ const FilterPanel = ({
             onChange={(e) => updateCountry(e.target.value)}
             className="bg-h_black/50 text-gray-300 text-xs rounded-md px-3 py-2 outline-none ring-1 ring-gray-700 focus:ring-h_red"
           >
-            <option value="">All countries</option>
+            <option value="" className="bg-h_blackLight hover:bg-white/5">
+              All countries
+            </option>
             {availableCountries.map((c) => (
-              <option key={c} value={c}>
+              <option
+                key={c}
+                value={c}
+                className="bg-h_blackLight hover:bg-white/5"
+              >
                 {c}
               </option>
             ))}
@@ -195,9 +201,15 @@ const FilterPanel = ({
               onChange={(e) => updateParam("city", e.target.value)}
               className="bg-h_black/50 text-gray-300 text-xs rounded-md px-3 py-2 outline-none ring-1 ring-gray-700 focus:ring-h_red"
             >
-              <option value="">All cities</option>
+              <option value="" className="bg-h_blackLight hover:bg-white/5">
+                All cities
+              </option>
               {citiesForCountry.map((c) => (
-                <option key={c} value={c}>
+                <option
+                  key={c}
+                  value={c}
+                  className="bg-h_blackLight hover:bg-white/5"
+                >
                   {c}
                 </option>
               ))}
@@ -216,7 +228,11 @@ const FilterPanel = ({
             className="bg-h_black/50 text-gray-300 text-xs rounded-md px-3 py-2 outline-none ring-1 ring-gray-700 focus:ring-h_red"
           >
             {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
+              <option
+                key={o.value}
+                value={o.value}
+                className="bg-h_blackLight hover:bg-white/5"
+              >
                 {o.label}
               </option>
             ))}

@@ -135,7 +135,7 @@ function DJCard({
 
         <div className="flex flex-wrap gap-1 justify-center">
           {dj.genres.slice(0, 2).map((g) => (
-            <Badge key={g} className="bg-h_redDark/60 text-red-100 border-0">
+            <Badge key={g} className="bg-h_redDark/60 text-red-300 border-0">
               {g}
             </Badge>
           ))}
