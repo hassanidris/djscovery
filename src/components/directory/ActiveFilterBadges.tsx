@@ -44,11 +44,19 @@ const ActiveFilterBadges = () => {
   type Badge = { label: string; onRemove: () => void };
 
   const badges: Badge[] = [
-    ...selectedGenres.map((g) => ({ label: g, onRemove: () => removeGenre(g) })),
+    ...selectedGenres.map((g) => ({
+      label: g,
+      onRemove: () => removeGenre(g),
+    })),
     ...(country ? [{ label: country, onRemove: removeCountry }] : []),
     ...(city ? [{ label: city, onRemove: () => removeParam("city") }] : []),
     ...(sort
-      ? [{ label: SORT_LABELS[sort] ?? sort, onRemove: () => removeParam("sort") }]
+      ? [
+          {
+            label: SORT_LABELS[sort] ?? sort,
+            onRemove: () => removeParam("sort"),
+          },
+        ]
       : []),
   ];
 
@@ -59,12 +67,12 @@ const ActiveFilterBadges = () => {
       {badges.map((badge, i) => (
         <span
           key={i}
-          className="flex items-center gap-1.5 bg-h_red/10 text-h_red text-xs px-2.5 py-1 rounded-full border border-h_red/30"
+          className="flex items-center gap-1.5 bg-h_red/10 text-red-400 text-xs px-2.5 py-1 rounded-full border border-h_red/50"
         >
           {badge.label}
           <button
             onClick={badge.onRemove}
-            className="hover:text-white transition-colors leading-none"
+            className="hover:text-white transition-colors leading-none cursor-pointer"
             aria-label={`Remove ${badge.label} filter`}
           >
             ×
