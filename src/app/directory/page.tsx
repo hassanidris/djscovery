@@ -76,16 +76,6 @@ const DirectoryPage = async ({
   }
 
   const demoDjs = demoDJsAsDjUsers();
-  // const hasFilters = !!(genre || country || sort);
-  // const displayDjs = hasFilters
-  //   ? djs.length
-  //     ? djs
-  //     : demoDjs
-  //   : fetchError
-  //     ? demoDjs
-  //     : djs.length
-  //       ? djs
-  //       : demoDjs;
 
   const filterDemoDjs = (list: DjUser[]) =>
     list.filter((dj) => {
@@ -213,9 +203,9 @@ const DirectoryPage = async ({
 
       {/* 3-Column Layout */}
       <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
-        <div className="flex gap-6 py-6">
+        <div className="flex flex-col xl:flex-row gap-6 py-6">
           {/* Left — Filters */}
-          <div className="hidden xl:block w-[20%] shrink-0">
+          <div className=" xl:block xl:w-[20%] shrink-0">
             <Suspense
               fallback={
                 <div className="bg-h_blackLight/50 rounded-xl p-4 h-96 animate-pulse" />
@@ -236,11 +226,6 @@ const DirectoryPage = async ({
             </Suspense>
             <DjGrid djs={displayDjs} />
           </div>
-
-          {/* Right — Events Calendar */}
-          {/* <div className="hidden lg:block w-[30%] shrink-0">
-            <EventCalendar />
-          </div> */}
         </div>
       </div>
     </>
