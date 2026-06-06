@@ -751,8 +751,8 @@ export default function DjProfilePremium({
 
             <div className="flex-1 min-w-0 pt-1 sm:pb-2">
               <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <h1 className="font-heading text-3xl md:text-4xl text-white leading-none">
-                  {DJ.stageName}
+                <h1 className="font-heading text-3xl md:text-4xl text-white leading-none z-10">
+                  Dj {DJ.stageName}
                 </h1>
                 <div className="flex items-center gap-1.5">
                   <Badge className="bg-blue-500/15 text-blue-400 border-blue-500/25 text-xs h-5.5">
