@@ -30,6 +30,7 @@ const nextConfig = {
       { protocol: "https", hostname: "theplayground.co.uk" },
       { protocol: "https", hostname: "www.b4l.cz" },
       { protocol: "https", hostname: "www.discoverbenelux.com" },
+      { protocol: "https", hostname: "assets.podomatic.net" },
     ],
   },
   webpack: (config, { isServer }) => {
