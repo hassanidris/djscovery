@@ -20,12 +20,7 @@
       "url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
       "alt": "Mira Sol live performance cover"
     },
-    "genres": [
-      "Deep House",
-      "Organic House",
-      "Downtempo",
-      "Melodic House"
-    ],
+    "genres": ["Deep House", "Organic House", "Downtempo", "Melodic House"],
     "socials": {
       "instagram": "https://www.instagram.com/mirasolmusic/",
       "soundcloud": "https://soundcloud.com/user-635857713",
@@ -44,23 +39,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Deep House Sessions Vol.4",
+        "title": "swuuuaaahhhhhg",
         "duration": "59m",
         "plays": 48345,
-        "genres": [
-          "Deep House",
-          "Organic House"
-        ],
-        "audioUrl": "https://soundcloud.com/mira-sol/deep-house-sessions",
+        "genres": ["Deep House", "Organic House"],
+        "audioUrl": "https://soundcloud.com/user-635857713/sets/swuuuaaahhhhhg?si=d8587947018a480b8c5f4782e02dbfc8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
       "featuredVideo": {
-        "title": "Live @ Fabric London 2025",
+        "title": "Why I Still Miss You",
         "subtitle": "Full headline set recording",
         "duration": "43 min",
         "views": 105000,
         "thumbnail": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/fZXUfs0NV-Y?si=pZuLvwsU80Z73ESK"
       }
     },
     "analytics": {
@@ -139,38 +131,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -212,12 +175,7 @@
       }
     ],
     "bio": "Mira Sol brings sunset-driven deep house and organic grooves to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Mira Sol has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
@@ -403,12 +361,7 @@
       "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
       "alt": "Kai Frequency live performance cover"
     },
-    "genres": [
-      "Techno",
-      "Melodic Techno",
-      "House",
-      "Electronica"
-    ],
+    "genres": ["Techno", "Melodic Techno", "House", "Electronica"],
     "socials": {
       "spotify": "https://open.spotify.com/track/5D7zgku43yFawUZ0Rpbn8H",
       "apple": "https://music.apple.com/fj/artist/dj-kai/1815815836"
@@ -427,10 +380,7 @@
         "title": "Techno Sessions Vol.5",
         "duration": "60m",
         "plays": 60690,
-        "genres": [
-          "Techno",
-          "Melodic Techno"
-        ],
+        "genres": ["Techno", "Melodic Techno"],
         "audioUrl": "https://soundcloud.com/kai-frequency/techno-sessions",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
@@ -519,38 +469,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -592,12 +513,7 @@
       }
     ],
     "bio": "Kai Frequency brings clean melodic techno with futuristic Seoul club energy to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Kai Frequency has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
@@ -783,12 +699,7 @@
       "url": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
       "alt": "Sahara Beats live performance cover"
     },
-    "genres": [
-      "Afro House",
-      "Organic House",
-      "Arab Electronic",
-      "Deep House"
-    ],
+    "genres": ["Afro House", "Organic House", "Arab Electronic", "Deep House"],
     "socials": {
       "soundcloud": "https://soundcloud.com/djsahara",
       "youtube": "https://www.youtube.com/@ArabesqueEcho"
@@ -804,23 +715,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Afro House Sessions Vol.6",
+        "title": "D j Sahara Commercial Top,Hits,New,Best Mix 2015",
         "duration": "61m",
         "plays": 73035,
-        "genres": [
-          "Afro House",
-          "Organic House"
-        ],
-        "audioUrl": "https://soundcloud.com/sahara-beats/afro-house-sessions",
+        "genres": ["Afro House", "Organic House"],
+        "audioUrl": "https://soundcloud.com/djsahara/d-j-sahara-commercial-tophitsnewbest-mix-2015?si=92de6d28df7c4a1b9148fe7e48305459&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1506157786151-b8491531f063"
       },
       "featuredVideo": {
-        "title": "Live @ Club Space 2025",
+        "title": "Late Night Mirage 2026 | Arabic EDM × Balkan Chill Progressive Mix 🌙",
         "subtitle": "Full headline set recording",
         "duration": "45 min",
         "views": 159000,
         "thumbnail": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/lHBiiJzdUss?si=zFC8JIaKneIcglYM"
       }
     },
     "analytics": {
@@ -899,38 +807,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -972,12 +851,7 @@
       }
     ],
     "bio": "Sahara Beats brings North African rhythms, Afro House, and warm desert-inspired percussion to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Sahara Beats has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
@@ -1163,12 +1037,7 @@
       "url": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
       "alt": "Rio Noir live performance cover"
     },
-    "genres": [
-      "Baile Funk",
-      "Latin House",
-      "Tech House",
-      "Bass"
-    ],
+    "genres": ["Baile Funk", "Latin House", "Tech House", "Bass"],
     "socials": {
       "instagram": "https://www.instagram.com/rionoir/",
       "soundcloud": "https://soundcloud.com/rionoirmusic",
@@ -1185,14 +1054,11 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Baile Funk Sessions Vol.7",
+        "title": "Shake The Disease",
         "duration": "62m",
         "plays": 85380,
-        "genres": [
-          "Baile Funk",
-          "Latin House"
-        ],
-        "audioUrl": "https://soundcloud.com/rio-noir/baile-funk-sessions",
+        "genres": ["Baile Funk", "Latin House"],
+        "audioUrl": "https://soundcloud.com/rionoirmusic/shake-the-disease?si=c3356aa4a54f4eb98240e9fff9dbb12a&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
       },
       "featuredVideo": {
@@ -1280,38 +1146,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -1353,12 +1190,7 @@
       }
     ],
     "bio": "Rio Noir brings Brazilian street energy mixed with club-ready Latin House to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Rio Noir has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1506157786151-b8491531f063",
@@ -1544,12 +1376,7 @@
       "url": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
       "alt": "Zara Luxe live performance cover"
     },
-    "genres": [
-      "Open Format",
-      "Commercial",
-      "Afro House",
-      "R&B"
-    ],
+    "genres": ["Open Format", "Commercial", "Afro House", "R&B"],
     "socials": {
       "instagram": "https://www.instagram.com/zaradj_/?hl=en",
       "soundcloud": "https://soundcloud.com/dj-zara-1",
@@ -1567,23 +1394,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Open Format Sessions Vol.8",
+        "title": "Afrojack & Shermanology - Cant Stop Me ( Zära Teaser Mix )",
         "duration": "63m",
         "plays": 97725,
-        "genres": [
-          "Open Format",
-          "Commercial"
-        ],
-        "audioUrl": "https://soundcloud.com/zara-luxe/open-format-sessions",
+        "genres": ["Open Format", "Commercial"],
+        "audioUrl": "https://soundcloud.com/dj-zara-1/afrojack-shermanology-cant?si=d166237b38804222bed84df63f6b4b17&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7"
       },
       "featuredVideo": {
-        "title": "Live @ Shelter NYC 2025",
+        "title": "Cubano House 🔥 Afro Latin Club Groove",
         "subtitle": "Full headline set recording",
         "duration": "47 min",
         "views": 213000,
         "thumbnail": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/QkY4jwwGrZI?si=cA7Vnj6Z3rFQWeqM"
       }
     },
     "analytics": {
@@ -1662,38 +1486,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -1735,12 +1530,7 @@
       }
     ],
     "bio": "Zara Luxe brings luxury event energy, open-format transitions, and premium club selections to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Zara Luxe has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
@@ -1926,12 +1716,7 @@
       "url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
       "alt": "Armin van Buuren live performance cover"
     },
-    "genres": [
-      "Trance",
-      "Progressive Trance",
-      "EDM",
-      "Progressive House"
-    ],
+    "genres": ["Trance", "Progressive Trance", "EDM", "Progressive House"],
     "socials": {
       "instagram": "https://www.instagram.com/arminvanbuuren/?hl=en",
       "soundcloud": "https://soundcloud.com/arminvanbuuren",
@@ -1950,23 +1735,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Trance Sessions Vol.3",
+        "title": "A State of Trance 25 Years - Selected Highlights (Mixed by Armin van Buuren)",
         "duration": "64m",
         "plays": 110070,
-        "genres": [
-          "Trance",
-          "Progressive Trance"
-        ],
-        "audioUrl": "https://soundcloud.com/armin-van-buuren/trance-sessions",
+        "genres": ["Trance", "Progressive Trance"],
+        "audioUrl": "https://soundcloud.com/arminvanbuuren/sets/a-state-of-trance-25-years?si=c1752a1397d74de686e40d756b26cc7b&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14"
       },
       "featuredVideo": {
-        "title": "Live @ Berns 2025",
+        "title": "Armin van Buuren & Olive Anguz - Vem Comigo (Official Music Video)",
         "subtitle": "Full headline set recording",
         "duration": "48 min",
         "views": 240000,
         "thumbnail": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/EIL4UJBvxuM?si=7wpOdEGYC4whMJWQ"
       }
     },
     "analytics": {
@@ -2045,38 +1827,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -2118,12 +1871,7 @@
       }
     ],
     "bio": "Armin van Buuren brings uplifting trance, emotional builds, and festival-scale energy to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Armin van Buuren has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
@@ -2309,12 +2057,7 @@
       "url": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
       "alt": "Tiësto live performance cover"
     },
-    "genres": [
-      "EDM",
-      "House",
-      "Progressive House",
-      "Electro House"
-    ],
+    "genres": ["EDM", "House", "Progressive House", "Electro House"],
     "socials": {
       "instagram": "https://www.instagram.com/tiesto/?hl=en",
       "soundcloud": "https://soundcloud.com/tiesto",
@@ -2333,23 +2076,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.4",
+        "title": "Bring Me To Life",
         "duration": "65m",
         "plays": 122415,
-        "genres": [
-          "EDM",
-          "House"
-        ],
-        "audioUrl": "https://soundcloud.com/tiesto/edm-sessions",
+        "genres": ["EDM", "House"],
+        "audioUrl": "https://soundcloud.com/tiesto/bring-me-to-life?si=58a8b86d96d24cfc80688d01092f5d6f&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
       },
       "featuredVideo": {
-        "title": "Live @ DC-10 2025",
+        "title": "Tiësto Live at EDC Las Vegas 2026",
         "subtitle": "Full headline set recording",
         "duration": "49 min",
         "views": 267000,
         "thumbnail": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://www.youtube.com/live/kG0SVvz9e-g?si=7swNmz9r1hyUmmz6"
       }
     },
     "analytics": {
@@ -2428,38 +2168,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -2501,12 +2212,7 @@
       }
     ],
     "bio": "Tiësto brings mainstage EDM with polished house and festival impact to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Tiësto has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
@@ -2692,12 +2398,7 @@
       "url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
       "alt": "David Guetta live performance cover"
     },
-    "genres": [
-      "EDM",
-      "Pop Dance",
-      "Electro House",
-      "Commercial"
-    ],
+    "genres": ["EDM", "Pop Dance", "Electro House", "Commercial"],
     "socials": {
       "instagram": "https://www.instagram.com/davidguetta/?hl=en",
       "soundcloud": "https://soundcloud.com/davidguetta",
@@ -2715,23 +2416,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.5",
+        "title": "Babylon (Men Machine Rework)",
         "duration": "66m",
         "plays": 134760,
-        "genres": [
-          "EDM",
-          "Pop Dance"
-        ],
-        "audioUrl": "https://soundcloud.com/david-guetta/edm-sessions",
+        "genres": ["EDM", "Pop Dance"],
+        "audioUrl": "https://soundcloud.com/davidguetta/babylon-men-machine-rework?si=0b8b00a75a37495a83142ba6c79f28f5&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
       },
       "featuredVideo": {
-        "title": "Live @ Rex Club 2025",
+        "title": "David Guetta & Hypaton - Walked Away (Live Performance @ Tomorrowland 2025)",
         "subtitle": "Full headline set recording",
         "duration": "50 min",
         "views": 294000,
         "thumbnail": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/SBz87t9u55s?si=_30hXnpPZanTnlBA"
       }
     },
     "analytics": {
@@ -2810,38 +2508,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -2883,12 +2552,7 @@
       }
     ],
     "bio": "David Guetta brings global pop-dance energy and radio-ready festival moments to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, David Guetta has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
@@ -3074,12 +2738,7 @@
       "url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
       "alt": "Alok live performance cover"
     },
-    "genres": [
-      "Brazilian Bass",
-      "House",
-      "Dance Pop",
-      "EDM"
-    ],
+    "genres": ["Brazilian Bass", "House", "Dance Pop", "EDM"],
     "socials": {
       "instagram": "https://www.instagram.com/alok/?hl=en",
       "soundcloud": "https://soundcloud.com/livealok",
@@ -3098,23 +2757,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Brazilian Bass Sessions Vol.6",
+        "title": "Run Run River (Angels Above Me)",
         "duration": "67m",
         "plays": 147105,
-        "genres": [
-          "Brazilian Bass",
-          "House"
-        ],
-        "audioUrl": "https://soundcloud.com/alok/brazilian-bass-sessions",
+        "genres": ["Brazilian Bass", "House"],
+        "audioUrl": "https://soundcloud.com/livealok/run-run-river-angels-above-me?si=4233c82bb2644e34ad4f6d1a16907f50&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
       "featuredVideo": {
-        "title": "Live @ Watergate 2025",
+        "title": "Alok b2b Green Velvet @ EDC Orlando 2025",
         "subtitle": "Full headline set recording",
         "duration": "51 min",
         "views": 321000,
         "thumbnail": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/iY4g1WaBmds?si=_m1UiaATv329X5RC"
       }
     },
     "analytics": {
@@ -3193,38 +2849,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -3266,12 +2893,7 @@
       }
     ],
     "bio": "Alok brings Brazilian bass, emotional hooks, and modern house production to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Alok has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
@@ -3457,12 +3079,7 @@
       "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
       "alt": "Don Diablo live performance cover"
     },
-    "genres": [
-      "Future House",
-      "EDM",
-      "Electro House",
-      "Dance"
-    ],
+    "genres": ["Future House", "EDM", "Electro House", "Dance"],
     "socials": {
       "instagram": "https://www.instagram.com/dondiablo/?hl=en",
       "soundcloud": "https://soundcloud.com/DONDIABLO",
@@ -3480,23 +3097,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Future House Sessions Vol.7",
+        "title": "Brighter Days (Don Diablo ReHex)",
         "duration": "68m",
         "plays": 159450,
-        "genres": [
-          "Future House",
-          "EDM"
-        ],
-        "audioUrl": "https://soundcloud.com/don-diablo/future-house-sessions",
+        "genres": ["Future House", "EDM"],
+        "audioUrl": "https://soundcloud.com/dondiablo/brighterdaysrehex?in=dondiablo/sets/rehexes&si=85c421c6ba424ea6bb7490497cf30944&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
       "featuredVideo": {
-        "title": "Live @ Ministry of Sound 2025",
+        "title": "Don Diablo, Wiz Khalifa & Chri$tian Gate$ - Go Home With A Stranger [LA SΞSSIONS 001]",
         "subtitle": "Full headline set recording",
         "duration": "52 min",
         "views": 348000,
         "thumbnail": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/fcYmegOL1Bg?si=d6lDd-mbw4YR5XP-"
       }
     },
     "analytics": {
@@ -3575,38 +3189,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -3648,12 +3233,7 @@
       }
     ],
     "bio": "Don Diablo brings future house, digital aesthetics, and high-energy dancefloor control to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Don Diablo has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
@@ -3839,12 +3419,7 @@
       "url": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
       "alt": "NERVO live performance cover"
     },
-    "genres": [
-      "EDM",
-      "Electro House",
-      "Progressive House",
-      "Dance Pop"
-    ],
+    "genres": ["EDM", "Electro House", "Progressive House", "Dance Pop"],
     "socials": {
       "instagram": "https://www.instagram.com/nervomusic/?hl=en",
       "soundcloud": "https://soundcloud.com/marco-dachille",
@@ -3863,23 +3438,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.8",
+        "title": "LOCKDOWN-tempo #1 - Once Upon A Time",
         "duration": "69m",
         "plays": 171795,
-        "genres": [
-          "EDM",
-          "Electro House"
-        ],
-        "audioUrl": "https://soundcloud.com/nervo/edm-sessions",
+        "genres": ["EDM", "Electro House"],
+        "audioUrl": "https://soundcloud.com/marco-dachille/lockdown-tempo-1-once-upon-a-time?si=97c9dd965e3a4ad0a45920bff7580053&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1506157786151-b8491531f063"
       },
       "featuredVideo": {
-        "title": "Live @ Amnesia 2025",
+        "title": "NERVO Live @ Tomorrowland 2018",
         "subtitle": "Full headline set recording",
         "duration": "53 min",
         "views": 375000,
         "thumbnail": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/Ifwz5BgY4eA?si=jRIORIhsSANxETRw"
       }
     },
     "analytics": {
@@ -3958,38 +3530,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -4031,12 +3574,7 @@
       }
     ],
     "bio": "NERVO brings bright EDM hooks, festival drops, and vocal-driven dance music to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, NERVO has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
@@ -4222,12 +3760,7 @@
       "url": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
       "alt": "Claptone live performance cover"
     },
-    "genres": [
-      "House",
-      "Deep House",
-      "Tech House",
-      "Melodic House"
-    ],
+    "genres": ["House", "Deep House", "Tech House", "Melodic House"],
     "socials": {
       "instagram": "https://www.instagram.com/claptone.official/?hl=en",
       "soundcloud": "https://soundcloud.com/claptone",
@@ -4246,23 +3779,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "House Sessions Vol.3",
+        "title": "Sandcastles",
         "duration": "70m",
         "plays": 184140,
-        "genres": [
-          "House",
-          "Deep House"
-        ],
-        "audioUrl": "https://soundcloud.com/claptone/house-sessions",
+        "genres": ["House", "Deep House"],
+        "audioUrl": "https://soundcloud.com/claptone/track-5?si=975ad8eaab8146bb8e1d7979cd4d7c96&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
       },
       "featuredVideo": {
-        "title": "Live @ Berghain 2025",
+        "title": "Wanderlust (Official Music Video)",
         "subtitle": "Full headline set recording",
         "duration": "54 min",
         "views": 402000,
         "thumbnail": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/jOHL5y-h-eg?si=V8bp50qYXZiGCnSX"
       }
     },
     "analytics": {
@@ -4341,38 +3871,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -4414,12 +3915,7 @@
       }
     ],
     "bio": "Claptone brings mysterious house selections, deep grooves, and refined club storytelling to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Claptone has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1506157786151-b8491531f063",
@@ -4605,12 +4101,7 @@
       "url": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
       "alt": "Vintage Culture live performance cover"
     },
-    "genres": [
-      "House",
-      "Deep House",
-      "Tech House",
-      "Melodic House"
-    ],
+    "genres": ["House", "Deep House", "Tech House", "Melodic House"],
     "socials": {
       "instagram": "https://www.instagram.com/vintageculture/?hl=en",
       "soundcloud": "https://soundcloud.com/vintageculturemusic",
@@ -4629,23 +4120,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "House Sessions Vol.4",
+        "title": "Do You EP",
         "duration": "71m",
         "plays": 196485,
-        "genres": [
-          "House",
-          "Deep House"
-        ],
-        "audioUrl": "https://soundcloud.com/vintage-culture/house-sessions",
+        "genres": ["House", "Deep House"],
+        "audioUrl": "https://soundcloud.com/vintageculturemusic/sets/do-you-ep-3?si=9d651c3b0a05474ab69e946219d8a3bb&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7"
       },
       "featuredVideo": {
-        "title": "Live @ Fabric London 2025",
+        "title": "Ultra Music Festival Miami 2026 - Resistance Megastructure",
         "subtitle": "Full headline set recording",
         "duration": "55 min",
         "views": 429000,
         "thumbnail": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/xXRjglkAmq8?si=2viJUe5GK6FiYRAb"
       }
     },
     "analytics": {
@@ -4724,38 +4212,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -4797,12 +4256,7 @@
       }
     ],
     "bio": "Vintage Culture brings melodic house, Brazilian warmth, and late-night festival emotion to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Vintage Culture has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
@@ -4988,12 +4442,7 @@
       "url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
       "alt": "Timmy Trumpet live performance cover"
     },
-    "genres": [
-      "EDM",
-      "Big Room",
-      "Hard Dance",
-      "Festival"
-    ],
+    "genres": ["EDM", "Big Room", "Hard Dance", "Festival"],
     "socials": {
       "instagram": "https://www.instagram.com/timmytrumpet/?hl=en",
       "soundcloud": "https://soundcloud.com/timmytrumpet",
@@ -5012,23 +4461,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.5",
+        "title": "Robin Schulz x Timmy Trumpet x KOPPY - All the Things She Said",
         "duration": "72m",
         "plays": 208830,
-        "genres": [
-          "EDM",
-          "Big Room"
-        ],
-        "audioUrl": "https://soundcloud.com/timmy-trumpet/edm-sessions",
+        "genres": ["EDM", "Big Room"],
+        "audioUrl": "https://soundcloud.com/timmytrumpet/sets/robin-schulz-x-timmy-trumpet-x?si=908ec697811f471ca638220e48cd9224&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14"
       },
       "featuredVideo": {
-        "title": "Live @ Pacha 2025",
+        "title": "Timmy Trumpet x Frank Walker (feat. John Martin) - All My Life [Official Audio]",
         "subtitle": "Full headline set recording",
         "duration": "56 min",
         "views": 456000,
         "thumbnail": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/axlkYsorFMs?si=rzsd_8D4MvZ8ivev"
       }
     },
     "analytics": {
@@ -5107,38 +4553,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -5180,12 +4597,7 @@
       }
     ],
     "bio": "Timmy Trumpet brings explosive big-room EDM and live trumpet-led stage energy to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Timmy Trumpet has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
@@ -5371,12 +4783,7 @@
       "url": "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",
       "alt": "Afrojack live performance cover"
     },
-    "genres": [
-      "EDM",
-      "Electro House",
-      "Dutch House",
-      "Big Room"
-    ],
+    "genres": ["EDM", "Electro House", "Dutch House", "Big Room"],
     "socials": {
       "instagram": "https://www.instagram.com/afrojack/?hl=en",
       "soundcloud": "https://soundcloud.com/afrojack",
@@ -5395,23 +4802,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.6",
+        "title": "Take Over Control (feat. Eva Simons) [The Remixes 2025]",
         "duration": "73m",
         "plays": 221175,
-        "genres": [
-          "EDM",
-          "Electro House"
-        ],
-        "audioUrl": "https://soundcloud.com/afrojack/edm-sessions",
+        "genres": ["EDM", "Electro House"],
+        "audioUrl": "https://soundcloud.com/afrojack/sets/take-over-control-feat-eva-5?si=a8ac3f953bcf471097cc0ea6fbfbb029&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
       },
       "featuredVideo": {
-        "title": "Live @ Club Space 2025",
+        "title": "ULTRA MUSIC FESTIVAL MIAMI 2025",
         "subtitle": "Full headline set recording",
         "duration": "57 min",
         "views": 483000,
         "thumbnail": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/gWd3YaBsxvs?si=49VkA1IfB5H5CzBV"
       }
     },
     "analytics": {
@@ -5490,38 +4894,9 @@
     "availability": {
       "timezone": "Europe/Stockholm",
       "month": "2025-09",
-      "availableDays": [
-        1,
-        2,
-        3,
-        8,
-        9,
-        10,
-        15,
-        16,
-        17,
-        22,
-        23,
-        24,
-        29,
-        30
-      ],
-      "bookedDays": [
-        5,
-        6,
-        12,
-        13,
-        19,
-        20,
-        26,
-        27
-      ],
-      "tentativeDays": [
-        4,
-        11,
-        18,
-        25
-      ]
+      "availableDays": [1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30],
+      "bookedDays": [5, 6, 12, 13, 19, 20, 26, 27],
+      "tentativeDays": [4, 11, 18, 25]
     },
     "packages": [
       {
@@ -5563,12 +4938,7 @@
       }
     ],
     "bio": "Afrojack brings Dutch house, powerful festival drops, and sharp electro-house production to international dancefloors. Known for sharp transitions, crowd reading, and memorable peak-time moments, Afrojack has built a reputation across clubs, festivals, and private events.",
-    "specialties": [
-      "Festival",
-      "Club",
-      "Corporate",
-      "Private Events"
-    ],
+    "specialties": ["Festival", "Club", "Corporate", "Private Events"],
     "media": {
       "photos": [
         "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14",

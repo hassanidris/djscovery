@@ -13,20 +13,18 @@
       "country": "Nigeria"
     },
     "avatar": {
-      "url": "https://i.kfs.io/album/global/290973828,0v1/fit/500x500.jpg",
+      "url": "https://assets.podomatic.net/ts/c1/e5/27/djamara22/600x600_12651194.jpg",
       "alt": "Amara Pulse"
     },
     "coverImage": {
       "url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
       "alt": "Amara Pulse live performance cover"
     },
-    "genres": ["Afrobeats", "Amapiano", "House", "Afro-Tech"],
+    "genres": ["R&B", "Electro House", "Hip-Hop"],
     "socials": {
-      "instagram": "https://www.instagram.com/amara.musicc/",
-      "soundcloud": "https://soundcloud.com/felipe-clavero/pulse-original-mix-amara",
-      "spotify": "https://open.spotify.com/album/24cH1e7Qvhsr6XvHMlo3Wi",
-      "youtube": "https://www.youtube.com/channel/UCCFyNdZfRJAOx1E3qgIkVzg",
-      "anghami": "https://play.anghami.com/song/1264441505",
+      "instagram": "https://www.instagram.com/djamara/?hl=en",
+      "soundcloud": "https://soundcloud.com/djamara",
+      "youtube": "https://www.youtube.com/channel/UCERf4bNH_7SzQA-wUFqa7pw",
       "website": "https://www.djamara.com/bio"
     },
     "stats": {
@@ -40,20 +38,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Afrobeats Sessions Vol.5",
+        "title": "Miguel - Do You (Ark Patrol Remix)",
         "duration": "80m",
         "plays": 51339,
-        "genres": ["Afrobeats", "Amapiano"],
-        "audioUrl": "https://soundcloud.com/amara-pulse/afrobeats-sessions",
+        "genres": ["R&B", "Electro House"],
+        "audioUrl": "https://soundcloud.com/djamara/sets/tora-jaigantic-galimatias?si=c4ce5464119c41e39dd6e567772a0573&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
       },
       "featuredVideo": {
-        "title": "Live @ Fabric London 2025",
+        "title": "Skybound (DJ Amara - The 11th Hour – Track 9)",
         "subtitle": "Full headline set recording",
         "duration": "64 min",
         "views": 340029,
         "thumbnail": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/jKgfYtkSs0U?si=R8NvCr1ERBF0c0fO"
       }
     },
     "analytics": {
@@ -384,16 +382,16 @@
         "duration": "76m",
         "plays": 147492,
         "genres": ["Hip-Hop", "R&B"],
-        "audioUrl": "https://soundcloud.com/marcus-groove/hip-hop-sessions",
+        "audioUrl": "https://soundcloud.com/reagancooper97/mc-marcus-dj-topgroove?si=c01bb58d1d0a4478b3112d8e62cbf59e&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
       "featuredVideo": {
-        "title": "Live @ Pacha 2025",
+        "title": "DJ Marcus Intro",
         "subtitle": "Full headline set recording",
         "duration": "46 min",
         "views": 360835,
         "thumbnail": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/PgXxxq3fLm4"
       }
     },
     "analytics": {
@@ -682,7 +680,7 @@
     ]
   },
   {
-    "id": "dj_dj_nova",
+    "id": "dj_nova",
     "slug": "dj-nova",
     "type": "fictional_demo",
     "plan": "premium",
@@ -723,20 +721,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "House Sessions Vol.8",
+        "title": "REGGAETON CLASSICO VOL.1",
         "duration": "86m",
         "plays": 28773,
         "genres": ["House", "Techno"],
-        "audioUrl": "https://soundcloud.com/dj-nova/house-sessions",
+        "audioUrl": "https://soundcloud.com/djnovanyc/reggaeton-classico-vol-1?si=88c23e0241d64a94a720841ca3173951&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
       "featuredVideo": {
-        "title": "Live @ Club Space 2025",
+        "title": "DJ NOVA – THE ALBUM (Afro-House Feat. Eurodance 90s Vibes) | THE ULTIMATE SUMMER 2025 MEGAMIX",
         "subtitle": "Full headline set recording",
         "duration": "38 min",
         "views": 132854,
         "thumbnail": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/S3AXrm56QMQ?si=cgBddUWkxPefZUAn"
       }
     },
     "analytics": {
@@ -1399,11 +1397,11 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Organic House Sessions Vol.3",
+        "title": "Human + Spirit",
         "duration": "83m",
         "plays": 144936,
         "genres": ["Organic House", "Melodic Techno"],
-        "audioUrl": "https://soundcloud.com/ayla-moon/organic-house-sessions",
+        "audioUrl": "https://soundcloud.com/dj-ayla-402039174/human-spirit?si=94392ea586fd4c55acabca1a7d2e7160&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
       },
       "featuredVideo": {
@@ -1739,20 +1737,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.2",
+        "title": "Martin Garrix & Ed Sheeran",
         "duration": "89m",
         "plays": 167264,
         "genres": ["EDM", "Progressive House"],
-        "audioUrl": "https://soundcloud.com/martin-garrix/edm-sessions",
+        "audioUrl": "https://soundcloud.com/martingarrix/repeat-it?si=cb853356a1a14608b4cb8f7e9257cc75&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
       },
       "featuredVideo": {
-        "title": "Live @ Berns 2025",
+        "title": "Martin Garrix & Ed Sheeran - Repeat It (Official Video)",
         "subtitle": "Full headline set recording",
         "duration": "59 min",
         "views": 319575,
         "thumbnail": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://www.youtube.com/watch?v=Sf9NZF5qBak"
       }
     },
     "analytics": {
@@ -2080,15 +2078,15 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "House Sessions Vol.2",
+        "title": "EoO - Bad Bunny (Peggy Gou Rhythm Mix)",
         "duration": "78m",
         "plays": 44891,
         "genres": ["House", "Techno"],
-        "audioUrl": "https://soundcloud.com/peggy-gou/house-sessions",
+        "audioUrl": "https://soundcloud.com/peggygou/eoo-bad-bunny-peggy-gou-rhythm?si=6101631109bc46168c020488e5e3f1f9&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
       },
       "featuredVideo": {
-        "title": "Live @ DC-10 2025",
+        "title": "Peggy Gou - Starry Night",
         "subtitle": "Full headline set recording",
         "duration": "59 min",
         "views": 349962,
@@ -2405,6 +2403,7 @@
     "genres": ["Afro House", "Deep House", "House"],
     "socials": {
       "instagram": "https://www.instagram.com/realblackcoffee/?hl=en",
+      "soundcloud": "https://soundcloud.com/realblackcoffee",
       "spotify": "https://open.spotify.com/artist/6wMr4zKPrrR0UVz08WtUWc",
       "youtube": "https://www.youtube.com/channel/UC0cUnMCsopLMon3_lXYTx_g",
       "website": "https://www.realblackcoffee.net/music"
@@ -2420,20 +2419,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Afro House Sessions Vol.5",
+        "title": "Billie Eilish - CHIHIRO (Black Coffee Remix)",
         "duration": "88m",
         "plays": 153128,
         "genres": ["Afro House", "Deep House"],
-        "audioUrl": "https://soundcloud.com/black-coffee/afro-house-sessions",
+        "audioUrl": "https://soundcloud.com/realblackcoffee/billie-eilish-chihiro-black-coffee-remix?si=3bc48e0f57ef498db31fb7a88dd93856&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
       "featuredVideo": {
-        "title": "Live @ Rex Club 2025",
+        "title": "Mayan Warrior - Burning Man 2025",
         "subtitle": "Full headline set recording",
         "duration": "71 min",
         "views": 250402,
         "thumbnail": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://www.youtube.com/watch?v=FH7lIOv1s3Q"
       }
     },
     "analytics": {
@@ -2762,20 +2761,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Techno Sessions Vol.2",
+        "title": "Charlotte de Witte - The Realm (Original Mix)",
         "duration": "70m",
         "plays": 145754,
         "genres": ["Techno", "Acid Techno"],
-        "audioUrl": "https://soundcloud.com/charlotte-de-witte/techno-sessions",
+        "audioUrl": "https://soundcloud.com/charlottedewittemusic/charlotte-de-witte-the-realm-original-mix-1?in=charlottedewittemusic/sets/charlotte-de-witte&si=6b64934a37224caea71764f3be34595f&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
       "featuredVideo": {
-        "title": "Live @ Berghain 2025",
+        "title": "Charlotte de Witte feat. CERES - Amor (Original Mix) [KNTXT033]",
         "subtitle": "Full headline set recording",
         "duration": "55 min",
         "views": 136249,
         "thumbnail": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/R9m5i-A749I?si=fW89zDoMpUQF2jky"
       }
     },
     "analytics": {
@@ -3104,20 +3103,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.3",
+        "title": "Selfish Love",
         "duration": "53m",
         "plays": 166265,
         "genres": ["EDM", "Trap"],
-        "audioUrl": "https://soundcloud.com/dj-snake/edm-sessions",
+        "audioUrl": "https://soundcloud.com/djsnake/selfish-love?si=e06c83a877ca41d99d3f123e4ee70d44&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1506157786151-b8491531f063"
       },
       "featuredVideo": {
-        "title": "Live @ Fabric London 2025",
+        "title": "DJ Snake - Cairo Express",
         "subtitle": "Full headline set recording",
         "duration": "64 min",
         "views": 307665,
         "thumbnail": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/uy-58A5midE?si=gOIxHB8Le5UUep2O"
       }
     },
     "analytics": {
@@ -3444,20 +3443,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Techno Sessions Vol.2",
+        "title": "I'm Black and I'm Proud - Say It Loud (Carl Cox Remix)",
         "duration": "65m",
         "plays": 96873,
         "genres": ["Techno", "House"],
-        "audioUrl": "https://soundcloud.com/carl-cox/techno-sessions",
+        "audioUrl": "https://soundcloud.com/carl-cox/sets/im-black-and-im-proud-say-it?si=eb24f3e3461144e3aca180010509ffeb&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
       },
       "featuredVideo": {
-        "title": "Live @ Pacha 2025",
+        "title": "Carl Cox & Perry Farrell - Joya (Radio Edit)",
         "subtitle": "Full headline set recording",
         "duration": "54 min",
         "views": 290508,
         "thumbnail": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/yxPwqPKYx_8?si=FKsD_j7_FCIMRR1h"
       }
     },
     "analytics": {
@@ -3784,20 +3783,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Techno Sessions Vol.3",
+        "title": "Amelie Lens - our frequency",
         "duration": "80m",
         "plays": 134929,
         "genres": ["Techno", "Minimal Techno"],
-        "audioUrl": "https://soundcloud.com/amelie-lens/techno-sessions",
+        "audioUrl": "https://soundcloud.com/amelielens/amelie-lens-our-frequency?si=fb724de7836c4b0bb0e59b004ad08c2e&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
       },
       "featuredVideo": {
-        "title": "Live @ Club Space 2025",
+        "title": "Amelie Lens - our frequency",
         "subtitle": "Full headline set recording",
         "duration": "61 min",
         "views": 126381,
         "thumbnail": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/nPWxLBT8oj4?si=6FieQhtSakVZNGKB"
       }
     },
     "analytics": {
@@ -4124,20 +4123,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Tech House Sessions Vol.2",
+        "title": "FISHER x Tones And I - Favour",
         "duration": "79m",
         "plays": 22021,
         "genres": ["Tech House", "House"],
-        "audioUrl": "https://soundcloud.com/fisher/tech-house-sessions",
+        "audioUrl": "https://soundcloud.com/fish-tales/fisher-x-tones-i-favour?si=daf4a65f50d749fd840dc9deefcf9486&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
       },
       "featuredVideo": {
-        "title": "Live @ Printworks 2025",
+        "title": "FISHER & Tones and I - FAVOUR [Official Music Video]",
         "subtitle": "Full headline set recording",
         "duration": "46 min",
         "views": 228977,
         "thumbnail": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/B7i3D8E8kOw?si=GReUrw2p5y5qwjRp"
       }
     },
     "analytics": {
@@ -4467,20 +4466,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "EDM Sessions Vol.2",
+        "title": "Selected by Steve Aoki",
         "duration": "86m",
         "plays": 166315,
         "genres": ["EDM", "Electro House"],
-        "audioUrl": "https://soundcloud.com/steve-aoki/edm-sessions",
+        "audioUrl": "https://soundcloud.com/steveaoki/sets/soundcloud-aapi?si=181c621c6d2b4d00a354c6540421e6d8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
       },
       "featuredVideo": {
-        "title": "Live @ Shelter NYC 2025",
+        "title": "Farruko, Greeicy, Steve Aoki - YAPAQUE (Official Video)",
         "subtitle": "Full headline set recording",
         "duration": "48 min",
         "views": 172803,
         "thumbnail": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/dZzBa7jlXY0?si=QSiVGfEb0HTDysCz"
       }
     },
     "analytics": {
@@ -4808,20 +4807,20 @@
     },
     "spotlight": {
       "featuredMix": {
-        "title": "Deep House Sessions Vol.8",
+        "title": "Live It All",
         "duration": "55m",
         "plays": 54659,
         "genres": ["Deep House", "Tropical House"],
-        "audioUrl": "https://soundcloud.com/lost-frequencies/deep-house-sessions",
+        "audioUrl": "https://soundcloud.com/lo-freq-1/live-it-all?si=caf76376caf04cd686643eb0abb8e7d6&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
         "coverImage": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f"
       },
       "featuredVideo": {
-        "title": "Live @ Berns 2025",
+        "title": "Tomorrowland Winter 2026",
         "subtitle": "Full headline set recording",
         "duration": "64 min",
         "views": 365777,
         "thumbnail": "https://images.unsplash.com/photo-1506157786151-b8491531f063",
-        "videoUrl": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "videoUrl": "https://youtu.be/Nlmh1ASVPYs?si=r10MjoY99mbx5MEw"
       }
     },
     "analytics": {

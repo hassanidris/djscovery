@@ -388,9 +388,9 @@ export default function DjProfileFree({
                 />
               </div>
             </div>
-            <div className="flex-1 min-w-0 pt-1 sm:pb-2">
+            <div className="flex-1 min-w-0 pt-1 sm:pb-2  z-10">
               <h1 className="font-heading text-3xl md:text-4xl text-white leading-none">
-                {DJ.stageName}
+                Dj {DJ.stageName}
               </h1>
               <p className="text-gray-400 text-sm mt-1.5 flex items-center gap-1.5">
                 <FontAwesomeIcon
