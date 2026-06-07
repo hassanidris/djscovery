@@ -11,7 +11,7 @@ const Subscription = () => {
         backgroundPositionX: "right",
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-800 to-purple-800/15 z-10" />
+      <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/60 to-black/20 z-10" />
       <div className="relative z-20 text-left px-4">
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold mb-6 text-title">

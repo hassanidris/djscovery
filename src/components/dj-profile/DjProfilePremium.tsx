@@ -305,7 +305,7 @@ const DEFAULT_PACKAGES = [
       "Exclusive promotion",
       "Post-show content",
     ],
-    color: "from-purple-600/20 to-transparent",
+    color: "from-amber-500/20 to-transparent",
     featured: true,
   },
   {
@@ -531,7 +531,7 @@ function mapPressFromData(d: DjDemoData) {
 function mapPackagesFromData(d: DjDemoData) {
   const PKG_COLORS: Record<string, string> = {
     "Club Night": "from-h_red/20 to-transparent",
-    Festival: "from-purple-600/20 to-transparent",
+    Festival: "from-amber-500/20 to-transparent",
     "Private Event": "from-blue-600/20 to-transparent",
   };
   return d.packages.map((pkg, i) => ({
@@ -918,7 +918,7 @@ export default function DjProfilePremium({
                   title={SPOTLIGHT.featuredMix.title}
                 >
                   <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all gap-0">
-                    <div className="relative h-44 bg-linear-to-br from-h_red/20 via-purple-900/20 to-black">
+                    <div className="relative h-44 bg-linear-to-br from-h_red/20 to-black">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
                           <FontAwesomeIcon
@@ -1306,7 +1306,7 @@ export default function DjProfilePremium({
                       title={mix.title}
                     >
                       <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0 flex flex-row items-center cursor-pointer hover:border-white/15 transition-colors">
-                        <div className="size-12 rounded-lg bg-linear-to-br from-h_red/30 to-purple-900/30 border border-white/8 flex items-center justify-center shrink-0 mr-4">
+                        <div className="size-12 rounded-lg bg-linear-to-br from-h_red/30 to-h_redDark/10 border border-white/8 flex items-center justify-center shrink-0 mr-4">
                           <FontAwesomeIcon
                             icon={faMusic}
                             className="h-4 w-4 text-h_red"
