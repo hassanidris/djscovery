@@ -130,14 +130,18 @@ export default function NavDesktop({
             <button
               aria-label="Notifications — Coming Soon"
               title="Notifications — Coming Soon"
-              className="size-9 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
+              disabled
+              aria-disabled="true"
+              className="size-9 flex items-center justify-center rounded-full text-gray-500 cursor-not-allowed opacity-70 focus-visible:outline-none"
             >
               <Bell className="h-4.5 w-4.5" aria-hidden />
             </button>
             <button
               aria-label="Messages — Coming Soon"
               title="Messages — Coming Soon"
-              className="size-9 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
+              disabled
+              aria-disabled="true"
+              className="size-9 flex items-center justify-center rounded-full text-gray-500 cursor-not-allowed opacity-70 focus-visible:outline-none"
             >
               <MessageCircle className="h-4.5 w-4.5" aria-hidden />
             </button>

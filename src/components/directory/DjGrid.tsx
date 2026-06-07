@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DjUser } from "@/lib/data";
 import DjCard from "./DjCard";
 
@@ -12,6 +12,10 @@ type DjGridProps = {
 
 const DjGrid = ({ djs }: DjGridProps) => {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [djs]);
 
   if (djs.length === 0) {
     return (

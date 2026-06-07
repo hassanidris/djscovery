@@ -13,6 +13,7 @@ type SearchParams = {
   country?: string;
   city?: string;
   sort?: string;
+  q?: string;
 };
 
 const DirectoryPage = async ({
@@ -20,7 +21,7 @@ const DirectoryPage = async ({
 }: {
   searchParams: Promise<SearchParams>;
 }) => {
-  const { genre, country, city, sort } = await searchParams;
+  const { genre, country, city, sort, q } = await searchParams;
   const genreList = genre ? genre.split(",").filter(Boolean) : [];
 
   let djs: DjUser[] = [];
@@ -29,6 +30,23 @@ const DirectoryPage = async ({
     const profiles = await prisma.djProfile.findMany({
       where: {
         deletedAt: null,
+        ...(q
+          ? {
+              OR: [
+                { stageName: { contains: q, mode: "insensitive" } },
+                { country: { name: { contains: q, mode: "insensitive" } } },
+                { city: { name: { contains: q, mode: "insensitive" } } },
+                {
+                  genres: {
+                    some: {
+                      genre: { name: { contains: q, mode: "insensitive" } },
+                    },
+                  },
+                },
+              ],
+            }
+          : {}),
+
         ...(genreList.length > 0
           ? {
               genres: {
@@ -91,7 +109,15 @@ const DirectoryPage = async ({
       const cityOk = city
         ? (dj.city ?? "").toLowerCase().includes(city.toLowerCase())
         : true;
-      return genreOk && countryOk && cityOk;
+      const qOk = q
+        ? [
+            dj.stageName ?? dj.username,
+            dj.genres ?? "",
+            dj.country ?? "",
+            dj.city ?? "",
+          ].some((field) => field.toLowerCase().includes(q.toLowerCase()))
+        : true;
+      return genreOk && countryOk && cityOk && qOk;
     });
 
   const sortDjs = (list: DjUser[]) => {

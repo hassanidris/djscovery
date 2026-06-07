@@ -43,9 +43,12 @@ export default function NavMobileTop(props: NavUserData) {
 
         {props.isLoggedIn && (
           <button
+            type="button"
+            disabled
+            aria-disabled="true"
             aria-label="Notifications — Coming Soon"
             title="Notifications — Coming Soon"
-            className="size-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
+            className="size-9 flex items-center justify-center rounded-lg text-gray-500 cursor-not-allowed"
           >
             <Bell className="h-5 w-5" aria-hidden />
           </button>

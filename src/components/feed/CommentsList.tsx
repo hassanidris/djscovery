@@ -7,7 +7,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useOptimistic, useState } from "react";
 
-type CommentWithUser = PostComment & { user: User };
+type ReplyPreview = {
+  id: number;
+  content: string;
+  user: Pick<User, "username" | "image">;
+};
+type CommentWithUser = PostComment & { user: User; replies?: ReplyPreview[] };
 
 const CommentsList = ({
   comments,
@@ -135,6 +140,27 @@ const CommentsList = ({
               <div className="flex items-center gap-8 text-xs text-gray-500 mt-2">
                 <div>Reply</div>
               </div>
+              {comment.replies && comment.replies.length > 0 && (
+                <div className="mt-3 flex flex-col gap-3 pl-4 border-l border-gray-700/60">
+                  {comment.replies.map((reply) => (
+                    <div key={reply.id} className="flex gap-3 items-start">
+                      <Image
+                        src={reply.user.image ?? "/noAvatar.png"}
+                        alt=""
+                        width={28}
+                        height={28}
+                        className="w-7 h-7 rounded-full ring-1 ring-gray-600 shrink-0"
+                      />
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs font-medium text-gray-300">
+                          {reply.user.username}
+                        </span>
+                        <p className="text-xs text-gray-400">{reply.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <Image
               src="/more.png"
