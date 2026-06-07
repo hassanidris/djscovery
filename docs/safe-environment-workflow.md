@@ -24,7 +24,7 @@
 
 ## 1. Architecture Overview
 
-```
+```text
 Local machine  ──────────────────────────── djscovery-staging Supabase
                                              (jarmybsjvztwrmsdcnje)
 Vercel Preview (feature branches)  ──────── djscovery-staging Supabase
@@ -40,12 +40,13 @@ Vercel Production (main branch)  ────────── djscovery-prod S
 
 ## 2. Supabase Projects
 
-| Project | ID | Purpose |
-|---|---|---|
-| `djscovery-staging` | `jarmybsjvztwrmsdcnje` | Dev, testing, demo content |
-| `djscovery-prod` | `unrqebwfdfumpjgvavbk` | Real users, production only |
+| Project             | ID                     | Purpose                     |
+| ------------------- | ---------------------- | --------------------------- |
+| `djscovery-staging` | `jarmybsjvztwrmsdcnje` | Dev, testing, demo content  |
+| `djscovery-prod`    | `unrqebwfdfumpjgvavbk` | Real users, production only |
 
 ### What must match between both projects
+
 - Database schema (run Prisma migrations on both)
 - RLS policies (apply `docs/rls-policies.sql` to both)
 - Auth settings (email templates, redirect URLs, providers)
@@ -53,6 +54,7 @@ Vercel Production (main branch)  ────────── djscovery-prod S
 - Webhook configuration (different secrets, same endpoint pattern)
 
 ### What is different between projects
+
 - Data (staging has test/fake users, prod has real users)
 - Webhook secret (each project has its own)
 - Database password (rotated independently)
@@ -61,7 +63,7 @@ Vercel Production (main branch)  ────────── djscovery-prod S
 
 ## 3. GitHub Branch Strategy
 
-```
+```text
 main          Production — only receives merges from dev (or hotfix/*)
 dev           Staging — active development branch
 feature/*     New features — branch from dev, PR back to dev
@@ -139,33 +141,35 @@ The prod direct URL is found in:
 
 ### Production (main branch)
 
-| Variable | Value |
-|---|---|
-| `NEXT_PUBLIC_APP_ENV` | `production` |
-| `DATABASE_URL` | prod transaction pooler URL |
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://unrqebwfdfumpjgvavbk.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | prod anon key |
-| `NEXT_PUBLIC_BASE_URL` | `https://djscovery.vercel.app` |
-| `SUPABASE_WEBHOOK_SECRET` | prod webhook secret |
+| Variable                               | Value                                      |
+| -------------------------------------- | ------------------------------------------ |
+| `NEXT_PUBLIC_APP_ENV`                  | `production`                               |
+| `DATABASE_URL`                         | prod transaction pooler URL                |
+| `NEXT_PUBLIC_SUPABASE_URL`             | `https://unrqebwfdfumpjgvavbk.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | prod anon key                              |
+| `NEXT_PUBLIC_BASE_URL`                 | `https://djscovery.vercel.app`             |
+| `SUPABASE_WEBHOOK_SECRET`              | prod webhook secret                        |
 
 ### Preview + Development (all other branches)
 
-| Variable | Value |
-|---|---|
-| `NEXT_PUBLIC_APP_ENV` | `staging` |
-| `DATABASE_URL` | staging transaction pooler URL |
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://jarmybsjvztwrmsdcnje.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | staging anon key |
-| `NEXT_PUBLIC_BASE_URL` | `https://djscovery.vercel.app` |
-| `SUPABASE_WEBHOOK_SECRET` | staging webhook secret |
+| Variable                               | Value                                      |
+| -------------------------------------- | ------------------------------------------ |
+| `NEXT_PUBLIC_APP_ENV`                  | `staging`                                  |
+| `DATABASE_URL`                         | staging transaction pooler URL             |
+| `NEXT_PUBLIC_SUPABASE_URL`             | `https://jarmybsjvztwrmsdcnje.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | staging anon key                           |
+| `NEXT_PUBLIC_BASE_URL`                 | `https://djscovery.vercel.app`             |
+| `SUPABASE_WEBHOOK_SECRET`              | staging webhook secret                     |
 
 ### Cloudinary (all environments — same account)
 
-| Variable | Scope |
-|---|---|
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | All Environments |
-| `NEXT_PUBLIC_CLOUDINARY_API_KEY` | All Environments |
-| `CLOUDINARY_API_SECRET` | Production+Preview (Sensitive) + Development (separate) |
+| Variable                            | Scope                                 |
+| ----------------------------------- | ------------------------------------- |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | All Environments                      |
+| `NEXT_PUBLIC_CLOUDINARY_API_KEY`    | All Environments                      |
+| `CLOUDINARY_API_SECRET`             | Production (Sensitive) — do not share |
+
+> **Note:** If collaborators need upload access, create a **restricted API key** in the Cloudinary dashboard (scoped to upload presets only) rather than sharing `CLOUDINARY_API_SECRET`.
 
 ---
 
@@ -175,7 +179,7 @@ The prod direct URL is found in:
 
 Demo DJs live in JSON files — they are **never inserted into any database**.
 
-```
+```text
 src/data/djscovery_seed_1.json   (15 demo DJs)
 src/data/djscovery_seed_2.json   (15 demo DJs)
 src/data/djs.ts                  (combines both files)
@@ -186,20 +190,20 @@ src/data/djs.ts                  (combines both files)
 Controlled by `NEXT_PUBLIC_APP_ENV` in `src/app/directory/page.tsx`:
 
 ```ts
-const isStaging = process.env.NEXT_PUBLIC_APP_ENV !== 'production';
+const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
 
 // Staging: DB DJs + demo DJs merged, deduped by ID
-// Production: real DB DJs only
+// Production/unset: real DB DJs only — fail-safe default
 ```
 
-| Environment | Directory shows |
-|---|---|
+| Environment                | Directory shows                    |
+| -------------------------- | ---------------------------------- |
 | Local dev / Vercel Preview | Demo DJs + staging DB DJs together |
-| Vercel Production | Real DB DJs only — no demo content |
+| Vercel Production          | Real DB DJs only — no demo content |
 
 ### To disable demo content in staging
 
-Set `NEXT_PUBLIC_APP_ENV=production` in your local `.env.local` temporarily.
+Unset `NEXT_PUBLIC_APP_ENV` or set it to any value other than `staging` in your local `.env.local` temporarily.
 
 ---
 
@@ -276,14 +280,14 @@ Prisma uses the postgres/service role and **bypasses RLS entirely**. The app con
 
 ### Policy summary
 
-| Tables | Access |
-|---|---|
-| `Country`, `City`, `Genre` | Public read |
-| `DjProfile` (APPROVED) | Public read, owner write |
-| `Post`, `PostComment`, `DjRating` | Public read, authenticated write |
-| `User`, `UserRole`, `Notification` | Owner only |
-| `JobApplication`, `Conversation`, `Message` | Participants only |
-| `Hire` | No API access — Prisma only |
+| Tables                                      | Access                           |
+| ------------------------------------------- | -------------------------------- |
+| `Country`, `City`, `Genre`                  | Public read                      |
+| `DjProfile` (APPROVED)                      | Public read, owner write         |
+| `Post`, `PostComment`, `DjRating`           | Public read, authenticated write |
+| `User`, `UserRole`, `Notification`          | Owner only                       |
+| `JobApplication`, `Conversation`, `Message` | Participants only                |
+| `Hire`                                      | No API access — Prisma only      |
 
 ---
 
@@ -306,14 +310,14 @@ Prisma uses the postgres/service role and **bypasses RLS entirely**. The app con
 
 ### What to share
 
-| Item | Share with collaborators? |
-|---|---|
-| Staging `DATABASE_URL` | ✅ Yes |
-| Staging `NEXT_PUBLIC_SUPABASE_*` | ✅ Yes |
-| Staging `SUPABASE_WEBHOOK_SECRET` | ✅ Yes |
-| `CLOUDINARY_API_SECRET` | ✅ Yes (same account) |
-| Production credentials of any kind | ❌ Never |
-| `SUPABASE_SERVICE_ROLE_KEY` | ❌ Never (not even staging) |
+| Item                               | Share with collaborators?                            |
+| ---------------------------------- | ---------------------------------------------------- |
+| Staging `DATABASE_URL`             | ✅ Yes                                               |
+| Staging `NEXT_PUBLIC_SUPABASE_*`   | ✅ Yes                                               |
+| Staging `SUPABASE_WEBHOOK_SECRET`  | ✅ Yes                                               |
+| `CLOUDINARY_API_SECRET`            | ⚠️ Avoid — share a restricted Cloudinary key instead |
+| Production credentials of any kind | ❌ Never                                             |
+| `SUPABASE_SERVICE_ROLE_KEY`        | ❌ Never (not even staging)                          |
 
 ---
 
@@ -321,7 +325,7 @@ Prisma uses the postgres/service role and **bypasses RLS entirely**. The app con
 
 ### Standard release (feature → staging → production)
 
-```
+```text
 1. Feature branches merged into dev
 2. Test on Vercel staging preview
 3. When ready: open PR from dev → main
@@ -338,7 +342,7 @@ Before merging `dev` → `main`:
 - [ ] All features tested on Vercel staging
 - [ ] No console errors in staging preview
 - [ ] Auth flow works (sign up, sign in, sign out)
-- [ ] Directory page shows real DJs only (set `NEXT_PUBLIC_APP_ENV=production` locally to test)
+- [ ] Directory page shows real DJs only (unset `NEXT_PUBLIC_APP_ENV` or set to `production` locally to verify)
 - [ ] Schema migrations written and tested on staging
 - [ ] `.env.example` is up to date
 - [ ] No staging credentials in code or commits
@@ -382,5 +386,5 @@ git push origin main
 
 ---
 
-*Last updated: June 2026*
-*Setup completed with: Next.js 15, Supabase Auth, Prisma v7, Vercel, Cloudinary*
+_Last updated: June 2026_
+_Setup completed with: Next.js 15, Supabase Auth, Prisma v7, Vercel, Cloudinary_
