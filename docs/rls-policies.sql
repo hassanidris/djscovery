@@ -71,16 +71,41 @@ CREATE POLICY "DJ can update own profile"
   USING (auth.uid()::text = "userId");
 
 CREATE POLICY "Public read DJ genres"
-  ON "DjGenre" FOR SELECT USING (true);
+  ON "DjGenre" FOR SELECT
+  USING (
+    "djProfileId" IN (
+      SELECT id FROM "DjProfile"
+      WHERE status = 'APPROVED' AND "deletedAt" IS NULL
+    )
+  );
 
 CREATE POLICY "Public read DJ types"
-  ON "DjProfileType" FOR SELECT USING (true);
+  ON "DjProfileType" FOR SELECT
+  USING (
+    "djProfileId" IN (
+      SELECT id FROM "DjProfile"
+      WHERE status = 'APPROVED' AND "deletedAt" IS NULL
+    )
+  );
 
 CREATE POLICY "Public read social links"
-  ON "SocialLink" FOR SELECT USING (true);
+  ON "SocialLink" FOR SELECT
+  USING (
+    "djProfileId" IN (
+      SELECT id FROM "DjProfile"
+      WHERE status = 'APPROVED' AND "deletedAt" IS NULL
+    )
+  );
 
 CREATE POLICY "Public read media"
-  ON "Media" FOR SELECT USING (true);
+  ON "Media" FOR SELECT
+  USING (
+    "djProfileId" IS NULL
+    OR "djProfileId" IN (
+      SELECT id FROM "DjProfile"
+      WHERE status = 'APPROVED' AND "deletedAt" IS NULL
+    )
+  );
 
 
 -- ============================================================
@@ -182,7 +207,13 @@ CREATE POLICY "Public read published events"
   USING (status = 'PUBLISHED' AND "deletedAt" IS NULL);
 
 CREATE POLICY "Public read event DJs"
-  ON "EventDj" FOR SELECT USING (true);
+  ON "EventDj" FOR SELECT
+  USING (
+    "eventId" IN (
+      SELECT id FROM "Event"
+      WHERE status = 'PUBLISHED' AND "deletedAt" IS NULL
+    )
+  );
 
 
 -- ============================================================
@@ -221,7 +252,8 @@ CREATE POLICY "Organizer can update own profile"
   ON "OrganizerProfile" FOR UPDATE
   USING (auth.uid()::text = "userId");
 
--- JobApplication: applicant or organizer can read
+-- JobApplication: applicant reads own records.
+-- Organizer access is enforced server-side via Prisma (bypasses RLS) — no policy needed here.
 CREATE POLICY "Applicant can read own applications"
   ON "JobApplication" FOR SELECT
   USING (auth.uid()::text = "applicantId");
@@ -293,3 +325,7 @@ CREATE POLICY "Authenticated user can read event attendance"
 CREATE POLICY "Authenticated user can set attendance"
   ON "EventAttendance" FOR INSERT
   WITH CHECK (auth.uid()::text = "userId");
+
+CREATE POLICY "Authenticated user can remove attendance"
+  ON "EventAttendance" FOR DELETE
+  USING (auth.uid()::text = "userId");
