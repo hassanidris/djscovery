@@ -76,6 +76,30 @@ const GENRES = [
 ];
 
 async function main() {
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV ?? "staging";
+  const forceSeed = process.env.FORCE_SEED === "true";
+
+  if (appEnv === "production" && !forceSeed) {
+    console.error(`
+❌  Seed blocked — NEXT_PUBLIC_APP_ENV=production
+
+    This guard prevents accidental seeding of the production database.
+    The seed script contains reference data only (genres, countries, cities).
+
+    To seed production intentionally, run:
+    FORCE_SEED=true npm run seed
+
+    ⚠️  Never seed fake or demo content into production.
+`);
+    process.exit(1);
+  }
+
+  if (appEnv === "production" && forceSeed) {
+    console.warn(
+      "⚠️  FORCE_SEED=true — seeding production with reference data only.",
+    );
+  }
+
   console.log(`🎵 Seeding ${GENRES.length} genres...`);
   await prisma.genre.createMany({
     data: GENRES.map((name) => ({ name })),

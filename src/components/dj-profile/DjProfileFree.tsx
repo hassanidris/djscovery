@@ -41,13 +41,18 @@ import {
   faYoutube,
   faSoundcloud,
   faSpotify,
+  faApple,
 } from "@fortawesome/free-brands-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { format } from "date-fns";
+import type { DjDemoData, ViewMode } from "@/types/dj-demo";
+import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
+import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
+import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 
 // ── Demo Data ──────────────────────────────────────────────────────────────────
 
-const DJ = {
+const DEFAULT_DJ = {
   stageName: "Amara Pulse",
   avatar: "/rated-6.webp",
   coverImage: "/noCover-3.png",
@@ -73,7 +78,7 @@ const DJ = {
   djTypes: ["Festival", "Club", "Corporate"],
 };
 
-const EVENTS = [
+const DEFAULT_EVENTS = [
   {
     id: 1,
     title: "Berlin Underground — Summer Closing",
@@ -100,7 +105,7 @@ const EVENTS = [
   },
 ];
 
-const VENUES = [
+const DEFAULT_VENUES = [
   { name: "Berghain", city: "Berlin", country: "DE", count: 4 },
   { name: "Fabric London", city: "London", country: "UK", count: 6 },
   { name: "DC-10", city: "Ibiza", country: "ES", count: 3 },
@@ -108,7 +113,7 @@ const VENUES = [
   { name: "Printworks", city: "London", country: "UK", count: 5 },
 ];
 
-const REVIEWS = [
+const DEFAULT_REVIEWS = [
   {
     id: 1,
     rating: 5,
@@ -135,7 +140,7 @@ const REVIEWS = [
   },
 ];
 
-const MEDIA = [
+const DEFAULT_MEDIA = [
   { id: 1, url: "/gallery-1.png" },
   { id: 2, url: "/gallery-2.png" },
   { id: 3, url: "/gallery-3.png" },
@@ -150,7 +155,95 @@ const SOCIAL_ICONS: Record<string, IconDefinition> = {
   youtube: faYoutube,
   soundcloud: faSoundcloud,
   spotify: faSpotify,
+  website: faGlobe,
+  apple: faApple,
 };
+
+// ── JSON → Component mapping helpers ──────────────────────────────────────────
+
+const FREE_REVIEWER_AVATARS = [
+  "/rated-1.webp",
+  "/rated-2.webp",
+  "/rated-3.webp",
+];
+
+function freeGetPlatformFromUrl(url: string): string {
+  if (url.includes("soundcloud")) return "SoundCloud";
+  if (url.includes("mixcloud")) return "Mixcloud";
+  if (url.includes("spotify")) return "Spotify";
+  if (url.includes("youtube")) return "YouTube";
+  return "External";
+}
+
+function freeFormatPlays(plays: number): string {
+  if (plays >= 1000) return `${(plays / 1000).toFixed(1)}k`;
+  return String(plays);
+}
+
+function mapFreeDjToProps(d: DjDemoData) {
+  const socialLinks = Object.entries(d.socials)
+    .filter(([, url]) => Boolean(url))
+    .map(([platform, url]) => ({ platform, url: url as string }));
+  return {
+    stageName: d.stageName,
+    avatar: d.avatar.url,
+    coverImage: d.coverImage.url,
+    bio: d.bio,
+    city: d.location.city,
+    country: d.location.country,
+    genres: d.genres,
+    socialLinks,
+    avgRating: d.stats.rating,
+    ratingCount: d.stats.reviews,
+    followerCount: d.stats.followers,
+    eventsCount: d.stats.events,
+    bookingEmail: d.booking.email,
+    bookingPhone: d.booking.phone,
+    website: d.booking.website,
+    minFee: `${d.booking.feeRange.currency}${d.booking.feeRange.min.toLocaleString()}`,
+    maxFee: `${d.booking.feeRange.currency}${d.booking.feeRange.max.toLocaleString()}`,
+    djTypes: d.specialties,
+  };
+}
+
+function mapFreeEventsFromData(d: DjDemoData) {
+  const normalizeEventDate = (value: string) =>
+    value.includes("T") ? value : `${value}T20:00:00Z`;
+  return d.upcomingEvents.map((e, i) => ({
+    id: i + 1,
+    title: e.title,
+    date: normalizeEventDate(e.date),
+    venue: e.venue,
+    city: e.city,
+    country: "",
+  }));
+}
+
+function mapFreeVenuesFromData(d: DjDemoData) {
+  return d.venuesPlayed.map((v) => ({
+    name: v.venue,
+    city: v.city,
+    country: "",
+    count: v.timesPlayed,
+  }));
+}
+
+function mapFreeReviewsFromData(d: DjDemoData) {
+  return d.reviewsList.map((r, i) => ({
+    id: i + 1,
+    rating: r.rating,
+    review: r.comment,
+    date: r.date,
+    user: {
+      name: r.name,
+      image: FREE_REVIEWER_AVATARS[i % FREE_REVIEWER_AVATARS.length],
+    },
+  }));
+}
+
+function mapFreeMediaFromData(d: DjDemoData) {
+  return d.media.photos.map((url, i) => ({ id: i + 1, url }));
+}
 
 // ── Helper ─────────────────────────────────────────────────────────────────────
 
@@ -225,8 +318,45 @@ function SectionHeading({
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
-export default function DjProfileFree() {
+export default function DjProfileFree({
+  djData,
+  viewMode = "fan",
+}: {
+  djData?: DjDemoData;
+  viewMode?: ViewMode;
+} = {}) {
   const [bioExpanded, setBioExpanded] = useState(false);
+
+  // ── Resolve data: JSON prop overrides hardcoded defaults ──────────────────
+  const DJ = djData ? mapFreeDjToProps(djData) : DEFAULT_DJ;
+  const EVENTS = djData ? mapFreeEventsFromData(djData) : DEFAULT_EVENTS;
+  const VENUES = djData ? mapFreeVenuesFromData(djData) : DEFAULT_VENUES;
+  const REVIEWS = djData ? mapFreeReviewsFromData(djData) : DEFAULT_REVIEWS;
+  const MEDIA = djData ? mapFreeMediaFromData(djData) : DEFAULT_MEDIA;
+  const FEATURED_MIX = djData
+    ? {
+        title: djData.spotlight.featuredMix.title,
+        duration: djData.spotlight.featuredMix.duration,
+        plays: freeFormatPlays(djData.spotlight.featuredMix.plays),
+        platform: freeGetPlatformFromUrl(djData.spotlight.featuredMix.audioUrl),
+        genres: djData.spotlight.featuredMix.genres,
+        audioUrl: djData.spotlight.featuredMix.audioUrl,
+      }
+    : {
+        title: "Afrobeats & Amapiano Fusion Vol.3",
+        duration: "1h 24m",
+        plays: "38.2k",
+        platform: "SoundCloud",
+        genres: ["Afrobeats", "Amapiano"],
+        audioUrl: "",
+      };
+  const lockedMixesCount = djData
+    ? Math.max(0, djData.media.mixes.length - 1)
+    : 8;
+  const videoThumb = djData
+    ? djData.spotlight.featuredVideo.thumbnail
+    : "/gallery-2.png";
+
   const location = `${DJ.city}, ${DJ.country}`;
 
   return (
@@ -258,9 +388,9 @@ export default function DjProfileFree() {
                 />
               </div>
             </div>
-            <div className="flex-1 min-w-0 pt-1 sm:pb-2">
+            <div className="flex-1 min-w-0 pt-1 sm:pb-2  z-10">
               <h1 className="font-heading text-3xl md:text-4xl text-white leading-none">
-                {DJ.stageName}
+                Dj {DJ.stageName}
               </h1>
               <p className="text-gray-400 text-sm mt-1.5 flex items-center gap-1.5">
                 <FontAwesomeIcon
@@ -383,87 +513,104 @@ export default function DjProfileFree() {
               </SectionHeading>
               <div className="grid sm:grid-cols-2 gap-4">
                 {/* Featured Mix */}
-                <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0">
-                  <div className="relative h-40 bg-linear-to-br from-h_red/20 via-purple-900/20 to-black">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
-                        <FontAwesomeIcon
-                          icon={faPlay}
-                          className="h-5 w-5 text-white ml-0.5"
-                        />
+                <MediaAudioPlayer
+                  audioUrl={FEATURED_MIX.audioUrl}
+                  title={FEATURED_MIX.title}
+                >
+                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0">
+                    <div className="relative h-40 bg-linear-to-br from-h_red/20 to-black">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
+                          <FontAwesomeIcon
+                            icon={faPlay}
+                            className="h-5 w-5 text-white ml-0.5"
+                          />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-3 left-3">
+                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                          <FontAwesomeIcon
+                            icon={faHeadphones}
+                            className="h-2.5 w-2.5 mr-1"
+                          />
+                          Featured Mix
+                        </Badge>
                       </div>
                     </div>
-                    <div className="absolute bottom-3 left-3">
-                      <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                        <FontAwesomeIcon
-                          icon={faHeadphones}
-                          className="h-2.5 w-2.5 mr-1"
-                        />
-                        Featured Mix
-                      </Badge>
+                    <div className="p-4">
+                      <p className="text-white text-sm font-semibold">
+                        {FEATURED_MIX.title}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        {FEATURED_MIX.duration} · {FEATURED_MIX.plays} plays
+                      </p>
+                      <div className="flex items-center gap-1 mt-2">
+                        {FEATURED_MIX.genres.map((t) => (
+                          <Badge
+                            key={t}
+                            className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4"
+                          >
+                            {t}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-white text-sm font-semibold">
-                      Afrobeats & Amapiano Fusion Vol.3
-                    </p>
-                    <p className="text-gray-500 text-xs mt-1">
-                      1h 24m · 38.2k plays
-                    </p>
-                    <div className="flex items-center gap-1 mt-2">
-                      {["Afrobeats", "Amapiano"].map((t) => (
-                        <Badge
-                          key={t}
-                          className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4"
-                        >
-                          {t}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                </MediaAudioPlayer>
 
                 {/* Featured Video */}
-                <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0">
-                  <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black">
-                    <Image
-                      src="/gallery-1.png"
-                      alt="video thumbnail"
-                      fill
-                      className="object-cover opacity-50 group-hover:opacity-60 transition-opacity"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                        <FontAwesomeIcon
-                          icon={faPlay}
-                          className="h-5 w-5 text-white ml-0.5"
-                        />
+                <MediaVideoModal
+                  videoUrl={djData?.spotlight.featuredVideo.videoUrl ?? ""}
+                  thumbnail={videoThumb}
+                  title={
+                    djData?.spotlight.featuredVideo.title ??
+                    "Live @ Berghain — Summer Closing 2024"
+                  }
+                >
+                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0">
+                    <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black">
+                      <Image
+                        src={videoThumb}
+                        alt="video thumbnail"
+                        fill
+                        className="object-cover opacity-50 group-hover:opacity-60 transition-opacity"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
+                          <FontAwesomeIcon
+                            icon={faPlay}
+                            className="h-5 w-5 text-white ml-0.5"
+                          />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-3 left-3">
+                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                          <FontAwesomeIcon
+                            icon={faVideo}
+                            className="h-2.5 w-2.5 mr-1"
+                          />
+                          Featured Video
+                        </Badge>
                       </div>
                     </div>
-                    <div className="absolute bottom-3 left-3">
-                      <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                        <FontAwesomeIcon
-                          icon={faVideo}
-                          className="h-2.5 w-2.5 mr-1"
-                        />
-                        Featured Video
-                      </Badge>
+                    <div className="p-4">
+                      <p className="text-white text-sm font-semibold">
+                        {djData?.spotlight.featuredVideo.title ??
+                          "Live @ Berghain — Summer Closing 2024"}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        {djData?.spotlight.featuredVideo.duration ?? "45 min"} ·
+                        {" "}
+                        {djData?.spotlight.featuredVideo.subtitle ?? "YouTube"}
+                      </p>
+                      <div className="mt-2">
+                        <Badge className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4">
+                          Live Performance
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-white text-sm font-semibold">
-                      Live @ Berghain — Summer Closing 2024
-                    </p>
-                    <p className="text-gray-500 text-xs mt-1">
-                      45 min · YouTube
-                    </p>
-                    <div className="mt-2">
-                      <Badge className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4">
-                        Live Performance
-                      </Badge>
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                </MediaVideoModal>
               </div>
             </section>
 
@@ -511,55 +658,60 @@ export default function DjProfileFree() {
               <SectionHeading sub="1 mix · Upgrade to share your full discography">
                 My Sound
               </SectionHeading>
-              <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-                <div className="flex items-center gap-4">
-                  <div className="size-14 rounded-lg bg-linear-to-br from-h_red/30 to-purple-900/30 border border-white/8 flex items-center justify-center shrink-0">
-                    <FontAwesomeIcon
-                      icon={faMusic}
-                      className="h-5 w-5 text-h_red"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-semibold">
-                      Afrobeats & Amapiano Fusion Vol.3
-                    </p>
-                    <p className="text-gray-500 text-xs mt-0.5">
-                      SoundCloud · 1h 24m · 38.2k plays
-                    </p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full w-1/3 bg-h_red rounded-full" />
+              <MediaAudioPlayer
+                audioUrl={FEATURED_MIX.audioUrl}
+                title={FEATURED_MIX.title}
+              >
+                <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0 cursor-pointer hover:border-white/15 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="size-14 rounded-lg bg-linear-to-br from-h_red/30 to-h_redDark/10 border border-white/8 flex items-center justify-center shrink-0">
+                      <FontAwesomeIcon
+                        icon={faMusic}
+                        className="h-5 w-5 text-h_red"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-semibold">
+                        {FEATURED_MIX.title}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-0.5">
+                        {FEATURED_MIX.platform} · {FEATURED_MIX.duration} ·{" "}
+                        {FEATURED_MIX.plays} plays
+                      </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full w-1/3 bg-h_red rounded-full" />
+                        </div>
+                        <span className="text-gray-600 text-[10px]">
+                          28:14 / 1:24:00
+                        </span>
                       </div>
-                      <span className="text-gray-600 text-[10px]">
-                        28:14 / 1:24:00
-                      </span>
+                    </div>
+                    <div className="size-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                      <FontAwesomeIcon
+                        icon={faPlay}
+                        className="h-3 w-3 ml-0.5"
+                      />
                     </div>
                   </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-gray-400 hover:text-white shrink-0"
-                  >
-                    <FontAwesomeIcon icon={faPlay} className="h-4 w-4" />
-                  </Button>
-                </div>
-              </Card>
+                </Card>
+              </MediaAudioPlayer>
               {/* Locked more mixes */}
-              <div className="mt-3 p-3 rounded-lg border border-dashed border-white/10 flex items-center gap-3">
+              {/* <div className="mt-3 p-3 rounded-lg border border-dashed border-white/10 flex items-center gap-3">
                 <FontAwesomeIcon
                   icon={faLock}
                   className="h-3.5 w-3.5 text-amber-500 shrink-0"
                 />
                 <p className="text-gray-500 text-xs">
                   <span className="text-amber-400 font-medium">
-                    8 more mixes hidden.
+                    {lockedMixesCount} more mixes hidden.
                   </span>{" "}
                   Upgrade to Premium to unlock your full discography.
                 </p>
                 <Badge className="ml-auto shrink-0 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs cursor-pointer hover:bg-amber-500/20 transition-colors">
                   Upgrade
                 </Badge>
-              </div>
+              </div> */}
             </section>
 
             <Separator className="bg-white/8" />
@@ -569,26 +721,12 @@ export default function DjProfileFree() {
               <SectionHeading sub="Unlimited photos · 1 video on Free plan">
                 Media
               </SectionHeading>
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                {MEDIA.map((m) => (
-                  <div
-                    key={m.id}
-                    className="relative aspect-square rounded-lg overflow-hidden bg-h_blackLight/50 ring-1 ring-white/5 hover:ring-h_red/40 transition-all cursor-pointer group"
-                  >
-                    <Image
-                      src={m.url}
-                      alt="DJ media"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                ))}
-              </div>
+              <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
               {/* Locked video */}
-              <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden gap-0">
+              {/* <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden gap-0">
                 <div className="relative h-44 bg-linear-to-br from-slate-900 to-black">
                   <Image
-                    src="/gallery-2.png"
+                    src={videoThumb}
                     alt="video"
                     fill
                     className="object-cover opacity-30"
@@ -615,7 +753,7 @@ export default function DjProfileFree() {
                     </Badge>
                   </div>
                 </div>
-              </Card>
+              </Card> */}
             </section>
 
             <Separator className="bg-white/8" />
@@ -737,7 +875,7 @@ export default function DjProfileFree() {
             <Separator className="bg-white/8" />
 
             {/* ── BOOKING DETAILS ── */}
-            <section>
+            {/* <section>
               <SectionHeading>Booking Details</SectionHeading>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
@@ -795,10 +933,10 @@ export default function DjProfileFree() {
                   </Button>
                 </Card>
               </div>
-            </section>
+            </section> */}
 
             {/* ── LOCKED PREMIUM TEASERS ── */}
-            <section>
+            {/* <section>
               <div className="flex items-center gap-2 mb-5">
                 <h2 className="font-heading text-xl text-white">
                   Unlock More with Premium
@@ -852,7 +990,7 @@ export default function DjProfileFree() {
                   </Button>
                 </div>
               </div>
-            </section>
+            </section> */}
           </div>
 
           {/* ── SIDEBAR ── */}
@@ -943,7 +1081,7 @@ export default function DjProfileFree() {
             <Separator className="bg-white/8" />
 
             {/* Locked Analytics teaser */}
-            <div className="p-4 rounded-xl border border-white/8 bg-white/2">
+            {/* <div className="p-4 rounded-xl border border-white/8 bg-white/2">
               <div className="flex items-center gap-2 mb-3">
                 <FontAwesomeIcon
                   icon={faLock}
@@ -971,7 +1109,7 @@ export default function DjProfileFree() {
                   ),
                 )}
               </div>
-            </div>
+            </div> */}
 
             {/* Profile completion prompt */}
             <div>

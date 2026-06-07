@@ -3,20 +3,49 @@ import React from "react";
 
 const NotFound = () => {
   return (
-    <section className="flex items-center h-screen p-16 bg-[#272727] dark:bg-gray-700">
-      <div className="container mx-auto flex flex-col items-center ">
-        <div className="flex flex-col gap-6 max-w-md text-center">
-          <h2 className="font-extrabold text-9xl text-gray-600 dark:text-gray-100">
-            <span className="sr-only">Error</span>404
-          </h2>
-          <p className="text-2xl md:text-3xl dark:text-gray-300">
-            Sorry, we couldn&apos;t find this page.
-          </p>
+    <section className="min-h-screen bg-black flex items-center justify-center px-6">
+      {/* Ambient glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-h_red/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center text-center max-w-lg">
+        {/* 404 */}
+        <p className="font-heading text-[9rem] sm:text-[12rem] leading-none text-white/5 select-none tracking-tight">
+          404
+        </p>
+
+        {/* Icon row */}
+        <div className="flex items-center gap-3 -mt-6 mb-6">
+          <div className="h-px w-12 bg-white/10" />
+          <span className="text-2xl">🎧</span>
+          <div className="h-px w-12 bg-white/10" />
+        </div>
+
+        {/* Heading */}
+        <h1 className="font-heading text-2xl sm:text-3xl text-white mb-3">
+          This track doesn&apos;t exist
+        </h1>
+
+        {/* Body */}
+        <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-sm">
+          The page you&apos;re looking for has been dropped from the setlist.
+          Head back to the main stage.
+        </p>
+
+        {/* CTAs */}
+        <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="px-8 py-4 text-xl font-semibold rounded bg-purple-600 text-gray-50 hover:text-gray-200"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-h_red hover:bg-h_redDark text-white text-sm font-semibold transition-colors"
           >
-            Back to home
+            Back to Home
+          </Link>
+          <Link
+            href="/directory"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-white/15 text-gray-300 hover:bg-white/5 text-sm font-semibold transition-colors"
+          >
+            Browse DJs
           </Link>
         </div>
       </div>

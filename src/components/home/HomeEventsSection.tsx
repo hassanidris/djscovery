@@ -124,7 +124,7 @@ export default function HomeEventsSection() {
                       {event.venue} · {event.city}, {event.country}
                     </span>
                   </div>
-                  <Badge className="bg-h_redDark/60 text-h_red border-0 w-fit mt-1">
+                  <Badge className="bg-h_redDark/60 text-red-300 border-0 w-fit mt-1">
                     🎧 {event.dj}
                   </Badge>
                 </div>

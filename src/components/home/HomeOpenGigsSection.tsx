@@ -76,7 +76,9 @@ export default function HomeOpenGigsSection() {
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="shrink-0 bg-h_redDark/40 border border-h_red/30 rounded-lg px-4 py-3 text-center min-w-22.5">
-                  <p className="text-h_red font-bold text-base">{gig.budget}</p>
+                  <p className="text-red-300 font-bold text-base">
+                    {gig.budget}
+                  </p>
                   <p className="text-gray-500 text-xs">budget</p>
                 </div>
 
@@ -93,7 +95,7 @@ export default function HomeOpenGigsSection() {
                     {gig.genres.map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_redDark/60 text-red-100 border-0"
+                        className="bg-h_redDark/60 text-red-300 border-0"
                       >
                         {g}
                       </Badge>
@@ -102,12 +104,12 @@ export default function HomeOpenGigsSection() {
                 </div>
 
                 {/* This will be done with the functionalite of the gig */}
-                {/* <Button
-                size="sm"
-                className="shrink-0 bg-h_red hover:bg-h_redDark text-white"
-              >
-                Apply
-              </Button> */}
+                <Button
+                  size="sm"
+                  className="shrink-0 bg-h_red hover:bg-h_redDark text-white cursor-pointer"
+                >
+                  Apply
+                </Button>
               </div>
             </Card>
           ))}
