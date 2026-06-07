@@ -76,12 +76,25 @@ const GENRES = [
 ];
 
 async function main() {
-  const appEnv = process.env.NEXT_PUBLIC_APP_ENV ?? "staging";
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV;
+  const databaseUrl = process.env.DATABASE_URL ?? "";
   const forceSeed = process.env.FORCE_SEED === "true";
 
-  if (appEnv === "production" && !forceSeed) {
+  // Known production markers — add more if the prod project changes
+  const PROD_MARKERS = ["unrqebwfdfumpjgvavbk"];
+  const urlLooksProd = PROD_MARKERS.some((m) => databaseUrl.includes(m));
+  const envIsProd = appEnv === "production";
+  const isProd = envIsProd || urlLooksProd;
+
+  if (isProd && !forceSeed) {
     console.error(`
-❌  Seed blocked — NEXT_PUBLIC_APP_ENV=production
+❌  Seed blocked — production database detected
+
+    Reason: ${
+      envIsProd
+        ? "NEXT_PUBLIC_APP_ENV=production"
+        : "DATABASE_URL contains a known production marker"
+    }
 
     This guard prevents accidental seeding of the production database.
     The seed script contains reference data only (genres, countries, cities).
@@ -94,7 +107,7 @@ async function main() {
     process.exit(1);
   }
 
-  if (appEnv === "production" && forceSeed) {
+  if (isProd && forceSeed) {
     console.warn(
       "⚠️  FORCE_SEED=true — seeding production with reference data only.",
     );

@@ -136,7 +136,7 @@ const DirectoryPage = async ({
     return list;
   };
 
-  const isStaging = process.env.NEXT_PUBLIC_APP_ENV !== "production";
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   const filteredDemoDjs = filterDemoDjs(demoDjs);
   const dbIds = new Set(djs.map((d) => d.id));
   const displayDjs = sortDjs(
