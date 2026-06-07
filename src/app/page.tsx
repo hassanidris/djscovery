@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/client";
 import Hero from "@/components/Hero";
 import HomeDJsTabs from "@/components/home/HomeDJsTabs";
 import type { DemoDJ } from "@/components/home/HomeDJsRow";
@@ -25,8 +26,8 @@ const toDemoDJ = (dj: (typeof ALL_DEMO_DJS)[number]): DemoDJ => ({
   isPremium: dj.plan === "premium",
 });
 
-const NEW_DJS: DemoDJ[] = ALL_DEMO_DJS.slice(0, 8).map(toDemoDJ);
-const TRENDING_DJS: DemoDJ[] = [...ALL_DEMO_DJS]
+const DEMO_NEW_DJS: DemoDJ[] = ALL_DEMO_DJS.slice(0, 8).map(toDemoDJ);
+const DEMO_TRENDING_DJS: DemoDJ[] = [...ALL_DEMO_DJS]
   .sort(
     (a, b) =>
       b.stats.rating - a.stats.rating || b.stats.followers - a.stats.followers,
@@ -40,6 +41,86 @@ const Homepage = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  let dbNewDJs: DemoDJ[] = [];
+  let dbTrendingDJs: DemoDJ[] = [];
+  try {
+    const [recentProfiles, topProfiles] = await Promise.all([
+      prisma.djProfile.findMany({
+        where: { deletedAt: null, status: "APPROVED" },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+        include: {
+          user: { include: { _count: { select: { followers: true } } } },
+          country: { select: { name: true } },
+          city: { select: { name: true } },
+          genres: { include: { genre: { select: { name: true } } } },
+          ratings: { select: { rating: true } },
+        },
+      }),
+      prisma.djProfile.findMany({
+        where: { deletedAt: null, status: "APPROVED" },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          user: { include: { _count: { select: { followers: true } } } },
+          country: { select: { name: true } },
+          city: { select: { name: true } },
+          genres: { include: { genre: { select: { name: true } } } },
+          ratings: { select: { rating: true } },
+        },
+      }),
+    ]);
+
+    const toHomeDJ = (p: (typeof recentProfiles)[number]): DemoDJ => ({
+      id: String(p.id),
+      stageName: p.stageName,
+      avatar: p.avatar ?? "/noAvatar.png",
+      genres: p.genres.map((g) => g.genre.name),
+      city: p.city?.name ?? "",
+      country: p.country?.name ?? "",
+      rating:
+        p.ratings.length > 0
+          ? Math.round(
+              (p.ratings.reduce((sum, r) => sum + r.rating, 0) /
+                p.ratings.length) *
+                10,
+            ) / 10
+          : 0,
+      followers: p.user._count.followers,
+      slug: p.slug,
+      isPremium: false,
+    });
+
+    dbNewDJs = recentProfiles.map(toHomeDJ);
+    dbTrendingDJs = topProfiles
+      .map(toHomeDJ)
+      .sort((a, b) => b.rating - a.rating || b.followers - a.followers);
+  } catch {
+    // DB unavailable — fall through to demo data
+  }
+
+  const dbSlugs = new Set(dbNewDJs.map((d) => d.slug));
+  const newDJs = isStaging
+    ? [...dbNewDJs, ...DEMO_NEW_DJS.filter((d) => !dbSlugs.has(d.slug))].slice(
+        0,
+        8,
+      )
+    : dbNewDJs.length > 0
+      ? dbNewDJs
+      : DEMO_NEW_DJS;
+
+  const trendingSlugs = new Set(dbTrendingDJs.map((d) => d.slug));
+  const trendingDJs = isStaging
+    ? [
+        ...dbTrendingDJs,
+        ...DEMO_TRENDING_DJS.filter((d) => !trendingSlugs.has(d.slug)),
+      ].slice(0, 10)
+    : dbTrendingDJs.length > 0
+      ? dbTrendingDJs
+      : DEMO_TRENDING_DJS;
+
   return (
     <div className="flex flex-col">
       {/* Video hero */}
@@ -49,7 +130,7 @@ const Homepage = async () => {
       <HomeFeaturedDJs />
 
       {/* DJ rows with tabs */}
-      <HomeDJsTabs newDJs={NEW_DJS} trendingDJs={TRENDING_DJS} />
+      <HomeDJsTabs newDJs={newDJs} trendingDJs={trendingDJs} />
 
       {/* Upcoming Events */}
       <HomeEventsSection />
