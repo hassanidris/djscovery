@@ -14,6 +14,7 @@ export default function NavDesktop({
   navRole,
   isLoggedIn,
   username,
+  djSlug,
   displayName,
   avatarSrc,
   initials,
@@ -151,6 +152,8 @@ export default function NavDesktop({
                 displayName={displayName}
                 initials={initials}
                 username={username}
+                navRole={navRole}
+                djSlug={djSlug}
               />
             </div>
           </div>

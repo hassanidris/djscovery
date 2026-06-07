@@ -8,9 +8,10 @@ import { bottomNavByRole, type NavRole } from "@/config/navigation";
 type Props = {
   navRole: NavRole;
   username: string | null;
+  djSlug: string | null;
 };
 
-export default function NavMobileBottom({ navRole, username }: Props) {
+export default function NavMobileBottom({ navRole, username, djSlug }: Props) {
   const pathname = usePathname();
   const items = bottomNavByRole[navRole];
 
@@ -41,11 +42,20 @@ export default function NavMobileBottom({ navRole, username }: Props) {
             );
           }
 
-          /* Profile item — dynamic href built from username */
+          /* Profile item — dynamic href, DJ goes to /djs/[slug] */
           if (item.id === "profile") {
-            const href = username ? `/profile/${username}` : "/settings";
+            const href =
+              navRole === "dj" && djSlug
+                ? `/djs/${djSlug}`
+                : navRole === "dj"
+                  ? "/become-dj"
+                  : username
+                    ? `/profile/${username}`
+                    : "/settings";
             const isActive =
-              pathname.startsWith("/profile") || pathname === "/settings";
+              pathname.startsWith("/djs/") ||
+              pathname.startsWith("/profile") ||
+              pathname === "/settings";
 
             return (
               <Link

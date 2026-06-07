@@ -7,6 +7,7 @@ export type NavUserData = {
   navRole: NavRole;
   isLoggedIn: boolean;
   username: string | null;
+  djSlug: string | null;
   displayName: string;
   avatarSrc: string | null;
   initials: string;
@@ -23,6 +24,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
       navRole: "guest",
       isLoggedIn: false,
       username: null,
+      djSlug: null,
       displayName: "Guest",
       avatarSrc: null,
       initials: "G",
@@ -34,7 +36,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
     select: {
       username: true,
       roles: { select: { role: true } },
-      djProfile: { select: { avatar: true, stageName: true } },
+      djProfile: { select: { avatar: true, stageName: true, slug: true } },
     },
   });
 
@@ -53,6 +55,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
     navRole,
     isLoggedIn: true,
     username: profile?.username ?? null,
+    djSlug: profile?.djProfile?.slug ?? null,
     displayName,
     avatarSrc,
     initials,

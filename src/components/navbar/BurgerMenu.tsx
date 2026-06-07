@@ -17,14 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  User,
-  Settings,
-  LogOut,
-  LogIn,
-  UserPlus,
-} from "lucide-react";
+import { Menu, User, Settings, LogOut, LogIn, UserPlus } from "lucide-react";
 import { desktopNavByRole } from "@/config/navigation";
 import { signOut } from "@/lib/actions/auth";
 import type { NavUserData } from "@/lib/auth/getNavUser";
@@ -35,6 +28,7 @@ export default function BurgerMenu({
   navRole,
   isLoggedIn,
   username,
+  djSlug,
   displayName,
   avatarSrc,
   initials,
@@ -109,9 +103,7 @@ export default function BurgerMenu({
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400 text-sm mt-4">
-                Welcome to DJscovery
-              </p>
+              <p className="text-gray-400 text-sm mt-4">Welcome to DJscovery</p>
             )}
           </SheetHeader>
 
@@ -184,31 +176,41 @@ export default function BurgerMenu({
                     Account
                   </p>
 
-                  {username && (
-                    <SheetClose asChild>
-                      <Link
-                        href={`/profile/${username}`}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
-                          pathname.startsWith("/profile")
-                            ? "text-white bg-white/5"
-                            : "text-gray-400 hover:text-white hover:bg-white/5",
-                        )}
-                        aria-current={
-                          pathname.startsWith("/profile") ? "page" : undefined
-                        }
-                      >
-                        <User
-                          className={cn(
-                            "h-4 w-4 shrink-0",
-                            pathname.startsWith("/profile") ? "text-h_red" : "",
-                          )}
-                          aria-hidden
-                        />
-                        <span>My Profile</span>
-                      </Link>
-                    </SheetClose>
-                  )}
+                  {(username || djSlug) &&
+                    (() => {
+                      const profileHref =
+                        navRole === "dj" && djSlug
+                          ? `/djs/${djSlug}`
+                          : navRole === "dj"
+                            ? "/become-dj"
+                            : `/profile/${username}`;
+                      const isProfileActive =
+                        pathname.startsWith("/djs/") ||
+                        pathname.startsWith("/profile");
+                      return (
+                        <SheetClose asChild>
+                          <Link
+                            href={profileHref}
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                              isProfileActive
+                                ? "text-white bg-white/5"
+                                : "text-gray-400 hover:text-white hover:bg-white/5",
+                            )}
+                            aria-current={isProfileActive ? "page" : undefined}
+                          >
+                            <User
+                              className={cn(
+                                "h-4 w-4 shrink-0",
+                                isProfileActive ? "text-h_red" : "",
+                              )}
+                              aria-hidden
+                            />
+                            <span>My Profile</span>
+                          </Link>
+                        </SheetClose>
+                      );
+                    })()}
 
                   <SheetClose asChild>
                     <Link

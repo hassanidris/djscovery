@@ -118,7 +118,7 @@ export default function BecomeDjForm({
           .replace(/[^a-z0-9\s-]/g, "")
           .trim()
           .replace(/\s+/g, "-")
-          .slice(0, 50) + `-${userId.slice(0, 8)}`
+          .slice(0, 60)
       : "";
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {

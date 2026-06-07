@@ -5,14 +5,29 @@ import prisma from "@/lib/client";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-function makeSlug(stageName: string, userId: string) {
-  const base = stageName
+function makeSlugBase(stageName: string) {
+  return stageName
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-")
-    .slice(0, 50);
-  return `${base}-${userId.slice(0, 8)}`;
+    .slice(0, 60);
+}
+
+async function makeUniqueSlug(stageName: string, excludeUserId?: string) {
+  const base = makeSlugBase(stageName);
+  const existing = await prisma.djProfile.findMany({
+    where: {
+      slug: { startsWith: base },
+      ...(excludeUserId ? { userId: { not: excludeUserId } } : {}),
+    },
+    select: { slug: true },
+  });
+  const taken = new Set(existing.map((p) => p.slug));
+  if (!taken.has(base)) return base;
+  let i = 2;
+  while (taken.has(`${base}-${i}`)) i++;
+  return `${base}-${i}`;
 }
 
 export async function getCitiesByCountry(countryId: number) {
@@ -108,7 +123,7 @@ export async function createDjProfile(
     }
   }
 
-  const slug = makeSlug(stageName, user.id);
+  const slug = await makeUniqueSlug(stageName, user.id);
 
   await prisma.$transaction(async (tx) => {
     const profile = await tx.djProfile.upsert({

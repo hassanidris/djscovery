@@ -12,11 +12,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/lib/actions/auth";
 
+import type { NavRole } from "@/config/navigation";
+
 type Props = {
   avatarSrc: string | null;
   displayName: string;
   initials: string;
   username: string | null;
+  navRole: NavRole;
+  djSlug: string | null;
 };
 
 export default function NavbarAvatar({
@@ -24,6 +28,8 @@ export default function NavbarAvatar({
   displayName,
   initials,
   username,
+  navRole,
+  djSlug,
 }: Props) {
   const signOutFormRef = useRef<HTMLFormElement>(null);
 
@@ -50,12 +56,22 @@ export default function NavbarAvatar({
           sideOffset={8}
           className="w-52 bg-h_blackLight border border-white/10 text-white"
         >
-          {username && (
+          {(username || djSlug) && (
             <DropdownMenuItem
               asChild
               className="cursor-pointer text-gray-300 focus:text-white focus:bg-white/5"
             >
-              <Link href={`/profile/${username}`}>My Profile</Link>
+              <Link
+                href={
+                  navRole === "dj" && djSlug
+                    ? `/djs/${djSlug}`
+                    : navRole === "dj"
+                      ? "/become-dj"
+                      : `/profile/${username}`
+                }
+              >
+                My Profile
+              </Link>
             </DropdownMenuItem>
           )}
 
