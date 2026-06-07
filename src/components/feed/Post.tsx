@@ -48,8 +48,11 @@ const Post = ({
               className="w-10 h-10 rounded-full ring-1 ring-gray-700 object-cover"
             />
             <div className="flex flex-col">
-              <span className="font-medium leading-tight">
-                {post.user.username}
+              <span className="font-semibold leading-tight text-h_white">
+                DJ {post.user.name || post.user.username}
+              </span>
+              <span className="text-xs text-gray-500 leading-none">
+                @{post.user.username}
               </span>
               {/* Post type badge — directly below the name */}
               {post.type === PostTypeEnum.IMAGE ? (

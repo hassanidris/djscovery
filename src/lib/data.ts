@@ -51,6 +51,7 @@ export function demoPosts() {
   const u = (i: number) => ({
     id: `demo-dj-${i}`,
     username: djs[i].slug,
+    name: djs[i].stageName,
     image: djs[i].avatar.url,
   });
   const likes = (n: number) =>
