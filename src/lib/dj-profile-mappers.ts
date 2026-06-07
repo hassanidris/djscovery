@@ -222,7 +222,7 @@ export function mapPackagesFromData(d: DjDemoData) {
     name: pkg.name,
     icon:
       PACKAGE_ICON_MAP[pkg.name] ?? HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
-    price: `From ${d.booking.feeRange.currency}${pkg.priceFrom.toLocaleString()}`,
+    price: `From ${pkg.currency}${pkg.priceFrom.toLocaleString()}`,
     duration: pkg.features[0] ?? "",
     includes: pkg.features.slice(1),
     color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",

@@ -58,6 +58,7 @@ export const SOCIAL_ICONS: Record<string, IconDefinition> = {
   spotify: faSpotify,
   website: faGlobe,
   apple: faApple,
+  anghami: faGlobe,
 };
 
 export const REVIEWER_AVATARS = [
