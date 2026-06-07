@@ -136,8 +136,14 @@ const DirectoryPage = async ({
     return list;
   };
 
-  const fallbackDjs = sortDjs(filterDemoDjs(demoDjs));
-  const displayDjs = djs.length ? djs : fallbackDjs;
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV !== "production";
+  const filteredDemoDjs = filterDemoDjs(demoDjs);
+  const dbIds = new Set(djs.map((d) => d.id));
+  const displayDjs = sortDjs(
+    isStaging
+      ? [...djs, ...filteredDemoDjs.filter((d) => !dbIds.has(d.id))]
+      : djs,
+  );
 
   let availableGenres: string[] = [];
   try {
@@ -155,13 +161,16 @@ const DirectoryPage = async ({
     // ignore — handled below
   }
 
-  if (availableGenres.length === 0) {
-    availableGenres = [
+  if (isStaging) {
+    const demoGenreList = [
       ...new Set(
         demoDjs
           .flatMap((dj) => (dj.genres ?? "").split(",").map((g) => g.trim()))
           .filter(Boolean),
       ),
+    ];
+    availableGenres = [
+      ...new Set([...availableGenres, ...demoGenreList]),
     ].sort();
   }
 
@@ -189,17 +198,17 @@ const DirectoryPage = async ({
     // ignore
   }
 
-  if (availableCountries.length === 0) {
-    availableCountries = [
-      ...new Set(demoDjs.map((dj) => dj.country).filter(Boolean) as string[]),
-    ].sort();
+  if (isStaging) {
     for (const dj of demoDjs) {
+      if (dj.country && !availableCountries.includes(dj.country))
+        availableCountries.push(dj.country);
       if (dj.country && dj.city) {
         if (!countryCities[dj.country]) countryCities[dj.country] = [];
         if (!countryCities[dj.country].includes(dj.city))
           countryCities[dj.country].push(dj.city);
       }
     }
+    availableCountries.sort();
     for (const c in countryCities) countryCities[c].sort();
   }
 
