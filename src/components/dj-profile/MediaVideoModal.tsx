@@ -45,7 +45,18 @@ export default function MediaVideoModal({
 
   return (
     <>
-      <div onClick={() => setOpen(true)} className="cursor-pointer h-full">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+        className="cursor-pointer h-full"
+      >
         {children}
       </div>
 

@@ -39,7 +39,12 @@ const socialLinks = [
 ];
 
 const Footer = async () => {
-  const { navRole } = await getNavUser();
+  let navRole: keyof typeof desktopNavByRole = "guest";
+  try {
+    ({ navRole } = await getNavUser());
+  } catch {
+    navRole = "guest";
+  }
   const exploreItems = [
     { id: "home", label: "Home", href: "/", icon: House },
     ...desktopNavByRole[navRole],

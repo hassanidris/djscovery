@@ -41,11 +41,13 @@ export default function ProfileReviews({
                 : 0;
             return (
               <div key={s} className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 w-3 text-right">{s}</span>
+                <span className="text-xs text-gray-400 w-3 text-right">
+                  {s}
+                </span>
                 <Star className="h-3 w-3 text-amber-400 shrink-0" />
                 <Progress value={pct} className="flex-1 h-1.5 bg-white/8" />
                 <span className="text-xs text-gray-600 w-8 text-right">
-                  {Math.round((ratingCount * pct) / 100)}
+                  {count}
                 </span>
               </div>
             );
@@ -54,7 +56,10 @@ export default function ProfileReviews({
       </div>
       <div className="flex flex-col gap-4">
         {reviews.map((r) => (
-          <Card key={r.id} className="bg-h_blackLight/30 border-white/5 p-5 gap-0">
+          <Card
+            key={r.id}
+            className="bg-h_blackLight/30 border-white/5 p-5 gap-0"
+          >
             <div className="flex items-start gap-3">
               <Avatar className="size-9 ring-1 ring-white/10 shrink-0">
                 <AvatarImage src={r.user.image} />
