@@ -46,7 +46,7 @@ const Homepage = async () => {
   let dbNewDJs: DemoDJ[] = [];
   let dbTrendingDJs: DemoDJ[] = [];
   try {
-    const [recentProfiles, topProfiles] = await Promise.all([
+    const [recentProfiles, trendingCandidates] = await Promise.all([
       prisma.djProfile.findMany({
         where: { deletedAt: null, status: "APPROVED" },
         orderBy: { createdAt: "desc" },
@@ -61,8 +61,6 @@ const Homepage = async () => {
       }),
       prisma.djProfile.findMany({
         where: { deletedAt: null, status: "APPROVED" },
-        orderBy: { createdAt: "desc" },
-        take: 10,
         include: {
           user: { include: { _count: { select: { followers: true } } } },
           country: { select: { name: true } },
@@ -94,9 +92,10 @@ const Homepage = async () => {
     });
 
     dbNewDJs = recentProfiles.map(toHomeDJ);
-    dbTrendingDJs = topProfiles
+    dbTrendingDJs = trendingCandidates
       .map(toHomeDJ)
-      .sort((a, b) => b.rating - a.rating || b.followers - a.followers);
+      .sort((a, b) => b.rating - a.rating || b.followers - a.followers)
+      .slice(0, 10);
   } catch {
     // DB unavailable — fall through to demo data
   }
@@ -112,14 +111,18 @@ const Homepage = async () => {
       : DEMO_NEW_DJS;
 
   const trendingSlugs = new Set(dbTrendingDJs.map((d) => d.slug));
-  const trendingDJs = isStaging
+  const trendingSource = isStaging
     ? [
         ...dbTrendingDJs,
         ...DEMO_TRENDING_DJS.filter((d) => !trendingSlugs.has(d.slug)),
-      ].slice(0, 10)
+      ]
     : dbTrendingDJs.length > 0
       ? dbTrendingDJs
       : DEMO_TRENDING_DJS;
+
+  const trendingDJs = [...trendingSource]
+    .sort((a, b) => b.rating - a.rating || b.followers - a.followers)
+    .slice(0, 10);
 
   return (
     <div className="flex flex-col">

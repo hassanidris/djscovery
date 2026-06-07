@@ -62,7 +62,17 @@ export default async function HomeCommunityHighlights() {
   let dbPosts: PostCard[] = [];
   try {
     const posts = await prisma.post.findMany({
-      where: { deletedAt: null, content: { not: null } },
+      where: {
+        deletedAt: null,
+        content: { not: null },
+        user: {
+          djProfile: {
+            is: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
       take: 3,
       include: {
