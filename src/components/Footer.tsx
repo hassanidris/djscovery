@@ -44,7 +44,6 @@ const Footer = async () => {
     { id: "home", label: "Home", href: "/", icon: House },
     ...desktopNavByRole[navRole],
   ];
-
   return (
     <footer className="w-full bg-black border-t border-white/5">
       {/* Top accent bar */}
