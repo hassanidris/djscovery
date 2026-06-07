@@ -5,316 +5,58 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faMapPin,
-  faStar,
-  faUsers,
-  faCalendarDays,
-  faUserPlus,
-  faShareNodes,
-  faLock,
-  faPlay,
-  faMusic,
-  faVideo,
-  faImage,
-  faCheckCircle,
-  faChartLine,
-  faBolt,
-  faCrown,
-  faEnvelope,
-  faPhone,
-  faGlobe,
-  faLocationDot,
-  faTrophy,
-  faFireFlameCurved,
-  faHeadphones,
-  faClockRotateLeft,
-} from "@fortawesome/free-solid-svg-icons";
-import {
-  faInstagram,
-  faTiktok,
-  faYoutube,
-  faSoundcloud,
-  faSpotify,
-  faApple,
-} from "@fortawesome/free-brands-svg-icons";
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { format } from "date-fns";
+  MapPin,
+  Users,
+  CalendarDays,
+  UserPlus,
+  Share2,
+  Play,
+  Music,
+  Video,
+  Headphones,
+  CalendarCheck2,
+  Mail,
+  Star,
+  Crown,
+  Lock,
+  ChartLine,
+  Trophy,
+  Newspaper,
+  BriefcaseBusiness,
+} from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
-
-// ── Demo Data ──────────────────────────────────────────────────────────────────
-
-const DEFAULT_DJ = {
-  stageName: "Amara Pulse",
-  avatar: "/rated-6.webp",
-  coverImage: "/noCover-3.png",
-  bio: "Bringing the pulse of Lagos to the world stage. Amara blends Afrobeats and Amapiano into euphoric, floor-filling sets that transcend borders. With residencies across London, Paris, and Dubai, she's one of the fastest-rising names in global club culture.",
-  city: "Lagos",
-  country: "Nigeria",
-  genres: ["Afrobeats", "Amapiano", "House"],
-  socialLinks: [
-    { platform: "instagram", url: "#" },
-    { platform: "soundcloud", url: "#" },
-    { platform: "tiktok", url: "#" },
-    { platform: "spotify", url: "#" },
-  ],
-  avgRating: 4.8,
-  ratingCount: 42,
-  followerCount: 5200,
-  eventsCount: 12,
-  bookingEmail: "bookings@amarapulse.com",
-  bookingPhone: "+44 7700 900123",
-  website: "www.amarapulse.com",
-  minFee: "£1,500",
-  maxFee: "£8,000",
-  djTypes: ["Festival", "Club", "Corporate"],
-};
-
-const DEFAULT_EVENTS = [
-  {
-    id: 1,
-    title: "Berlin Underground — Summer Closing",
-    date: "2025-09-20T22:00:00Z",
-    venue: "Berghain",
-    city: "Berlin",
-    country: "Germany",
-  },
-  {
-    id: 2,
-    title: "Sunburn Festival — Stage B",
-    date: "2025-10-15T18:00:00Z",
-    venue: "Candolim Beach",
-    city: "Goa",
-    country: "India",
-  },
-  {
-    id: 3,
-    title: "Warehouse Sessions Vol. 4",
-    date: "2025-11-08T23:00:00Z",
-    venue: "Fabric London",
-    city: "London",
-    country: "UK",
-  },
-];
-
-const DEFAULT_VENUES = [
-  { name: "Berghain", city: "Berlin", country: "DE", count: 4 },
-  { name: "Fabric London", city: "London", country: "UK", count: 6 },
-  { name: "DC-10", city: "Ibiza", country: "ES", count: 3 },
-  { name: "Club Space", city: "Miami", country: "US", count: 2 },
-  { name: "Printworks", city: "London", country: "UK", count: 5 },
-];
-
-const DEFAULT_REVIEWS = [
-  {
-    id: 1,
-    rating: 5,
-    review:
-      "Absolutely electric set. The crowd energy was insane from first to last track. One of the best nights I've been to.",
-    date: "2025-06-12",
-    user: { name: "Alex K.", image: "/rated-1.webp" },
-  },
-  {
-    id: 2,
-    rating: 4,
-    review:
-      "Incredible mixing skills. The transitions were seamless and the track selection was perfect for the vibe.",
-    date: "2025-05-28",
-    user: { name: "Sarah M.", image: "/rated-2.webp" },
-  },
-  {
-    id: 3,
-    rating: 5,
-    review:
-      "Been following this DJ for years. Always delivers. Worth every penny for a booking.",
-    date: "2025-04-10",
-    user: { name: "Jay T.", image: "/rated-3.webp" },
-  },
-];
-
-const DEFAULT_MEDIA = [
-  { id: 1, url: "/gallery-1.png" },
-  { id: 2, url: "/gallery-2.png" },
-  { id: 3, url: "/gallery-3.png" },
-  { id: 4, url: "/gallery-4.png" },
-  { id: 5, url: "/rated-9.webp" },
-  { id: 6, url: "/rated-10.webp" },
-];
-
-const SOCIAL_ICONS: Record<string, IconDefinition> = {
-  instagram: faInstagram,
-  tiktok: faTiktok,
-  youtube: faYoutube,
-  soundcloud: faSoundcloud,
-  spotify: faSpotify,
-  website: faGlobe,
-  apple: faApple,
-};
-
-// ── JSON → Component mapping helpers ──────────────────────────────────────────
-
-const FREE_REVIEWER_AVATARS = [
-  "/rated-1.webp",
-  "/rated-2.webp",
-  "/rated-3.webp",
-];
-
-function freeGetPlatformFromUrl(url: string): string {
-  if (url.includes("soundcloud")) return "SoundCloud";
-  if (url.includes("mixcloud")) return "Mixcloud";
-  if (url.includes("spotify")) return "Spotify";
-  if (url.includes("youtube")) return "YouTube";
-  return "External";
-}
-
-function freeFormatPlays(plays: number): string {
-  if (plays >= 1000) return `${(plays / 1000).toFixed(1)}k`;
-  return String(plays);
-}
-
-function mapFreeDjToProps(d: DjDemoData) {
-  const socialLinks = Object.entries(d.socials)
-    .filter(([, url]) => Boolean(url))
-    .map(([platform, url]) => ({ platform, url: url as string }));
-  return {
-    stageName: d.stageName,
-    avatar: d.avatar.url,
-    coverImage: d.coverImage.url,
-    bio: d.bio,
-    city: d.location.city,
-    country: d.location.country,
-    genres: d.genres,
-    socialLinks,
-    avgRating: d.stats.rating,
-    ratingCount: d.stats.reviews,
-    followerCount: d.stats.followers,
-    eventsCount: d.stats.events,
-    bookingEmail: d.booking.email,
-    bookingPhone: d.booking.phone,
-    website: d.booking.website,
-    minFee: `${d.booking.feeRange.currency}${d.booking.feeRange.min.toLocaleString()}`,
-    maxFee: `${d.booking.feeRange.currency}${d.booking.feeRange.max.toLocaleString()}`,
-    djTypes: d.specialties,
-  };
-}
-
-function mapFreeEventsFromData(d: DjDemoData) {
-  const normalizeEventDate = (value: string) =>
-    value.includes("T") ? value : `${value}T20:00:00Z`;
-  return d.upcomingEvents.map((e, i) => ({
-    id: i + 1,
-    title: e.title,
-    date: normalizeEventDate(e.date),
-    venue: e.venue,
-    city: e.city,
-    country: "",
-  }));
-}
-
-function mapFreeVenuesFromData(d: DjDemoData) {
-  return d.venuesPlayed.map((v) => ({
-    name: v.venue,
-    city: v.city,
-    country: "",
-    count: v.timesPlayed,
-  }));
-}
-
-function mapFreeReviewsFromData(d: DjDemoData) {
-  return d.reviewsList.map((r, i) => ({
-    id: i + 1,
-    rating: r.rating,
-    review: r.comment,
-    date: r.date,
-    user: {
-      name: r.name,
-      image: FREE_REVIEWER_AVATARS[i % FREE_REVIEWER_AVATARS.length],
-    },
-  }));
-}
-
-function mapFreeMediaFromData(d: DjDemoData) {
-  return d.media.photos.map((url, i) => ({ id: i + 1, url }));
-}
-
-// ── Helper ─────────────────────────────────────────────────────────────────────
-
-function Stars({
-  rating,
-  size = "sm",
-}: {
-  rating: number;
-  size?: "sm" | "lg";
-}) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <FontAwesomeIcon
-          key={i}
-          icon={faStar}
-          className={cn(
-            size === "lg" ? "h-4 w-4" : "h-3 w-3",
-            i <= Math.round(rating) ? "text-amber-400" : "text-gray-700",
-          )}
-        />
-      ))}
-    </div>
-  );
-}
-
-function LockedCard({
-  title,
-  description,
-  icon,
-}: {
-  title: string;
-  description: string;
-  icon: IconDefinition;
-}) {
-  return (
-    <div className="relative rounded-xl border border-white/8 bg-white/2 overflow-hidden">
-      <div className="absolute inset-0 backdrop-blur-[1px]" />
-      <div className="relative p-5 flex flex-col items-center text-center gap-3">
-        <div className="size-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-          <FontAwesomeIcon icon={faLock} className="h-4 w-4 text-amber-400" />
-        </div>
-        <div>
-          <p className="text-white text-sm font-semibold">{title}</p>
-          <p className="text-gray-500 text-xs mt-1">{description}</p>
-        </div>
-        <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
-          <FontAwesomeIcon icon={faCrown} className="h-2.5 w-2.5 mr-1" />
-          Premium Feature
-        </Badge>
-      </div>
-    </div>
-  );
-}
-
-function SectionHeading({
-  children,
-  sub,
-}: {
-  children: React.ReactNode;
-  sub?: string;
-}) {
-  return (
-    <div className="flex items-center justify-between mb-5">
-      <div>
-        <h2 className="font-heading text-xl text-white">{children}</h2>
-        {sub && <p className="text-gray-500 text-xs mt-0.5">{sub}</p>}
-      </div>
-    </div>
-  );
-}
+import ProfileAbout from "@/components/dj-profile/ProfileAbout";
+import ProfileReviews from "@/components/dj-profile/ProfileReviews";
+import ProfileVenues from "@/components/dj-profile/ProfileVenues";
+import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+import {
+  SOCIAL_ICONS,
+  SectionHeading,
+} from "@/components/dj-profile/dj-profile-shared";
+import {
+  FREE_DEFAULT_DJ,
+  FREE_DEFAULT_EVENTS,
+  FREE_DEFAULT_VENUES,
+  FREE_DEFAULT_REVIEWS,
+  FREE_DEFAULT_MEDIA,
+  FREE_DEFAULT_FEATURED_MIX,
+} from "@/data/dj-profile-defaults";
+import {
+  mapFreeDjToProps,
+  mapFreeEventsFromData,
+  mapFreeVenuesFromData,
+  mapFreeReviewsFromData,
+  mapFreeMediaFromData,
+  mapFreeFeaturedMix,
+} from "@/lib/dj-profile-mappers";
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
@@ -327,36 +69,19 @@ export default function DjProfileFree({
 } = {}) {
   const [bioExpanded, setBioExpanded] = useState(false);
 
-  // ── Resolve data: JSON prop overrides hardcoded defaults ──────────────────
-  const DJ = djData ? mapFreeDjToProps(djData) : DEFAULT_DJ;
-  const EVENTS = djData ? mapFreeEventsFromData(djData) : DEFAULT_EVENTS;
-  const VENUES = djData ? mapFreeVenuesFromData(djData) : DEFAULT_VENUES;
-  const REVIEWS = djData ? mapFreeReviewsFromData(djData) : DEFAULT_REVIEWS;
-  const MEDIA = djData ? mapFreeMediaFromData(djData) : DEFAULT_MEDIA;
+  const DJ = djData ? mapFreeDjToProps(djData) : FREE_DEFAULT_DJ;
+  const EVENTS = djData ? mapFreeEventsFromData(djData) : FREE_DEFAULT_EVENTS;
+  const VENUES = djData ? mapFreeVenuesFromData(djData) : FREE_DEFAULT_VENUES;
+  const REVIEWS = djData
+    ? mapFreeReviewsFromData(djData)
+    : FREE_DEFAULT_REVIEWS;
+  const MEDIA = djData ? mapFreeMediaFromData(djData) : FREE_DEFAULT_MEDIA;
   const FEATURED_MIX = djData
-    ? {
-        title: djData.spotlight.featuredMix.title,
-        duration: djData.spotlight.featuredMix.duration,
-        plays: freeFormatPlays(djData.spotlight.featuredMix.plays),
-        platform: freeGetPlatformFromUrl(djData.spotlight.featuredMix.audioUrl),
-        genres: djData.spotlight.featuredMix.genres,
-        audioUrl: djData.spotlight.featuredMix.audioUrl,
-      }
-    : {
-        title: "Afrobeats & Amapiano Fusion Vol.3",
-        duration: "1h 24m",
-        plays: "38.2k",
-        platform: "SoundCloud",
-        genres: ["Afrobeats", "Amapiano"],
-        audioUrl: "",
-      };
-  const lockedMixesCount = djData
-    ? Math.max(0, djData.media.mixes.length - 1)
-    : 8;
+    ? mapFreeFeaturedMix(djData)
+    : FREE_DEFAULT_FEATURED_MIX;
   const videoThumb = djData
     ? djData.spotlight.featuredVideo.thumbnail
     : "/gallery-2.png";
-
   const location = `${DJ.city}, ${DJ.country}`;
 
   return (
@@ -393,29 +118,19 @@ export default function DjProfileFree({
                 Dj {DJ.stageName}
               </h1>
               <p className="text-gray-400 text-sm mt-1.5 flex items-center gap-1.5">
-                <FontAwesomeIcon
-                  icon={faMapPin}
-                  className="h-3 w-3 text-h_red"
-                />{" "}
-                {location}
+                <MapPin className="h-3 w-3 text-h_red" /> {location}
               </p>
             </div>
             <div className="flex items-center gap-2 sm:pb-2">
               <Button className="bg-h_red hover:bg-h_redDark text-white font-semibold">
-                <FontAwesomeIcon
-                  icon={faCalendarDays}
-                  className="h-3.5 w-3.5 mr-1.5"
-                />
+                <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
                 Book DJ
               </Button>
               <Button
                 variant="outline"
                 className="border-white/20 text-gray-300 hover:bg-white/5"
               >
-                <FontAwesomeIcon
-                  icon={faUserPlus}
-                  className="h-3.5 w-3.5 mr-1.5"
-                />
+                <UserPlus className="h-3.5 w-3.5 mr-1.5" />
                 Follow
               </Button>
               <Button
@@ -424,7 +139,7 @@ export default function DjProfileFree({
                 className="text-gray-400 hover:text-white"
                 aria-label="Share"
               >
-                <FontAwesomeIcon icon={faShareNodes} className="h-4 w-4" />
+                <Share2 className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -466,36 +181,38 @@ export default function DjProfileFree({
               {
                 val: DJ.followerCount.toLocaleString(),
                 label: "Followers",
-                icon: faUsers,
+                icon: Users,
               },
               {
                 val: DJ.avgRating.toFixed(1),
                 label: `${DJ.ratingCount} reviews`,
-                icon: faStar,
+                icon: Star,
               },
               {
                 val: DJ.eventsCount.toString(),
                 label: "Events",
-                icon: faCalendarDays,
+                icon: CalendarDays,
               },
-            ].map((s, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "flex flex-col items-center",
-                  i < 2 && "border-r border-white/10",
-                )}
-              >
-                <span className="text-2xl font-bold text-white">{s.val}</span>
-                <span className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                  <FontAwesomeIcon
-                    icon={s.icon}
-                    className={cn("h-3 w-3", i === 1 && "text-amber-400")}
-                  />
-                  {s.label}
-                </span>
-              </div>
-            ))}
+            ].map((s, i) => {
+              const SIcon = s.icon;
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    "flex flex-col items-center",
+                    i < 2 && "border-r border-white/10",
+                  )}
+                >
+                  <span className="text-2xl font-bold text-white">{s.val}</span>
+                  <span className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                    <SIcon
+                      className={cn("h-3 w-3", i === 1 && "text-amber-400")}
+                    />
+                    {s.label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
           <Separator className="bg-white/10" />
         </div>
@@ -517,22 +234,16 @@ export default function DjProfileFree({
                   audioUrl={FEATURED_MIX.audioUrl}
                   title={FEATURED_MIX.title}
                 >
-                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0">
-                    <div className="relative h-40 bg-linear-to-br from-h_red/20 to-black">
+                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
+                    <div className="relative h-40 bg-linear-to-br from-h_red/20 to-black shrink-0">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
-                          <FontAwesomeIcon
-                            icon={faPlay}
-                            className="h-5 w-5 text-white ml-0.5"
-                          />
+                          <Play className="h-5 w-5 text-white ml-0.5" />
                         </div>
                       </div>
                       <div className="absolute bottom-3 left-3">
                         <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                          <FontAwesomeIcon
-                            icon={faHeadphones}
-                            className="h-2.5 w-2.5 mr-1"
-                          />
+                          <Headphones className="h-2.5 w-2.5 mr-1" />
                           Featured Mix
                         </Badge>
                       </div>
@@ -567,8 +278,8 @@ export default function DjProfileFree({
                     "Live @ Berghain — Summer Closing 2024"
                   }
                 >
-                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0">
-                    <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black">
+                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
+                    <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black shrink-0">
                       <Image
                         src={videoThumb}
                         alt="video thumbnail"
@@ -577,18 +288,12 @@ export default function DjProfileFree({
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                          <FontAwesomeIcon
-                            icon={faPlay}
-                            className="h-5 w-5 text-white ml-0.5"
-                          />
+                          <Play className="h-5 w-5 text-white ml-0.5" />
                         </div>
                       </div>
                       <div className="absolute bottom-3 left-3">
                         <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                          <FontAwesomeIcon
-                            icon={faVideo}
-                            className="h-2.5 w-2.5 mr-1"
-                          />
+                          <Video className="h-2.5 w-2.5 mr-1" />
                           Featured Video
                         </Badge>
                       </div>
@@ -616,40 +321,12 @@ export default function DjProfileFree({
 
             <Separator className="bg-white/8" />
 
-            {/* ── ABOUT ── */}
-            <section>
-              <SectionHeading>About Me</SectionHeading>
-              <div>
-                <p
-                  className={cn(
-                    "text-gray-300 text-sm leading-relaxed",
-                    !bioExpanded && "line-clamp-4",
-                  )}
-                >
-                  {DJ.bio}
-                </p>
-                <button
-                  onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-h_red text-xs mt-2 hover:text-red-400 transition-colors"
-                >
-                  {bioExpanded ? "Show less" : "Read more"}
-                </button>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap mt-4">
-                <span className="text-xs text-gray-500 shrink-0">
-                  Specializes in:
-                </span>
-                {DJ.djTypes.map((t) => (
-                  <Badge
-                    key={t}
-                    variant="outline"
-                    className="border-white/15 text-gray-300 text-xs"
-                  >
-                    {t}
-                  </Badge>
-                ))}
-              </div>
-            </section>
+            <ProfileAbout
+              bio={DJ.bio}
+              djTypes={DJ.djTypes}
+              bioExpanded={bioExpanded}
+              onToggleBio={() => setBioExpanded(!bioExpanded)}
+            />
 
             <Separator className="bg-white/8" />
 
@@ -665,10 +342,7 @@ export default function DjProfileFree({
                 <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0 cursor-pointer hover:border-white/15 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="size-14 rounded-lg bg-linear-to-br from-h_red/30 to-h_redDark/10 border border-white/8 flex items-center justify-center shrink-0">
-                      <FontAwesomeIcon
-                        icon={faMusic}
-                        className="h-5 w-5 text-h_red"
-                      />
+                      <Music className="h-5 w-5 text-h_red" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-semibold">
@@ -688,30 +362,11 @@ export default function DjProfileFree({
                       </div>
                     </div>
                     <div className="size-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                      <FontAwesomeIcon
-                        icon={faPlay}
-                        className="h-3 w-3 ml-0.5"
-                      />
+                      <Play className="h-3 w-3 ml-0.5" />
                     </div>
                   </div>
                 </Card>
               </MediaAudioPlayer>
-              {/* Locked more mixes */}
-              {/* <div className="mt-3 p-3 rounded-lg border border-dashed border-white/10 flex items-center gap-3">
-                <FontAwesomeIcon
-                  icon={faLock}
-                  className="h-3.5 w-3.5 text-amber-500 shrink-0"
-                />
-                <p className="text-gray-500 text-xs">
-                  <span className="text-amber-400 font-medium">
-                    {lockedMixesCount} more mixes hidden.
-                  </span>{" "}
-                  Upgrade to Premium to unlock your full discography.
-                </p>
-                <Badge className="ml-auto shrink-0 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs cursor-pointer hover:bg-amber-500/20 transition-colors">
-                  Upgrade
-                </Badge>
-              </div> */}
             </section>
 
             <Separator className="bg-white/8" />
@@ -722,275 +377,100 @@ export default function DjProfileFree({
                 Media
               </SectionHeading>
               <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
-              {/* Locked video */}
-              {/* <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden gap-0">
-                <div className="relative h-44 bg-linear-to-br from-slate-900 to-black">
-                  <Image
-                    src={videoThumb}
-                    alt="video"
-                    fill
-                    className="object-cover opacity-30"
-                  />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                    <div className="size-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
-                      <FontAwesomeIcon
-                        icon={faLock}
-                        className="h-5 w-5 text-amber-400"
-                      />
-                    </div>
-                    <p className="text-white text-sm font-semibold">
-                      Video Locked
-                    </p>
-                    <p className="text-gray-500 text-xs px-8 text-center">
-                      Upgrade to Premium to add and display unlimited videos
-                    </p>
-                    <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs cursor-pointer hover:bg-amber-500/20 mt-1">
-                      <FontAwesomeIcon
-                        icon={faCrown}
-                        className="h-2.5 w-2.5 mr-1"
-                      />{" "}
-                      Unlock Videos
-                    </Badge>
-                  </div>
-                </div>
-              </Card> */}
             </section>
 
             <Separator className="bg-white/8" />
 
-            {/* ── WHERE I'VE PLAYED ── */}
-            <section>
-              <SectionHeading>Where I&apos;ve Played</SectionHeading>
-              <div className="flex flex-col gap-2">
-                {VENUES.map((v, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-h_blackLight/30 border border-white/5 hover:border-white/10 transition-colors"
-                  >
-                    <div className="size-9 rounded-md bg-white/5 border border-white/8 flex items-center justify-center shrink-0">
-                      <FontAwesomeIcon
-                        icon={faLocationDot}
-                        className="h-3.5 w-3.5 text-h_red"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium">{v.name}</p>
-                      <p className="text-gray-500 text-xs">
-                        {v.city}, {v.country}
+            <ProfileVenues venues={VENUES} />
+
+            <Separator className="bg-white/8" />
+
+            <ProfileReviews
+              avgRating={DJ.avgRating}
+              ratingCount={DJ.ratingCount}
+              reviews={REVIEWS}
+            />
+
+            {/* ── LOCKED PREMIUM TEASERS (DJ owner only) ── */}
+            {viewMode === "dj-owner" && (
+              <>
+                <Separator className="bg-white/8" />
+                <section>
+                  <div className="flex items-center justify-between mb-5">
+                    <div>
+                      <h2 className="font-heading text-xl text-white flex items-center gap-2">
+                        <Crown className="h-4 w-4 text-amber-400" />
+                        Unlock Premium Features
+                      </h2>
+                      <p className="text-gray-500 text-xs mt-0.5">
+                        Upgrade to share more and grow your bookings
                       </p>
                     </div>
-                    <Badge className="bg-white/5 text-gray-400 border-white/10 text-xs shrink-0">
-                      {v.count}x
-                    </Badge>
+                    <Button
+                      size="sm"
+                      className="bg-amber-500 hover:bg-amber-600 text-black font-semibold text-xs shrink-0"
+                    >
+                      Upgrade Now
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            {/* ── REVIEWS ── */}
-            <section>
-              <SectionHeading sub={`${DJ.ratingCount} verified reviews`}>
-                Crowd Feedback
-              </SectionHeading>
-              <div className="flex flex-col sm:flex-row gap-6 mb-7 p-5 rounded-xl bg-h_blackLight/30 border border-white/5">
-                <div className="flex flex-col items-center justify-center shrink-0 min-w-24 gap-1.5">
-                  <span className="text-5xl font-bold text-white leading-none">
-                    {DJ.avgRating.toFixed(1)}
-                  </span>
-                  <Stars rating={DJ.avgRating} size="lg" />
-                  <span className="text-xs text-gray-500">
-                    {DJ.ratingCount} reviews
-                  </span>
-                </div>
-                <div className="flex-1 flex flex-col justify-center gap-2">
-                  {[5, 4, 3, 2, 1].map((s) => {
-                    const pct =
-                      s === 5
-                        ? 78
-                        : s === 4
-                          ? 14
-                          : s === 3
-                            ? 5
-                            : s === 2
-                              ? 2
-                              : 1;
-                    return (
-                      <div key={s} className="flex items-center gap-3">
-                        <span className="text-xs text-gray-400 w-3 text-right">
-                          {s}
-                        </span>
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          className="h-3 w-3 text-amber-400 shrink-0"
-                        />
-                        <Progress
-                          value={pct}
-                          className="flex-1 h-1.5 bg-white/8"
-                        />
-                        <span className="text-xs text-gray-600 w-5 text-right">
-                          {Math.round((DJ.ratingCount * pct) / 100)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="flex flex-col gap-4">
-                {REVIEWS.map((r) => (
-                  <Card
-                    key={r.id}
-                    className="bg-h_blackLight/30 border-white/5 p-5 gap-0"
-                  >
-                    <div className="flex items-start gap-3">
-                      <Avatar className="size-9 ring-1 ring-white/10 shrink-0">
-                        <AvatarImage src={r.user.image} />
-                        <AvatarFallback className="bg-h_blackLight text-white text-xs">
-                          {r.user.name.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <div className="flex items-center gap-2">
-                            <span className="text-white text-sm font-medium">
-                              {r.user.name}
-                            </span>
-                            <Stars rating={r.rating} />
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {(
+                      [
+                        {
+                          title: "Performance Insights",
+                          desc: "Analytics, profile views & booking stats",
+                          icon: ChartLine,
+                        },
+                        {
+                          title: "Availability Calendar",
+                          desc: "Show your available & booked dates",
+                          icon: CalendarDays,
+                        },
+                        {
+                          title: "Booking Packages",
+                          desc: "Offer tailored packages to clients",
+                          icon: BriefcaseBusiness,
+                        },
+                        {
+                          title: "Career Highlights",
+                          desc: "Showcase your biggest achievements",
+                          icon: Trophy,
+                        },
+                        {
+                          title: "Industry Endorsements",
+                          desc: "Display testimonials from venues & promoters",
+                          icon: Star,
+                        },
+                        {
+                          title: "Press & Media",
+                          desc: "Link your features, interviews & podcasts",
+                          icon: Newspaper,
+                        },
+                      ] as const
+                    ).map((f) => {
+                      const FIcon = f.icon;
+                      return (
+                        <div
+                          key={f.title}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/15"
+                        >
+                          <div className="size-8 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                            <FIcon className="h-3.5 w-3.5 text-amber-400" />
                           </div>
-                          <span className="text-xs text-gray-600">
-                            {r.date}
-                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white text-sm font-medium">
+                              {f.title}
+                            </p>
+                            <p className="text-gray-500 text-xs">{f.desc}</p>
+                          </div>
+                          <Lock className="h-3.5 w-3.5 text-gray-600 shrink-0" />
                         </div>
-                        <p className="text-gray-300 text-sm mt-2 leading-relaxed">
-                          {r.review}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            {/* ── BOOKING DETAILS ── */}
-            {/* <section>
-              <SectionHeading>Booking Details</SectionHeading>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
-                  <h3 className="text-white text-sm font-semibold mb-3">
-                    Contact
-                  </h3>
-                  <div className="flex flex-col gap-2.5">
-                    <div className="flex items-center gap-2 text-sm text-gray-300">
-                      <FontAwesomeIcon
-                        icon={faEnvelope}
-                        className="h-3.5 w-3.5 text-h_red shrink-0"
-                      />
-                      {DJ.bookingEmail}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-300">
-                      <FontAwesomeIcon
-                        icon={faPhone}
-                        className="h-3.5 w-3.5 text-h_red shrink-0"
-                      />
-                      {DJ.bookingPhone}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-300">
-                      <FontAwesomeIcon
-                        icon={faGlobe}
-                        className="h-3.5 w-3.5 text-h_red shrink-0"
-                      />
-                      {DJ.website}
-                    </div>
+                      );
+                    })}
                   </div>
-                </Card>
-                <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
-                  <h3 className="text-white text-sm font-semibold mb-3">
-                    Fee Range
-                  </h3>
-                  <div className="flex items-end gap-2 mb-2">
-                    <span className="text-2xl font-bold text-white">
-                      {DJ.minFee}
-                    </span>
-                    <span className="text-gray-500 text-sm mb-0.5">
-                      – {DJ.maxFee}
-                    </span>
-                  </div>
-                  <p className="text-gray-500 text-xs">
-                    Per event · varies by duration & travel
-                  </p>
-                  <Button
-                    className="w-full mt-4 bg-h_red hover:bg-h_redDark text-white font-semibold"
-                    size="sm"
-                  >
-                    <FontAwesomeIcon
-                      icon={faCalendarDays}
-                      className="h-3.5 w-3.5 mr-1.5"
-                    />
-                    Request Booking
-                  </Button>
-                </Card>
-              </div>
-            </section> */}
-
-            {/* ── LOCKED PREMIUM TEASERS ── */}
-            {/* <section>
-              <div className="flex items-center gap-2 mb-5">
-                <h2 className="font-heading text-xl text-white">
-                  Unlock More with Premium
-                </h2>
-                <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20">
-                  <FontAwesomeIcon
-                    icon={faCrown}
-                    className="h-2.5 w-2.5 mr-1"
-                  />
-                  Upgrade
-                </Badge>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <LockedCard
-                  icon={faChartLine}
-                  title="Performance Analytics"
-                  description="Profile views, booking requests, audience demographics, and growth trends."
-                />
-                <LockedCard
-                  icon={faCheckCircle}
-                  title="Verified DJ Badge"
-                  description="Stand out with a blue verification badge. Build trust instantly."
-                />
-                <LockedCard
-                  icon={faBolt}
-                  title="Featured Placement"
-                  description="Appear at the top of DJ searches and get 10x more visibility."
-                />
-                <LockedCard
-                  icon={faFireFlameCurved}
-                  title="Booking Insights"
-                  description="See who's visiting your profile and convert them into clients."
-                />
-              </div>
-              <div className="mt-6 p-6 rounded-xl border border-amber-500/20 bg-linear-to-br from-amber-500/5 via-transparent to-transparent">
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="flex-1">
-                    <p className="text-white font-heading text-lg">
-                      Ready to grow your career?
-                    </p>
-                    <p className="text-gray-400 text-sm mt-1">
-                      DJs on Premium get 3x more booking requests.
-                    </p>
-                  </div>
-                  <Button className="bg-amber-500 hover:bg-amber-400 text-black font-bold shrink-0">
-                    <FontAwesomeIcon
-                      icon={faCrown}
-                      className="h-3.5 w-3.5 mr-2"
-                    />
-                    Go Premium
-                  </Button>
-                </div>
-              </div>
-            </section> */}
+                </section>
+              </>
+            )}
           </div>
 
           {/* ── SIDEBAR ── */}
@@ -1004,65 +484,26 @@ export default function DjProfileFree({
                 For clubs, festivals, events & more
               </p>
               <Button className="w-full bg-h_red hover:bg-h_redDark text-white font-semibold mb-2">
-                <FontAwesomeIcon
-                  icon={faCalendarDays}
-                  className="h-3.5 w-3.5 mr-1.5"
-                />
+                <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
                 Book / Hire DJ
               </Button>
               <Button
                 variant="outline"
                 className="w-full border-white/15 text-gray-300 hover:bg-white/5"
               >
-                <FontAwesomeIcon
-                  icon={faEnvelope}
-                  className="h-3.5 w-3.5 mr-1.5"
-                />
+                <Mail className="h-3.5 w-3.5 mr-1.5" />
                 Send Inquiry
               </Button>
             </Card>
 
-            {/* Upcoming Events */}
-            <div>
-              <h3 className="text-white text-sm font-semibold mb-3">
-                Upcoming Events
-              </h3>
-              <div className="flex flex-col gap-2">
-                {EVENTS.map((e) => (
-                  <div
-                    key={e.id}
-                    className="flex items-center gap-3 p-2.5 rounded-lg bg-h_blackLight/30 border border-white/5 hover:border-white/10 transition-colors cursor-pointer"
-                  >
-                    <div className="shrink-0 w-10 h-10 rounded-md bg-h_red/10 border border-h_red/20 flex flex-col items-center justify-center">
-                      <span className="text-h_red text-[9px] font-bold uppercase leading-none">
-                        {format(new Date(e.date), "MMM")}
-                      </span>
-                      <span className="text-white text-sm font-bold leading-none mt-0.5">
-                        {format(new Date(e.date), "d")}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-xs font-medium truncate">
-                        {e.title}
-                      </p>
-                      <p className="text-gray-500 text-[10px] mt-0.5 truncate">
-                        {[e.venue, e.city].filter(Boolean).join(" · ")}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ProfileEventsSidebar events={EVENTS} />
 
             <Separator className="bg-white/8" />
 
             {/* Specializes In */}
             <div>
               <h3 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
-                <FontAwesomeIcon
-                  icon={faMusic}
-                  className="h-3 w-3 text-h_red"
-                />
+                <Music className="h-3 w-3 text-h_red" />
                 Specializes In
               </h3>
               <div className="flex flex-wrap gap-1.5">
@@ -1079,37 +520,6 @@ export default function DjProfileFree({
             </div>
 
             <Separator className="bg-white/8" />
-
-            {/* Locked Analytics teaser */}
-            {/* <div className="p-4 rounded-xl border border-white/8 bg-white/2">
-              <div className="flex items-center gap-2 mb-3">
-                <FontAwesomeIcon
-                  icon={faLock}
-                  className="h-3.5 w-3.5 text-amber-400"
-                />
-                <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider">
-                  Analytics
-                </h3>
-                <Badge className="ml-auto bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px]">
-                  Premium
-                </Badge>
-              </div>
-              <div className="flex flex-col gap-2 opacity-40 pointer-events-none select-none">
-                {["Profile Views", "Booking Requests", "Follower Growth"].map(
-                  (m) => (
-                    <div key={m} className="flex items-center justify-between">
-                      <span className="text-gray-400 text-xs">{m}</span>
-                      <div className="h-2 w-16 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-h_red rounded-full"
-                          style={{ width: `${Math.random() * 60 + 30}%` }}
-                        />
-                      </div>
-                    </div>
-                  ),
-                )}
-              </div>
-            </div> */}
 
             {/* Profile completion prompt */}
             <div>

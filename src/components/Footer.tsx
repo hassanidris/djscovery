@@ -9,22 +9,11 @@ import {
   faTiktok,
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import {
-  faHeadphones,
-  faCompactDisc,
-  faUsers,
-  faCalendarDays,
-  faMicrophone,
-  faEnvelope,
-} from "@fortawesome/free-solid-svg-icons";
+import { House, Mic, Mail } from "lucide-react";
+import { getNavUser } from "@/lib/auth/getNavUser";
+import { desktopNavByRole } from "@/config/navigation";
 
 const footerLinks = {
-  explore: [
-    { label: "Home", href: "/", icon: faHeadphones },
-    { label: "DJ Directory", href: "/directory", icon: faCompactDisc },
-    { label: "Community", href: "/community", icon: faUsers },
-    { label: "Events", href: "/community", icon: faCalendarDays },
-  ],
   forDJs: [
     { label: "Join as DJ", href: "/sign-up?role=dj" },
     { label: "Join as Organiser", href: "/sign-up?role=organiser" },
@@ -49,7 +38,13 @@ const socialLinks = [
   { icon: faYoutube, href: "#", label: "YouTube" },
 ];
 
-const Footer = () => {
+const Footer = async () => {
+  const { navRole } = await getNavUser();
+  const exploreItems = [
+    { id: "home", label: "Home", href: "/", icon: House },
+    ...desktopNavByRole[navRole],
+  ];
+
   return (
     <footer className="w-full bg-black border-t border-white/5">
       {/* Top accent bar */}
@@ -78,10 +73,7 @@ const Footer = () => {
             {/* Newsletter mini-CTA */}
             <div className="flex items-center gap-2 mt-1">
               <div className="flex-1 flex items-center gap-2 bg-h_blackLight/60 ring-1 ring-white/10 rounded-lg px-3 py-2.5">
-                <FontAwesomeIcon
-                  icon={faEnvelope}
-                  className="h-3.5 w-3.5 text-gray-500 shrink-0"
-                />
+                <Mail className="h-3.5 w-3.5 text-gray-500 shrink-0" />
                 <input
                   type="email"
                   aria-label="Email address for newsletter"
@@ -115,20 +107,34 @@ const Footer = () => {
               Explore
             </h4>
             <ul className="flex flex-col gap-3">
-              {footerLinks.explore.map((link) => (
-                <li key={link.href + link.label}>
-                  <Link
-                    href={link.href}
-                    className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_red transition-colors group"
-                  >
-                    <FontAwesomeIcon
-                      icon={link.icon}
-                      className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors"
-                    />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {exploreItems.map((item) => {
+                const Icon = item.icon;
+                if (item.comingSoon || !item.href) {
+                  return (
+                    <li
+                      key={item.id}
+                      className="flex items-center gap-2.5 text-gray-600 text-sm select-none"
+                    >
+                      <Icon className="h-3.5 w-3.5 text-h_redDark/40" />
+                      {item.label}
+                      <span className="text-[9px] font-semibold uppercase tracking-wider text-h_red/50 bg-h_red/10 px-1.5 py-0.5 rounded-full leading-none">
+                        Soon
+                      </span>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={item.id}>
+                    <Link
+                      href={item.href}
+                      className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_red transition-colors group"
+                    >
+                      <Icon className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors" />
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -144,10 +150,7 @@ const Footer = () => {
                     href={link.href}
                     className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_red transition-colors group"
                   >
-                    <FontAwesomeIcon
-                      icon={faMicrophone}
-                      className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors"
-                    />
+                    <Mic className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors" />
                     {link.label}
                   </Link>
                 </li>

@@ -29,7 +29,7 @@ export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
             setOpen(true);
           }
         }}
-        className="cursor-pointer"
+        className="cursor-pointer h-full"
       >
         {children}
       </div>
