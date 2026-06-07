@@ -2,9 +2,11 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import prisma from "@/lib/client";
+import { formatDistanceToNow } from "date-fns";
 
-type DemoPost = {
-  id: number;
+type PostCard = {
+  id: number | string;
   dj: string;
   avatar: string;
   content: string;
@@ -15,9 +17,9 @@ type DemoPost = {
   country: string;
 };
 
-const DEMO_POSTS: DemoPost[] = [
+const DEMO_POSTS: PostCard[] = [
   {
-    id: 1,
+    id: "demo-1",
     dj: "DJ Nova",
     avatar: "/rated-1.webp",
     content:
@@ -29,7 +31,7 @@ const DEMO_POSTS: DemoPost[] = [
     country: "Sweden",
   },
   {
-    id: 2,
+    id: "demo-2",
     dj: "Marcus Groove",
     avatar: "/rated-5.webp",
     content:
@@ -41,7 +43,7 @@ const DEMO_POSTS: DemoPost[] = [
     country: "USA",
   },
   {
-    id: 3,
+    id: "demo-3",
     dj: "Amara Pulse",
     avatar: "/rated-6.webp",
     content:
@@ -54,7 +56,49 @@ const DEMO_POSTS: DemoPost[] = [
   },
 ];
 
-export default function HomeCommunityHighlights() {
+export default async function HomeCommunityHighlights() {
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  let dbPosts: PostCard[] = [];
+  try {
+    const posts = await prisma.post.findMany({
+      where: { deletedAt: null, content: { not: null } },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      include: {
+        user: {
+          include: {
+            djProfile: { select: { stageName: true } },
+            city: { select: { name: true } },
+            country: { select: { name: true } },
+          },
+        },
+        _count: { select: { likes: true, comments: true } },
+      },
+    });
+
+    dbPosts = posts.map((p) => ({
+      id: p.id,
+      dj: p.user.djProfile?.stageName ?? p.user.name ?? p.user.username,
+      avatar: p.user.image ?? "/noAvatar.png",
+      content: p.content ?? "",
+      likes: p._count.likes,
+      comments: p._count.comments,
+      postedAgo: formatDistanceToNow(p.createdAt, { addSuffix: true }),
+      city: p.user.city?.name ?? "",
+      country: p.user.country?.name ?? "",
+    }));
+  } catch {
+    // DB unavailable — fall through to demo data
+  }
+
+  const dbIds = new Set(dbPosts.map((p) => p.id));
+  const posts = isStaging
+    ? [...dbPosts, ...DEMO_POSTS.filter((p) => !dbIds.has(p.id))].slice(0, 3)
+    : dbPosts.length > 0
+      ? dbPosts
+      : DEMO_POSTS;
+
   return (
     <section className="py-12 px-4 md:px-8 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
@@ -77,10 +121,10 @@ export default function HomeCommunityHighlights() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {DEMO_POSTS.map((post) => (
-            <Link key={post.id} href="/community">
-              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all p-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+          {posts.map((post) => (
+            <Link key={post.id} href="/community" className="h-full">
+              <Card className="h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all p-4 gap-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="size-11 ring-2 ring-h_red shrink-0">
                     <AvatarImage src={post.avatar} alt={post.dj} />
@@ -93,12 +137,15 @@ export default function HomeCommunityHighlights() {
                       {post.dj}
                     </p>
                     <p className="text-gray-500 text-xs">
-                      📍 {post.city}, {post.country} · {post.postedAgo}
+                      {post.city && post.country
+                        ? `📍 ${post.city}, ${post.country} · `
+                        : ""}
+                      {post.postedAgo}
                     </p>
                   </div>
                 </div>
 
-                <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
+                <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 flex-1">
                   {post.content}
                 </p>
 

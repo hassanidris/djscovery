@@ -87,6 +87,7 @@ const DirectoryPage = async ({
       genres: p.genres.map((g) => g.genre.name).join(", ") || null,
       country: p.country?.name ?? null,
       city: p.city?.name ?? null,
+      slug: p.slug,
       _count: { followers: p.user._count.followers },
     }));
   } catch {

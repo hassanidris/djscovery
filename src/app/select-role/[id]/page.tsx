@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { assignRole } from "@/lib/actions/auth";
-import Footer from "@/components/Footer";
 
 export default function SelectRolePage() {
   const [role, setRole] = useState<"DJ" | "ORGANIZER" | null>(null);
@@ -76,7 +75,6 @@ export default function SelectRolePage() {
           </button>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

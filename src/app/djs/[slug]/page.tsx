@@ -2,37 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
-import DjProfileHero from "@/components/dj-profile/DjProfileHero";
-import DjProfileTabs from "@/components/dj-profile/DjProfileTabs";
-import DjProfileContent from "@/components/dj-profile/DjProfileContent";
-import DjProfileSidebar from "@/components/dj-profile/DjProfileSidebar";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
-import type { DjType } from "@prisma/client";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
-
-const DEMO_DJ = {
-  stageName: "Amara Pulse",
-  avatar: "/rated-6.webp",
-  coverImage: "/noCover.png",
-  bio: "Bringing the pulse of Lagos to the world stage. Amara blends Afrobeats and Amapiano into euphoric, floor-filling sets that transcend borders. With residencies across London, Paris, and Dubai, she's one of the fastest-rising names in global club culture.",
-  city: "Lagos",
-  country: "Nigeria",
-  genres: ["Afrobeats", "Amapiano", "House"],
-  socialLinks: [
-    { platform: "instagram", url: "#" },
-    { platform: "soundcloud", url: "#" },
-    { platform: "tiktok", url: "#" },
-    { platform: "spotify", url: "#" },
-  ],
-  avgRating: 4.8,
-  ratingCount: 0,
-  followerCount: 5200,
-  eventsCount: 0,
-};
-
-const DEMO_DJ_TYPES: DjType[] = ["FESTIVAL", "CLUB"];
 
 export default async function DjProfilePage({
   params,
@@ -73,70 +46,6 @@ export default async function DjProfilePage({
           </Link>
         </div>
         <DjProfilePremium />
-      </div>
-    );
-  }
-
-  if (slug === "demo") {
-    return (
-      <div className="min-h-screen bg-black">
-        <div className="bg-h_red/10 border-b border-h_red/15 text-red-200 text-xs text-center py-2 px-4 font-medium tracking-wide">
-          Layout V1 — Tabbed &nbsp;·&nbsp;{" "}
-          <Link
-            href="/djs/demo-v2"
-            className="underline underline-offset-2 opacity-70 hover:opacity-100"
-          >
-            Switch to V2 (Two-Column) →
-          </Link>
-        </div>
-        <DjProfileHero {...DEMO_DJ} />
-        <div className="max-w-5xl mx-auto px-4 md:px-8 py-10">
-          <DjProfileTabs
-            bio={DEMO_DJ.bio}
-            djTypes={DEMO_DJ_TYPES}
-            city={DEMO_DJ.city}
-            country={DEMO_DJ.country}
-            media={[]}
-            events={[]}
-            ratings={[]}
-            avgRating={0}
-            ratingCount={0}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (slug === "demo-v2") {
-    return (
-      <div className="min-h-screen bg-black">
-        <div className="bg-h_red/10 border-b border-h_red/15 text-red-200 text-xs text-center py-2 px-4 font-medium tracking-wide">
-          Layout V2 — Editorial Two-Column &nbsp;·&nbsp;{" "}
-          <Link
-            href="/djs/demo"
-            className="underline underline-offset-2 opacity-70 hover:opacity-100"
-          >
-            Switch to V1 (Tabs) →
-          </Link>
-        </div>
-        <DjProfileHero {...DEMO_DJ} />
-        <div className="max-w-5xl mx-auto px-4 md:px-8 py-10">
-          <div className="flex gap-8 items-start">
-            <div className="flex-1 min-w-0">
-              <DjProfileContent
-                bio={DEMO_DJ.bio}
-                djTypes={DEMO_DJ_TYPES}
-                media={[]}
-                ratings={[]}
-                avgRating={0}
-                ratingCount={0}
-              />
-            </div>
-            <div className="hidden lg:block w-72 shrink-0">
-              <DjProfileSidebar djTypes={DEMO_DJ_TYPES} events={[]} />
-            </div>
-          </div>
-        </div>
       </div>
     );
   }

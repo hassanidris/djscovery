@@ -59,7 +59,7 @@ export default function HomeDJsRow({
                 href={dj.slug ? `/djs/${dj.slug}` : "/directory"}
                 className="block h-full"
               >
-                <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red gap-3 p-4 cursor-pointer transition-all overflow-visible">
+                <Card className="relative shrink-0 w-56 min-h-64 flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red gap-3 p-4 cursor-pointer transition-all overflow-visible">
                   {variant === "trending" ? (
                     <Badge className="absolute top-2 left-2 bg-h_redDark/50 text-h_red border-0">
                       #{index + 1}
@@ -87,13 +87,13 @@ export default function HomeDJsRow({
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-1 justify-center">
+                  <div className="flex gap-1 justify-center">
                     {dj.genres.slice(0, 2).map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_redDark/60 text-red-100 border-0"
+                        className="bg-h_redDark/60 text-red-100 border-0 whitespace-nowrap"
                       >
-                        {g}
+                        {g.length > 11 ? `${g.slice(0, 10)}…` : g}
                       </Badge>
                     ))}
                   </div>
