@@ -270,9 +270,6 @@ export type DjUser = {
   country: string | null;
   city: string | null;
   slug?: string;
-  isPremium?: boolean;
-  isFeatured?: boolean;
-  verified?: boolean;
   _count?: { followers: number };
 };
 
@@ -286,9 +283,6 @@ export function demoDJsAsDjUsers(): DjUser[] {
     country: dj.location.country,
     city: dj.location.city,
     slug: dj.slug,
-    isPremium: dj.plan === "premium",
-    isFeatured: dj.featured,
-    verified: dj.verified,
     _count: { followers: dj.stats.followers },
   }));
 }

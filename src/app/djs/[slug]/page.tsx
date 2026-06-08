@@ -83,7 +83,7 @@ export default async function DjProfilePage({
       },
       media: {
         where: { type: "IMAGE" },
-        take: 24,
+        take: 12,
         orderBy: { createdAt: "desc" },
       },
       eventsOwned: {
@@ -115,25 +115,13 @@ export default async function DjProfilePage({
 
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
 
-  const djPlan = dj.plan;
-  const djVerified = dj.verified;
-  const djFeatured = dj.featured;
-  const djBookingEmail = dj.bookingEmail ?? "";
-  const djBookingPhone = dj.bookingPhone ?? "";
-  const djFeeMin = dj.feeMin ?? 0;
-  const djFeeMax = dj.feeMax ?? 0;
-  const djFeeCurrency = dj.feeCurrency ?? "USD";
-
-  const websiteLink =
-    dj.socialLinks.find((s) => s.platform === "website")?.url ?? "";
-
   const djDemoData: DjDemoData = {
     id: String(dj.id),
     slug: dj.slug,
     type: "fictional_demo",
-    plan: djPlan === "PREMIUM" ? "premium" : "free",
-    verified: djVerified,
-    featured: djFeatured,
+    plan: "free",
+    verified: false,
+    featured: false,
     name: dj.stageName,
     stageName: dj.stageName,
     location: {
@@ -223,10 +211,10 @@ export default async function DjProfilePage({
       bookingAgent: { name: "", agency: "", email: "" },
     },
     booking: {
-      email: djBookingEmail,
-      phone: djBookingPhone,
-      website: websiteLink,
-      feeRange: { min: djFeeMin, max: djFeeMax, currency: djFeeCurrency },
+      email: "",
+      phone: "",
+      website: "",
+      feeRange: { min: 0, max: 0, currency: "USD" },
     },
     upcomingEvents: dj.eventsOwned.map((e) => ({
       title: e.title,
@@ -236,8 +224,6 @@ export default async function DjProfilePage({
     })),
   };
 
-  const isPremium = djPlan === "PREMIUM";
-
   return (
     <div>
       {dj.status === "PENDING_APPROVAL" && (
@@ -245,11 +231,7 @@ export default async function DjProfilePage({
           ⏳ Your profile is pending admin approval and is only visible to you.
         </div>
       )}
-      {isPremium ? (
-        <DjProfilePremium djData={djDemoData} viewMode={viewMode} />
-      ) : (
-        <DjProfileFree djData={djDemoData} viewMode={viewMode} />
-      )}
+      <DjProfileFree djData={djDemoData} viewMode={viewMode} />
     </div>
   );
 }

@@ -88,9 +88,6 @@ const DirectoryPage = async ({
       country: p.country?.name ?? null,
       city: p.city?.name ?? null,
       slug: p.slug,
-      isPremium: p.plan === "PREMIUM",
-      isFeatured: p.featured,
-      verified: p.verified,
       _count: { followers: p.user._count.followers },
     }));
   } catch {

@@ -79,11 +79,6 @@ enum DjType {
   BAR_LOUNGE
 }
 
-enum DjPlan {
-  FREE
-  PREMIUM
-}
-
 // ============================================================
 // SECTION 1: MVP MODELS
 // ============================================================
@@ -195,16 +190,6 @@ model DjProfile {
   cityId    Int?
   city      City?    @relation(fields: [cityId], references: [id])
 
-  plan         DjPlan   @default(FREE)
-  verified     Boolean  @default(false)
-  featured     Boolean  @default(false)
-  searchScore  Float    @default(0)
-  bookingEmail String?
-  bookingPhone String?
-  feeMin       Int?
-  feeMax       Int?
-  feeCurrency  String?
-
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -220,9 +205,6 @@ model DjProfile {
 
   @@index([slug])
   @@index([status])
-  @@index([plan])
-  @@index([featured])
-  @@index([searchScore])
   @@index([countryId])
   @@index([cityId])
 }
@@ -644,25 +626,30 @@ model Hire {
 // (Commented placeholders — do NOT implement yet)
 // ============================================================
 
-// ✅ DjPlan enum implemented (FREE | PREMIUM). Extend with PRO | AGENCY | ENTERPRISE as needed.
-// ✅ plan, verified, featured, searchScore, bookingEmail, bookingPhone, feeMin, feeMax, feeCurrency added to DjProfile.
-// Feature gating lives in src/lib/plan-features.ts.
-// Profile completion lives in src/lib/profile-completion.ts.
+// -- SubscriptionPlan --
+// Tiers: FREE | PRO | AGENCY
+// Add `planId Int?` to DjProfile and OrganizerProfile when ready.
+// Gate features (media upload limits, featured slots) via plan.
 
-// -- Future: FeaturedDj (paid time-boxed slots) --
-// Fields: djProfileId, startsAt DateTime, endsAt DateTime, position Int
-// @@index([startsAt, endsAt]) for efficient expiry queries.
-// Use alongside featured Boolean for granular control.
+// -- DjBadge --
+// Verification badge for DJs.
+// Add `verified Boolean @default(false)` to DjProfile.
+// Could be tied to SubscriptionPlan or manual admin action.
 
-// -- Future: FeaturedJob --
+// -- FeaturedDj --
+// Paid slot to appear at top of discovery pages.
+// Fields: djProfileId, startsAt, endsAt, position
+// Add `@@index([startsAt, endsAt])` for efficient expiry queries.
+
+// -- FeaturedJob --
 // Organizer pays to boost job listing visibility.
 // Fields: jobId, startsAt, endsAt
 
-// -- Future: BookingInquiry --
-// Replaces mailto: with structured booking requests.
-// Fields: djProfileId, organizerId, message, status, createdAt
-// Phase 3 of booking pipeline.
+// -- SearchRankingBoost --
+// Weight multiplier applied at query time for premium DJs.
+// Can be implemented as a score column on DjProfile:
+// `searchScore Float @default(0)` with @@index([searchScore]).
 
-// -- Future: OrganizerPlan --
-// Mirror of DjPlan for organizer subscriptions.
-// Tiers: FREE | PREMIUM | AGENCY
+// -- MediaUploadLimit --
+// FREE tier: 5 images. PRO: unlimited.
+// Track usage in a `MediaUsage` table or via count queries on Media.
