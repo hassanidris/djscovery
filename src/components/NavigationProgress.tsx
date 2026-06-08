@@ -85,7 +85,7 @@ function ProgressBar() {
   return (
     <div
       aria-hidden
-      className={`fixed top-0 left-0 z-[9999] h-0.5 bg-h_red pointer-events-none ${
+      className={`fixed top-0 left-0 z-9999 h-0.5 bg-h_red pointer-events-none ${
         complete
           ? "w-full opacity-0 transition-all duration-300"
           : "animate-nav-progress"

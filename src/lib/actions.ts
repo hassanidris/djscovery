@@ -124,15 +124,31 @@ export const deletePostComment = async (commentId: number) => {
 // POSTS (DJ only — enforced in UI; double-checked here)
 // -------------------------------------------------------
 
+function isSafeUrl(raw: string): boolean {
+  try {
+    const { protocol } = new URL(raw);
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export const addPost = async (formData: FormData, imageUrl?: string) => {
-  const content = formData.get("content") as string;
-  const videoUrl = (formData.get("videoUrl") as string | null) || "";
-  const audioUrl = (formData.get("audioUrl") as string | null) || "";
+  const content = ((formData.get("content") as string | null) ?? "").trim();
+  const rawVideoUrl = (
+    (formData.get("videoUrl") as string | null) ?? ""
+  ).trim();
+  const rawAudioUrl = (
+    (formData.get("audioUrl") as string | null) ?? ""
+  ).trim();
+
+  const videoUrl = rawVideoUrl && isSafeUrl(rawVideoUrl) ? rawVideoUrl : "";
+  const audioUrl = rawAudioUrl && isSafeUrl(rawAudioUrl) ? rawAudioUrl : "";
 
   const validated = z.string().min(0).max(1000).safeParse(content);
   if (!validated.success) return;
   const hasMedia = !!(imageUrl || videoUrl || audioUrl);
-  if (!validated.data.trim() && !hasMedia) return;
+  if (!validated.data && !hasMedia) return;
 
   const userId = await getCurrentUserId();
 

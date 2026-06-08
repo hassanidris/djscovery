@@ -143,8 +143,8 @@ const CommentsList = ({
               comment.user.name ??
               comment.user.username;
             const isDj = !!(comment.user as any).djProfile?.stageName;
-            const cHref = (comment.user as any).djProfile
-              ? `/djs/${(comment.user as any).djProfile.slug ?? comment.user.username}`
+            const cHref = (comment.user as any).djProfile?.slug
+              ? `/djs/${(comment.user as any).djProfile.slug}`
               : `/profile/${comment.user.username}`;
 
             return (

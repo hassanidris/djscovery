@@ -79,7 +79,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
             toast.error("Add some text or attach a photo, video, or mix.");
             return;
           }
-          if (content.length > 1000) {
+          if (content.trim().length > 1000) {
             toast.error("Post text must be under 1000 characters.");
             return;
           }
