@@ -24,7 +24,7 @@ export default function BecomeOrganizerForm() {
     if (state.error) {
       toast.error(state.error);
     }
-  }, [state.success, state.error, router]);
+  }, [state, router]);
 
   return (
     <form
@@ -48,8 +48,7 @@ export default function BecomeOrganizerForm() {
 
       <div className="flex flex-col gap-1.5">
         <label className="text-sm text-gray-300 font-medium">
-          Phone{" "}
-          <span className="text-gray-500 font-normal">(optional)</span>
+          Phone <span className="text-gray-500 font-normal">(optional)</span>
         </label>
         <input
           type="tel"

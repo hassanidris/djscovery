@@ -215,21 +215,23 @@ export async function createOrganizerProfile(
   }
 
   try {
-    await prisma.organizerProfile.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: {
-        userId: user.id,
-        businessName: parsed.data.businessName,
-        phone: parsed.data.phone ?? null,
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.organizerProfile.upsert({
+        where: { userId: user.id },
+        update: {},
+        create: {
+          userId: user.id,
+          businessName: parsed.data.businessName,
+          phone: parsed.data.phone ?? null,
+        },
+      });
 
-    // Grant ORGANIZER role only now — after the profile is fully saved.
-    await prisma.userRole.upsert({
-      where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
-      update: {},
-      create: { userId: user.id, role: "ORGANIZER" },
+      // Grant ORGANIZER role only now — after the profile is fully saved.
+      await tx.userRole.upsert({
+        where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
+        update: {},
+        create: { userId: user.id, role: "ORGANIZER" },
+      });
     });
 
     return { success: true, error: null };

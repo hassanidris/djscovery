@@ -335,9 +335,14 @@ export default function BecomeDjForm({
           });
           router.push("/");
         }
-      } catch {
+      } catch (error) {
         await cleanupUploads();
-        toast.error("Something went wrong. Please try again.", { id: toastId });
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+          { id: toastId },
+        );
       }
     });
   }

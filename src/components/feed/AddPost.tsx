@@ -46,6 +46,13 @@ const AddPost = () => {
         {/* Text Input */}
         <form
           action={async (formData) => {
+            const content = (formData.get("content") as string | null) ?? "";
+            if (!content || content.length > 1000) {
+              toast.error(
+                "Post content must be between 1 and 1000 characters.",
+              );
+              return;
+            }
             try {
               await addPost(formData, img?.secure_url || "");
               toast.success("Post shared with the community!");
