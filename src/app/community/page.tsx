@@ -11,39 +11,39 @@ const CommunityPage = () => {
   return (
     <>
       {/* ── Hero Banner ── */}
-      <section className="bg-h_blackLight/30 border-b border-gray-800 py-10 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-        <div className="max-w-7xl w-full mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           {/* Left — icon + title + subtitle */}
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-h_red/10 border border-h_red/20 flex items-center justify-center shrink-0">
-              <Users className="w-6 h-6 text-h_red" />
+            <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
+              <Users className="text-h_red h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
-              <h1 className="text-h_white font-bold text-3xl md:text-5xl">
+              <h1 className="text-h_white text-3xl font-bold md:text-5xl">
                 DJ <span className="text-h_red/80">Community</span>
               </h1>
-              <p className="text-gray-400 text-sm tracking-wide">
-                Share posts and connect with the DJ community
+              <p className="text-sm tracking-wide text-gray-400">
+                Share posts and connect with the DJ community.
               </p>
             </div>
           </div>
 
           {/* Right — community stat badges */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge className="bg-h_red/10 text-h_red border border-h_red/20 gap-1.5 py-1 px-3">
-              <Headphones className="w-3 h-3" /> 1.2k DJs
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="bg-h_red/10 text-h_red border-h_red/20 gap-1.5 border px-3 py-1">
+              <Headphones className="h-3 w-3" /> 1.2k DJs
             </Badge>
-            <Badge className="bg-gray-800/80 text-gray-300 border border-gray-700 gap-1.5 py-1 px-3">
-              <Users className="w-3 h-3" /> 4.8k Members
+            <Badge className="gap-1.5 border border-gray-700 bg-gray-800/80 px-3 py-1 text-gray-300">
+              <Users className="h-3 w-3" /> 4.8k Members
             </Badge>
-            <Badge className="bg-gray-800/80 text-gray-300 border border-gray-700 gap-1.5 py-1 px-3">
-              <Zap className="w-3 h-3 text-yellow-400" /> Active Now
+            <Badge className="gap-1.5 border border-gray-700 bg-gray-800/80 px-3 py-1 text-gray-300">
+              <Zap className="h-3 w-3 text-yellow-400" /> Active Now
             </Badge>
           </div>
         </div>
       </section>
 
-      <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         {/* ── Step 2: Active DJs Bar ── */}
         {/*
         WHY here: Placing Stories full-width above the 3-column layout
@@ -65,9 +65,9 @@ const CommunityPage = () => {
         so the layout stays correct at every breakpoint without
         hard-coded width arithmetic.
       */}
-        <div className="flex gap-4 md:gap-6 py-6">
+        <div className="flex gap-4 py-6 md:gap-6">
           {/* Left — xl+ only, fixed width */}
-          <div className="hidden xl:block w-56 shrink-0">
+          <div className="hidden w-56 shrink-0 xl:block">
             <LeftMenu type="home" />
           </div>
 
@@ -81,7 +81,7 @@ const CommunityPage = () => {
           This avoids wrapping Feed in "use client" which would break
           server-side data fetching.
         */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <FeedTabs
               forYouContent={
                 <div className="flex flex-col gap-6">
@@ -90,24 +90,24 @@ const CommunityPage = () => {
                 </div>
               }
               followingContent={
-                <div className="p-8 bg-h_blackLight/50 rounded-lg border border-gray-800 flex flex-col items-center gap-3 text-center">
-                  <Music2 className="w-10 h-10 text-h_red/60" />
+                <div className="bg-h_blackLight/50 flex flex-col items-center gap-3 rounded-lg border border-gray-800 p-8 text-center">
+                  <Music2 className="text-h_red/60 h-10 w-10" />
                   <p className="text-h_white font-semibold">
                     Following feed coming soon
                   </p>
-                  <p className="text-gray-400 text-sm max-w-xs">
+                  <p className="max-w-xs text-sm text-gray-400">
                     Posts from DJs you follow will appear here once the filtered
                     feed is implemented.
                   </p>
                 </div>
               }
               trendingContent={
-                <div className="p-8 bg-h_blackLight/50 rounded-lg border border-gray-800 flex flex-col items-center gap-3 text-center">
-                  <Flame className="w-10 h-10 text-h_red/60" />
+                <div className="bg-h_blackLight/50 flex flex-col items-center gap-3 rounded-lg border border-gray-800 p-8 text-center">
+                  <Flame className="text-h_red/60 h-10 w-10" />
                   <p className="text-h_white font-semibold">
                     Trending feed coming soon
                   </p>
-                  <p className="text-gray-400 text-sm max-w-xs">
+                  <p className="max-w-xs text-sm text-gray-400">
                     We&apos;ll surface the hottest posts, mixes, and DJs ranked
                     by community engagement.
                   </p>
@@ -124,7 +124,7 @@ const CommunityPage = () => {
           get Trending DJs + Events without needing a full desktop.
           Fixed w-72 (288px) keeps it consistent across md/lg/xl.
         */}
-          <div className="hidden md:block w-72 shrink-0">
+          <div className="hidden w-72 shrink-0 md:block">
             <CommunityRightPanel />
           </div>
         </div>

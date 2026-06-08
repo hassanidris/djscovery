@@ -7,6 +7,8 @@ import ActiveFilterBadges from "@/components/directory/ActiveFilterBadges";
 import EventCalendar from "@/components/directory/EventCalendar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadphones } from "@fortawesome/free-solid-svg-icons";
+import { Headphones } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 type SearchParams = {
   genre?: string;
@@ -219,35 +221,39 @@ const DirectoryPage = async ({
   return (
     <>
       {/* Hero Banner */}
-      <section className="bg-h_blackLight/30 border-b border-gray-800 py-10 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-        <div className="flex flex-col gap-2 max-w-7xl w-full mx-auto px-4 md:px-8">
-          <h1 className="text-h_white font-bold text-3xl md:text-5xl">
-            DJ{" "}
-            <span className="text-h_red/80">
-              Directory{" "}
-              <FontAwesomeIcon
-                icon={faHeadphones}
-                className="w-8 h-8 md:w-10 md:h-10 inline"
-              />
-            </span>
-          </h1>
-          <p className="text-gray-400 text-sm tracking-wide">
-            Browse and discover talented DJs from around the world.
-          </p>
-          <p className="text-gray-500 text-xs mt-1">
-            {displayDjs.length} DJ{displayDjs.length !== 1 ? "s" : ""} listed
-          </p>
+      <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
+          <div className="flex items-center gap-4">
+            <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
+              <Headphones className="text-h_red h-6 w-6" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-h_white text-3xl font-bold md:text-5xl">
+                DJ <span className="text-h_red/80">Directory</span>
+              </h1>
+              <p className="text-sm tracking-wide text-gray-400">
+                Browse and discover talented DJs from around the world.
+              </p>
+            </div>
+          </div>
+          {/* Right — community stat badges */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="bg-h_red/10 text-h_red border-h_red/20 gap-1.5 border px-3 py-1">
+              <Headphones className="h-3 w-3" /> {displayDjs.length} DJ
+              {displayDjs.length !== 1 ? "s" : ""} listed
+            </Badge>
+          </div>
         </div>
       </section>
 
       {/* 3-Column Layout */}
-      <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
-        <div className="flex flex-col xl:flex-row gap-6 py-6">
+      <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
+        <div className="flex flex-col gap-6 py-6 xl:flex-row">
           {/* Left — Filters */}
-          <div className=" xl:block xl:w-[20%] shrink-0">
+          <div className="shrink-0 xl:block xl:w-[20%]">
             <Suspense
               fallback={
-                <div className="bg-h_blackLight/50 rounded-xl p-4 h-96 animate-pulse " />
+                <div className="bg-h_blackLight/50 h-96 animate-pulse rounded-xl p-4" />
               }
             >
               <FilterPanel
