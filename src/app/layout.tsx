@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNavServer from "@/components/MobileBottomNavServer";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -56,6 +57,13 @@ export default function RootLayout({
           </div>
           <MobileBottomNavServer />
         </div>
+        <Toaster
+          position="bottom-right"
+          theme="dark"
+          richColors
+          closeButton
+          offset={{ bottom: 80 }}
+        />
       </body>
     </html>
   );

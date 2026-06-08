@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { redirect } from "next/navigation";
-import { createOrganizerProfile } from "@/lib/actions/profile";
+import BecomeOrganizerForm from "@/components/BecomeOrganizerForm";
 import Footer from "@/components/Footer";
 
 export default async function BecomeOrganizerPage() {
@@ -29,51 +29,12 @@ export default async function BecomeOrganizerPage() {
               Set Up Your Organizer Profile
             </h1>
             <p className="text-gray-400 text-sm max-w-sm mx-auto">
-              As an organizer you can post gigs, manage events, and connect
-              with DJs on the platform.
+              As an organizer you can post gigs, manage events, and connect with
+              DJs on the platform.
             </p>
           </div>
 
-          <form
-            action={createOrganizerProfile}
-            className="bg-white/5 border border-white/10 rounded-xl p-8 flex flex-col gap-5"
-          >
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-gray-300 font-medium">
-                Business / Event Name <span className="text-h_red">*</span>
-              </label>
-              <input
-                type="text"
-                name="businessName"
-                placeholder="e.g. Nolimits Events"
-                required
-                minLength={2}
-                maxLength={80}
-                className="bg-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-gray-300 font-medium">
-                Phone{" "}
-                <span className="text-gray-500 font-normal">(optional)</span>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                placeholder="+1 555 000 0000"
-                maxLength={30}
-                className="bg-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-h_red hover:bg-h_redDark text-white font-bold py-3 rounded-lg transition-colors"
-            >
-              Create Organizer Profile
-            </button>
-          </form>
+          <BecomeOrganizerForm />
         </div>
       </div>
       <Footer />

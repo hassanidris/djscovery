@@ -1,6 +1,7 @@
 "use client";
 
 import { switchLike } from "@/lib/actions";
+import { toast } from "sonner";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState } from "react";
@@ -45,8 +46,9 @@ const PostInteraction = ({
         likeCount: state.isLiked ? state.likeCount - 1 : state.likeCount + 1,
         isLiked: !state.isLiked,
       }));
-    } catch (err) {
+    } catch {
       switchOptimisticLike("");
+      toast.error("Action failed. Try again.");
     }
   };
 

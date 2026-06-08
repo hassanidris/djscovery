@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/lib/actions/auth";
-
+import { toast } from "sonner";
 import type { NavRole } from "@/config/navigation";
 
 type Props = {
@@ -87,7 +87,10 @@ export default function NavbarAvatar({
           <DropdownMenuItem
             variant="destructive"
             className="cursor-pointer focus:bg-red-500/10"
-            onSelect={() => signOutFormRef.current?.requestSubmit()}
+            onSelect={() => {
+              toast.info("Signing out...");
+              signOutFormRef.current?.requestSubmit();
+            }}
           >
             Sign out
           </DropdownMenuItem>
