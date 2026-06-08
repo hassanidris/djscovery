@@ -1,7 +1,9 @@
 import {
   AddPostSkeleton,
   FeedSkeleton,
+  ProfileCardSkeleton,
   RightPanelSkeleton,
+  SuggestedDJsSkeleton,
 } from "@/components/ui/skeletons";
 import { Badge } from "@/components/ui/badge";
 import { Headphones, Users, Zap } from "lucide-react";
@@ -41,14 +43,17 @@ export default function CommunityLoading() {
 
       <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
         <div className="flex gap-4 md:gap-6 py-6">
-          {/* Left panel placeholder — keeps layout stable */}
-          <div className="hidden xl:block w-56 shrink-0" />
+          {/* Left panel — mirrors LeftMenu layout */}
+          <div className="hidden xl:flex xl:flex-col gap-5 w-56 shrink-0">
+            <ProfileCardSkeleton />
+            <SuggestedDJsSkeleton />
+          </div>
 
           {/* Center — feed skeleton */}
           <div className="flex-1 min-w-0 flex flex-col gap-4">
             {/* Tab bar skeleton */}
             <div className="flex gap-1 border-b border-gray-800 pb-1">
-              {["For You", "Following", "Trending", "Events"].map((label) => (
+              {["For You", "Following", "Trending"].map((label) => (
                 <div
                   key={label}
                   className="h-8 px-4 rounded-t-md bg-h_blackLight/50 animate-pulse flex items-center"

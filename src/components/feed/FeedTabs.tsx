@@ -56,7 +56,7 @@ const FeedTabs = ({
         */}
         <TabsTrigger
           value="for-you"
-          className="flex-1 gap-1.5 text-gray-400 data-[state=active]:text-h_white data-[state=active]:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-h_red rounded-md py-2 text-sm transition-all"
+          className="flex-1 gap-1.5 text-gray-400 data-[state=active]:text-h_white data-[state=active]:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-h_red rounded-md py-2 text-sm transition-all cursor-pointer"
         >
           <Rss className="w-3.5 h-3.5 shrink-0" />
           <span className="hidden sm:inline">For You</span>
@@ -64,7 +64,7 @@ const FeedTabs = ({
 
         <TabsTrigger
           value="following"
-          className="flex-1 gap-1.5 text-gray-400 data-[state=active]:text-h_white data-[state=active]:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-h_red rounded-md py-2 text-sm transition-all"
+          className="flex-1 gap-1.5 text-gray-400 data-[state=active]:text-h_white data-[state=active]:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-h_red rounded-md py-2 text-sm transition-all cursor-pointer"
         >
           <Music2 className="w-3.5 h-3.5 shrink-0" />
           <span className="hidden sm:inline">Following</span>
@@ -72,7 +72,7 @@ const FeedTabs = ({
 
         <TabsTrigger
           value="trending"
-          className="flex-1 gap-1.5 text-gray-400 data-[state=active]:text-h_white data-[state=active]:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-h_red rounded-md py-2 text-sm transition-all"
+          className="flex-1 gap-1.5 text-gray-400 data-[state=active]:text-h_white data-[state=active]:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-h_red rounded-md py-2 text-sm transition-all cursor-pointer"
         >
           <Flame className="w-3.5 h-3.5 shrink-0" />
           <span className="hidden sm:inline">Trending</span>
