@@ -22,12 +22,14 @@ const Hero = async () => {
   return (
     <>
       <section className="bg-zinc-800 h-[40vh] lg:h-[50vh] w-full relative">
+        {/* Background image - maybe later I will change alt to (DJ performing at electronic music event)*/}
         <Image
           src="/cover-hero.png"
-          alt="Hero"
+          alt=""
           width={1920}
           height={1080}
           className="w-full h-full object-cover bg-bottom"
+          priority
         />
         {/* <video
           className="w-full h-full object-cover bg-bottom"

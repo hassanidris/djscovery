@@ -62,10 +62,11 @@ const ProfileCard = async () => {
             {initials}
           </AvatarFallback>
         </Avatar>
-        <Link href={profileHref} className="mb-1">
-          <button className="bg-h_red hover:bg-h_redDark text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
-            My Profile
-          </button>
+        <Link
+          href={profileHref}
+          className="mb-1 inline-flex bg-h_red hover:bg-h_redDark text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+        >
+          My Profile
         </Link>
       </div>
 
