@@ -58,8 +58,9 @@ export async function getOrCreateGenre(
 
 const DjProfileInputSchema = z.object({
   stageName: z.string().min(2).max(60),
-  bio: z.string().max(500).optional(),
+  bio: z.string().max(800).optional(),
   avatarUrl: z.string().url().optional(),
+  coverImageUrl: z.string().url().optional(),
   countryId: z.number().int().positive({ message: "Country is required" }),
   cityId: z.number().int().positive().optional(),
   genreIds: z
@@ -79,7 +80,44 @@ const DjProfileInputSchema = z.object({
       bucket: z.string(),
     }),
   ),
+  bookingEmail: z.string().email().optional(),
+  bookingPhone: z.string().max(30).optional(),
+  feeMin: z.number().int().nonnegative().optional(),
+  feeMax: z.number().int().nonnegative().optional(),
+  feeCurrency: z.string().max(3).optional(),
 });
+
+const UpdateDjProfileSchema = z.object({
+  stageName: z
+    .string()
+    .min(2, "Stage name must be at least 2 characters")
+    .max(60)
+    .optional(),
+  bio: z.string().max(800).optional().nullable(),
+  avatarUrl: z.string().url().optional().nullable(),
+  coverImageUrl: z.string().url().optional().nullable(),
+  countryId: z.number().int().positive().optional().nullable(),
+  cityId: z.number().int().positive().optional().nullable(),
+  genreNames: z.array(z.string().min(1).max(50)).max(12).optional(),
+  socialLinks: z
+    .array(
+      z.object({
+        platform: z.string().min(1),
+        url: z.string().url("Invalid URL"),
+      }),
+    )
+    .optional(),
+  djTypes: z
+    .array(z.enum(["CLUB", "WEDDING", "FESTIVAL", "CORPORATE", "BAR_LOUNGE"]))
+    .optional(),
+  bookingEmail: z.string().email("Invalid email address").optional().nullable(),
+  bookingPhone: z.string().max(30).optional().nullable(),
+  feeMin: z.number().int().nonnegative().optional().nullable(),
+  feeMax: z.number().int().nonnegative().optional().nullable(),
+  feeCurrency: z.string().max(3).optional().nullable(),
+});
+
+export type UpdateDjProfileInput = z.infer<typeof UpdateDjProfileSchema>;
 
 export async function createDjProfile(
   input: unknown,
@@ -102,12 +140,18 @@ export async function createDjProfile(
     stageName,
     bio,
     avatarUrl,
+    coverImageUrl,
     countryId,
     cityId,
     genreIds,
     socialLinks,
     djTypes,
     media,
+    bookingEmail,
+    bookingPhone,
+    feeMin,
+    feeMax,
+    feeCurrency,
   } = parsed.data;
 
   if (cityId) {
@@ -125,18 +169,23 @@ export async function createDjProfile(
   const slug = await makeUniqueSlug(stageName, user.id);
 
   await prisma.$transaction(async (tx) => {
+    const profileData = {
+      stageName,
+      bio: bio ?? null,
+      avatar: avatarUrl ?? null,
+      coverImage: coverImageUrl ?? null,
+      countryId: countryId ?? null,
+      cityId: cityId ?? null,
+      bookingEmail: bookingEmail ?? null,
+      bookingPhone: bookingPhone ?? null,
+      feeMin: feeMin ?? null,
+      feeMax: feeMax ?? null,
+      feeCurrency: feeCurrency ?? null,
+    };
     const profile = await tx.djProfile.upsert({
       where: { userId: user.id },
-      update: {},
-      create: {
-        userId: user.id,
-        stageName,
-        slug,
-        bio: bio ?? null,
-        avatar: avatarUrl ?? null,
-        countryId: countryId ?? null,
-        cityId: cityId ?? null,
-      },
+      update: profileData,
+      create: { userId: user.id, slug, ...profileData },
     });
 
     if (djTypes.length > 0) {
@@ -185,6 +234,132 @@ export async function createDjProfile(
   });
 
   return { success: true as const };
+}
+
+export async function updateDjProfile(
+  input: unknown,
+): Promise<{ success: true; newSlug?: string } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const parsed = UpdateDjProfileSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      error:
+        "Validation failed: " +
+        parsed.error.issues.map((i) => i.message).join(", "),
+    };
+  }
+
+  const existing = await prisma.djProfile.findUnique({
+    where: { userId: user.id },
+    select: { id: true, stageName: true, slug: true, countryId: true },
+  });
+  if (!existing) return { error: "DJ profile not found" };
+
+  const data = parsed.data;
+
+  let newSlug = existing.slug;
+  if (data.stageName && data.stageName !== existing.stageName) {
+    newSlug = await makeUniqueSlug(data.stageName, user.id);
+  }
+
+  const effectiveCountryId = data.countryId ?? existing.countryId;
+  if (data.cityId && effectiveCountryId) {
+    const city = await prisma.city.findFirst({
+      where: { id: data.cityId, countryId: effectiveCountryId },
+      select: { id: true },
+    });
+    if (!city)
+      return {
+        error: "The selected city does not belong to the selected country.",
+      };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.djProfile.update({
+        where: { userId: user.id },
+        data: {
+          ...(data.stageName !== undefined && {
+            stageName: data.stageName,
+            slug: newSlug,
+          }),
+          ...(data.bio !== undefined && { bio: data.bio }),
+          ...(data.avatarUrl !== undefined && { avatar: data.avatarUrl }),
+          ...(data.coverImageUrl !== undefined && {
+            coverImage: data.coverImageUrl,
+          }),
+          ...(data.countryId !== undefined && { countryId: data.countryId }),
+          ...(data.cityId !== undefined && { cityId: data.cityId }),
+          ...(data.bookingEmail !== undefined && {
+            bookingEmail: data.bookingEmail,
+          }),
+          ...(data.bookingPhone !== undefined && {
+            bookingPhone: data.bookingPhone,
+          }),
+          ...(data.feeMin !== undefined && { feeMin: data.feeMin }),
+          ...(data.feeMax !== undefined && { feeMax: data.feeMax }),
+          ...(data.feeCurrency !== undefined && {
+            feeCurrency: data.feeCurrency,
+          }),
+        },
+      });
+
+      if (data.genreNames !== undefined) {
+        const genres = await Promise.all(
+          data.genreNames.map((name) => getOrCreateGenre(name)),
+        );
+        await tx.djGenre.deleteMany({ where: { djProfileId: existing.id } });
+        if (genres.length > 0) {
+          await tx.djGenre.createMany({
+            data: genres.map((g) => ({
+              djProfileId: existing.id,
+              genreId: g.id,
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+
+      if (data.djTypes !== undefined) {
+        await tx.djProfileType.deleteMany({
+          where: { djProfileId: existing.id },
+        });
+        if (data.djTypes.length > 0) {
+          await tx.djProfileType.createMany({
+            data: data.djTypes.map((type) => ({
+              djProfileId: existing.id,
+              type,
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+
+      if (data.socialLinks !== undefined) {
+        await tx.socialLink.deleteMany({ where: { djProfileId: existing.id } });
+        if (data.socialLinks.length > 0) {
+          await tx.socialLink.createMany({
+            data: data.socialLinks.map((link) => ({
+              djProfileId: existing.id,
+              platform: link.platform,
+              url: link.url,
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+    });
+
+    const slugChanged = newSlug !== existing.slug;
+    return { success: true as const, ...(slugChanged && { newSlug }) };
+  } catch {
+    return { error: "Something went wrong. Please try again." };
+  }
 }
 
 export async function createOrganizerProfile(
