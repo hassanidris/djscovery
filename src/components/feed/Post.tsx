@@ -12,6 +12,10 @@ import PostInteraction from "./PostInteraction";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { FileText, ImageIcon, Video, Music2, Play } from "lucide-react";
+import {
+  PostInteractionSkeleton,
+  CommentInputSkeleton,
+} from "@/components/ui/skeletons";
 
 type FeedPostType = PostType & { user: User } & {
   likes: { userId: string }[];
@@ -119,7 +123,7 @@ const Post = ({
         })()}
       </div>
       {/* INTERACTION */}
-      <Suspense fallback="Loading...">
+      <Suspense fallback={<PostInteractionSkeleton />}>
         <PostInteraction
           postId={post.id}
           likes={post.likes.map((like) => like.userId)}
@@ -128,7 +132,7 @@ const Post = ({
         />
       </Suspense>
       <div className="border-t border-gray-700/50" />
-      <Suspense fallback="Loading...">
+      <Suspense fallback={<CommentInputSkeleton />}>
         <Comments
           postId={post.id}
           initialComments={(post as any).demoComments}

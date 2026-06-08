@@ -1,5 +1,6 @@
 import { signIn } from "@/lib/actions/auth";
 import Link from "next/link";
+import { SignInSubmitBtn } from "./SignInSubmitBtn";
 
 export default async function Page({
   searchParams,
@@ -51,12 +52,7 @@ export default async function Page({
           required
           className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red"
         />
-        <button
-          type="submit"
-          className="bg-h_red hover:bg-h_redDark text-white font-semibold py-3 rounded-lg transition-colors"
-        >
-          Sign In
-        </button>
+        <SignInSubmitBtn />
         <p className="text-gray-400 text-sm text-center">
           No account?{" "}
           <Link href="/sign-up" className="text-h_red hover:underline">
