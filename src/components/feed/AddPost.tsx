@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import AddPostBtn from "./AddPostBtn";
 import { addPost } from "@/lib/actions";
+import { AddPostSkeleton } from "@/components/ui/skeletons";
 
 const AddPost = () => {
   const { isLoaded, user } = useUser();
@@ -14,7 +15,7 @@ const AddPost = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   if (!isLoaded) {
-    return "Loading...";
+    return <AddPostSkeleton />;
   }
   if (!user) {
     return (
@@ -97,7 +98,7 @@ const AddPost = () => {
             {({ open }) => {
               return (
                 <div
-                  className="flex items-center gap-2 cursor-pointer"
+                  className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors"
                   onClick={() => open()}
                 >
                   <Image src="/addimage.png" alt="" width={20} height={20} />
@@ -106,15 +107,15 @@ const AddPost = () => {
               );
             }}
           </CldUploadWidget>
-          <div className="flex items-center gap-2 cursor-pointer">
+          <div className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
             <Image src="/addVideo.png" alt="" width={20} height={20} />
             Video
           </div>
-          <div className="flex items-center gap-2 cursor-pointer">
+          <div className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
             <Image src="/poll.png" alt="" width={20} height={20} />
             Poll
           </div>
-          <div className="flex items-center gap-2 cursor-pointer">
+          <div className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
             <Image src="/addevent.png" alt="" width={20} height={20} />
             Event
           </div>

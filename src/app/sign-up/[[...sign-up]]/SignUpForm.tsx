@@ -3,6 +3,28 @@
 import { signUp } from "@/lib/actions/auth";
 import Link from "next/link";
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
+import { Loader2 } from "lucide-react";
+
+function SignUpSubmitBtn({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="bg-h_red hover:bg-h_redDark active:scale-[0.98] text-white font-semibold py-3 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+    >
+      {pending ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Creating account...
+        </>
+      ) : (
+        label
+      )}
+    </button>
+  );
+}
 
 type Role = "" | "dj" | "organiser";
 
@@ -102,16 +124,15 @@ export default function SignUpForm({ error }: { error?: string }) {
         className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all"
       />
 
-      <button
-        type="submit"
-        className="bg-h_red hover:bg-h_redDark text-white font-semibold py-3 rounded-lg transition-colors"
-      >
-        {selected === "dj"
-          ? "Sign Up as DJ"
-          : selected === "organiser"
-            ? "Sign Up as Organizer"
-            : "Sign Up as Fan"}
-      </button>
+      <SignUpSubmitBtn
+        label={
+          selected === "dj"
+            ? "Sign Up as DJ"
+            : selected === "organiser"
+              ? "Sign Up as Organizer"
+              : "Sign Up as Fan"
+        }
+      />
 
       <p className="text-gray-400 text-sm text-center">
         Already have an account?{" "}

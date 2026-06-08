@@ -16,7 +16,7 @@
 
 import { switchFollow } from "@/lib/actions";
 import { UserCheck, UserPlus } from "lucide-react";
-import { useOptimistic, useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 const SuggestFollowBtn = ({
   userId,
@@ -26,29 +26,33 @@ const SuggestFollowBtn = ({
   isFollowing?: boolean;
 }) => {
   const [following, setFollowing] = useState(isFollowing);
+  const [isPending, startTransition] = useTransition();
 
   const [optimisticFollowing, toggleOptimistic] = useOptimistic(
     following,
     (state) => !state,
   );
 
-  const follow = async () => {
-    toggleOptimistic(null);
-    try {
-      await switchFollow(userId);
-      setFollowing((prev) => !prev);
-    } catch {
+  const follow = () => {
+    startTransition(async () => {
       toggleOptimistic(null);
-    }
+      try {
+        await switchFollow(userId);
+        setFollowing((prev) => !prev);
+      } catch {
+        toggleOptimistic(null);
+      }
+    });
   };
 
   return (
     <form action={follow}>
       <button
-        className={`flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${
+        disabled={isPending}
+        className={`flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg transition-all disabled:opacity-60 disabled:cursor-wait ${
           optimisticFollowing
-            ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            : "bg-h_red/10 text-h_red border border-h_red/20 hover:bg-h_red/20"
+            ? "bg-gray-700 text-gray-300 hover:bg-gray-600 cursor-pointer"
+            : "bg-h_red/10 text-h_red border border-h_red/20 hover:bg-h_red/20 cursor-pointer"
         }`}
       >
         {optimisticFollowing ? (

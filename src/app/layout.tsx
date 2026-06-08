@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNavServer from "@/components/MobileBottomNavServer";
 import { Toaster } from "@/components/ui/sonner";
+import { NavigationProgress } from "@/components/NavigationProgress";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -43,6 +44,7 @@ export default function RootLayout({
       )}
     >
       <body className={spaceGrotesk.className}>
+        <NavigationProgress />
         <div className="flex flex-col min-h-screen">
           <header className="w-full bg-black/95 backdrop-blur-sm border-b border-white/5 fixed top-0 inset-x-0 z-50">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
