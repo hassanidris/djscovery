@@ -2,7 +2,7 @@
 
 import { switchLike } from "@/lib/actions";
 import { toast } from "sonner";
-import Image from "next/image";
+import { Heart, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState } from "react";
 
@@ -53,56 +53,32 @@ const PostInteraction = ({
   };
 
   return (
-    <div className="flex items-center justify-between text-sm my-4">
-      <div className="flex gap-8">
-        <div className="flex items-center gap-2 p-2 rounded-xl">
-          <form action={likeAction}>
-            <button title={!currentUserId ? "Sign in to like" : ""}>
-              <Image
-                src={optimisticLike.isLiked ? "/liked.png" : "/like.png"}
-                width={16}
-                height={16}
-                alt=""
-                className="cursor-pointer"
-              />
-            </button>
-          </form>
-          <span className="text-gray-400">|</span>
-          <span className="text-gray-400">
+    <div className="flex items-center gap-6 text-sm">
+      <form action={likeAction}>
+        <button
+          title={!currentUserId ? "Sign in to like" : ""}
+          className="flex items-center gap-1.5 group cursor-pointer"
+        >
+          <Heart
+            className={`w-4 h-4 transition-colors ${
+              optimisticLike.isLiked
+                ? "fill-h_red text-h_red"
+                : "text-gray-500 group-hover:text-h_red"
+            }`}
+          />
+          <span className="text-gray-500 group-hover:text-gray-300 transition-colors text-xs">
             {optimisticLike.likeCount}
-            <span className="hidden md:inline"> Likes</span>
+            <span className="hidden sm:inline"> Likes</span>
           </span>
-        </div>
-        <div className="flex items-center gap-2 p-2 rounded-xl">
-          <Image
-            src="/comment.png"
-            width={16}
-            height={16}
-            alt=""
-            className="cursor-pointer"
-          />
-          <span className="text-gray-400">|</span>
-          <span className="text-gray-400">
-            {commentNumber}
-            <span className="hidden md:inline"> Comments</span>
-          </span>
-        </div>
+        </button>
+      </form>
+      <div className="flex items-center gap-1.5 text-gray-500">
+        <MessageCircle className="w-4 h-4" />
+        <span className="text-xs">
+          {commentNumber}
+          <span className="hidden sm:inline"> Comments</span>
+        </span>
       </div>
-      {/* <div className="">
-        <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
-          <Image
-            src="/share.png"
-            width={16}
-            height={16}
-            alt=""
-            className="cursor-pointer"
-          />
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">
-            <span className="hidden md:inline"> Share</span>
-          </span>
-        </div>
-      </div> */}
     </div>
   );
 };

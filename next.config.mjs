@@ -32,6 +32,7 @@ const nextConfig = {
       { protocol: "https", hostname: "www.discoverbenelux.com" },
       { protocol: "https", hostname: "assets.podomatic.net" },
       { protocol: "https", hostname: "jarmybsjvztwrmsdcnje.supabase.co" },
+      { protocol: "https", hostname: "unrqebwfdfumpjgvavbk.supabase.co" },
     ],
   },
   webpack: (config, { isServer }) => {

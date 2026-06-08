@@ -26,14 +26,15 @@ const DjCard = ({
         .filter(Boolean)
     : [];
 
+  const formatDjName = (name: string) => {
+    const normalized = name.trim();
+    return /^[Dd][Jj]\.?\s/i.test(normalized)
+      ? normalized
+      : `Dj. ${normalized}`;
+  };
+
   return (
     <div className="bg-h_blackLight/50 rounded-xl p-4 flex flex-col gap-3 hover:ring-1 hover:ring-h_red hover:scale-[1.015] hover:shadow-lg hover:shadow-h_red/5 transition-all duration-200 relative group">
-      {isFeatured && (
-        <span className="absolute top-3 right-3 bg-h_red text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-          ✦ FEATURED
-        </span>
-      )}
-
       <Link
         href={profileHref}
         className="flex items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-h_red focus-visible:rounded-lg"
@@ -58,7 +59,7 @@ const DjCard = ({
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <h3 className="text-h_white font-semibold text-sm truncate">
-              {stageName || username}
+              {formatDjName(stageName || username)}
             </h3>
             {verified && (
               <CircleCheck className="h-3.5 w-3.5 text-blue-400 shrink-0" />

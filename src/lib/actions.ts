@@ -124,11 +124,31 @@ export const deletePostComment = async (commentId: number) => {
 // POSTS (DJ only — enforced in UI; double-checked here)
 // -------------------------------------------------------
 
-export const addPost = async (formData: FormData, imageUrl?: string) => {
-  const content = formData.get("content") as string;
+function isSafeUrl(raw: string): boolean {
+  try {
+    const { protocol } = new URL(raw);
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
-  const validated = z.string().min(1).max(1000).safeParse(content);
+export const addPost = async (formData: FormData, imageUrl?: string) => {
+  const content = ((formData.get("content") as string | null) ?? "").trim();
+  const rawVideoUrl = (
+    (formData.get("videoUrl") as string | null) ?? ""
+  ).trim();
+  const rawAudioUrl = (
+    (formData.get("audioUrl") as string | null) ?? ""
+  ).trim();
+
+  const videoUrl = rawVideoUrl && isSafeUrl(rawVideoUrl) ? rawVideoUrl : "";
+  const audioUrl = rawAudioUrl && isSafeUrl(rawAudioUrl) ? rawAudioUrl : "";
+
+  const validated = z.string().min(0).max(1000).safeParse(content);
   if (!validated.success) return;
+  const hasMedia = !!(imageUrl || videoUrl || audioUrl);
+  if (!validated.data && !hasMedia) return;
 
   const userId = await getCurrentUserId();
 
@@ -148,6 +168,30 @@ export const addPost = async (formData: FormData, imageUrl?: string) => {
           bucket: "djscovery-media",
           path: imageUrl,
           type: "IMAGE",
+          postId: post.id,
+        },
+      });
+    }
+
+    if (videoUrl) {
+      await prisma.media.create({
+        data: {
+          url: videoUrl,
+          bucket: "external",
+          path: videoUrl,
+          type: "VIDEO",
+          postId: post.id,
+        },
+      });
+    }
+
+    if (audioUrl) {
+      await prisma.media.create({
+        data: {
+          url: audioUrl,
+          bucket: "external",
+          path: audioUrl,
+          type: "AUDIO",
           postId: post.id,
         },
       });

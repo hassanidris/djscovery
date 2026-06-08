@@ -4,7 +4,11 @@ import prisma from "@/lib/client";
 import { demoPosts } from "@/lib/data";
 
 const postInclude = {
-  user: true,
+  user: {
+    include: {
+      djProfile: { select: { avatar: true, stageName: true, slug: true } },
+    },
+  },
   likes: { select: { userId: true } },
   media: true,
   _count: { select: { comments: true } },
@@ -42,7 +46,18 @@ const Feed = async ({ username }: { username?: string }) => {
     // DB unavailable — fall through to demo posts below
   }
 
-  const displayPosts = posts.length ? posts : username ? [] : demoPosts();
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  let displayPosts: any[];
+  if (username) {
+    displayPosts = posts;
+  } else if (isStaging) {
+    const demos = demoPosts();
+    const realIds = new Set(posts.map((p: any) => p.id));
+    displayPosts = [...posts, ...demos.filter((d) => !realIds.has(d.id))];
+  } else {
+    displayPosts = posts.length ? posts : [];
+  }
 
   if (!displayPosts.length) {
     return (

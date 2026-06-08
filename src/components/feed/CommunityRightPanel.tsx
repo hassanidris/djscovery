@@ -111,7 +111,7 @@ const CommunityRightPanel = () => {
                 <div className="flex-1 min-w-0">
                   <Link href={`/djs/${dj.slug}`} className="hover:underline">
                     <p className="text-sm text-h_white font-medium truncate">
-                      {dj.name}
+                      Dj. {dj.name}
                     </p>
                   </Link>
                   <p className="text-xs text-gray-500">

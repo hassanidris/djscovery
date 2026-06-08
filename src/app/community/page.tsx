@@ -5,14 +5,7 @@ import FeedTabs from "@/components/feed/FeedTabs";
 import Stories from "@/components/feed/Stories";
 import LeftMenu from "@/components/leftMenu/LeftMenu";
 import { Badge } from "@/components/ui/badge";
-import {
-  CalendarDays,
-  Flame,
-  Headphones,
-  Music2,
-  Users,
-  Zap,
-} from "lucide-react";
+import { Flame, Headphones, Music2, Users, Zap } from "lucide-react";
 
 const CommunityPage = () => {
   return (
@@ -117,18 +110,6 @@ const CommunityPage = () => {
                   <p className="text-gray-400 text-sm max-w-xs">
                     We&apos;ll surface the hottest posts, mixes, and DJs ranked
                     by community engagement.
-                  </p>
-                </div>
-              }
-              eventsContent={
-                <div className="p-8 bg-h_blackLight/50 rounded-lg border border-gray-800 flex flex-col items-center gap-3 text-center">
-                  <CalendarDays className="w-10 h-10 text-h_red/60" />
-                  <p className="text-h_white font-semibold">
-                    Events feed coming soon
-                  </p>
-                  <p className="text-gray-400 text-sm max-w-xs">
-                    Upcoming gigs, club nights, and festival announcements from
-                    DJs you follow will appear here.
                   </p>
                 </div>
               }

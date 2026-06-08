@@ -8,7 +8,7 @@ const AddPostBtn = () => {
 
   return (
     <button
-      className="bg-h_red hover:bg-h_redDark active:scale-95 p-2 mt-2 rounded-md text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5 text-sm font-medium min-w-[72px] justify-center"
+      className="bg-h_red hover:bg-h_redDark active:scale-95 p-2 mt-2 rounded-md text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5 text-sm font-medium min-w-18 justify-center"
       disabled={pending}
     >
       {pending ? (

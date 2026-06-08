@@ -7,6 +7,7 @@ const _HR = 3_600_000;
 const _FANS = ALL_DEMO_DJS.slice(6, 11).map((dj, i) => ({
   id: `demo-dj-${6 + i}`,
   username: dj.slug,
+  name: dj.stageName,
   image: dj.avatar.url,
 }));
 
