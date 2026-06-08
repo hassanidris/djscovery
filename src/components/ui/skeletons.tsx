@@ -116,6 +116,44 @@ export function DjProfileSkeleton() {
   );
 }
 
+// ── Profile Card Skeleton ─────────────────────────────────────────────────────
+export function ProfileCardSkeleton() {
+  return (
+    <div className="bg-h_blackLight/50 rounded-xl border border-gray-800/70 overflow-hidden">
+      <Skeleton className="h-20 w-full rounded-none" />
+      <div className="-mt-6 px-4 flex items-end justify-between">
+        <Skeleton className="w-14 h-14 rounded-full shrink-0" />
+        <Skeleton className="h-7 w-24 rounded-lg mb-1" />
+      </div>
+      <div className="px-4 pt-2 pb-4 flex flex-col gap-2">
+        <Skeleton className="h-3.5 w-32 rounded" />
+        <Skeleton className="h-3 w-20 rounded" />
+        <Skeleton className="h-px w-full rounded mt-1" />
+        <Skeleton className="h-3 w-16 rounded" />
+      </div>
+    </div>
+  );
+}
+
+// ── Suggested DJs Skeleton ────────────────────────────────────────────────────
+export function SuggestedDJsSkeleton() {
+  return (
+    <div className="bg-h_blackLight/50 rounded-xl border border-gray-800/70 p-4 flex flex-col gap-4">
+      <Skeleton className="h-4 w-28 rounded" />
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+          <div className="flex flex-col gap-1.5 flex-1">
+            <Skeleton className="h-3.5 w-24 rounded" />
+            <Skeleton className="h-3 w-16 rounded" />
+          </div>
+          <Skeleton className="h-7 w-16 rounded-md shrink-0" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── Post Skeleton ────────────────────────────────────────────────────────────
 export function PostSkeleton({ showImage = false }: { showImage?: boolean }) {
   return (

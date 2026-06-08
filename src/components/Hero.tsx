@@ -5,6 +5,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import Image from "next/image";
 
 const Hero = async () => {
   const supabase = await createClient();
@@ -21,7 +22,14 @@ const Hero = async () => {
   return (
     <>
       <section className="bg-zinc-800 h-[40vh] lg:h-[50vh] w-full relative">
-        <video
+        <Image
+          src="/cover-hero.png"
+          alt="Hero"
+          width={1920}
+          height={1080}
+          className="w-full h-full object-cover bg-bottom"
+        />
+        {/* <video
           className="w-full h-full object-cover bg-bottom"
           autoPlay
           muted
@@ -29,21 +37,16 @@ const Hero = async () => {
           disableRemotePlayback
         >
           <source src="/bnr.mp4" type="video/mp4" />
-          {/* <source
-          autoPlay
-          src={`${BASENAME}/video/welcome_to_stockholm.mp4`}
-          type="video/mp4"
-        /> */}
           Your browser does not support the video tag.
-        </video>
-        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40 z-10"></div>
+        </video> */}
+        {/* Overlay for for video was opacity text readability */}
+        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-70 z-10"></div>
         <div className="absolute top-0 left-0 h-full w-full flex items-center z-10">
           <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-start text-white">
-            <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl max-w-xl md:max-w-2xl lg:max-w-3xl leading-tight">
-              Find the{" "}
-              <span className="font-bold text-h_red/80">Perfect DJ </span>
+            <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl max-w-xl md:max-w-2xl lg:max-w-3xl leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+              Find the <span className="font-bold text-h_red">Perfect DJ </span>
               For You!{" "}
-              <span className="font-bold text-h_red/80">
+              <span className="font-bold text-h_red">
                 <FontAwesomeIcon
                   icon={faHeadphones}
                   className="w-10 h-10 md:w-14 md:h-14 inline"
