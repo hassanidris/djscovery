@@ -1,22 +1,23 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
+import { Loader2 } from "lucide-react";
 
 const AddPostBtn = () => {
   const { pending } = useFormStatus();
 
   return (
     <button
-      className="bg-h_red p-2 mt-2 rounded-md text-white disabled:bg-opacity-50 disabled:cursor-not-allowed"
+      className="bg-h_red hover:bg-h_redDark active:scale-95 p-2 mt-2 rounded-md text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5 text-sm font-medium min-w-[72px] justify-center"
       disabled={pending}
     >
       {pending ? (
-        <div className="flex items-center gap-2">
-          {/* <div className="inline-block h-[10px] w-[10px] animate-spin rounded-full border-2 border-white-300 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite]" /> */}
+        <>
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
           Sending
-        </div>
+        </>
       ) : (
-        "Send"
+        "Post"
       )}
     </button>
   );
