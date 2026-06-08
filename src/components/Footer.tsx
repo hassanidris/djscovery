@@ -50,147 +50,152 @@ const Footer = async () => {
     ...desktopNavByRole[navRole],
   ];
   return (
-    <footer className="w-full bg-black border-t border-white/5">
+    <footer className="w-full border-t border-white/5 bg-black">
       {/* Top accent bar */}
-      <div className="h-px w-full bg-linear-to-r from-transparent via-h_red/40 to-transparent" />
+      <div className="via-h_red/40 h-px w-full bg-linear-to-r from-transparent to-transparent" />
 
       {/* Main footer body */}
-      <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-          {/* ── Brand column ── */}
-          <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-block w-fit">
-              <Image
-                src="/dj-logo-blue.svg"
-                alt="DJscovery"
-                width={130}
-                height={110}
-                className="brightness-110"
-              />
-            </Link>
-
-            <p className="text-gray-400 text-sm leading-relaxed max-w-65">
-              The world&apos;s first &amp; largest DJ community. Discover
-              talent, connect with fans, and find your perfect DJ.
-            </p>
-
-            {/* Newsletter mini-CTA */}
-            <div className="flex items-center gap-2 mt-1">
-              <div className="flex-1 flex items-center gap-2 bg-h_blackLight/60 ring-1 ring-white/10 rounded-lg px-3 py-2.5">
-                <Mail className="h-3.5 w-3.5 text-gray-500 shrink-0" />
-                <input
-                  type="email"
-                  aria-label="Email address for newsletter"
-                  placeholder="Your email…"
-                  className="bg-transparent text-sm text-white placeholder:text-gray-500 outline-none w-full"
+      <div className="py-14">
+        <div className="mx-auto max-w-7xl px-4 md:px-8">
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-14">
+            {/* ── Brand column ── */}
+            <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-2">
+              <Link href="/" className="inline-block w-fit">
+                <Image
+                  src="/dj-logo-blue.svg"
+                  alt="DJscovery"
+                  width={130}
+                  height={110}
+                  className="brightness-110"
                 />
+              </Link>
+
+              <p className="max-w-65 text-sm leading-relaxed text-gray-400">
+                The world&apos;s first &amp; largest DJ community. Discover
+                talent, connect with fans, and find your perfect DJ.
+              </p>
+
+              {/* Newsletter mini-CTA */}
+              <div className="mt-1 flex items-center gap-2">
+                <div className="bg-h_blackLight/60 focus-within:ring-h_red flex flex-1 items-center gap-2 rounded-lg px-3 py-2.5 ring-1 ring-white/10 transition-colors">
+                  <Mail className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                  <input
+                    type="email"
+                    aria-label="Email address for newsletter"
+                    placeholder="Your email…"
+                    className="w-full bg-transparent text-sm text-white outline-none placeholder:text-gray-500"
+                  />
+                </div>
+                <button className="bg-h_red hover:bg-h_redDark shrink-0 rounded-lg px-3 py-2.5 text-xs font-semibold text-white transition-colors">
+                  Subscribe
+                </button>
               </div>
-              <button className="shrink-0 px-3 py-2.5 rounded-lg bg-h_red hover:bg-h_redDark text-white text-xs font-semibold transition-colors">
-                Subscribe
-              </button>
+
+              {/* Social icons */}
+              <div className="mt-1 flex items-center gap-2.5">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    aria-label={social.label}
+                    className="bg-h_blackLight/60 hover:bg-h_red hover:ring-h_red flex size-9 items-center justify-center rounded-full text-gray-400 ring-1 ring-white/10 transition-all hover:text-white"
+                  >
+                    <FontAwesomeIcon
+                      icon={social.icon}
+                      className="h-3.5 w-3.5"
+                    />
+                  </a>
+                ))}
+              </div>
             </div>
 
-            {/* Social icons */}
-            <div className="flex items-center gap-2.5 mt-1">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="size-9 flex items-center justify-center rounded-full bg-h_blackLight/60 ring-1 ring-white/10 text-gray-400 hover:bg-h_red hover:text-white hover:ring-h_red transition-all"
-                >
-                  <FontAwesomeIcon icon={social.icon} className="h-3.5 w-3.5" />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Explore ── */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">
-              Explore
-            </h4>
-            <ul className="flex flex-col gap-3">
-              {exploreItems.map((item) => {
-                const Icon = item.icon;
-                if (item.comingSoon || !item.href) {
+            {/* ── Explore ── */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-semibold tracking-[0.15em] text-white uppercase">
+                Explore
+              </h4>
+              <ul className="flex flex-col gap-3">
+                {exploreItems.map((item) => {
+                  const Icon = item.icon;
+                  if (item.comingSoon || !item.href) {
+                    return (
+                      <li
+                        key={item.id}
+                        className="flex items-center gap-2.5 text-sm text-gray-600 select-none"
+                      >
+                        <Icon className="text-h_redDark/40 h-3.5 w-3.5" />
+                        {item.label}
+                        <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[9px] leading-none font-semibold tracking-wider uppercase">
+                          Soon
+                        </span>
+                      </li>
+                    );
+                  }
                   return (
-                    <li
-                      key={item.id}
-                      className="flex items-center gap-2.5 text-gray-600 text-sm select-none"
-                    >
-                      <Icon className="h-3.5 w-3.5 text-h_redDark/40" />
-                      {item.label}
-                      <span className="text-[9px] font-semibold uppercase tracking-wider text-h_red/50 bg-h_red/10 px-1.5 py-0.5 rounded-full leading-none">
-                        Soon
-                      </span>
+                    <li key={item.id}>
+                      <Link
+                        href={item.href}
+                        className="hover:text-h_red group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
+                      >
+                        <Icon className="text-h_redDark group-hover:text-h_red h-3.5 w-3.5 transition-colors" />
+                        {item.label}
+                      </Link>
                     </li>
                   );
-                }
-                return (
-                  <li key={item.id}>
+                })}
+              </ul>
+            </div>
+
+            {/* ── For DJs & Organisers ── */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-semibold tracking-[0.15em] text-white uppercase">
+                For DJs &amp; Organisers
+              </h4>
+              <ul className="flex flex-col gap-3">
+                {footerLinks.forDJs.map((link) => (
+                  <li key={link.label}>
                     <Link
-                      href={item.href}
-                      className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_red transition-colors group"
+                      href={link.href}
+                      className="hover:text-h_red group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                     >
-                      <Icon className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors" />
-                      {item.label}
+                      <Mic className="text-h_redDark group-hover:text-h_red h-3.5 w-3.5 transition-colors" />
+                      {link.label}
                     </Link>
                   </li>
-                );
-              })}
-            </ul>
-          </div>
+                ))}
+              </ul>
+            </div>
 
-          {/* ── For DJs & Organisers ── */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">
-              For DJs &amp; Organisers
-            </h4>
-            <ul className="flex flex-col gap-3">
-              {footerLinks.forDJs.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="flex items-center gap-2.5 text-gray-400 text-sm hover:text-h_red transition-colors group"
-                  >
-                    <Mic className="h-3.5 w-3.5 text-h_redDark group-hover:text-h_red transition-colors" />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* ── Company ── */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-semibold tracking-[0.15em] text-white uppercase">
+                Company
+              </h4>
+              <ul className="flex flex-col gap-3">
+                {footerLinks.company.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="hover:text-h_red text-sm text-gray-400 transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
 
-          {/* ── Company ── */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">
-              Company
-            </h4>
-            <ul className="flex flex-col gap-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-400 text-sm hover:text-h_red transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            {/* App badge placeholder */}
-            <div className="mt-4 flex flex-col gap-2">
-              <p className="text-gray-600 text-xs uppercase tracking-widest">
-                Coming soon
-              </p>
-              <div className="flex gap-2">
-                <div className="px-3 py-1.5 rounded-md bg-h_blackLight/60 ring-1 ring-white/10 text-gray-500 text-xs font-medium">
-                  App Store
-                </div>
-                <div className="px-3 py-1.5 rounded-md bg-h_blackLight/60 ring-1 ring-white/10 text-gray-500 text-xs font-medium">
-                  Google Play
+              {/* App badge placeholder */}
+              <div className="mt-4 flex flex-col gap-2">
+                <p className="text-xs tracking-widest text-gray-600 uppercase">
+                  Coming soon
+                </p>
+                <div className="flex gap-2">
+                  <div className="bg-h_blackLight/60 rounded-md px-3 py-1.5 text-xs font-medium text-gray-500 ring-1 ring-white/10">
+                    App Store
+                  </div>
+                  <div className="bg-h_blackLight/60 rounded-md px-3 py-1.5 text-xs font-medium text-gray-500 ring-1 ring-white/10">
+                    Google Play
+                  </div>
                 </div>
               </div>
             </div>
@@ -199,8 +204,8 @@ const Footer = async () => {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/5 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 py-5">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+      <div className="border-t border-white/5 py-5">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 text-xs text-gray-500 sm:flex-row md:px-8">
           <span>
             &copy; {new Date().getFullYear()} DJscovery. All rights reserved.
             Built for the culture.
