@@ -309,94 +309,101 @@ export default function DjProfileFree({
                 {hasSpotlight ? (
                   <div className="grid sm:grid-cols-2 gap-4">
                     {/* Featured Mix */}
-                    <MediaAudioPlayer
-                      audioUrl={FEATURED_MIX.audioUrl}
-                      title={FEATURED_MIX.title}
-                    >
-                      <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
-                        <div className="relative h-40 bg-linear-to-br from-h_red/20 to-black shrink-0">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
-                              <Play className="h-5 w-5 text-white ml-0.5" />
+                    {hasFeaturedMix && (
+                      <MediaAudioPlayer
+                        audioUrl={FEATURED_MIX.audioUrl}
+                        title={FEATURED_MIX.title}
+                      >
+                        <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
+                          <div className="relative h-40 bg-linear-to-br from-h_red/20 to-black shrink-0">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
+                                <Play className="h-5 w-5 text-white ml-0.5" />
+                              </div>
+                            </div>
+                            <div className="absolute bottom-3 left-3">
+                              <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                                <Headphones className="h-2.5 w-2.5 mr-1" />
+                                Featured Mix
+                              </Badge>
                             </div>
                           </div>
-                          <div className="absolute bottom-3 left-3">
-                            <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                              <Headphones className="h-2.5 w-2.5 mr-1" />
-                              Featured Mix
-                            </Badge>
+                          <div className="p-4">
+                            <p className="text-white text-sm font-semibold">
+                              {FEATURED_MIX.title}
+                            </p>
+                            <p className="text-gray-500 text-xs mt-1">
+                              {FEATURED_MIX.duration} · {FEATURED_MIX.plays}{" "}
+                              plays
+                            </p>
+                            <div className="flex items-center gap-1 mt-2">
+                              {FEATURED_MIX.genres.map((t) => (
+                                <Badge
+                                  key={t}
+                                  className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4"
+                                >
+                                  {t}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-white text-sm font-semibold">
-                            {FEATURED_MIX.title}
-                          </p>
-                          <p className="text-gray-500 text-xs mt-1">
-                            {FEATURED_MIX.duration} · {FEATURED_MIX.plays} plays
-                          </p>
-                          <div className="flex items-center gap-1 mt-2">
-                            {FEATURED_MIX.genres.map((t) => (
-                              <Badge
-                                key={t}
-                                className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4"
-                              >
-                                {t}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </Card>
-                    </MediaAudioPlayer>
+                        </Card>
+                      </MediaAudioPlayer>
+                    )}
 
                     {/* Featured Video */}
-                    <MediaVideoModal
-                      videoUrl={djData?.spotlight.featuredVideo.videoUrl ?? ""}
-                      thumbnail={videoThumb}
-                      title={
-                        djData?.spotlight.featuredVideo.title ??
-                        "Live @ Berghain — Summer Closing 2024"
-                      }
-                    >
-                      <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
-                        <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black shrink-0">
-                          <Image
-                            src={videoThumb}
-                            alt="video thumbnail"
-                            fill
-                            className="object-cover opacity-50 group-hover:opacity-60 transition-opacity"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                              <Play className="h-5 w-5 text-white ml-0.5" />
+                    {hasFeaturedVideo && (
+                      <MediaVideoModal
+                        videoUrl={
+                          djData?.spotlight.featuredVideo.videoUrl ?? ""
+                        }
+                        thumbnail={videoThumb}
+                        title={
+                          djData?.spotlight.featuredVideo.title ??
+                          "Live @ Berghain — Summer Closing 2024"
+                        }
+                      >
+                        <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
+                          <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black shrink-0">
+                            <Image
+                              src={videoThumb}
+                              alt="video thumbnail"
+                              fill
+                              className="object-cover opacity-50 group-hover:opacity-60 transition-opacity"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
+                                <Play className="h-5 w-5 text-white ml-0.5" />
+                              </div>
+                            </div>
+                            <div className="absolute bottom-3 left-3">
+                              <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                                <Video className="h-2.5 w-2.5 mr-1" />
+                                Featured Video
+                              </Badge>
                             </div>
                           </div>
-                          <div className="absolute bottom-3 left-3">
-                            <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                              <Video className="h-2.5 w-2.5 mr-1" />
-                              Featured Video
-                            </Badge>
+                          <div className="p-4">
+                            <p className="text-white text-sm font-semibold">
+                              {djData?.spotlight.featuredVideo.title ??
+                                "Live @ Berghain — Summer Closing 2024"}
+                            </p>
+                            <p className="text-gray-500 text-xs mt-1">
+                              {djData?.spotlight.featuredVideo.duration ??
+                                "45 min"}{" "}
+                              ·{" "}
+                              {djData?.spotlight.featuredVideo.subtitle ??
+                                "YouTube"}
+                            </p>
+                            <div className="mt-2">
+                              <Badge className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4">
+                                Live Performance
+                              </Badge>
+                            </div>
                           </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-white text-sm font-semibold">
-                            {djData?.spotlight.featuredVideo.title ??
-                              "Live @ Berghain — Summer Closing 2024"}
-                          </p>
-                          <p className="text-gray-500 text-xs mt-1">
-                            {djData?.spotlight.featuredVideo.duration ??
-                              "45 min"}{" "}
-                            ·{" "}
-                            {djData?.spotlight.featuredVideo.subtitle ??
-                              "YouTube"}
-                          </p>
-                          <div className="mt-2">
-                            <Badge className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4">
-                              Live Performance
-                            </Badge>
-                          </div>
-                        </div>
-                      </Card>
-                    </MediaVideoModal>
+                        </Card>
+                      </MediaVideoModal>
+                    )}
                   </div>
                 ) : (
                   <EmptySectionState

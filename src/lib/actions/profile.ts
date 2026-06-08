@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 function makeSlugBase(stageName: string) {
@@ -40,17 +41,18 @@ export async function getCitiesByCountry(countryId: number) {
 
 export async function getOrCreateGenre(
   name: string,
+  client: Prisma.TransactionClient | typeof prisma = prisma,
 ): Promise<{ id: number; name: string }> {
   const trimmed = name.trim();
   if (!trimmed) {
     throw new Error("Genre name is required");
   }
-  const existing = await prisma.genre.findFirst({
+  const existing = await client.genre.findFirst({
     where: { name: { equals: trimmed, mode: "insensitive" } },
     select: { id: true, name: true },
   });
   if (existing) return existing;
-  return await prisma.genre.create({
+  return await client.genre.create({
     data: { name: trimmed },
     select: { id: true, name: true },
   });
@@ -311,7 +313,7 @@ export async function updateDjProfile(
 
       if (data.genreNames !== undefined) {
         const genres = await Promise.all(
-          data.genreNames.map((name) => getOrCreateGenre(name)),
+          data.genreNames.map((name) => getOrCreateGenre(name, tx)),
         );
         await tx.djGenre.deleteMany({ where: { djProfileId: existing.id } });
         if (genres.length > 0) {
