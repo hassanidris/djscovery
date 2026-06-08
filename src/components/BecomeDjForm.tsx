@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import {
   createDjProfile,
@@ -102,8 +104,8 @@ export default function BecomeDjForm({
   const [audioLinks, setAudioLinks] = useState<string[]>([]);
 
   // Form state
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{
     djTypes?: string;
     country?: string;
@@ -253,6 +255,7 @@ export default function BecomeDjForm({
     }
 
     startTransition(async () => {
+      const toastId = toast.loading("Preparing your profile...");
       const uploadedPaths: { path: string; bucket: string }[] = [];
 
       async function cleanupUploads() {
@@ -275,7 +278,7 @@ export default function BecomeDjForm({
       try {
         let avatarUrl: string | undefined;
         if (avatarFile) {
-          setUploadProgress("Uploading avatar...");
+          toast.loading("Uploading avatar...", { id: toastId });
           const uploaded = await uploadFile(avatarFile, "avatars");
           uploadedPaths.push({ path: uploaded.path, bucket: uploaded.bucket });
           avatarUrl = uploaded.url;
@@ -289,8 +292,9 @@ export default function BecomeDjForm({
         }[] = [];
 
         for (let i = 0; i < galleryFiles.length; i++) {
-          setUploadProgress(
-            `Uploading gallery image ${i + 1}/${galleryFiles.length}...`,
+          toast.loading(
+            `Uploading image ${i + 1} of ${galleryFiles.length}...`,
+            { id: toastId },
           );
           const m = await uploadFile(galleryFiles[i], "gallery");
           uploadedPaths.push({ path: m.path, bucket: m.bucket });
@@ -305,7 +309,7 @@ export default function BecomeDjForm({
           media.push({ type: "AUDIO", url, path: url, bucket: "external" });
         }
 
-        setUploadProgress("Saving profile...");
+        toast.loading("Saving your profile...", { id: toastId });
 
         const result = await createDjProfile({
           stageName: stageName.trim(),
@@ -319,24 +323,21 @@ export default function BecomeDjForm({
           media,
         });
 
-        if (result?.error) {
+        if (result && "error" in result) {
           await cleanupUploads();
-          setError(result.error);
+          toast.error(result.error, { id: toastId });
+          return;
         }
-      } catch (err: unknown) {
-        const isRedirect =
-          err &&
-          typeof err === "object" &&
-          "digest" in err &&
-          typeof (err as Record<string, unknown>).digest === "string" &&
-          String((err as Record<string, unknown>).digest).startsWith(
-            "NEXT_REDIRECT",
-          );
-        if (isRedirect) return;
+
+        if (result && "success" in result) {
+          toast.success("Profile created! Pending admin review. 🎛️", {
+            id: toastId,
+          });
+          router.push("/");
+        }
+      } catch {
         await cleanupUploads();
-        setError("Something went wrong. Please try again.");
-      } finally {
-        setUploadProgress("");
+        toast.error("Something went wrong. Please try again.", { id: toastId });
       }
     });
   }
@@ -757,7 +758,7 @@ export default function BecomeDjForm({
         {isPending ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            {uploadProgress || "Creating profile..."}
+            {"Creating profile..."}
           </>
         ) : (
           "Create DJ Profile"

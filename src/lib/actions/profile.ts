@@ -2,7 +2,6 @@
 
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 function makeSlugBase(stageName: string) {
@@ -84,7 +83,7 @@ const DjProfileInputSchema = z.object({
 
 export async function createDjProfile(
   input: unknown,
-): Promise<{ error: string } | void> {
+): Promise<{ error: string } | { success: true }> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -185,15 +184,18 @@ export async function createDjProfile(
     });
   });
 
-  redirect("/");
+  return { success: true as const };
 }
 
-export async function createOrganizerProfile(formData: FormData) {
+export async function createOrganizerProfile(
+  _prevState: { success: boolean; error: string | null },
+  formData: FormData,
+): Promise<{ success: boolean; error: string | null }> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/sign-in");
+  if (!user) return { success: false, error: "Not authenticated" };
 
   const Schema = z.object({
     businessName: z.string().min(2).max(80),
@@ -205,24 +207,33 @@ export async function createOrganizerProfile(formData: FormData) {
     phone: formData.get("phone") || undefined,
   });
 
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: "Please check your details and try again.",
+    };
+  }
 
-  await prisma.organizerProfile.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: {
-      userId: user.id,
-      businessName: parsed.data.businessName,
-      phone: parsed.data.phone ?? null,
-    },
-  });
+  try {
+    await prisma.organizerProfile.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        businessName: parsed.data.businessName,
+        phone: parsed.data.phone ?? null,
+      },
+    });
 
-  // Grant ORGANIZER role only now — after the profile is fully saved.
-  await prisma.userRole.upsert({
-    where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
-    update: {},
-    create: { userId: user.id, role: "ORGANIZER" },
-  });
+    // Grant ORGANIZER role only now — after the profile is fully saved.
+    await prisma.userRole.upsert({
+      where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
+      update: {},
+      create: { userId: user.id, role: "ORGANIZER" },
+    });
 
-  redirect("/");
+    return { success: true, error: null };
+  } catch {
+    return { success: false, error: "Something went wrong. Please try again." };
+  }
 }
