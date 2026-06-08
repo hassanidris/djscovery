@@ -66,7 +66,7 @@ const RecentAdded = () => {
             </div>
           </div>
           {index < DJS.length - 1 && (
-            <hr className="border-t-1 border-gray-800 w-full self-center" />
+            <hr className="border-t border-gray-800 w-full self-center" />
           )}
         </React.Fragment>
       ))}

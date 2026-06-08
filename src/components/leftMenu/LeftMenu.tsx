@@ -1,7 +1,10 @@
 import React, { Suspense } from "react";
 import ProfileCard from "./ProfileCard";
 import SuggestedDJs from "./SuggestedDJs";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  ProfileCardSkeleton,
+  SuggestedDJsSkeleton,
+} from "@/components/ui/skeletons";
 
 /*
   WHY only these two widgets:
@@ -20,15 +23,11 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
   return (
     <div className="flex flex-col gap-5">
       {type === "home" && (
-        <Suspense
-          fallback={<Skeleton className="h-36 w-full rounded-xl bg-gray-800" />}
-        >
+        <Suspense fallback={<ProfileCardSkeleton />}>
           <ProfileCard />
         </Suspense>
       )}
-      <Suspense
-        fallback={<Skeleton className="h-48 w-full rounded-xl bg-gray-800" />}
-      >
+      <Suspense fallback={<SuggestedDJsSkeleton />}>
         <SuggestedDJs />
       </Suspense>
     </div>

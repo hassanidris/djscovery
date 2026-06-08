@@ -131,7 +131,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
                 <button
                   type="button"
                   onClick={() => setVideoUrl("")}
-                  className="text-white/30 hover:text-white/60 transition-colors"
+                  className="text-white/30 hover:text-white/60 transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -209,7 +209,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
                       open();
                     }
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
                     activeMedia === "photo"
                       ? "text-h_red bg-h_red/10 border border-h_red/20"
                       : "text-white/40 hover:text-white hover:bg-white/5"
@@ -225,7 +225,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
             <button
               type="button"
               onClick={() => switchMedia("video")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer text-xs transition-all ${
                 activeMedia === "video"
                   ? "text-h_red bg-h_red/10 border border-h_red/20"
                   : "text-white/40 hover:text-white hover:bg-white/5"
@@ -239,7 +239,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
             <button
               type="button"
               onClick={() => switchMedia("mix")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+              className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
                 activeMedia === "mix"
                   ? "text-h_red bg-h_red/10 border border-h_red/20"
                   : "text-white/40 hover:text-white hover:bg-white/5"
