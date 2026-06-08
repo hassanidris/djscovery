@@ -23,20 +23,18 @@
 
 import { ReactNode } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Flame, Music2, CalendarDays, Rss } from "lucide-react";
+import { Flame, Music2, Rss } from "lucide-react";
 
 interface FeedTabsProps {
   forYouContent: ReactNode;
   followingContent: ReactNode;
   trendingContent: ReactNode;
-  eventsContent: ReactNode;
 }
 
 const FeedTabs = ({
   forYouContent,
   followingContent,
   trendingContent,
-  eventsContent,
 }: FeedTabsProps) => {
   return (
     <Tabs defaultValue="for-you" className="w-full">
@@ -79,14 +77,6 @@ const FeedTabs = ({
           <Flame className="w-3.5 h-3.5 shrink-0" />
           <span className="hidden sm:inline">Trending</span>
         </TabsTrigger>
-
-        <TabsTrigger
-          value="events"
-          className="flex-1 gap-1.5 text-gray-400 data-[state=active]:text-h_white data-[state=active]:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-h_red rounded-md py-2 text-sm transition-all"
-        >
-          <CalendarDays className="w-3.5 h-3.5 shrink-0" />
-          <span className="hidden sm:inline">Events</span>
-        </TabsTrigger>
       </TabsList>
 
       {/* Tab 1 — For You: the default community feed */}
@@ -107,11 +97,6 @@ const FeedTabs = ({
       */}
       <TabsContent value="trending" className="mt-0">
         {trendingContent}
-      </TabsContent>
-
-      {/* Tab 4 — Events: placeholder for now, same rationale */}
-      <TabsContent value="events" className="mt-0">
-        {eventsContent}
       </TabsContent>
     </Tabs>
   );

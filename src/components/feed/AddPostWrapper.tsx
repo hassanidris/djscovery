@@ -33,13 +33,22 @@ const AddPostWrapper = async () => {
   // Not logged in — AddPost handles the sign-up prompt itself
   if (!userId) return <AddPost />;
 
-  // Check if the user has the DJ role
-  const djRole = await prisma.userRole.findFirst({
-    where: { userId, role: Role.DJ },
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      username: true,
+      image: true,
+      roles: { where: { role: Role.DJ }, select: { role: true } },
+      djProfile: { select: { avatar: true, stageName: true } },
+    },
   });
 
+  const avatarUrl = dbUser?.djProfile?.avatar ?? dbUser?.image ?? null;
+  const displayName = dbUser?.djProfile?.stageName ?? dbUser?.username ?? null;
+
   // DJ — show the full compose form
-  if (djRole) return <AddPost />;
+  if (dbUser?.roles.length)
+    return <AddPost avatarUrl={avatarUrl} displayName={displayName} />;
 
   // Fan (logged in, not a DJ) — show engagement info card
   return (

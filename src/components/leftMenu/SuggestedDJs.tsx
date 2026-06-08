@@ -98,7 +98,7 @@ const SuggestedDJs = async () => {
                 <div className="flex-1 min-w-0">
                   <Link href={`/djs/${dj.slug}`}>
                     <p className="text-sm text-h_white font-medium truncate hover:underline">
-                      {dj.stageName}
+                      Dj. {dj.stageName}
                     </p>
                   </Link>
                   {dj.genres[0] && (
@@ -146,7 +146,7 @@ const SuggestedDJs = async () => {
                 <div className="flex-1 min-w-0">
                   <Link href={`/profile/${dj.username}`}>
                     <p className="text-sm text-h_white font-medium truncate hover:underline">
-                      {displayName}
+                      Dj. {displayName}
                     </p>
                   </Link>
                   {genre && (

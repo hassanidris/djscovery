@@ -126,9 +126,13 @@ export const deletePostComment = async (commentId: number) => {
 
 export const addPost = async (formData: FormData, imageUrl?: string) => {
   const content = formData.get("content") as string;
+  const videoUrl = (formData.get("videoUrl") as string | null) || "";
+  const audioUrl = (formData.get("audioUrl") as string | null) || "";
 
-  const validated = z.string().min(1).max(1000).safeParse(content);
+  const validated = z.string().min(0).max(1000).safeParse(content);
   if (!validated.success) return;
+  const hasMedia = !!(imageUrl || videoUrl || audioUrl);
+  if (!validated.data.trim() && !hasMedia) return;
 
   const userId = await getCurrentUserId();
 
@@ -148,6 +152,30 @@ export const addPost = async (formData: FormData, imageUrl?: string) => {
           bucket: "djscovery-media",
           path: imageUrl,
           type: "IMAGE",
+          postId: post.id,
+        },
+      });
+    }
+
+    if (videoUrl) {
+      await prisma.media.create({
+        data: {
+          url: videoUrl,
+          bucket: "external",
+          path: videoUrl,
+          type: "VIDEO",
+          postId: post.id,
+        },
+      });
+    }
+
+    if (audioUrl) {
+      await prisma.media.create({
+        data: {
+          url: audioUrl,
+          bucket: "external",
+          path: audioUrl,
+          type: "AUDIO",
           postId: post.id,
         },
       });

@@ -58,7 +58,7 @@ const DjCard = ({
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <h3 className="text-h_white font-semibold text-sm truncate">
-              {stageName || username}
+              Dj. {stageName || username}
             </h3>
             {verified && (
               <CircleCheck className="h-3.5 w-3.5 text-blue-400 shrink-0" />

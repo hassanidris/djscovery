@@ -1,23 +1,26 @@
 import Image from "next/image";
 import Comments from "./Comments";
-import {
-  Media,
-  Post as PostType,
-  PostType as PostTypeEnum,
-  User,
-} from "@prisma/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Media, Post as PostType, User } from "@prisma/client";
 import PostInfo from "./PostInfo";
 import { Suspense } from "react";
 import PostInteraction from "./PostInteraction";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { FileText, ImageIcon, Video, Music2, Play } from "lucide-react";
+import { Music2, Play } from "lucide-react";
 import {
   PostInteractionSkeleton,
   CommentInputSkeleton,
 } from "@/components/ui/skeletons";
 
-type FeedPostType = PostType & { user: User } & {
+type DjProfileSnippet = {
+  avatar: string | null;
+  stageName: string;
+  slug: string;
+} | null;
+
+type FeedPostType = PostType & {
+  user: User & { djProfile?: DjProfileSnippet };
+} & {
   likes: { userId: string }[];
   media: Media[];
 } & {
@@ -31,113 +34,125 @@ const Post = ({
   post: FeedPostType;
   currentUserId?: string;
 }) => {
+  const avatarSrc =
+    post.user.djProfile?.avatar ?? post.user.image ?? "/noAvatar.png";
+  const displayName =
+    post.user.djProfile?.stageName ?? post.user.name ?? post.user.username;
+  const profileHref = post.user.djProfile?.slug
+    ? `/djs/${post.user.djProfile.slug}`
+    : `/profile/${post.user.username}`;
+
+  const firstMedia = (post.media as any[])?.[0];
+
   return (
-    <div className="flex flex-col gap-4 p-4 bg-h_blackLight/50 rounded-xl border border-gray-800/70 shadow-md">
-      {/* USER */}
-      {/*
-        Post type badge: reads the real `post.type` field from the DB
-        (PostTypeEnum: TEXT | IMAGE). No fake data — this reflects what
-        the user actually posted, making each card self-descriptive.
-        Using shadcn Badge so it stays consistent with the header stats
-        and right-panel genre labels across the whole page.
-      */}
-      <div className="flex items-center justify-between">
-        <Link href={`/profile/${post.user.username}`}>
-          <div className="flex items-center gap-3 text-h_white hover:underline">
-            <Image
-              src={post.user.image || "/noAvatar.png"}
-              width={40}
-              height={40}
-              alt=""
-              className="w-10 h-10 rounded-full ring-1 ring-gray-700 object-cover"
-            />
+    <div className="flex flex-col bg-h_blackLight/50 rounded-xl border border-gray-800/70 shadow-md overflow-hidden">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <Link href={profileHref} className="group">
+          <div className="flex items-center gap-3">
+            <Avatar className="w-10 h-10 ring-1 ring-white/20 shrink-0">
+              <AvatarImage src={avatarSrc} alt={displayName} />
+              <AvatarFallback className="bg-white/10 text-white text-sm font-semibold">
+                {displayName.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <div className="flex flex-col">
-              <span className="font-semibold leading-tight text-h_white">
-                DJ {post.user.name || post.user.username}
+              <span className="font-semibold text-sm text-h_white group-hover:text-white/70 transition-colors leading-tight">
+                Dj. {displayName}
               </span>
-              <span className="text-xs text-gray-500 leading-none">
-                @{post.user.username}
+              <span className="text-[11px] text-white/40 leading-none mt-0.5">
+                @{post.user.djProfile?.slug ?? post.user.username}
               </span>
-              {/* Post type badge — directly below the name */}
-              {post.type === PostTypeEnum.IMAGE ? (
-                <Badge className="w-fit bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] px-1.5 py-0 gap-1 mt-0.5">
-                  <ImageIcon className="w-2.5 h-2.5" /> Photo
-                </Badge>
-              ) : (
-                <Badge className="w-fit bg-gray-700/50 text-gray-400 border border-gray-700 text-[10px] px-1.5 py-0 gap-1 mt-0.5">
-                  <FileText className="w-2.5 h-2.5" /> Post
-                </Badge>
-              )}
             </div>
           </div>
         </Link>
         {currentUserId === post.user.id && <PostInfo postId={post.id} />}
       </div>
-      {/* CONTENT */}
-      <div className="flex flex-col gap-4 text-h_white">
-        {post.content && <p>{post.content}</p>}
-        {(() => {
-          const m = (post.media as any[])?.[0];
-          if (!m) return null;
-          if (m.type === "VIDEO")
-            return (
+
+      {/* ── Content + Media (single container) ── */}
+      {(post.content || firstMedia) && (
+        <div className="mx-4 mb-3 bg-black/25 rounded-xl border border-white/[0.07] overflow-hidden">
+          {post.content && (
+            <p className="text-h_white text-sm leading-relaxed px-4 pt-3 pb-3">
+              {post.content}
+            </p>
+          )}
+
+          {firstMedia?.type === "IMAGE" && (
+            <Image
+              src={firstMedia.url}
+              alt="post image"
+              width={800}
+              height={450}
+              className="w-full object-cover max-h-96"
+            />
+          )}
+
+          {firstMedia?.type === "VIDEO" && (
+            <div className={post.content ? "px-4 pb-3" : "p-3"}>
               <video
-                src={m.url}
+                src={firstMedia.url}
                 controls
-                className="w-full rounded-lg ring-1 ring-gray-700 max-h-80 object-cover"
+                className="w-full rounded-lg border border-white/10 max-h-80"
               />
-            );
-          if (m.type === "AUDIO")
-            return (
-              <div className="flex items-center gap-4 p-4 bg-gray-800/60 rounded-xl ring-1 ring-gray-700">
-                <div className="w-12 h-12 rounded-xl bg-h_red/10 border border-h_red/20 flex items-center justify-center shrink-0">
-                  <Music2 className="w-6 h-6 text-h_red" />
+            </div>
+          )}
+
+          {firstMedia?.type === "AUDIO" && (
+            <div className={post.content ? "px-4 pb-3" : "p-3"}>
+              <div className="flex items-center gap-4 p-4 bg-black/20 rounded-xl border border-white/10">
+                <div className="w-11 h-11 rounded-xl bg-h_red/10 border border-h_red/20 flex items-center justify-center shrink-0">
+                  <Music2 className="w-5 h-5 text-h_red" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-h_white font-semibold truncate">
-                    {m.title ?? "Mix"}
+                    {firstMedia.title ?? "Mix"}
                   </p>
-                  {m.duration && (
-                    <p className="text-xs text-gray-500 mt-0.5">{m.duration}</p>
+                  {firstMedia.duration && (
+                    <p className="text-xs text-white/40 mt-0.5">
+                      {firstMedia.duration}
+                    </p>
                   )}
-                  <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full w-1/3 bg-h_red rounded-full" />
                   </div>
                 </div>
-                <div className="size-10 bg-h_red/90 rounded-full flex items-center justify-center shrink-0">
+                <a
+                  href={firstMedia.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="size-9 bg-h_red/90 hover:bg-h_red rounded-full flex items-center justify-center shrink-0 transition-colors"
+                >
                   <Play className="w-4 h-4 text-white" fill="white" />
-                </div>
+                </a>
               </div>
-            );
-          return (
-            <div className="relative w-full rounded-lg overflow-hidden">
-              <Image
-                src={m.url}
-                alt="post image"
-                width={800}
-                height={450}
-                className="w-full object-cover rounded-lg"
-              />
             </div>
-          );
-        })()}
+          )}
+        </div>
+      )}
+
+      {/* ── Interaction (likes / comments count) ── */}
+      <div className="border-t border-white/10 px-4 py-2.5">
+        <Suspense fallback={<PostInteractionSkeleton />}>
+          <PostInteraction
+            postId={post.id}
+            likes={post.likes.map((like) => like.userId)}
+            commentNumber={post._count.comments}
+            currentUserId={currentUserId}
+          />
+        </Suspense>
       </div>
-      {/* INTERACTION */}
-      <Suspense fallback={<PostInteractionSkeleton />}>
-        <PostInteraction
-          postId={post.id}
-          likes={post.likes.map((like) => like.userId)}
-          commentNumber={post._count.comments}
-          currentUserId={currentUserId}
-        />
-      </Suspense>
-      <div className="border-t border-gray-700/50" />
-      <Suspense fallback={<CommentInputSkeleton />}>
-        <Comments
-          postId={post.id}
-          initialComments={(post as any).demoComments}
-        />
-      </Suspense>
+
+      {/* ── Comments ── */}
+      <div className="border-t border-white/10 px-4 py-4 bg-black/20">
+        <Suspense fallback={<CommentInputSkeleton />}>
+          <Comments
+            postId={post.id}
+            initialComments={(post as any).demoComments}
+            currentUserId={currentUserId}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 };
