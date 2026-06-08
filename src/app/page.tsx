@@ -88,7 +88,7 @@ const Homepage = async () => {
           : 0,
       followers: p.user._count.followers,
       slug: p.slug,
-      isPremium: false,
+      isPremium: p.plan === "PREMIUM",
     });
 
     dbNewDJs = recentProfiles.map(toHomeDJ);

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,8 @@ import {
   Trophy,
   Newspaper,
   BriefcaseBusiness,
+  Pencil,
+  ImageIcon,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
@@ -57,6 +60,36 @@ import {
   mapFreeMediaFromData,
   mapFreeFeaturedMix,
 } from "@/lib/dj-profile-mappers";
+import { calculateProfileCompletion } from "@/lib/profile-completion";
+
+function EmptySectionState({
+  icon: Icon,
+  title,
+  description,
+  actionLabel,
+  actionHref,
+}: {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionHref: string;
+}) {
+  return (
+    <Link href={actionHref}>
+      <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg border border-dashed border-white/10 text-center group hover:border-white/20 transition-colors">
+        <div className="size-10 rounded-full bg-white/5 flex items-center justify-center mb-3 group-hover:bg-white/8 transition-colors">
+          <Icon className="h-5 w-5 text-gray-600" />
+        </div>
+        <p className="text-gray-400 text-sm font-medium">{title}</p>
+        <p className="text-gray-600 text-xs mt-1">{description}</p>
+        <span className="mt-3 text-xs text-h_red font-medium">
+          {actionLabel} →
+        </span>
+      </div>
+    </Link>
+  );
+}
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
@@ -83,6 +116,29 @@ export default function DjProfileFree({
     ? djData.spotlight.featuredVideo.thumbnail
     : "/gallery-2.png";
   const location = `${DJ.city}, ${DJ.country}`;
+
+  const isOwner = viewMode === "dj-owner";
+  const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
+  const bookingEmail = djData
+    ? djData.booking.email
+    : FREE_DEFAULT_DJ.bookingEmail;
+  const bookingPhone = djData
+    ? djData.booking.phone
+    : FREE_DEFAULT_DJ.bookingPhone;
+  const bookingHref = bookingEmail
+    ? `mailto:${bookingEmail}?subject=Booking%20Enquiry%20via%20DJscovery`
+    : bookingPhone
+      ? `tel:${bookingPhone}`
+      : "#";
+
+  const hasFeaturedMix = FEATURED_MIX.audioUrl !== "";
+  const hasFeaturedVideo = !!djData?.spotlight.featuredVideo.videoUrl;
+  const hasSpotlight = hasFeaturedMix || hasFeaturedVideo;
+  const hasMixes = hasFeaturedMix;
+  const hasPhotos = MEDIA.length > 0;
+  const hasVenues = VENUES.length > 0;
+
+  const completion = djData ? calculateProfileCompletion(djData) : null;
 
   return (
     <div className="min-h-screen bg-black">
@@ -122,17 +178,38 @@ export default function DjProfileFree({
               </p>
             </div>
             <div className="flex items-center gap-2 sm:pb-2">
-              <Button className="bg-h_red hover:bg-h_redDark text-white font-semibold">
-                <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
-                Book DJ
-              </Button>
-              <Button
-                variant="outline"
-                className="border-white/20 text-gray-300 hover:bg-white/5"
-              >
-                <UserPlus className="h-3.5 w-3.5 mr-1.5" />
-                Follow
-              </Button>
+              {isOwner && djData?.slug ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-amber-500/50 text-amber-300 hover:bg-amber-500/10"
+                  asChild
+                >
+                  <Link href={editHref}>
+                    <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                    Edit Profile
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    className="bg-h_red hover:bg-h_redDark text-white font-semibold"
+                    asChild
+                  >
+                    <a href={bookingHref}>
+                      <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
+                      Book DJ
+                    </a>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-white/20 text-gray-300 hover:bg-white/5"
+                  >
+                    <UserPlus className="h-3.5 w-3.5 mr-1.5" />
+                    Follow
+                  </Button>
+                </>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -224,102 +301,123 @@ export default function DjProfileFree({
           {/* Main Column */}
           <div className="lg:col-span-2 flex flex-col gap-12">
             {/* ── SPOTLIGHT ── */}
-            <section>
-              <SectionHeading sub="Featured content curated by this DJ">
-                Spotlight
-              </SectionHeading>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {/* Featured Mix */}
-                <MediaAudioPlayer
-                  audioUrl={FEATURED_MIX.audioUrl}
-                  title={FEATURED_MIX.title}
-                >
-                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
-                    <div className="relative h-40 bg-linear-to-br from-h_red/20 to-black shrink-0">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
-                          <Play className="h-5 w-5 text-white ml-0.5" />
-                        </div>
-                      </div>
-                      <div className="absolute bottom-3 left-3">
-                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                          <Headphones className="h-2.5 w-2.5 mr-1" />
-                          Featured Mix
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-white text-sm font-semibold">
-                        {FEATURED_MIX.title}
-                      </p>
-                      <p className="text-gray-500 text-xs mt-1">
-                        {FEATURED_MIX.duration} · {FEATURED_MIX.plays} plays
-                      </p>
-                      <div className="flex items-center gap-1 mt-2">
-                        {FEATURED_MIX.genres.map((t) => (
-                          <Badge
-                            key={t}
-                            className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4"
-                          >
-                            {t}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </Card>
-                </MediaAudioPlayer>
+            {(hasSpotlight || isOwner) && (
+              <section>
+                <SectionHeading sub="Featured content curated by this DJ">
+                  Spotlight
+                </SectionHeading>
+                {hasSpotlight ? (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {/* Featured Mix */}
+                    {hasFeaturedMix && (
+                      <MediaAudioPlayer
+                        audioUrl={FEATURED_MIX.audioUrl}
+                        title={FEATURED_MIX.title}
+                      >
+                        <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
+                          <div className="relative h-40 bg-linear-to-br from-h_red/20 to-black shrink-0">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
+                                <Play className="h-5 w-5 text-white ml-0.5" />
+                              </div>
+                            </div>
+                            <div className="absolute bottom-3 left-3">
+                              <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                                <Headphones className="h-2.5 w-2.5 mr-1" />
+                                Featured Mix
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <p className="text-white text-sm font-semibold">
+                              {FEATURED_MIX.title}
+                            </p>
+                            <p className="text-gray-500 text-xs mt-1">
+                              {FEATURED_MIX.duration} · {FEATURED_MIX.plays}{" "}
+                              plays
+                            </p>
+                            <div className="flex items-center gap-1 mt-2">
+                              {FEATURED_MIX.genres.map((t) => (
+                                <Badge
+                                  key={t}
+                                  className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4"
+                                >
+                                  {t}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </Card>
+                      </MediaAudioPlayer>
+                    )}
 
-                {/* Featured Video */}
-                <MediaVideoModal
-                  videoUrl={djData?.spotlight.featuredVideo.videoUrl ?? ""}
-                  thumbnail={videoThumb}
-                  title={
-                    djData?.spotlight.featuredVideo.title ??
-                    "Live @ Berghain — Summer Closing 2024"
-                  }
-                >
-                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
-                    <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black shrink-0">
-                      <Image
-                        src={videoThumb}
-                        alt="video thumbnail"
-                        fill
-                        className="object-cover opacity-50 group-hover:opacity-60 transition-opacity"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                          <Play className="h-5 w-5 text-white ml-0.5" />
-                        </div>
-                      </div>
-                      <div className="absolute bottom-3 left-3">
-                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                          <Video className="h-2.5 w-2.5 mr-1" />
-                          Featured Video
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-white text-sm font-semibold">
-                        {djData?.spotlight.featuredVideo.title ??
-                          "Live @ Berghain — Summer Closing 2024"}
-                      </p>
-                      <p className="text-gray-500 text-xs mt-1">
-                        {djData?.spotlight.featuredVideo.duration ?? "45 min"} ·
-                        {" "}
-                        {djData?.spotlight.featuredVideo.subtitle ?? "YouTube"}
-                      </p>
-                      <div className="mt-2">
-                        <Badge className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4">
-                          Live Performance
-                        </Badge>
-                      </div>
-                    </div>
-                  </Card>
-                </MediaVideoModal>
-              </div>
-            </section>
+                    {/* Featured Video */}
+                    {hasFeaturedVideo && (
+                      <MediaVideoModal
+                        videoUrl={
+                          djData?.spotlight.featuredVideo.videoUrl ?? ""
+                        }
+                        thumbnail={videoThumb}
+                        title={
+                          djData?.spotlight.featuredVideo.title ??
+                          "Live @ Berghain — Summer Closing 2024"
+                        }
+                      >
+                        <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-h_red/30 transition-all gap-0 h-full flex flex-col">
+                          <div className="relative h-40 bg-linear-to-br from-slate-900 via-gray-900 to-black shrink-0">
+                            <Image
+                              src={videoThumb}
+                              alt="video thumbnail"
+                              fill
+                              className="object-cover opacity-50 group-hover:opacity-60 transition-opacity"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
+                                <Play className="h-5 w-5 text-white ml-0.5" />
+                              </div>
+                            </div>
+                            <div className="absolute bottom-3 left-3">
+                              <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
+                                <Video className="h-2.5 w-2.5 mr-1" />
+                                Featured Video
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <p className="text-white text-sm font-semibold">
+                              {djData?.spotlight.featuredVideo.title ??
+                                "Live @ Berghain — Summer Closing 2024"}
+                            </p>
+                            <p className="text-gray-500 text-xs mt-1">
+                              {djData?.spotlight.featuredVideo.duration ??
+                                "45 min"}{" "}
+                              ·{" "}
+                              {djData?.spotlight.featuredVideo.subtitle ??
+                                "YouTube"}
+                            </p>
+                            <div className="mt-2">
+                              <Badge className="bg-white/5 text-gray-400 border-white/10 text-[10px] h-4">
+                                Live Performance
+                              </Badge>
+                            </div>
+                          </div>
+                        </Card>
+                      </MediaVideoModal>
+                    )}
+                  </div>
+                ) : (
+                  <EmptySectionState
+                    icon={Play}
+                    title="No spotlight content yet"
+                    description="Add a featured mix or video to showcase your sound"
+                    actionLabel="Add Content"
+                    actionHref={editHref}
+                  />
+                )}
+              </section>
+            )}
 
-            <Separator className="bg-white/8" />
+            {(hasSpotlight || isOwner) && <Separator className="bg-white/8" />}
 
             <ProfileAbout
               bio={DJ.bio}
@@ -331,59 +429,83 @@ export default function DjProfileFree({
             <Separator className="bg-white/8" />
 
             {/* ── MY SOUND ── */}
-            <section>
-              <SectionHeading sub="1 mix · Upgrade to share your full discography">
-                My Sound
-              </SectionHeading>
-              <MediaAudioPlayer
-                audioUrl={FEATURED_MIX.audioUrl}
-                title={FEATURED_MIX.title}
-              >
-                <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0 cursor-pointer hover:border-white/15 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="size-14 rounded-lg bg-linear-to-br from-h_red/30 to-h_redDark/10 border border-white/8 flex items-center justify-center shrink-0">
-                      <Music className="h-5 w-5 text-h_red" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-semibold">
-                        {FEATURED_MIX.title}
-                      </p>
-                      <p className="text-gray-500 text-xs mt-0.5">
-                        {FEATURED_MIX.platform} · {FEATURED_MIX.duration} ·{" "}
-                        {FEATURED_MIX.plays} plays
-                      </p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full w-1/3 bg-h_red rounded-full" />
+            {(hasMixes || isOwner) && (
+              <section>
+                <SectionHeading sub="1 mix · Upgrade to share your full discography">
+                  My Sound
+                </SectionHeading>
+                {hasMixes ? (
+                  <MediaAudioPlayer
+                    audioUrl={FEATURED_MIX.audioUrl}
+                    title={FEATURED_MIX.title}
+                  >
+                    <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0 cursor-pointer hover:border-white/15 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="size-14 rounded-lg bg-linear-to-br from-h_red/30 to-h_redDark/10 border border-white/8 flex items-center justify-center shrink-0">
+                          <Music className="h-5 w-5 text-h_red" />
                         </div>
-                        <span className="text-gray-600 text-[10px]">
-                          28:14 / 1:24:00
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-sm font-semibold">
+                            {FEATURED_MIX.title}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-0.5">
+                            {FEATURED_MIX.platform} · {FEATURED_MIX.duration} ·{" "}
+                            {FEATURED_MIX.plays} plays
+                          </p>
+                          <div className="mt-2 flex items-center gap-2">
+                            <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                              <div className="h-full w-1/3 bg-h_red rounded-full" />
+                            </div>
+                            <span className="text-gray-600 text-[10px]">
+                              28:14 / 1:24:00
+                            </span>
+                          </div>
+                        </div>
+                        <div className="size-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                          <Play className="h-3 w-3 ml-0.5" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="size-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                      <Play className="h-3 w-3 ml-0.5" />
-                    </div>
-                  </div>
-                </Card>
-              </MediaAudioPlayer>
-            </section>
+                    </Card>
+                  </MediaAudioPlayer>
+                ) : (
+                  <EmptySectionState
+                    icon={Music}
+                    title="No mixes added yet"
+                    description="Share your first mix or playlist link with your audience"
+                    actionLabel="Add Mix"
+                    actionHref={editHref}
+                  />
+                )}
+              </section>
+            )}
 
-            <Separator className="bg-white/8" />
+            {(hasMixes || isOwner) && <Separator className="bg-white/8" />}
 
             {/* ── MEDIA ── */}
-            <section>
-              <SectionHeading sub="Unlimited photos · 1 video on Free plan">
-                Media
-              </SectionHeading>
-              <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
-            </section>
+            {(hasPhotos || isOwner) && (
+              <section>
+                <SectionHeading sub="Upgrade to unlock video uploads">
+                  Media
+                </SectionHeading>
+                {hasPhotos ? (
+                  <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
+                ) : (
+                  <EmptySectionState
+                    icon={ImageIcon}
+                    title="No photos yet"
+                    description="Add photos to show your vibe and past events"
+                    actionLabel="Add Photos"
+                    actionHref={editHref}
+                  />
+                )}
+              </section>
+            )}
 
-            <Separator className="bg-white/8" />
+            {(hasPhotos || isOwner) && <Separator className="bg-white/8" />}
 
-            <ProfileVenues venues={VENUES} />
+            {hasVenues && <ProfileVenues venues={VENUES} />}
 
-            <Separator className="bg-white/8" />
+            {hasVenues && <Separator className="bg-white/8" />}
 
             <ProfileReviews
               avgRating={DJ.avgRating}
@@ -483,20 +605,28 @@ export default function DjProfileFree({
               <p className="text-gray-400 text-xs mb-4">
                 For clubs, festivals, events & more
               </p>
-              <Button className="w-full bg-h_red hover:bg-h_redDark text-white font-semibold mb-2">
-                <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
-                Book / Hire DJ
+              <Button
+                className="w-full bg-h_red hover:bg-h_redDark text-white font-semibold mb-2"
+                asChild
+              >
+                <a href={bookingHref}>
+                  <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
+                  Book / Hire DJ
+                </a>
               </Button>
               <Button
                 variant="outline"
                 className="w-full border-white/15 text-gray-300 hover:bg-white/5"
+                asChild
               >
-                <Mail className="h-3.5 w-3.5 mr-1.5" />
-                Send Inquiry
+                <a href={bookingHref}>
+                  <Mail className="h-3.5 w-3.5 mr-1.5" />
+                  Send Inquiry
+                </a>
               </Button>
             </Card>
 
-            <ProfileEventsSidebar events={EVENTS} />
+            <ProfileEventsSidebar events={EVENTS} isOwner={isOwner} />
 
             <Separator className="bg-white/8" />
 
@@ -527,11 +657,17 @@ export default function DjProfileFree({
                 <span className="text-gray-400 text-xs font-medium">
                   Profile Strength
                 </span>
-                <span className="text-white text-xs font-bold">68%</span>
+                <span className="text-white text-xs font-bold">
+                  {completion ? `${completion.percentage}%` : "68%"}
+                </span>
               </div>
-              <Progress value={68} className="h-1.5 bg-white/8 mb-2" />
+              <Progress
+                value={completion?.percentage ?? 68}
+                className="h-1.5 bg-white/8 mb-2"
+              />
               <p className="text-gray-500 text-xs">
-                Add more photos & connect Spotify to reach 100%.
+                {completion?.suggestions[0] ??
+                  "Add more photos & connect Spotify to reach 100%."}
               </p>
             </div>
           </aside>
