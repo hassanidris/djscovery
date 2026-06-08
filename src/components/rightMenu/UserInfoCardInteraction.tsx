@@ -1,6 +1,7 @@
 "use client";
 
 import { switchFollow } from "@/lib/actions";
+import { toast } from "sonner";
 import { useOptimistic, useState } from "react";
 
 const UserInfoCardInteraction = ({
@@ -22,9 +23,9 @@ const UserInfoCardInteraction = ({
     try {
       await switchFollow(userId);
       setFollowing((prev) => !prev);
-    } catch (err) {
-      console.log(err);
+    } catch {
       toggleOptimistic(null);
+      toast.error("Couldn’t update follow. Try again.");
     }
   };
 

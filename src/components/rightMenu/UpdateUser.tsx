@@ -4,8 +4,9 @@ import { updateDjProfile } from "@/lib/actions";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@prisma/client";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import UpdateBtn from "./UpdateBtn";
 
 const UpdateUser = ({ user }: { user: User }) => {
@@ -17,11 +18,25 @@ const UpdateUser = ({ user }: { user: User }) => {
   });
 
   const router = useRouter();
+  const isFirstRender = useRef(true);
 
   const handleClose = () => {
     setOpen(false);
-    if (state.success) router.refresh();
   };
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (state.success) {
+      toast.success("Profile updated");
+      setOpen(false);
+      router.refresh();
+    } else if (state.error) {
+      toast.error("Update failed. Please try again.");
+    }
+  }, [state]);
 
   useEffect(() => {
     if (open) {
@@ -59,7 +74,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                 <input
                   type="text"
                   placeholder="Dj. Echo"
-                  className="w-full ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                  className="w-full ring-1 ring-gray-300 p-3.25 rounded-md text-sm"
                   name="stageName"
                 />
               </div>
@@ -68,7 +83,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                 <label className="text-xs text-gray-500">Bio</label>
                 <textarea
                   placeholder="Tell your fans about yourself..."
-                  className="w-full ring-1 ring-gray-300 p-[13px] rounded-md text-sm resize-none"
+                  className="w-full ring-1 ring-gray-300 p-3.25 rounded-md text-sm resize-none"
                   name="bio"
                   rows={3}
                 />
@@ -76,12 +91,6 @@ const UpdateUser = ({ user }: { user: User }) => {
             </div>
 
             <UpdateBtn />
-            {state.success && (
-              <span className="text-green-500">Profile updated!</span>
-            )}
-            {state.error && (
-              <span className="text-red-500">Something went wrong!</span>
-            )}
             <div
               className="absolute text-xl right-3 top-3 cursor-pointer"
               onClick={handleClose}

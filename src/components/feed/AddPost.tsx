@@ -3,13 +3,15 @@ import { useUser } from "@/lib/supabase/useUser";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import AddPostBtn from "./AddPostBtn";
 import { addPost } from "@/lib/actions";
 
 const AddPost = () => {
   const { isLoaded, user } = useUser();
   const [img, setImg] = useState<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   if (!isLoaded) {
     return "Loading...";
@@ -43,10 +45,20 @@ const AddPost = () => {
       <div className="flex-1">
         {/* Text Input */}
         <form
-          action={(formData) => addPost(formData, img?.secure_url || "")}
+          action={async (formData) => {
+            try {
+              await addPost(formData, img?.secure_url || "");
+              toast.success("Post shared with the community!");
+              if (textareaRef.current) textareaRef.current.value = "";
+              setImg(null);
+            } catch {
+              toast.error("Failed to post. Try again.");
+            }
+          }}
           className="flex gap-4"
         >
           <textarea
+            ref={textareaRef}
             placeholder="What's on your mind?"
             className="flex-1 bg-gray-600 rounded-lg p-2 text-h_white"
             name="content"
@@ -69,6 +81,10 @@ const AddPost = () => {
             onSuccess={(result, { widget }) => {
               setImg(result.info);
               widget.close();
+              toast.success("Photo added to your post");
+            }}
+            onError={() => {
+              toast.error("Photo upload failed. Try again.");
             }}
           >
             {({ open }) => {

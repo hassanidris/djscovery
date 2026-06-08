@@ -2,6 +2,7 @@
 
 import { addPostComment } from "@/lib/actions";
 import { useUser } from "@/lib/supabase/useUser";
+import { toast } from "sonner";
 import { PostComment, User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -54,8 +55,9 @@ const CommentsList = ({
     try {
       const created = await addPostComment(postId, text);
       setCommentState((prev) => [created, ...prev]);
+      setText("");
     } catch {
-      //
+      toast.error("Comment failed. Please try again.");
     }
   };
 
