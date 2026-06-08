@@ -256,7 +256,7 @@ export async function updateDjProfile(
 
   const existing = await prisma.djProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true, stageName: true, slug: true },
+    select: { id: true, stageName: true, slug: true, countryId: true },
   });
   if (!existing) return { error: "DJ profile not found" };
 
@@ -267,9 +267,10 @@ export async function updateDjProfile(
     newSlug = await makeUniqueSlug(data.stageName, user.id);
   }
 
-  if (data.cityId && data.countryId) {
+  const effectiveCountryId = data.countryId ?? existing.countryId;
+  if (data.cityId && effectiveCountryId) {
     const city = await prisma.city.findFirst({
-      where: { id: data.cityId, countryId: data.countryId },
+      where: { id: data.cityId, countryId: effectiveCountryId },
       select: { id: true },
     });
     if (!city)

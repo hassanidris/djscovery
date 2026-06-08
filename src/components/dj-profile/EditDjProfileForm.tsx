@@ -211,7 +211,8 @@ export default function EditDjProfileForm({
     JSON.stringify([...genreNames].sort()) !==
       JSON.stringify([...profile.genres].sort()) ||
     JSON.stringify([...djTypes].sort()) !==
-      JSON.stringify([...profile.djTypes].sort());
+      JSON.stringify([...profile.djTypes].sort()) ||
+    JSON.stringify(socialLinks) !== JSON.stringify(profile.socialLinks);
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
