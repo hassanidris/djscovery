@@ -3,23 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { SlidersHorizontal, X } from "lucide-react";
+import { DJ_TYPES } from "@/config/dj-types";
+export { DJ_TYPES } from "@/config/dj-types";
 
 const SORT_OPTIONS = [
   { value: "", label: "Newest" },
   { value: "a-z", label: "A – Z" },
   { value: "z-a", label: "Z – A" },
   { value: "most-followed", label: "Most Followed" },
-];
-
-export const DJ_TYPES = [
-  { value: "WEDDING", label: "Wedding" },
-  { value: "CLUB", label: "Club" },
-  { value: "CORPORATE", label: "Corporate" },
-  { value: "FESTIVAL", label: "Festival" },
-  { value: "PRIVATE_PARTY", label: "Private Party" },
-  { value: "BAR_LOUNGE", label: "Lounge / Bar" },
-  { value: "BIRTHDAY", label: "Birthday" },
-  { value: "CULTURAL_EVENT", label: "Cultural Event" },
 ];
 
 type DraftFilters = {

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import prisma from "@/lib/client";
-import type { DjType } from "@prisma/client";
+import { DjType } from "@prisma/client";
 import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
 import FilterPanel from "@/components/directory/FilterPanel";
 import FilterBottomSheet from "@/components/directory/FilterBottomSheet";
@@ -28,7 +28,10 @@ const DirectoryPage = async ({
 }) => {
   const { genre, country, city, sort, q, djType } = await searchParams;
   const genreList = genre ? genre.split(",").filter(Boolean) : [];
-  const djTypeList = djType ? djType.split(",").filter(Boolean) : [];
+  const validDjTypes = new Set(Object.values(DjType));
+  const djTypeList = (djType ? djType.split(",").filter(Boolean) : []).filter(
+    (t): t is DjType => validDjTypes.has(t as DjType),
+  );
 
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   let djs: DjUser[] = [];
@@ -139,7 +142,7 @@ const DirectoryPage = async ({
         : true;
       const djTypeOk =
         djTypeList.length > 0
-          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t))
+          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
           : true;
       return genreOk && countryOk && cityOk && qOk && djTypeOk;
     });
@@ -215,7 +218,7 @@ const DirectoryPage = async ({
         : true;
       const djTypeOk =
         djTypeList.length > 0
-          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t))
+          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
           : true;
       return countryOk && cityOk && djTypeOk;
     });
@@ -267,7 +270,7 @@ const DirectoryPage = async ({
           : true;
       const djTypeOk =
         djTypeList.length > 0
-          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t))
+          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
           : true;
       return genreOk && djTypeOk;
     });

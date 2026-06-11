@@ -39,7 +39,9 @@
   --color-h_cyan: #06b6d4;
   --color-h_cyanDark: #0e7490;
   --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   --font-heading: var(--font-sora);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
