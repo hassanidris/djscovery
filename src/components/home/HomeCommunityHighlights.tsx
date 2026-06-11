@@ -110,14 +110,14 @@ export default async function HomeCommunityHighlights() {
       : DEMO_POSTS;
 
   return (
-    <section className="py-12 px-4 md:px-8 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-6">
+    <section className="border-t border-white/5 px-4 py-12 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex items-end justify-between">
           <div>
-            <h2 className="text-white text-3xl md:text-4xl">
+            <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
               Community Highlights
             </h2>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="mt-1 text-sm leading-relaxed text-gray-400">
               Latest from DJs in the community
             </p>
           </div>
@@ -131,22 +131,22 @@ export default async function HomeCommunityHighlights() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+        <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
           {posts.map((post) => (
             <Link key={post.id} href="/community" className="h-full">
-              <Card className="h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all p-4 gap-3">
+              <Card className="bg-h_blackLight/50 hover:ring-h_red flex h-full flex-col gap-3 p-4 ring-white/5 transition-all">
                 <div className="flex items-center gap-3">
-                  <Avatar className="size-11 ring-2 ring-h_red shrink-0">
+                  <Avatar className="ring-h_red size-11 shrink-0 ring-2">
                     <AvatarImage src={post.avatar} alt={post.dj} />
                     <AvatarFallback className="bg-h_redDark text-white">
                       {post.dj[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-white font-semibold text-sm">
+                    <p className="text-sm font-semibold text-white">
                       {post.dj}
                     </p>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-xs text-gray-500">
                       {post.city && post.country
                         ? `📍 ${post.city}, ${post.country} · `
                         : ""}
@@ -155,11 +155,11 @@ export default async function HomeCommunityHighlights() {
                   </div>
                 </div>
 
-                <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 flex-1">
+                <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-gray-300">
                   {post.content}
                 </p>
 
-                <div className="flex items-center gap-4 text-xs text-gray-500 border-t border-white/5 pt-3 mt-auto">
+                <div className="mt-auto flex items-center gap-4 border-t border-white/5 pt-3 text-xs text-gray-500">
                   <span>❤️ {post.likes.toLocaleString()} likes</span>
                   <span>💬 {post.comments} comments</span>
                 </div>

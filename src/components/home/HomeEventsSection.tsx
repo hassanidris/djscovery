@@ -80,12 +80,14 @@ function formatDate(iso: string) {
 
 export default function HomeEventsSection() {
   return (
-    <section className="py-12 px-4 md:px-8 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-6">
+    <section className="border-t border-white/5 px-4 py-12 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex items-end justify-between">
           <div>
-            <h2 className="text-white text-3xl md:text-4xl">Upcoming Events</h2>
-            <p className="text-gray-400 text-sm mt-1">
+            <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+              Upcoming Events
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-gray-400">
               Don&apos;t miss what&apos;s happening near you
             </p>
           </div>
@@ -99,21 +101,21 @@ export default function HomeEventsSection() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DEMO_EVENTS.map((event) => (
             <Link key={event.id} href={`/events/${event.id}`}>
               +{" "}
-              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all overflow-hidden p-0 gap-0 cursor-pointer">
+              <Card className="bg-h_blackLight/50 hover:ring-h_red cursor-pointer gap-0 overflow-hidden p-0 ring-white/5 transition-all">
                 {/* Header */}
-                <div className="relative bg-h_redDark/20 h-28 flex items-end p-4 overflow-hidden">
-                  <div className="absolute inset-0 bg-linear-to-br from-h_redDark/40 to-transparent" />
-                  <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-h_red/50 to-transparent" />
-                  <h3 className="relative text-white text-2xl tracking-widest leading-none">
+                <div className="bg-h_redDark/20 relative flex h-28 items-end overflow-hidden p-4">
+                  <div className="from-h_redDark/40 absolute inset-0 bg-linear-to-br to-transparent" />
+                  <div className="via-h_red/50 absolute top-0 right-0 left-0 h-px bg-linear-to-r from-transparent to-transparent" />
+                  <h3 className="relative text-xl leading-none font-bold tracking-wider text-white">
                     {event.title}
                   </h3>
                 </div>
 
-                <div className="p-4 flex flex-col gap-2">
+                <div className="flex flex-col gap-2 p-4">
                   <div className="flex items-center gap-2 text-sm text-gray-300">
                     <span>📅</span>
                     <span>{formatDate(event.date)}</span>
@@ -124,7 +126,7 @@ export default function HomeEventsSection() {
                       {event.venue} · {event.city}, {event.country}
                     </span>
                   </div>
-                  <Badge className="bg-h_redDark/60 text-red-300 border-0 w-fit mt-1">
+                  <Badge className="bg-h_redDark/60 mt-1 w-fit border-0 text-red-300">
                     🎧 {event.dj}
                   </Badge>
                 </div>

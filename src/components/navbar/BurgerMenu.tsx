@@ -120,7 +120,7 @@ export default function BurgerMenu({
             aria-label="Mobile navigation"
           >
             <div className="px-3">
-              <p className="mb-2 px-2 text-[10px] font-semibold tracking-widest text-gray-600 uppercase">
+              <p className="mb-2 px-2 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
                 Explore
               </p>
 
@@ -141,7 +141,7 @@ export default function BurgerMenu({
                     >
                       <Icon className="h-4 w-4 shrink-0" aria-hidden />
                       <span className="flex-1">{item.label}</span>
-                      <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[9px] leading-none font-semibold tracking-wider uppercase">
+                      <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                         Soon
                       </span>
                     </span>
@@ -178,7 +178,7 @@ export default function BurgerMenu({
               <>
                 <Separator className="my-3 bg-white/8" />
                 <div className="px-3">
-                  <p className="mb-2 px-2 text-[10px] font-semibold tracking-widest text-gray-600 uppercase">
+                  <p className="mb-2 px-2 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
                     Account
                   </p>
 

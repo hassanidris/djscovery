@@ -18,12 +18,14 @@ type Props = {
 
 export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
   return (
-    <section className="py-12 px-4 md:px-8 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
+    <section className="border-t border-white/5 px-4 py-12 md:px-8">
+      <div className="mx-auto max-w-7xl">
         <Tabs defaultValue="new">
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <div className="flex flex-wrap items-center gap-4">
-              <h2 className="text-white text-3xl md:text-4xl">Discover DJs</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+                Discover DJs
+              </h2>
               <TabsList className="bg-h_blackLight/80 border border-white/10">
                 <TabsTrigger
                   value="new"
@@ -51,7 +53,7 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
 
           <TabsContent value="new">
             <ScrollArea className="w-full">
-              <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
+              <div className="flex items-stretch gap-4 px-1 pt-1 pb-4">
                 {newDJs.map((dj) => (
                   <DJCard key={dj.id} dj={dj} showNew />
                 ))}
@@ -62,7 +64,7 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
 
           <TabsContent value="trending">
             <ScrollArea className="w-full">
-              <div className="flex gap-4 pb-4 px-1 pt-1 items-stretch">
+              <div className="flex items-stretch gap-4 px-1 pt-1 pb-4">
                 {trendingDJs.map((dj, index) => (
                   <DJCard key={dj.id} dj={dj} rank={index + 1} />
                 ))}
@@ -90,19 +92,19 @@ function DJCard({
       href={dj.slug ? `/djs/${dj.slug}` : "/directory"}
       className="block h-full"
     >
-      <Card className="relative shrink-0 w-56 h-full flex flex-col bg-h_blackLight/50 ring-white/5 hover:ring-h_red gap-3 p-4 cursor-pointer transition-all overflow-visible">
+      <Card className="bg-h_blackLight/50 hover:ring-h_red relative flex h-full w-56 shrink-0 cursor-pointer flex-col gap-3 overflow-visible p-4 ring-white/5 transition-all">
         {rank !== undefined && (
-          <Badge className="absolute top-2 left-2 bg-h_redDark/50 text-h_red border-0">
+          <Badge className="bg-h_redDark/50 text-h_red absolute top-2 left-2 border-0">
             #{rank}
           </Badge>
         )}
         {showNew && (
-          <Badge className="absolute top-2 right-2 bg-h_red text-white border-0">
+          <Badge className="bg-h_red absolute top-2 right-2 border-0 text-white">
             NEW
           </Badge>
         )}
 
-        <div className="flex flex-col items-center gap-2 text-center pt-2">
+        <div className="flex flex-col items-center gap-2 pt-2 text-center">
           <div className="relative">
             <Avatar
               className={`size-20 ring-2 ring-offset-2 ring-offset-black ${
@@ -110,12 +112,12 @@ function DJCard({
               }`}
             >
               <AvatarImage src={dj.avatar} alt={dj.stageName} />
-              <AvatarFallback className="bg-h_redDark text-white text-lg">
+              <AvatarFallback className="bg-h_redDark text-lg text-white">
                 {dj.stageName[0] || "?"}
               </AvatarFallback>
             </Avatar>
             {dj.isPremium && (
-              <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-amber-400 border-2 border-black flex items-center justify-center">
+              <div className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full border-2 border-black bg-amber-400">
                 <FontAwesomeIcon
                   icon={faCrown}
                   className="h-3 w-3 text-black"
@@ -124,24 +126,24 @@ function DJCard({
             )}
           </div>
           <div>
-            <p className="text-white font-semibold text-sm leading-tight truncate w-40 mx-auto">
+            <p className="mx-auto w-40 truncate text-sm leading-tight font-semibold text-white">
               {dj.stageName}
             </p>
-            <p className="text-gray-500 text-xs mt-0.5">
+            <p className="mt-0.5 text-xs text-gray-500">
               📍 {dj.city}, {dj.country}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-1 justify-center">
+        <div className="flex flex-wrap justify-center gap-1">
           {dj.genres.slice(0, 2).map((g) => (
-            <Badge key={g} className="bg-h_redDark/60 text-red-300 border-0">
+            <Badge key={g} className="bg-h_redDark/60 border-0 text-red-300">
               {g}
             </Badge>
           ))}
         </div>
 
-        <div className="flex items-center justify-between text-xs text-gray-400 mt-auto border-t border-white/5 pt-2">
+        <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-2 text-xs text-gray-400">
           <span>⭐ {dj.rating}</span>
           <span>{dj.followers.toLocaleString()} fans</span>
         </div>

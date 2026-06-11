@@ -45,15 +45,15 @@ const Hero = async () => {
         <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70"></div>
         <div className="absolute top-0 left-0 z-10 flex h-full w-full items-center">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-start px-4 text-white md:px-8">
-            <h1 className="max-w-xl text-4xl leading-tight font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] md:max-w-2xl md:text-6xl lg:max-w-3xl lg:text-6xl">
+            <h1 className="max-w-xl text-4xl font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] md:max-w-2xl md:text-5xl lg:max-w-3xl lg:text-6xl">
               Get Discovered. <br />
               Get Booked.
               <br />
-              <span className="text-h_red leading-7 font-bold">
+              <span className="text-h_red font-bold">
                 Build Your Reputation.{" "}
               </span>
             </h1>
-            <p className="mt-3 max-w-2xl text-sm tracking-wide text-white/80 md:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base">
               Join a growing network of DJs and organizers, showcase your
               talent, and unlock new opportunities.
             </p>

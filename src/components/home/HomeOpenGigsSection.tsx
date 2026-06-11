@@ -49,12 +49,14 @@ const DEMO_GIGS: DemoGig[] = [
 
 export default function HomeOpenGigsSection() {
   return (
-    <section className="py-12 px-4 md:px-8 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-6">
+    <section className="border-t border-white/5 px-4 py-12 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex items-end justify-between">
           <div>
-            <h2 className="text-white text-3xl md:text-4xl">Open Gigs</h2>
-            <p className="text-gray-400 text-sm mt-1">
+            <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+              Open Gigs
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-gray-400">
               Organisers looking to hire right now
             </p>
           </div>
@@ -72,18 +74,18 @@ export default function HomeOpenGigsSection() {
           {DEMO_GIGS.map((gig) => (
             <Card
               key={gig.id}
-              className="bg-h_blackLight/50 ring-white/5 p-4 gap-0"
+              className="bg-h_blackLight/50 gap-0 p-4 ring-white/5"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="shrink-0 bg-h_redDark/40 border border-h_red/30 rounded-lg px-4 py-3 text-center min-w-22.5">
-                  <p className="text-red-300 font-bold text-base">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <div className="bg-h_redDark/40 border-h_red/30 min-w-22.5 shrink-0 rounded-lg border px-4 py-3 text-center">
+                  <p className="text-base font-bold text-red-300">
                     {gig.budget}
                   </p>
-                  <p className="text-gray-500 text-xs">budget</p>
+                  <p className="text-xs text-gray-500">budget</p>
                 </div>
 
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <p className="text-white font-semibold">{gig.title}</p>
+                <div className="flex flex-1 flex-col gap-1.5">
+                  <p className="font-semibold text-white">{gig.title}</p>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
                     <span>🏢 {gig.organizer}</span>
                     <span>
@@ -91,11 +93,11 @@ export default function HomeOpenGigsSection() {
                     </span>
                     <span>🕐 {gig.postedAgo}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1 mt-1">
+                  <div className="mt-1 flex flex-wrap gap-1">
                     {gig.genres.map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_redDark/60 text-red-300 border-0"
+                        className="bg-h_redDark/60 border-0 text-red-300"
                       >
                         {g}
                       </Badge>
@@ -106,7 +108,7 @@ export default function HomeOpenGigsSection() {
                 {/* This will be done with the functionalite of the gig */}
                 <Button
                   size="sm"
-                  className="shrink-0 bg-h_red hover:bg-h_redDark text-white cursor-pointer"
+                  className="bg-h_red hover:bg-h_redDark shrink-0 cursor-pointer text-white"
                 >
                   Apply
                 </Button>

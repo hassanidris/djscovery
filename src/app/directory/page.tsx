@@ -297,10 +297,10 @@ const DirectoryPage = async ({
               <Headphones className="text-h_red h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
-              <h1 className="text-h_white text-3xl font-bold md:text-5xl">
+              <h1 className="text-h_white text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl">
                 DJ <span className="text-h_red/80">Directory</span>
               </h1>
-              <p className="text-sm tracking-wide text-gray-400">
+              <p className="text-sm leading-relaxed text-gray-400">
                 Browse and discover talented DJs from around the world.
               </p>
             </div>

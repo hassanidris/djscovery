@@ -115,8 +115,12 @@ export function SectionHeading({
 }) {
   return (
     <div className="mb-5">
-      <h2 className="font-heading text-xl text-white">{children}</h2>
-      {sub && <p className="text-gray-500 text-xs mt-0.5">{sub}</p>}
+      <h2 className="font-heading text-lg font-semibold tracking-tight text-white md:text-xl">
+        {children}
+      </h2>
+      {sub && (
+        <p className="mt-0.5 text-xs leading-relaxed text-gray-500">{sub}</p>
+      )}
     </div>
   );
 }

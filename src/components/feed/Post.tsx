@@ -45,22 +45,22 @@ const Post = ({
   const firstMedia = (post.media as any[])?.[0];
 
   return (
-    <div className="flex flex-col bg-h_blackLight/50 rounded-xl border border-gray-800/70 shadow-md overflow-hidden">
+    <div className="bg-h_blackLight/50 flex flex-col overflow-hidden rounded-xl border border-gray-800/70 shadow-md">
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <Link href={profileHref} className="group">
           <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10 ring-1 ring-white/20 shrink-0">
+            <Avatar className="h-10 w-10 shrink-0 ring-1 ring-white/20">
               <AvatarImage src={avatarSrc} alt={displayName} />
-              <AvatarFallback className="bg-white/10 text-white text-sm font-semibold">
+              <AvatarFallback className="bg-white/10 text-sm font-semibold text-white">
                 {displayName.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="font-semibold text-sm text-h_white group-hover:text-white/70 transition-colors leading-tight">
+              <span className="text-h_white text-sm leading-tight font-semibold transition-colors group-hover:text-white/70">
                 Dj. {displayName}
               </span>
-              <span className="text-[11px] text-white/40 leading-none mt-0.5">
+              <span className="mt-0.5 text-xs leading-none text-white/40">
                 @{post.user.djProfile?.slug ?? post.user.username}
               </span>
             </div>
@@ -71,9 +71,9 @@ const Post = ({
 
       {/* ── Content + Media (single container) ── */}
       {(post.content || firstMedia) && (
-        <div className="mx-4 mb-3 bg-black/25 rounded-xl border border-white/[0.07] overflow-hidden">
+        <div className="mx-4 mb-3 overflow-hidden rounded-xl border border-white/[0.07] bg-black/25">
           {post.content && (
-            <p className="text-h_white text-sm leading-relaxed px-4 pt-3 pb-3">
+            <p className="text-h_white px-4 pt-3 pb-3 text-sm leading-relaxed">
               {post.content}
             </p>
           )}
@@ -84,7 +84,7 @@ const Post = ({
               alt="post image"
               width={800}
               height={450}
-              className="w-full object-cover max-h-96"
+              className="max-h-96 w-full object-cover"
             />
           )}
 
@@ -93,37 +93,37 @@ const Post = ({
               <video
                 src={firstMedia.url}
                 controls
-                className="w-full rounded-lg border border-white/10 max-h-80"
+                className="max-h-80 w-full rounded-lg border border-white/10"
               />
             </div>
           )}
 
           {firstMedia?.type === "AUDIO" && (
             <div className={post.content ? "px-4 pb-3" : "p-3"}>
-              <div className="flex items-center gap-4 p-4 bg-black/20 rounded-xl border border-white/10">
-                <div className="w-11 h-11 rounded-xl bg-h_red/10 border border-h_red/20 flex items-center justify-center shrink-0">
-                  <Music2 className="w-5 h-5 text-h_red" />
+              <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="bg-h_red/10 border-h_red/20 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border">
+                  <Music2 className="text-h_red h-5 w-5" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-h_white font-semibold truncate">
+                <div className="min-w-0 flex-1">
+                  <p className="text-h_white truncate text-sm font-semibold">
                     {firstMedia.title ?? "Mix"}
                   </p>
                   {firstMedia.duration && (
-                    <p className="text-xs text-white/40 mt-0.5">
+                    <p className="mt-0.5 text-xs text-white/40">
                       {firstMedia.duration}
                     </p>
                   )}
-                  <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full w-1/3 bg-h_red rounded-full" />
+                  <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
+                    <div className="bg-h_red h-full w-1/3 rounded-full" />
                   </div>
                 </div>
                 <a
                   href={firstMedia.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="size-9 bg-h_red/90 hover:bg-h_red rounded-full flex items-center justify-center shrink-0 transition-colors"
+                  className="bg-h_red/90 hover:bg-h_red flex size-9 shrink-0 items-center justify-center rounded-full transition-colors"
                 >
-                  <Play className="w-4 h-4 text-white" fill="white" />
+                  <Play className="h-4 w-4 text-white" fill="white" />
                 </a>
               </div>
             </div>
@@ -144,7 +144,7 @@ const Post = ({
       </div>
 
       {/* ── Comments ── */}
-      <div className="border-t border-white/10 px-4 py-4 bg-black/20">
+      <div className="border-t border-white/10 bg-black/20 px-4 py-4">
         <Suspense fallback={<CommentInputSkeleton />}>
           <Comments
             postId={post.id}

@@ -78,21 +78,21 @@ const CommunityRightPanel = () => {
         competition and make the list scannable. The red color on #1
         pulls the eye and rewards the top DJ visually.
       */}
-      <Card className="bg-h_blackLight/50 border-gray-800 ring-0 shadow-md py-0 gap-0">
-        <CardHeader className="px-4 pt-4 pb-3 border-b border-gray-800">
-          <CardTitle className="flex items-center gap-2 text-h_white text-sm font-semibold">
-            <TrendingUp className="w-4 h-4 text-h_red" />
+      <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
+        <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
+          <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
+            <TrendingUp className="text-h_red h-4 w-4" />
             Trending DJs
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="px-4 py-3 flex flex-col gap-0">
+        <CardContent className="flex flex-col gap-0 px-4 py-3">
           {trendingDJs.map((dj, index) => (
             <div key={dj.slug}>
               <div className="flex items-center gap-3 py-2.5">
                 {/* Rank number */}
                 <span
-                  className={`text-xs font-bold w-4 text-right shrink-0 ${
+                  className={`w-4 shrink-0 text-right text-xs font-bold ${
                     index === 0 ? "text-h_red" : "text-gray-500"
                   }`}
                 >
@@ -100,17 +100,17 @@ const CommunityRightPanel = () => {
                 </span>
 
                 {/* Avatar */}
-                <Avatar className="w-8 h-8 shrink-0">
+                <Avatar className="h-8 w-8 shrink-0">
                   <AvatarImage src={dj.img} alt={dj.name} />
-                  <AvatarFallback className="bg-gray-700 text-gray-300 text-xs font-semibold">
+                  <AvatarFallback className="bg-gray-700 text-xs font-semibold text-gray-300">
                     {dj.name.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
 
                 {/* Name + followers */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <Link href={`/djs/${dj.slug}`} className="hover:underline">
-                    <p className="text-sm text-h_white font-medium truncate">
+                    <p className="text-h_white truncate text-sm font-medium">
                       Dj. {dj.name}
                     </p>
                   </Link>
@@ -120,7 +120,7 @@ const CommunityRightPanel = () => {
                 </div>
 
                 {/* Genre badge */}
-                <Badge className="bg-gray-800 text-gray-400 border border-gray-700 text-[10px] px-1.5 py-0 shrink-0">
+                <Badge className="shrink-0 border border-gray-700 bg-gray-800 px-1.5 py-0 text-[11px] text-gray-400">
                   {dj.genre}
                 </Badge>
               </div>
@@ -140,37 +140,37 @@ const CommunityRightPanel = () => {
         piece of info in an event listing — it creates urgency.
         Highlighting it in brand red immediately draws the eye there.
       */}
-      <Card className="bg-h_blackLight/50 border-gray-800 ring-0 shadow-md py-0 gap-0">
-        <CardHeader className="px-4 pt-4 pb-3 border-b border-gray-800">
-          <CardTitle className="flex items-center gap-2 text-h_white text-sm font-semibold">
-            <CalendarDays className="w-4 h-4 text-h_red" />
+      <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
+        <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
+          <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
+            <CalendarDays className="text-h_red h-4 w-4" />
             Upcoming Events
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="px-4 py-3 flex flex-col gap-0">
+        <CardContent className="flex flex-col gap-0 px-4 py-3">
           {upcomingEvents.map((event, index) => (
             <div key={event.id}>
               <div className="flex items-start gap-3 py-2.5">
                 {/* Date pill */}
-                <div className="shrink-0 flex flex-col items-center bg-h_red/10 border border-h_red/20 rounded-lg px-2 py-1 min-w-11">
-                  <span className="text-[10px] text-h_red font-bold uppercase leading-none">
+                <div className="bg-h_red/10 border-h_red/20 flex min-w-11 shrink-0 flex-col items-center rounded-lg border px-2 py-1">
+                  <span className="text-h_red text-[11px] leading-none font-bold uppercase">
                     {event.date.split(" ")[0]}
                   </span>
-                  <span className="text-sm text-h_white font-bold leading-snug">
+                  <span className="text-h_white text-sm leading-snug font-bold">
                     {event.date.split(" ")[1]}
                   </span>
                 </div>
 
                 {/* Event details */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-h_white font-medium truncate">
+                <div className="min-w-0 flex-1">
+                  <p className="text-h_white truncate text-sm font-medium">
                     {event.title}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p className="truncate text-xs text-gray-500">
                     {event.venue}
                   </p>
-                  <Badge className="bg-gray-800 text-gray-400 border border-gray-700 text-[10px] px-1.5 py-0 mt-1">
+                  <Badge className="mt-1 border border-gray-700 bg-gray-800 px-1.5 py-0 text-[11px] text-gray-400">
                     {event.genre}
                   </Badge>
                 </div>
@@ -184,7 +184,7 @@ const CommunityRightPanel = () => {
 
           <Link
             href="/events"
-            className="flex items-center justify-center gap-1 mt-2 text-xs text-gray-500 hover:text-h_red transition-colors py-1"
+            className="hover:text-h_red mt-2 flex items-center justify-center gap-1 py-1 text-xs text-gray-500 transition-colors"
           >
             View all events →
           </Link>
@@ -197,10 +197,10 @@ const CommunityRightPanel = () => {
         for music fans. Clickable tag chips make the platform feel
         like a real music community (think SoundCloud, Bandcamp).
       */}
-      <Card className="bg-h_blackLight/50 border-gray-800 ring-0 shadow-md py-0 gap-0">
-        <CardHeader className="px-4 pt-4 pb-3 border-b border-gray-800">
-          <CardTitle className="flex items-center gap-2 text-h_white text-sm font-semibold">
-            <Hash className="w-4 h-4 text-h_red" />
+      <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
+        <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
+          <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
+            <Hash className="text-h_red h-4 w-4" />
             Hot Tags
           </CardTitle>
         </CardHeader>
@@ -210,7 +210,7 @@ const CommunityRightPanel = () => {
             {hotTags.map((tag) => (
               <Badge
                 key={tag}
-                className="bg-gray-800/80 text-gray-300 border border-gray-700 hover:bg-h_red/10 hover:text-h_red hover:border-h_red/30 cursor-pointer transition-all text-xs px-2.5 py-1"
+                className="hover:bg-h_red/10 hover:text-h_red hover:border-h_red/30 cursor-pointer border border-gray-700 bg-gray-800/80 px-2.5 py-1 text-xs text-gray-300 transition-all"
               >
                 {tag}
               </Badge>

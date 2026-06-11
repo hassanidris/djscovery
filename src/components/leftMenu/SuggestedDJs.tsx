@@ -70,9 +70,9 @@ const SuggestedDJs = async () => {
   }
 
   const cardHeader = (
-    <CardHeader className="px-4 pt-4 pb-3 border-b border-gray-800">
-      <CardTitle className="flex items-center gap-2 text-h_white text-sm font-semibold">
-        <UserSearch className="w-4 h-4 text-h_red" />
+    <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
+      <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
+        <UserSearch className="text-h_red h-4 w-4" />
         Suggested DJs
       </CardTitle>
     </CardHeader>
@@ -81,35 +81,35 @@ const SuggestedDJs = async () => {
   if (!suggested.length) {
     const demoSuggestions = ALL_DEMO_DJS.slice(0, 4);
     return (
-      <Card className="bg-h_blackLight/50 border-gray-800 ring-0 shadow-md py-0 gap-0">
+      <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
         {cardHeader}
-        <CardContent className="px-4 py-3 flex flex-col gap-0">
+        <CardContent className="flex flex-col gap-0 px-4 py-3">
           {demoSuggestions.map((dj, index) => (
             <div key={dj.slug}>
               <div className="flex items-center gap-3 py-2.5">
                 <Link href={`/djs/${dj.slug}`} className="shrink-0">
-                  <Avatar className="w-9 h-9">
+                  <Avatar className="h-9 w-9">
                     <AvatarImage src={dj.avatar.url} alt={dj.stageName} />
-                    <AvatarFallback className="bg-gray-700 text-gray-200 text-xs font-semibold">
+                    <AvatarFallback className="bg-gray-700 text-xs font-semibold text-gray-200">
                       {dj.stageName.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Link>
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <Link href={`/djs/${dj.slug}`}>
-                    <p className="text-sm text-h_white font-medium truncate hover:underline">
+                    <p className="text-h_white truncate text-sm font-medium hover:underline">
                       Dj. {dj.stageName}
                     </p>
                   </Link>
                   {dj.genres[0] && (
-                    <Badge className="bg-gray-800 text-gray-400 border border-gray-700 text-[10px] px-1.5 py-0 mt-0.5">
+                    <Badge className="mt-0.5 border border-gray-700 bg-gray-800 px-1.5 py-0 text-[11px] text-gray-400">
                       {dj.genres[0]}
                     </Badge>
                   )}
                 </div>
                 <Link
                   href={`/djs/${dj.slug}`}
-                  className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg bg-h_red/10 text-h_red border border-h_red/20 hover:bg-h_red/20 transition-all"
+                  className="bg-h_red/10 text-h_red border-h_red/20 hover:bg-h_red/20 flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all"
                 >
                   View
                 </Link>
@@ -125,9 +125,9 @@ const SuggestedDJs = async () => {
   }
 
   return (
-    <Card className="bg-h_blackLight/50 border-gray-800 ring-0 shadow-md py-0 gap-0">
+    <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
       {cardHeader}
-      <CardContent className="px-4 py-3 flex flex-col gap-0">
+      <CardContent className="flex flex-col gap-0 px-4 py-3">
         {suggested.map((dj, index) => {
           const displayName = dj.djProfile?.stageName ?? dj.username;
           const genre = dj.djProfile?.genres?.[0]?.genre?.name;
@@ -136,21 +136,21 @@ const SuggestedDJs = async () => {
             <div key={dj.id}>
               <div className="flex items-center gap-3 py-2.5">
                 <Link href={`/profile/${dj.username}`} className="shrink-0">
-                  <Avatar className="w-9 h-9">
+                  <Avatar className="h-9 w-9">
                     <AvatarImage src={dj.image ?? ""} alt={displayName} />
-                    <AvatarFallback className="bg-gray-700 text-gray-200 text-xs font-semibold">
+                    <AvatarFallback className="bg-gray-700 text-xs font-semibold text-gray-200">
                       {displayName.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Link>
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <Link href={`/profile/${dj.username}`}>
-                    <p className="text-sm text-h_white font-medium truncate hover:underline">
+                    <p className="text-h_white truncate text-sm font-medium hover:underline">
                       Dj. {displayName}
                     </p>
                   </Link>
                   {genre && (
-                    <Badge className="bg-gray-800 text-gray-400 border border-gray-700 text-[10px] px-1.5 py-0 mt-0.5">
+                    <Badge className="mt-0.5 border border-gray-700 bg-gray-800 px-1.5 py-0 text-[11px] text-gray-400">
                       {genre}
                     </Badge>
                   )}

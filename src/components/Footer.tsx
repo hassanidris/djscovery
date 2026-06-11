@@ -148,7 +148,7 @@ const Footer = async () => {
                       >
                         <Icon className="text-h_redDark/40 h-3.5 w-3.5" />
                         {item.label}
-                        <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[9px] leading-none font-semibold tracking-wider uppercase">
+                        <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                           Soon
                         </span>
                       </li>

@@ -32,19 +32,19 @@ const activeDJs = [
 
 const Stories = () => {
   return (
-    <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg">
+    <div className="bg-h_blackLight/50 rounded-lg p-4 shadow-md">
       {/* Section header with live pulse indicator */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="mb-4 flex items-center gap-2">
         {/*
           WHY the ping animation: Tailwind's animate-ping creates
           a ripple effect that signals "live" or "real-time" — common
           in platforms like Twitch or Discord for online presence.
         */}
-        <div className="relative flex items-center justify-center w-3 h-3">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-h_red opacity-60 animate-ping" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-h_red" />
+        <div className="relative flex h-3 w-3 items-center justify-center">
+          <span className="bg-h_red absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" />
+          <span className="bg-h_red relative inline-flex h-2 w-2 rounded-full" />
         </div>
-        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        <span className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
           Active DJs
         </span>
       </div>
@@ -55,7 +55,7 @@ const Stories = () => {
           {activeDJs.map((dj) => (
             <div
               key={dj.id}
-              className="flex flex-col items-center gap-1.5 cursor-pointer min-w-fit group"
+              className="group flex min-w-fit cursor-pointer flex-col items-center gap-1.5"
             >
               {/*
                 Double-ring effect:
@@ -64,14 +64,14 @@ const Stories = () => {
                 This is a pure CSS trick — no extra dependencies needed.
               */}
               <div
-                className={`p-0.5 rounded-full transition-colors ${
+                className={`rounded-full p-0.5 transition-colors ${
                   dj.active ? "bg-h_red" : "bg-gray-700"
                 }`}
               >
-                <div className="p-0.5 bg-h_blackLight rounded-full">
-                  <Avatar className="w-14 h-14">
+                <div className="bg-h_blackLight rounded-full p-0.5">
+                  <Avatar className="h-14 w-14">
                     <AvatarImage src={dj.img} alt={dj.name} />
-                    <AvatarFallback className="bg-gray-700 text-gray-200 text-sm font-semibold">
+                    <AvatarFallback className="bg-gray-700 text-sm font-semibold text-gray-200">
                       {dj.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -79,12 +79,12 @@ const Stories = () => {
               </div>
 
               {/* DJ first name */}
-              <span className="text-xs text-gray-200 font-medium truncate max-w-16 text-center group-hover:text-h_white transition-colors">
+              <span className="group-hover:text-h_white max-w-16 truncate text-center text-xs font-medium text-gray-200 transition-colors">
                 {dj.name.split(" ")[0]}
               </span>
 
               {/* Genre tag */}
-              <span className="text-[10px] text-gray-500 truncate max-w-16 text-center">
+              <span className="max-w-16 truncate text-center text-[11px] text-gray-500">
                 {dj.genre}
               </span>
             </div>
