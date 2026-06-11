@@ -163,7 +163,7 @@ const FilterBottomSheet = ({
           <div
             aria-hidden="true"
             onClick={closeSheet}
-            className={`fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+            className={`fixed inset-0 z-59 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
           />
 
           {/* Sheet */}
@@ -173,7 +173,7 @@ const FilterBottomSheet = ({
             aria-modal="true"
             aria-label="Filter DJs"
             tabIndex={-1}
-            className={`bg-h_blackLight fixed right-0 bottom-0 left-0 z-50 flex max-h-[90dvh] flex-col rounded-t-2xl border-t border-gray-800 shadow-2xl transition-transform duration-300 ease-out outline-none ${visible ? "translate-y-0" : "translate-y-full"}`}
+            className={`bg-h_blackLight fixed right-0 bottom-0 left-0 z-60 flex max-h-[90dvh] flex-col rounded-t-2xl border-t border-gray-800 shadow-2xl transition-transform duration-300 ease-out outline-none ${visible ? "translate-y-0" : "translate-y-full"}`}
           >
             {/* Drag handle + header */}
             <div className="relative flex shrink-0 items-center justify-between border-b border-gray-800 px-5 pt-5 pb-4">
