@@ -45,7 +45,7 @@ export default function BurgerMenu({
         <SheetTrigger asChild>
           <button
             aria-label="Open navigation menu"
-            className="size-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
+            className="focus-visible:ring-h_red flex size-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:outline-none"
           >
             <Menu className="h-5 w-5" aria-hidden />
           </button>
@@ -54,7 +54,7 @@ export default function BurgerMenu({
         <SheetContent
           side="left"
           showCloseButton={false}
-          className="bg-black border-r border-white/8 text-white flex flex-col p-0 gap-0"
+          className="flex flex-col gap-0 border-r border-white/8 bg-black p-0 text-white"
         >
           <SheetHeader className="shrink-0 p-5 pb-4">
             <SheetTitle className="sr-only">Navigation menu</SheetTitle>
@@ -62,18 +62,24 @@ export default function BurgerMenu({
             <div className="flex items-center justify-between">
               <SheetClose asChild>
                 <Link href="/" aria-label="DJscovery home">
-                  <Image
-                    src="/dj-logo-blue.svg"
-                    alt="DJscovery"
-                    width={44}
-                    height={37}
-                  />
+                  <div className="flex items-center gap-2 py-1">
+                    <Image
+                      src="/dj-logo-red.svg"
+                      alt=""
+                      width={26}
+                      height={30}
+                    />
+                    <span className="font-heading text-xl leading-none tracking-tight text-white">
+                      <span className="font-bold">DJ</span>
+                      <span className="font-semibold">covery</span>
+                    </span>
+                  </div>
                 </Link>
               </SheetClose>
               <SheetClose asChild>
                 <button
                   aria-label="Close menu"
-                  className="size-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors text-xl font-light"
+                  className="flex size-8 items-center justify-center rounded-lg text-xl font-light text-gray-500 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   ✕
                 </button>
@@ -81,40 +87,40 @@ export default function BurgerMenu({
             </div>
 
             {isLoggedIn ? (
-              <div className="flex items-center gap-3 mt-4">
-                <Avatar className="size-10 ring-2 ring-h_red shrink-0">
+              <div className="mt-4 flex items-center gap-3">
+                <Avatar className="ring-h_red size-10 shrink-0 ring-2">
                   <AvatarImage
                     src={avatarSrc ?? "/noAvatar.png"}
                     alt={displayName}
                   />
-                  <AvatarFallback className="bg-h_redDark text-white text-sm font-semibold">
+                  <AvatarFallback className="bg-h_redDark text-sm font-semibold text-white">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-semibold truncate">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-white">
                     {displayName}
                   </p>
                   {username && (
-                    <p className="text-gray-500 text-xs truncate">
+                    <p className="truncate text-xs text-gray-500">
                       @{username}
                     </p>
                   )}
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400 text-sm mt-4">Welcome to DJscovery</p>
+              <p className="mt-4 text-sm text-gray-400">Welcome to DJscovery</p>
             )}
           </SheetHeader>
 
           <Separator className="bg-white/8" />
 
           <nav
-            className="flex-1 overflow-y-auto py-3 scrollbar-hide"
+            className="scrollbar-hide flex-1 overflow-y-auto py-3"
             aria-label="Mobile navigation"
           >
             <div className="px-3">
-              <p className="text-[10px] text-gray-600 uppercase tracking-widest font-semibold px-2 mb-2">
+              <p className="mb-2 px-2 text-[10px] font-semibold tracking-widest text-gray-600 uppercase">
                 Explore
               </p>
 
@@ -130,12 +136,12 @@ export default function BurgerMenu({
                   return (
                     <span
                       key={item.id}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 cursor-not-allowed select-none"
+                      className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-600 select-none"
                       aria-disabled="true"
                     >
                       <Icon className="h-4 w-4 shrink-0" aria-hidden />
                       <span className="flex-1">{item.label}</span>
-                      <span className="text-[9px] font-semibold uppercase tracking-wider text-h_red/50 bg-h_red/10 px-1.5 py-0.5 rounded-full leading-none">
+                      <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[9px] leading-none font-semibold tracking-wider uppercase">
                         Soon
                       </span>
                     </span>
@@ -147,10 +153,10 @@ export default function BurgerMenu({
                     <Link
                       href={item.href}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                         isActive
-                          ? "text-white bg-white/5"
-                          : "text-gray-400 hover:text-white hover:bg-white/5",
+                          ? "bg-white/5 text-white"
+                          : "text-gray-400 hover:bg-white/5 hover:text-white",
                       )}
                       aria-current={isActive ? "page" : undefined}
                     >
@@ -170,9 +176,9 @@ export default function BurgerMenu({
 
             {isLoggedIn && (
               <>
-                <Separator className="bg-white/8 my-3" />
+                <Separator className="my-3 bg-white/8" />
                 <div className="px-3">
-                  <p className="text-[10px] text-gray-600 uppercase tracking-widest font-semibold px-2 mb-2">
+                  <p className="mb-2 px-2 text-[10px] font-semibold tracking-widest text-gray-600 uppercase">
                     Account
                   </p>
 
@@ -192,10 +198,10 @@ export default function BurgerMenu({
                           <Link
                             href={profileHref}
                             className={cn(
-                              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                               isProfileActive
-                                ? "text-white bg-white/5"
-                                : "text-gray-400 hover:text-white hover:bg-white/5",
+                                ? "bg-white/5 text-white"
+                                : "text-gray-400 hover:bg-white/5 hover:text-white",
                             )}
                             aria-current={isProfileActive ? "page" : undefined}
                           >
@@ -216,10 +222,10 @@ export default function BurgerMenu({
                     <Link
                       href="/settings"
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                         pathname === "/settings"
-                          ? "text-white bg-white/5"
-                          : "text-gray-400 hover:text-white hover:bg-white/5",
+                          ? "bg-white/5 text-white"
+                          : "text-gray-400 hover:bg-white/5 hover:text-white",
                       )}
                       aria-current={
                         pathname === "/settings" ? "page" : undefined
@@ -246,32 +252,32 @@ export default function BurgerMenu({
             {isLoggedIn ? (
               <button
                 onClick={() => signOutFormRef.current?.requestSubmit()}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
               >
-                <LogOut className="h-4 w-4 text-h_red shrink-0" aria-hidden />
+                <LogOut className="text-h_red h-4 w-4 shrink-0" aria-hidden />
                 <span>Sign out</span>
               </button>
             ) : (
-              <div className="flex flex-col gap-2 w-full">
+              <div className="flex w-full flex-col gap-2">
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full border-h_red/60 text-h_red hover:bg-h_red/15 hover:text-h_red hover:border-h_red"
+                  className="border-h_red/60 text-h_red hover:bg-h_red/15 hover:text-h_red hover:border-h_red w-full"
                 >
                   <SheetClose asChild>
                     <Link href="/sign-in">
-                      <LogIn className="h-4 w-4 mr-2" aria-hidden />
+                      <LogIn className="mr-2 h-4 w-4" aria-hidden />
                       Sign In
                     </Link>
                   </SheetClose>
                 </Button>
                 <Button
                   asChild
-                  className="w-full bg-h_red hover:bg-h_redDark text-white"
+                  className="bg-h_red hover:bg-h_redDark w-full text-white"
                 >
                   <SheetClose asChild>
                     <Link href="/sign-up">
-                      <UserPlus className="h-4 w-4 mr-2" aria-hidden />
+                      <UserPlus className="mr-2 h-4 w-4" aria-hidden />
                       Sign Up
                     </Link>
                   </SheetClose>

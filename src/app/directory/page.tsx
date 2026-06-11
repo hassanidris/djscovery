@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import prisma from "@/lib/client";
+import type { DjType } from "@prisma/client";
 import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
 import FilterPanel from "@/components/directory/FilterPanel";
+import FilterBottomSheet from "@/components/directory/FilterBottomSheet";
 import DjGrid from "@/components/directory/DjGrid";
 import ActiveFilterBadges from "@/components/directory/ActiveFilterBadges";
 import EventCalendar from "@/components/directory/EventCalendar";
@@ -16,6 +18,7 @@ type SearchParams = {
   city?: string;
   sort?: string;
   q?: string;
+  djType?: string;
 };
 
 const DirectoryPage = async ({
@@ -23,80 +26,93 @@ const DirectoryPage = async ({
 }: {
   searchParams: Promise<SearchParams>;
 }) => {
-  const { genre, country, city, sort, q } = await searchParams;
+  const { genre, country, city, sort, q, djType } = await searchParams;
   const genreList = genre ? genre.split(",").filter(Boolean) : [];
+  const djTypeList = djType ? djType.split(",").filter(Boolean) : [];
 
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   let djs: DjUser[] = [];
 
-  try {
-    const profiles = await prisma.djProfile.findMany({
-      where: {
-        deletedAt: null,
-        ...(q
-          ? {
-              OR: [
-                { stageName: { contains: q, mode: "insensitive" } },
-                { country: { name: { contains: q, mode: "insensitive" } } },
-                { city: { name: { contains: q, mode: "insensitive" } } },
-                {
-                  genres: {
-                    some: {
-                      genre: { name: { contains: q, mode: "insensitive" } },
+  if (!isStaging) {
+    try {
+      const profiles = await prisma.djProfile.findMany({
+        where: {
+          deletedAt: null,
+          ...(q
+            ? {
+                OR: [
+                  { stageName: { contains: q, mode: "insensitive" } },
+                  { country: { name: { contains: q, mode: "insensitive" } } },
+                  { city: { name: { contains: q, mode: "insensitive" } } },
+                  {
+                    genres: {
+                      some: {
+                        genre: { name: { contains: q, mode: "insensitive" } },
+                      },
                     },
                   },
-                },
-              ],
-            }
-          : {}),
+                ],
+              }
+            : {}),
 
-        ...(genreList.length > 0
-          ? {
-              genres: {
-                some: {
-                  genre: { name: { in: genreList } },
+          ...(genreList.length > 0
+            ? {
+                genres: {
+                  some: {
+                    genre: { name: { in: genreList } },
+                  },
                 },
-              },
-            }
-          : {}),
-        ...(country
-          ? { country: { name: { contains: country, mode: "insensitive" } } }
-          : {}),
-        ...(city
-          ? { city: { name: { contains: city, mode: "insensitive" } } }
-          : {}),
-      },
-      orderBy:
-        sort === "a-z"
-          ? { stageName: "asc" }
-          : sort === "z-a"
-            ? { stageName: "desc" }
-            : { createdAt: "desc" },
-      include: {
-        user: {
-          include: { _count: { select: { followers: true } } },
+              }
+            : {}),
+          ...(country
+            ? { country: { name: { contains: country, mode: "insensitive" } } }
+            : {}),
+          ...(city
+            ? { city: { name: { contains: city, mode: "insensitive" } } }
+            : {}),
+          ...(djTypeList.length > 0
+            ? {
+                djTypes: {
+                  some: { type: { in: djTypeList as DjType[] } },
+                },
+              }
+            : {}),
         },
-        country: { select: { name: true } },
-        city: { select: { name: true } },
-        genres: { include: { genre: { select: { name: true } } } },
-      },
-    });
+        orderBy:
+          sort === "a-z"
+            ? { stageName: "asc" }
+            : sort === "z-a"
+              ? { stageName: "desc" }
+              : { createdAt: "desc" },
+        include: {
+          user: {
+            include: { _count: { select: { followers: true } } },
+          },
+          country: { select: { name: true } },
+          city: { select: { name: true } },
+          genres: { include: { genre: { select: { name: true } } } },
+          djTypes: { select: { type: true } },
+        },
+      });
 
-    djs = profiles.map((p) => ({
-      id: p.userId,
-      username: p.user.username,
-      stageName: p.stageName,
-      avatar: p.avatar,
-      genres: p.genres.map((g) => g.genre.name).join(", ") || null,
-      country: p.country?.name ?? null,
-      city: p.city?.name ?? null,
-      slug: p.slug,
-      isPremium: p.plan === "PREMIUM",
-      isFeatured: p.featured,
-      verified: p.verified,
-      _count: { followers: p.user._count.followers },
-    }));
-  } catch {
-    // fetchError: fallback to demoDjs via djs.length check below
+      djs = profiles.map((p) => ({
+        id: p.userId,
+        username: p.user.username,
+        stageName: p.stageName,
+        avatar: p.avatar,
+        genres: p.genres.map((g) => g.genre.name).join(", ") || null,
+        country: p.country?.name ?? null,
+        city: p.city?.name ?? null,
+        slug: p.slug,
+        isPremium: p.plan === "PREMIUM",
+        isFeatured: p.featured,
+        verified: p.verified,
+        djTypes: p.djTypes.map((t) => t.type),
+        _count: { followers: p.user._count.followers },
+      }));
+    } catch {
+      // fetchError
+    }
   }
 
   const demoDjs = demoDJsAsDjUsers();
@@ -123,7 +139,11 @@ const DirectoryPage = async ({
             dj.city ?? "",
           ].some((field) => field.toLowerCase().includes(q.toLowerCase()))
         : true;
-      return genreOk && countryOk && cityOk && qOk;
+      const djTypeOk =
+        djTypeList.length > 0
+          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t))
+          : true;
+      return genreOk && countryOk && cityOk && qOk && djTypeOk;
     });
 
   const sortDjs = (list: DjUser[]) => {
@@ -142,69 +162,61 @@ const DirectoryPage = async ({
     return list;
   };
 
-  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   const filteredDemoDjs = filterDemoDjs(demoDjs);
-  const dbIds = new Set(djs.map((d) => d.id));
-  const displayDjs = sortDjs(
-    isStaging
-      ? [...djs, ...filteredDemoDjs.filter((d) => !dbIds.has(d.id))]
-      : djs,
-  );
+  const displayDjs = sortDjs(isStaging ? filteredDemoDjs : djs);
 
   let availableGenres: string[] = [];
-  try {
-    const genres = await prisma.genre.findMany({
-      where: {
-        djGenres: {
-          some: { djProfile: { deletedAt: null } },
-        },
-      },
-      orderBy: { name: "asc" },
-      select: { name: true },
-    });
-    availableGenres = genres.map((g) => g.name);
-  } catch {
-    // ignore — handled below
-  }
 
-  if (isStaging) {
-    const demoGenreList = [
+  if (!isStaging) {
+    try {
+      const genres = await prisma.genre.findMany({
+        where: {
+          djGenres: {
+            some: { djProfile: { deletedAt: null } },
+          },
+        },
+        orderBy: { name: "asc" },
+        select: { name: true },
+      });
+      availableGenres = genres.map((g) => g.name);
+    } catch {
+      // ignore
+    }
+  } else {
+    availableGenres = [
       ...new Set(
         demoDjs
           .flatMap((dj) => (dj.genres ?? "").split(",").map((g) => g.trim()))
           .filter(Boolean),
       ),
-    ];
-    availableGenres = [
-      ...new Set([...availableGenres, ...demoGenreList]),
     ].sort();
   }
 
   let availableCountries: string[] = [];
   let countryCities: Record<string, string[]> = {};
 
-  try {
-    const countryData = await prisma.country.findMany({
-      where: { djProfiles: { some: { deletedAt: null } } },
-      orderBy: { name: "asc" },
-      select: {
-        name: true,
-        cities: {
-          where: { djProfiles: { some: { deletedAt: null } } },
-          orderBy: { name: "asc" },
-          select: { name: true },
+  if (!isStaging) {
+    try {
+      const countryData = await prisma.country.findMany({
+        where: { djProfiles: { some: { deletedAt: null } } },
+        orderBy: { name: "asc" },
+        select: {
+          name: true,
+          cities: {
+            where: { djProfiles: { some: { deletedAt: null } } },
+            orderBy: { name: "asc" },
+            select: { name: true },
+          },
         },
-      },
-    });
-    availableCountries = countryData.map((c) => c.name);
-    for (const c of countryData) {
-      countryCities[c.name] = c.cities.map((ci) => ci.name);
+      });
+      availableCountries = countryData.map((c) => c.name);
+      for (const c of countryData) {
+        countryCities[c.name] = c.cities.map((ci) => ci.name);
+      }
+    } catch {
+      // ignore
     }
-  } catch {
-    // ignore
-  }
-
-  if (isStaging) {
+  } else {
     for (const dj of demoDjs) {
       if (dj.country && !availableCountries.includes(dj.country))
         availableCountries.push(dj.country);
@@ -249,8 +261,8 @@ const DirectoryPage = async ({
       {/* 3-Column Layout */}
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="flex flex-col gap-6 py-6 xl:flex-row">
-          {/* Left — Filters */}
-          <div className="shrink-0 xl:block xl:w-[20%]">
+          {/* Left — Filters (desktop sidebar only) */}
+          <div className="hidden xl:block xl:w-[20%] xl:shrink-0">
             <Suspense
               fallback={
                 <div className="bg-h_blackLight/50 h-96 animate-pulse rounded-xl p-4" />
@@ -266,6 +278,14 @@ const DirectoryPage = async ({
 
           {/* Center — DJ Grid */}
           <div className="w-full">
+            {/* Mobile filter trigger (hidden on xl+) */}
+            <Suspense fallback={null}>
+              <FilterBottomSheet
+                genres={availableGenres}
+                availableCountries={availableCountries}
+                countryCities={countryCities}
+              />
+            </Suspense>
             <Suspense fallback={null}>
               <ActiveFilterBadges />
             </Suspense>

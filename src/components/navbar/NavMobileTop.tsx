@@ -12,7 +12,7 @@ export default function NavMobileTop(props: NavUserData) {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <div className="flex md:hidden h-14 items-center justify-between relative">
+    <div className="relative flex h-14 items-center justify-between md:hidden">
       {/* Left: Burger menu trigger */}
       <BurgerMenu {...props} />
 
@@ -20,15 +20,21 @@ export default function NavMobileTop(props: NavUserData) {
       <Link
         href="/"
         aria-label="DJscovery — Go to home"
-        className="absolute left-1/2 -translate-x-1/2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red rounded-sm"
+        className="focus-visible:ring-h_red absolute left-1/2 -translate-x-1/2 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
       >
-        <Image
-          src="/dj-logo-blue.svg"
-          alt="DJscovery"
-          width={44}
-          height={37}
-          priority
-        />
+        <div className="flex items-center gap-2 py-1">
+          <Image
+            src="/dj-logo-red.svg"
+            alt=""
+            width={26}
+            height={30}
+            priority
+          />
+          <span className="font-heading text-xl leading-none tracking-tight text-white">
+            <span className="font-bold">DJ</span>
+            <span className="font-semibold">covery</span>
+          </span>
+        </div>
       </Link>
 
       {/* Right: Search + Bell */}
@@ -36,7 +42,7 @@ export default function NavMobileTop(props: NavUserData) {
         <button
           aria-label="Open search"
           onClick={() => setSearchOpen(true)}
-          className="size-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
+          className="focus-visible:ring-h_red flex size-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:outline-none"
         >
           <Search className="h-5 w-5" aria-hidden />
         </button>
@@ -48,7 +54,7 @@ export default function NavMobileTop(props: NavUserData) {
             aria-disabled="true"
             aria-label="Notifications — Coming Soon"
             title="Notifications — Coming Soon"
-            className="size-9 flex items-center justify-center rounded-lg text-gray-500 cursor-not-allowed"
+            className="flex size-9 cursor-not-allowed items-center justify-center rounded-lg text-gray-500"
           >
             <Bell className="h-5 w-5" aria-hidden />
           </button>
