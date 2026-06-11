@@ -416,7 +416,7 @@ export default function DjProfileComparePage() {
                         {row.feature}
                       </span>
                       {row.upgradeHook && (
-                        <span className="mt-0.5 text-xs text-gray-600 italic">
+                        <span className="mt-0.5 text-xs text-gray-500 italic">
                           {row.upgradeHook}
                         </span>
                       )}
