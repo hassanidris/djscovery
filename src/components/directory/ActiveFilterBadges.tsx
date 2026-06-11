@@ -1,12 +1,17 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { DJ_TYPES } from "./FilterBottomSheet";
 
 const SORT_LABELS: Record<string, string> = {
   "a-z": "A – Z",
   "z-a": "Z – A",
   "most-followed": "Most Followed",
 };
+
+const DJ_TYPE_LABEL: Record<string, string> = Object.fromEntries(
+  DJ_TYPES.map((t) => [t.value, t.label]),
+);
 
 const ActiveFilterBadges = () => {
   const router = useRouter();
@@ -17,13 +22,16 @@ const ActiveFilterBadges = () => {
   const country = searchParams.get("country") || "";
   const city = searchParams.get("city") || "";
   const sort = searchParams.get("sort") || "";
+  const djType = searchParams.get("djType") || "";
 
   const selectedGenres = genre ? genre.split(",").filter(Boolean) : [];
+  const selectedDjTypes = djType ? djType.split(",").filter(Boolean) : [];
 
   const removeParam = (key: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete(key);
-    router.push(`${pathname}?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   };
 
   const removeGenre = (g: string) => {
@@ -31,29 +39,48 @@ const ActiveFilterBadges = () => {
     const params = new URLSearchParams(searchParams.toString());
     if (updated) params.set("genre", updated);
     else params.delete("genre");
-    router.push(`${pathname}?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
+  };
+
+  const removeDjType = (t: string) => {
+    const updated = selectedDjTypes.filter((st) => st !== t).join(",");
+    const params = new URLSearchParams(searchParams.toString());
+    if (updated) params.set("djType", updated);
+    else params.delete("djType");
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   };
 
   const removeCountry = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("country");
     params.delete("city");
-    router.push(`${pathname}?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   };
 
   type Badge = { label: string; onRemove: () => void };
 
   const badges: Badge[] = [
     ...selectedGenres.map((g) => ({
-      label: g,
+      label: `Genre: ${g}`,
       onRemove: () => removeGenre(g),
     })),
-    ...(country ? [{ label: country, onRemove: removeCountry }] : []),
-    ...(city ? [{ label: city, onRemove: () => removeParam("city") }] : []),
+    ...selectedDjTypes.map((t) => ({
+      label: `DJ Type: ${DJ_TYPE_LABEL[t] ?? t}`,
+      onRemove: () => removeDjType(t),
+    })),
+    ...(country
+      ? [{ label: `Country: ${country}`, onRemove: removeCountry }]
+      : []),
+    ...(city
+      ? [{ label: `City: ${city}`, onRemove: () => removeParam("city") }]
+      : []),
     ...(sort
       ? [
           {
-            label: SORT_LABELS[sort] ?? sort,
+            label: `Sort: ${SORT_LABELS[sort] ?? sort}`,
             onRemove: () => removeParam("sort"),
           },
         ]
@@ -63,16 +90,16 @@ const ActiveFilterBadges = () => {
   if (badges.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-4">
+    <div className="mb-4 flex flex-wrap items-center gap-2">
       {badges.map((badge, i) => (
         <span
           key={i}
-          className="flex items-center gap-1.5 bg-h_red/10 text-red-400 text-xs px-2.5 py-1 rounded-full border border-h_red/50"
+          className="bg-h_red/10 border-h_red/50 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs text-red-400"
         >
           {badge.label}
           <button
             onClick={badge.onRemove}
-            className="hover:text-white transition-colors leading-none cursor-pointer"
+            className="cursor-pointer leading-none transition-colors hover:text-white"
             aria-label={`Remove ${badge.label} filter`}
           >
             ×
@@ -81,7 +108,7 @@ const ActiveFilterBadges = () => {
       ))}
       <button
         onClick={() => router.push(pathname)}
-        className="text-xs text-gray-400 hover:text-white underline underline-offset-2 transition-colors"
+        className="cursor-pointer text-xs text-gray-400 underline underline-offset-2 transition-colors hover:text-white"
       >
         Clear all
       </button>

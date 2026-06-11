@@ -21,14 +21,14 @@ const Hero = async () => {
   const joinHref = user ? "/select-role" : "/sign-up";
   return (
     <>
-      <section className="bg-zinc-800 h-[40vh] lg:h-[50vh] w-full relative">
+      <section className="relative h-[40vh] w-full bg-zinc-800 lg:h-[50vh]">
         {/* Background image - maybe later I will change alt to (DJ performing at electronic music event)*/}
         <Image
           src="/cover-hero.png"
           alt=""
           width={1920}
           height={1080}
-          className="w-full h-full object-cover bg-bottom"
+          className="h-full w-full bg-bottom object-cover"
           priority
         />
         {/* <video
@@ -42,36 +42,35 @@ const Hero = async () => {
           Your browser does not support the video tag.
         </video> */}
         {/* Overlay for for video was opacity text readability */}
-        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-70 z-10"></div>
-        <div className="absolute top-0 left-0 h-full w-full flex items-center z-10">
-          <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-start text-white">
-            <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl max-w-xl md:max-w-2xl lg:max-w-3xl leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
-              Find the <span className="font-bold text-h_red">Perfect DJ </span>
-              For You!{" "}
-              <span className="font-bold text-h_red">
-                <FontAwesomeIcon
-                  icon={faHeadphones}
-                  className="w-10 h-10 md:w-14 md:h-14 inline"
-                />
+        <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70"></div>
+        <div className="absolute top-0 left-0 z-10 flex h-full w-full items-center">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-start px-4 text-white md:px-8">
+            <h1 className="max-w-xl text-4xl leading-tight font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] md:max-w-2xl md:text-6xl lg:max-w-3xl lg:text-6xl">
+              Get Discovered. <br />
+              Get Booked.
+              <br />
+              <span className="text-h_red leading-7 font-bold">
+                Build Your Reputation.{" "}
               </span>
             </h1>
-            <p className="mt-3 text-sm md:text-base text-white/80 tracking-wide">
-              On the world&apos;s first & largest DJ&apos;s Community.
+            <p className="mt-3 max-w-2xl text-sm tracking-wide text-white/80 md:text-base">
+              Join a growing network of DJs and organizers, showcase your
+              talent, and unlock new opportunities.
             </p>
 
-            <div className="flex gap-4 mt-6">
+            <div className="mt-6 flex gap-4">
               {userRole?.role === "DJ" ? (
                 <>
                   <Button
                     asChild
-                    className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
                   >
                     <Link href="/dj/dashboard">My DJ Dashboard</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red text-red-300 hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
                   >
                     <Link href="/directory">Browse Open Gigs</Link>
                   </Button>
@@ -80,14 +79,14 @@ const Hero = async () => {
                 <>
                   <Button
                     asChild
-                    className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
                   >
                     <Link href="/organizer/dashboard">Post a Gig</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red text-red-300 hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
                   >
                     <Link href="/directory">Find DJs</Link>
                   </Button>
@@ -96,14 +95,14 @@ const Hero = async () => {
                 <>
                   <Button
                     asChild
-                    className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
                   >
                     <Link href={joinHref}>Join as DJ</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red text-red-300 hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6 text-sm md:text-base"
+                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
                   >
                     <Link href={joinHref}>Join as Organiser</Link>
                   </Button>

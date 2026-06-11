@@ -60,7 +60,7 @@ const Footer = async () => {
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-14">
             {/* ── Brand column ── */}
             <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-2">
-              <Link href="/" className="inline-block w-fit">
+              {/* <Link href="/" className="inline-block w-fit">
                 <Image
                   src="/dj-logo-blue.svg"
                   alt="DJscovery"
@@ -68,12 +68,35 @@ const Footer = async () => {
                   height={110}
                   className="brightness-110"
                 />
+              </Link> */}
+
+              <Link
+                href="/"
+                aria-label="DJscovery — Go to home"
+                className="focus-visible:ring-h_red shrink-0 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
+              >
+                <div className="flex flex-col items-start gap-1.5 py-1">
+                  <Image
+                    src="/dj-logo-red.svg"
+                    alt=""
+                    width={90}
+                    height={76}
+                    priority
+                  />
+                  <span className="font-heading mt-2 text-2xl leading-none tracking-tight text-white">
+                    <span className="font-bold">DJ</span>
+                    <span className="font-semibold">covery</span>
+                  </span>
+                  <span className="mt-3 text-base font-thin text-[#A1A1AA]">
+                    The Professional Network for DJs
+                  </span>
+                </div>
               </Link>
 
-              <p className="max-w-65 text-sm leading-relaxed text-gray-400">
+              {/* <p className="max-w-65 text-sm leading-relaxed text-gray-400">
                 The world&apos;s first &amp; largest DJ community. Discover
                 talent, connect with fans, and find your perfect DJ.
-              </p>
+              </p> */}
 
               {/* Newsletter mini-CTA */}
               <div className="mt-1 flex items-center gap-2">

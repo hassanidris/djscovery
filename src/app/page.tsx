@@ -45,77 +45,71 @@ const Homepage = async () => {
 
   let dbNewDJs: DemoDJ[] = [];
   let dbTrendingDJs: DemoDJ[] = [];
-  try {
-    const [recentProfiles, trendingCandidates] = await Promise.all([
-      prisma.djProfile.findMany({
-        where: { deletedAt: null, status: "APPROVED" },
-        orderBy: { createdAt: "desc" },
-        take: 8,
-        include: {
-          user: { include: { _count: { select: { followers: true } } } },
-          country: { select: { name: true } },
-          city: { select: { name: true } },
-          genres: { include: { genre: { select: { name: true } } } },
-          ratings: { select: { rating: true } },
-        },
-      }),
-      prisma.djProfile.findMany({
-        where: { deletedAt: null, status: "APPROVED" },
-        include: {
-          user: { include: { _count: { select: { followers: true } } } },
-          country: { select: { name: true } },
-          city: { select: { name: true } },
-          genres: { include: { genre: { select: { name: true } } } },
-          ratings: { select: { rating: true } },
-        },
-      }),
-    ]);
 
-    const toHomeDJ = (p: (typeof recentProfiles)[number]): DemoDJ => ({
-      id: String(p.id),
-      stageName: p.stageName,
-      avatar: p.avatar ?? "/noAvatar.png",
-      genres: p.genres.map((g) => g.genre.name),
-      city: p.city?.name ?? "",
-      country: p.country?.name ?? "",
-      rating:
-        p.ratings.length > 0
-          ? Math.round(
-              (p.ratings.reduce((sum, r) => sum + r.rating, 0) /
-                p.ratings.length) *
-                10,
-            ) / 10
-          : 0,
-      followers: p.user._count.followers,
-      slug: p.slug,
-      isPremium: p.plan === "PREMIUM",
-    });
+  if (!isStaging)
+    try {
+      const [recentProfiles, trendingCandidates] = await Promise.all([
+        prisma.djProfile.findMany({
+          where: { deletedAt: null, status: "APPROVED" },
+          orderBy: { createdAt: "desc" },
+          take: 8,
+          include: {
+            user: { include: { _count: { select: { followers: true } } } },
+            country: { select: { name: true } },
+            city: { select: { name: true } },
+            genres: { include: { genre: { select: { name: true } } } },
+            ratings: { select: { rating: true } },
+          },
+        }),
+        prisma.djProfile.findMany({
+          where: { deletedAt: null, status: "APPROVED" },
+          include: {
+            user: { include: { _count: { select: { followers: true } } } },
+            country: { select: { name: true } },
+            city: { select: { name: true } },
+            genres: { include: { genre: { select: { name: true } } } },
+            ratings: { select: { rating: true } },
+          },
+        }),
+      ]);
 
-    dbNewDJs = recentProfiles.map(toHomeDJ);
-    dbTrendingDJs = trendingCandidates
-      .map(toHomeDJ)
-      .sort((a, b) => b.rating - a.rating || b.followers - a.followers)
-      .slice(0, 10);
-  } catch {
-    // DB unavailable — fall through to demo data
-  }
+      const toHomeDJ = (p: (typeof recentProfiles)[number]): DemoDJ => ({
+        id: String(p.id),
+        stageName: p.stageName,
+        avatar: p.avatar ?? "/noAvatar.png",
+        genres: p.genres.map((g) => g.genre.name),
+        city: p.city?.name ?? "",
+        country: p.country?.name ?? "",
+        rating:
+          p.ratings.length > 0
+            ? Math.round(
+                (p.ratings.reduce((sum, r) => sum + r.rating, 0) /
+                  p.ratings.length) *
+                  10,
+              ) / 10
+            : 0,
+        followers: p.user._count.followers,
+        slug: p.slug,
+        isPremium: p.plan === "PREMIUM",
+      });
 
-  const dbSlugs = new Set(dbNewDJs.map((d) => d.slug));
+      dbNewDJs = recentProfiles.map(toHomeDJ);
+      dbTrendingDJs = trendingCandidates
+        .map(toHomeDJ)
+        .sort((a, b) => b.rating - a.rating || b.followers - a.followers)
+        .slice(0, 10);
+    } catch {
+      // DB unavailable — fall through to demo data
+    }
+
   const newDJs = isStaging
-    ? [...dbNewDJs, ...DEMO_NEW_DJS.filter((d) => !dbSlugs.has(d.slug))].slice(
-        0,
-        8,
-      )
+    ? DEMO_NEW_DJS
     : dbNewDJs.length > 0
       ? dbNewDJs
       : DEMO_NEW_DJS;
 
-  const trendingSlugs = new Set(dbTrendingDJs.map((d) => d.slug));
   const trendingSource = isStaging
-    ? [
-        ...dbTrendingDJs,
-        ...DEMO_TRENDING_DJS.filter((d) => !trendingSlugs.has(d.slug)),
-      ]
+    ? DEMO_TRENDING_DJS
     : dbTrendingDJs.length > 0
       ? dbTrendingDJs
       : DEMO_TRENDING_DJS;
@@ -151,23 +145,23 @@ const Homepage = async () => {
       <HomeGenresSection />
 
       {/* CTA section */}
-      <div className="flex flex-col items-center justify-center gap-8 py-16 px-4 border-t border-white/5">
+      <div className="flex flex-col items-center justify-center gap-8 border-t border-white/5 px-4 py-16">
         {user ? (
           <div className="flex flex-col items-center gap-4">
-            <p className="text-gray-300 text-sm">
+            <p className="text-sm text-gray-300">
               Signed in as <span className="text-h_red">{user.email}</span>
             </p>
             <div className="flex gap-4">
               <Button
                 asChild
-                className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6"
+                className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 font-semibold text-white"
               >
                 <Link href="/community">Community</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6"
+                className="border-h_red text-h_red hover:bg-h_red h-auto px-6 py-3 font-semibold hover:text-white"
               >
                 <Link href="/directory">Browse DJs</Link>
               </Button>
@@ -175,20 +169,20 @@ const Homepage = async () => {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-gray-400 text-lg">
+            <p className="text-lg text-gray-400">
               Join the world&apos;s first DJ community platform
             </p>
             <div className="flex gap-4">
               <Button
                 asChild
                 variant="outline"
-                className="border-h_red text-h_red hover:bg-h_red hover:text-white font-semibold h-auto py-3 px-6"
+                className="border-h_red text-h_red hover:bg-h_red h-auto px-6 py-3 font-semibold hover:text-white"
               >
                 <Link href="/sign-in">Sign In</Link>
               </Button>
               <Button
                 asChild
-                className="bg-h_red hover:bg-h_redDark text-white font-semibold h-auto py-3 px-6"
+                className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 font-semibold text-white"
               >
                 <Link href="/sign-up">Get Started</Link>
               </Button>
