@@ -75,7 +75,7 @@ export default function NavDesktop({
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden />
                 <span>{item.label}</span>
-                <span className="text-h_red/60 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[9px] leading-none font-semibold tracking-wider uppercase">
+                <span className="text-h_red/60 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                   Soon
                 </span>
               </span>

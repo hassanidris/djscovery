@@ -145,12 +145,12 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="bg-h_blackLight/40 border-white/8 p-6 gap-0">
+    <Card className="bg-h_blackLight/40 gap-0 border-white/8 p-6">
       <div className="mb-5">
-        <h2 className="text-white font-semibold text-sm">{title}</h2>
-        {subtitle && <p className="text-gray-500 text-xs mt-0.5">{subtitle}</p>}
+        <h2 className="text-sm font-semibold text-white">{title}</h2>
+        {subtitle && <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>}
       </div>
-      <Separator className="bg-white/8 mb-5" />
+      <Separator className="mb-5 bg-white/8" />
       {children}
     </Card>
   );
@@ -338,23 +338,23 @@ export default function EditDjProfileForm({
   return (
     <>
       {/* Page Header */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="mb-8 flex items-center gap-3">
         <button
           type="button"
           onClick={handleBack}
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-gray-400 transition-colors hover:text-white"
           aria-label="Back to profile"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
-          <h1 className="text-white text-2xl font-bold">Edit Profile</h1>
-          <p className="text-gray-500 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-white">Edit Profile</h1>
+          <p className="mt-0.5 text-sm text-gray-500">
             Update your DJ profile information
           </p>
         </div>
         {isDirty && (
-          <span className="text-amber-400 text-xs font-medium">
+          <span className="text-xs font-medium text-amber-400">
             Unsaved changes
           </span>
         )}
@@ -369,7 +369,7 @@ export default function EditDjProfileForm({
           <div className="flex flex-col gap-5">
             {/* Avatar */}
             <div className="flex items-center gap-4">
-              <div className="relative shrink-0 w-20 h-20 rounded-full overflow-hidden ring-2 ring-white/10 bg-white/5">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white/5 ring-2 ring-white/10">
                 {avatarUrl ? (
                   <Image
                     src={avatarUrl}
@@ -378,16 +378,16 @@ export default function EditDjProfileForm({
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
+                  <div className="flex h-full w-full items-center justify-center">
                     <Camera className="h-6 w-6 text-gray-600" />
                   </div>
                 )}
               </div>
               <div>
-                <p className="text-white text-xs font-medium mb-0.5">
+                <p className="mb-0.5 text-xs font-medium text-white">
                   Profile Photo
                 </p>
-                <p className="text-gray-500 text-xs mb-2">
+                <p className="mb-2 text-xs text-gray-500">
                   Shown on your profile and directory card
                 </p>
                 <CldUploadWidget
@@ -417,7 +417,7 @@ export default function EditDjProfileForm({
                       onClick={() => open()}
                       className="border-white/15 text-gray-300 hover:bg-white/5"
                     >
-                      <Camera className="h-3.5 w-3.5 mr-1.5" />
+                      <Camera className="mr-1.5 h-3.5 w-3.5" />
                       {avatarUrl ? "Change Avatar" : "Upload Avatar"}
                     </Button>
                   )}
@@ -429,14 +429,14 @@ export default function EditDjProfileForm({
 
             {/* Cover Image */}
             <div>
-              <p className="text-white text-xs font-medium mb-0.5">
+              <p className="mb-0.5 text-xs font-medium text-white">
                 Cover Image
               </p>
-              <p className="text-gray-500 text-xs mb-3">
+              <p className="mb-3 text-xs text-gray-500">
                 The banner shown at the top of your profile
               </p>
               {coverImageUrl && (
-                <div className="relative w-full h-24 rounded-lg overflow-hidden mb-3 bg-white/5">
+                <div className="relative mb-3 h-24 w-full overflow-hidden rounded-lg bg-white/5">
                   <Image
                     src={coverImageUrl}
                     alt="cover"
@@ -468,7 +468,7 @@ export default function EditDjProfileForm({
                     onClick={() => open()}
                     className="border-white/15 text-gray-300 hover:bg-white/5"
                   >
-                    <Camera className="h-3.5 w-3.5 mr-1.5" />
+                    <Camera className="mr-1.5 h-3.5 w-3.5" />
                     {coverImageUrl ? "Change Cover" : "Upload Cover"}
                   </Button>
                 )}
@@ -484,13 +484,13 @@ export default function EditDjProfileForm({
         >
           <div className="flex flex-col gap-4">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <Label className="text-gray-300 text-xs">
+              <div className="mb-1.5 flex items-center justify-between">
+                <Label className="text-xs text-gray-300">
                   Stage Name <span className="text-h_red">*</span>
                 </Label>
-                <span className="text-gray-600 text-[11px]">
+                <span className="text-[11px] text-gray-600">
                   Displays as{" "}
-                  <span className="text-gray-400 font-medium">
+                  <span className="font-medium text-gray-400">
                     Dj {stageName.trim() || "Your Name"}
                   </span>{" "}
                   — no &ldquo;DJ&rdquo; needed
@@ -500,41 +500,41 @@ export default function EditDjProfileForm({
                 value={stageName}
                 onChange={(e) => setStageName(e.target.value)}
                 placeholder="e.g. Hassan, Tiësto, Carl Cox"
-                className={`bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50 ${
+                className={`focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600 ${
                   submitted && stageNameError ? "border-red-500/60" : ""
                 }`}
                 maxLength={60}
               />
               {submitted && stageNameError && (
-                <p className="text-red-400 text-[11px] mt-1">
+                <p className="mt-1 text-[11px] text-red-400">
                   Stage name is required (min 2 characters)
                 </p>
               )}
             </div>
             <div>
-              <Label className="text-gray-300 text-xs mb-1.5 block">
+              <Label className="mb-1.5 block text-xs text-gray-300">
                 Biography
               </Label>
               <Textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Tell bookers and fans about your sound and story..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50 min-h-28 resize-none"
+                className="focus:border-h_red/50 min-h-28 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                 maxLength={800}
               />
-              <div className="flex items-center justify-between mt-1">
+              <div className="mt-1 flex items-center justify-between">
                 {bio.trim().length === 0 ? (
-                  <p className="text-amber-400/70 text-[11px]">
+                  <p className="text-[11px] text-amber-400/70">
                     ⚠ A bio increases your booking chances
                   </p>
                 ) : bio.trim().length < 50 ? (
-                  <p className="text-amber-400/70 text-[11px]">
+                  <p className="text-[11px] text-amber-400/70">
                     ⚠ Short bio — aim for 50+ characters
                   </p>
                 ) : (
                   <span />
                 )}
-                <p className="text-gray-600 text-[11px]">{bio.length}/800</p>
+                <p className="text-[11px] text-gray-600">{bio.length}/800</p>
               </div>
             </div>
           </div>
@@ -542,14 +542,14 @@ export default function EditDjProfileForm({
 
         {/* Location */}
         <SectionCard title="Location" subtitle="Where you are based">
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <Label className="text-gray-300 text-xs">
+              <div className="mb-1.5 flex items-center justify-between">
+                <Label className="text-xs text-gray-300">
                   Country <span className="text-h_red">*</span>
                 </Label>
                 {submitted && countryError && (
-                  <span className="text-red-400 text-[11px]">
+                  <span className="text-[11px] text-red-400">
                     Country is required
                   </span>
                 )}
@@ -561,7 +561,7 @@ export default function EditDjProfileForm({
                   setCountryId(val ? Number(val) : null);
                   setCityId(null);
                 }}
-                className={`w-full bg-white/5 border rounded-md text-white text-sm px-3 py-2 focus:outline-none focus:border-h_red/50 ${
+                className={`focus:border-h_red/50 w-full rounded-md border bg-white/5 px-3 py-2 text-sm text-white focus:outline-none ${
                   submitted && countryError
                     ? "border-red-500/60"
                     : "border-white/10"
@@ -578,7 +578,7 @@ export default function EditDjProfileForm({
               </select>
             </div>
             <div>
-              <Label className="text-gray-300 text-xs mb-1.5 block">City</Label>
+              <Label className="mb-1.5 block text-xs text-gray-300">City</Label>
               <select
                 value={cityId ?? ""}
                 onChange={(e) => {
@@ -586,7 +586,7 @@ export default function EditDjProfileForm({
                   setCityId(val ? Number(val) : null);
                 }}
                 disabled={!countryId || cities.length === 0}
-                className="w-full bg-white/5 border border-white/10 rounded-md text-white text-sm px-3 py-2 focus:outline-none focus:border-h_red/50 disabled:opacity-40"
+                className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none disabled:opacity-40"
               >
                 <option value="" className="bg-zinc-900">
                   {cities.length === 0 ? "Select country first" : "Select city"}
@@ -597,7 +597,7 @@ export default function EditDjProfileForm({
                   </option>
                 ))}
               </select>
-              <p className="text-gray-600 text-[11px] mt-1">
+              <p className="mt-1 text-[11px] text-gray-600">
                 Helps bookers find local DJs
               </p>
             </div>
@@ -611,27 +611,27 @@ export default function EditDjProfileForm({
         >
           <div className="flex flex-col gap-5">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <Label className="text-gray-300 text-xs">
+              <div className="mb-1.5 flex items-center justify-between">
+                <Label className="text-xs text-gray-300">
                   Genres <span className="text-h_red">*</span>
                 </Label>
                 {submitted && genresError && (
-                  <span className="text-red-400 text-[11px]">
+                  <span className="text-[11px] text-red-400">
                     Add at least one genre
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap gap-1.5 mb-2">
+              <div className="mb-2 flex flex-wrap gap-1.5">
                 {genreNames.map((g) => (
                   <span
                     key={g}
-                    className="flex items-center gap-1 text-xs bg-h_redDark/50 text-red-200 px-2 py-0.5 rounded-full"
+                    className="bg-h_redDark/50 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs text-red-200"
                   >
                     {g}
                     <button
                       type="button"
                       onClick={() => removeGenre(g)}
-                      className="text-red-400 hover:text-red-200 ml-0.5"
+                      className="ml-0.5 text-red-400 hover:text-red-200"
                       aria-label={`Remove ${g}`}
                     >
                       <X className="h-2.5 w-2.5" />
@@ -650,7 +650,7 @@ export default function EditDjProfileForm({
                     }
                   }}
                   placeholder="Type a genre and press Enter"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                   maxLength={50}
                 />
                 <Button
@@ -658,7 +658,7 @@ export default function EditDjProfileForm({
                   variant="outline"
                   size="sm"
                   onClick={addGenre}
-                  className="border-white/15 text-gray-300 hover:bg-white/5 shrink-0"
+                  className="shrink-0 border-white/15 text-gray-300 hover:bg-white/5"
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </Button>
@@ -666,28 +666,28 @@ export default function EditDjProfileForm({
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label className="text-gray-300 text-xs">
+              <div className="mb-3 flex items-center justify-between">
+                <Label className="text-xs text-gray-300">
                   DJ Type <span className="text-h_red">*</span>
                 </Label>
                 {submitted && djTypesError && (
-                  <span className="text-red-400 text-[11px]">
+                  <span className="text-[11px] text-red-400">
                     Select at least one
                   </span>
                 )}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {Object.entries(DJ_TYPE_LABELS).map(([value, label]) => (
                   <label
                     key={value}
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-white/3 transition-colors"
+                    className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white/3"
                   >
                     <Checkbox
                       checked={djTypes.includes(value)}
                       onCheckedChange={() => toggleDjType(value)}
-                      className="border-white/20 data-[state=checked]:bg-h_red data-[state=checked]:border-h_red"
+                      className="data-[state=checked]:bg-h_red data-[state=checked]:border-h_red border-white/20"
                     />
-                    <span className="text-gray-300 text-xs">{label}</span>
+                    <span className="text-xs text-gray-300">{label}</span>
                   </label>
                 ))}
               </div>
@@ -708,7 +708,7 @@ export default function EditDjProfileForm({
                   onChange={(e) =>
                     updateSocialLink(i, "platform", e.target.value)
                   }
-                  className="bg-white/5 border border-white/10 rounded-md text-white text-xs px-2 py-2 focus:outline-none focus:border-h_red/50 w-32 shrink-0"
+                  className="focus:border-h_red/50 w-32 shrink-0 rounded-md border border-white/10 bg-white/5 px-2 py-2 text-xs text-white focus:outline-none"
                 >
                   {SOCIAL_PLATFORMS.map((p) => (
                     <option
@@ -725,14 +725,14 @@ export default function EditDjProfileForm({
                   onChange={(e) => updateSocialLink(i, "url", e.target.value)}
                   placeholder="https://..."
                   type="url"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50 flex-1"
+                  className="focus:border-h_red/50 flex-1 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => removeSocialLink(i)}
-                  className="text-gray-600 hover:text-red-400 shrink-0"
+                  className="shrink-0 text-gray-600 hover:text-red-400"
                   aria-label="Remove link"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -744,9 +744,9 @@ export default function EditDjProfileForm({
               variant="outline"
               size="sm"
               onClick={addSocialLink}
-              className="border-white/15 text-gray-400 hover:bg-white/5 w-fit"
+              className="w-fit border-white/15 text-gray-400 hover:bg-white/5"
             >
-              <Plus className="h-3.5 w-3.5 mr-1.5" />
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
               Add Link
             </Button>
           </div>
@@ -758,9 +758,9 @@ export default function EditDjProfileForm({
           subtitle="How bookers can reach you and your rate range"
         >
           <div className="flex flex-col gap-4">
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label className="text-gray-300 text-xs mb-1.5 block">
+                <Label className="mb-1.5 block text-xs text-gray-300">
                   Booking Email
                 </Label>
                 <Input
@@ -768,11 +768,11 @@ export default function EditDjProfileForm({
                   value={bookingEmail}
                   onChange={(e) => setBookingEmail(e.target.value)}
                   placeholder="bookings@yourname.com"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                 />
               </div>
               <div>
-                <Label className="text-gray-300 text-xs mb-1.5 block">
+                <Label className="mb-1.5 block text-xs text-gray-300">
                   Booking Phone
                 </Label>
                 <Input
@@ -780,13 +780,13 @@ export default function EditDjProfileForm({
                   value={bookingPhone}
                   onChange={(e) => setBookingPhone(e.target.value)}
                   placeholder="+44 7700 900123"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                 />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label className="text-gray-300 text-xs mb-1.5 block">
+                <Label className="mb-1.5 block text-xs text-gray-300">
                   Min Fee
                 </Label>
                 <Input
@@ -795,11 +795,11 @@ export default function EditDjProfileForm({
                   onChange={(e) => setFeeMin(e.target.value)}
                   placeholder="500"
                   min={0}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                 />
               </div>
               <div>
-                <Label className="text-gray-300 text-xs mb-1.5 block">
+                <Label className="mb-1.5 block text-xs text-gray-300">
                   Max Fee
                 </Label>
                 <Input
@@ -808,14 +808,14 @@ export default function EditDjProfileForm({
                   onChange={(e) => setFeeMax(e.target.value)}
                   placeholder="5000"
                   min={0}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                 />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <Label className="text-gray-300 text-xs">Currency</Label>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <Label className="text-xs text-gray-300">Currency</Label>
                   {currencyAutoSet && (
-                    <span className="text-gray-600 text-[10px]">auto</span>
+                    <span className="text-[11px] text-gray-600">auto</span>
                   )}
                 </div>
                 <Input
@@ -826,7 +826,7 @@ export default function EditDjProfileForm({
                   }}
                   placeholder="USD"
                   maxLength={3}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-h_red/50 uppercase"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white uppercase placeholder:text-gray-600"
                 />
               </div>
             </div>
@@ -835,17 +835,17 @@ export default function EditDjProfileForm({
 
         {/* Submit */}
         <div className="flex items-center justify-between pt-2">
-          <p className="text-gray-600 text-xs">
+          <p className="text-xs text-gray-600">
             <span className="text-h_red">*</span> Required fields
           </p>
           <Button
             type="submit"
             disabled={isPending || (submitted && !canSave)}
-            className="bg-h_red hover:bg-h_redDark text-white font-semibold px-8 min-w-32 disabled:opacity-50"
+            className="bg-h_red hover:bg-h_redDark min-w-32 px-8 font-semibold text-white disabled:opacity-50"
           >
             {isPending ? (
               <>
-                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                 Saving...
               </>
             ) : (
@@ -856,7 +856,7 @@ export default function EditDjProfileForm({
       </form>
 
       <AlertDialog open={showLeaveAlert} onOpenChange={setShowLeaveAlert}>
-        <AlertDialogContent className="bg-zinc-900 border-white/10">
+        <AlertDialogContent className="border-white/10 bg-zinc-900">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">
               Unsaved Changes
@@ -867,7 +867,7 @@ export default function EditDjProfileForm({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-white/15 text-gray-300 bg-transparent hover:bg-white/5">
+            <AlertDialogCancel className="border-white/15 bg-transparent text-gray-300 hover:bg-white/5">
               Keep Editing
             </AlertDialogCancel>
             <AlertDialogAction

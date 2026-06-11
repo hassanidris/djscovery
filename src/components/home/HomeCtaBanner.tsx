@@ -18,61 +18,65 @@ export default async function HomeCtaBanner() {
 
   const joinHref = user ? "/select-role" : "/sign-up";
   return (
-    <section className="py-16 px-4 md:px-8 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <div className="relative rounded-2xl overflow-hidden bg-linear-to-br from-h_redDark via-h_red/20 to-black border border-h_red/50 shadow-[0_0_40px_-8px_rgba(211,1,1,0.25)] px-8 py-12 md:px-16">
+    <section className="border-t border-white/5 px-4 py-16 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="from-h_redDark via-h_red/20 border-h_red/50 relative overflow-hidden rounded-2xl border bg-linear-to-br to-black px-8 py-12 shadow-[0_0_40px_-8px_rgba(211,1,1,0.25)] md:px-16">
           {/* Decorative blobs */}
-          <div className="absolute -top-16 -right-16 w-64 h-64 bg-h_red/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-h_redDark/30 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-h_red/20 pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full blur-3xl" />
+          <div className="bg-h_redDark/30 pointer-events-none absolute -bottom-16 -left-16 h-64 w-64 rounded-full blur-3xl" />
 
-          <div className="relative z-10 flex flex-col items-center text-center gap-4 mb-10">
-            <span className="text-red-300 text-sm font-semibold tracking-widest uppercase">
+          <div className="relative z-10 mb-10 flex flex-col items-center gap-4 text-center">
+            <span className="text-xs font-semibold tracking-[0.15em] text-red-300 uppercase">
               Join the Community
             </span>
-            <h2 className="text-white text-4xl md:text-5xl leading-tight">
+            <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
               Ready to make your mark?
             </h2>
-            <p className="text-gray-400 max-w-xl text-base">
+            <p className="max-w-xl text-base text-gray-400">
               Whether you spin records or book talent — DJscovery has a place
               for you.
             </p>
           </div>
 
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="relative z-10 mx-auto grid max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
             {/* DJ card */}
-            <div className="bg-black/40 border border-white/10 rounded-xl p-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-4 rounded-xl border border-white/10 bg-black/40 p-6">
               <div className="text-4xl">🎧</div>
               <div>
-                <h3 className="text-white text-2xl">I&apos;m a DJ</h3>
-                <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                <h3 className="text-xl font-semibold text-white">
+                  I&apos;m a DJ
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-gray-400">
                   Showcase your mixes, get discovered by organisers, and grow
                   your fanbase.
                 </p>
               </div>
-              <ul className="text-gray-400 text-xs space-y-1">
+              <ul className="space-y-1 text-xs text-gray-400">
                 <li>✓ Free DJ profile & portfolio</li>
                 <li>✓ Apply to open gigs directly</li>
                 <li>✓ Connect with fans & other DJs</li>
               </ul>
               <Button
                 asChild
-                className="mt-auto bg-h_red hover:bg-h_redDark text-white font-semibold w-full"
+                className="bg-h_red hover:bg-h_redDark mt-auto w-full font-semibold text-white"
               >
                 <Link href={joinHref}>Join as DJ</Link>
               </Button>
             </div>
 
             {/* Organiser card */}
-            <div className="bg-black/40 border border-white/10 rounded-xl p-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-4 rounded-xl border border-white/10 bg-black/40 p-6">
               <div className="text-4xl">🎪</div>
               <div>
-                <h3 className="text-white text-2xl">I&apos;m an Organiser</h3>
-                <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                <h3 className="text-xl font-semibold text-white">
+                  I&apos;m an Organiser
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-gray-400">
                   Find and book the perfect DJ for your event from a global
                   directory.
                 </p>
               </div>
-              <ul className="text-gray-400 text-xs space-y-1">
+              <ul className="space-y-1 text-xs text-gray-400">
                 <li>✓ Browse verified DJ profiles</li>
                 <li>✓ Post open gigs for free</li>
                 <li>✓ Manage bookings in one place</li>
@@ -80,7 +84,7 @@ export default async function HomeCtaBanner() {
               <Button
                 asChild
                 variant="outline"
-                className="mt-auto border-h_red text-red-200 hover:bg-h_red hover:text-white font-semibold w-full cursor-pointer"
+                className="border-h_red hover:bg-h_red mt-auto w-full cursor-pointer font-semibold text-red-200 hover:text-white"
               >
                 <Link href={joinHref}>Join as Organiser</Link>
               </Button>

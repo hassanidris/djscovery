@@ -27,12 +27,14 @@ const FEATURED_DJS = [...PREMIUM_DEMO_DJS]
 
 export default function HomeFeaturedDJs() {
   return (
-    <section className="py-12 px-4 md:px-8 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-6">
+    <section className="border-t border-white/5 px-4 py-12 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex items-end justify-between">
           <div>
-            <h2 className="text-white text-3xl md:text-4xl">Featured DJs</h2>
-            <p className="text-gray-400 text-sm mt-1">
+            <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+              Featured DJs
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-gray-400">
               Handpicked talent making waves globally
             </p>
           </div>
@@ -46,20 +48,20 @@ export default function HomeFeaturedDJs() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {FEATURED_DJS.map((dj) => (
             <Link key={dj.slug} href={`/djs/${dj.slug}`}>
-              <Card className="bg-h_blackLight/50 ring-white/5 hover:ring-h_red transition-all overflow-hidden p-0 gap-0">
-                <div className="relative h-24 bg-linear-to-r from-h_cyanDark to-black">
+              <Card className="bg-h_blackLight/50 hover:ring-h_red gap-0 overflow-hidden p-0 ring-white/5 transition-all">
+                <div className="from-h_cyanDark relative h-24 bg-linear-to-r to-black">
                   <div className="absolute -bottom-8 left-4">
                     <div className="relative">
                       <Avatar className="size-16 ring-2 ring-amber-400 ring-offset-2 ring-offset-black">
                         <AvatarImage src={dj.avatar} alt={dj.stageName} />
-                        <AvatarFallback className="bg-h_redDark text-white text-lg">
+                        <AvatarFallback className="bg-h_redDark text-lg text-white">
                           {dj.stageName[0]}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="absolute -bottom-1 -right-1 size-5 rounded-full bg-amber-400 border-2 border-black flex items-center justify-center">
+                      <div className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border-2 border-black bg-amber-400">
                         <FontAwesomeIcon
                           icon={faCrown}
                           className="h-2.5 w-2.5 text-black"
@@ -67,22 +69,22 @@ export default function HomeFeaturedDJs() {
                       </div>
                     </div>
                   </div>
-                  <Badge className="absolute top-3 right-3 bg-h_red text-white border-0">
+                  <Badge className="bg-h_red absolute top-3 right-3 border-0 text-white">
                     ✦ FEATURED
                   </Badge>
                 </div>
 
-                <div className="pt-10 px-4 pb-4 flex flex-col gap-3">
+                <div className="flex flex-col gap-3 px-4 pt-10 pb-4">
                   <div>
-                    <p className="text-white font-bold text-lg leading-tight">
+                    <p className="text-lg leading-tight font-bold text-white">
                       {dj.stageName}
                     </p>
-                    <p className="text-gray-500 text-xs mt-0.5">
+                    <p className="mt-0.5 text-xs text-gray-500">
                       📍 {dj.city}, {dj.country}
                     </p>
                   </div>
 
-                  <p className="text-gray-400 text-xs leading-relaxed line-clamp-2">
+                  <p className="line-clamp-2 text-xs leading-relaxed text-gray-400">
                     {dj.bio}
                   </p>
 
@@ -90,14 +92,14 @@ export default function HomeFeaturedDJs() {
                     {dj.genres.map((g) => (
                       <Badge
                         key={g}
-                        className="bg-h_redDark/60 text-red-300 border-0"
+                        className="bg-h_redDark/60 border-0 text-red-300"
                       >
                         {g}
                       </Badge>
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-gray-400 border-t border-white/5 pt-3 mt-auto">
+                  <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3 text-xs text-gray-400">
                     <span>⭐ {dj.rating} rating</span>
                     <span>{dj.followers.toLocaleString()} followers</span>
                   </div>

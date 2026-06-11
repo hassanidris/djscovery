@@ -52,6 +52,9 @@
 body {
   height: 100vh;
   background-color: #050505;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -158,14 +161,27 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    line-height: 1.625;
   }
   html {
     @apply font-sans;
   }
-  h1,
-  h2,
+  h1 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  h2 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
   h3 {
     font-family: var(--font-heading);
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
   }
 }

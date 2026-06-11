@@ -141,7 +141,7 @@ const FilterBottomSheet = ({
           <SlidersHorizontal className="h-4 w-4" />
           Filters
           {activeCount > 0 && (
-            <span className="bg-h_red flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white">
+            <span className="bg-h_red flex h-4 w-4 items-center justify-center rounded-full text-[11px] font-bold text-white">
               {activeCount}
             </span>
           )}

@@ -95,14 +95,14 @@ function StatPill({
   trend?: string;
 }) {
   return (
-    <div className="flex flex-col items-center p-4 rounded-xl bg-white/3 border border-white/8">
+    <div className="flex flex-col items-center rounded-xl border border-white/8 bg-white/3 p-4">
       <span className="text-2xl font-bold text-white">{value}</span>
       {trend && (
-        <span className="text-emerald-400 text-[10px] font-semibold">
+        <span className="text-[11px] font-semibold text-emerald-400">
           {trend}
         </span>
       )}
-      <span className="text-gray-500 text-xs mt-1 text-center">{label}</span>
+      <span className="mt-1 text-center text-xs text-gray-500">{label}</span>
     </div>
   );
 }
@@ -158,7 +158,7 @@ export default function DjProfilePremium({
     <div className="min-h-screen bg-black">
       {/* ── PREMIUM HERO ── */}
       <section className="w-full">
-        <div className="relative w-full h-72 md:h-105 overflow-hidden">
+        <div className="relative h-72 w-full overflow-hidden md:h-105">
           <Image
             src={DJ.coverImage}
             alt="cover"
@@ -167,60 +167,60 @@ export default function DjProfilePremium({
             priority
           />
           <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-black/10" />
-          <div className="absolute inset-0 bg-linear-to-r from-h_red/10 to-transparent" />
+          <div className="from-h_red/10 absolute inset-0 bg-linear-to-r to-transparent" />
           {/* Premium ambient glow */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-black to-transparent" />
+          <div className="absolute right-0 bottom-0 left-0 h-32 bg-linear-to-t from-black to-transparent" />
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-20 sm:-mt-16 pb-5">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
+          <div className="-mt-20 flex flex-col gap-4 pb-5 sm:-mt-16 sm:flex-row sm:items-end">
             {/* Avatar with premium ring */}
-            <div className="relative shrink-0 z-10">
-              <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden ring-4 ring-amber-400 ring-offset-2 ring-offset-black">
+            <div className="relative z-10 shrink-0">
+              <div className="h-32 w-32 overflow-hidden rounded-full ring-4 ring-amber-400 ring-offset-2 ring-offset-black sm:h-36 sm:w-36">
                 <Image
                   src={DJ.avatar}
                   alt={DJ.stageName}
                   width={144}
                   height={144}
-                  className="object-cover w-full h-full"
+                  className="h-full w-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 size-8 rounded-full bg-amber-400 border-2 border-black flex items-center justify-center">
+              <div className="absolute -right-1 -bottom-1 flex size-8 items-center justify-center rounded-full border-2 border-black bg-amber-400">
                 <Crown className="h-3.5 w-3.5 text-black" />
               </div>
             </div>
 
-            <div className="flex-1 min-w-0 pt-1 sm:pb-2">
-              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <h1 className="font-heading text-3xl md:text-4xl text-white leading-none z-10">
+            <div className="min-w-0 flex-1 pt-1 sm:pb-2">
+              <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                <h1 className="font-heading z-10 text-2xl font-bold tracking-tight text-white md:text-4xl">
                   Dj {DJ.stageName}
                 </h1>
                 <div className="flex items-center gap-1.5">
-                  <Badge className="bg-blue-500/15 text-blue-400 border-blue-500/25 text-xs h-5.5">
-                    <CircleCheck className="h-2.5 w-2.5 mr-1" />
+                  <Badge className="h-5.5 border-blue-500/25 bg-blue-500/15 text-xs text-blue-400">
+                    <CircleCheck className="mr-1 h-2.5 w-2.5" />
                     Verified
                   </Badge>
-                  <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/25 text-xs h-5.5">
-                    <Crown className="h-2.5 w-2.5 mr-1" />
+                  <Badge className="h-5.5 border-amber-500/25 bg-amber-500/15 text-xs text-amber-400">
+                    <Crown className="mr-1 h-2.5 w-2.5" />
                     Premium
                   </Badge>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm flex items-center gap-1.5">
-                <MapPin className="h-3 w-3 text-h_red" /> {location}
+              <p className="flex items-center gap-1.5 text-sm text-gray-400">
+                <MapPin className="text-h_red h-3 w-3" /> {location}
               </p>
             </div>
 
-            <div className="flex items-center gap-2 sm:pb-2 flex-wrap">
-              <Button className="bg-h_red hover:bg-h_redDark text-white font-semibold px-5">
-                <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
+            <div className="flex flex-wrap items-center gap-2 sm:pb-2">
+              <Button className="bg-h_red hover:bg-h_redDark px-5 font-semibold text-white">
+                <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
                 Book DJ
               </Button>
               <Button
                 variant="outline"
                 className="border-white/20 text-gray-300 hover:bg-white/5"
               >
-                <UserPlus className="h-3.5 w-3.5 mr-1.5" />
+                <UserPlus className="mr-1.5 h-3.5 w-3.5" />
                 Follow
               </Button>
               <Button
@@ -234,11 +234,11 @@ export default function DjProfilePremium({
           </div>
 
           {/* Genres */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="mb-4 flex flex-wrap gap-2">
             {DJ.genres.map((g) => (
               <Badge
                 key={g}
-                className="bg-h_redDark/50 text-red-100 border-0 h-6"
+                className="bg-h_redDark/50 h-6 border-0 text-red-100"
               >
                 {g}
               </Badge>
@@ -246,7 +246,7 @@ export default function DjProfilePremium({
           </div>
 
           {/* Social */}
-          <div className="flex items-center gap-2 mb-6">
+          <div className="mb-6 flex items-center gap-2">
             {DJ.socialLinks.map((l) => {
               const icon = SOCIAL_ICONS[l.platform];
               if (!icon) return null;
@@ -256,7 +256,7 @@ export default function DjProfilePremium({
                   href={l.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="size-9 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors border border-white/8"
+                  className="flex size-9 items-center justify-center rounded-full border border-white/8 bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
                 >
                   <FontAwesomeIcon icon={icon} className="h-4 w-4" />
                 </a>
@@ -267,7 +267,7 @@ export default function DjProfilePremium({
           <Separator className="bg-white/10" />
 
           {/* Premium stats bar — 6 metrics */}
-          <div className="grid grid-cols-3 md:grid-cols-6 py-5 divide-x divide-white/10">
+          <div className="grid grid-cols-3 divide-x divide-white/10 py-5 md:grid-cols-6">
             {[
               {
                 val: DJ.followerCount.toLocaleString(),
@@ -306,12 +306,12 @@ export default function DjProfilePremium({
               const SIcon = s.icon;
               return (
                 <div key={i} className="flex flex-col items-center py-1">
-                  <span className="text-xl md:text-2xl font-bold text-white">
+                  <span className="text-xl font-bold text-white md:text-2xl">
                     {s.val}
                   </span>
                   <span
                     className={cn(
-                      "text-xs flex items-center gap-1 mt-1",
+                      "mt-1 flex items-center gap-1 text-xs",
                       s.amber
                         ? "text-amber-400"
                         : s.green
@@ -331,39 +331,39 @@ export default function DjProfilePremium({
       </section>
 
       {/* ── PAGE BODY ── */}
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* ── MAIN COLUMN ── */}
-          <div className="lg:col-span-2 flex flex-col gap-12">
+          <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── SPOTLIGHT ── */}
             <section>
               <SectionHeading sub="Curated featured content">
                 Spotlight
               </SectionHeading>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <MediaAudioPlayer
                   audioUrl={SPOTLIGHT.featuredMix.audioUrl}
                   title={SPOTLIGHT.featuredMix.title}
                 >
-                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all gap-0">
-                    <div className="relative h-44 bg-linear-to-br from-h_red/20 to-black">
+                  <Card className="bg-h_blackLight/30 group cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
+                    <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="size-14 rounded-full bg-h_red/20 border border-h_red/30 flex items-center justify-center group-hover:bg-h_red/30 transition-colors">
-                          <Play className="h-5 w-5 text-white ml-0.5" />
+                        <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
+                          <Play className="ml-0.5 h-5 w-5 text-white" />
                         </div>
                       </div>
                       <div className="absolute bottom-3 left-3">
-                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                          <Headphones className="h-2.5 w-2.5 mr-1" />
+                        <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                          <Headphones className="mr-1 h-2.5 w-2.5" />
                           Featured Mix
                         </Badge>
                       </div>
                     </div>
                     <div className="p-4">
-                      <p className="text-white text-sm font-semibold">
+                      <p className="text-sm font-semibold text-white">
                         {SPOTLIGHT.featuredMix.title}
                       </p>
-                      <p className="text-gray-500 text-xs mt-1">
+                      <p className="mt-1 text-xs text-gray-500">
                         {SPOTLIGHT.featuredMix.duration} ·{" "}
                         {formatPlays(SPOTLIGHT.featuredMix.plays)} plays
                       </p>
@@ -375,32 +375,32 @@ export default function DjProfilePremium({
                   thumbnail={SPOTLIGHT.featuredVideo.thumbnail}
                   title={SPOTLIGHT.featuredVideo.title}
                 >
-                  <Card className="bg-h_blackLight/30 border-white/8 overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all gap-0">
+                  <Card className="bg-h_blackLight/30 group cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
                     <div className="relative h-44 overflow-hidden">
                       <Image
                         src={SPOTLIGHT.featuredVideo.thumbnail}
                         alt="video"
                         fill
-                        className="object-cover opacity-60 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
+                        className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="size-14 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                          <Play className="h-5 w-5 text-white ml-0.5" />
+                        <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                          <Play className="ml-0.5 h-5 w-5 text-white" />
                         </div>
                       </div>
                       <div className="absolute bottom-3 left-3">
-                        <Badge className="bg-black/60 text-gray-300 border-white/10 text-[10px]">
-                          <Video className="h-2.5 w-2.5 mr-1" />
+                        <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                          <Video className="mr-1 h-2.5 w-2.5" />
                           {SPOTLIGHT.featuredVideo.subtitle}
                         </Badge>
                       </div>
                     </div>
                     <div className="p-4">
-                      <p className="text-white text-sm font-semibold">
+                      <p className="text-sm font-semibold text-white">
                         {SPOTLIGHT.featuredVideo.title}
                       </p>
-                      <p className="text-gray-500 text-xs mt-1">
+                      <p className="mt-1 text-xs text-gray-500">
                         {SPOTLIGHT.featuredVideo.duration} ·{" "}
                         {formatPlays(SPOTLIGHT.featuredVideo.views)} views
                       </p>
@@ -418,14 +418,14 @@ export default function DjProfilePremium({
                 <SectionHeading sub="Last 30 days · Premium analytics">
                   Performance Insights
                 </SectionHeading>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <StatPill value="3,240" label="Profile Views" trend="+24%" />
                   <StatPill value="47" label="Booking Requests" trend="+18%" />
                   <StatPill value="+312" label="New Followers" trend="+9%" />
                   <StatPill value="94%" label="Booking Rate" />
                 </div>
-                <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
-                  <h3 className="text-white text-sm font-semibold mb-4">
+                <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
+                  <h3 className="mb-4 text-sm font-semibold text-white">
                     Top Cities (Audience)
                   </h3>
                   <div className="flex flex-col gap-3">
@@ -437,23 +437,23 @@ export default function DjProfilePremium({
                       { city: "Ibiza", pct: 10 },
                     ].map((c) => (
                       <div key={c.city} className="flex items-center gap-3">
-                        <span className="text-gray-400 text-xs w-20 shrink-0">
+                        <span className="w-20 shrink-0 text-xs text-gray-400">
                           {c.city}
                         </span>
                         <Progress
                           value={c.pct}
-                          className="flex-1 h-1.5 bg-white/8"
+                          className="h-1.5 flex-1 bg-white/8"
                         />
-                        <span className="text-gray-500 text-xs w-8 text-right">
+                        <span className="w-8 text-right text-xs text-gray-500">
                           {c.pct}%
                         </span>
                       </div>
                     ))}
                   </div>
                 </Card>
-                <div className="grid sm:grid-cols-2 gap-3 mt-3">
-                  <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-                    <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+                    <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
                       Audience Age
                     </h3>
                     {[
@@ -462,22 +462,22 @@ export default function DjProfilePremium({
                       ["35–44", 16],
                       ["45+", 5],
                     ].map(([g, v]) => (
-                      <div key={g} className="flex items-center gap-2 mb-1.5">
-                        <span className="text-gray-400 text-xs w-12 shrink-0">
+                      <div key={g} className="mb-1.5 flex items-center gap-2">
+                        <span className="w-12 shrink-0 text-xs text-gray-400">
                           {g}
                         </span>
                         <Progress
                           value={Number(v)}
-                          className="flex-1 h-1 bg-white/8"
+                          className="h-1 flex-1 bg-white/8"
                         />
-                        <span className="text-gray-500 text-xs w-7 text-right">
+                        <span className="w-7 text-right text-xs text-gray-500">
                           {v}%
                         </span>
                       </div>
                     ))}
                   </Card>
-                  <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-                    <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                  <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+                    <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
                       Profile Traffic
                     </h3>
                     {[
@@ -486,15 +486,15 @@ export default function DjProfilePremium({
                       ["Social", 18],
                       ["Referral", 9],
                     ].map(([src, v]) => (
-                      <div key={src} className="flex items-center gap-2 mb-1.5">
-                        <span className="text-gray-400 text-xs w-14 shrink-0">
+                      <div key={src} className="mb-1.5 flex items-center gap-2">
+                        <span className="w-14 shrink-0 text-xs text-gray-400">
                           {src}
                         </span>
                         <Progress
                           value={Number(v)}
-                          className="flex-1 h-1 bg-white/8"
+                          className="h-1 flex-1 bg-white/8"
                         />
-                        <span className="text-gray-500 text-xs w-7 text-right">
+                        <span className="w-7 text-right text-xs text-gray-500">
                           {v}%
                         </span>
                       </div>
@@ -511,7 +511,7 @@ export default function DjProfilePremium({
               <SectionHeading sub={`${calendarLabel} availability`}>
                 Availability Calendar
               </SectionHeading>
-              <div className="flex items-center gap-4 mb-4">
+              <div className="mb-4 flex items-center gap-4">
                 {[
                   { color: "bg-emerald-500", label: "Available" },
                   { color: "bg-h_red", label: "Booked" },
@@ -519,17 +519,17 @@ export default function DjProfilePremium({
                 ].map((l) => (
                   <div key={l.label} className="flex items-center gap-1.5">
                     <div className={cn("size-2.5 rounded-full", l.color)} />
-                    <span className="text-gray-400 text-xs">{l.label}</span>
+                    <span className="text-xs text-gray-400">{l.label}</span>
                   </div>
                 ))}
               </div>
-              <Card className="bg-h_blackLight/30 border-white/8 p-5 gap-0">
+              <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
                 <div className="grid grid-cols-7 gap-1.5">
                   {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
                     (d) => (
                       <div
                         key={d}
-                        className="text-center text-gray-600 text-[10px] font-semibold pb-1"
+                        className="pb-1 text-center text-[11px] font-semibold text-gray-600"
                       >
                         {d}
                       </div>
@@ -543,13 +543,13 @@ export default function DjProfilePremium({
                     <div
                       key={day}
                       className={cn(
-                        "h-9 rounded-md flex items-center justify-center text-xs font-medium cursor-pointer transition-all",
+                        "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
                         status === "booked" &&
-                          "bg-h_red/20 text-h_red border border-h_red/30",
+                          "bg-h_red/20 text-h_red border-h_red/30 border",
                         status === "tentative" &&
-                          "bg-amber-500/20 text-amber-400 border border-amber-500/30",
+                          "border border-amber-500/30 bg-amber-500/20 text-amber-400",
                         status === "available" &&
-                          "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 hover:bg-emerald-500/25",
+                          "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
                         status === "free" && "text-gray-600 hover:bg-white/5",
                       )}
                     >
@@ -567,48 +567,48 @@ export default function DjProfilePremium({
               <SectionHeading sub="Tailored options for every event type">
                 Booking Packages
               </SectionHeading>
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid gap-4 sm:grid-cols-3">
                 {PACKAGES.map((pkg) => (
                   <Card
                     key={pkg.name}
                     className={cn(
-                      "relative overflow-hidden border-white/8 p-5 flex flex-col gap-0",
+                      "relative flex flex-col gap-0 overflow-hidden border-white/8 p-5",
                       pkg.featured
-                        ? "border-amber-500/30 bg-linear-to-b from-amber-500/10 to-h_blackLight/30"
+                        ? "to-h_blackLight/30 border-amber-500/30 bg-linear-to-b from-amber-500/10"
                         : "bg-h_blackLight/30",
                     )}
                   >
                     {pkg.featured && (
-                      <Badge className="absolute top-3 right-3 bg-amber-500/15 text-amber-400 border-amber-500/25 text-[10px]">
+                      <Badge className="absolute top-3 right-3 border-amber-500/25 bg-amber-500/15 text-[11px] text-amber-400">
                         Most Popular
                       </Badge>
                     )}
-                    <div className="size-10 rounded-lg bg-h_red/10 border border-h_red/20 flex items-center justify-center mb-3">
+                    <div className="bg-h_red/10 border-h_red/20 mb-3 flex size-10 items-center justify-center rounded-lg border">
                       {(() => {
                         const PkgIcon = pkg.icon;
-                        return <PkgIcon className="h-4 w-4 text-h_red" />;
+                        return <PkgIcon className="text-h_red h-4 w-4" />;
                       })()}
                     </div>
-                    <p className="text-white font-semibold text-sm">
+                    <p className="text-sm font-semibold text-white">
                       {pkg.name}
                     </p>
-                    <p className="text-h_red text-lg font-bold mt-1">
+                    <p className="text-h_red mt-1 text-lg font-bold">
                       {pkg.price}
                     </p>
-                    <p className="text-gray-500 text-xs mb-3">{pkg.duration}</p>
-                    <ul className="flex flex-col gap-1.5 flex-1">
+                    <p className="mb-3 text-xs text-gray-500">{pkg.duration}</p>
+                    <ul className="flex flex-1 flex-col gap-1.5">
                       {pkg.includes.map((item) => (
                         <li
                           key={item}
-                          className="flex items-center gap-1.5 text-gray-400 text-xs"
+                          className="flex items-center gap-1.5 text-xs text-gray-400"
                         >
-                          <CircleCheck className="h-3 w-3 text-emerald-500 shrink-0" />
+                          <CircleCheck className="h-3 w-3 shrink-0 text-emerald-500" />
                           {item}
                         </li>
                       ))}
                     </ul>
                     <Button
-                      className="w-full mt-4 bg-h_red hover:bg-h_redDark text-white font-semibold"
+                      className="bg-h_red hover:bg-h_redDark mt-4 w-full font-semibold text-white"
                       size="sm"
                     >
                       Enquire
@@ -634,16 +634,16 @@ export default function DjProfilePremium({
               <SectionHeading sub="Full media library · Unlimited with Premium">
                 Media Library
               </SectionHeading>
-              <div className="flex gap-2 mb-4">
+              <div className="mb-4 flex gap-2">
                 {(["photos", "videos", "mixes"] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setMediaTab(tab)}
                     className={cn(
-                      "px-4 py-1.5 rounded-full text-xs font-medium transition-all capitalize",
+                      "rounded-full px-4 py-1.5 text-xs font-medium capitalize transition-all",
                       mediaTab === tab
                         ? "bg-h_red text-white"
-                        : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10",
+                        : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white",
                     )}
                   >
                     {tab}
@@ -656,7 +656,7 @@ export default function DjProfilePremium({
                 />
               )}
               {mediaTab === "videos" && (
-                <div className="grid sm:grid-cols-2 gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   {MEDIA.filter((m) => m.type === "video").map((m) => (
                     <MediaVideoModal
                       key={m.id}
@@ -664,16 +664,16 @@ export default function DjProfilePremium({
                       thumbnail={m.url}
                       title={m.title ?? "Video"}
                     >
-                      <div className="relative aspect-video rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-h_red/40 transition-all cursor-pointer group">
+                      <div className="hover:ring-h_red/40 group relative aspect-video cursor-pointer overflow-hidden rounded-lg ring-1 ring-white/5 transition-all">
                         <Image
                           src={m.url}
                           alt="video"
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300 opacity-60"
+                          className="object-cover opacity-60 transition-transform duration-300 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="size-12 rounded-full bg-black/50 border border-white/20 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                            <Play className="h-4 w-4 text-white ml-0.5" />
+                          <div className="flex size-12 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                            <Play className="ml-0.5 h-4 w-4 text-white" />
                           </div>
                         </div>
                       </div>
@@ -689,20 +689,20 @@ export default function DjProfilePremium({
                       audioUrl={mix.audioUrl}
                       title={mix.title}
                     >
-                      <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0 flex flex-row items-center cursor-pointer hover:border-white/15 transition-colors">
-                        <div className="size-12 rounded-lg bg-linear-to-br from-h_red/30 to-h_redDark/10 border border-white/8 flex items-center justify-center shrink-0 mr-4">
-                          <Music className="h-4 w-4 text-h_red" />
+                      <Card className="bg-h_blackLight/30 flex cursor-pointer flex-row items-center gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
+                        <div className="from-h_red/30 to-h_redDark/10 mr-4 flex size-12 shrink-0 items-center justify-center rounded-lg border border-white/8 bg-linear-to-br">
+                          <Music className="text-h_red h-4 w-4" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white text-sm font-semibold">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-white">
                             {mix.title}
                           </p>
-                          <p className="text-gray-500 text-xs mt-0.5">
+                          <p className="mt-0.5 text-xs text-gray-500">
                             {mix.platform} · {mix.duration} · {mix.plays} plays
                           </p>
                         </div>
-                        <div className="size-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                          <Play className="h-3 w-3 ml-0.5" />
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white">
+                          <Play className="ml-0.5 h-3 w-3" />
                         </div>
                       </Card>
                     </MediaAudioPlayer>
@@ -724,18 +724,18 @@ export default function DjProfilePremium({
                   return (
                     <div key={i} className="flex gap-4 pb-6 last:pb-0">
                       <div className="flex flex-col items-center">
-                        <div className="size-9 rounded-full bg-h_red/10 border border-h_red/20 flex items-center justify-center shrink-0">
-                          <HIcon className="h-3.5 w-3.5 text-h_red" />
+                        <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-full border">
+                          <HIcon className="text-h_red h-3.5 w-3.5" />
                         </div>
                         {i < HIGHLIGHTS.length - 1 && (
-                          <div className="w-px flex-1 bg-white/8 mt-2" />
+                          <div className="mt-2 w-px flex-1 bg-white/8" />
                         )}
                       </div>
-                      <div className="pb-1 pt-1.5">
-                        <p className="text-white text-sm font-semibold">
+                      <div className="pt-1.5 pb-1">
+                        <p className="text-sm font-semibold text-white">
                           {h.title}
                         </p>
-                        <p className="text-gray-500 text-xs mt-0.5">{h.year}</p>
+                        <p className="mt-0.5 text-xs text-gray-500">{h.year}</p>
                       </div>
                     </div>
                   );
@@ -754,27 +754,27 @@ export default function DjProfilePremium({
                 {ENDORSEMENTS.map((e) => (
                   <Card
                     key={e.name}
-                    className="bg-h_blackLight/30 border-white/8 p-5 gap-0"
+                    className="bg-h_blackLight/30 gap-0 border-white/8 p-5"
                   >
                     <div className="flex items-start gap-3">
-                      <Avatar className="size-11 ring-1 ring-white/10 shrink-0">
+                      <Avatar className="size-11 shrink-0 ring-1 ring-white/10">
                         <AvatarImage src={e.avatar} />
-                        <AvatarFallback className="bg-h_blackLight text-white text-xs">
+                        <AvatarFallback className="bg-h_blackLight text-xs text-white">
                           {e.name.slice(0, 2)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-white text-sm font-semibold">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex items-center gap-2">
+                          <span className="text-sm font-semibold text-white">
                             {e.name}
                           </span>
-                          <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px]">
-                            <Landmark className="h-2 w-2 mr-1" />
+                          <Badge className="border-blue-500/20 bg-blue-500/10 text-[11px] text-blue-400">
+                            <Landmark className="mr-1 h-2 w-2" />
                             Venue
                           </Badge>
                         </div>
-                        <p className="text-gray-500 text-xs mb-2">{e.role}</p>
-                        <p className="text-gray-300 text-sm leading-relaxed italic">
+                        <p className="mb-2 text-xs text-gray-500">{e.role}</p>
+                        <p className="text-sm leading-relaxed text-gray-300 italic">
                           &ldquo;{e.quote}&rdquo;
                         </p>
                       </div>
@@ -791,31 +791,31 @@ export default function DjProfilePremium({
               <SectionHeading sub="Interviews, features, and podcasts">
                 Press &amp; Media
               </SectionHeading>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {PRESS.map((p) => {
                   const PressIcon = p.icon;
                   return (
                     <Card
                       key={p.title}
-                      className="bg-h_blackLight/30 border-white/8 p-4 gap-0 hover:border-white/15 cursor-pointer transition-colors group"
+                      className="bg-h_blackLight/30 group cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="size-9 rounded-md bg-white/5 border border-white/8 flex items-center justify-center shrink-0">
-                          <PressIcon className="h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-colors" />
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-white/8 bg-white/5">
+                          <PressIcon className="h-3.5 w-3.5 text-gray-400 transition-colors group-hover:text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-0.5 flex items-center gap-2">
                             <span className="text-h_red text-xs font-bold">
                               {p.outlet}
                             </span>
-                            <Badge className="bg-white/5 text-gray-500 border-white/8 text-[10px]">
+                            <Badge className="border-white/8 bg-white/5 text-[11px] text-gray-500">
                               {p.type}
                             </Badge>
                           </div>
-                          <p className="text-white text-sm font-medium line-clamp-2">
+                          <p className="line-clamp-2 text-sm font-medium text-white">
                             {p.title}
                           </p>
-                          <p className="text-gray-600 text-xs mt-1">{p.date}</p>
+                          <p className="mt-1 text-xs text-gray-600">{p.date}</p>
                         </div>
                       </div>
                     </Card>
@@ -838,53 +838,53 @@ export default function DjProfilePremium({
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="sticky top-28 flex flex-col gap-5 h-fit">
+          <aside className="sticky top-28 flex h-fit flex-col gap-5">
             {/* Priority Booking CTA */}
-            <Card className="border-amber-500/25 overflow-hidden gap-0 bg-linear-to-b from-amber-500/8 to-h_blackLight/30">
+            <Card className="to-h_blackLight/30 gap-0 overflow-hidden border-amber-500/25 bg-linear-to-b from-amber-500/8">
               <div className="px-5 pt-5 pb-3">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-1 flex items-center gap-2">
                   <Rocket className="h-3.5 w-3.5 text-amber-400" />
-                  <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider">
+                  <span className="text-xs font-semibold tracking-wider text-amber-400 uppercase">
                     Priority Booking
                   </span>
                 </div>
-                <h3 className="text-white font-semibold text-sm mb-1">
+                <h3 className="mb-1 text-sm font-semibold text-white">
                   Book {DJ.stageName}
                 </h3>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-emerald-400 text-xs font-medium">
+                <div className="mb-4 flex items-center gap-2">
+                  <div className="size-2 animate-pulse rounded-full bg-emerald-400" />
+                  <span className="text-xs font-medium text-emerald-400">
                     Responding within 2 hours
                   </span>
                 </div>
-                <Button className="w-full bg-h_red hover:bg-h_redDark text-white font-semibold mb-2">
-                  <CalendarCheck2 className="h-3.5 w-3.5 mr-1.5" />
+                <Button className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white">
+                  <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
                   Book / Hire DJ
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full border-white/15 text-gray-300 hover:bg-white/5"
                 >
-                  <Mail className="h-3.5 w-3.5 mr-1.5" />
+                  <Mail className="mr-1.5 h-3.5 w-3.5" />
                   Send Inquiry
                 </Button>
               </div>
-              <div className="px-5 py-3 border-t border-white/5 flex justify-between">
+              <div className="flex justify-between border-t border-white/5 px-5 py-3">
                 <div className="text-center">
-                  <p className="text-white text-sm font-bold">
+                  <p className="text-sm font-bold text-white">
                     {DJ.responseRate}%
                   </p>
-                  <p className="text-gray-500 text-[10px]">Response Rate</p>
+                  <p className="text-[11px] text-gray-500">Response Rate</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-white text-sm font-bold">
+                  <p className="text-sm font-bold text-white">
                     {DJ.bookingSuccessRate}%
                   </p>
-                  <p className="text-gray-500 text-[10px]">Booking Rate</p>
+                  <p className="text-[11px] text-gray-500">Booking Rate</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-white text-sm font-bold">&lt;2h</p>
-                  <p className="text-gray-500 text-[10px]">Reply Time</p>
+                  <p className="text-sm font-bold text-white">&lt;2h</p>
+                  <p className="text-[11px] text-gray-500">Reply Time</p>
                 </div>
               </div>
             </Card>
@@ -895,38 +895,38 @@ export default function DjProfilePremium({
 
             {/* Professional Contacts */}
             <div>
-              <h3 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
-                <BriefcaseBusiness className="h-3 w-3 text-h_red" />
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+                <BriefcaseBusiness className="text-h_red h-3 w-3" />
                 Professional Team
               </h3>
               <div className="flex flex-col gap-2">
-                <Card className="bg-h_blackLight/30 border-white/8 p-3 gap-0">
-                  <p className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold mb-1">
+                <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-3">
+                  <p className="mb-1 text-[11px] font-semibold tracking-wider text-gray-500 uppercase">
                     Manager
                   </p>
-                  <p className="text-white text-xs font-semibold">
+                  <p className="text-xs font-semibold text-white">
                     {DJ.manager.name}
                   </p>
                   <a
                     href={`mailto:${DJ.manager.email}`}
-                    className="text-gray-400 text-[11px] hover:text-h_red transition-colors truncate block mt-0.5"
+                    className="hover:text-h_red mt-0.5 block truncate text-xs text-gray-400 transition-colors"
                   >
                     {DJ.manager.email}
                   </a>
                 </Card>
-                <Card className="bg-h_blackLight/30 border-white/8 p-3 gap-0">
-                  <p className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold mb-1">
+                <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-3">
+                  <p className="mb-1 text-[11px] font-semibold tracking-wider text-gray-500 uppercase">
                     Booking Agent
                   </p>
-                  <p className="text-white text-xs font-semibold">
+                  <p className="text-xs font-semibold text-white">
                     {DJ.agent.name}
                   </p>
-                  <p className="text-gray-500 text-[10px] mt-0.5">
+                  <p className="mt-0.5 text-[11px] text-gray-500">
                     {DJ.agent.agency}
                   </p>
                   <a
                     href={`mailto:${DJ.agent.email}`}
-                    className="text-gray-400 text-[11px] hover:text-h_red transition-colors truncate block mt-0.5"
+                    className="hover:text-h_red mt-0.5 block truncate text-xs text-gray-400 transition-colors"
                   >
                     {DJ.agent.email}
                   </a>
@@ -937,29 +937,29 @@ export default function DjProfilePremium({
             <Separator className="bg-white/8" />
 
             {/* Fee Range */}
-            <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-              <h3 className="text-white text-sm font-semibold mb-3">
+            <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+              <h3 className="mb-3 text-sm font-semibold text-white">
                 Fee Range
               </h3>
-              <div className="flex items-end gap-2 mb-1">
+              <div className="mb-1 flex items-end gap-2">
                 <span className="text-2xl font-bold text-white">
                   {DJ.minFee}
                 </span>
-                <span className="text-gray-500 text-sm mb-0.5">
+                <span className="mb-0.5 text-sm text-gray-500">
                   – {DJ.maxFee}
                 </span>
               </div>
-              <p className="text-gray-500 text-xs">
+              <p className="text-xs text-gray-500">
                 Per event · varies by duration & travel
               </p>
             </Card>
 
             {/* Analytics snapshot (owner-only in fan view) */}
             {viewMode !== "fan" && (
-              <Card className="bg-h_blackLight/30 border-white/8 p-4 gap-0">
-                <div className="flex items-center gap-2 mb-3">
+              <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+                <div className="mb-3 flex items-center gap-2">
                   <ChartLine className="h-3.5 w-3.5 text-emerald-400" />
-                  <h3 className="text-white text-xs font-semibold">
+                  <h3 className="text-xs font-semibold text-white">
                     This Month
                   </h3>
                 </div>
@@ -970,14 +970,14 @@ export default function DjProfilePremium({
                 ].map((m) => (
                   <div
                     key={m.label}
-                    className="flex items-center justify-between mb-2"
+                    className="mb-2 flex items-center justify-between"
                   >
-                    <span className="text-gray-400 text-xs">{m.label}</span>
+                    <span className="text-xs text-gray-400">{m.label}</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-white text-xs font-semibold">
+                      <span className="text-xs font-semibold text-white">
                         {m.val}
                       </span>
-                      <span className="text-emerald-400 text-[10px]">
+                      <span className="text-[11px] text-emerald-400">
                         {m.trend}
                       </span>
                     </div>

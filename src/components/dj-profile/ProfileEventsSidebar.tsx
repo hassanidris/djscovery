@@ -17,14 +17,14 @@ export default function ProfileEventsSidebar({
 }: Props) {
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-white text-sm font-semibold">Upcoming Events</h3>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-white">Upcoming Events</h3>
         {isOwner && (
           <Button
             size="sm"
             variant="outline"
             disabled
-            className="h-6 px-2 text-[10px] border-white/15 text-gray-400 hover:bg-white/5 gap-1 opacity-60 cursor-not-allowed"
+            className="h-6 cursor-not-allowed gap-1 border-white/15 px-2 text-[11px] text-gray-400 opacity-60 hover:bg-white/5"
             title="Event management coming soon"
           >
             <Plus className="h-2.5 w-2.5" />
@@ -34,15 +34,15 @@ export default function ProfileEventsSidebar({
       </div>
 
       {events.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-6 px-3 rounded-lg border border-dashed border-white/8 text-center">
-          <div className="size-8 rounded-full bg-white/5 flex items-center justify-center mb-2">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/8 px-3 py-6 text-center">
+          <div className="mb-2 flex size-8 items-center justify-center rounded-full bg-white/5">
             <CalendarDays className="h-4 w-4 text-gray-600" />
           </div>
-          <p className="text-gray-500 text-xs font-medium">
+          <p className="text-xs font-medium text-gray-500">
             No upcoming events
           </p>
           {isOwner && (
-            <p className="text-gray-600 text-[10px] mt-0.5">
+            <p className="mt-0.5 text-[11px] text-gray-600">
               Event management coming soon
             </p>
           )}
@@ -56,26 +56,26 @@ export default function ProfileEventsSidebar({
             return (
               <div
                 key={e.id}
-                className="flex items-center gap-3 p-2.5 rounded-lg bg-h_blackLight/30 border border-white/5 hover:border-white/10 transition-colors cursor-pointer"
+                className="bg-h_blackLight/30 flex cursor-pointer items-center gap-3 rounded-lg border border-white/5 p-2.5 transition-colors hover:border-white/10"
               >
-                <div className="shrink-0 w-10 h-10 rounded-md bg-h_red/10 border border-h_red/20 flex flex-col items-center justify-center">
-                  <span className="text-h_red text-[9px] font-bold uppercase leading-none">
+                <div className="bg-h_red/10 border-h_red/20 flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-md border">
+                  <span className="text-h_red text-[10px] leading-none font-bold uppercase">
                     {month}
                   </span>
-                  <span className="text-white text-sm font-bold leading-none mt-0.5">
+                  <span className="mt-0.5 text-sm leading-none font-bold text-white">
                     {day}
                   </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-xs font-medium truncate">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium text-white">
                     {e.title}
                   </p>
-                  <p className="text-gray-500 text-[10px] mt-0.5 truncate">
+                  <p className="mt-0.5 truncate text-[11px] text-gray-500">
                     {[e.venue, e.city].filter(Boolean).join(" · ")}
                   </p>
                 </div>
                 {showStatus && e.status === "tentative" && (
-                  <Badge className="shrink-0 bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px]">
+                  <Badge className="shrink-0 border-amber-500/20 bg-amber-500/10 text-[11px] text-amber-400">
                     TBC
                   </Badge>
                 )}

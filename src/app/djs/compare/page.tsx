@@ -338,20 +338,20 @@ export default function DjProfileComparePage() {
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
-      <div className="max-w-5xl mx-auto px-4 md:px-8 py-16">
-        <div className="text-center mb-14">
-          <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 mb-4">
-            <FontAwesomeIcon icon={faCrown} className="h-2.5 w-2.5 mr-1" />
+      <div className="mx-auto max-w-5xl px-4 py-16 md:px-8">
+        <div className="mb-14 text-center">
+          <Badge className="mb-4 border-amber-500/20 bg-amber-500/10 text-amber-400">
+            <FontAwesomeIcon icon={faCrown} className="mr-1 h-2.5 w-2.5" />
             Plan Comparison
           </Badge>
-          <h1 className="font-heading text-4xl md:text-5xl text-white mb-4">
+          <h1 className="font-heading mb-4 text-4xl text-white md:text-5xl">
             Free vs Premium
           </h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="mx-auto max-w-xl text-lg text-gray-400">
             Everything DJs need to get booked, build credibility, and grow their
             community.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/djs/demo-free">
               <Button
                 variant="outline"
@@ -361,8 +361,8 @@ export default function DjProfileComparePage() {
               </Button>
             </Link>
             <Link href="/djs/demo-premium">
-              <Button className="bg-amber-500 hover:bg-amber-400 text-black font-bold">
-                <FontAwesomeIcon icon={faCrown} className="h-3.5 w-3.5 mr-2" />
+              <Button className="bg-amber-500 font-bold text-black hover:bg-amber-400">
+                <FontAwesomeIcon icon={faCrown} className="mr-2 h-3.5 w-3.5" />
                 View Premium Profile
               </Button>
             </Link>
@@ -370,29 +370,29 @@ export default function DjProfileComparePage() {
         </div>
 
         {/* Comparison Table */}
-        <div className="rounded-2xl border border-white/8 overflow-hidden mb-16">
+        <div className="mb-16 overflow-hidden rounded-2xl border border-white/8">
           {/* Table header */}
-          <div className="grid grid-cols-[1fr_100px_100px] md:grid-cols-[1fr_140px_160px] bg-h_blackLight/60 border-b border-white/8">
+          <div className="bg-h_blackLight/60 grid grid-cols-[1fr_100px_100px] border-b border-white/8 md:grid-cols-[1fr_140px_160px]">
             <div className="p-5">
-              <span className="text-gray-500 text-sm font-semibold">
+              <span className="text-sm font-semibold text-gray-500">
                 Feature
               </span>
             </div>
-            <div className="p-5 text-center border-l border-white/8">
-              <span className="text-white text-sm font-bold">Free</span>
-              <p className="text-gray-500 text-xs mt-0.5">£0 / mo</p>
+            <div className="border-l border-white/8 p-5 text-center">
+              <span className="text-sm font-bold text-white">Free</span>
+              <p className="mt-0.5 text-xs text-gray-500">£0 / mo</p>
             </div>
-            <div className="p-5 text-center border-l border-amber-500/20 bg-amber-500/5">
+            <div className="border-l border-amber-500/20 bg-amber-500/5 p-5 text-center">
               <div className="flex items-center justify-center gap-1.5">
                 <FontAwesomeIcon
                   icon={faCrown}
                   className="h-3.5 w-3.5 text-amber-400"
                 />
-                <span className="text-amber-400 text-sm font-bold">
+                <span className="text-sm font-bold text-amber-400">
                   Premium
                 </span>
               </div>
-              <p className="text-gray-500 text-xs mt-0.5">£19 / mo</p>
+              <p className="mt-0.5 text-xs text-gray-500">£19 / mo</p>
             </div>
           </div>
 
@@ -401,30 +401,30 @@ export default function DjProfileComparePage() {
             return (
               <div key={cat}>
                 {/* Category header */}
-                <div className="px-5 py-2.5 bg-white/2 border-b border-white/5">
-                  <span className="text-gray-500 text-[11px] font-bold uppercase tracking-widest">
+                <div className="border-b border-white/5 bg-white/2 px-5 py-2.5">
+                  <span className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">
                     {cat}
                   </span>
                 </div>
                 {catRows.map((row, i) => (
                   <div
                     key={row.feature}
-                    className={`grid grid-cols-[1fr_100px_100px] md:grid-cols-[1fr_140px_160px] border-b border-white/5 last:border-0 hover:bg-white/2 transition-colors ${i % 2 === 0 ? "" : "bg-white/1"}`}
+                    className={`grid grid-cols-[1fr_100px_100px] border-b border-white/5 transition-colors last:border-0 hover:bg-white/2 md:grid-cols-[1fr_140px_160px] ${i % 2 === 0 ? "" : "bg-white/1"}`}
                   >
-                    <div className="p-4 flex flex-col justify-center">
-                      <span className="text-gray-300 text-sm">
+                    <div className="flex flex-col justify-center p-4">
+                      <span className="text-sm text-gray-300">
                         {row.feature}
                       </span>
                       {row.upgradeHook && (
-                        <span className="text-gray-600 text-xs mt-0.5 italic">
+                        <span className="mt-0.5 text-xs text-gray-600 italic">
                           {row.upgradeHook}
                         </span>
                       )}
                     </div>
-                    <div className="p-4 flex items-center justify-center border-l border-white/5">
+                    <div className="flex items-center justify-center border-l border-white/5 p-4">
                       <Cell val={row.free} />
                     </div>
-                    <div className="p-4 flex items-center justify-center border-l border-amber-500/10 bg-amber-500/3">
+                    <div className="flex items-center justify-center border-l border-amber-500/10 bg-amber-500/3 p-4">
                       <Cell val={row.premium} />
                     </div>
                   </div>
@@ -436,35 +436,35 @@ export default function DjProfileComparePage() {
 
         {/* Upgrade Triggers Section */}
         <div className="mb-16">
-          <div className="text-center mb-10">
-            <h2 className="font-heading text-3xl text-white mb-2">
+          <div className="mb-10 text-center">
+            <h2 className="font-heading mb-2 text-3xl text-white">
               What Makes DJs Upgrade
             </h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-sm text-gray-500">
               Designed psychological triggers that convert Free users to Premium
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {UPGRADE_TRIGGERS.map((t, i) => (
               <div
                 key={i}
-                className="p-5 rounded-xl border border-white/8 bg-h_blackLight/20 hover:border-white/15 transition-colors"
+                className="bg-h_blackLight/20 rounded-xl border border-white/8 p-5 transition-colors hover:border-white/15"
               >
                 <div className="flex items-start gap-3">
-                  <div className="size-9 rounded-lg bg-h_red/10 border border-h_red/20 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="bg-h_red/10 border-h_red/20 mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border">
                     <FontAwesomeIcon
                       icon={t.icon}
-                      className="h-3.5 w-3.5 text-h_red"
+                      className="text-h_red h-3.5 w-3.5"
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="text-white text-sm font-semibold mb-1">
+                    <p className="mb-1 text-sm font-semibold text-white">
                       {t.trigger}
                     </p>
-                    <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px] mb-2">
+                    <Badge className="mb-2 border-amber-500/20 bg-amber-500/10 text-[11px] text-amber-400">
                       {t.emotion}
                     </Badge>
-                    <p className="text-h_red text-xs font-medium flex items-center gap-1">
+                    <p className="text-h_red flex items-center gap-1 text-xs font-medium">
                       <FontAwesomeIcon
                         icon={faArrowRight}
                         className="h-2.5 w-2.5"
@@ -479,19 +479,19 @@ export default function DjProfileComparePage() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="p-8 rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/8 via-transparent to-transparent text-center">
+        <div className="rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/8 via-transparent to-transparent p-8 text-center">
           <FontAwesomeIcon
             icon={faCrown}
-            className="h-8 w-8 text-amber-400 mb-4"
+            className="mb-4 h-8 w-8 text-amber-400"
           />
-          <h2 className="font-heading text-3xl text-white mb-2">
+          <h2 className="font-heading mb-2 text-3xl text-white">
             Start Free. Upgrade When You&apos;re Ready.
           </h2>
-          <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto">
+          <p className="mx-auto mb-6 max-w-md text-sm text-gray-400">
             Every DJ on DJscovery starts with a professional free profile.
             Premium unlocks the tools that turn visibility into bookings.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/djs/demo-free">
               <Button
                 variant="outline"
@@ -501,8 +501,8 @@ export default function DjProfileComparePage() {
               </Button>
             </Link>
             <Link href="/djs/demo-premium">
-              <Button className="bg-amber-500 hover:bg-amber-400 text-black font-bold px-8">
-                <FontAwesomeIcon icon={faCrown} className="h-3.5 w-3.5 mr-2" />
+              <Button className="bg-amber-500 px-8 font-bold text-black hover:bg-amber-400">
+                <FontAwesomeIcon icon={faCrown} className="mr-2 h-3.5 w-3.5" />
                 See Premium Profile
               </Button>
             </Link>
