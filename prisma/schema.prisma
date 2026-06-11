@@ -77,6 +77,9 @@ enum DjType {
   FESTIVAL
   CORPORATE
   BAR_LOUNGE
+  PRIVATE_PARTY
+  BIRTHDAY
+  CULTURAL_EVENT
 }
 
 enum DjPlan {

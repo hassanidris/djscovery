@@ -30,25 +30,31 @@ export default function NavDesktop({
   };
 
   return (
-    <div className="hidden md:flex h-16 items-center gap-4" role="banner">
+    <div className="hidden h-16 items-center gap-5 md:flex" role="banner">
       {/* Logo */}
       <Link
         href="/"
         aria-label="DJscovery — Go to home"
-        className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red rounded-sm"
+        className="focus-visible:ring-h_red shrink-0 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
       >
-        <Image
-          src="/dj-logo-blue.svg"
-          alt="DJscovery"
-          width={52}
-          height={44}
-          priority
-        />
+        <div className="flex items-center gap-1.5 py-1">
+          <Image
+            src="/dj-logo-red.svg"
+            alt=""
+            width={30}
+            height={34}
+            priority
+          />
+          <span className="font-heading text-2xl leading-none tracking-tight text-white">
+            <span className="font-bold">DJ</span>
+            <span className="font-semibold">covery</span>
+          </span>
+        </div>
       </Link>
 
       {/* Primary Navigation */}
       <nav
-        className="flex items-center gap-0.5 flex-1"
+        className="flex flex-1 items-center gap-0.5"
         aria-label="Primary navigation"
       >
         {items.map((item) => {
@@ -63,13 +69,13 @@ export default function NavDesktop({
             return (
               <span
                 key={item.id}
-                className="relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 cursor-not-allowed select-none"
+                className="relative flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 select-none"
                 aria-disabled="true"
                 title={`${item.label} — Coming Soon`}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden />
                 <span>{item.label}</span>
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-h_red/60 bg-h_red/10 px-1.5 py-0.5 rounded-full leading-none">
+                <span className="text-h_red/60 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[9px] leading-none font-semibold tracking-wider uppercase">
                   Soon
                 </span>
               </span>
@@ -81,10 +87,10 @@ export default function NavDesktop({
               key={item.id}
               href={item.href}
               className={cn(
-                "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red",
+                "focus-visible:ring-h_red relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-150 focus-visible:ring-2 focus-visible:outline-none",
                 isActive
                   ? "text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/5",
+                  : "text-gray-400 hover:bg-white/5 hover:text-white",
               )}
               aria-current={isActive ? "page" : undefined}
             >
@@ -98,7 +104,7 @@ export default function NavDesktop({
               <span>{item.label}</span>
               {isActive && (
                 <span
-                  className="absolute bottom-0 left-3 right-3 h-0.5 bg-h_red rounded-full"
+                  className="bg-h_red absolute right-3 bottom-0 left-3 h-0.5 rounded-full"
                   aria-hidden
                 />
               )}
@@ -108,20 +114,20 @@ export default function NavDesktop({
       </nav>
 
       {/* Right section: Search + Auth */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex shrink-0 items-center gap-2">
         {/* Compact inline search */}
         <form
           onSubmit={handleDesktopSearch}
           role="search"
           aria-label="Search DJscovery"
-          className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg ring-1 ring-white/8 focus-within:ring-h_red/50 transition-all"
+          className="focus-within:ring-h_red/50 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 ring-1 ring-white/8 transition-all"
         >
-          <Search className="h-3.5 w-3.5 text-gray-500 shrink-0" aria-hidden />
+          <Search className="h-3.5 w-3.5 shrink-0 text-gray-500" aria-hidden />
           <input
             name="q"
             type="search"
             placeholder="Search DJs, genres..."
-            className="bg-transparent outline-none text-sm text-white placeholder:text-gray-500 w-28 lg:w-36"
+            className="w-28 bg-transparent text-sm text-white outline-none placeholder:text-gray-500 lg:w-36"
             aria-label="Search"
           />
         </form>
@@ -133,7 +139,7 @@ export default function NavDesktop({
               title="Notifications — Coming Soon"
               disabled
               aria-disabled="true"
-              className="size-9 flex items-center justify-center rounded-full text-gray-500 cursor-not-allowed opacity-70 focus-visible:outline-none"
+              className="flex size-9 cursor-not-allowed items-center justify-center rounded-full text-gray-500 opacity-70 focus-visible:outline-none"
             >
               <Bell className="h-4.5 w-4.5" aria-hidden />
             </button>
@@ -142,7 +148,7 @@ export default function NavDesktop({
               title="Messages — Coming Soon"
               disabled
               aria-disabled="true"
-              className="size-9 flex items-center justify-center rounded-full text-gray-500 cursor-not-allowed opacity-70 focus-visible:outline-none"
+              className="flex size-9 cursor-not-allowed items-center justify-center rounded-full text-gray-500 opacity-70 focus-visible:outline-none"
             >
               <MessageCircle className="h-4.5 w-4.5" aria-hidden />
             </button>
@@ -170,7 +176,7 @@ export default function NavDesktop({
             <Button
               asChild
               size="sm"
-              className="bg-h_red hover:bg-h_redDark text-white font-semibold transition-all"
+              className="bg-h_red hover:bg-h_redDark font-semibold text-white transition-all"
             >
               <Link href="/sign-up">Sign Up</Link>
             </Button>

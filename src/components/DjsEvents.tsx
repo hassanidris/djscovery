@@ -2,18 +2,18 @@ import React from "react";
 
 const DjsEvents = () => {
   return (
-    <section className="mt-16 container mx-auto flex flex-col justify-between px-4">
-      <h2 className=" text-title text-3xl mb-6">Upcoming Events for DJs</h2>
+    <section className="container mx-auto mt-16 flex flex-col justify-between px-4">
+      <h2 className="text-title mb-6 text-3xl">Upcoming Events for DJs</h2>
 
-      <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         {/* today */}
-        <div className="p-6 flex justify-between">
-          <p className="text-[100px] font-bold flex items-start px-5">
+        <div className="flex justify-between p-6">
+          <p className="flex items-start px-5 text-[100px] font-bold">
             <span className="number">27</span>
-            <span className=" text-base inline font-thin">AUG</span>
+            <span className="inline text-base font-thin">AUG</span>
           </p>
-          <div className=" px-5 border-l-2 border-l-[#8951e6] overscroll-y-auto">
-            <article className="text-xs py-3 border-dashed border-b-[1px] border-b-[#8951e6]">
+          <div className="overscroll-y-auto border-l-2 border-l-[#8951e6] px-5">
+            <article className="border-b border-dashed border-b-[#8951e6] py-3 text-xs">
               <div className="mb-4">
                 <h5 className="text-lg font-bold">Dj. Echo</h5>
                 <p className="text-xs">Estisluna, Sweden</p>
@@ -31,7 +31,7 @@ const DjsEvents = () => {
                 <strong>Entry Fee:</strong> No
               </p>
             </article>
-            <article className="text-xs py-3 border-dashed border-b-[1px] border-b-[#8951e6]">
+            <article className="border-b border-dashed border-b-[#8951e6] py-3 text-xs">
               <div className="mb-4">
                 <h5 className="text-lg font-bold">Dj. Echo</h5>
                 <p className="text-xs">Estisluna, Sweden</p>
@@ -53,13 +53,13 @@ const DjsEvents = () => {
         </div>
 
         {/* tomorrow */}
-        <div className="p-6 flex">
-          <p className="text-[100px] font-bold flex items-start px-5">
+        <div className="flex p-6">
+          <p className="flex items-start px-5 text-[100px] font-bold">
             <span className="number">28</span>
-            <span className=" text-base inline font-thin">AUG</span>
+            <span className="inline text-base font-thin">AUG</span>
           </p>
-          <div className=" px-5 border-l-2 border-l-[#8951e6]  overscroll-y-auto">
-            <article className="text-xs py-3 border-dashed border-b-[1px] border-b-[#8951e6]">
+          <div className="overscroll-y-auto border-l-2 border-l-[#8951e6] px-5">
+            <article className="border-b border-dashed border-b-[#8951e6] py-3 text-xs">
               <div className="mb-4">
                 <h5 className="text-lg font-bold">Dj. Peggy Gou</h5>
                 <p className="text-xs">Seoul, South Korea</p>
@@ -77,7 +77,7 @@ const DjsEvents = () => {
                 <strong>Entry Fee:</strong> No
               </p>
             </article>
-            <article className="text-xs py-3 border-dashed border-b-[1px] border-b-[#8951e6]">
+            <article className="border-b border-dashed border-b-[#8951e6] py-3 text-xs">
               <div className="mb-4">
                 <h5 className="text-lg font-bold">Dj. Echo</h5>
                 <p className="text-xs">Estisluna, Sweden</p>
@@ -99,13 +99,13 @@ const DjsEvents = () => {
         </div>
 
         {/* day after tomorrow */}
-        <div className="p-6 flex">
-          <p className="text-[100px] font-bold flex items-start px-5">
+        <div className="flex p-6">
+          <p className="flex items-start px-5 text-[100px] font-bold">
             <span className="number">29</span>{" "}
-            <span className=" text-base inline font-thin">AUG</span>
+            <span className="inline text-base font-thin">AUG</span>
           </p>
-          <div className=" px-5 border-l-2 border-l-[#8951e6]  overscroll-y-auto">
-            <article className="text-xs py-3 border-dashed border-b-[1px] border-b-[#8951e6]">
+          <div className="overscroll-y-auto border-l-2 border-l-[#8951e6] px-5">
+            <article className="border-b border-dashed border-b-[#8951e6] py-3 text-xs">
               <div className="mb-4">
                 <h5 className="text-lg font-bold">Dj. Vishnu</h5>
                 <p className="text-xs">Bangalore, India</p>

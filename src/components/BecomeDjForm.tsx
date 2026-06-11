@@ -20,18 +20,11 @@ import {
   Video,
   Mic,
 } from "lucide-react";
+import { DJ_TYPES } from "@/config/dj-types";
 
 type Genre = { id: number; name: string };
 type Country = { id: number; name: string; code: string };
 type City = { id: number; name: string };
-
-const DJ_TYPES = [
-  { value: "CLUB", label: "Club DJ", icon: "🎛️" },
-  { value: "WEDDING", label: "Wedding DJ", icon: "💍" },
-  { value: "FESTIVAL", label: "Festival DJ", icon: "🎪" },
-  { value: "CORPORATE", label: "Corporate Event DJ", icon: "🏢" },
-  { value: "BAR_LOUNGE", label: "Bar & Lounge DJ", icon: "🍸" },
-];
 
 const SOCIAL_PLATFORMS = [
   { value: "instagram", label: "Instagram" },
@@ -356,16 +349,16 @@ export default function BecomeDjForm({
           <button
             type="button"
             onClick={() => avatarInputRef.current?.click()}
-            className="relative w-24 h-24 rounded-full overflow-hidden bg-white/10 border-2 border-dashed border-white/30 hover:border-h_red flex items-center justify-center shrink-0 transition-all"
+            className="hover:border-h_red relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-white/30 bg-white/10 transition-all"
           >
             {avatarPreview ? (
               <img
                 src={avatarPreview}
                 alt="Avatar preview"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
-              <Camera className="w-8 h-8 text-gray-500" />
+              <Camera className="h-8 w-8 text-gray-500" />
             )}
           </button>
           <input
@@ -377,7 +370,7 @@ export default function BecomeDjForm({
           />
           <div>
             <p className="text-sm text-gray-300">Upload your DJ photo</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="mt-1 text-xs text-gray-500">
               JPG, PNG or WEBP · Max 5 MB
             </p>
             {avatarFile && (
@@ -387,9 +380,9 @@ export default function BecomeDjForm({
                   setAvatarFile(null);
                   setAvatarPreview(null);
                 }}
-                className="text-xs text-h_red mt-2 flex items-center gap-1 hover:underline"
+                className="text-h_red mt-2 flex items-center gap-1 text-xs hover:underline"
               >
-                <X className="w-3 h-3" /> Remove
+                <X className="h-3 w-3" /> Remove
               </button>
             )}
           </div>
@@ -415,7 +408,7 @@ export default function BecomeDjForm({
             className={inputCls}
           />
           {slugPreview && (
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="mt-0.5 text-xs text-gray-500">
               Profile URL:{" "}
               <span className="text-gray-400">
                 djscovery.com/djs/{slugPreview}
@@ -436,7 +429,7 @@ export default function BecomeDjForm({
             maxLength={500}
             className={`${inputCls} resize-none`}
           />
-          <p className="text-xs text-gray-600 text-right">{bio.length}/500</p>
+          <p className="text-right text-xs text-gray-600">{bio.length}/500</p>
         </div>
       </div>
 
@@ -447,11 +440,11 @@ export default function BecomeDjForm({
         <h2 className={sectionTitleCls}>
           DJ Type <span className="text-h_red">*</span>
         </h2>
-        <p className="text-xs text-gray-400 -mt-2">
+        <p className="-mt-2 text-xs text-gray-400">
           Select all that apply — this will be used for search filters.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {DJ_TYPES.map((t) => {
             const checked = selectedDjTypes.has(t.value);
             return (
@@ -467,18 +460,18 @@ export default function BecomeDjForm({
                     return next;
                   });
                 }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-all text-left ${
+                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
                   checked
                     ? "bg-h_red/15 border-h_red text-white"
-                    : "bg-white/5 border-white/15 text-gray-400 hover:border-white/30 hover:text-gray-200"
+                    : "border-white/15 bg-white/5 text-gray-400 hover:border-white/30 hover:text-gray-200"
                 }`}
               >
                 <span
-                  className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-all ${
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
                     checked ? "bg-h_red border-h_red" : "border-white/30"
                   }`}
                 >
-                  {checked && <Check className="w-3 h-3 text-white" />}
+                  {checked && <Check className="h-3 w-3 text-white" />}
                 </span>
                 <span>{t.icon}</span>
                 {t.label}
@@ -488,7 +481,7 @@ export default function BecomeDjForm({
         </div>
 
         {fieldErrors.djTypes && (
-          <p className="text-xs text-red-400 -mt-1">{fieldErrors.djTypes}</p>
+          <p className="-mt-1 text-xs text-red-400">{fieldErrors.djTypes}</p>
         )}
       </div>
 
@@ -505,7 +498,7 @@ export default function BecomeDjForm({
           <select
             value={countryId ?? ""}
             onChange={(e) => handleCountryChange(Number(e.target.value))}
-            className={`${inputCls} appearance-none cursor-pointer`}
+            className={`${inputCls} cursor-pointer appearance-none`}
           >
             <option value="">Select a country...</option>
             {countries.map((c) => (
@@ -519,18 +512,18 @@ export default function BecomeDjForm({
             ))}
           </select>
           {fieldErrors.country && (
-            <p className="text-xs text-red-400 mt-1">{fieldErrors.country}</p>
+            <p className="mt-1 text-xs text-red-400">{fieldErrors.country}</p>
           )}
         </div>
 
         {countryId && (
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>
-              City <span className="text-gray-500 font-normal">(optional)</span>
+              City <span className="font-normal text-gray-500">(optional)</span>
             </label>
             {loadingCities ? (
-              <div className="flex items-center gap-2 text-gray-400 text-sm py-3">
-                <Loader2 className="w-4 h-4 animate-spin" /> Loading cities...
+              <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading cities...
               </div>
             ) : (
               <select
@@ -538,7 +531,7 @@ export default function BecomeDjForm({
                 onChange={(e) =>
                   setCityId(e.target.value ? Number(e.target.value) : null)
                 }
-                className={`${inputCls} appearance-none cursor-pointer`}
+                className={`${inputCls} cursor-pointer appearance-none`}
               >
                 <option value="">Select a city...</option>
                 {cities.map((c) => (
@@ -563,7 +556,7 @@ export default function BecomeDjForm({
         <h2 className={sectionTitleCls}>
           Genres <span className="text-h_red">*</span>
         </h2>
-        <p className="text-xs text-gray-400 -mt-2">
+        <p className="-mt-2 text-xs text-gray-400">
           Select all genres that apply to your style.
         </p>
 
@@ -575,13 +568,13 @@ export default function BecomeDjForm({
                 key={genre.id}
                 type="button"
                 onClick={() => toggleGenre(genre.id)}
-                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${
                   selected
                     ? "bg-h_red/20 border-h_red text-white"
-                    : "bg-white/5 border-white/20 text-gray-400 hover:border-white/40 hover:text-gray-200"
+                    : "border-white/20 bg-white/5 text-gray-400 hover:border-white/40 hover:text-gray-200"
                 }`}
               >
-                {selected && <Check className="w-3 h-3" />}
+                {selected && <Check className="h-3 w-3" />}
                 {genre.name}
               </button>
             );
@@ -589,7 +582,7 @@ export default function BecomeDjForm({
         </div>
 
         {fieldErrors.genres && (
-          <p className="text-xs text-red-400 -mt-2">{fieldErrors.genres}</p>
+          <p className="-mt-2 text-xs text-red-400">{fieldErrors.genres}</p>
         )}
 
         <div className="flex gap-2">
@@ -605,23 +598,23 @@ export default function BecomeDjForm({
             }}
             placeholder='Not in the list? Add it as "Other" e.g. Cumbia...'
             maxLength={50}
-            className="flex-1 bg-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-2.5 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all text-sm"
+            className="focus:ring-h_red flex-1 rounded-lg bg-white/10 px-4 py-2.5 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
           />
           <button
             type="button"
             onClick={handleAddGenre}
             disabled={!newGenreInput.trim() || addingGenre}
-            className="px-4 py-2.5 bg-h_red hover:bg-h_redDark disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 shrink-0"
+            className="bg-h_red hover:bg-h_redDark flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50"
           >
             {addingGenre ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Plus className="w-4 h-4" />
+              <Plus className="h-4 w-4" />
             )}
             Add
           </button>
         </div>
-        <p className="text-xs text-gray-600 -mt-1">
+        <p className="-mt-1 text-xs text-gray-600">
           New genres are saved to the database and will appear for future DJs.
         </p>
       </div>
@@ -637,20 +630,20 @@ export default function BecomeDjForm({
         </div>
 
         {socialLinks.length === 0 && (
-          <p className="text-xs text-gray-500 -mt-2">
+          <p className="-mt-2 text-xs text-gray-500">
             Add at least one link so fans can find you.
           </p>
         )}
 
         <div className="flex flex-col gap-3">
           {socialLinks.map((link, i) => (
-            <div key={i} className="flex gap-2 items-center">
+            <div key={i} className="flex items-center gap-2">
               <select
                 value={link.platform}
                 onChange={(e) =>
                   updateSocialLink(i, "platform", e.target.value)
                 }
-                className="bg-white/10 text-white rounded-lg px-3 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all appearance-none cursor-pointer text-sm w-36 shrink-0"
+                className="focus:ring-h_red w-36 shrink-0 cursor-pointer appearance-none rounded-lg bg-white/10 px-3 py-3 text-sm text-white ring-1 ring-white/20 transition-all outline-none"
               >
                 {SOCIAL_PLATFORMS.map((p) => (
                   <option
@@ -667,29 +660,29 @@ export default function BecomeDjForm({
                 value={link.url}
                 onChange={(e) => updateSocialLink(i, "url", e.target.value)}
                 placeholder="https://..."
-                className="flex-1 bg-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all text-sm"
+                className="focus:ring-h_red flex-1 rounded-lg bg-white/10 px-4 py-3 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
               />
               <button
                 type="button"
                 onClick={() => removeSocialLink(i)}
-                className="p-3 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-all shrink-0"
+                className="shrink-0 rounded-lg bg-white/5 p-3 text-gray-400 transition-all hover:bg-red-500/20 hover:text-red-400"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="h-4 w-4" />
               </button>
             </div>
           ))}
         </div>
 
         {fieldErrors.social && (
-          <p className="text-xs text-red-400 -mt-2">{fieldErrors.social}</p>
+          <p className="-mt-2 text-xs text-red-400">{fieldErrors.social}</p>
         )}
 
         <button
           type="button"
           onClick={addSocialLink}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white border border-dashed border-white/20 hover:border-white/40 rounded-lg px-4 py-2.5 transition-all w-fit"
+          className="flex w-fit items-center gap-2 rounded-lg border border-dashed border-white/20 px-4 py-2.5 text-sm text-gray-400 transition-all hover:border-white/40 hover:text-white"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
           Add social link
         </button>
       </div>
@@ -698,15 +691,15 @@ export default function BecomeDjForm({
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>
           Media{" "}
-          <span className="text-gray-500 font-normal text-sm">(optional)</span>
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
         </h2>
-        <p className="text-xs text-gray-400 -mt-2">
+        <p className="-mt-2 text-xs text-gray-400">
           Showcase your work — photos, video sets, and audio samples.
         </p>
 
         <MediaUploadSection
           label="Gallery Images"
-          icon={<ImageIcon className="w-4 h-4" />}
+          icon={<ImageIcon className="h-4 w-4" />}
           accept="image/*"
           hint="JPG, PNG, WEBP"
           files={galleryFiles}
@@ -719,7 +712,7 @@ export default function BecomeDjForm({
         <div className="border-t border-white/5 pt-4">
           <LinkInputSection
             label="Video Links"
-            icon={<Video className="w-4 h-4" />}
+            icon={<Video className="h-4 w-4" />}
             placeholder="https://youtube.com/watch?v=..."
             hint="YouTube, Vimeo, Facebook..."
             links={videoLinks}
@@ -730,7 +723,7 @@ export default function BecomeDjForm({
         <div className="border-t border-white/5 pt-4">
           <LinkInputSection
             label="Audio Sample Links"
-            icon={<Mic className="w-4 h-4" />}
+            icon={<Mic className="h-4 w-4" />}
             placeholder="https://soundcloud.com/..."
             hint="SoundCloud, Mixcloud, Spotify..."
             links={audioLinks}
@@ -740,8 +733,8 @@ export default function BecomeDjForm({
       </div>
 
       {/* ── Approval notice ── */}
-      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-4 py-3">
-        <p className="text-yellow-400 text-xs leading-relaxed">
+      <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3">
+        <p className="text-xs leading-relaxed text-yellow-400">
           ⏳ Your profile will be <strong>pending admin approval</strong> before
           it appears publicly. You can still update your profile while waiting.
         </p>
@@ -749,8 +742,8 @@ export default function BecomeDjForm({
 
       {/* ── Error ── */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3">
-          <p className="text-red-400 text-sm">{error}</p>
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
+          <p className="text-sm text-red-400">{error}</p>
         </div>
       )}
 
@@ -758,11 +751,11 @@ export default function BecomeDjForm({
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-h_red hover:bg-h_redDark disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-base"
+        className="bg-h_red hover:bg-h_redDark flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-base font-bold text-white transition-colors disabled:opacity-60"
       >
         {isPending ? (
           <>
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" />
             {"Creating profile..."}
           </>
         ) : (
@@ -794,26 +787,26 @@ function MediaUploadSection({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 mb-1">
+      <div className="mb-1 flex items-center gap-2">
         <span className="text-gray-400">{icon}</span>
-        <span className="text-sm text-gray-300 font-medium">{label}</span>
+        <span className="text-sm font-medium text-gray-300">{label}</span>
         <span className="text-xs text-gray-600">· {hint}</span>
       </div>
 
       {files.length > 0 && (
-        <div className="flex flex-col gap-1.5 mb-1">
+        <div className="mb-1 flex flex-col gap-1.5">
           {files.map((file, i) => (
             <div
               key={i}
-              className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-2 text-xs text-gray-400"
+              className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-xs text-gray-400"
             >
-              <span className="truncate max-w-xs">{file.name}</span>
+              <span className="max-w-xs truncate">{file.name}</span>
               <button
                 type="button"
                 onClick={() => onRemove(i)}
-                className="ml-3 text-gray-500 hover:text-red-400 transition-colors shrink-0"
+                className="ml-3 shrink-0 text-gray-500 transition-colors hover:text-red-400"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="h-3.5 w-3.5" />
               </button>
             </div>
           ))}
@@ -823,9 +816,9 @@ function MediaUploadSection({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 border border-dashed border-white/10 hover:border-white/30 rounded-lg px-3 py-2 transition-all w-fit"
+        className="flex w-fit items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-500 transition-all hover:border-white/30 hover:text-gray-300"
       >
-        <Plus className="w-3.5 h-3.5" />
+        <Plus className="h-3.5 w-3.5" />
         Add {label.toLowerCase()}
       </button>
       <input
@@ -873,14 +866,14 @@ function LinkInputSection({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 mb-1">
+      <div className="mb-1 flex items-center gap-2">
         <span className="text-gray-400">{icon}</span>
-        <span className="text-sm text-gray-300 font-medium">{label}</span>
+        <span className="text-sm font-medium text-gray-300">{label}</span>
         <span className="text-xs text-gray-600">· {hint}</span>
       </div>
 
       {links.length > 0 && (
-        <div className="flex flex-col gap-2 mb-1">
+        <div className="mb-1 flex flex-col gap-2">
           {links.map((link, i) => (
             <div key={i} className="flex items-center gap-2">
               <input
@@ -888,14 +881,14 @@ function LinkInputSection({
                 value={link}
                 onChange={(e) => updateLink(i, e.target.value)}
                 placeholder={placeholder}
-                className="flex-1 bg-white/10 text-white placeholder-gray-500 rounded-lg px-3 py-2 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all text-xs"
+                className="focus:ring-h_red flex-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
               />
               <button
                 type="button"
                 onClick={() => removeLink(i)}
-                className="text-gray-500 hover:text-red-400 transition-colors shrink-0"
+                className="shrink-0 text-gray-500 transition-colors hover:text-red-400"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="h-3.5 w-3.5" />
               </button>
             </div>
           ))}
@@ -905,9 +898,9 @@ function LinkInputSection({
       <button
         type="button"
         onClick={addLink}
-        className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 border border-dashed border-white/10 hover:border-white/30 rounded-lg px-3 py-2 transition-all w-fit"
+        className="flex w-fit items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-500 transition-all hover:border-white/30 hover:text-gray-300"
       >
-        <Plus className="w-3.5 h-3.5" />
+        <Plus className="h-3.5 w-3.5" />
         Add link
       </button>
     </div>

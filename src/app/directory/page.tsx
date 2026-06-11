@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import prisma from "@/lib/client";
+import { DjType } from "@prisma/client";
 import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
 import FilterPanel from "@/components/directory/FilterPanel";
+import FilterBottomSheet from "@/components/directory/FilterBottomSheet";
 import DjGrid from "@/components/directory/DjGrid";
 import ActiveFilterBadges from "@/components/directory/ActiveFilterBadges";
 import EventCalendar from "@/components/directory/EventCalendar";
@@ -16,6 +18,7 @@ type SearchParams = {
   city?: string;
   sort?: string;
   q?: string;
+  djType?: string;
 };
 
 const DirectoryPage = async ({
@@ -23,9 +26,14 @@ const DirectoryPage = async ({
 }: {
   searchParams: Promise<SearchParams>;
 }) => {
-  const { genre, country, city, sort, q } = await searchParams;
+  const { genre, country, city, sort, q, djType } = await searchParams;
   const genreList = genre ? genre.split(",").filter(Boolean) : [];
+  const validDjTypes = new Set(Object.values(DjType));
+  const djTypeList = (djType ? djType.split(",").filter(Boolean) : []).filter(
+    (t): t is DjType => validDjTypes.has(t as DjType),
+  );
 
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   let djs: DjUser[] = [];
 
   try {
@@ -64,6 +72,13 @@ const DirectoryPage = async ({
         ...(city
           ? { city: { name: { contains: city, mode: "insensitive" } } }
           : {}),
+        ...(djTypeList.length > 0
+          ? {
+              djTypes: {
+                some: { type: { in: djTypeList as DjType[] } },
+              },
+            }
+          : {}),
       },
       orderBy:
         sort === "a-z"
@@ -78,6 +93,7 @@ const DirectoryPage = async ({
         country: { select: { name: true } },
         city: { select: { name: true } },
         genres: { include: { genre: { select: { name: true } } } },
+        djTypes: { select: { type: true } },
       },
     });
 
@@ -93,10 +109,11 @@ const DirectoryPage = async ({
       isPremium: p.plan === "PREMIUM",
       isFeatured: p.featured,
       verified: p.verified,
+      djTypes: p.djTypes.map((t) => t.type),
       _count: { followers: p.user._count.followers },
     }));
   } catch {
-    // fetchError: fallback to demoDjs via djs.length check below
+    // fetchError
   }
 
   const demoDjs = demoDJsAsDjUsers();
@@ -123,7 +140,11 @@ const DirectoryPage = async ({
             dj.city ?? "",
           ].some((field) => field.toLowerCase().includes(q.toLowerCase()))
         : true;
-      return genreOk && countryOk && cityOk && qOk;
+      const djTypeOk =
+        djTypeList.length > 0
+          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
+          : true;
+      return genreOk && countryOk && cityOk && qOk && djTypeOk;
     });
 
   const sortDjs = (list: DjUser[]) => {
@@ -142,7 +163,6 @@ const DirectoryPage = async ({
     return list;
   };
 
-  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   const filteredDemoDjs = filterDemoDjs(demoDjs);
   const dbIds = new Set(djs.map((d) => d.id));
   const displayDjs = sortDjs(
@@ -152,11 +172,33 @@ const DirectoryPage = async ({
   );
 
   let availableGenres: string[] = [];
+
   try {
     const genres = await prisma.genre.findMany({
       where: {
         djGenres: {
-          some: { djProfile: { deletedAt: null } },
+          some: {
+            djProfile: {
+              deletedAt: null,
+              ...(country
+                ? {
+                    country: {
+                      name: { contains: country, mode: "insensitive" },
+                    },
+                  }
+                : {}),
+              ...(city
+                ? { city: { name: { contains: city, mode: "insensitive" } } }
+                : {}),
+              ...(djTypeList.length > 0
+                ? {
+                    djTypes: {
+                      some: { type: { in: djTypeList as DjType[] } },
+                    },
+                  }
+                : {}),
+            },
+          },
         },
       },
       orderBy: { name: "asc" },
@@ -164,33 +206,48 @@ const DirectoryPage = async ({
     });
     availableGenres = genres.map((g) => g.name);
   } catch {
-    // ignore — handled below
+    // ignore
   }
-
   if (isStaging) {
-    const demoGenreList = [
-      ...new Set(
-        demoDjs
-          .flatMap((dj) => (dj.genres ?? "").split(",").map((g) => g.trim()))
-          .filter(Boolean),
-      ),
-    ];
-    availableGenres = [
-      ...new Set([...availableGenres, ...demoGenreList]),
-    ].sort();
+    const demoForGenres = demoDjs.filter((dj) => {
+      const countryOk = country
+        ? (dj.country ?? "").toLowerCase().includes(country.toLowerCase())
+        : true;
+      const cityOk = city
+        ? (dj.city ?? "").toLowerCase().includes(city.toLowerCase())
+        : true;
+      const djTypeOk =
+        djTypeList.length > 0
+          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
+          : true;
+      return countryOk && cityOk && djTypeOk;
+    });
+    const demoGenres = demoForGenres
+      .flatMap((dj) => (dj.genres ?? "").split(",").map((g) => g.trim()))
+      .filter(Boolean);
+    availableGenres = [...new Set([...availableGenres, ...demoGenres])].sort();
   }
 
   let availableCountries: string[] = [];
   let countryCities: Record<string, string[]> = {};
 
   try {
+    const countryWhere = {
+      deletedAt: null as null,
+      ...(genreList.length > 0
+        ? { genres: { some: { genre: { name: { in: genreList } } } } }
+        : {}),
+      ...(djTypeList.length > 0
+        ? { djTypes: { some: { type: { in: djTypeList as DjType[] } } } }
+        : {}),
+    };
     const countryData = await prisma.country.findMany({
-      where: { djProfiles: { some: { deletedAt: null } } },
+      where: { djProfiles: { some: countryWhere } },
       orderBy: { name: "asc" },
       select: {
         name: true,
         cities: {
-          where: { djProfiles: { some: { deletedAt: null } } },
+          where: { djProfiles: { some: countryWhere } },
           orderBy: { name: "asc" },
           select: { name: true },
         },
@@ -203,9 +260,21 @@ const DirectoryPage = async ({
   } catch {
     // ignore
   }
-
   if (isStaging) {
-    for (const dj of demoDjs) {
+    const demoForCountries = demoDjs.filter((dj) => {
+      const genreOk =
+        genreList.length > 0
+          ? genreList.some((g) =>
+              (dj.genres ?? "").toLowerCase().includes(g.toLowerCase()),
+            )
+          : true;
+      const djTypeOk =
+        djTypeList.length > 0
+          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
+          : true;
+      return genreOk && djTypeOk;
+    });
+    for (const dj of demoForCountries) {
       if (dj.country && !availableCountries.includes(dj.country))
         availableCountries.push(dj.country);
       if (dj.country && dj.city) {
@@ -249,8 +318,8 @@ const DirectoryPage = async ({
       {/* 3-Column Layout */}
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="flex flex-col gap-6 py-6 xl:flex-row">
-          {/* Left — Filters */}
-          <div className="shrink-0 xl:block xl:w-[20%]">
+          {/* Left — Filters (desktop sidebar only) */}
+          <div className="hidden xl:block xl:w-[20%] xl:shrink-0">
             <Suspense
               fallback={
                 <div className="bg-h_blackLight/50 h-96 animate-pulse rounded-xl p-4" />
@@ -266,6 +335,14 @@ const DirectoryPage = async ({
 
           {/* Center — DJ Grid */}
           <div className="w-full">
+            {/* Mobile filter trigger (hidden on xl+) */}
+            <Suspense fallback={null}>
+              <FilterBottomSheet
+                genres={availableGenres}
+                availableCountries={availableCountries}
+                countryCities={countryCities}
+              />
+            </Suspense>
             <Suspense fallback={null}>
               <ActiveFilterBadges />
             </Suspense>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Russo_One, Space_Grotesk, Geist } from "next/font/google";
+import { Sora, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,17 +8,14 @@ import { Toaster } from "@/components/ui/sonner";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
-
-const spaceGrotesk = Space_Grotesk({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-inter",
 });
 
-const russoOne = Russo_One({
+const sora = Sora({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-russo-one",
+  variable: "--font-sora",
 });
 
 export const metadata: Metadata = {
@@ -35,26 +32,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(
-        spaceGrotesk.variable,
-        russoOne.variable,
-        "font-sans",
-        geist.variable,
-        "dark",
-      )}
+      className={cn(inter.variable, sora.variable, "font-sans", "dark")}
     >
-      <body className={spaceGrotesk.className}>
+      <body className={inter.className}>
         <NavigationProgress />
-        <div className="flex flex-col min-h-screen">
-          <header className="w-full bg-black/95 backdrop-blur-sm border-b border-white/5 fixed top-0 inset-x-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="flex min-h-screen flex-col">
+          <header className="fixed inset-x-0 top-0 z-50 w-full border-b border-white/5 bg-black/95 backdrop-blur-sm">
+            <div className="mx-auto max-w-7xl px-4 md:px-8">
               <Navbar />
             </div>
           </header>
-          <main className="w-full flex-1 bg-black mt-14 md:mt-16 pb-20 md:pb-0">
+          <main className="mt-14 w-full flex-1 bg-black pb-20 md:mt-16 md:pb-0">
             {children}
           </main>
-          <div className="w-full hidden md:block">
+          <div className="hidden w-full md:block">
             <Footer />
           </div>
           <MobileBottomNavServer />

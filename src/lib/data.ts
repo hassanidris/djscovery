@@ -274,11 +274,23 @@ export type DjUser = {
   isPremium?: boolean;
   isFeatured?: boolean;
   verified?: boolean;
+  djTypes?: string[];
   _count?: { followers: number };
 };
 
+const _DEMO_DJ_TYPES: string[][] = [
+  ["CLUB", "FESTIVAL"],
+  ["WEDDING", "CORPORATE"],
+  ["PRIVATE_PARTY", "BIRTHDAY"],
+  ["BAR_LOUNGE", "CULTURAL_EVENT"],
+  ["WEDDING", "FESTIVAL"],
+  ["CLUB", "BAR_LOUNGE"],
+  ["CORPORATE", "PRIVATE_PARTY"],
+  ["BIRTHDAY", "WEDDING"],
+];
+
 export function demoDJsAsDjUsers(): DjUser[] {
-  return ALL_DEMO_DJS.map((dj) => ({
+  return ALL_DEMO_DJS.map((dj, i) => ({
     id: dj.id,
     username: dj.slug,
     stageName: dj.stageName,
@@ -290,6 +302,7 @@ export function demoDJsAsDjUsers(): DjUser[] {
     isPremium: dj.plan === "premium",
     isFeatured: dj.featured,
     verified: dj.verified,
+    djTypes: _DEMO_DJ_TYPES[i % _DEMO_DJ_TYPES.length],
     _count: { followers: dj.stats.followers },
   }));
 }
