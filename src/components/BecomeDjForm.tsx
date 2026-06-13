@@ -272,7 +272,7 @@ export default function BecomeDjForm({
         let avatarUrl: string | undefined;
         if (avatarFile) {
           toast.loading("Uploading avatar...", { id: toastId });
-          const uploaded = await uploadFile(avatarFile, "avatars");
+          const uploaded = await uploadFile(avatarFile, "dj-avatars");
           uploadedPaths.push({ path: uploaded.path, bucket: uploaded.bucket });
           avatarUrl = uploaded.url;
         }
@@ -289,7 +289,7 @@ export default function BecomeDjForm({
             `Uploading image ${i + 1} of ${galleryFiles.length}...`,
             { id: toastId },
           );
-          const m = await uploadFile(galleryFiles[i], "gallery");
+          const m = await uploadFile(galleryFiles[i], "dj-gallery");
           uploadedPaths.push({ path: m.path, bucket: m.bucket });
           media.push({ type: "IMAGE", ...m });
         }

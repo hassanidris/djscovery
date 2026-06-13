@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 import { X, Plus, Loader2, Camera, ArrowLeft } from "lucide-react";
-import { CldUploadWidget } from "next-cloudinary";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,8 +13,12 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { updateDjProfile } from "@/lib/actions/profile";
-import { getCitiesByCountry } from "@/lib/actions/profile";
+import {
+  updateDjProfile,
+  addGalleryImage,
+  deleteGalleryImage,
+  getCitiesByCountry,
+} from "@/lib/actions/profile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +32,7 @@ import {
 
 type Country = { id: number; name: string };
 type City = { id: number; name: string };
+type GalleryImage = { id: number; url: string; path: string; bucket: string };
 
 const COUNTRY_CURRENCIES: Record<string, string> = {
   Sweden: "SEK",
@@ -133,6 +138,8 @@ interface Props {
   profile: ProfileData;
   countries: Country[];
   initialCities: City[];
+  userId: string;
+  galleryImages: GalleryImage[];
 }
 
 function SectionCard({
@@ -160,6 +167,8 @@ export default function EditDjProfileForm({
   profile,
   countries,
   initialCities,
+  userId,
+  galleryImages,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -195,6 +204,13 @@ export default function EditDjProfileForm({
   );
   const [submitted, setSubmitted] = useState(false);
   const [showLeaveAlert, setShowLeaveAlert] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const [gallery, setGallery] = useState<GalleryImage[]>(galleryImages);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const isDirty =
     stageName !== profile.stageName ||
@@ -293,9 +309,96 @@ export default function EditDjProfileForm({
     );
   }
 
+  async function uploadFile(
+    file: File,
+    folder: string,
+    filename: string,
+  ): Promise<string> {
+    const supabase = createClient();
+    const ext = file.name.split(".").pop() ?? "bin";
+    const path = `${folder}/${userId}/${filename}.${ext}`;
+    const { data, error } = await supabase.storage
+      .from("djscovery-media")
+      .upload(path, file, { upsert: true });
+    if (error) throw new Error(error.message);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("djscovery-media").getPublicUrl(data.path);
+    return publicUrl;
+  }
+
+  async function handleAvatarChange(file: File | undefined) {
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    try {
+      const url = await uploadFile(file, "dj-avatars", "avatar");
+      setAvatarUrl(url);
+      toast.success("Avatar updated");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  }
+
+  async function handleCoverChange(file: File | undefined) {
+    if (!file) return;
+    setIsUploadingCover(true);
+    try {
+      const url = await uploadFile(file, "dj-covers", "cover");
+      setCoverImageUrl(url);
+      toast.success("Cover image updated");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setIsUploadingCover(false);
+    }
+  }
+
+  async function handleGalleryUpload(file: File | undefined) {
+    if (!file) return;
+    setIsUploadingGallery(true);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop() ?? "bin";
+      const path = `dj-gallery/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { data, error } = await supabase.storage
+        .from("djscovery-media")
+        .upload(path, file, { upsert: false });
+      if (error) throw new Error(error.message);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("djscovery-media").getPublicUrl(data.path);
+      const result = await addGalleryImage({
+        url: publicUrl,
+        path: data.path,
+        bucket: "djscovery-media",
+      });
+      if ("error" in result) throw new Error(result.error);
+      setGallery((prev) => [result, ...prev]);
+      toast.success("Photo added");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setIsUploadingGallery(false);
+    }
+  }
+
+  async function handleGalleryDelete(item: GalleryImage) {
+    const toastId = toast.loading("Removing photo...");
+    const result = await deleteGalleryImage(item.id);
+    if ("error" in result) {
+      toast.error(result.error, { id: toastId });
+      return;
+    }
+    setGallery((prev) => prev.filter((g) => g.id !== item.id));
+    toast.success("Photo removed", { id: toastId });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
+    if (isUploadingAvatar || isUploadingCover || isUploadingGallery) return;
     if (!canSave) return;
     const toastId = toast.loading("Saving profile...");
 
@@ -390,38 +493,31 @@ export default function EditDjProfileForm({
                 <p className="mb-2 text-xs text-gray-500">
                   Shown on your profile and directory card
                 </p>
-                <CldUploadWidget
-                  uploadPreset="djscovery"
-                  onSuccess={(result, { widget }) => {
-                    if (
-                      result.info &&
-                      typeof result.info === "object" &&
-                      "secure_url" in result.info
-                    ) {
-                      setAvatarUrl(result.info.secure_url as string);
-                      toast.success("Avatar updated");
-                    }
-                    widget.close();
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    handleAvatarChange(e.target.files?.[0]);
+                    e.target.value = "";
                   }}
-                  options={{
-                    maxFiles: 1,
-                    cropping: true,
-                    croppingAspectRatio: 1,
-                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isUploadingAvatar}
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="border-white/15 text-gray-300 hover:bg-white/5"
                 >
-                  {({ open }) => (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => open()}
-                      className="border-white/15 text-gray-300 hover:bg-white/5"
-                    >
-                      <Camera className="mr-1.5 h-3.5 w-3.5" />
-                      {avatarUrl ? "Change Avatar" : "Upload Avatar"}
-                    </Button>
+                  {isUploadingAvatar ? (
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Camera className="mr-1.5 h-3.5 w-3.5" />
                   )}
-                </CldUploadWidget>
+                  {avatarUrl ? "Change Avatar" : "Upload Avatar"}
+                </Button>
               </div>
             </div>
 
@@ -445,34 +541,31 @@ export default function EditDjProfileForm({
                   />
                 </div>
               )}
-              <CldUploadWidget
-                uploadPreset="djscovery"
-                onSuccess={(result, { widget }) => {
-                  if (
-                    result.info &&
-                    typeof result.info === "object" &&
-                    "secure_url" in result.info
-                  ) {
-                    setCoverImageUrl(result.info.secure_url as string);
-                    toast.success("Cover image updated");
-                  }
-                  widget.close();
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  handleCoverChange(e.target.files?.[0]);
+                  e.target.value = "";
                 }}
-                options={{ maxFiles: 1 }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isUploadingCover}
+                onClick={() => coverInputRef.current?.click()}
+                className="border-white/15 text-gray-300 hover:bg-white/5"
               >
-                {({ open }) => (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => open()}
-                    className="border-white/15 text-gray-300 hover:bg-white/5"
-                  >
-                    <Camera className="mr-1.5 h-3.5 w-3.5" />
-                    {coverImageUrl ? "Change Cover" : "Upload Cover"}
-                  </Button>
+                {isUploadingCover ? (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Camera className="mr-1.5 h-3.5 w-3.5" />
                 )}
-              </CldUploadWidget>
+                {coverImageUrl ? "Change Cover" : "Upload Cover"}
+              </Button>
             </div>
           </div>
         </SectionCard>
@@ -833,6 +926,70 @@ export default function EditDjProfileForm({
           </div>
         </SectionCard>
 
+        {/* Photo Gallery */}
+        <SectionCard
+          title="Photo Gallery"
+          subtitle="Showcase your work — up to 12 photos"
+        >
+          <div>
+            <div className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {gallery.map((img) => (
+                <div
+                  key={img.id}
+                  className="group relative aspect-square overflow-hidden rounded-lg bg-white/5"
+                >
+                  <Image
+                    src={img.url}
+                    alt="Gallery photo"
+                    fill
+                    className="object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleGalleryDelete(img)}
+                    className="absolute top-1 right-1 rounded-full bg-black/60 p-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-900/80"
+                    aria-label="Remove photo"
+                  >
+                    <X className="h-3 w-3 text-white" />
+                  </button>
+                </div>
+              ))}
+              {gallery.length < 12 && (
+                <button
+                  type="button"
+                  onClick={() => galleryInputRef.current?.click()}
+                  disabled={isUploadingGallery}
+                  className="flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-white/15 bg-white/3 transition-colors hover:border-white/30 hover:bg-white/5 disabled:opacity-50"
+                >
+                  {isUploadingGallery ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+                  ) : (
+                    <>
+                      <Plus className="h-5 w-5 text-gray-500" />
+                      <span className="text-[10px] text-gray-600">
+                        Add Photo
+                      </span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                handleGalleryUpload(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <p className="text-[11px] text-gray-600">
+              {gallery.length}/12 photos
+            </p>
+          </div>
+        </SectionCard>
+
         {/* Submit */}
         <div className="flex items-center justify-between pt-2">
           <p className="text-xs text-gray-600">
@@ -840,7 +997,13 @@ export default function EditDjProfileForm({
           </p>
           <Button
             type="submit"
-            disabled={isPending || (submitted && !canSave)}
+            disabled={
+              isPending ||
+              isUploadingAvatar ||
+              isUploadingCover ||
+              isUploadingGallery ||
+              (submitted && !canSave)
+            }
             className="bg-h_red hover:bg-h_redDark min-w-32 px-8 font-semibold text-white disabled:opacity-50"
           >
             {isPending ? (

@@ -364,6 +364,71 @@ export async function updateDjProfile(
   }
 }
 
+export async function addGalleryImage(input: {
+  url: string;
+  path: string;
+  bucket: string;
+}): Promise<
+  { id: number; url: string; path: string; bucket: string } | { error: string }
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const profile = await prisma.djProfile.findUnique({
+    where: { userId: user.id },
+    select: { id: true },
+  });
+  if (!profile) return { error: "DJ profile not found" };
+
+  const media = await prisma.media.create({
+    data: {
+      type: "IMAGE",
+      url: input.url,
+      path: input.path,
+      bucket: input.bucket,
+      djProfileId: profile.id,
+    },
+  });
+
+  return {
+    id: media.id,
+    url: media.url,
+    path: media.path,
+    bucket: media.bucket,
+  };
+}
+
+export async function deleteGalleryImage(
+  mediaId: number,
+): Promise<{ success: true } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const media = await prisma.media.findUnique({
+    where: { id: mediaId },
+    include: { djProfile: { select: { userId: true } } },
+  });
+  if (!media) return { error: "Image not found" };
+  if (media.djProfile?.userId !== user.id) return { error: "Unauthorized" };
+
+  if (media.bucket !== "external") {
+    try {
+      await supabase.storage.from(media.bucket).remove([media.path]);
+    } catch {
+      // Storage deletion is best-effort; DB record is always removed.
+    }
+  }
+
+  await prisma.media.delete({ where: { id: mediaId } });
+  return { success: true as const };
+}
+
 export async function createOrganizerProfile(
   _prevState: { success: boolean; error: string | null },
   formData: FormData,
