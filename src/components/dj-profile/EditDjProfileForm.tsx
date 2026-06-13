@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 import { X, Plus, Loader2, Camera, ArrowLeft } from "lucide-react";
-import { CldUploadWidget } from "next-cloudinary";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -133,6 +133,7 @@ interface Props {
   profile: ProfileData;
   countries: Country[];
   initialCities: City[];
+  userId: string;
 }
 
 function SectionCard({
@@ -160,6 +161,7 @@ export default function EditDjProfileForm({
   profile,
   countries,
   initialCities,
+  userId,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -195,6 +197,10 @@ export default function EditDjProfileForm({
   );
   const [submitted, setSubmitted] = useState(false);
   const [showLeaveAlert, setShowLeaveAlert] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const isDirty =
     stageName !== profile.stageName ||
@@ -291,6 +297,48 @@ export default function EditDjProfileForm({
     setSocialLinks((prev) =>
       prev.map((link, i) => (i === index ? { ...link, [field]: value } : link)),
     );
+  }
+
+  async function uploadFile(file: File, folder: string): Promise<string> {
+    const supabase = createClient();
+    const ext = file.name.split(".").pop() ?? "bin";
+    const path = `${folder}/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { data, error } = await supabase.storage
+      .from("djscovery-media")
+      .upload(path, file, { upsert: true });
+    if (error) throw new Error(error.message);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("djscovery-media").getPublicUrl(data.path);
+    return publicUrl;
+  }
+
+  async function handleAvatarChange(file: File | undefined) {
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    try {
+      const url = await uploadFile(file, "dj-avatars");
+      setAvatarUrl(url);
+      toast.success("Avatar updated");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  }
+
+  async function handleCoverChange(file: File | undefined) {
+    if (!file) return;
+    setIsUploadingCover(true);
+    try {
+      const url = await uploadFile(file, "dj-covers");
+      setCoverImageUrl(url);
+      toast.success("Cover image updated");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setIsUploadingCover(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -390,38 +438,28 @@ export default function EditDjProfileForm({
                 <p className="mb-2 text-xs text-gray-500">
                   Shown on your profile and directory card
                 </p>
-                <CldUploadWidget
-                  uploadPreset="djscovery"
-                  onSuccess={(result, { widget }) => {
-                    if (
-                      result.info &&
-                      typeof result.info === "object" &&
-                      "secure_url" in result.info
-                    ) {
-                      setAvatarUrl(result.info.secure_url as string);
-                      toast.success("Avatar updated");
-                    }
-                    widget.close();
-                  }}
-                  options={{
-                    maxFiles: 1,
-                    cropping: true,
-                    croppingAspectRatio: 1,
-                  }}
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleAvatarChange(e.target.files?.[0])}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isUploadingAvatar}
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="border-white/15 text-gray-300 hover:bg-white/5"
                 >
-                  {({ open }) => (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => open()}
-                      className="border-white/15 text-gray-300 hover:bg-white/5"
-                    >
-                      <Camera className="mr-1.5 h-3.5 w-3.5" />
-                      {avatarUrl ? "Change Avatar" : "Upload Avatar"}
-                    </Button>
+                  {isUploadingAvatar ? (
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Camera className="mr-1.5 h-3.5 w-3.5" />
                   )}
-                </CldUploadWidget>
+                  {avatarUrl ? "Change Avatar" : "Upload Avatar"}
+                </Button>
               </div>
             </div>
 
@@ -445,34 +483,28 @@ export default function EditDjProfileForm({
                   />
                 </div>
               )}
-              <CldUploadWidget
-                uploadPreset="djscovery"
-                onSuccess={(result, { widget }) => {
-                  if (
-                    result.info &&
-                    typeof result.info === "object" &&
-                    "secure_url" in result.info
-                  ) {
-                    setCoverImageUrl(result.info.secure_url as string);
-                    toast.success("Cover image updated");
-                  }
-                  widget.close();
-                }}
-                options={{ maxFiles: 1 }}
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleCoverChange(e.target.files?.[0])}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isUploadingCover}
+                onClick={() => coverInputRef.current?.click()}
+                className="border-white/15 text-gray-300 hover:bg-white/5"
               >
-                {({ open }) => (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => open()}
-                    className="border-white/15 text-gray-300 hover:bg-white/5"
-                  >
-                    <Camera className="mr-1.5 h-3.5 w-3.5" />
-                    {coverImageUrl ? "Change Cover" : "Upload Cover"}
-                  </Button>
+                {isUploadingCover ? (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Camera className="mr-1.5 h-3.5 w-3.5" />
                 )}
-              </CldUploadWidget>
+                {coverImageUrl ? "Change Cover" : "Upload Cover"}
+              </Button>
             </div>
           </div>
         </SectionCard>

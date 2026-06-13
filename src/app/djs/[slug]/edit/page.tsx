@@ -66,11 +66,12 @@ export default async function EditDjProfilePage({
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="max-w-3xl mx-auto px-4 md:px-8 py-10">
+      <div className="mx-auto max-w-3xl px-4 py-10 md:px-8">
         <EditDjProfileForm
           profile={profileData}
           countries={countries}
           initialCities={existingCities}
+          userId={user.id}
         />
       </div>
     </div>
