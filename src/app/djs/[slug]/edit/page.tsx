@@ -44,6 +44,12 @@ export default async function EditDjProfilePage({
       })
     : [];
 
+  const galleryImages = await prisma.media.findMany({
+    where: { djProfileId: dj.id, type: "IMAGE" },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, url: true, path: true, bucket: true },
+  });
+
   const profileData = {
     stageName: dj.stageName,
     bio: dj.bio ?? "",
@@ -72,6 +78,7 @@ export default async function EditDjProfilePage({
           countries={countries}
           initialCities={existingCities}
           userId={user.id}
+          galleryImages={galleryImages}
         />
       </div>
     </div>
