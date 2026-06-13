@@ -299,10 +299,14 @@ export default function EditDjProfileForm({
     );
   }
 
-  async function uploadFile(file: File, folder: string): Promise<string> {
+  async function uploadFile(
+    file: File,
+    folder: string,
+    filename: string,
+  ): Promise<string> {
     const supabase = createClient();
     const ext = file.name.split(".").pop() ?? "bin";
-    const path = `${folder}/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const path = `${folder}/${userId}/${filename}.${ext}`;
     const { data, error } = await supabase.storage
       .from("djscovery-media")
       .upload(path, file, { upsert: true });
@@ -317,7 +321,7 @@ export default function EditDjProfileForm({
     if (!file) return;
     setIsUploadingAvatar(true);
     try {
-      const url = await uploadFile(file, "dj-avatars");
+      const url = await uploadFile(file, "dj-avatars", "avatar");
       setAvatarUrl(url);
       toast.success("Avatar updated");
     } catch (err) {
@@ -331,7 +335,7 @@ export default function EditDjProfileForm({
     if (!file) return;
     setIsUploadingCover(true);
     try {
-      const url = await uploadFile(file, "dj-covers");
+      const url = await uploadFile(file, "dj-covers", "cover");
       setCoverImageUrl(url);
       toast.success("Cover image updated");
     } catch (err) {
@@ -344,6 +348,7 @@ export default function EditDjProfileForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
+    if (isUploadingAvatar || isUploadingCover) return;
     if (!canSave) return;
     const toastId = toast.loading("Saving profile...");
 
@@ -443,7 +448,10 @@ export default function EditDjProfileForm({
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => handleAvatarChange(e.target.files?.[0])}
+                  onChange={(e) => {
+                    handleAvatarChange(e.target.files?.[0]);
+                    e.target.value = "";
+                  }}
                 />
                 <Button
                   type="button"
@@ -488,7 +496,10 @@ export default function EditDjProfileForm({
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => handleCoverChange(e.target.files?.[0])}
+                onChange={(e) => {
+                  handleCoverChange(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
               />
               <Button
                 type="button"
@@ -872,7 +883,12 @@ export default function EditDjProfileForm({
           </p>
           <Button
             type="submit"
-            disabled={isPending || (submitted && !canSave)}
+            disabled={
+              isPending ||
+              isUploadingAvatar ||
+              isUploadingCover ||
+              (submitted && !canSave)
+            }
             className="bg-h_red hover:bg-h_redDark min-w-32 px-8 font-semibold text-white disabled:opacity-50"
           >
             {isPending ? (
