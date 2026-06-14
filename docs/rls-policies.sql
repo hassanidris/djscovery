@@ -408,3 +408,77 @@ CREATE POLICY "Authenticated user can set attendance"
 CREATE POLICY "Authenticated user can remove attendance"
   ON "EventAttendance" FOR DELETE
   USING (auth.uid()::text = "userId");
+
+
+-- ============================================================
+-- STEP 9: Supabase Storage — organizer image buckets
+-- ============================================================
+-- Run these in the Supabase SQL Editor (same as above).
+-- Buckets must be created first in the Supabase Dashboard:
+--   Storage → New bucket → name: "org-avatar", Public: ON
+--   Storage → New bucket → name: "org-cover",  Public: ON
+--
+-- Storage policies operate on the storage.objects table.
+-- Path convention: {userId}/{timestamp}.{ext}
+-- The folder name (first path segment) must match the uploader's uid.
+-- ============================================================
+
+-- org-avatar bucket: authenticated users upload/update their own folder
+CREATE POLICY "Organizer can upload own logo"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'org-avatar'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "Organizer can update own logo"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'org-avatar'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "Organizer can delete own logo"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'org-avatar'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "Public can read organizer logos"
+  ON storage.objects FOR SELECT
+  TO public
+  USING (bucket_id = 'org-avatar');
+
+-- org-cover bucket: same pattern, higher size limit enforced in app
+CREATE POLICY "Organizer can upload own cover"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'org-cover'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "Organizer can update own cover"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'org-cover'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "Organizer can delete own cover"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'org-cover'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "Public can read organizer covers"
+  ON storage.objects FOR SELECT
+  TO public
+  USING (bucket_id = 'org-cover');

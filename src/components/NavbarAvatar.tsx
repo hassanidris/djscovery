@@ -21,6 +21,7 @@ type Props = {
   username: string | null;
   navRole: NavRole;
   djSlug: string | null;
+  organizerSlug: string | null;
   isOrganizer: boolean;
 };
 
@@ -31,6 +32,7 @@ export default function NavbarAvatar({
   username,
   navRole,
   djSlug,
+  organizerSlug,
   isOrganizer,
 }: Props) {
   const signOutFormRef = useRef<HTMLFormElement>(null);
@@ -58,7 +60,7 @@ export default function NavbarAvatar({
           sideOffset={8}
           className="bg-h_blackLight w-52 border border-white/10 text-white"
         >
-          {(username || djSlug) && (
+          {(username || djSlug || organizerSlug) && (
             <DropdownMenuItem
               asChild
               className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
@@ -69,7 +71,9 @@ export default function NavbarAvatar({
                     ? `/djs/${djSlug}`
                     : navRole === "dj"
                       ? "/become-dj"
-                      : `/profile/${username}`
+                      : isOrganizer && organizerSlug
+                        ? `/organizers/${organizerSlug}`
+                        : `/profile/${username}`
                 }
               >
                 My Profile

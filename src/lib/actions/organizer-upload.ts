@@ -45,7 +45,7 @@ async function uploadOrganizerImage(
     .upload(path, file, { upsert: true, contentType: file.type });
 
   if (uploadError) {
-    return { error: "Upload failed. Please try again." };
+    return { error: `Upload failed: ${uploadError.message}` };
   }
 
   const {

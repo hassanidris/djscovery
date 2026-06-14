@@ -9,6 +9,7 @@ export type NavUserData = {
   isOrganizer: boolean;
   username: string | null;
   djSlug: string | null;
+  organizerSlug: string | null;
   displayName: string;
   avatarSrc: string | null;
   initials: string;
@@ -27,6 +28,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
       isOrganizer: false,
       username: null,
       djSlug: null,
+      organizerSlug: null,
       displayName: "Guest",
       avatarSrc: null,
       initials: "G",
@@ -39,6 +41,9 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
       username: true,
       roles: { select: { role: true } },
       djProfile: { select: { avatar: true, stageName: true, slug: true } },
+      organizerProfile: {
+        select: { slug: true, status: true, deletedAt: true },
+      },
     },
   });
 
@@ -53,12 +58,19 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
   const avatarSrc = profile?.djProfile?.avatar ?? null;
   const initials = displayName.slice(0, 2).toUpperCase();
 
+  const orgProfile = profile?.organizerProfile;
+  const organizerSlug =
+    orgProfile?.status === "ACTIVE" && orgProfile?.deletedAt === null
+      ? (orgProfile.slug ?? null)
+      : null;
+
   return {
     navRole,
     isLoggedIn: true,
     isOrganizer: roles.includes("ORGANIZER"),
     username: profile?.username ?? null,
     djSlug: profile?.djProfile?.slug ?? null,
+    organizerSlug,
     displayName,
     avatarSrc,
     initials,
