@@ -17,7 +17,15 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Menu, User, Settings, LogOut, LogIn, UserPlus } from "lucide-react";
+import {
+  Menu,
+  User,
+  Settings,
+  LogOut,
+  LogIn,
+  UserPlus,
+  Briefcase,
+} from "lucide-react";
 import { desktopNavByRole } from "@/config/navigation";
 import { signOut } from "@/lib/actions/auth";
 import type { NavUserData } from "@/lib/auth/getNavUser";
@@ -27,6 +35,7 @@ type Props = NavUserData;
 export default function BurgerMenu({
   navRole,
   isLoggedIn,
+  isOrganizer,
   username,
   djSlug,
   displayName,
@@ -217,6 +226,39 @@ export default function BurgerMenu({
                         </SheetClose>
                       );
                     })()}
+
+                  {isOrganizer && (
+                    <SheetClose asChild>
+                      <Link
+                        href="/organizer/dashboard"
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                          pathname === "/organizer" ||
+                            pathname.startsWith("/organizer/")
+                            ? "bg-white/5 text-white"
+                            : "text-gray-400 hover:bg-white/5 hover:text-white",
+                        )}
+                        aria-current={
+                          pathname === "/organizer" ||
+                          pathname.startsWith("/organizer/")
+                            ? "page"
+                            : undefined
+                        }
+                      >
+                        <Briefcase
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            pathname === "/organizer" ||
+                              pathname.startsWith("/organizer/")
+                              ? "text-h_red"
+                              : "",
+                          )}
+                          aria-hidden
+                        />
+                        <span>Organizer Dashboard</span>
+                      </Link>
+                    </SheetClose>
+                  )}
 
                   <SheetClose asChild>
                     <Link

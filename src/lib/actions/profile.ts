@@ -14,6 +14,32 @@ function makeSlugBase(stageName: string) {
     .slice(0, 60);
 }
 
+async function makeUniqueOrganizerSlug(
+  displayName: string,
+  excludeUserId?: string,
+) {
+  const base = displayName
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 80);
+  if (!base)
+    throw new Error("Display name must contain at least one letter or number.");
+  const existing = await prisma.organizerProfile.findMany({
+    where: {
+      slug: { startsWith: base },
+      ...(excludeUserId ? { userId: { not: excludeUserId } } : {}),
+    },
+    select: { slug: true },
+  });
+  const taken = new Set(existing.map((p) => p.slug));
+  if (!taken.has(base)) return base;
+  let i = 2;
+  while (taken.has(`${base}-${i}`)) i++;
+  return `${base}-${i}`;
+}
+
 async function makeUniqueSlug(stageName: string, excludeUserId?: string) {
   const base = makeSlugBase(stageName);
   const existing = await prisma.djProfile.findMany({
@@ -429,6 +455,63 @@ export async function deleteGalleryImage(
   return { success: true as const };
 }
 
+// ============================================================
+// ORGANIZER PROFILE ACTIONS
+// ============================================================
+
+const CreateOrganizerSchema = z.object({
+  displayName: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(80, "Name is too long"),
+  organizerType: z.enum(
+    ["INDIVIDUAL", "COMPANY", "VENUE", "AGENCY", "FESTIVAL"],
+    { errorMap: () => ({ message: "Please select an organizer type" }) },
+  ),
+});
+
+const UpdateOrganizerSchema = z.object({
+  displayName: z.string().min(2).max(80).optional(),
+  organizerType: z
+    .enum(["INDIVIDUAL", "COMPANY", "VENUE", "AGENCY", "FESTIVAL"])
+    .optional(),
+  bio: z
+    .string()
+    .max(600, "Bio must be under 600 characters")
+    .optional()
+    .nullable(),
+  website: z.string().url("Must be a valid URL").max(200).optional().nullable(),
+  contactEmail: z.string().email("Invalid email address").optional().nullable(),
+  phone: z
+    .string()
+    .max(30)
+    .regex(/^[+\d\s()./-]*$/, "Invalid phone format")
+    .optional()
+    .nullable(),
+  logoUrl: z.string().url().optional().nullable(),
+  coverImageUrl: z.string().url().optional().nullable(),
+  countryId: z.number().int().positive().optional().nullable(),
+  cityId: z.number().int().positive().optional().nullable(),
+  socialLinks: z
+    .array(
+      z.object({
+        platform: z.enum([
+          "instagram",
+          "linkedin",
+          "facebook",
+          "tiktok",
+          "youtube",
+          "website",
+        ]),
+        url: z.string().url("Invalid social link URL"),
+      }),
+    )
+    .max(6, "Maximum 6 social links")
+    .optional(),
+});
+
+export type UpdateOrganizerInput = z.infer<typeof UpdateOrganizerSchema>;
+
 export async function createOrganizerProfile(
   _prevState: { success: boolean; error: string | null },
   formData: FormData,
@@ -439,20 +522,25 @@ export async function createOrganizerProfile(
   } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Not authenticated" };
 
-  const Schema = z.object({
-    businessName: z.string().min(2).max(80),
-    phone: z.string().max(30).optional(),
-  });
-
-  const parsed = Schema.safeParse({
-    businessName: formData.get("businessName"),
-    phone: formData.get("phone") || undefined,
+  const parsed = CreateOrganizerSchema.safeParse({
+    displayName: formData.get("displayName"),
+    organizerType: formData.get("organizerType"),
   });
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Please check your details and try again.",
+      error: parsed.error.issues.map((i) => i.message).join(", "),
+    };
+  }
+
+  let slug: string;
+  try {
+    slug = await makeUniqueOrganizerSlug(parsed.data.displayName, user.id);
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Invalid display name.",
     };
   }
 
@@ -460,11 +548,19 @@ export async function createOrganizerProfile(
     await prisma.$transaction(async (tx) => {
       await tx.organizerProfile.upsert({
         where: { userId: user.id },
-        update: {},
+        update: {
+          displayName: parsed.data.displayName,
+          slug,
+          organizerType: parsed.data.organizerType,
+          status: "ACTIVE",
+          deletedAt: null,
+        },
         create: {
           userId: user.id,
-          businessName: parsed.data.businessName,
-          phone: parsed.data.phone ?? null,
+          displayName: parsed.data.displayName,
+          slug,
+          organizerType: parsed.data.organizerType,
+          status: "ACTIVE",
         },
       });
 
@@ -479,5 +575,143 @@ export async function createOrganizerProfile(
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Something went wrong. Please try again." };
+  }
+}
+
+export async function updateOrganizerProfile(
+  input: unknown,
+): Promise<{ success: true; newSlug?: string } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const parsed = UpdateOrganizerSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      error:
+        "Validation failed: " +
+        parsed.error.issues.map((i) => i.message).join(", "),
+    };
+  }
+
+  const existing = await prisma.organizerProfile.findUnique({
+    where: { userId: user.id },
+    select: {
+      id: true,
+      displayName: true,
+      slug: true,
+      countryId: true,
+      status: true,
+      deletedAt: true,
+    },
+  });
+  if (!existing) return { error: "Organizer profile not found" };
+  if (existing.status !== "ACTIVE" || existing.deletedAt !== null)
+    return { error: "Your organizer profile is not active." };
+
+  const data = parsed.data;
+
+  let newSlug = existing.slug;
+  if (data.displayName && data.displayName !== existing.displayName) {
+    try {
+      newSlug = await makeUniqueOrganizerSlug(data.displayName, user.id);
+    } catch (e) {
+      return {
+        error: e instanceof Error ? e.message : "Invalid display name.",
+      };
+    }
+  }
+
+  const effectiveCountryId = data.countryId ?? existing.countryId;
+  if (data.cityId && effectiveCountryId) {
+    const city = await prisma.city.findFirst({
+      where: { id: data.cityId, countryId: effectiveCountryId },
+      select: { id: true },
+    });
+    if (!city)
+      return {
+        error: "The selected city does not belong to the selected country.",
+      };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.organizerProfile.update({
+        where: { userId: user.id },
+        data: {
+          ...(data.displayName !== undefined && {
+            displayName: data.displayName,
+            slug: newSlug,
+          }),
+          ...(data.organizerType !== undefined && {
+            organizerType: data.organizerType,
+          }),
+          ...(data.bio !== undefined && { bio: data.bio }),
+          ...(data.website !== undefined && { website: data.website }),
+          ...(data.contactEmail !== undefined && {
+            contactEmail: data.contactEmail,
+          }),
+          ...(data.phone !== undefined && { phone: data.phone }),
+          ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl }),
+          ...(data.coverImageUrl !== undefined && {
+            coverImageUrl: data.coverImageUrl,
+          }),
+          ...(data.countryId !== undefined && { countryId: data.countryId }),
+          ...(data.cityId !== undefined
+            ? { cityId: data.cityId }
+            : data.countryId !== undefined
+              ? { cityId: null }
+              : {}),
+        },
+      });
+
+      if (data.socialLinks !== undefined) {
+        await tx.organizerSocialLink.deleteMany({
+          where: { organizerProfileId: existing.id },
+        });
+        if (data.socialLinks.length > 0) {
+          await tx.organizerSocialLink.createMany({
+            data: data.socialLinks.map((link) => ({
+              organizerProfileId: existing.id,
+              platform: link.platform,
+              url: link.url,
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+    });
+
+    const slugChanged = newSlug !== existing.slug;
+    return { success: true as const, ...(slugChanged && { newSlug }) };
+  } catch {
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export async function deleteOrganizerProfile(): Promise<
+  { success: true } | { error: string }
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.organizerProfile.update({
+        where: { userId: user.id },
+        data: { deletedAt: new Date(), status: "SUSPENDED" },
+      });
+      await tx.userRole.deleteMany({
+        where: { userId: user.id, role: "ORGANIZER" },
+      });
+    });
+    return { success: true as const };
+  } catch {
+    return { error: "Something went wrong. Please try again." };
   }
 }
