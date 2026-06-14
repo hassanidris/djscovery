@@ -114,28 +114,35 @@ export default async function OrganizerPublicProfilePage({
 
   if (!profile) return notFound();
 
-  const activeJobs = await prisma.job.findMany({
-    where: { organizerProfileId: profile.id, status: "OPEN", deletedAt: null },
+  const activeGigs = await prisma.gig.findMany({
+    where: {
+      organizerProfileId: profile.id,
+      status: "PUBLISHED",
+      deletedAt: null,
+    },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
       title: true,
-      budget: true,
+      gigType: true,
+      budgetType: true,
+      budgetMin: true,
+      budgetMax: true,
+      currency: true,
+      eventDate: true,
       createdAt: true,
-      countryId: true,
-      cityId: true,
     },
     take: 6,
   });
 
-  const pastJobs = await prisma.job.findMany({
+  const pastGigs = await prisma.gig.findMany({
     where: {
       organizerProfileId: profile.id,
-      status: "CLOSED",
+      status: { in: ["FILLED", "CANCELLED"] },
       deletedAt: null,
     },
     orderBy: { updatedAt: "desc" },
-    select: { id: true, title: true, updatedAt: true },
+    select: { id: true, title: true, gigType: true, updatedAt: true },
     take: 6,
   });
 
@@ -259,14 +266,14 @@ export default async function OrganizerPublicProfilePage({
               <h2 className="text-base font-semibold text-white">
                 Active Gigs
               </h2>
-              {activeJobs.length > 0 && (
+              {activeGigs.length > 0 && (
                 <span className="bg-h_red/20 text-h_red rounded-full px-2 py-0.5 text-xs font-medium">
-                  {activeJobs.length}
+                  {activeGigs.length}
                 </span>
               )}
             </div>
 
-            {activeJobs.length === 0 ? (
+            {activeGigs.length === 0 ? (
               <div className="rounded-xl border border-dashed border-white/10 p-8 text-center">
                 <Briefcase className="mx-auto mb-2 h-6 w-6 text-gray-700" />
                 <p className="text-sm text-gray-600">
@@ -275,27 +282,34 @@ export default async function OrganizerPublicProfilePage({
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {activeJobs.map((job) => (
+                {activeGigs.map((gig) => (
                   <div
-                    key={job.id}
+                    key={gig.id}
                     className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-5 py-4"
                   >
                     <div>
-                      <p className="font-medium text-white">{job.title}</p>
+                      <p className="font-medium text-white">{gig.title}</p>
                       <p className="mt-0.5 text-xs text-gray-500">
-                        Posted{" "}
-                        {new Date(job.createdAt).toLocaleDateString("en-US", {
+                        {new Date(gig.eventDate).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
                           year: "numeric",
                         })}
                       </p>
                     </div>
-                    {job.budget !== null && (
+                    {gig.budgetType === "FIXED" && gig.budgetMin != null && (
                       <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
-                        ${Number(job.budget).toLocaleString()}
+                        {gig.currency} {gig.budgetMin.toLocaleString()}
                       </span>
                     )}
+                    {gig.budgetType === "RANGE" &&
+                      gig.budgetMin != null &&
+                      gig.budgetMax != null && (
+                        <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
+                          {gig.currency} {gig.budgetMin.toLocaleString()} –{" "}
+                          {gig.budgetMax.toLocaleString()}
+                        </span>
+                      )}
                   </div>
                 ))}
               </div>
@@ -303,25 +317,25 @@ export default async function OrganizerPublicProfilePage({
           </section>
 
           {/* Past gigs */}
-          {pastJobs.length > 0 && (
+          {pastGigs.length > 0 && (
             <section>
               <div className="mb-4 flex items-center gap-2">
                 <h2 className="text-base font-semibold text-white">
                   Past Gigs
                 </h2>
                 <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-gray-400">
-                  {pastJobs.length}
+                  {pastGigs.length}
                 </span>
               </div>
               <div className="flex flex-col gap-2">
-                {pastJobs.map((job) => (
+                {pastGigs.map((gig) => (
                   <div
-                    key={job.id}
+                    key={gig.id}
                     className="flex items-center justify-between rounded-xl border border-white/8 px-5 py-3 text-sm"
                   >
-                    <span className="text-gray-400">{job.title}</span>
+                    <span className="text-gray-400">{gig.title}</span>
                     <span className="text-xs text-gray-600">
-                      {new Date(job.updatedAt).toLocaleDateString("en-US", {
+                      {new Date(gig.updatedAt).toLocaleDateString("en-US", {
                         month: "short",
                         year: "numeric",
                       })}

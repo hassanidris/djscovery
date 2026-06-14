@@ -47,28 +47,63 @@ enum EventStatus {
   COMPLETED
 }
 
-enum JobStatus {
-  OPEN
-  CLOSED
+enum GigStatus {
+  DRAFT
+  PUBLISHED
+  UNDER_REVIEW
+  FILLED
   CANCELLED
+  EXPIRED
 }
 
-enum ApplicationStatus {
-  PENDING
+enum GigApplicationStatus {
+  APPLIED
+  SHORTLISTED
   ACCEPTED
   REJECTED
   WITHDRAWN
+}
+
+enum GigType {
+  CLUB
+  FESTIVAL
+  WEDDING
+  CORPORATE_EVENT
+  PRIVATE_PARTY
+  BIRTHDAY_PARTY
+  LOUNGE
+  RESTAURANT
+  HOTEL
+  BAR
+  OTHER
+}
+
+enum BudgetType {
+  FIXED
+  RANGE
+  NEGOTIABLE
+  TBA
+}
+
+enum ExperienceLevel {
+  OPEN
+  BEGINNER
+  INTERMEDIATE
+  PROFESSIONAL
+  EXPERT
 }
 
 enum NotificationType {
   NEW_COMMENT
   NEW_REPLY
   NEW_RATING
-  NEW_JOB
-  JOB_APPLICATION
-  APPLICATION_ACCEPTED
-  APPLICATION_REJECTED
   DJ_REGISTRATION // Admin receives this when a DJ registers
+  GIG_PUBLISHED
+  GIG_APPLICATION_RECEIVED
+  GIG_APPLICATION_SHORTLISTED
+  GIG_APPLICATION_ACCEPTED
+  GIG_APPLICATION_REJECTED
+  GIG_APPLICATION_WITHDRAWN
 }
 
 enum DjType {
@@ -116,6 +151,7 @@ model Country {
   djProfiles        DjProfile[]
   organizerProfiles OrganizerProfile[]
   events            Event[]
+  gigs              Gig[]
 
   @@index([name])
 }
@@ -129,6 +165,7 @@ model City {
   djProfiles        DjProfile[]
   organizerProfiles OrganizerProfile[]
   events            Event[]
+  gigs              Gig[]
 
   @@unique([name, countryId])
   @@index([countryId])
@@ -164,9 +201,6 @@ model User {
   djComments     DjComment[]
   djCommentLikes DjCommentLike[]
   djRatings      DjRating[]
-
-  jobApplications JobApplication[] @relation("ApplicantApplications")
-  jobsPosted      Job[]            @relation("OrganizerJobs")
 
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationSender")
@@ -226,14 +260,15 @@ model DjProfile {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  genres      DjGenre[]
-  djTypes     DjProfileType[]
-  socialLinks SocialLink[]
-  ratings     DjRating[]
-  comments    DjComment[]
-  media       Media[]
-  events      EventDj[]
-  eventsOwned Event[]         @relation("EventOwner")
+  genres          DjGenre[]
+  djTypes         DjProfileType[]
+  socialLinks     SocialLink[]
+  ratings         DjRating[]
+  comments        DjComment[]
+  media           Media[]
+  events          EventDj[]
+  eventsOwned     Event[]          @relation("EventOwner")
+  gigApplications GigApplication[]
 
   @@index([slug])
   @@index([status])
@@ -276,7 +311,7 @@ model OrganizerProfile {
   deletedAt DateTime?
 
   socialLinks OrganizerSocialLink[]
-  jobs        Job[]
+  gigs        Gig[]
 
   @@index([slug])
   @@index([status])
@@ -530,50 +565,98 @@ model EventDj {
   @@id([eventId, djProfileId])
 }
 
-// ------ HIRING MARKETPLACE ------
+// ------ GIGS MARKETPLACE ------
 
-model Job {
-  id          Int       @id @default(autoincrement())
-  title       String
-  description String?
-  budget      Decimal?
-  status      JobStatus @default(OPEN)
-  deletedAt   DateTime?
+model Gig {
+  id   Int    @id @default(autoincrement())
+  slug String @unique
 
-  organizerId        String
-  organizer          User             @relation("OrganizerJobs", fields: [organizerId], references: [id])
-  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id])
   organizerProfileId Int
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
 
-  countryId Int?
-  cityId    Int?
+  title               String
+  gigType             GigType
+  description         String?
+  status              GigStatus @default(DRAFT)
+  eventDate           DateTime
+  applicationDeadline DateTime?
 
-  applications JobApplication[]
+  // Location (city/country always visible; address/venue revealed only after acceptance)
+  countryId       Int?
+  country         Country? @relation(fields: [countryId], references: [id])
+  cityId          Int?
+  city            City?    @relation(fields: [cityId], references: [id])
+  venueName       String?
+  hideVenueName   Boolean  @default(false)
+  venueAddress    String? // PRIVATE — revealed to accepted DJ only
+  venuePostalCode String? // PRIVATE — revealed to accepted DJ only
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Budget
+  budgetType BudgetType @default(TBA)
+  budgetMin  Int?
+  budgetMax  Int?
+  currency   String     @default("SEK")
+
+  // Requirements
+  requiredGenres          String[]
+  requiredExperienceLevel ExperienceLevel @default(OPEN)
+  setDurationMinutes      Int?
+  guestCount              Int?
+  dressCode               String?
+  mcRequired              Boolean         @default(false)
+  micRequired             Boolean         @default(false)
+  languagesSpoken         String[]
+
+  // Equipment (bounded multi-select; values enforced by app layer)
+  venueProvides String[]
+  djMustBring   String[]
+
+  // Logistics (PRIVATE — revealed to accepted DJ only)
+  arrivalInstructions   String?
+  setupNotes            String?
+  organizerContactName  String?
+  organizerContactPhone String?
+  organizerContactEmail String?
+
+  viewCount Int       @default(0)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  applications GigApplication[]
 
   @@index([status])
-  @@index([organizerId])
+  @@index([gigType])
+  @@index([organizerProfileId])
+  @@index([eventDate])
+  @@index([cityId])
+  @@index([countryId])
+  @@index([applicationDeadline])
+  @@index([slug])
 }
 
-model JobApplication {
-  id       Int               @id @default(autoincrement())
-  status   ApplicationStatus @default(PENDING)
-  message  String? // DJ's cover message
-  isInvite Boolean           @default(false) // true = organizer invited DJ directly
+model GigApplication {
+  id      Int                  @id @default(autoincrement())
+  status  GigApplicationStatus @default(APPLIED)
+  message String?
 
-  jobId       Int
-  job         Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  applicantId String
-  applicant   User   @relation("ApplicantApplications", fields: [applicantId], references: [id])
+  gigId Int
+  gig   Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  shortlistedAt DateTime?
+  acceptedAt    DateTime?
+  rejectedAt    DateTime?
+  withdrawnAt   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([jobId, applicantId])
-  @@index([jobId])
-  @@index([applicantId])
+  @@unique([gigId, djProfileId])
+  @@index([gigId])
+  @@index([djProfileId])
   @@index([status])
 }
 
@@ -675,7 +758,7 @@ model EventAttendance {
 
 // ------ HIRE RECORDS ------
 
-// Created automatically when a JobApplication is ACCEPTED
+// Created automatically when a GigApplication is ACCEPTED
 model Hire {
   id            Int      @id @default(autoincrement())
   applicationId Int      @unique
@@ -703,9 +786,9 @@ model Hire {
 // @@index([startsAt, endsAt]) for efficient expiry queries.
 // Use alongside featured Boolean for granular control.
 
-// -- Future: FeaturedJob --
-// Organizer pays to boost job listing visibility.
-// Fields: jobId, startsAt, endsAt
+// -- Future: FeaturedGig --
+// Organizer pays to boost gig listing visibility.
+// Fields: gigId, startsAt, endsAt
 
 // -- Future: BookingInquiry --
 // Replaces mailto: with structured booking requests.
