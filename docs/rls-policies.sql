@@ -431,6 +431,10 @@ CREATE POLICY "Organizer can upload own logo"
     bucket_id = 'djscovery-media'
     AND (storage.foldername(name))[1] = 'org-avatar'
     AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
   );
 
 CREATE POLICY "Organizer can update own logo"
@@ -459,6 +463,10 @@ CREATE POLICY "Organizer can upload own cover"
     bucket_id = 'djscovery-media'
     AND (storage.foldername(name))[1] = 'org-cover'
     AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
   );
 
 CREATE POLICY "Organizer can update own cover"

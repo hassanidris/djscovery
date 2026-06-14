@@ -45,9 +45,15 @@ export async function signUp(formData: FormData) {
     redirect("/"); // Fan — go straight to the app
   }
 
-  // Email confirmation required — pass role through so auth callback can use it
+  // Email confirmation required — pass role destination via callback `next`
+  const next =
+    role === "dj"
+      ? "/become-dj"
+      : role === "organiser"
+        ? "/become-organizer"
+        : "/";
   redirect(
-    `/sign-in?message=Check your email to confirm your account&role=${encodeURIComponent(role)}`,
+    `/sign-in?message=Check your email to confirm your account&next=${encodeURIComponent(next)}`,
   );
 }
 

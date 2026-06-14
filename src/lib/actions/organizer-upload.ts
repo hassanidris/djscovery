@@ -87,6 +87,7 @@ export async function uploadOrganizerLogo(
     });
   } catch (err) {
     console.error("[uploadOrganizerLogo] prisma update failed:", err);
+    await supabase.storage.from(BUCKET).remove([result.path]);
     return {
       error: "Image uploaded but failed to save to profile. Please try again.",
     };
@@ -129,6 +130,7 @@ export async function uploadOrganizerCover(
     });
   } catch (err) {
     console.error("[uploadOrganizerCover] prisma update failed:", err);
+    await supabase.storage.from(BUCKET).remove([result.path]);
     return {
       error: "Image uploaded but failed to save to profile. Please try again.",
     };
@@ -163,12 +165,12 @@ export async function deleteOrganizerImage(
   const storagePath =
     field === "logoUrl" ? profile.logoPath : profile.coverImagePath;
 
-  // Best-effort storage delete — DB is always updated regardless
   if (storagePath) {
-    try {
-      await supabase.storage.from(BUCKET).remove([storagePath]);
-    } catch {
-      // continue
+    const { error: removeError } = await supabase.storage
+      .from(BUCKET)
+      .remove([storagePath]);
+    if (removeError) {
+      return { error: `Failed to delete image: ${removeError.message}` };
     }
   }
 
