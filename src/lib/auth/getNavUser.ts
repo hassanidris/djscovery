@@ -6,6 +6,7 @@ import type { NavRole } from "@/config/navigation";
 export type NavUserData = {
   navRole: NavRole;
   isLoggedIn: boolean;
+  isOrganizer: boolean;
   username: string | null;
   djSlug: string | null;
   displayName: string;
@@ -23,6 +24,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
     return {
       navRole: "guest",
       isLoggedIn: false,
+      isOrganizer: false,
       username: null,
       djSlug: null,
       displayName: "Guest",
@@ -54,6 +56,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
   return {
     navRole,
     isLoggedIn: true,
+    isOrganizer: roles.includes("ORGANIZER"),
     username: profile?.username ?? null,
     djSlug: profile?.djProfile?.slug ?? null,
     displayName,

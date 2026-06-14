@@ -42,6 +42,7 @@ ALTER TABLE "ConversationParticipant" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Message"                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "EventAttendance"         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Hire"                    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "OrganizerSocialLink"     ENABLE ROW LEVEL SECURITY;
 
 
 -- ============================================================
@@ -243,14 +244,57 @@ CREATE POLICY "User can read own roles"
   ON "UserRole" FOR SELECT
   USING (auth.uid()::text = "userId");
 
--- OrganizerProfile: owner only
-CREATE POLICY "Organizer can read own profile"
+-- OrganizerProfile: public read for ACTIVE profiles; full CRUD for owner only
+CREATE POLICY "Public can view active organizer profiles"
+  ON "OrganizerProfile" FOR SELECT
+  USING (status = 'ACTIVE' AND "deletedAt" IS NULL);
+
+CREATE POLICY "Organizer can read own profile (any status)"
   ON "OrganizerProfile" FOR SELECT
   USING (auth.uid()::text = "userId");
 
+CREATE POLICY "Authenticated user can create own organizer profile"
+  ON "OrganizerProfile" FOR INSERT
+  WITH CHECK (auth.uid()::text = "userId");
+
 CREATE POLICY "Organizer can update own profile"
   ON "OrganizerProfile" FOR UPDATE
-  USING (auth.uid()::text = "userId");
+  USING (auth.uid()::text = "userId")
+  WITH CHECK (auth.uid()::text = "userId");
+
+-- OrganizerSocialLink: public read if parent profile is ACTIVE; owner full CRUD
+CREATE POLICY "Public can view active organizer social links"
+  ON "OrganizerSocialLink" FOR SELECT
+  USING (
+    "organizerProfileId" IN (
+      SELECT id FROM "OrganizerProfile"
+      WHERE status = 'ACTIVE' AND "deletedAt" IS NULL
+    )
+  );
+
+CREATE POLICY "Organizer can insert own social links"
+  ON "OrganizerSocialLink" FOR INSERT
+  WITH CHECK (
+    "organizerProfileId" IN (
+      SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Organizer can update own social links"
+  ON "OrganizerSocialLink" FOR UPDATE
+  USING (
+    "organizerProfileId" IN (
+      SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Organizer can delete own social links"
+  ON "OrganizerSocialLink" FOR DELETE
+  USING (
+    "organizerProfileId" IN (
+      SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
+    )
+  );
 
 -- JobApplication: applicant reads own records.
 -- Organizer access is enforced server-side via Prisma (bypasses RLS) — no policy needed here.

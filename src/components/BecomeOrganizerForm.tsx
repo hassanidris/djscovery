@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createOrganizerProfile } from "@/lib/actions/profile";
 
+const ORGANIZER_TYPES = [
+  { value: "INDIVIDUAL", label: "Individual — solo organizer or promoter" },
+  { value: "COMPANY", label: "Company — registered business or brand" },
+  { value: "VENUE", label: "Venue — club, bar, or event space" },
+  { value: "AGENCY", label: "Agency — talent or booking agency" },
+  { value: "FESTIVAL", label: "Festival — multi-act or recurring festival" },
+] as const;
+
 const initialState = { success: false, error: null as string | null };
 
 export default function BecomeOrganizerForm() {
@@ -16,10 +24,8 @@ export default function BecomeOrganizerForm() {
 
   useEffect(() => {
     if (state.success) {
-      toast.success(
-        "Organizer profile created! Let\u2019s post your first gig. \ud83c\udf89",
-      );
-      router.push("/");
+      toast.success("Organizer profile created! 🎉");
+      router.push("/organizer/dashboard");
     }
     if (state.error) {
       toast.error(state.error);
@@ -29,40 +35,62 @@ export default function BecomeOrganizerForm() {
   return (
     <form
       action={formAction}
-      className="bg-white/5 border border-white/10 rounded-xl p-8 flex flex-col gap-5"
+      className="flex flex-col gap-5 rounded-xl border border-white/10 bg-white/5 p-8"
     >
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm text-gray-300 font-medium">
-          Business / Event Name <span className="text-h_red">*</span>
+        <label
+          htmlFor="displayName"
+          className="text-sm font-medium text-gray-300"
+        >
+          Display Name <span className="text-h_red">*</span>
         </label>
         <input
+          id="displayName"
           type="text"
-          name="businessName"
+          name="displayName"
           placeholder="e.g. Nolimits Events"
           required
           minLength={2}
           maxLength={80}
-          className="bg-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all"
+          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
         />
+        <p className="text-xs text-gray-500">
+          This is the name DJs will see on your profile and gig postings.
+        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm text-gray-300 font-medium">
-          Phone <span className="text-gray-500 font-normal">(optional)</span>
+        <label
+          htmlFor="organizerType"
+          className="text-sm font-medium text-gray-300"
+        >
+          Organizer Type <span className="text-h_red">*</span>
         </label>
-        <input
-          type="tel"
-          name="phone"
-          placeholder="+1 555 000 0000"
-          maxLength={30}
-          className="bg-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all"
-        />
+        <select
+          id="organizerType"
+          name="organizerType"
+          required
+          defaultValue=""
+          className="focus:ring-h_red appearance-none rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 transition-all outline-none"
+        >
+          <option value="" disabled className="bg-gray-900">
+            Select a type...
+          </option>
+          {ORGANIZER_TYPES.map((t) => (
+            <option key={t.value} value={t.value} className="bg-gray-900">
+              {t.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500">
+          Shown as a badge on your public profile. You can change it later.
+        </p>
       </div>
 
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-h_red hover:bg-h_redDark disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors"
+        className="bg-h_red hover:bg-h_redDark w-full rounded-lg py-3 font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Creating profile..." : "Create Organizer Profile"}
       </button>

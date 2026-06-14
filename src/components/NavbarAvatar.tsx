@@ -21,6 +21,7 @@ type Props = {
   username: string | null;
   navRole: NavRole;
   djSlug: string | null;
+  isOrganizer: boolean;
 };
 
 export default function NavbarAvatar({
@@ -30,6 +31,7 @@ export default function NavbarAvatar({
   username,
   navRole,
   djSlug,
+  isOrganizer,
 }: Props) {
   const signOutFormRef = useRef<HTMLFormElement>(null);
 
@@ -38,13 +40,13 @@ export default function NavbarAvatar({
       <form ref={signOutFormRef} action={signOut} className="hidden" />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="outline-none rounded-full focus-visible:ring-2 focus-visible:ring-h_red">
-            <Avatar className="size-8 ring-2 ring-h_red hover:ring-h_redDark transition-all cursor-pointer">
+          <button className="focus-visible:ring-h_red rounded-full outline-none focus-visible:ring-2">
+            <Avatar className="ring-h_red hover:ring-h_redDark size-8 cursor-pointer ring-2 transition-all">
               <AvatarImage
                 src={avatarSrc ?? "/noAvatar.png"}
                 alt={displayName}
               />
-              <AvatarFallback className="bg-h_redDark text-white text-sm font-semibold">
+              <AvatarFallback className="bg-h_redDark text-sm font-semibold text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -54,12 +56,12 @@ export default function NavbarAvatar({
         <DropdownMenuContent
           align="end"
           sideOffset={8}
-          className="w-52 bg-h_blackLight border border-white/10 text-white"
+          className="bg-h_blackLight w-52 border border-white/10 text-white"
         >
           {(username || djSlug) && (
             <DropdownMenuItem
               asChild
-              className="cursor-pointer text-gray-300 focus:text-white focus:bg-white/5"
+              className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
             >
               <Link
                 href={
@@ -75,9 +77,18 @@ export default function NavbarAvatar({
             </DropdownMenuItem>
           )}
 
+          {isOrganizer && (
+            <DropdownMenuItem
+              asChild
+              className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
+            >
+              <Link href="/organizer/dashboard">Organizer Dashboard</Link>
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuItem
             asChild
-            className="cursor-pointer text-gray-300 focus:text-white focus:bg-white/5"
+            className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
           >
             <Link href="/settings">Settings</Link>
           </DropdownMenuItem>

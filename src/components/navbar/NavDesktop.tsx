@@ -13,6 +13,7 @@ import type { NavUserData } from "@/lib/auth/getNavUser";
 export default function NavDesktop({
   navRole,
   isLoggedIn,
+  isOrganizer,
   username,
   djSlug,
   displayName,
@@ -160,6 +161,7 @@ export default function NavDesktop({
                 username={username}
                 navRole={navRole}
                 djSlug={djSlug}
+                isOrganizer={isOrganizer}
               />
             </div>
           </div>
