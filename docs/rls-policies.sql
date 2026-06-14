@@ -411,74 +411,76 @@ CREATE POLICY "Authenticated user can remove attendance"
 
 
 -- ============================================================
--- STEP 9: Supabase Storage — organizer image buckets
+-- STEP 9: Supabase Storage — organizer images in djscovery-media
 -- ============================================================
--- Run these in the Supabase SQL Editor (same as above).
--- Buckets must be created first in the Supabase Dashboard:
---   Storage → New bucket → name: "org-avatar", Public: ON
---   Storage → New bucket → name: "org-cover",  Public: ON
+-- All organizer images go into the shared djscovery-media bucket
+-- (same bucket as dj-avatars / dj-covers / dj-gallery).
+-- Path convention: org-avatar/{userId}/{timestamp}.{ext}
+--                  org-cover/{userId}/{timestamp}.{ext}
 --
--- Storage policies operate on the storage.objects table.
--- Path convention: {userId}/{timestamp}.{ext}
--- The folder name (first path segment) must match the uploader's uid.
+-- If djscovery-media already has broad SELECT/INSERT policies from
+-- the DJ upload setup, these may already be covered. Run only if
+-- organizer uploads are still being blocked.
 -- ============================================================
 
--- org-avatar bucket: authenticated users upload/update their own folder
+-- Allow authenticated users to upload under org-avatar/{their uid}/
 CREATE POLICY "Organizer can upload own logo"
   ON storage.objects FOR INSERT
   TO authenticated
   WITH CHECK (
-    bucket_id = 'org-avatar'
-    AND (storage.foldername(name))[1] = auth.uid()::text
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-avatar'
+    AND (storage.foldername(name))[2] = auth.uid()::text
   );
 
 CREATE POLICY "Organizer can update own logo"
   ON storage.objects FOR UPDATE
   TO authenticated
   USING (
-    bucket_id = 'org-avatar'
-    AND (storage.foldername(name))[1] = auth.uid()::text
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-avatar'
+    AND (storage.foldername(name))[2] = auth.uid()::text
   );
 
 CREATE POLICY "Organizer can delete own logo"
   ON storage.objects FOR DELETE
   TO authenticated
   USING (
-    bucket_id = 'org-avatar'
-    AND (storage.foldername(name))[1] = auth.uid()::text
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-avatar'
+    AND (storage.foldername(name))[2] = auth.uid()::text
   );
 
-CREATE POLICY "Public can read organizer logos"
-  ON storage.objects FOR SELECT
-  TO public
-  USING (bucket_id = 'org-avatar');
-
--- org-cover bucket: same pattern, higher size limit enforced in app
+-- Allow authenticated users to upload under org-cover/{their uid}/
 CREATE POLICY "Organizer can upload own cover"
   ON storage.objects FOR INSERT
   TO authenticated
   WITH CHECK (
-    bucket_id = 'org-cover'
-    AND (storage.foldername(name))[1] = auth.uid()::text
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[2] = auth.uid()::text
   );
 
 CREATE POLICY "Organizer can update own cover"
   ON storage.objects FOR UPDATE
   TO authenticated
   USING (
-    bucket_id = 'org-cover'
-    AND (storage.foldername(name))[1] = auth.uid()::text
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[2] = auth.uid()::text
   );
 
 CREATE POLICY "Organizer can delete own cover"
   ON storage.objects FOR DELETE
   TO authenticated
   USING (
-    bucket_id = 'org-cover'
-    AND (storage.foldername(name))[1] = auth.uid()::text
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[2] = auth.uid()::text
   );
 
-CREATE POLICY "Public can read organizer covers"
-  ON storage.objects FOR SELECT
-  TO public
-  USING (bucket_id = 'org-cover');
+-- Public SELECT is already covered by the broad djscovery-media policy.
+-- Only add this if public reads are missing:
+-- CREATE POLICY "Public can read organizer images"
+--   ON storage.objects FOR SELECT TO public
+--   USING (bucket_id = 'djscovery-media');

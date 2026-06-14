@@ -35,7 +35,7 @@ function profileCompleteness(profile: {
 }): { score: number; missing: string[] } {
   const checks: [boolean, string][] = [
     [!!profile.bio, "Add a bio"],
-    [!!profile.logoUrl, "Upload an organizer logo"],
+    [!!profile.logoUrl, "Upload your avatar / logo"],
     [!!profile.coverImageUrl, "Upload a cover image"],
     [!!profile.website, "Add your website"],
     [!!profile.countryId, "Set your location"],
