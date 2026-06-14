@@ -23,6 +23,8 @@ export default async function OrganizerSettingsPage() {
   });
 
   if (!profile) redirect("/become-organizer");
+  if (profile.status !== "ACTIVE" || profile.deletedAt !== null)
+    redirect("/become-organizer");
 
   const countries = await prisma.country.findMany({
     orderBy: { name: "asc" },

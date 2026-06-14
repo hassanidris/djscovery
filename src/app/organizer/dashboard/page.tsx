@@ -66,6 +66,8 @@ export default async function OrganizerDashboardPage() {
   });
 
   if (!profile) redirect("/become-organizer");
+  if (profile.status !== "ACTIVE" || profile.deletedAt !== null)
+    redirect("/become-organizer");
 
   const { score, missing } = profileCompleteness(profile);
   const typeLabel =

@@ -33,6 +33,17 @@ const SOCIAL_ICONS: Record<string, string> = {
   website: "🌐",
 };
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function safeHref(url: string): string | null {
+  try {
+    const { protocol } = new URL(url);
+    return protocol === "http:" || protocol === "https:" ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({
@@ -197,9 +208,9 @@ export default async function OrganizerPublicProfilePage({
             {/* Social links + website */}
             {(profile.website || profile.socialLinks.length > 0) && (
               <div className="mt-1 flex flex-wrap items-center gap-2">
-                {profile.website && (
+                {profile.website && safeHref(profile.website) && (
                   <a
-                    href={profile.website}
+                    href={safeHref(profile.website)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-300 transition-colors hover:border-white/25 hover:text-white"
@@ -209,19 +220,23 @@ export default async function OrganizerPublicProfilePage({
                     <ExternalLink className="h-3 w-3 opacity-60" />
                   </a>
                 )}
-                {profile.socialLinks.map((link) => (
-                  <a
-                    key={link.platform}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={link.platform}
-                    className="rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-400 transition-colors hover:border-white/25 hover:text-white"
-                  >
-                    {SOCIAL_ICONS[link.platform] ?? "🔗"}{" "}
-                    <span className="capitalize">{link.platform}</span>
-                  </a>
-                ))}
+                {profile.socialLinks.map((link) => {
+                  const href = safeHref(link.url);
+                  if (!href) return null;
+                  return (
+                    <a
+                      key={link.platform}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={link.platform}
+                      className="rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-400 transition-colors hover:border-white/25 hover:text-white"
+                    >
+                      {SOCIAL_ICONS[link.platform] ?? "🔗"}{" "}
+                      <span className="capitalize">{link.platform}</span>
+                    </a>
+                  );
+                })}
               </div>
             )}
           </div>

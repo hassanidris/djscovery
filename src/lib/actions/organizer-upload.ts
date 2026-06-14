@@ -64,16 +64,27 @@ export async function uploadOrganizerLogo(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
+  const profileCheck = await prisma.organizerProfile.findUnique({
+    where: { userId: user.id },
+    select: { status: true, deletedAt: true },
+  });
+  if (
+    !profileCheck ||
+    profileCheck.status !== "ACTIVE" ||
+    profileCheck.deletedAt !== null
+  )
+    return { error: "Your organizer profile is not active." };
+
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
 
   const result = await uploadOrganizerImage(file, "avatar");
   if ("error" in result) return result;
 
-  // Persist the URL to the organizer profile
+  // Persist the URL and Storage path to the organizer profile
   await prisma.organizerProfile.update({
     where: { userId: user.id },
-    data: { logoUrl: result.url },
+    data: { logoUrl: result.url, logoPath: result.path },
   });
 
   return result;
@@ -88,16 +99,27 @@ export async function uploadOrganizerCover(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
+  const profileCheck = await prisma.organizerProfile.findUnique({
+    where: { userId: user.id },
+    select: { status: true, deletedAt: true },
+  });
+  if (
+    !profileCheck ||
+    profileCheck.status !== "ACTIVE" ||
+    profileCheck.deletedAt !== null
+  )
+    return { error: "Your organizer profile is not active." };
+
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
 
   const result = await uploadOrganizerImage(file, "cover");
   if ("error" in result) return result;
 
-  // Persist the URL to the organizer profile
+  // Persist the URL and Storage path to the organizer profile
   await prisma.organizerProfile.update({
     where: { userId: user.id },
-    data: { coverImageUrl: result.url },
+    data: { coverImageUrl: result.url, coverImagePath: result.path },
   });
 
   return result;
@@ -105,7 +127,6 @@ export async function uploadOrganizerCover(
 
 export async function deleteOrganizerImage(
   field: "logoUrl" | "coverImageUrl",
-  path: string,
 ): Promise<{ success: true } | { error: string }> {
   const supabase = await createClient();
   const {
@@ -113,19 +134,37 @@ export async function deleteOrganizerImage(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
+  const pathField = field === "logoUrl" ? "logoPath" : "coverImagePath";
   const bucketKey: BucketKey = field === "logoUrl" ? "avatar" : "cover";
   const bucket = BUCKETS[bucketKey];
 
+  // Read the stored path from DB — server is the source of truth; also verify active status
+  const profile = await prisma.organizerProfile.findUnique({
+    where: { userId: user.id },
+    select: {
+      logoPath: true,
+      coverImagePath: true,
+      status: true,
+      deletedAt: true,
+    },
+  });
+  if (!profile || profile.status !== "ACTIVE" || profile.deletedAt !== null)
+    return { error: "Your organizer profile is not active." };
+  const storagePath =
+    field === "logoUrl" ? profile.logoPath : profile.coverImagePath;
+
   // Best-effort storage delete — DB is always updated regardless
-  try {
-    await supabase.storage.from(bucket).remove([path]);
-  } catch {
-    // continue
+  if (storagePath) {
+    try {
+      await supabase.storage.from(bucket).remove([storagePath]);
+    } catch {
+      // continue
+    }
   }
 
   await prisma.organizerProfile.update({
     where: { userId: user.id },
-    data: { [field]: null },
+    data: { [field]: null, [pathField]: null },
   });
 
   return { success: true as const };

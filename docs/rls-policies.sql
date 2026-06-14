@@ -255,12 +255,30 @@ CREATE POLICY "Organizer can read own profile (any status)"
 
 CREATE POLICY "Authenticated user can create own organizer profile"
   ON "OrganizerProfile" FOR INSERT
-  WITH CHECK (auth.uid()::text = "userId");
+  WITH CHECK (
+    auth.uid()::text = "userId"
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
+  );
 
+-- Note: status and deletedAt are server-controlled via Prisma (bypasses RLS); deletedAt IS NULL
+-- guard below prevents direct-API updates to soft-deleted profiles and undo of soft-deletes.
 CREATE POLICY "Organizer can update own profile"
   ON "OrganizerProfile" FOR UPDATE
-  USING (auth.uid()::text = "userId")
-  WITH CHECK (auth.uid()::text = "userId");
+  USING (
+    auth.uid()::text = "userId"
+    AND "deletedAt" IS NULL
+  )
+  WITH CHECK (
+    auth.uid()::text = "userId"
+    AND "deletedAt" IS NULL
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
+  );
 
 -- OrganizerSocialLink: public read if parent profile is ACTIVE; owner full CRUD
 CREATE POLICY "Public can view active organizer social links"
@@ -278,6 +296,10 @@ CREATE POLICY "Organizer can insert own social links"
     "organizerProfileId" IN (
       SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
     )
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
   );
 
 CREATE POLICY "Organizer can update own social links"
@@ -286,6 +308,15 @@ CREATE POLICY "Organizer can update own social links"
     "organizerProfileId" IN (
       SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
     )
+  )
+  WITH CHECK (
+    "organizerProfileId" IN (
+      SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
+    )
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
   );
 
 CREATE POLICY "Organizer can delete own social links"
@@ -293,6 +324,10 @@ CREATE POLICY "Organizer can delete own social links"
   USING (
     "organizerProfileId" IN (
       SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
+    )
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
     )
   );
 

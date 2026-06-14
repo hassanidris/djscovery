@@ -44,15 +44,15 @@ The Organizer Profile exists to:
 
 ## Responsibilities
 
-| Responsibility | Scope |
-|---|---|
-| Post gigs | Core MVP |
-| Hire DJs via gig applications | Core MVP |
-| Write post-gig reviews for DJs | Phase 2 |
-| View their own posted gigs | Core MVP |
-| View their own hired DJs | Phase 2 |
-| Be discoverable via Gig pages | Core MVP (passive) |
-| Be discoverable via directory | **Never** |
+| Responsibility                 | Scope              |
+| ------------------------------ | ------------------ |
+| Post gigs                      | Core MVP           |
+| Hire DJs via gig applications  | Core MVP           |
+| Write post-gig reviews for DJs | Phase 2            |
+| View their own posted gigs     | Core MVP           |
+| View their own hired DJs       | Phase 2            |
+| Be discoverable via Gig pages  | Core MVP (passive) |
+| Be discoverable via directory  | **Never**          |
 
 ---
 
@@ -120,6 +120,7 @@ The Organizer Profile exists to:
 ```
 
 **Important:** The URL `/organizers/[slug]` is NOT linked from any directory or search. It is only surfaced from:
+
 - Gig detail pages (`/gigs/[id]` → Organizer Name → links to this page)
 - Future: completed gig records
 - Future: DJ review pages (showing which organizer left the review)
@@ -130,29 +131,29 @@ The Organizer Profile exists to:
 
 ### MVP Required Fields
 
-| Field Name | Data Type | Validation Rules | Public | Editable |
-|---|---|---|---|---|
-| `displayName` | `String` | min 2, max 80 chars | ✅ Yes | ✅ Yes |
-| `organizerType` | `OrganizerType` enum | must be valid enum value | ✅ Yes | ✅ Yes |
-| `slug` | `String` | auto-generated from displayName, unique, URL-safe, max 100 | ✅ Yes | ❌ No (auto) |
-| `userId` | `String` | FK → User.id | ❌ No | ❌ No |
-| `status` | `OrganizerStatus` enum | PENDING / ACTIVE / SUSPENDED | ❌ No | ❌ No (admin) |
-| `createdAt` | `DateTime` | auto | ❌ No | ❌ No |
-| `updatedAt` | `DateTime` | auto | ❌ No | ❌ No |
+| Field Name      | Data Type              | Validation Rules                                           | Public | Editable      |
+| --------------- | ---------------------- | ---------------------------------------------------------- | ------ | ------------- |
+| `displayName`   | `String`               | min 2, max 80 chars                                        | ✅ Yes | ✅ Yes        |
+| `organizerType` | `OrganizerType` enum   | must be valid enum value                                   | ✅ Yes | ✅ Yes        |
+| `slug`          | `String`               | auto-generated from displayName, unique, URL-safe, max 100 | ✅ Yes | ❌ No (auto)  |
+| `userId`        | `String`               | FK → User.id                                               | ❌ No  | ❌ No         |
+| `status`        | `OrganizerStatus` enum | PENDING / ACTIVE / SUSPENDED                               | ❌ No  | ❌ No (admin) |
+| `createdAt`     | `DateTime`             | auto                                                       | ❌ No  | ❌ No         |
+| `updatedAt`     | `DateTime`             | auto                                                       | ❌ No  | ❌ No         |
 
 ### MVP Optional Fields
 
-| Field Name | Data Type | Validation Rules | Public | Editable |
-|---|---|---|---|---|
-| `bio` | `String?` | max 600 chars | ✅ Yes | ✅ Yes |
-| `logoUrl` | `String?` | valid URL, Supabase Storage path, max 5MB, jpg/png/webp | ✅ Yes | ✅ Yes |
-| `coverImageUrl` | `String?` | valid URL, Supabase Storage path, max 10MB, jpg/png/webp | ✅ Yes | ✅ Yes |
-| `website` | `String?` | valid URL, must begin with https://, max 200 chars | ✅ Yes | ✅ Yes |
-| `countryId` | `Int?` | FK → Country.id | ✅ Yes | ✅ Yes |
-| `cityId` | `Int?` | FK → City.id, must belong to countryId | ✅ Yes | ✅ Yes |
-| `contactEmail` | `String?` | valid email, max 100 chars | ❌ Hidden | ✅ Yes |
-| `phone` | `String?` | max 30 chars, digits/spaces/+()- only | ❌ Hidden | ✅ Yes |
-| `socialLinks` | `OrganizerSocialLink[]` | platform enum, valid URL per entry, max 6 entries | ✅ Yes | ✅ Yes |
+| Field Name      | Data Type               | Validation Rules                                         | Public    | Editable |
+| --------------- | ----------------------- | -------------------------------------------------------- | --------- | -------- |
+| `bio`           | `String?`               | max 600 chars                                            | ✅ Yes    | ✅ Yes   |
+| `logoUrl`       | `String?`               | valid URL, Supabase Storage path, max 5MB, jpg/png/webp  | ✅ Yes    | ✅ Yes   |
+| `coverImageUrl` | `String?`               | valid URL, Supabase Storage path, max 10MB, jpg/png/webp | ✅ Yes    | ✅ Yes   |
+| `website`       | `String?`               | valid URL, must begin with https://, max 200 chars       | ✅ Yes    | ✅ Yes   |
+| `countryId`     | `Int?`                  | FK → Country.id                                          | ✅ Yes    | ✅ Yes   |
+| `cityId`        | `Int?`                  | FK → City.id, must belong to countryId                   | ✅ Yes    | ✅ Yes   |
+| `contactEmail`  | `String?`               | valid email, max 100 chars                               | ❌ Hidden | ✅ Yes   |
+| `phone`         | `String?`               | max 30 chars, digits/spaces/+()- only                    | ❌ Hidden | ✅ Yes   |
+| `socialLinks`   | `OrganizerSocialLink[]` | platform enum, valid URL per entry, max 6 entries        | ✅ Yes    | ✅ Yes   |
 
 **Note on `contactEmail`:** This is stored in the DB but never rendered in the public profile HTML. It is used server-side only for the future BookingInquiry feature. For MVP, organizers are contacted via their public `website` link.
 
@@ -160,18 +161,18 @@ The Organizer Profile exists to:
 
 ### Future Premium Fields
 
-| Field Name | Data Type | Purpose | Notes |
-|---|---|---|---|
-| `plan` | `OrganizerPlan` enum | FREE / PREMIUM / AGENCY | Already planned in schema comments |
-| `verified` | `Boolean` | Admin-verified badge | Same pattern as DjProfile.verified |
-| `featured` | `Boolean` | Boost on gig listings | Paid feature |
-| `teamSize` | `String?` | "1-5", "6-20", "20+" | Company organizers |
-| `yearsActive` | `Int?` | Experience indicator | Trust signal |
-| `portfolioLinks` | `Json?` | Past event URLs / press | Paid tier |
-| `responseRate` | `Float?` | % of gig applications responded to | Computed field |
-| `avgResponseTime` | `Int?` | Hours to first response | Computed field |
-| `totalGigsPosted` | `Int` | Denormalized count | Cache for perf |
-| `totalDJsHired` | `Int` | Denormalized count | Cache for perf |
+| Field Name        | Data Type            | Purpose                            | Notes                              |
+| ----------------- | -------------------- | ---------------------------------- | ---------------------------------- |
+| `plan`            | `OrganizerPlan` enum | FREE / PREMIUM / AGENCY            | Already planned in schema comments |
+| `verified`        | `Boolean`            | Admin-verified badge               | Same pattern as DjProfile.verified |
+| `featured`        | `Boolean`            | Boost on gig listings              | Paid feature                       |
+| `teamSize`        | `String?`            | "1-5", "6-20", "20+"               | Company organizers                 |
+| `yearsActive`     | `Int?`               | Experience indicator               | Trust signal                       |
+| `portfolioLinks`  | `Json?`              | Past event URLs / press            | Paid tier                          |
+| `responseRate`    | `Float?`             | % of gig applications responded to | Computed field                     |
+| `avgResponseTime` | `Int?`               | Hours to first response            | Computed field                     |
+| `totalGigsPosted` | `Int`                | Denormalized count                 | Cache for perf                     |
+| `totalDJsHired`   | `Int`                | Denormalized count                 | Cache for perf                     |
 
 ---
 
@@ -240,7 +241,7 @@ GigCard shows: title, location, budget range (if set), application count (privat
 └─────────────────────────────────────────────┘
 ```
 
-Fetches `Job` records where `status = CLOSED`. Shows title, city, approximate date. No financial data shown publicly.
+Fetches `Job` records where `organizerProfileId = profile.id` AND `status = CLOSED`. Shows title, city, approximate date. No financial data shown publicly.
 
 ### Reviews Summary Placeholder
 
@@ -278,11 +279,12 @@ This section is always rendered as a placeholder in MVP. The schema (`DjRating` 
 The `organizer_profiles` table requires the following RLS policies (to be added to `docs/rls-policies.sql`):
 
 #### SELECT (Read)
+
 ```sql
 -- Anyone can read ACTIVE organizer profiles
 CREATE POLICY "Public can view active organizer profiles"
   ON "OrganizerProfile" FOR SELECT
-  USING (status = 'ACTIVE');
+  USING (status = 'ACTIVE' AND "deletedAt" IS NULL);
 
 -- Owner can always read their own profile (any status)
 CREATE POLICY "Owner can read own organizer profile"
@@ -291,6 +293,7 @@ CREATE POLICY "Owner can read own organizer profile"
 ```
 
 #### INSERT
+
 ```sql
 -- Only authenticated users can create their own organizer profile
 CREATE POLICY "Authenticated user can create own organizer profile"
@@ -299,6 +302,7 @@ CREATE POLICY "Authenticated user can create own organizer profile"
 ```
 
 #### UPDATE
+
 ```sql
 -- Owner can only update their own profile
 CREATE POLICY "Owner can update own organizer profile"
@@ -308,12 +312,14 @@ CREATE POLICY "Owner can update own organizer profile"
 ```
 
 #### DELETE
+
 ```sql
 -- Only service role / admin can delete (soft delete via status field)
 -- No user-facing DELETE policy — use status = SUSPENDED instead
 ```
 
 ### RLS Policies for OrganizerSocialLink (future join table)
+
 ```sql
 -- SELECT: public if parent profile is ACTIVE
 -- INSERT/UPDATE/DELETE: only owner of parent profile
@@ -322,6 +328,7 @@ CREATE POLICY "Owner can update own organizer profile"
 ### Owner-Only Update Rules
 
 The `updateOrganizerProfile` server action must:
+
 1. Always call `supabase.auth.getUser()` — never trust client-passed userId
 2. Fetch `OrganizerProfile.where({ userId: user.id })` — ownership enforced at DB query
 3. Never expose `status`, `verified`, `featured`, `plan` as editable fields via the public action
@@ -329,12 +336,12 @@ The `updateOrganizerProfile` server action must:
 
 ### Profile Visibility Rules
 
-| Condition | Visible Publicly |
-|---|---|
-| status = ACTIVE | ✅ Yes |
-| status = PENDING | ❌ No — returns 404 |
+| Condition          | Visible Publicly    |
+| ------------------ | ------------------- |
+| status = ACTIVE    | ✅ Yes              |
+| status = PENDING   | ❌ No — returns 404 |
 | status = SUSPENDED | ❌ No — returns 404 |
-| Profile not found | ❌ 404 |
+| Profile not found  | ❌ 404              |
 
 ### Prevent Role Abuse
 
@@ -401,19 +408,19 @@ socialLinks:    z.array(
 
 ### State Requirements (all forms and data surfaces)
 
-| State | Requirement |
-|---|---|
-| **Loading** | Skeleton screens on profile page. Button spinner + disabled state during form submission. |
-| **Empty** | Contextual empty states with helpful copy (e.g. "No active gigs yet — post your first gig"). |
-| **Error** | Inline field errors (Zod), toast for server errors (Sonner). Never silent failures. |
-| **Success** | Toast "Profile updated" via Sonner. Redirect if slug changed. |
+| State       | Requirement                                                                                  |
+| ----------- | -------------------------------------------------------------------------------------------- |
+| **Loading** | Skeleton screens on profile page. Button spinner + disabled state during form submission.    |
+| **Empty**   | Contextual empty states with helpful copy (e.g. "No active gigs yet — post your first gig"). |
+| **Error**   | Inline field errors (Zod), toast for server errors (Sonner). Never silent failures.          |
+| **Success** | Toast "Profile updated" via Sonner. Redirect if slug changed.                                |
 
 ### Form UX Rules
 
 1. **Validation fires on submit** for create flow. **Fires on blur** for update/settings flow.
 2. **Error messages** are human-readable, not technical (e.g. "Name must be at least 2 characters", not "min_length").
 3. **Toast notifications** use Sonner (already installed in the project) — success in green, error in red.
-4. **Loading indicators** — form submit button shows spinner and becomes disabled during pending state. Use React `useActionState` with `isPending` from `useFormStatus`.
+4. **Loading indicators** — form submit button shows spinner and becomes disabled during pending state. Use `isPending` (third return value of `useActionState`) or `pending` from `useFormStatus` — not both together.
 5. **Image uploads** — show preview immediately after selection (before upload), replace with final URL on success.
 6. **City field** — disabled until country is selected (same pattern as `FilterBottomSheet`).
 7. **Social links** — dynamic add/remove rows (max 6), platform selector + URL input per row.
@@ -456,7 +463,8 @@ enum OrganizerType {
 **Why not a separate `Venue` model for MVP?**  
 A Venue is semantically an organizer subtype with extra attributes (capacity, address, technical specs). Creating a separate model now would require a separate creation flow, separate profile pages, separate RLS policies, and separate gig posting logic — all for a feature we won't build out in MVP. Using an enum value `VENUE` on `OrganizerType` correctly categorises the organizer without structural overhead. The transition to a `Venue` model in Phase 3 is clean: add `venueDetails` relation only for `organizerType = VENUE` records.
 
-**Why is this scalable?**  
+**Why is this scalable?**
+
 - Adding new types (e.g. `TALENT_AGENCY`, `BROADCAST`) = one enum value addition + one `db push`.
 - The application layer (UI labels, icons, filtering) is already parameterised off the enum.
 - If a type grows complex enough to need its own fields (e.g. Venue needs `capacity`, `address`), it gets a separate one-to-one model `VenueDetails` keyed to `organizerProfileId` where `organizerType = VENUE`.
@@ -573,26 +581,26 @@ Slug is **never** editable by the user — it auto-regenerates when `displayName
 
 ### New Routes
 
-| Route | Type | Auth | Purpose |
-|---|---|---|---|
-| `/organizers/[slug]` | Public page | None required | Public organizer profile |
+| Route                  | Type           | Auth           | Purpose                         |
+| ---------------------- | -------------- | -------------- | ------------------------------- |
+| `/organizers/[slug]`   | Public page    | None required  | Public organizer profile        |
 | `/organizer/dashboard` | Protected page | ORGANIZER role | Organizer home / gig management |
-| `/organizer/settings` | Protected page | ORGANIZER role | Edit organizer profile |
-| `/organizer/gigs` | Protected page | ORGANIZER role | List own gigs |
-| `/organizer/gigs/new` | Protected page | ORGANIZER role | Create new gig |
-| `/organizer/gigs/[id]` | Protected page | ORGANIZER role | View/edit single gig |
+| `/organizer/settings`  | Protected page | ORGANIZER role | Edit organizer profile          |
+| `/organizer/gigs`      | Protected page | ORGANIZER role | List own gigs                   |
+| `/organizer/gigs/new`  | Protected page | ORGANIZER role | Create new gig                  |
+| `/organizer/gigs/[id]` | Protected page | ORGANIZER role | View/edit single gig            |
 
 **Middleware update required:** Add `/organizer` prefix to `protectedPaths` in `middleware.ts`.
 
 ### New Server Actions
 
-| Action | Location | Input | Auth Check |
-|---|---|---|---|
-| `createOrganizerProfile` | `actions/profile.ts` | displayName, organizerType | user.id from Supabase |
-| `updateOrganizerProfile` | `actions/profile.ts` | all optional fields | user.id → where userId |
-| `uploadOrganizerLogo` | `actions/upload.ts` | file (validated) | user.id ownership |
-| `uploadOrganizerCover` | `actions/upload.ts` | file (validated) | user.id ownership |
-| `deleteOrganizerProfile` | `actions/profile.ts` | none | user.id, soft delete |
+| Action                   | Location             | Input                      | Auth Check             |
+| ------------------------ | -------------------- | -------------------------- | ---------------------- |
+| `createOrganizerProfile` | `actions/profile.ts` | displayName, organizerType | user.id from Supabase  |
+| `updateOrganizerProfile` | `actions/profile.ts` | all optional fields        | user.id → where userId |
+| `uploadOrganizerLogo`    | `actions/upload.ts`  | file (validated)           | user.id ownership      |
+| `uploadOrganizerCover`   | `actions/upload.ts`  | file (validated)           | user.id ownership      |
+| `deleteOrganizerProfile` | `actions/profile.ts` | none                       | user.id, soft delete   |
 
 ### Indexes
 
@@ -612,7 +620,9 @@ export async function generateMetadata({ params }) {
   const profile = await getOrganizerProfileBySlug(params.slug);
   return {
     title: `${profile.displayName} — Organizer on DJscovery`,
-    description: profile.bio?.slice(0, 155) ?? `${profile.displayName} books DJs on DJscovery.`,
+    description:
+      profile.bio?.slice(0, 155) ??
+      `${profile.displayName} books DJs on DJscovery.`,
     openGraph: {
       images: profile.logoUrl ? [profile.logoUrl] : [],
     },
@@ -632,45 +642,45 @@ export async function generateStaticParams() {
 
 ### Build Now
 
-| Feature | Rationale |
-|---|---|
-| Extend `OrganizerProfile` schema (slug, organizerType, status, bio, logoUrl, coverImageUrl, website, socialLinks table) | Foundation — nothing else works without this |
-| `updateOrganizerProfile` server action with full Zod validation | Required for settings page |
-| `/organizer/settings` page (tabbed: Profile, Contact, Social) | Organizer needs to enrich their profile to build trust |
-| `/organizers/[slug]` public profile page | Needed the moment a gig links to an organizer |
-| Logo + cover image upload to Supabase Storage | Visual trust signals — organizers without logos feel anonymous |
-| `OrganizerSocialLink` model + CRUD in settings | Professional organizers need to link their presence |
-| Middleware guard for `/organizer/*` routes | Security |
-| RLS policies for `OrganizerProfile` | Security |
-| `OrganizerStatus` enum + auto-ACTIVE on creation | Prevents broken profiles on gig pages |
-| `OrganizerType` enum + selection in become-organizer flow | Enables type badge on public profile |
-| Navigation: Organizer dashboard link in user dropdown | Accessibility of organizer features |
+| Feature                                                                                                                 | Rationale                                                      |
+| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Extend `OrganizerProfile` schema (slug, organizerType, status, bio, logoUrl, coverImageUrl, website, socialLinks table) | Foundation — nothing else works without this                   |
+| `updateOrganizerProfile` server action with full Zod validation                                                         | Required for settings page                                     |
+| `/organizer/settings` page (tabbed: Profile, Contact, Social)                                                           | Organizer needs to enrich their profile to build trust         |
+| `/organizers/[slug]` public profile page                                                                                | Needed the moment a gig links to an organizer                  |
+| Logo + cover image upload to Supabase Storage                                                                           | Visual trust signals — organizers without logos feel anonymous |
+| `OrganizerSocialLink` model + CRUD in settings                                                                          | Professional organizers need to link their presence            |
+| Middleware guard for `/organizer/*` routes                                                                              | Security                                                       |
+| RLS policies for `OrganizerProfile`                                                                                     | Security                                                       |
+| `OrganizerStatus` enum + auto-ACTIVE on creation                                                                        | Prevents broken profiles on gig pages                          |
+| `OrganizerType` enum + selection in become-organizer flow                                                               | Enables type badge on public profile                           |
+| Navigation: Organizer dashboard link in user dropdown                                                                   | Accessibility of organizer features                            |
 
 ### Build Later (Phase 2)
 
-| Feature | Rationale |
-|---|---|
-| Organizer can leave reviews on DJs after a completed gig | Requires completed gig tracking first |
-| `OrganizerRating` model (DJs rate organizers back) | Trust is bidirectional — but needs Phase 2 gig completion flow |
-| Gig detail page links to organizer public profile | Requires `/gigs/[id]` page, which is Phase 2 |
-| Organizer dashboard with gig analytics (views, applications) | Needs data volume first |
-| Invite DJ directly to a gig | Already partially modelled (`isInvite` on `JobApplication`) |
-| Organizer notification system (new application received) | Notification infra already exists — wire it up |
-| Direct messages between Organizer and DJ | Conversation model already in schema Phase 2 section |
+| Feature                                                      | Rationale                                                      |
+| ------------------------------------------------------------ | -------------------------------------------------------------- |
+| Organizer can leave reviews on DJs after a completed gig     | Requires completed gig tracking first                          |
+| `OrganizerRating` model (DJs rate organizers back)           | Trust is bidirectional — but needs Phase 2 gig completion flow |
+| Gig detail page links to organizer public profile            | Requires `/gigs/[id]` page, which is Phase 2                   |
+| Organizer dashboard with gig analytics (views, applications) | Needs data volume first                                        |
+| Invite DJ directly to a gig                                  | Already partially modelled (`isInvite` on `JobApplication`)    |
+| Organizer notification system (new application received)     | Notification infra already exists — wire it up                 |
+| Direct messages between Organizer and DJ                     | Conversation model already in schema Phase 2 section           |
 
 ### Do Not Build Yet
 
-| Feature | Rationale |
-|---|---|
-| Organizer directory / search page | Violates core product rule — platform must stay DJ-focused |
-| Featured organizer slots | Premature monetization before trust is established |
-| Organizer rankings / leaderboards | No value without data volume; risks gaming |
-| Separate Venue model | Venue = OrganizerType.VENUE for MVP; full model adds complexity without proportional value |
-| `OrganizerPlan` subscription tiers | Needs payment infrastructure (Stripe); zero revenue risk to defer |
-| Response rate / avg response time metrics | Requires significant data and a background job to compute |
-| Team member management (multi-user organizer) | Enterprise-level complexity; far beyond solo-founder MVP |
-| Organizer portfolio / past events gallery | High content effort for organizers; better as a Phase 3 premium feature |
-| Email notifications to DJs about organizer activity | Requires email provider setup (Resend/SendGrid); defer to Phase 2 |
+| Feature                                             | Rationale                                                                                  |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Organizer directory / search page                   | Violates core product rule — platform must stay DJ-focused                                 |
+| Featured organizer slots                            | Premature monetization before trust is established                                         |
+| Organizer rankings / leaderboards                   | No value without data volume; risks gaming                                                 |
+| Separate Venue model                                | Venue = OrganizerType.VENUE for MVP; full model adds complexity without proportional value |
+| `OrganizerPlan` subscription tiers                  | Needs payment infrastructure (Stripe); zero revenue risk to defer                          |
+| Response rate / avg response time metrics           | Requires significant data and a background job to compute                                  |
+| Team member management (multi-user organizer)       | Enterprise-level complexity; far beyond solo-founder MVP                                   |
+| Organizer portfolio / past events gallery           | High content effort for organizers; better as a Phase 3 premium feature                    |
+| Email notifications to DJs about organizer activity | Requires email provider setup (Resend/SendGrid); defer to Phase 2                          |
 
 ---
 
@@ -678,22 +688,23 @@ export async function generateStaticParams() {
 
 The following gaps exist between the current `OrganizerProfile` model and this spec. These must be addressed in the schema migration before implementation:
 
-| Gap | Action Required |
-|---|---|
-| `businessName` → `displayName` rename | DB migration: add column, copy data, drop old |
-| Missing `slug` field | Add `slug String @unique` + generate for existing rows |
-| Missing `organizerType` field | Add `OrganizerType` enum + field, default `INDIVIDUAL` |
-| Missing `status` field | Add `OrganizerStatus` enum + field, default `ACTIVE` |
-| Missing `bio` field | Add `bio String?` |
-| Missing `logoUrl` field | Add `logoUrl String?` |
-| Missing `coverImageUrl` field | Add `coverImageUrl String?` |
-| Missing `website` field | Add `website String?` |
-| Missing `contactEmail` field | Add `contactEmail String?` |
-| Missing `deletedAt` field | Add `deletedAt DateTime?` for soft-delete parity with DjProfile |
-| Missing `OrganizerSocialLink` model | New model required |
-| Missing indexes | Add slug, status, organizerType, cityId indexes |
+| Gap                                   | Action Required                                                 |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `businessName` → `displayName` rename | DB migration: add column, copy data, drop old                   |
+| Missing `slug` field                  | Add `slug String @unique` + generate for existing rows          |
+| Missing `organizerType` field         | Add `OrganizerType` enum + field, default `INDIVIDUAL`          |
+| Missing `status` field                | Add `OrganizerStatus` enum + field, default `ACTIVE`            |
+| Missing `bio` field                   | Add `bio String?`                                               |
+| Missing `logoUrl` field               | Add `logoUrl String?`                                           |
+| Missing `coverImageUrl` field         | Add `coverImageUrl String?`                                     |
+| Missing `website` field               | Add `website String?`                                           |
+| Missing `contactEmail` field          | Add `contactEmail String?`                                      |
+| Missing `deletedAt` field             | Add `deletedAt DateTime?` for soft-delete parity with DjProfile |
+| Missing `OrganizerSocialLink` model   | New model required                                              |
+| Missing indexes                       | Add slug, status, organizerType, cityId indexes                 |
 
 **Migration approach (no `migrate dev` — use `db push`):**
+
 1. Add all new nullable fields in one schema edit.
 2. Run `npx prisma db push` on staging.
 3. Run `npx prisma generate`.
@@ -702,4 +713,4 @@ The following gaps exist between the current `OrganizerProfile` model and this s
 
 ---
 
-*End of specification. Ready for implementation review.*
+_End of specification. Ready for implementation review._

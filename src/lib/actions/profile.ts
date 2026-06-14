@@ -24,6 +24,8 @@ async function makeUniqueOrganizerSlug(
     .trim()
     .replace(/\s+/g, "-")
     .slice(0, 80);
+  if (!base)
+    throw new Error("Display name must contain at least one letter or number.");
   const existing = await prisma.organizerProfile.findMany({
     where: {
       slug: { startsWith: base },
@@ -532,13 +534,27 @@ export async function createOrganizerProfile(
     };
   }
 
-  const slug = await makeUniqueOrganizerSlug(parsed.data.displayName, user.id);
+  let slug: string;
+  try {
+    slug = await makeUniqueOrganizerSlug(parsed.data.displayName, user.id);
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Invalid display name.",
+    };
+  }
 
   try {
     await prisma.$transaction(async (tx) => {
       await tx.organizerProfile.upsert({
         where: { userId: user.id },
-        update: {},
+        update: {
+          displayName: parsed.data.displayName,
+          slug,
+          organizerType: parsed.data.organizerType,
+          status: "ACTIVE",
+          deletedAt: null,
+        },
         create: {
           userId: user.id,
           displayName: parsed.data.displayName,
@@ -582,15 +598,30 @@ export async function updateOrganizerProfile(
 
   const existing = await prisma.organizerProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true, displayName: true, slug: true, countryId: true },
+    select: {
+      id: true,
+      displayName: true,
+      slug: true,
+      countryId: true,
+      status: true,
+      deletedAt: true,
+    },
   });
   if (!existing) return { error: "Organizer profile not found" };
+  if (existing.status !== "ACTIVE" || existing.deletedAt !== null)
+    return { error: "Your organizer profile is not active." };
 
   const data = parsed.data;
 
   let newSlug = existing.slug;
   if (data.displayName && data.displayName !== existing.displayName) {
-    newSlug = await makeUniqueOrganizerSlug(data.displayName, user.id);
+    try {
+      newSlug = await makeUniqueOrganizerSlug(data.displayName, user.id);
+    } catch (e) {
+      return {
+        error: e instanceof Error ? e.message : "Invalid display name.",
+      };
+    }
   }
 
   const effectiveCountryId = data.countryId ?? existing.countryId;
@@ -628,7 +659,11 @@ export async function updateOrganizerProfile(
             coverImageUrl: data.coverImageUrl,
           }),
           ...(data.countryId !== undefined && { countryId: data.countryId }),
-          ...(data.cityId !== undefined && { cityId: data.cityId }),
+          ...(data.cityId !== undefined
+            ? { cityId: data.cityId }
+            : data.countryId !== undefined
+              ? { cityId: null }
+              : {}),
         },
       });
 

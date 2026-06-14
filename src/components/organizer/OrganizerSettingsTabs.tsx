@@ -210,7 +210,7 @@ function ProfileTab({
 
   async function handleRemoveLogo() {
     setUploadingLogo(true);
-    const result = await deleteOrganizerImage("logoUrl", "");
+    const result = await deleteOrganizerImage("logoUrl");
     setUploadingLogo(false);
     if ("error" in result) toast.error(result.error);
     else {
@@ -221,7 +221,7 @@ function ProfileTab({
 
   async function handleRemoveCover() {
     setUploadingCover(true);
-    const result = await deleteOrganizerImage("coverImageUrl", "");
+    const result = await deleteOrganizerImage("coverImageUrl");
     setUploadingCover(false);
     if ("error" in result) toast.error(result.error);
     else {

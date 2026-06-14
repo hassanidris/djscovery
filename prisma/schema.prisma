@@ -257,12 +257,14 @@ model OrganizerProfile {
   organizerType OrganizerType   @default(INDIVIDUAL)
   status        OrganizerStatus @default(ACTIVE)
 
-  bio           String?
-  logoUrl       String? // Supabase Storage: org-avatar bucket
-  coverImageUrl String? // Supabase Storage: org-cover bucket
-  website       String?
-  contactEmail  String? // PRIVATE — never rendered publicly
-  phone         String?
+  bio            String?
+  logoUrl        String? // Supabase Storage: org-avatar bucket public URL
+  logoPath       String? // Supabase Storage: org-avatar bucket object path (for deletion)
+  coverImageUrl  String? // Supabase Storage: org-cover bucket public URL
+  coverImagePath String? // Supabase Storage: org-cover bucket object path (for deletion)
+  website        String?
+  contactEmail   String? // PRIVATE — never rendered publicly
+  phone          String?
 
   countryId Int?
   country   Country? @relation(fields: [countryId], references: [id])

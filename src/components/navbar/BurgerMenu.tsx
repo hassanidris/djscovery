@@ -233,18 +233,23 @@ export default function BurgerMenu({
                         href="/organizer/dashboard"
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                          pathname.startsWith("/organizer")
+                          pathname === "/organizer" ||
+                            pathname.startsWith("/organizer/")
                             ? "bg-white/5 text-white"
                             : "text-gray-400 hover:bg-white/5 hover:text-white",
                         )}
                         aria-current={
-                          pathname.startsWith("/organizer") ? "page" : undefined
+                          pathname === "/organizer" ||
+                          pathname.startsWith("/organizer/")
+                            ? "page"
+                            : undefined
                         }
                       >
                         <Briefcase
                           className={cn(
                             "h-4 w-4 shrink-0",
-                            pathname.startsWith("/organizer")
+                            pathname === "/organizer" ||
+                              pathname.startsWith("/organizer/")
                               ? "text-h_red"
                               : "",
                           )}
