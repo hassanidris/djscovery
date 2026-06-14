@@ -39,10 +39,13 @@ export async function signUp(formData: FormData) {
       create: { id: userId, email, username },
     });
 
-    redirect(`/select-role?role=${encodeURIComponent(role)}`);
+    // Skip select-role — user already chose their role on the sign-up form
+    if (role === "dj") redirect("/become-dj");
+    if (role === "organiser") redirect("/become-organizer");
+    redirect("/"); // Fan — go straight to the app
   }
 
-  // Email confirmation required — auth callback handles redirect to /select-role
+  // Email confirmation required — pass role through so auth callback can use it
   redirect(
     `/sign-in?message=Check your email to confirm your account&role=${encodeURIComponent(role)}`,
   );

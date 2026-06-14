@@ -42,7 +42,13 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
       roles: { select: { role: true } },
       djProfile: { select: { avatar: true, stageName: true, slug: true } },
       organizerProfile: {
-        select: { slug: true, status: true, deletedAt: true },
+        select: {
+          slug: true,
+          status: true,
+          deletedAt: true,
+          logoUrl: true,
+          displayName: true,
+        },
       },
     },
   });
@@ -54,8 +60,13 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
   else if (roles.includes("ORGANIZER")) navRole = "organizer";
 
   const displayName =
-    profile?.djProfile?.stageName ?? profile?.username ?? user.email ?? "?";
-  const avatarSrc = profile?.djProfile?.avatar ?? null;
+    profile?.djProfile?.stageName ??
+    profile?.organizerProfile?.displayName ??
+    profile?.username ??
+    user.email ??
+    "?";
+  const avatarSrc =
+    profile?.djProfile?.avatar ?? profile?.organizerProfile?.logoUrl ?? null;
   const initials = displayName.slice(0, 2).toUpperCase();
 
   const orgProfile = profile?.organizerProfile;

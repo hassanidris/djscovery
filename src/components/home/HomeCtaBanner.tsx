@@ -16,7 +16,8 @@ export default async function HomeCtaBanner() {
 
   if (hasUpgradeableRole) return null;
 
-  const joinHref = user ? "/select-role" : "/sign-up";
+  const djHref = user ? "/become-dj" : "/sign-up?role=dj";
+  const organiserHref = user ? "/become-organizer" : "/sign-up?role=organiser";
   return (
     <section className="border-t border-white/5 px-4 py-16 md:px-8">
       <div className="mx-auto max-w-7xl">
@@ -60,7 +61,7 @@ export default async function HomeCtaBanner() {
                 asChild
                 className="bg-h_red hover:bg-h_redDark mt-auto w-full font-semibold text-white"
               >
-                <Link href={joinHref}>Join as DJ</Link>
+                <Link href={djHref}>Join as DJ</Link>
               </Button>
             </div>
 
@@ -86,7 +87,7 @@ export default async function HomeCtaBanner() {
                 variant="outline"
                 className="border-h_red hover:bg-h_red mt-auto w-full cursor-pointer font-semibold text-red-200 hover:text-white"
               >
-                <Link href={joinHref}>Join as Organiser</Link>
+                <Link href={organiserHref}>Join as Organiser</Link>
               </Button>
             </div>
           </div>
