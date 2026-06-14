@@ -5,7 +5,7 @@ import RightMenu from "@/components/rightMenu/RightMenu";
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React from "react";
 
 const ProfilePage = async ({
@@ -30,6 +30,13 @@ const ProfilePage = async ({
 
   if (!user) return notFound();
 
+  // Organizers have a dedicated public profile page — redirect there
+  const orgProfile = await prisma.organizerProfile.findFirst({
+    where: { userId: user.id, status: "ACTIVE", deletedAt: null },
+    select: { slug: true },
+  });
+  if (orgProfile) redirect(`/organizers/${orgProfile.slug}`);
+
   const supabase = await createClient();
   const {
     data: { user: authUser },
@@ -39,13 +46,13 @@ const ProfilePage = async ({
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
       <div className="flex gap-6 py-6">
-        <div className="hidden xl:block w-[20%]">
+        <div className="hidden w-[20%] xl:block">
           <LeftMenu type="profile" />
         </div>
         <div className="w-full lg:w-[70%] xl:w-[50%]">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col items-center justify-center">
-              <div className="w-full h-64 relative">
+              <div className="relative h-64 w-full">
                 <Image
                   src="/noCover.png"
                   alt=""
@@ -57,13 +64,13 @@ const ProfilePage = async ({
                   alt=""
                   width={128}
                   height={128}
-                  className="w-32 h-32 rounded-full absolute right-0 left-0 m-auto -bottom-16 ring-4 ring-gray-800 object-cover"
+                  className="absolute right-0 -bottom-16 left-0 m-auto h-32 w-32 rounded-full object-cover ring-4 ring-gray-800"
                 />
               </div>
-              <h1 className="mt-20 mb-4 text-2xl font-medium text-h_white">
+              <h1 className="text-h_white mt-20 mb-4 text-2xl font-medium">
                 {user.username}
               </h1>
-              <div className="flex justify-center items-center gap-12 mb-4 text-gray-200">
+              <div className="mb-4 flex items-center justify-center gap-12 text-gray-200">
                 <div className="flex flex-col items-center">
                   <span className="font-medium">{user._count.posts}</span>
                   <span className="text-sm">Posts</span>
@@ -82,7 +89,7 @@ const ProfilePage = async ({
             <Feed username={user.username} />
           </div>
         </div>
-        <div className="hidden xl:block w-[30%]">
+        <div className="hidden w-[30%] xl:block">
           <RightMenu user={user} />
         </div>
       </div>

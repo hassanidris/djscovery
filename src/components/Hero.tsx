@@ -18,7 +18,8 @@ const Hero = async () => {
       })
     : null;
 
-  const joinHref = user ? "/select-role" : "/sign-up";
+  const djHref = user ? "/become-dj" : "/sign-up?role=dj";
+  const organiserHref = user ? "/become-organizer" : "/sign-up?role=organiser";
   return (
     <>
       <section className="relative h-[40vh] w-full bg-zinc-800 lg:h-[50vh]">
@@ -97,14 +98,14 @@ const Hero = async () => {
                     asChild
                     className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
                   >
-                    <Link href={joinHref}>Join as DJ</Link>
+                    <Link href={djHref}>Join as DJ</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
                     className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
                   >
-                    <Link href={joinHref}>Join as Organiser</Link>
+                    <Link href={organiserHref}>Join as Organiser</Link>
                   </Button>
                 </>
               )}

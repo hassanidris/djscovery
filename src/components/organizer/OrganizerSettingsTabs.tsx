@@ -177,16 +177,23 @@ function ProfileTab({
     if (!file) return;
     setLogoPreview(URL.createObjectURL(file));
     setUploadingLogo(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const result = await uploadOrganizerLogo(fd);
-    setUploadingLogo(false);
-    if ("error" in result) {
-      toast.error(result.error);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const result = await uploadOrganizerLogo(fd);
+      if ("error" in result) {
+        toast.error(result.error);
+        setLogoPreview(profile.logoUrl);
+      } else {
+        setLogoPreview(result.url);
+        toast.success("Avatar updated.");
+      }
+    } catch (err) {
+      console.error("[uploadOrganizerLogo] unexpected error:", err);
+      toast.error("Unexpected error uploading avatar. Check the console.");
       setLogoPreview(profile.logoUrl);
-    } else {
-      setLogoPreview(result.url);
-      toast.success("Logo updated.");
+    } finally {
+      setUploadingLogo(false);
     }
   }
 
@@ -195,38 +202,57 @@ function ProfileTab({
     if (!file) return;
     setCoverPreview(URL.createObjectURL(file));
     setUploadingCover(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const result = await uploadOrganizerCover(fd);
-    setUploadingCover(false);
-    if ("error" in result) {
-      toast.error(result.error);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const result = await uploadOrganizerCover(fd);
+      if ("error" in result) {
+        toast.error(result.error);
+        setCoverPreview(profile.coverImageUrl);
+      } else {
+        setCoverPreview(result.url);
+        toast.success("Cover image updated.");
+      }
+    } catch (err) {
+      console.error("[uploadOrganizerCover] unexpected error:", err);
+      toast.error("Unexpected error uploading cover. Check the console.");
       setCoverPreview(profile.coverImageUrl);
-    } else {
-      setCoverPreview(result.url);
-      toast.success("Cover image updated.");
+    } finally {
+      setUploadingCover(false);
     }
   }
 
   async function handleRemoveLogo() {
     setUploadingLogo(true);
-    const result = await deleteOrganizerImage("logoUrl");
-    setUploadingLogo(false);
-    if ("error" in result) toast.error(result.error);
-    else {
-      setLogoPreview("");
-      toast.success("Logo removed.");
+    try {
+      const result = await deleteOrganizerImage("logoUrl");
+      if ("error" in result) toast.error(result.error);
+      else {
+        setLogoPreview("");
+        toast.success("Avatar removed.");
+      }
+    } catch (err) {
+      console.error("[deleteOrganizerImage logo] unexpected error:", err);
+      toast.error("Unexpected error removing avatar.");
+    } finally {
+      setUploadingLogo(false);
     }
   }
 
   async function handleRemoveCover() {
     setUploadingCover(true);
-    const result = await deleteOrganizerImage("coverImageUrl");
-    setUploadingCover(false);
-    if ("error" in result) toast.error(result.error);
-    else {
-      setCoverPreview("");
-      toast.success("Cover image removed.");
+    try {
+      const result = await deleteOrganizerImage("coverImageUrl");
+      if ("error" in result) toast.error(result.error);
+      else {
+        setCoverPreview("");
+        toast.success("Cover image removed.");
+      }
+    } catch (err) {
+      console.error("[deleteOrganizerImage cover] unexpected error:", err);
+      toast.error("Unexpected error removing cover.");
+    } finally {
+      setUploadingCover(false);
     }
   }
 
@@ -310,13 +336,13 @@ function ProfileTab({
         />
       </div>
 
-      {/* Organizer Logo */}
+      {/* Organizer Avatar / Logo */}
       <div className="flex flex-col gap-2">
         <div>
-          <Label>Organizer Logo</Label>
+          <Label>Profile Avatar / Logo</Label>
           <p className="text-muted-foreground mt-0.5 text-xs">
-            Shown as your avatar on gig listings and your public profile. JPEG,
-            PNG or WebP · max 5 MB.
+            Upload your logo or avatar — shown on gig listings and your public
+            profile. JPEG, PNG or WebP · max 5 MB.
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -324,7 +350,7 @@ function ProfileTab({
             {logoPreview ? (
               <Image
                 src={logoPreview}
-                alt="Logo"
+                alt="Avatar"
                 fill
                 className="object-cover"
               />
@@ -347,7 +373,7 @@ function ProfileTab({
               ) : (
                 <Camera className="h-4 w-4" />
               )}
-              {logoPreview ? "Change Logo" : "Upload Logo"}
+              {logoPreview ? "Change Avatar / Logo" : "Upload Avatar / Logo"}
             </Button>
             {logoPreview && !uploadingLogo && (
               <Button

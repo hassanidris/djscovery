@@ -9,6 +9,7 @@ export type NavUserData = {
   isOrganizer: boolean;
   username: string | null;
   djSlug: string | null;
+  organizerSlug: string | null;
   displayName: string;
   avatarSrc: string | null;
   initials: string;
@@ -27,6 +28,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
       isOrganizer: false,
       username: null,
       djSlug: null,
+      organizerSlug: null,
       displayName: "Guest",
       avatarSrc: null,
       initials: "G",
@@ -39,6 +41,15 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
       username: true,
       roles: { select: { role: true } },
       djProfile: { select: { avatar: true, stageName: true, slug: true } },
+      organizerProfile: {
+        select: {
+          slug: true,
+          status: true,
+          deletedAt: true,
+          logoUrl: true,
+          displayName: true,
+        },
+      },
     },
   });
 
@@ -49,9 +60,20 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
   else if (roles.includes("ORGANIZER")) navRole = "organizer";
 
   const displayName =
-    profile?.djProfile?.stageName ?? profile?.username ?? user.email ?? "?";
-  const avatarSrc = profile?.djProfile?.avatar ?? null;
+    profile?.djProfile?.stageName ??
+    profile?.organizerProfile?.displayName ??
+    profile?.username ??
+    user.email ??
+    "?";
+  const avatarSrc =
+    profile?.djProfile?.avatar ?? profile?.organizerProfile?.logoUrl ?? null;
   const initials = displayName.slice(0, 2).toUpperCase();
+
+  const orgProfile = profile?.organizerProfile;
+  const organizerSlug =
+    orgProfile?.status === "ACTIVE" && orgProfile?.deletedAt === null
+      ? (orgProfile.slug ?? null)
+      : null;
 
   return {
     navRole,
@@ -59,6 +81,7 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
     isOrganizer: roles.includes("ORGANIZER"),
     username: profile?.username ?? null,
     djSlug: profile?.djProfile?.slug ?? null,
+    organizerSlug,
     displayName,
     avatarSrc,
     initials,

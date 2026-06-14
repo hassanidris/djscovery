@@ -16,6 +16,7 @@ export default function NavDesktop({
   isOrganizer,
   username,
   djSlug,
+  organizerSlug,
   displayName,
   avatarSrc,
   initials,
@@ -161,6 +162,7 @@ export default function NavDesktop({
                 username={username}
                 navRole={navRole}
                 djSlug={djSlug}
+                organizerSlug={organizerSlug}
                 isOrganizer={isOrganizer}
               />
             </div>

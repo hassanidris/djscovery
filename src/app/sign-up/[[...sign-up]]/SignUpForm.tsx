@@ -12,7 +12,7 @@ function SignUpSubmitBtn({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="bg-h_red hover:bg-h_redDark active:scale-[0.98] text-white font-semibold py-3 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+      className="bg-h_red hover:bg-h_redDark flex cursor-pointer items-center justify-center gap-2 rounded-lg py-3 font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? (
         <>
@@ -54,27 +54,33 @@ const ROLES: {
   },
 ];
 
-export default function SignUpForm({ error }: { error?: string }) {
-  const [selected, setSelected] = useState<Role>("");
+export default function SignUpForm({
+  error,
+  defaultRole,
+}: {
+  error?: string;
+  defaultRole?: Role;
+}) {
+  const [selected, setSelected] = useState<Role>(defaultRole ?? "");
 
   return (
     <form
       action={signUp}
-      className="bg-white/5 border border-white/20 rounded-xl p-8 flex flex-col gap-5 w-full max-w-sm"
+      className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-white/20 bg-white/5 p-8"
     >
-      <h1 className="text-2xl font-bold text-white text-center">
+      <h1 className="text-center text-2xl font-bold text-white">
         Create Account
       </h1>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm text-center">
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-400">
           {error}
         </div>
       )}
 
       {/* Role selector */}
       <div className="flex flex-col gap-2">
-        <p className="text-gray-400 text-xs text-center">
+        <p className="text-center text-xs text-gray-400">
           I&apos;m joining as a…
         </p>
         <div className="grid grid-cols-3 gap-2">
@@ -83,7 +89,7 @@ export default function SignUpForm({ error }: { error?: string }) {
               key={r.value}
               type="button"
               onClick={() => setSelected(r.value)}
-              className={`flex flex-col items-center gap-1 p-3 rounded-lg border text-center transition-all ${
+              className={`flex flex-col items-center gap-1 rounded-lg border p-3 text-center transition-all ${
                 selected === r.value
                   ? "border-h_red bg-h_red/10 text-white"
                   : "border-white/10 bg-white/5 text-gray-400 hover:border-white/30"
@@ -95,12 +101,12 @@ export default function SignUpForm({ error }: { error?: string }) {
           ))}
         </div>
         {selected && (
-          <p className="text-gray-500 text-xs text-center">
+          <p className="text-center text-xs text-gray-500">
             {ROLES.find((r) => r.value === selected)?.description}
           </p>
         )}
         {!selected && (
-          <p className="text-gray-500 text-xs text-center">
+          <p className="text-center text-xs text-gray-500">
             Browse DJs, follow artists &amp; attend events
           </p>
         )}
@@ -113,7 +119,7 @@ export default function SignUpForm({ error }: { error?: string }) {
         name="email"
         placeholder="Email"
         required
-        className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all"
+        className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
       />
       <input
         type="password"
@@ -121,7 +127,7 @@ export default function SignUpForm({ error }: { error?: string }) {
         placeholder="Password (min 6 chars)"
         minLength={6}
         required
-        className="bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all"
+        className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
       />
 
       <SignUpSubmitBtn
@@ -134,7 +140,7 @@ export default function SignUpForm({ error }: { error?: string }) {
         }
       />
 
-      <p className="text-gray-400 text-sm text-center">
+      <p className="text-center text-sm text-gray-400">
         Already have an account?{" "}
         <Link href="/sign-in" className="text-h_red hover:underline">
           Sign in

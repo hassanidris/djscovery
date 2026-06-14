@@ -408,3 +408,87 @@ CREATE POLICY "Authenticated user can set attendance"
 CREATE POLICY "Authenticated user can remove attendance"
   ON "EventAttendance" FOR DELETE
   USING (auth.uid()::text = "userId");
+
+
+-- ============================================================
+-- STEP 9: Supabase Storage — organizer images in djscovery-media
+-- ============================================================
+-- All organizer images go into the shared djscovery-media bucket
+-- (same bucket as dj-avatars / dj-covers / dj-gallery).
+-- Path convention: org-avatar/{userId}/{timestamp}.{ext}
+--                  org-cover/{userId}/{timestamp}.{ext}
+--
+-- If djscovery-media already has broad SELECT/INSERT policies from
+-- the DJ upload setup, these may already be covered. Run only if
+-- organizer uploads are still being blocked.
+-- ============================================================
+
+-- Allow authenticated users to upload under org-avatar/{their uid}/
+CREATE POLICY "Organizer can upload own logo"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-avatar'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
+  );
+
+CREATE POLICY "Organizer can update own logo"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-avatar'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+CREATE POLICY "Organizer can delete own logo"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-avatar'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+-- Allow authenticated users to upload under org-cover/{their uid}/
+CREATE POLICY "Organizer can upload own cover"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
+  );
+
+CREATE POLICY "Organizer can update own cover"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+CREATE POLICY "Organizer can delete own cover"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+-- Public SELECT is already covered by the broad djscovery-media policy.
+-- Only add this if public reads are missing:
+-- CREATE POLICY "Public can read organizer images"
+--   ON storage.objects FOR SELECT TO public
+--   USING (bucket_id = 'djscovery-media');

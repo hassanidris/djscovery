@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {},
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "11mb",
+    },
+  },
   turbopack: {
     root: process.cwd(),
   },
