@@ -87,6 +87,20 @@ enum DjPlan {
   PREMIUM
 }
 
+enum OrganizerType {
+  INDIVIDUAL
+  COMPANY
+  VENUE
+  AGENCY
+  FESTIVAL
+}
+
+enum OrganizerStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
 // ============================================================
 // SECTION 1: MVP MODELS
 // ============================================================
@@ -198,10 +212,10 @@ model DjProfile {
   cityId    Int?
   city      City?    @relation(fields: [cityId], references: [id])
 
-  plan         DjPlan   @default(FREE)
-  verified     Boolean  @default(false)
-  featured     Boolean  @default(false)
-  searchScore  Float    @default(0)
+  plan         DjPlan  @default(FREE)
+  verified     Boolean @default(false)
+  featured     Boolean @default(false)
+  searchScore  Float   @default(0)
   bookingEmail String?
   bookingPhone String?
   feeMin       Int?
@@ -237,20 +251,50 @@ model OrganizerProfile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  businessName String
-  phone        String?
+  displayName String
+
+  slug          String          @unique // /organizers/[slug]
+  organizerType OrganizerType   @default(INDIVIDUAL)
+  status        OrganizerStatus @default(ACTIVE)
+
+  bio           String?
+  logoUrl       String? // Supabase Storage: org-avatar bucket
+  coverImageUrl String? // Supabase Storage: org-cover bucket
+  website       String?
+  contactEmail  String? // PRIVATE — never rendered publicly
+  phone         String?
 
   countryId Int?
   country   Country? @relation(fields: [countryId], references: [id])
   cityId    Int?
   city      City?    @relation(fields: [cityId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  jobs Job[]
+  socialLinks OrganizerSocialLink[]
+  jobs        Job[]
 
+  @@index([slug])
+  @@index([status])
+  @@index([organizerType])
   @@index([countryId])
+  @@index([cityId])
+}
+
+// ------ ORGANIZER SOCIAL LINKS ------
+
+// platform values: "instagram" | "linkedin" | "facebook" | "tiktok" | "youtube" | "website"
+model OrganizerSocialLink {
+  id                 Int              @id @default(autoincrement())
+  organizerProfileId Int
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+  platform           String
+  url                String
+
+  @@unique([organizerProfileId, platform])
+  @@index([organizerProfileId])
 }
 
 // ------ GENRES ------

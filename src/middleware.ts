@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
     "/become-dj",
     "/become-organizer",
     "/dj/dashboard",
-    "/organizer/dashboard",
+    "/organizer",
     "/settings",
     "/profile/edit",
   ];
