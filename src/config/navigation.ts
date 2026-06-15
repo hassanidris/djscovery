@@ -1,12 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Home,
-  Headphones,
-  Briefcase,
-  CalendarDays,
-  Users,
-  User,
-} from "lucide-react";
+import { Home, Headphones, Briefcase, CalendarDays, User } from "lucide-react";
 
 export type NavRole = "guest" | "fan" | "dj" | "organizer" | "admin";
 
@@ -49,13 +42,6 @@ const events: NavItem = {
   comingSoon: true,
 };
 
-const community: NavItem = {
-  id: "community",
-  label: "Community",
-  href: "/community",
-  icon: Users,
-};
-
 const profile: NavItem = {
   id: "profile",
   label: "Profile",
@@ -71,11 +57,11 @@ const account: NavItem = {
 };
 
 export const desktopNavByRole: Record<NavRole, NavItem[]> = {
-  guest: [directory, events, community],
-  fan: [directory, events, community],
-  dj: [directory, djGigs, events, community],
-  organizer: [directory, orgGigs, events, community],
-  admin: [directory, djGigs, events, community],
+  guest: [directory, events],
+  fan: [directory, events],
+  dj: [directory, djGigs, events],
+  organizer: [directory, orgGigs, events],
+  admin: [directory, djGigs, events],
 };
 
 export const bottomNavByRole: Record<NavRole, NavItem[]> = {
@@ -85,3 +71,68 @@ export const bottomNavByRole: Record<NavRole, NavItem[]> = {
   organizer: [home, directory, orgGigs, events, profile],
   admin: [home, directory, djGigs, events, profile],
 };
+
+export type FooterProfessionalLink = {
+  label: string;
+  href: string;
+};
+
+export function getFooterProfessionalLabel(navRole: NavRole): string {
+  if (navRole === "dj" || navRole === "admin") return "DJ Hub";
+  if (navRole === "organizer") return "Organizer Hub";
+  if (navRole === "fan") return "Go Professional";
+  return "For DJs & Organizers";
+}
+
+export function getFooterProfessionalLinks(opts: {
+  navRole: NavRole;
+  djSlug: string | null;
+  organizerSlug: string | null;
+  isOrganizer: boolean;
+}): FooterProfessionalLink[] {
+  const { navRole, djSlug, organizerSlug, isOrganizer } = opts;
+
+  if (navRole === "dj" || navRole === "admin") {
+    return [
+      ...(djSlug ? [{ label: "My DJ Profile", href: `/djs/${djSlug}` }] : []),
+      { label: "My Gigs", href: "/dashboard/dj/gigs" },
+      { label: "Applications", href: "/dashboard/dj/applications" },
+      { label: "Account Settings", href: "/settings" },
+      ...(!isOrganizer
+        ? [{ label: "Become an Organizer", href: "/become-organizer" }]
+        : [{ label: "Organizer Dashboard", href: "/organizer/dashboard" }]),
+    ];
+  }
+
+  if (navRole === "organizer") {
+    return [
+      ...(organizerSlug
+        ? [
+            {
+              label: "My Organizer Profile",
+              href: `/organizers/${organizerSlug}`,
+            },
+          ]
+        : []),
+      { label: "Organizer Dashboard", href: "/organizer/dashboard" },
+      { label: "Post a Gig", href: "/dashboard/organizer/gigs/new" },
+      { label: "My Gigs", href: "/dashboard/organizer/gigs" },
+      { label: "Become a DJ", href: "/become-dj" },
+    ];
+  }
+
+  if (navRole === "fan") {
+    return [
+      { label: "Become a DJ", href: "/become-dj" },
+      { label: "Become an Organizer", href: "/become-organizer" },
+      { label: "Browse DJ Directory", href: "/directory" },
+    ];
+  }
+
+  return [
+    { label: "Join as DJ", href: "/sign-up?role=dj" },
+    { label: "Join as Organizer", href: "/sign-up?role=organizer" },
+    { label: "Create Your Profile", href: "/sign-up?role=dj" },
+    { label: "Browse DJ Directory", href: "/directory" },
+  ];
+}

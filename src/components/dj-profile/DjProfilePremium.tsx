@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils/currency";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   MapPin,
@@ -270,7 +271,7 @@ export default function DjProfilePremium({
           <div className="grid grid-cols-3 divide-x divide-white/10 py-5 md:grid-cols-6">
             {[
               {
-                val: DJ.followerCount.toLocaleString(),
+                val: formatNumber(DJ.followerCount),
                 label: "Followers",
                 icon: Users,
               },
@@ -298,7 +299,7 @@ export default function DjProfilePremium({
                 green: true,
               },
               {
-                val: DJ.profileViews.toLocaleString(),
+                val: formatNumber(DJ.profileViews),
                 label: "Monthly Views",
                 icon: Eye,
               },

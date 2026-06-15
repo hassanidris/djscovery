@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { formatNumber } from "@/lib/utils/currency";
 
 export type DemoDJ = {
   id: number | string;
@@ -102,7 +103,7 @@ export default function HomeDJsRow({
 
                   <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-2 text-xs text-gray-400">
                     <span>⭐ {dj.rating}</span>
-                    <span>{dj.followers.toLocaleString()} fans</span>
+                    <span>{formatNumber(dj.followers)} fans</span>
                   </div>
                 </Card>
               </Link>

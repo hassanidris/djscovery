@@ -16,6 +16,7 @@ import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GigActions } from "@/components/gigs/GigActions";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { formatDuration } from "@/lib/utils/duration";
+import { formatNumber } from "@/lib/utils/currency";
 
 export default async function OrganizerGigDetailPage({
   params,
@@ -66,9 +67,9 @@ export default async function OrganizerGigDetailPage({
       : gig.budgetType === "NEGOTIABLE"
         ? "Negotiable"
         : gig.budgetType === "FIXED" && gig.budgetMin != null
-          ? `${gig.currency} ${gig.budgetMin.toLocaleString()}`
+          ? `${gig.currency} ${formatNumber(gig.budgetMin)}`
           : gig.budgetMin != null && gig.budgetMax != null
-            ? `${gig.currency} ${gig.budgetMin.toLocaleString()} – ${gig.budgetMax.toLocaleString()}`
+            ? `${gig.currency} ${formatNumber(gig.budgetMin)} – ${formatNumber(gig.budgetMax)}`
             : "Budget TBA";
 
   return (

@@ -11,24 +11,20 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { House, Mic, Mail } from "lucide-react";
 import { getNavUser } from "@/lib/auth/getNavUser";
-import { desktopNavByRole } from "@/config/navigation";
+import {
+  desktopNavByRole,
+  getFooterProfessionalLabel,
+  getFooterProfessionalLinks,
+  type NavRole,
+} from "@/config/navigation";
 
-const footerLinks = {
-  forDJs: [
-    { label: "Join as DJ", href: "/sign-up?role=dj" },
-    { label: "Join as Organiser", href: "/sign-up?role=organiser" },
-    { label: "Create Your Profile", href: "/sign-up?role=dj" },
-    { label: "Browse DJ Events", href: "/community" },
-    { label: "DJ Resources", href: "/directory" },
-  ],
-  company: [
-    { label: "About DJscovery", href: "/" },
-    { label: "Contact Us", href: "/" },
-    { label: "Privacy Policy", href: "/" },
-    { label: "Terms of Service", href: "/" },
-    { label: "Cookie Policy", href: "/" },
-  ],
-};
+const companyLinks = [
+  { label: "About DJscovery", href: "/" },
+  { label: "Contact Us", href: "/" },
+  { label: "Privacy Policy", href: "/" },
+  { label: "Terms of Service", href: "/" },
+  { label: "Cookie Policy", href: "/" },
+];
 
 const socialLinks = [
   { icon: faXTwitter, href: "#", label: "X (Twitter)" },
@@ -39,16 +35,34 @@ const socialLinks = [
 ];
 
 const Footer = async () => {
-  let navRole: keyof typeof desktopNavByRole = "guest";
+  let navData: {
+    navRole: NavRole;
+    djSlug: string | null;
+    organizerSlug: string | null;
+    isOrganizer: boolean;
+  } = {
+    navRole: "guest",
+    djSlug: null,
+    organizerSlug: null,
+    isOrganizer: false,
+  };
   try {
-    ({ navRole } = await getNavUser());
+    const user = await getNavUser();
+    navData = {
+      navRole: user.navRole,
+      djSlug: user.djSlug,
+      organizerSlug: user.organizerSlug,
+      isOrganizer: user.isOrganizer,
+    };
   } catch {
-    navRole = "guest";
+    // keep guest defaults
   }
   const exploreItems = [
     { id: "home", label: "Home", href: "/", icon: House },
-    ...desktopNavByRole[navRole],
+    ...desktopNavByRole[navData.navRole],
   ];
+  const professionalLinks = getFooterProfessionalLinks(navData);
+  const professionalLabel = getFooterProfessionalLabel(navData.navRole);
   return (
     <footer className="w-full border-t border-white/5 bg-black">
       {/* Top accent bar */}
@@ -169,13 +183,13 @@ const Footer = async () => {
               </ul>
             </div>
 
-            {/* ── For DJs & Organisers ── */}
+            {/* ── For DJs & Organizers ── */}
             <div className="flex flex-col gap-4">
               <h4 className="text-xs font-semibold tracking-[0.15em] text-white uppercase">
-                For DJs &amp; Organisers
+                {professionalLabel}
               </h4>
               <ul className="flex flex-col gap-3">
-                {footerLinks.forDJs.map((link) => (
+                {professionalLinks.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
@@ -195,7 +209,7 @@ const Footer = async () => {
                 Company
               </h4>
               <ul className="flex flex-col gap-3">
-                {footerLinks.company.map((link) => (
+                {companyLinks.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}

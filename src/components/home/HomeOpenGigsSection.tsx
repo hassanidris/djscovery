@@ -57,7 +57,7 @@ export default function HomeOpenGigsSection() {
               Open Gigs
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-gray-400">
-              Organisers looking to hire right now
+              Organizers looking to hire right now
             </p>
           </div>
           <Button

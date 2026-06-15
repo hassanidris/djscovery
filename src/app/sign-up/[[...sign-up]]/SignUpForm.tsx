@@ -26,7 +26,7 @@ function SignUpSubmitBtn({ label }: { label: string }) {
   );
 }
 
-type Role = "" | "dj" | "organiser";
+type Role = "" | "dj" | "organizer";
 
 const ROLES: {
   value: Role;
@@ -47,7 +47,7 @@ const ROLES: {
     description: "Create a profile, get discovered & booked",
   },
   {
-    value: "organiser",
+    value: "organizer",
     label: "Organizer",
     icon: "🎪",
     description: "Post gigs, hire DJs & manage events",
@@ -134,7 +134,7 @@ export default function SignUpForm({
         label={
           selected === "dj"
             ? "Sign Up as DJ"
-            : selected === "organiser"
+            : selected === "organizer"
               ? "Sign Up as Organizer"
               : "Sign Up as Fan"
         }

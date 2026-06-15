@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/client";
 import { formatDistanceToNow } from "date-fns";
+import { formatNumber } from "@/lib/utils/currency";
 
 type PostCard = {
   id: number | string;
@@ -160,7 +161,7 @@ export default async function HomeCommunityHighlights() {
                 </p>
 
                 <div className="mt-auto flex items-center gap-4 border-t border-white/5 pt-3 text-xs text-gray-500">
-                  <span>❤️ {post.likes.toLocaleString()} likes</span>
+                  <span>❤️ {formatNumber(post.likes)} likes</span>
                   <span>💬 {post.comments} comments</span>
                 </div>
               </Card>
