@@ -7,7 +7,7 @@ export default async function Page({
 }) {
   const { error, role } = await searchParams;
   const defaultRole =
-    role === "dj" ? "dj" : role === "organiser" ? "organiser" : undefined;
+    role === "dj" ? "dj" : role === "organizer" ? "organizer" : undefined;
 
   return (
     <div className="flex min-h-[calc(100vh-96px)] items-center justify-center px-4">

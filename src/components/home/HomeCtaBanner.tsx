@@ -17,7 +17,7 @@ export default async function HomeCtaBanner() {
   if (hasUpgradeableRole) return null;
 
   const djHref = user ? "/become-dj" : "/sign-up?role=dj";
-  const organiserHref = user ? "/become-organizer" : "/sign-up?role=organiser";
+  const organizerHref = user ? "/become-organizer" : "/sign-up?role=organizer";
   return (
     <section className="border-t border-white/5 px-4 py-16 md:px-8">
       <div className="mx-auto max-w-7xl">
@@ -48,7 +48,7 @@ export default async function HomeCtaBanner() {
                   I&apos;m a DJ
                 </h3>
                 <p className="mt-1 text-sm leading-relaxed text-gray-400">
-                  Showcase your mixes, get discovered by organisers, and grow
+                  Showcase your mixes, get discovered by organizers, and grow
                   your fanbase.
                 </p>
               </div>
@@ -65,12 +65,12 @@ export default async function HomeCtaBanner() {
               </Button>
             </div>
 
-            {/* Organiser card */}
+            {/* Organizer card */}
             <div className="flex flex-col gap-4 rounded-xl border border-white/10 bg-black/40 p-6">
               <div className="text-4xl">🎪</div>
               <div>
                 <h3 className="text-xl font-semibold text-white">
-                  I&apos;m an Organiser
+                  I&apos;m an Organizer
                 </h3>
                 <p className="mt-1 text-sm leading-relaxed text-gray-400">
                   Find and book the perfect DJ for your event from a global
@@ -87,7 +87,7 @@ export default async function HomeCtaBanner() {
                 variant="outline"
                 className="border-h_red hover:bg-h_red mt-auto w-full cursor-pointer font-semibold text-red-200 hover:text-white"
               >
-                <Link href={organiserHref}>Join as Organiser</Link>
+                <Link href={organizerHref}>Join as Organizer</Link>
               </Button>
             </div>
           </div>

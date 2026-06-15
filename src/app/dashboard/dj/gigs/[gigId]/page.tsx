@@ -18,6 +18,7 @@ import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GigApplicationButton } from "@/components/gigs/GigApplicationButton";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { formatDuration } from "@/lib/utils/duration";
+import { formatNumber } from "@/lib/utils/currency";
 
 export default async function DjGigDetailPage({
   params,
@@ -58,9 +59,9 @@ export default async function DjGigDetailPage({
       : gig.budgetType === "NEGOTIABLE"
         ? "Negotiable"
         : gig.budgetType === "FIXED" && gig.budgetMin != null
-          ? `${gig.currency} ${gig.budgetMin.toLocaleString()}`
+          ? `${gig.currency} ${formatNumber(gig.budgetMin)}`
           : gig.budgetMin != null && gig.budgetMax != null
-            ? `${gig.currency} ${gig.budgetMin.toLocaleString()} – ${gig.budgetMax.toLocaleString()}`
+            ? `${gig.currency} ${formatNumber(gig.budgetMin)} – ${formatNumber(gig.budgetMax)}`
             : "Budget TBA";
 
   const canApply =

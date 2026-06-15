@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { PREMIUM_DEMO_DJS } from "@/data/djs";
+import { formatNumber } from "@/lib/utils/currency";
 
 const FEATURED_DJS = [...PREMIUM_DEMO_DJS]
   .sort(
@@ -101,7 +102,7 @@ export default function HomeFeaturedDJs() {
 
                   <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3 text-xs text-gray-400">
                     <span>⭐ {dj.rating} rating</span>
-                    <span>{dj.followers.toLocaleString()} followers</span>
+                    <span>{formatNumber(dj.followers)} followers</span>
                   </div>
                 </div>
               </Card>

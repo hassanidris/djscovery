@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/client";
+import { formatNumber } from "@/lib/utils/currency";
 import {
   MapPin,
   Globe,
@@ -299,15 +300,15 @@ export default async function OrganizerPublicProfilePage({
                     </div>
                     {gig.budgetType === "FIXED" && gig.budgetMin != null && (
                       <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
-                        {gig.currency} {gig.budgetMin.toLocaleString()}
+                        {gig.currency} {formatNumber(gig.budgetMin)}
                       </span>
                     )}
                     {gig.budgetType === "RANGE" &&
                       gig.budgetMin != null &&
                       gig.budgetMax != null && (
                         <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
-                          {gig.currency} {gig.budgetMin.toLocaleString()} –{" "}
-                          {gig.budgetMax.toLocaleString()}
+                          {gig.currency} {formatNumber(gig.budgetMin)} –{" "}
+                          {formatNumber(gig.budgetMax)}
                         </span>
                       )}
                   </div>
