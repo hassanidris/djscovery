@@ -61,7 +61,7 @@ export default async function OrganizerDashboardPage() {
       socialLinks: { select: { id: true } },
       country: { select: { name: true } },
       city: { select: { name: true } },
-      _count: { select: { jobs: true } },
+      _count: { select: { gigs: true } },
     },
   });
 
@@ -121,7 +121,7 @@ export default async function OrganizerDashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">{profile._count.jobs}</p>
+              <p className="text-3xl font-bold">{profile._count.gigs}</p>
             </CardContent>
           </Card>
 
@@ -225,7 +225,7 @@ export default async function OrganizerDashboardPage() {
                 </p>
               </div>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/organizer/gigs/new">Go →</Link>
+                <Link href="/dashboard/organizer/gigs/new">Go →</Link>
               </Button>
             </CardContent>
           </Card>
