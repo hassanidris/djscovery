@@ -69,7 +69,7 @@ export function GigApplicationButton({
       </div>
     );
   }
-  if (applicationStatus === "WITHDRAWN") {
+  if (applicationStatus === "WITHDRAWN" && !showForm) {
     return (
       <button
         disabled={isPending}
@@ -82,10 +82,7 @@ export function GigApplicationButton({
   }
 
   // Active application — show withdraw
-  if (
-    applicationStatus === "APPLIED" ||
-    applicationStatus === "SHORTLISTED"
-  ) {
+  if (applicationStatus === "APPLIED" || applicationStatus === "SHORTLISTED") {
     return (
       <div className="flex flex-col gap-2">
         <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-5 py-3 text-center">
@@ -112,7 +109,7 @@ export function GigApplicationButton({
       <div className="flex flex-col gap-3 rounded-xl border border-white/15 p-4">
         <label className="text-sm font-medium text-white">
           Cover message{" "}
-          <span className="text-gray-500 font-normal">(optional)</span>
+          <span className="font-normal text-gray-500">(optional)</span>
         </label>
         <textarea
           value={message}

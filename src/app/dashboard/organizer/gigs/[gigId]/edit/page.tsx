@@ -11,11 +11,23 @@ import { getCountries } from "@/lib/actions/locations";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GigForm, type GigFormData } from "@/components/gigs/GigForm";
 
+function toLocalDateTimeInput(value: Date | string) {
+  const d = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function toLocalDateInput(value: Date | string) {
+  const d = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 function gigDetailToFormData(gig: OrganizerGigDetail): GigFormData {
   return {
     title: gig.title,
     gigType: gig.gigType,
-    eventDate: new Date(gig.eventDate).toISOString().slice(0, 16),
+    eventDate: toLocalDateTimeInput(gig.eventDate),
     description: gig.description ?? "",
     countryId: gig.countryId?.toString() ?? "",
     cityId: gig.cityId?.toString() ?? "",
@@ -43,7 +55,7 @@ function gigDetailToFormData(gig: OrganizerGigDetail): GigFormData {
     arrivalInstructions: gig.arrivalInstructions ?? "",
     setupNotes: gig.setupNotes ?? "",
     applicationDeadline: gig.applicationDeadline
-      ? new Date(gig.applicationDeadline).toISOString().slice(0, 10)
+      ? toLocalDateInput(gig.applicationDeadline)
       : "",
   };
 }

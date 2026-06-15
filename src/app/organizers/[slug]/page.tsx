@@ -138,7 +138,7 @@ export default async function OrganizerPublicProfilePage({
   const pastGigs = await prisma.gig.findMany({
     where: {
       organizerProfileId: profile.id,
-      status: { in: ["FILLED", "CANCELLED"] },
+      status: { in: ["FILLED", "CANCELLED", "EXPIRED"] },
       deletedAt: null,
     },
     orderBy: { updatedAt: "desc" },

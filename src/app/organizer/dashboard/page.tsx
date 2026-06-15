@@ -61,7 +61,16 @@ export default async function OrganizerDashboardPage() {
       socialLinks: { select: { id: true } },
       country: { select: { name: true } },
       city: { select: { name: true } },
-      _count: { select: { gigs: true } },
+      _count: {
+        select: {
+          gigs: {
+            where: {
+              status: { in: ["PUBLISHED", "UNDER_REVIEW"] },
+              deletedAt: null,
+            },
+          },
+        },
+      },
     },
   });
 

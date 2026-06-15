@@ -16,16 +16,29 @@ export function GigFormStep1({
   const [loadingCities, setLoadingCities] = useState(false);
 
   useEffect(() => {
+    let active = true;
     if (!data.countryId) {
       setCities([]);
       if (data.cityId) onChange("cityId", "");
       return;
     }
     setLoadingCities(true);
-    getCitiesForCountry(parseInt(data.countryId)).then((c) => {
-      setCities(c);
-      setLoadingCities(false);
-    });
+    getCitiesForCountry(parseInt(data.countryId))
+      .then((c) => {
+        if (!active) return;
+        setCities(c);
+      })
+      .catch(() => {
+        if (!active) return;
+        setCities([]);
+      })
+      .finally(() => {
+        if (!active) return;
+        setLoadingCities(false);
+      });
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.countryId]);
 
@@ -90,7 +103,13 @@ export function GigFormStep1({
         <input
           type="datetime-local"
           value={data.eventDate}
-          onChange={(e) => onChange("eventDate", e.target.value)}
+          onChange={(e) => {
+            const nextCountryId = e.target.value;
+            onChange("countryId", nextCountryId);
+            if (nextCountryId !== data.countryId) {
+              onChange("cityId", "");
+            }
+          }}
           className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white scheme-dark focus:border-white/25 focus:outline-none"
         />
         {errors.eventDate && (

@@ -101,7 +101,9 @@ export function GigFormStep2({
             />
             <button
               type="button"
-              onClick={() => addChip("requiredGenres", genreInput, setGenreInput)}
+              onClick={() =>
+                addChip("requiredGenres", genreInput, setGenreInput)
+              }
               className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400 hover:text-white"
             >
               Add
@@ -112,12 +114,13 @@ export function GigFormStep2({
               {data.requiredGenres.map((g) => (
                 <span
                   key={g}
-                  className="flex items-center gap-1 rounded-full bg-white/10 py-0.5 pl-2.5 pr-1.5 text-xs text-white"
+                  className="flex items-center gap-1 rounded-full bg-white/10 py-0.5 pr-1.5 pl-2.5 text-xs text-white"
                 >
                   {g}
                   <button
                     type="button"
                     onClick={() => removeChip("requiredGenres", g)}
+                    aria-label={`Remove genre ${g}`}
                     className="hover:text-red-400"
                   >
                     <X className="h-3 w-3" />
@@ -259,7 +262,9 @@ export function GigFormStep2({
             />
             <button
               type="button"
-              onClick={() => addChip("languagesSpoken", langInput, setLangInput)}
+              onClick={() =>
+                addChip("languagesSpoken", langInput, setLangInput)
+              }
               className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400 hover:text-white"
             >
               Add
@@ -270,12 +275,13 @@ export function GigFormStep2({
               {data.languagesSpoken.map((l) => (
                 <span
                   key={l}
-                  className="flex items-center gap-1 rounded-full bg-white/10 py-0.5 pl-2.5 pr-1.5 text-xs text-white"
+                  className="flex items-center gap-1 rounded-full bg-white/10 py-0.5 pr-1.5 pl-2.5 text-xs text-white"
                 >
                   {l}
                   <button
                     type="button"
                     onClick={() => removeChip("languagesSpoken", l)}
+                    aria-label={`Remove language ${l}`}
                     className="hover:text-red-400"
                   >
                     <X className="h-3 w-3" />

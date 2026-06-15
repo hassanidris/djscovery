@@ -47,7 +47,9 @@ export default async function DjGigDetailPage({
   const { gig, application, venueRevealed } = result;
 
   const typeLabel = GIG_TYPE_FIELDS[gig.gigType].label;
-  const location = [gig.city?.name, gig.country?.name].filter(Boolean).join(", ");
+  const location = [gig.city?.name, gig.country?.name]
+    .filter(Boolean)
+    .join(", ");
 
   const budgetStr =
     gig.budgetType === "TBA"
@@ -87,7 +89,7 @@ export default async function DjGigDetailPage({
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Main content */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
+          <div className="flex flex-col gap-6 lg:col-span-2">
             {/* Key info */}
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -139,7 +141,7 @@ export default async function DjGigDetailPage({
                 <h2 className="mb-2 text-sm font-semibold text-white">
                   About this gig
                 </h2>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-gray-400">
+                <p className="text-sm leading-relaxed whitespace-pre-line text-gray-400">
                   {gig.description}
                 </p>
               </div>
@@ -176,7 +178,7 @@ export default async function DjGigDetailPage({
                       <dd className="text-white">Yes</dd>
                     </div>
                   )}
-                  {gig.mcRequired && (
+                  {gig.micRequired && (
                     <div className="flex justify-between">
                       <dt className="text-gray-500">Microphone</dt>
                       <dd className="text-white">Required</dd>
@@ -276,7 +278,9 @@ export default async function DjGigDetailPage({
                   {gig.organizerContactPhone && (
                     <div>
                       <dt className="text-xs text-gray-500">Phone</dt>
-                      <dd className="text-white">{gig.organizerContactPhone}</dd>
+                      <dd className="text-white">
+                        {gig.organizerContactPhone}
+                      </dd>
                     </div>
                   )}
                   {gig.arrivalInstructions && (

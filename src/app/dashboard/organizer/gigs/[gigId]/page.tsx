@@ -33,9 +33,14 @@ export default async function OrganizerGigDetailPage({
 
   const orgProfile = await prisma.organizerProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true },
+    select: { id: true, status: true, deletedAt: true },
   });
-  if (!orgProfile) redirect("/become-organizer");
+  if (
+    !orgProfile ||
+    orgProfile.status !== "ACTIVE" ||
+    orgProfile.deletedAt !== null
+  )
+    redirect("/become-organizer");
 
   const gig = await getOrganizerGigDetail(gigId, orgProfile.id);
   if (!gig) return notFound();

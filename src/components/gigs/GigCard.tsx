@@ -48,7 +48,7 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
 
   return (
     <div className="group flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:border-white/20 hover:bg-white/8 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/dashboard/organizer/gigs/${gig.id}`}
@@ -119,10 +119,13 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
     gig.currency,
   );
 
+  const deadlineDeltaMs = gig.applicationDeadline
+    ? new Date(gig.applicationDeadline).getTime() - Date.now()
+    : null;
   const deadlineWarning =
-    gig.applicationDeadline &&
-    new Date(gig.applicationDeadline).getTime() - Date.now() <
-      3 * 24 * 60 * 60 * 1000; // < 3 days
+    deadlineDeltaMs != null &&
+    deadlineDeltaMs > 0 &&
+    deadlineDeltaMs < 3 * 24 * 60 * 60 * 1000; // within next 3 days
 
   return (
     <Link
@@ -131,8 +134,8 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-1">
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
               {typeLabel}
             </span>
@@ -142,7 +145,7 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
               </span>
             )}
           </div>
-          <h3 className="font-semibold text-white truncate leading-snug">
+          <h3 className="truncate leading-snug font-semibold text-white">
             {gig.title}
           </h3>
         </div>

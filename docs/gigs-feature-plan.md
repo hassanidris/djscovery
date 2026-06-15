@@ -47,7 +47,7 @@ This split happens in a server component / server action. Never rely on client-s
 
 ### 6. Multi-Step Form — Client Component with Local State
 
-A single `GigForm` client component with `step: 1–5` local state managed by `useReducer`. Form data accumulates in state. Only submitted on final step. Uses `zod.parse` on each step's fields for inline validation before advancing. Final submission calls `createGig` server action.
+A single `GigForm` client component with `step: 1–4` local state managed by `useReducer`. Form data accumulates in state. Only submitted on final step. Uses `zod.parse` on each step's fields for inline validation before advancing. Final submission calls `createGig` server action.
 
 ### 7. Dashboard Route Structure
 
@@ -241,17 +241,17 @@ model GigApplication {
 
 ### Models to Remove
 
-| Remove | Replaced by |
-|---|---|
-| `Job` | `Gig` |
-| `JobApplication` | `GigApplication` |
-| `JobStatus` enum | `GigStatus` enum |
-| `ApplicationStatus` enum | `GigApplicationStatus` enum |
-| `User.jobApplications` relation | `DjProfile.gigApplications` |
-| `User.jobsPosted` relation | `OrganizerProfile.gigs` |
-| `OrganizerProfile.jobs` relation | `OrganizerProfile.gigs` |
-| `Hire` model | Moved to Phase 2 |
-| `NotificationType.NEW_JOB` etc. | New gig-specific notification types |
+| Remove                           | Replaced by                         |
+| -------------------------------- | ----------------------------------- |
+| `Job`                            | `Gig`                               |
+| `JobApplication`                 | `GigApplication`                    |
+| `JobStatus` enum                 | `GigStatus` enum                    |
+| `ApplicationStatus` enum         | `GigApplicationStatus` enum         |
+| `User.jobApplications` relation  | `DjProfile.gigApplications`         |
+| `User.jobsPosted` relation       | `OrganizerProfile.gigs`             |
+| `OrganizerProfile.jobs` relation | `OrganizerProfile.gigs`             |
+| `Hire` model                     | Moved to Phase 2                    |
+| `NotificationType.NEW_JOB` etc.  | New gig-specific notification types |
 
 ---
 
@@ -296,7 +296,7 @@ A refinement of `updateGigSchema` — stricter: `title`, `gigType`, `eventDate`,
 
 ## File & Folder Structure
 
-```
+```text
 src/
 ├── app/
 │   └── dashboard/
@@ -329,7 +329,6 @@ src/
 │       ├── GigFormStep2Requirements.tsx           ← Step 2 sub-form
 │       ├── GigFormStep3Equipment.tsx              ← Step 3 sub-form
 │       ├── GigFormStep4Budget.tsx                 ← Step 4 sub-form
-│       ├── GigFormStep5Review.tsx                 ← Step 5 review + publish
 │       ├── GigDetailsHeader.tsx                   ← Title, type badge, date, location
 │       ├── GigStatusBadge.tsx                     ← Colored status pill
 │       ├── GigFilters.tsx                         ← Type, date, budget, location filters (Client)
@@ -497,13 +496,12 @@ Props: `gig` (public shape), `userRole`, `applicationStatus?`
 
 ### `GigForm` (Client Component, multi-step)
 
-Uses `useReducer` for accumulated form state across 5 steps.
+Uses `useReducer` for accumulated form state across 4 steps.
 
-- Step 1 — Basics: title, type, date, deadline, country/city
+- Step 1 — Basics: title, type, date, country/city
 - Step 2 — Requirements: description, genres, experience level, set duration, guest count, dress code, MC/mic flags, languages
-- Step 3 — Equipment: two multi-select groups (`venueProvides`, `djMustBring`)
-- Step 4 — Budget: budgetType selector, conditional min/max fields, currency
-- Step 5 — Review: read-only summary + publish toggle + submit
+- Step 3 — Budget & Equipment: budgetType selector, conditional min/max fields, currency, venue/DJ equipment lists
+- Step 4 — Logistics & Review: deadline, venue name/address, contact details, arrival/setup notes, inline review summary + submit
 - Per-step Zod validation before advancing
 - `sonner.toast` on submission result
 
@@ -511,14 +509,14 @@ Uses `useReducer` for accumulated form state across 5 steps.
 
 Maps `GigStatus` → color variant:
 
-| Status | Color |
-|---|---|
-| DRAFT | gray |
-| PUBLISHED | green |
+| Status       | Color  |
+| ------------ | ------ |
+| DRAFT        | gray   |
+| PUBLISHED    | green  |
 | UNDER_REVIEW | yellow |
-| FILLED | blue |
-| CANCELLED | red |
-| EXPIRED | orange |
+| FILLED       | blue   |
+| CANCELLED    | red    |
+| EXPIRED      | orange |
 
 ### `VenueInfoCard`
 
@@ -553,23 +551,41 @@ Variants:
 ```typescript
 // Conceptual structure — not final code
 type FieldConfig = {
-  visible: GigFieldKey[]
-  required: GigFieldKey[]
-}
+  visible: GigFieldKey[];
+  required: GigFieldKey[];
+};
 
 const gigTypeFields: Record<GigType, FieldConfig> = {
-  CLUB:            { visible: ["genres", "experienceLevel", "setDuration"],           required: ["genres"] },
-  WEDDING:         { visible: ["guestCount", "languages", "equipment", "mcRequired"], required: ["guestCount"] },
-  PRIVATE_PARTY:   { visible: ["guestCount", "equipment", "setupNotes"],              required: [] },
-  FESTIVAL:        { visible: ["setDuration", "equipment", "setupNotes"],             required: ["setDuration"] },
-  CORPORATE_EVENT: { visible: ["dressCode", "mcRequired", "micRequired"],             required: [] },
-  LOUNGE:          { visible: ["genres", "equipment", "description"],                 required: [] },
-  RESTAURANT:      { visible: ["genres", "equipment", "description"],                 required: [] },
-  BAR:             { visible: ["genres", "equipment"],                                required: [] },
-  HOTEL:           { visible: ["genres", "guestCount", "equipment"],                  required: [] },
-  BIRTHDAY_PARTY:  { visible: ["guestCount", "equipment", "genres"],                  required: [] },
-  OTHER:           { visible: ["description"],                                        required: [] },
-}
+  CLUB: {
+    visible: ["genres", "experienceLevel", "setDuration"],
+    required: ["genres"],
+  },
+  WEDDING: {
+    visible: ["guestCount", "languages", "equipment", "mcRequired"],
+    required: ["guestCount"],
+  },
+  PRIVATE_PARTY: {
+    visible: ["guestCount", "equipment", "setupNotes"],
+    required: [],
+  },
+  FESTIVAL: {
+    visible: ["setDuration", "equipment", "setupNotes"],
+    required: ["setDuration"],
+  },
+  CORPORATE_EVENT: {
+    visible: ["dressCode", "mcRequired", "micRequired"],
+    required: [],
+  },
+  LOUNGE: { visible: ["genres", "equipment", "description"], required: [] },
+  RESTAURANT: { visible: ["genres", "equipment", "description"], required: [] },
+  BAR: { visible: ["genres", "equipment"], required: [] },
+  HOTEL: { visible: ["genres", "guestCount", "equipment"], required: [] },
+  BIRTHDAY_PARTY: {
+    visible: ["guestCount", "equipment", "genres"],
+    required: [],
+  },
+  OTHER: { visible: ["description"], required: [] },
+};
 ```
 
 The `GigFormStep2Requirements` and `GigFormStep3Equipment` components consume this config to conditionally render fields and apply step-level Zod refinements.
@@ -586,16 +602,16 @@ Split `gigs` into two nav items and update `desktopNavByRole` / `bottomNavByRole
 const gigsMarketplace: NavItem = {
   id: "gigs",
   label: "Gigs",
-  href: "/dashboard/dj/gigs",   // DJ view — marketplace
+  href: "/dashboard/dj/gigs", // DJ view — marketplace
   icon: Briefcase,
-}
+};
 
 const gigsManage: NavItem = {
   id: "gigs",
   label: "Gigs",
-  href: "/dashboard/organizer/gigs",  // Organizer view — own gigs
+  href: "/dashboard/organizer/gigs", // Organizer view — own gigs
   icon: Briefcase,
-}
+};
 ```
 
 Both remove `comingSoon: true`.
@@ -625,17 +641,17 @@ Both remove `comingSoon: true`.
 
 ## Security Review
 
-| Threat | Mitigation |
-|---|---|
-| DJ views private venue fields before acceptance | Server query split — private fields never included in public/pre-acceptance shape |
-| Organizer edits another organizer's gig | `organizerProfileId` ownership check in every mutation action |
-| DJ applies to draft/cancelled/expired gig | Status + date checked server-side in `applyToGig` |
-| DJ applies twice to same gig | `@@unique([gigId, djProfileId])` + server-side check before insert |
-| DJ applies after deadline | `applicationDeadline` checked server-side |
-| Organizer accepts multiple DJs | `updateApplicationStatus` checks for existing `ACCEPTED` on same gig |
-| Role bypass via direct POST to server action | Every action fetches fresh session from Supabase, checks `UserRole` from DB |
-| Slug enumeration of private gig data | Gig detail routes check `navRole` before serving; organizer routes verify ownership |
-| Fan/Guest accessing gig routes | Dashboard layout guard + per-page `navRole` check |
+| Threat                                          | Mitigation                                                                          |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------- |
+| DJ views private venue fields before acceptance | Server query split — private fields never included in public/pre-acceptance shape   |
+| Organizer edits another organizer's gig         | `organizerProfileId` ownership check in every mutation action                       |
+| DJ applies to draft/cancelled/expired gig       | Status + date checked server-side in `applyToGig`                                   |
+| DJ applies twice to same gig                    | `@@unique([gigId, djProfileId])` + server-side check before insert                  |
+| DJ applies after deadline                       | `applicationDeadline` checked server-side                                           |
+| Organizer accepts multiple DJs                  | `updateApplicationStatus` checks for existing `ACCEPTED` on same gig                |
+| Role bypass via direct POST to server action    | Every action fetches fresh session from Supabase, checks `UserRole` from DB         |
+| Slug enumeration of private gig data            | Gig detail routes check `navRole` before serving; organizer routes verify ownership |
+| Fan/Guest accessing gig routes                  | Dashboard layout guard + per-page `navRole` check                                   |
 
 ---
 
@@ -652,7 +668,7 @@ Both remove `comingSoon: true`.
 
 ## UX Review
 
-- **Gig creation:** Multi-step wizard prevents overwhelming the organizer. Step 5 review shows a live preview of what DJs will see. Publish is an explicit action, not a default.
+- **Gig creation:** Multi-step wizard prevents overwhelming the organizer. Step 4 review shows a live preview of what DJs will see. Publish is an explicit action, not a default.
 - **Gig detail (DJ view):** Rendered as a professional job posting — not a raw form dump. Natural language paragraphs for description, highlight cards for key facts, bulleted lists for requirements and equipment.
 - **Venue card:** The locked/revealed pattern creates a clear trust signal and makes the privacy model tangible to the DJ.
 - **Applicant table:** Inline status transitions with confirmation. No full page reload — optimistic UI with `useTransition`.
@@ -704,7 +720,7 @@ Both remove `comingSoon: true`.
 ### Step 7 — Organizer Gig Management
 
 - `OrganizerGigListPage` + `GigCard` (organizer variant)
-- `GigCreatePage` + `GigForm` (all 5 steps)
+- `GigCreatePage` + `GigForm` (all 4 steps)
 - `OrganizerGigDetailPage` + `GigDetailsHeader`
 - `GigEditPage` (pre-fills `GigForm`)
 - `GigStatusBadge`, `EmptyGigsState`

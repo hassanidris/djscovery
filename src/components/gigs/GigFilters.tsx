@@ -19,11 +19,12 @@ export function GigFilters() {
     } else {
       params.delete(key);
     }
-    router.push(`${pathname}?${params.toString()}`);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }
 
   function clearAll() {
-    router.push(pathname);
+    router.replace(pathname, { scroll: false });
   }
 
   const hasFilters = !!(activeType || activeQ);
@@ -32,13 +33,13 @@ export function GigFilters() {
     <div className="mb-6 flex flex-wrap items-center gap-3">
       {/* Search */}
       <div className="relative min-w-48 flex-1">
-        <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-600" />
+        <Search className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-gray-600" />
         <input
           type="text"
-          defaultValue={activeQ}
+          value={activeQ}
           onChange={(e) => updateParam("q", e.target.value)}
           placeholder="Search gigs…"
-          className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+          className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pr-3 pl-9 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
         />
       </div>
 

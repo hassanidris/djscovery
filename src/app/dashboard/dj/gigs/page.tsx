@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPublishedGigsForDj } from "@/lib/queries/gigs";
 import { DjGigCard } from "@/components/gigs/GigCard";
 import { GigFilters } from "@/components/gigs/GigFilters";
-import type { GigType, ExperienceLevel } from "@prisma/client";
+import { GigType, ExperienceLevel } from "@prisma/client";
 
 export const metadata = { title: "Gigs — DJscovery" };
 
@@ -22,11 +22,23 @@ export default async function DjGigMarketplacePage({
 
   const sp = await searchParams;
 
+  const countryIdNum = sp.countryId ? Number(sp.countryId) : undefined;
+  const cityIdNum = sp.cityId ? Number(sp.cityId) : undefined;
+  const gigType =
+    sp.type && Object.values(GigType).includes(sp.type as GigType)
+      ? (sp.type as GigType)
+      : undefined;
+  const experienceLevel =
+    sp.level &&
+    Object.values(ExperienceLevel).includes(sp.level as ExperienceLevel)
+      ? (sp.level as ExperienceLevel)
+      : undefined;
+
   const gigs = await getPublishedGigsForDj({
-    gigType: sp.type as GigType | undefined,
-    countryId: sp.countryId ? parseInt(sp.countryId, 10) : undefined,
-    cityId: sp.cityId ? parseInt(sp.cityId, 10) : undefined,
-    experienceLevel: sp.level as ExperienceLevel | undefined,
+    gigType,
+    countryId: Number.isInteger(countryIdNum) ? countryIdNum : undefined,
+    cityId: Number.isInteger(cityIdNum) ? cityIdNum : undefined,
+    experienceLevel,
     search: sp.q,
   });
 

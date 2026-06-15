@@ -270,7 +270,8 @@ export function GigForm(props: GigFormProps) {
     if (Object.keys(errs).length) {
       toast.error("Please fix the errors before submitting.");
       setErrors(errs);
-      setStep(1);
+      const hasStep3Errors = "budgetMin" in errs || "budgetMax" in errs;
+      setStep(hasStep3Errors ? 3 : 1);
       return;
     }
 

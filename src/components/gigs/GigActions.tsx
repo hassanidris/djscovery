@@ -21,12 +21,16 @@ export function GigActions({
     successMsg: string,
   ) {
     startTransition(async () => {
-      const result = await action();
-      if (result.success) {
-        toast.success(successMsg);
-        router.refresh();
-      } else {
-        toast.error(result.error ?? "Something went wrong.");
+      try {
+        const result = await action();
+        if (result.success) {
+          toast.success(successMsg);
+          router.refresh();
+        } else {
+          toast.error(result.error ?? "Something went wrong.");
+        }
+      } catch {
+        toast.error("Something went wrong.");
       }
     });
   }
@@ -43,10 +47,7 @@ export function GigActions({
         <button
           disabled={isPending}
           onClick={() =>
-            handleAction(
-              () => publishGig(gigId),
-              "Gig published successfully.",
-            )
+            handleAction(() => publishGig(gigId), "Gig published successfully.")
           }
           className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-500 disabled:opacity-50"
         >

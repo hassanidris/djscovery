@@ -487,30 +487,49 @@ export async function applyToGig(
       error: "You have already applied to this gig.",
     };
 
-  const application = await prisma.$transaction(async (tx) => {
-    const app = await tx.gigApplication.create({
-      data: {
-        gigId,
-        djProfileId: djProfile.id,
-        status: "APPLIED",
-        message: message ?? null,
-      },
-      select: { id: true },
+  try {
+    const application = await prisma.$transaction(async (tx) => {
+      // Re-check inside transaction to minimize race window
+      const existing = await tx.gigApplication.findUnique({
+        where: { gigId_djProfileId: { gigId, djProfileId: djProfile.id } },
+        select: { id: true, status: true },
+      });
+      if (existing && existing.status !== "WITHDRAWN") {
+        throw new Error("DUPLICATE");
+      }
+      const app = await tx.gigApplication.create({
+        data: {
+          gigId,
+          djProfileId: djProfile.id,
+          status: "APPLIED",
+          message: message ?? null,
+        },
+        select: { id: true },
+      });
+
+      await tx.notification.create({
+        data: {
+          type: "GIG_APPLICATION_RECEIVED",
+          recipientId: gig.organizerProfile.userId,
+          senderId: user.id,
+          data: { gigId, applicationId: app.id },
+        },
+      });
+
+      return app;
     });
 
-    await tx.notification.create({
-      data: {
-        type: "GIG_APPLICATION_RECEIVED",
-        recipientId: gig.organizerProfile.userId,
-        senderId: user.id,
-        data: { gigId, applicationId: app.id },
-      },
-    });
-
-    return app;
-  });
-
-  return { success: true, data: { applicationId: application.id } };
+    return { success: true, data: { applicationId: application.id } };
+  } catch (err) {
+    if (err instanceof Error && err.message === "DUPLICATE") {
+      return { success: false, error: "You have already applied to this gig." };
+    }
+    // Prisma unique constraint error code
+    if ((err as { code?: string }).code === "P2002") {
+      return { success: false, error: "You have already applied to this gig." };
+    }
+    throw err;
+  }
 }
 
 // ============================================================

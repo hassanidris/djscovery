@@ -115,7 +115,9 @@ export async function getOrganizerGigs(organizerProfileId: number) {
   });
 }
 
-export type OrganizerGigListItem = Awaited<ReturnType<typeof getOrganizerGigs>>[number];
+export type OrganizerGigListItem = Awaited<
+  ReturnType<typeof getOrganizerGigs>
+>[number];
 
 // ============================================================
 // 2. ORGANIZER — GIG DETAIL
@@ -171,9 +173,7 @@ export async function getPublishedGigsForDj(filters: DjGigFilters = {}) {
       ...(gigType ? { gigType } : {}),
       ...(countryId ? { countryId } : {}),
       ...(cityId ? { cityId } : {}),
-      ...(experienceLevel
-        ? { requiredExperienceLevel: experienceLevel }
-        : {}),
+      ...(experienceLevel ? { requiredExperienceLevel: experienceLevel } : {}),
       ...(budgetMin != null ? { budgetMin: { gte: budgetMin } } : {}),
       ...(budgetMax != null ? { budgetMax: { lte: budgetMax } } : {}),
       ...(search
@@ -206,13 +206,7 @@ export type DjGigListItem = Awaited<
 // ============================================================
 
 export async function getDjGigDetail(gigId: number, djProfileId: number) {
-  const gig = await prisma.gig.findUnique({
-    where: { id: gigId, status: "PUBLISHED", deletedAt: null },
-    select: fullGigSelect,
-  });
-
-  if (!gig) return null;
-
+  // First check if DJ has an accepted application — if so, allow viewing regardless of gig status
   const application = await prisma.gigApplication.findUnique({
     where: { gigId_djProfileId: { gigId, djProfileId } },
     select: {
@@ -227,7 +221,21 @@ export async function getDjGigDetail(gigId: number, djProfileId: number) {
     },
   });
 
-  const venueRevealed = application?.status === "ACCEPTED";
+  const isAccepted = application?.status === "ACCEPTED";
+
+  const gig = await prisma.gig.findUnique({
+    where: {
+      id: gigId,
+      deletedAt: null,
+      // Accepted DJs can view any status; others only see PUBLISHED
+      ...(isAccepted ? {} : { status: "PUBLISHED" }),
+    },
+    select: fullGigSelect,
+  });
+
+  if (!gig) return null;
+
+  const venueRevealed = isAccepted;
 
   if (!venueRevealed) {
     return {

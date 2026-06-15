@@ -25,9 +25,14 @@ export default async function GigApplicantsPage({
 
   const orgProfile = await prisma.organizerProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true },
+    select: { id: true, status: true, deletedAt: true },
   });
-  if (!orgProfile) redirect("/become-organizer");
+  if (
+    !orgProfile ||
+    orgProfile.status !== "ACTIVE" ||
+    orgProfile.deletedAt !== null
+  )
+    redirect("/become-organizer");
 
   const result = await getGigApplicants(gigId, orgProfile.id);
   if (!result) return notFound();
@@ -53,7 +58,7 @@ export default async function GigApplicantsPage({
             Back to Gig
           </Link>
           <h1 className="text-2xl font-bold text-white">Applicants</h1>
-          <p className="text-muted-foreground mt-1 text-sm truncate">
+          <p className="text-muted-foreground mt-1 truncate text-sm">
             {gig.title} · {applications.length} total
           </p>
         </div>
@@ -71,7 +76,7 @@ export default async function GigApplicantsPage({
         {/* Active applications */}
         {active.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Pending Review ({active.length})
             </h2>
             <div className="flex flex-col gap-3">
@@ -111,7 +116,10 @@ export default async function GigApplicantsPage({
                       {(app.djProfile.city?.name ||
                         app.djProfile.country?.name) && (
                         <p className="text-xs text-gray-500">
-                          {[app.djProfile.city?.name, app.djProfile.country?.name]
+                          {[
+                            app.djProfile.city?.name,
+                            app.djProfile.country?.name,
+                          ]
                             .filter(Boolean)
                             .join(", ")}
                         </p>
@@ -200,7 +208,7 @@ export default async function GigApplicantsPage({
         {/* Decided applications */}
         {decided.length > 0 && (
           <section>
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Decided ({decided.length})
             </h2>
             <div className="flex flex-col gap-3">
