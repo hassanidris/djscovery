@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import { getNavUser } from "@/lib/auth/getNavUser";
 import Hero from "@/components/Hero";
 import HomeDJsTabs from "@/components/home/HomeDJsTabs";
 import type { DemoDJ } from "@/components/home/HomeDJsRow";
@@ -40,6 +41,24 @@ const Homepage = async () => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const navData = await getNavUser();
+  const isDj = navData.navRole === "dj" || navData.navRole === "admin";
+
+  let djCountryId: number | null = null;
+  let djCountryName: string | null = null;
+  if (isDj && user) {
+    try {
+      const djProfile = await prisma.djProfile.findUnique({
+        where: { userId: user.id, deletedAt: null },
+        select: { countryId: true, country: { select: { name: true } } },
+      });
+      djCountryId = djProfile?.countryId ?? null;
+      djCountryName = djProfile?.country?.name ?? null;
+    } catch {
+      // ignore
+    }
+  }
 
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
 
@@ -139,8 +158,12 @@ const Homepage = async () => {
       {/* Upcoming Events */}
       <HomeEventsSection />
 
-      {/* Open Gigs */}
-      <HomeOpenGigsSection />
+      {/* Open Gigs — visible to DJs only, filtered by DJ's country */}
+      <HomeOpenGigsSection
+        isDj={isDj}
+        countryId={djCountryId}
+        countryName={djCountryName}
+      />
 
       {/* Community Highlights */}
       <HomeCommunityHighlights />

@@ -3,9 +3,17 @@ import { redirect } from "next/navigation";
 import { Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getPublishedGigsForDj } from "@/lib/queries/gigs";
+import type { DjGigListItem } from "@/lib/queries/gigs";
 import { DjGigCard } from "@/components/gigs/GigCard";
 import { GigFilters } from "@/components/gigs/GigFilters";
-import { GigType, ExperienceLevel } from "@prisma/client";
+import {
+  GigType,
+  ExperienceLevel,
+  BudgetType,
+  OrganizerType,
+} from "@prisma/client";
+import { ALL_DEMO_GIGS } from "@/data/gigs-demo";
+import { getDemoOrganizerBySlug } from "@/data/organizers";
 
 export const metadata = { title: "Gigs — DJscovery" };
 
@@ -34,13 +42,72 @@ export default async function DjGigMarketplacePage({
       ? (sp.level as ExperienceLevel)
       : undefined;
 
-  const gigs = await getPublishedGigsForDj({
+  const dbGigs = await getPublishedGigsForDj({
     gigType,
     countryId: Number.isInteger(countryIdNum) ? countryIdNum : undefined,
     cityId: Number.isInteger(cityIdNum) ? cityIdNum : undefined,
     experienceLevel,
     search: sp.q,
   });
+
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  let gigs: DjGigListItem[] = dbGigs;
+
+  if (isStaging) {
+    const dbSlugs = new Set(dbGigs.map((g) => g.slug));
+    const demoItems = ALL_DEMO_GIGS.filter((g) => {
+      if (dbSlugs.has(g.slug)) return false;
+      if (gigType && g.gigType !== gigType) return false;
+      if (sp.q && !g.title.toLowerCase().includes(sp.q.toLowerCase()))
+        return false;
+      return true;
+    }).map((g, i) => {
+      const org = getDemoOrganizerBySlug(g.organizerSlug);
+      return {
+        id: -(i + 1),
+        slug: g.slug,
+        title: g.title,
+        gigType: g.gigType as GigType,
+        description: null,
+        status: "PUBLISHED",
+        eventDate: g.eventDate,
+        applicationDeadline: g.applicationDeadline,
+        countryId: null,
+        country: g.country ? { id: 0, name: g.country, code: "" } : null,
+        cityId: null,
+        city: g.city ? { id: 0, name: g.city } : null,
+        venueName: null,
+        hideVenueName: false,
+        budgetType: g.budgetType as BudgetType,
+        budgetMin: g.budgetMin,
+        budgetMax: g.budgetMax,
+        currency: g.currency,
+        requiredGenres: g.requiredGenres,
+        requiredExperienceLevel: null,
+        setDurationMinutes: null,
+        guestCount: null,
+        dressCode: null,
+        mcRequired: false,
+        micRequired: false,
+        languagesSpoken: [],
+        venueProvides: [],
+        djMustBring: [],
+        viewCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        organizerProfile: {
+          id: 0,
+          displayName: org?.displayName ?? g.organizerSlug,
+          slug: g.organizerSlug,
+          logoUrl: org?.logoUrl ?? null,
+          organizerType: (org?.organizerType ?? "COMPANY") as OrganizerType,
+        },
+        _count: { applications: g.applicationsCount },
+      } as unknown as DjGigListItem;
+    });
+    gigs = [...dbGigs, ...demoItems];
+  }
 
   return (
     <div className="min-h-screen bg-black">
