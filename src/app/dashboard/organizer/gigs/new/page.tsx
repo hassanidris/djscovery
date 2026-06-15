@@ -26,7 +26,13 @@ export default async function GigCreatePage() {
   )
     redirect("/become-organizer");
 
-  const countries = await getCountries();
+  const [countries, genres] = await Promise.all([
+    getCountries(),
+    prisma.genre.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   return (
     <div className="min-h-screen bg-black">
@@ -44,7 +50,7 @@ export default async function GigCreatePage() {
           Fill in the details below to start finding the right DJ.
         </p>
 
-        <GigForm mode="create" countries={countries} />
+        <GigForm mode="create" countries={countries} genres={genres} />
       </div>
     </div>
   );

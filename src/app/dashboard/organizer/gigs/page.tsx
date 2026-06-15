@@ -17,12 +17,18 @@ export default async function OrganizerGigListPage() {
     where: { userId: user.id },
     select: { id: true, status: true, deletedAt: true },
   });
-  if (!orgProfile || orgProfile.status !== "ACTIVE" || orgProfile.deletedAt !== null)
+  if (
+    !orgProfile ||
+    orgProfile.status !== "ACTIVE" ||
+    orgProfile.deletedAt !== null
+  )
     redirect("/become-organizer");
 
   const gigs = await getOrganizerGigs(orgProfile.id);
 
-  const active = gigs.filter((g) => g.status === "PUBLISHED" || g.status === "UNDER_REVIEW");
+  const active = gigs.filter(
+    (g) => g.status === "PUBLISHED" || g.status === "UNDER_REVIEW",
+  );
   const drafts = gigs.filter((g) => g.status === "DRAFT");
   const closed = gigs.filter((g) =>
     ["FILLED", "CANCELLED", "EXPIRED"].includes(g.status),
@@ -55,23 +61,17 @@ export default async function OrganizerGigListPage() {
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 py-20 text-center">
             <Briefcase className="mb-4 h-10 w-10 text-gray-700" />
             <p className="mb-1 font-semibold text-white">No gigs yet</p>
-            <p className="text-muted-foreground mb-6 text-sm">
-              Post your first gig to start finding DJs.
+            <p className="text-muted-foreground text-sm">
+              Use the <span className="text-white">Post a Gig</span> button
+              above to get started.
             </p>
-            <Link
-              href="/dashboard/organizer/gigs/new"
-              className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90"
-            >
-              <Plus className="h-4 w-4" />
-              Post a Gig
-            </Link>
           </div>
         )}
 
         {/* Active gigs */}
         {active.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Active
             </h2>
             <div className="flex flex-col gap-3">
@@ -85,7 +85,7 @@ export default async function OrganizerGigListPage() {
         {/* Drafts */}
         {drafts.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Drafts
             </h2>
             <div className="flex flex-col gap-3">
@@ -99,7 +99,7 @@ export default async function OrganizerGigListPage() {
         {/* Closed / past */}
         {closed.length > 0 && (
           <section>
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Past
             </h2>
             <div className="flex flex-col gap-3">

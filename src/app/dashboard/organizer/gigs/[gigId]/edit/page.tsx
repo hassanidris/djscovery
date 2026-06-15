@@ -81,9 +81,13 @@ export default async function GigEditPage({
   });
   if (!orgProfile) redirect("/become-organizer");
 
-  const [gig, countries] = await Promise.all([
+  const [gig, countries, genres] = await Promise.all([
     getOrganizerGigDetail(gigId, orgProfile.id),
     getCountries(),
+    prisma.genre.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
   ]);
   if (!gig) return notFound();
 
@@ -117,6 +121,7 @@ export default async function GigEditPage({
           gigId={gigId}
           initialData={initialData}
           countries={countries}
+          genres={genres}
         />
       </div>
     </div>

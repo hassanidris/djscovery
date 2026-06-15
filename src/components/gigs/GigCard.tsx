@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, CalendarDays, Users } from "lucide-react";
+import { MapPin, CalendarDays, Users, Wrench } from "lucide-react";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import type { OrganizerGigListItem } from "@/lib/queries/gigs";
@@ -189,6 +189,15 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
               +{gig.requiredGenres.length - 4} more
             </span>
           )}
+        </div>
+      )}
+
+      {/* DJ must bring indicator */}
+      {gig.djMustBring.length > 0 && (
+        <div className="flex items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 px-2.5 py-1.5 text-xs text-amber-400">
+          <Wrench className="h-3 w-3 shrink-0" />
+          You must bring {gig.djMustBring.length} item
+          {gig.djMustBring.length > 1 ? "s" : ""}
         </div>
       )}
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { X, ChevronDown, Check } from "lucide-react";
 import { isFieldVisible } from "@/config/gig-type-fields";
 import type { StepProps } from "./GigForm";
 import type { ExperienceLevel, GigType } from "@prisma/client";
@@ -15,39 +15,63 @@ const EXPERIENCE_OPTIONS: { value: ExperienceLevel; label: string }[] = [
   { value: "EXPERT", label: "Expert / Top tier" },
 ];
 
+const MAX_GENRES = 5;
+
 export function GigFormStep2({
   data,
   errors,
   onChange,
   onNext,
   onBack,
+  genres,
 }: StepProps) {
-  const [genreInput, setGenreInput] = useState("");
+  const [genreOpen, setGenreOpen] = useState(false);
   const [langInput, setLangInput] = useState("");
+  const genreDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        genreDropdownRef.current &&
+        !genreDropdownRef.current.contains(e.target as Node)
+      ) {
+        setGenreOpen(false);
+      }
+    }
+    if (genreOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [genreOpen]);
+
+  function toggleGenre(name: string) {
+    const current = data.requiredGenres;
+    if (current.includes(name)) {
+      onChange(
+        "requiredGenres",
+        current.filter((g) => g !== name),
+      );
+    } else if (current.length < MAX_GENRES) {
+      onChange("requiredGenres", [...current, name]);
+    }
+  }
 
   const gigType = data.gigType as GigType | "";
   const show = (field: GigFieldKey) =>
     !gigType || isFieldVisible(gigType as GigType, field);
 
-  function addChip(
-    field: "requiredGenres" | "languagesSpoken",
-    input: string,
-    setInput: (v: string) => void,
-  ) {
+  function addLang(input: string, setInput: (v: string) => void) {
     const val = input.trim();
-    if (val && !(data[field] as string[]).includes(val)) {
-      onChange(field, [...(data[field] as string[]), val]);
+    if (val && !data.languagesSpoken.includes(val)) {
+      onChange("languagesSpoken", [...data.languagesSpoken, val]);
     }
     setInput("");
   }
 
-  function removeChip(
-    field: "requiredGenres" | "languagesSpoken",
-    val: string,
-  ) {
+  function removeLang(val: string) {
     onChange(
-      field,
-      (data[field] as string[]).filter((x) => x !== val),
+      "languagesSpoken",
+      data.languagesSpoken.filter((x) => x !== val),
     );
   }
 
@@ -83,32 +107,79 @@ export function GigFormStep2({
         <div>
           <label className="mb-1.5 block text-sm font-medium text-white">
             Required Genres{" "}
-            <span className="font-normal text-gray-500">(optional)</span>
+            <span className="font-normal text-gray-500">
+              (optional, up to {MAX_GENRES})
+            </span>
           </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={genreInput}
-              onChange={(e) => setGenreInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addChip("requiredGenres", genreInput, setGenreInput);
-                }
-              }}
-              placeholder="e.g. House, Techno…"
-              className={`${inputCls} flex-1`}
-            />
+          <div ref={genreDropdownRef} className="relative">
             <button
               type="button"
-              onClick={() =>
-                addChip("requiredGenres", genreInput, setGenreInput)
-              }
-              className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400 hover:text-white"
+              onClick={() => setGenreOpen((o) => !o)}
+              className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white transition-colors hover:border-white/25 focus:outline-none"
             >
-              Add
+              <span
+                className={
+                  data.requiredGenres.length === 0
+                    ? "text-gray-600"
+                    : "text-white"
+                }
+              >
+                {data.requiredGenres.length === 0
+                  ? "Select genres…"
+                  : `${data.requiredGenres.length} genre${data.requiredGenres.length > 1 ? "s" : ""} selected`}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 text-gray-500 transition-transform ${genreOpen ? "rotate-180" : ""}`}
+              />
             </button>
+
+            {genreOpen && (
+              <div className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-[#111] py-1 shadow-xl">
+                {genres.length === 0 ? (
+                  <p className="px-3 py-2 text-xs text-gray-500">
+                    No genres available
+                  </p>
+                ) : (
+                  genres.map((genre) => {
+                    const selected = data.requiredGenres.includes(genre.name);
+                    const atMax =
+                      !selected && data.requiredGenres.length >= MAX_GENRES;
+                    return (
+                      <button
+                        key={genre.id}
+                        type="button"
+                        disabled={atMax}
+                        onClick={() => toggleGenre(genre.name)}
+                        className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors ${
+                          atMax
+                            ? "cursor-not-allowed opacity-40"
+                            : "hover:bg-white/5"
+                        }`}
+                      >
+                        <span
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                            selected
+                              ? "border-white bg-white"
+                              : "border-white/30 bg-transparent"
+                          }`}
+                        >
+                          {selected && (
+                            <Check className="h-2.5 w-2.5 text-black" />
+                          )}
+                        </span>
+                        <span
+                          className={selected ? "text-white" : "text-gray-400"}
+                        >
+                          {genre.name}
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
+
           {data.requiredGenres.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {data.requiredGenres.map((g) => (
@@ -119,7 +190,7 @@ export function GigFormStep2({
                   {g}
                   <button
                     type="button"
-                    onClick={() => removeChip("requiredGenres", g)}
+                    onClick={() => toggleGenre(g)}
                     aria-label={`Remove genre ${g}`}
                     className="hover:text-red-400"
                   >
@@ -128,6 +199,12 @@ export function GigFormStep2({
                 </span>
               ))}
             </div>
+          )}
+
+          {data.requiredGenres.length >= MAX_GENRES && (
+            <p className="mt-1.5 text-xs text-gray-500">
+              Maximum of {MAX_GENRES} genres reached.
+            </p>
           )}
         </div>
       )}
@@ -155,28 +232,69 @@ export function GigFormStep2({
       )}
 
       {/* Set Duration */}
-      {show("setDuration") && (
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-white">
-            Set Duration{" "}
-            <span className="font-normal text-gray-500">(minutes)</span>
-          </label>
-          <input
-            type="number"
-            min={15}
-            max={720}
-            value={data.setDurationMinutes}
-            onChange={(e) => onChange("setDurationMinutes", e.target.value)}
-            placeholder="e.g. 90"
-            className={inputCls}
-          />
-          {errors.setDurationMinutes && (
-            <p className="mt-1 text-xs text-red-400">
-              {errors.setDurationMinutes}
-            </p>
-          )}
-        </div>
-      )}
+      {show("setDuration") &&
+        (() => {
+          const totalMin = parseInt(data.setDurationMinutes) || 0;
+          const dHrs = Math.floor(totalMin / 60);
+          const dMins = totalMin % 60;
+
+          function onHrsChange(val: string) {
+            const h = Math.max(0, Math.min(23, parseInt(val) || 0));
+            const total = h * 60 + dMins;
+            onChange("setDurationMinutes", total > 0 ? String(total) : "");
+          }
+
+          function onMinsChange(val: string) {
+            const m = Math.max(0, Math.min(59, parseInt(val) || 0));
+            const total = dHrs * 60 + m;
+            onChange("setDurationMinutes", total > 0 ? String(total) : "");
+          }
+
+          return (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-white">
+                Set Duration{" "}
+                <span className="font-normal text-gray-500">(optional)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="flex flex-1 items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    max={23}
+                    value={dHrs === 0 ? "" : dHrs}
+                    onChange={(e) => onHrsChange(e.target.value)}
+                    placeholder="0"
+                    className={`${inputCls} text-center`}
+                  />
+                  <span className="text-sm text-gray-400">hrs</span>
+                </div>
+                <div className="flex flex-1 items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    max={59}
+                    value={dMins === 0 ? "" : dMins}
+                    onChange={(e) => onMinsChange(e.target.value)}
+                    placeholder="0"
+                    className={`${inputCls} text-center`}
+                  />
+                  <span className="text-sm text-gray-400">min</span>
+                </div>
+              </div>
+              {totalMin > 0 && (
+                <p className="mt-1.5 text-xs text-gray-500">
+                  Total: {totalMin} minutes
+                </p>
+              )}
+              {errors.setDurationMinutes && (
+                <p className="mt-1 text-xs text-red-400">
+                  {errors.setDurationMinutes}
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
       {/* Guest Count */}
       {show("guestCount") && (
@@ -254,7 +372,7 @@ export function GigFormStep2({
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  addChip("languagesSpoken", langInput, setLangInput);
+                  addLang(langInput, setLangInput);
                 }
               }}
               placeholder="e.g. English, Swedish…"
@@ -262,9 +380,7 @@ export function GigFormStep2({
             />
             <button
               type="button"
-              onClick={() =>
-                addChip("languagesSpoken", langInput, setLangInput)
-              }
+              onClick={() => addLang(langInput, setLangInput)}
               className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400 hover:text-white"
             >
               Add
@@ -280,7 +396,7 @@ export function GigFormStep2({
                   {l}
                   <button
                     type="button"
-                    onClick={() => removeChip("languagesSpoken", l)}
+                    onClick={() => removeLang(l)}
                     aria-label={`Remove language ${l}`}
                     className="hover:text-red-400"
                   >
