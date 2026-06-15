@@ -27,12 +27,18 @@ const directory: NavItem = {
   icon: Headphones,
 };
 
-const gigs: NavItem = {
+const djGigs: NavItem = {
   id: "gigs",
   label: "Gigs",
-  href: null,
+  href: "/dashboard/dj/gigs",
   icon: Briefcase,
-  comingSoon: true,
+};
+
+const orgGigs: NavItem = {
+  id: "gigs",
+  label: "My Gigs",
+  href: "/dashboard/organizer/gigs",
+  icon: Briefcase,
 };
 
 const events: NavItem = {
@@ -67,15 +73,15 @@ const account: NavItem = {
 export const desktopNavByRole: Record<NavRole, NavItem[]> = {
   guest: [directory, events, community],
   fan: [directory, events, community],
-  dj: [directory, gigs, events, community],
-  organizer: [directory, events, community],
-  admin: [directory, gigs, events, community],
+  dj: [directory, djGigs, events, community],
+  organizer: [directory, orgGigs, events, community],
+  admin: [directory, djGigs, events, community],
 };
 
 export const bottomNavByRole: Record<NavRole, NavItem[]> = {
   guest: [home, directory, events, account],
   fan: [home, directory, events, profile],
-  dj: [home, directory, gigs, events, profile],
-  organizer: [home, directory, events, profile],
-  admin: [home, directory, gigs, events, profile],
+  dj: [home, directory, djGigs, events, profile],
+  organizer: [home, directory, orgGigs, events, profile],
+  admin: [home, directory, djGigs, events, profile],
 };

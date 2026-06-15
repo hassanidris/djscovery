@@ -104,7 +104,6 @@ export default function HomeEventsSection() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DEMO_EVENTS.map((event) => (
             <Link key={event.id} href={`/events/${event.id}`}>
-              +{" "}
               <Card className="bg-h_blackLight/50 hover:ring-h_red cursor-pointer gap-0 overflow-hidden p-0 ring-white/5 transition-all">
                 {/* Header */}
                 <div className="bg-h_redDark/20 relative flex h-28 items-end overflow-hidden p-4">
