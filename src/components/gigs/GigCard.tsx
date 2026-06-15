@@ -203,7 +203,7 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
       )}
 
       {/* Organizer footer */}
-      <div className="flex items-center gap-2 border-t border-white/8 pt-3">
+      <div className="mt-auto flex items-center gap-2 border-t border-white/8 pt-3">
         {gig.organizerProfile.logoUrl ? (
           <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full">
             <Image

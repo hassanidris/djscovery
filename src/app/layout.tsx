@@ -19,9 +19,26 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "DJscovery || DJs Directory App",
+  title: {
+    default: "DJscovery — Where DJs Get Discovered",
+    template: "%s | DJscovery",
+  },
   description:
-    "DJscovery is your go-to hub for showcasing your talent and connecting with fans.",
+    "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
+  openGraph: {
+    siteName: "DJscovery",
+    type: "website",
+    locale: "en_US",
+    title: "DJscovery — Where DJs Get Discovered",
+    description:
+      "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DJscovery — Where DJs Get Discovered",
+    description:
+      "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
+  },
 };
 
 export default function RootLayout({
