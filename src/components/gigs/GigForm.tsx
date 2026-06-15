@@ -223,8 +223,15 @@ function validate(step: number, data: GigFormData): Record<string, string> {
 // MAIN COMPONENT
 // ============================================================
 
+type OrgDefaults = { countryId: string; cityId: string; currency: string };
+
 type GigFormProps =
-  | { mode: "create"; countries: CountryOption[]; genres: GenreOption[] }
+  | {
+      mode: "create";
+      countries: CountryOption[];
+      genres: GenreOption[];
+      orgDefaults?: OrgDefaults;
+    }
   | {
       mode: "edit";
       gigId: number;
@@ -238,7 +245,11 @@ export function GigForm(props: GigFormProps) {
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [data, setData] = useState<GigFormData>(
-    props.mode === "edit" ? props.initialData : GIG_FORM_DEFAULT,
+    props.mode === "edit"
+      ? props.initialData
+      : props.orgDefaults
+        ? { ...GIG_FORM_DEFAULT, ...props.orgDefaults }
+        : GIG_FORM_DEFAULT,
   );
   const [errors, setErrors] = useState<
     Partial<Record<keyof GigFormData, string>>
