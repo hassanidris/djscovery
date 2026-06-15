@@ -32,7 +32,7 @@ export default function NavMobileTop(props: NavUserData) {
           />
           <span className="font-heading text-xl leading-none tracking-tight text-white">
             <span className="font-bold">DJ</span>
-            <span className="font-semibold">covery</span>
+            <span className="font-semibold">scovery</span>
           </span>
         </div>
       </Link>

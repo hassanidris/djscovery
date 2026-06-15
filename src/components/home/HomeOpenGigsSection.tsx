@@ -1,53 +1,144 @@
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { CalendarDays, MapPin, Users } from "lucide-react";
+import { getPublishedGigsForDj } from "@/lib/queries/gigs";
+import { getDemoGigs } from "@/data/gigs-demo";
+import { getDemoOrganizerBySlug } from "@/data/organizers";
+import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
+import type { GigType } from "@prisma/client";
 
-type DemoGig = {
-  id: number;
+type HomeGigItem = {
+  id: string;
+  slug: string;
+  dbId?: number;
   title: string;
-  organizer: string;
+  gigTypeLabel: string;
   city: string;
   country: string;
-  budget: string;
-  genres: string[];
-  postedAgo: string;
+  budgetType: "FIXED" | "RANGE" | "NEGOTIABLE" | "TBA";
+  budgetMin: number | null;
+  budgetMax: number | null;
+  currency: string;
+  requiredGenres: string[];
+  eventDate: Date;
+  applicationsCount: number;
+  isDemo: boolean;
+  organizer: {
+    displayName: string;
+    slug: string;
+    logoUrl: string | null;
+  };
 };
 
-const DEMO_GIGS: DemoGig[] = [
-  {
-    id: 1,
-    title: "NYE 2026 Headline DJ",
-    organizer: "Club Vapor Berlin",
-    city: "Berlin",
-    country: "Germany",
-    budget: "€2,500",
-    genres: ["Techno", "House"],
-    postedAgo: "2h ago",
-  },
-  {
-    id: 2,
-    title: "Summer Gala Wedding DJ",
-    organizer: "The Grand Events Co.",
-    city: "London",
-    country: "UK",
-    budget: "£800",
-    genres: ["R&B", "Afrobeats"],
-    postedAgo: "5h ago",
-  },
-  {
-    id: 3,
-    title: "Rooftop Sessions Weekly Resident",
-    organizer: "Sky Lounge Ibiza",
-    city: "Ibiza",
-    country: "Spain",
-    budget: "€500 / set",
-    genres: ["Deep House", "Chill"],
-    postedAgo: "1d ago",
-  },
-];
+function formatBudget(
+  budgetType: string,
+  budgetMin: number | null,
+  budgetMax: number | null,
+  currency: string,
+): string {
+  if (budgetType === "NEGOTIABLE") return "Negotiable";
+  if (budgetType === "TBA") return "Budget TBA";
+  if (budgetType === "FIXED" && budgetMin != null)
+    return `${currency} ${budgetMin.toLocaleString()}`;
+  if (budgetType === "RANGE" && budgetMin != null && budgetMax != null)
+    return `${currency} ${budgetMin.toLocaleString()} – ${budgetMax.toLocaleString()}`;
+  return "Budget TBA";
+}
 
-export default function HomeOpenGigsSection() {
+function formatEventDate(date: Date): string {
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export default async function HomeOpenGigsSection({
+  isDj,
+  countryId,
+  countryName,
+}: {
+  isDj: boolean;
+  countryId: number | null;
+  countryName: string | null;
+}) {
+  if (!isDj) return null;
+
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  let dbGigs: HomeGigItem[] = [];
+  try {
+    const rows = await getPublishedGigsForDj({
+      latestFirst: true,
+      ...(countryId ? { countryId } : {}),
+    });
+    dbGigs = rows.slice(0, 4).map((g) => ({
+      id: String(g.id),
+      slug: g.slug,
+      dbId: g.id,
+      title: g.title,
+      gigTypeLabel: GIG_TYPE_FIELDS[g.gigType]?.label ?? g.gigType,
+      city: g.city?.name ?? "",
+      country: g.country?.name ?? "",
+      budgetType: g.budgetType as HomeGigItem["budgetType"],
+      budgetMin: g.budgetMin,
+      budgetMax: g.budgetMax,
+      currency: g.currency,
+      requiredGenres: g.requiredGenres,
+      eventDate: g.eventDate,
+      applicationsCount: g._count.applications,
+      isDemo: false,
+      organizer: {
+        displayName: g.organizerProfile.displayName,
+        slug: g.organizerProfile.slug,
+        logoUrl: g.organizerProfile.logoUrl ?? null,
+      },
+    }));
+  } catch {
+    // DB unavailable — fall through to demo data
+  }
+
+  const demoGigsAll: HomeGigItem[] = getDemoGigs().map((g) => {
+    const org = getDemoOrganizerBySlug(g.organizerSlug);
+    return {
+      id: g.id,
+      slug: g.slug,
+      title: g.title,
+      gigTypeLabel: GIG_TYPE_FIELDS[g.gigType as GigType]?.label ?? g.gigType,
+      city: g.city,
+      country: g.country,
+      budgetType: g.budgetType,
+      budgetMin: g.budgetMin,
+      budgetMax: g.budgetMax,
+      currency: g.currency,
+      requiredGenres: g.requiredGenres,
+      eventDate: g.eventDate,
+      applicationsCount: g.applicationsCount,
+      isDemo: true,
+      organizer: {
+        displayName: org?.displayName ?? g.organizerSlug,
+        slug: g.organizerSlug,
+        logoUrl: org?.logoUrl ?? null,
+      },
+    };
+  });
+
+  const demoGigs = countryName
+    ? demoGigsAll.filter(
+        (g) => g.country.toLowerCase() === countryName.toLowerCase(),
+      )
+    : demoGigsAll;
+
+  const dbSlugs = new Set(dbGigs.map((g) => g.slug));
+  const gigs = isStaging
+    ? [...dbGigs, ...demoGigs.filter((g) => !dbSlugs.has(g.slug))].slice(0, 4)
+    : dbGigs.length > 0
+      ? dbGigs.slice(0, 4)
+      : demoGigs.slice(0, 4);
+
+  if (gigs.length === 0) return null;
+
   return (
     <section className="border-t border-white/5 px-4 py-12 md:px-8">
       <div className="mx-auto max-w-7xl">
@@ -60,61 +151,101 @@ export default function HomeOpenGigsSection() {
               Organizers looking to hire right now
             </p>
           </div>
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="text-h_red hover:text-h_red hover:bg-white/5"
+          <Link
+            href="/dashboard/dj/gigs"
+            className="text-h_red hover:text-h_red/80 text-sm font-medium transition-colors"
           >
-            <Link href="/community">View all →</Link>
-          </Button>
+            View all →
+          </Link>
         </div>
 
         <div className="flex flex-col gap-3">
-          {DEMO_GIGS.map((gig) => (
-            <Card
-              key={gig.id}
-              className="bg-h_blackLight/50 gap-0 p-4 ring-white/5"
-            >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <div className="bg-h_redDark/40 border-h_red/30 min-w-22.5 shrink-0 rounded-lg border px-4 py-3 text-center">
-                  <p className="text-base font-bold text-red-300">
-                    {gig.budget}
+          {gigs.map((gig) => {
+            const budgetLabel = formatBudget(
+              gig.budgetType,
+              gig.budgetMin,
+              gig.budgetMax,
+              gig.currency,
+            );
+            const applyHref = gig.dbId
+              ? `/dashboard/dj/gigs/${gig.dbId}`
+              : "/dashboard/dj/gigs";
+
+            return (
+              <Link
+                key={gig.id}
+                href={applyHref}
+                className="group hover:ring-h_red flex flex-col gap-4 rounded-xl bg-white/5 p-5 ring-1 ring-white/10 transition-all sm:flex-row sm:items-start"
+              >
+                {/* LEFT — what is the gig */}
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <span className="self-start rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
+                    {gig.gigTypeLabel}
+                  </span>
+                  <p className="leading-snug font-semibold text-white">
+                    {gig.title}
                   </p>
-                  <p className="text-xs text-gray-500">budget</p>
+                  {gig.requiredGenres.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {gig.requiredGenres.slice(0, 3).map((g) => (
+                        <Badge
+                          key={g}
+                          className="bg-h_redDark/60 border-0 text-red-300"
+                        >
+                          {g}
+                        </Badge>
+                      ))}
+                      {gig.requiredGenres.length > 3 && (
+                        <span className="text-xs text-gray-500">
+                          +{gig.requiredGenres.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-1 flex-col gap-1.5">
-                  <p className="font-semibold text-white">{gig.title}</p>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
-                    <span>🏢 {gig.organizer}</span>
-                    <span>
-                      📍 {gig.city}, {gig.country}
+                {/* Divider — mobile only */}
+                <div className="border-t border-white/8 sm:hidden" />
+
+                {/* RIGHT — budget + who / where / when */}
+                <div className="flex shrink-0 flex-col gap-1.5 sm:items-end sm:text-right">
+                  <p className="text-base font-bold text-white">
+                    {budgetLabel}
+                  </p>
+                  <span className="flex items-center gap-1.5 text-xs text-gray-400 sm:justify-end">
+                    {gig.organizer.logoUrl ? (
+                      <span className="relative inline-block h-3.5 w-3.5 shrink-0 overflow-hidden rounded-full">
+                        <Image
+                          src={gig.organizer.logoUrl}
+                          alt={gig.organizer.displayName}
+                          fill
+                          className="object-cover"
+                          sizes="14px"
+                        />
+                      </span>
+                    ) : (
+                      <span className="text-[10px]">🏢</span>
+                    )}
+                    {gig.organizer.displayName}
+                  </span>
+                  {(gig.city || gig.country) && (
+                    <span className="flex items-center gap-1 text-xs text-gray-400 sm:justify-end">
+                      <MapPin className="h-3 w-3" />
+                      {[gig.city, gig.country].filter(Boolean).join(", ")}
                     </span>
-                    <span>🕐 {gig.postedAgo}</span>
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {gig.genres.map((g) => (
-                      <Badge
-                        key={g}
-                        className="bg-h_redDark/60 border-0 text-red-300"
-                      >
-                        {g}
-                      </Badge>
-                    ))}
-                  </div>
+                  )}
+                  <span className="flex items-center gap-1 text-xs text-gray-400 sm:justify-end">
+                    <CalendarDays className="h-3 w-3" />
+                    {formatEventDate(gig.eventDate)}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-500 sm:justify-end">
+                    <Users className="h-3 w-3" />
+                    {gig.applicationsCount} applied
+                  </span>
                 </div>
-
-                {/* This will be done with the functionalite of the gig */}
-                <Button
-                  size="sm"
-                  className="bg-h_red hover:bg-h_redDark shrink-0 cursor-pointer text-white"
-                >
-                  Apply
-                </Button>
-              </div>
-            </Card>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

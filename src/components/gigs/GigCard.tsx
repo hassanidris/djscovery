@@ -108,7 +108,13 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
 // Used in /dashboard/dj/gigs marketplace.
 // ============================================================
 
-export function DjGigCard({ gig }: { gig: DjGigListItem }) {
+export function DjGigCard({
+  gig,
+  isDemo = false,
+}: {
+  gig: DjGigListItem;
+  isDemo?: boolean;
+}) {
   const typeLabel = GIG_TYPE_FIELDS[gig.gigType].label;
   const location = [gig.city?.name, gig.country?.name]
     .filter(Boolean)
@@ -128,11 +134,11 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
     deadlineDeltaMs > 0 &&
     deadlineDeltaMs < 3 * 24 * 60 * 60 * 1000; // within next 3 days
 
-  return (
-    <Link
-      href={`/dashboard/dj/gigs/${gig.id}`}
-      className="group flex flex-col gap-4 rounded-xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-white/20 hover:bg-white/8"
-    >
+  const cardClass =
+    "group flex flex-col gap-4 rounded-xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-white/20 hover:bg-white/8";
+
+  const inner = (
+    <>
       {/* Header row */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -140,6 +146,11 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
             <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
               {typeLabel}
             </span>
+            {isDemo && (
+              <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-xs text-gray-500">
+                Demo
+              </span>
+            )}
             {deadlineWarning && (
               <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs text-amber-400">
                 Deadline soon
@@ -203,7 +214,7 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
       )}
 
       {/* Organizer footer */}
-      <div className="flex items-center gap-2 border-t border-white/8 pt-3">
+      <div className="mt-auto flex items-center gap-2 border-t border-white/8 pt-3">
         {gig.organizerProfile.logoUrl ? (
           <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full">
             <Image
@@ -222,6 +233,16 @@ export function DjGigCard({ gig }: { gig: DjGigListItem }) {
           {gig.organizerProfile.displayName}
         </span>
       </div>
+    </>
+  );
+
+  if (isDemo) {
+    return <div className={cardClass}>{inner}</div>;
+  }
+
+  return (
+    <Link href={`/dashboard/dj/gigs/${gig.id}`} className={cardClass}>
+      {inner}
     </Link>
   );
 }

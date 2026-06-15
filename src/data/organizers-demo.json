@@ -1,0 +1,227 @@
+[
+  {
+    "id": "demo-org-001",
+    "slug": "stockholm-house-collective",
+    "displayName": "Stockholm House Collective",
+    "organizerType": "COMPANY",
+    "bio": "Independent house music promoter organizing club nights and rooftop events across Stockholm.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/stockholm-house-collective.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1200&q=80",
+    "website": "https://stockholmhousecollective.se",
+    "city": "Stockholm",
+    "country": "Sweden",
+    "socialLinks": {
+      "instagram": "https://instagram.com/stockholmhousecollective",
+      "facebook": "https://facebook.com/stockholmhousecollective"
+    }
+  },
+  {
+    "id": "demo-org-002",
+    "slug": "nordic-wedding-events",
+    "displayName": "Nordic Wedding Events",
+    "organizerType": "COMPANY",
+    "bio": "Luxury wedding planning company specializing in multicultural weddings throughout Scandinavia.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/nordic-wedding-events.jpg",
+    "coverImageUrl": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=1200&q=80",
+    "website": "https://nordicweddingevents.se",
+    "city": "Malmö",
+    "country": "Sweden",
+    "socialLinks": {
+      "instagram": "https://instagram.com/nordicweddingevents"
+    }
+  },
+  {
+    "id": "demo-org-003",
+    "slug": "pulse-nightclub",
+    "displayName": "Pulse Nightclub",
+    "organizerType": "VENUE",
+    "bio": "Modern nightclub hosting electronic music, Afrobeat, and open-format DJs every weekend.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/pulse-nightclub.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200&q=80",
+    "website": "https://pulsenightclub.se",
+    "city": "Gothenburg",
+    "country": "Sweden",
+    "socialLinks": {
+      "instagram": "https://instagram.com/pulsenightclub",
+      "tiktok": "https://tiktok.com/@pulsenightclub"
+    }
+  },
+  {
+    "id": "demo-org-004",
+    "slug": "scandi-festival-group",
+    "displayName": "Scandi Festival Group",
+    "organizerType": "FESTIVAL",
+    "bio": "Organizers of summer music festivals featuring international and local talent.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/scandi-festival-group.jpg",
+    "coverImageUrl": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=1200&q=80",
+    "website": "https://scandifestivals.com",
+    "city": "Uppsala",
+    "country": "Sweden",
+    "socialLinks": {
+      "instagram": "https://instagram.com/scandifestivals"
+    }
+  },
+  {
+    "id": "demo-org-005",
+    "slug": "elite-talent-agency",
+    "displayName": "Elite Talent Agency",
+    "organizerType": "AGENCY",
+    "bio": "Artist booking and talent management agency working with DJs across Europe.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/elite-talent-agency.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80",
+    "website": "https://elitetalentagency.com",
+    "city": "Stockholm",
+    "country": "Sweden",
+    "socialLinks": {
+      "linkedin": "https://linkedin.com/company/elite-talent-agency"
+    }
+  },
+  {
+    "id": "demo-org-006",
+    "slug": "afro-vibes-stockholm",
+    "displayName": "Afro Vibes Stockholm",
+    "organizerType": "COMPANY",
+    "bio": "Promoting Afrobeat, Amapiano and Afrofusion experiences in Sweden.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/afro-vibes-Stockholm.webp",
+    "coverImageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1200&q=80",
+    "website": "https://afrovibes.se",
+    "city": "Stockholm",
+    "country": "Sweden",
+    "socialLinks": {
+      "instagram": "https://instagram.com/afrovibesstockholm"
+    }
+  },
+  {
+    "id": "demo-org-007",
+    "slug": "lion-bar",
+    "displayName": "Lion Bar",
+    "organizerType": "VENUE",
+    "bio": "Corporate and private event organizer serving central Sweden.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/lion-bar.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200&q=80",
+    "website": "https://eskilstunaeventhouse.se",
+    "city": "Eskilstuna",
+    "country": "Sweden",
+    "socialLinks": {
+      "facebook": "https://facebook.com/eskilstunaeventhouse"
+    }
+  },
+  {
+    "id": "demo-org-008",
+    "slug": "royal-weddings-jeddah",
+    "displayName": "Royal Weddings Jeddah",
+    "organizerType": "COMPANY",
+    "bio": "Premium wedding organizer known for elegant celebrations and live entertainment.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/royal-weddings-jeddah.jpeg",
+    "coverImageUrl": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=1200&q=80",
+    "website": "https://royalweddings.sa",
+    "city": "Jeddah",
+    "country": "Saudi Arabia",
+    "socialLinks": {
+      "instagram": "https://instagram.com/royalweddingsjeddah"
+    }
+  },
+  {
+    "id": "demo-org-009",
+    "slug": "sunset-beach-festival",
+    "displayName": "Sunset Beach Festival",
+    "organizerType": "FESTIVAL",
+    "bio": "Annual beach festival featuring electronic, Afro and tropical music acts.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/sunset-beach-festival.svg",
+    "coverImageUrl": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=1200&q=80",
+    "website": "https://sunsetbeachfestival.com",
+    "city": "Barcelona",
+    "country": "Spain",
+    "socialLinks": {
+      "instagram": "https://instagram.com/sunsetbeachfestival"
+    }
+  },
+  {
+    "id": "demo-org-010",
+    "slug": "urban-nights",
+    "displayName": "Urban Nights",
+    "organizerType": "COMPANY",
+    "bio": "Weekly nightlife events focusing on hip-hop and urban culture.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/urban-nights.jpeg",
+    "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1200&q=80",
+    "website": "https://urbannights.se",
+    "city": "Västerås",
+    "country": "Sweden",
+    "socialLinks": {
+      "instagram": "https://instagram.com/urbannights"
+    }
+  },
+  {
+    "id": "demo-org-011",
+    "slug": "skyline-rooftop-events",
+    "displayName": "Skyline Rooftop Events",
+    "organizerType": "VENUE",
+    "bio": "Exclusive rooftop venue hosting seasonal music and networking events.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/skyline-rooftop-events.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1200&q=80",
+    "website": "https://skylineevents.se",
+    "city": "Stockholm",
+    "country": "Sweden",
+    "socialLinks": {
+      "instagram": "https://instagram.com/skylineevents"
+    }
+  },
+  {
+    "id": "demo-org-012",
+    "slug": "corporate-sound-events",
+    "displayName": "Corporate Sound Events",
+    "organizerType": "COMPANY",
+    "bio": "Specialized in conferences, product launches and corporate entertainment.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/corporate-sound-events.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80",
+    "website": "https://corporatesoundevents.com",
+    "city": "Stockholm",
+    "country": "Sweden",
+    "socialLinks": {
+      "linkedin": "https://linkedin.com/company/corporate-sound-events"
+    }
+  },
+  {
+    "id": "demo-org-013",
+    "slug": "eritrean-community-events",
+    "displayName": "Eritrean Community Events",
+    "organizerType": "INDIVIDUAL",
+    "bio": "Community-driven cultural events celebrating Eritrean music and heritage.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/eritrean-community-events.jpg",
+    "coverImageUrl": "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=1200&q=80",
+    "website": "https://eritreanevents.org",
+    "city": "Eskilstuna",
+    "country": "Sweden",
+    "socialLinks": {
+      "facebook": "https://facebook.com/eritreanevents"
+    }
+  },
+  {
+    "id": "demo-org-014",
+    "slug": "nordic-beats-agency",
+    "displayName": "Nordic Beats Agency",
+    "organizerType": "AGENCY",
+    "bio": "Booking agency connecting emerging DJs with clubs and festivals.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/org-avatar/60770465-97a6-4e5d-b0b9-e09fdb2d5221/nordic-beats-agency.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80",
+    "website": "https://nordicbeatsagency.com",
+    "city": "Copenhagen",
+    "country": "Denmark",
+    "socialLinks": {
+      "instagram": "https://instagram.com/nordicbeatsagency"
+    }
+  },
+  {
+    "id": "demo-org-015",
+    "slug": "private-celebration-host",
+    "displayName": "Private Celebration Host",
+    "organizerType": "INDIVIDUAL",
+    "bio": "Private event organizer arranging milestone celebrations and family gatherings.",
+    "logoUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/org-avatar/private-celebration-host.png",
+    "coverImageUrl": "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1200&q=80",
+    "website": "",
+    "city": "Örebro",
+    "country": "Sweden",
+    "socialLinks": {}
+  }
+]

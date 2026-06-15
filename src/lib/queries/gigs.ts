@@ -15,6 +15,7 @@ export type DjGigFilters = {
   budgetMax?: number;
   experienceLevel?: ExperienceLevel;
   search?: string;
+  latestFirst?: boolean;
 };
 
 // ============================================================
@@ -160,6 +161,7 @@ export async function getPublishedGigsForDj(filters: DjGigFilters = {}) {
     budgetMax,
     experienceLevel,
     search,
+    latestFirst,
   } = filters;
 
   return prisma.gig.findMany({
@@ -185,7 +187,7 @@ export async function getPublishedGigsForDj(filters: DjGigFilters = {}) {
           }
         : {}),
     },
-    orderBy: { eventDate: "asc" },
+    orderBy: latestFirst ? { createdAt: "desc" } : { eventDate: "asc" },
     select: publicGigSelect,
   });
 }
