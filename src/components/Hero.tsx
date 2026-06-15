@@ -22,7 +22,7 @@ const Hero = async () => {
   const organiserHref = user ? "/become-organizer" : "/sign-up?role=organiser";
   return (
     <>
-      <section className="relative h-[40vh] w-full bg-zinc-800 lg:h-[50vh]">
+      <section className="relative h-[60vh] w-full bg-zinc-800 md:h-[50vh] lg:h-[55vh]">
         {/* Background image - maybe later I will change alt to (DJ performing at electronic music event)*/}
         <Image
           src="/cover-hero.png"
@@ -46,7 +46,7 @@ const Hero = async () => {
         <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70"></div>
         <div className="absolute top-0 left-0 z-10 flex h-full w-full items-center">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-start px-4 text-white md:px-8">
-            <h1 className="max-w-xl text-4xl font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] md:max-w-2xl md:text-5xl lg:max-w-3xl lg:text-6xl">
+            <h1 className="max-w-xl text-2xl font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-3xl md:max-w-2xl md:text-4xl lg:max-w-3xl lg:text-5xl xl:text-6xl">
               Get Discovered. <br />
               Get Booked.
               <br />
@@ -82,7 +82,7 @@ const Hero = async () => {
                     asChild
                     className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
                   >
-                    <Link href="/organizer/dashboard">Post a Gig</Link>
+                    <Link href="/dashboard/organizer/gigs/new">Post a Gig</Link>
                   </Button>
                   <Button
                     asChild

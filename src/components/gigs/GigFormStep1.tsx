@@ -103,13 +103,7 @@ export function GigFormStep1({
         <input
           type="datetime-local"
           value={data.eventDate}
-          onChange={(e) => {
-            const nextCountryId = e.target.value;
-            onChange("countryId", nextCountryId);
-            if (nextCountryId !== data.countryId) {
-              onChange("cityId", "");
-            }
-          }}
+          onChange={(e) => onChange("eventDate", e.target.value)}
           className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white scheme-dark focus:border-white/25 focus:outline-none"
         />
         {errors.eventDate && (

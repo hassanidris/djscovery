@@ -17,6 +17,7 @@ import type { GigType, BudgetType, ExperienceLevel } from "@prisma/client";
 
 export type CountryOption = { id: number; name: string };
 export type CityOption = { id: number; name: string };
+export type GenreOption = { id: number; name: string };
 
 export type GigFormData = {
   title: string;
@@ -59,6 +60,7 @@ export type StepProps = {
   onBack: () => void;
   isPending: boolean;
   countries: CountryOption[];
+  genres: GenreOption[];
 };
 
 // ============================================================
@@ -222,12 +224,13 @@ function validate(step: number, data: GigFormData): Record<string, string> {
 // ============================================================
 
 type GigFormProps =
-  | { mode: "create"; countries: CountryOption[] }
+  | { mode: "create"; countries: CountryOption[]; genres: GenreOption[] }
   | {
       mode: "edit";
       gigId: number;
       initialData: GigFormData;
       countries: CountryOption[];
+      genres: GenreOption[];
     };
 
 export function GigForm(props: GigFormProps) {
@@ -309,6 +312,7 @@ export function GigForm(props: GigFormProps) {
     onBack: handleBack,
     isPending,
     countries: props.countries,
+    genres: props.genres,
   };
 
   return (

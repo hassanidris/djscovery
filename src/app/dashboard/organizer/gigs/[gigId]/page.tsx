@@ -50,6 +50,14 @@ export default async function OrganizerGigDetailPage({
     .filter(Boolean)
     .join(", ");
 
+  function formatDuration(mins: number): string {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h > 0 && m > 0) return `${h} hr${h > 1 ? "s" : ""} ${m} min`;
+    if (h > 0) return `${h} hr${h > 1 ? "s" : ""}`;
+    return `${m} min`;
+  }
+
   function formatDate(d: Date) {
     return new Date(d).toLocaleDateString("en-US", {
       weekday: "long",
@@ -162,7 +170,9 @@ export default async function OrganizerGigDetailPage({
             {gig.setDurationMinutes && (
               <div>
                 <dt className="text-xs text-gray-500">Set duration</dt>
-                <dd className="text-white">{gig.setDurationMinutes} min</dd>
+                <dd className="text-white">
+                  {formatDuration(gig.setDurationMinutes)}
+                </dd>
               </div>
             )}
             {gig.guestCount && (
@@ -206,6 +216,43 @@ export default async function OrganizerGigDetailPage({
             </div>
           )}
         </section>
+
+        {/* Equipment */}
+        {(gig.venueProvides.length > 0 || gig.djMustBring.length > 0) && (
+          <section className="mb-6 rounded-xl border border-white/8 bg-white/3 p-5">
+            <h2 className="mb-4 text-sm font-semibold text-white">Equipment</h2>
+            {gig.venueProvides.length > 0 && (
+              <div className="mb-3">
+                <p className="mb-2 text-xs text-gray-500">Venue provides</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {gig.venueProvides.map((e) => (
+                    <span
+                      key={e}
+                      className="rounded-full border border-green-500/20 bg-green-500/5 px-2 py-0.5 text-xs text-green-400"
+                    >
+                      {e}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {gig.djMustBring.length > 0 && (
+              <div>
+                <p className="mb-2 text-xs text-gray-500">DJ must bring</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {gig.djMustBring.map((e) => (
+                    <span
+                      key={e}
+                      className="rounded-full border border-amber-500/20 bg-amber-500/5 px-2 py-0.5 text-xs text-amber-400"
+                    >
+                      {e}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Private logistics */}
         <section className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/5 p-5">
