@@ -5,6 +5,19 @@ export type OrganizerDemoType =
   | "AGENCY"
   | "FESTIVAL";
 
+export type DemoGigType =
+  | "CLUB"
+  | "FESTIVAL"
+  | "WEDDING"
+  | "CORPORATE_EVENT"
+  | "PRIVATE_PARTY"
+  | "BIRTHDAY_PARTY"
+  | "LOUNGE"
+  | "RESTAURANT"
+  | "HOTEL"
+  | "BAR"
+  | "OTHER";
+
 export interface OrganizerDemoData {
   id: string;
   slug: string;
@@ -23,7 +36,7 @@ export interface DemoGig {
   id: string;
   slug: string;
   title: string;
-  gigType: string;
+  gigType: DemoGigType;
   city: string;
   country: string;
   budgetType: "FIXED" | "RANGE" | "NEGOTIABLE" | "TBA";

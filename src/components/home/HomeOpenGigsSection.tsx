@@ -3,13 +3,14 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, MapPin, Users } from "lucide-react";
 import { getPublishedGigsForDj } from "@/lib/queries/gigs";
-import { ALL_DEMO_GIGS } from "@/data/gigs-demo";
+import { getDemoGigs } from "@/data/gigs-demo";
 import { getDemoOrganizerBySlug } from "@/data/organizers";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import type { GigType } from "@prisma/client";
 
 type HomeGigItem = {
   id: string;
+  slug: string;
   dbId?: number;
   title: string;
   gigTypeLabel: string;
@@ -74,6 +75,7 @@ export default async function HomeOpenGigsSection({
     });
     dbGigs = rows.slice(0, 4).map((g) => ({
       id: String(g.id),
+      slug: g.slug,
       dbId: g.id,
       title: g.title,
       gigTypeLabel: GIG_TYPE_FIELDS[g.gigType]?.label ?? g.gigType,
@@ -97,10 +99,11 @@ export default async function HomeOpenGigsSection({
     // DB unavailable — fall through to demo data
   }
 
-  const demoGigsAll: HomeGigItem[] = ALL_DEMO_GIGS.map((g) => {
+  const demoGigsAll: HomeGigItem[] = getDemoGigs().map((g) => {
     const org = getDemoOrganizerBySlug(g.organizerSlug);
     return {
       id: g.id,
+      slug: g.slug,
       title: g.title,
       gigTypeLabel: GIG_TYPE_FIELDS[g.gigType as GigType]?.label ?? g.gigType,
       city: g.city,
@@ -127,9 +130,9 @@ export default async function HomeOpenGigsSection({
       )
     : demoGigsAll;
 
-  const dbIds = new Set(dbGigs.map((g) => g.id));
+  const dbSlugs = new Set(dbGigs.map((g) => g.slug));
   const gigs = isStaging
-    ? [...dbGigs, ...demoGigs.filter((g) => !dbIds.has(g.id))].slice(0, 4)
+    ? [...dbGigs, ...demoGigs.filter((g) => !dbSlugs.has(g.slug))].slice(0, 4)
     : dbGigs.length > 0
       ? dbGigs.slice(0, 4)
       : demoGigs.slice(0, 4);
