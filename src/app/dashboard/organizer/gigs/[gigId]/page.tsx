@@ -15,6 +15,7 @@ import { getOrganizerGigDetail } from "@/lib/queries/gigs";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GigActions } from "@/components/gigs/GigActions";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
+import { formatDuration } from "@/lib/utils/duration";
 
 export default async function OrganizerGigDetailPage({
   params,
@@ -49,14 +50,6 @@ export default async function OrganizerGigDetailPage({
   const location = [gig.city?.name, gig.country?.name]
     .filter(Boolean)
     .join(", ");
-
-  function formatDuration(mins: number): string {
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    if (h > 0 && m > 0) return `${h} hr${h > 1 ? "s" : ""} ${m} min`;
-    if (h > 0) return `${h} hr${h > 1 ? "s" : ""}`;
-    return `${m} min`;
-  }
 
   function formatDate(d: Date) {
     return new Date(d).toLocaleDateString("en-US", {

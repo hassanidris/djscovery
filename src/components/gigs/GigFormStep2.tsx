@@ -115,6 +115,9 @@ export function GigFormStep2({
             <button
               type="button"
               onClick={() => setGenreOpen((o) => !o)}
+              aria-haspopup="listbox"
+              aria-expanded={genreOpen}
+              aria-controls="required-genres-listbox"
               className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white transition-colors hover:border-white/25 focus:outline-none"
             >
               <span
@@ -134,7 +137,12 @@ export function GigFormStep2({
             </button>
 
             {genreOpen && (
-              <div className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-[#111] py-1 shadow-xl">
+              <div
+                id="required-genres-listbox"
+                role="listbox"
+                aria-multiselectable="true"
+                className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-[`#111`] py-1 shadow-xl"
+              >
                 {genres.length === 0 ? (
                   <p className="px-3 py-2 text-xs text-gray-500">
                     No genres available
@@ -148,6 +156,8 @@ export function GigFormStep2({
                       <button
                         key={genre.id}
                         type="button"
+                        role="option"
+                        aria-selected={selected}
                         disabled={atMax}
                         onClick={() => toggleGenre(genre.name)}
                         className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors ${
@@ -260,6 +270,7 @@ export function GigFormStep2({
                 <div className="flex flex-1 items-center gap-2">
                   <input
                     type="number"
+                    aria-label="Set duration hours"
                     min={0}
                     max={23}
                     value={dHrs === 0 ? "" : dHrs}
@@ -272,6 +283,7 @@ export function GigFormStep2({
                 <div className="flex flex-1 items-center gap-2">
                   <input
                     type="number"
+                    aria-label="Set duration minutes"
                     min={0}
                     max={59}
                     value={dMins === 0 ? "" : dMins}

@@ -17,6 +17,7 @@ import { getDjGigDetail } from "@/lib/queries/gigs";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GigApplicationButton } from "@/components/gigs/GigApplicationButton";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
+import { formatDuration } from "@/lib/utils/duration";
 
 export default async function DjGigDetailPage({
   params,
@@ -50,14 +51,6 @@ export default async function DjGigDetailPage({
   const location = [gig.city?.name, gig.country?.name]
     .filter(Boolean)
     .join(", ");
-
-  function formatDuration(mins: number): string {
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    if (h > 0 && m > 0) return `${h} hr${h > 1 ? "s" : ""} ${m} min`;
-    if (h > 0) return `${h} hr${h > 1 ? "s" : ""}`;
-    return `${m} min`;
-  }
 
   const budgetStr =
     gig.budgetType === "TBA"

@@ -52,14 +52,20 @@ function EquipmentAssignmentList({
         <span className="text-xs text-gray-500">Quick assign:</span>
         <button
           type="button"
-          onClick={() => onChange("venueProvides", allItems)}
+          onClick={() => {
+            onChange("venueProvides", allItems);
+            onChange("djMustBring", []);
+          }}
           className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-gray-400 transition-colors hover:border-white/20 hover:text-white"
         >
           All → Venue
         </button>
         <button
           type="button"
-          onClick={() => onChange("djMustBring", allItems)}
+          onClick={() => {
+            onChange("venueProvides", []);
+            onChange("djMustBring", allItems);
+          }}
           className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-gray-400 transition-colors hover:border-white/20 hover:text-white"
         >
           All → DJ
