@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { getCountries } from "@/lib/actions/locations";
 import { GigForm } from "@/components/gigs/GigForm";
+import { currencyForCountryCode } from "@/lib/utils/currency";
 
 export const metadata = { title: "Post a Gig — DJscovery" };
 
@@ -17,7 +18,14 @@ export default async function GigCreatePage() {
 
   const orgProfile = await prisma.organizerProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true, status: true, deletedAt: true },
+    select: {
+      id: true,
+      status: true,
+      deletedAt: true,
+      countryId: true,
+      cityId: true,
+      country: { select: { code: true } },
+    },
   });
   if (
     !orgProfile ||
@@ -26,7 +34,13 @@ export default async function GigCreatePage() {
   )
     redirect("/become-organizer");
 
-  const countries = await getCountries();
+  const [countries, genres] = await Promise.all([
+    getCountries(),
+    prisma.genre.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   return (
     <div className="min-h-screen bg-black">
@@ -44,7 +58,16 @@ export default async function GigCreatePage() {
           Fill in the details below to start finding the right DJ.
         </p>
 
-        <GigForm mode="create" countries={countries} />
+        <GigForm
+          mode="create"
+          countries={countries}
+          genres={genres}
+          orgDefaults={{
+            countryId: orgProfile.countryId?.toString() ?? "",
+            cityId: orgProfile.cityId?.toString() ?? "",
+            currency: currencyForCountryCode(orgProfile.country?.code),
+          }}
+        />
       </div>
     </div>
   );

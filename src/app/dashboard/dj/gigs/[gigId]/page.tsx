@@ -17,6 +17,7 @@ import { getDjGigDetail } from "@/lib/queries/gigs";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GigApplicationButton } from "@/components/gigs/GigApplicationButton";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
+import { formatDuration } from "@/lib/utils/duration";
 
 export default async function DjGigDetailPage({
   params,
@@ -110,7 +111,7 @@ export default async function DjGigDetailPage({
                       {
                         icon: Clock,
                         label: "Set Duration",
-                        value: `${gig.setDurationMinutes} min`,
+                        value: formatDuration(gig.setDurationMinutes),
                       },
                     ]
                   : []),

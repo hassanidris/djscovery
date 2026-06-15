@@ -11,57 +11,140 @@ const BUDGET_OPTIONS: { value: BudgetType; label: string; hint: string }[] = [
   { value: "RANGE", label: "Range", hint: "Min and max amount" },
 ];
 
-function EquipmentSection({
-  title,
-  field,
-  selected,
+function EquipmentAssignmentList({
+  venueProvides,
+  djMustBring,
   onChange,
 }: {
-  title: string;
-  field: "venueProvides" | "djMustBring";
-  selected: string[];
+  venueProvides: string[];
+  djMustBring: string[];
   onChange: (field: "venueProvides" | "djMustBring", value: string[]) => void;
 }) {
-  function toggle(item: string) {
-    onChange(
-      field,
-      selected.includes(item)
-        ? selected.filter((x) => x !== item)
-        : [...selected, item],
-    );
+  function toggle(field: "venueProvides" | "djMustBring", item: string) {
+    const current = field === "venueProvides" ? venueProvides : djMustBring;
+    const opposite =
+      field === "venueProvides" ? "djMustBring" : "venueProvides";
+    const oppositeList =
+      field === "venueProvides" ? djMustBring : venueProvides;
+
+    if (current.includes(item)) {
+      onChange(
+        field,
+        current.filter((x) => x !== item),
+      );
+    } else {
+      onChange(field, [...current, item]);
+      if (oppositeList.includes(item)) {
+        onChange(
+          opposite,
+          oppositeList.filter((x) => x !== item),
+        );
+      }
+    }
   }
+
+  const allItems = [...EQUIPMENT_ITEMS];
 
   return (
     <div>
-      <p className="mb-3 text-sm font-medium text-white">{title}</p>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {EQUIPMENT_ITEMS.map((item) => {
-          const checked = selected.includes(item);
+      {/* Quick actions */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="text-xs text-gray-500">Quick assign:</span>
+        <button
+          type="button"
+          onClick={() => {
+            onChange("venueProvides", allItems);
+            onChange("djMustBring", []);
+          }}
+          className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-gray-400 transition-colors hover:border-white/20 hover:text-white"
+        >
+          All → Venue
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            onChange("venueProvides", []);
+            onChange("djMustBring", allItems);
+          }}
+          className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-gray-400 transition-colors hover:border-white/20 hover:text-white"
+        >
+          All → DJ
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            onChange("venueProvides", []);
+            onChange("djMustBring", []);
+          }}
+          className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-gray-400 transition-colors hover:border-red-400/40 hover:text-red-400"
+        >
+          Clear all
+        </button>
+      </div>
+
+      {/* Column headers */}
+      <div className="mb-1 grid grid-cols-[1fr_60px_60px] items-center gap-2 px-3 text-xs font-medium text-gray-500">
+        <span>Item</span>
+        <span className="text-center">Venue</span>
+        <span className="text-center">DJ</span>
+      </div>
+
+      {/* Item rows */}
+      <div className="overflow-hidden rounded-lg border border-white/8">
+        {EQUIPMENT_ITEMS.map((item, i) => {
+          const inVenue = venueProvides.includes(item);
+          const inDJ = djMustBring.includes(item);
           return (
-            <label
+            <div
               key={item}
-              className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-xs transition-colors ${
-                checked
-                  ? "border-white/30 bg-white/10 text-white"
-                  : "border-white/8 bg-white/3 text-gray-400 hover:border-white/15 hover:text-gray-300"
-              }`}
+              className={`grid grid-cols-[1fr_60px_60px] items-center gap-2 px-3 py-2.5 transition-colors ${
+                i < EQUIPMENT_ITEMS.length - 1 ? "border-b border-white/5" : ""
+              } ${inVenue || inDJ ? "bg-white/3" : ""}`}
             >
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => toggle(item)}
-                className="sr-only"
-              />
               <span
-                className={`h-3.5 w-3.5 shrink-0 rounded border transition-colors ${
-                  checked ? "border-white bg-white" : "border-white/30"
+                className={`text-sm ${
+                  inVenue || inDJ ? "text-white" : "text-gray-400"
                 }`}
-              />
-              {item}
-            </label>
+              >
+                {item}
+              </span>
+              <button
+                type="button"
+                onClick={() => toggle("venueProvides", item)}
+                className={`rounded-md py-1 text-xs font-medium transition-colors ${
+                  inVenue
+                    ? "bg-white text-black"
+                    : "border border-white/10 text-gray-500 hover:border-white/25 hover:text-gray-300"
+                }`}
+              >
+                Venue
+              </button>
+              <button
+                type="button"
+                onClick={() => toggle("djMustBring", item)}
+                className={`rounded-md py-1 text-xs font-medium transition-colors ${
+                  inDJ
+                    ? "bg-white text-black"
+                    : "border border-white/10 text-gray-500 hover:border-white/25 hover:text-gray-300"
+                }`}
+              >
+                DJ
+              </button>
+            </div>
           );
         })}
       </div>
+
+      {/* Summary */}
+      {(venueProvides.length > 0 || djMustBring.length > 0) && (
+        <p className="mt-2 text-xs text-gray-500">
+          {venueProvides.length > 0 &&
+            `Venue: ${venueProvides.length} item${venueProvides.length > 1 ? "s" : ""}`}
+          {venueProvides.length > 0 && djMustBring.length > 0 && " · "}
+          {djMustBring.length > 0 &&
+            `DJ: ${djMustBring.length} item${djMustBring.length > 1 ? "s" : ""}`}
+        </p>
+      )}
     </div>
   );
 }
@@ -87,28 +170,19 @@ export function GigFormStep3({
     <div className="flex flex-col gap-8">
       {/* Equipment section */}
       <section>
-        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <h3 className="mb-4 text-xs font-semibold tracking-wider text-gray-500 uppercase">
           Equipment
         </h3>
-        <div className="flex flex-col gap-6">
-          <EquipmentSection
-            title="Venue provides"
-            field="venueProvides"
-            selected={data.venueProvides}
-            onChange={(f, v) => onChange(f, v)}
-          />
-          <EquipmentSection
-            title="DJ must bring"
-            field="djMustBring"
-            selected={data.djMustBring}
-            onChange={(f, v) => onChange(f, v)}
-          />
-        </div>
+        <EquipmentAssignmentList
+          venueProvides={data.venueProvides}
+          djMustBring={data.djMustBring}
+          onChange={(f, v) => onChange(f, v)}
+        />
       </section>
 
       {/* Budget section */}
       <section>
-        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <h3 className="mb-4 text-xs font-semibold tracking-wider text-gray-500 uppercase">
           Budget
         </h3>
 
@@ -208,7 +282,7 @@ export function GigFormStep3({
                 }
                 maxLength={3}
                 placeholder="SEK"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm uppercase text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white uppercase placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
               />
             </div>
           </div>

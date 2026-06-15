@@ -17,6 +17,7 @@ import type { GigType, BudgetType, ExperienceLevel } from "@prisma/client";
 
 export type CountryOption = { id: number; name: string };
 export type CityOption = { id: number; name: string };
+export type GenreOption = { id: number; name: string };
 
 export type GigFormData = {
   title: string;
@@ -59,6 +60,7 @@ export type StepProps = {
   onBack: () => void;
   isPending: boolean;
   countries: CountryOption[];
+  genres: GenreOption[];
 };
 
 // ============================================================
@@ -221,13 +223,21 @@ function validate(step: number, data: GigFormData): Record<string, string> {
 // MAIN COMPONENT
 // ============================================================
 
+type OrgDefaults = { countryId: string; cityId: string; currency: string };
+
 type GigFormProps =
-  | { mode: "create"; countries: CountryOption[] }
+  | {
+      mode: "create";
+      countries: CountryOption[];
+      genres: GenreOption[];
+      orgDefaults?: OrgDefaults;
+    }
   | {
       mode: "edit";
       gigId: number;
       initialData: GigFormData;
       countries: CountryOption[];
+      genres: GenreOption[];
     };
 
 export function GigForm(props: GigFormProps) {
@@ -235,7 +245,11 @@ export function GigForm(props: GigFormProps) {
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [data, setData] = useState<GigFormData>(
-    props.mode === "edit" ? props.initialData : GIG_FORM_DEFAULT,
+    props.mode === "edit"
+      ? props.initialData
+      : props.orgDefaults
+        ? { ...GIG_FORM_DEFAULT, ...props.orgDefaults }
+        : GIG_FORM_DEFAULT,
   );
   const [errors, setErrors] = useState<
     Partial<Record<keyof GigFormData, string>>
@@ -309,6 +323,7 @@ export function GigForm(props: GigFormProps) {
     onBack: handleBack,
     isPending,
     countries: props.countries,
+    genres: props.genres,
   };
 
   return (
