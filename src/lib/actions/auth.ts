@@ -41,7 +41,7 @@ export async function signUp(formData: FormData) {
 
     // Skip select-role — user already chose their role on the sign-up form
     if (role === "dj") redirect("/become-dj");
-    if (role === "organiser") redirect("/become-organizer");
+    if (role === "organizer") redirect("/become-organizer");
     redirect("/"); // Fan — go straight to the app
   }
 
@@ -49,7 +49,7 @@ export async function signUp(formData: FormData) {
   const next =
     role === "dj"
       ? "/become-dj"
-      : role === "organiser"
+      : role === "organizer"
         ? "/become-organizer"
         : "/";
   redirect(

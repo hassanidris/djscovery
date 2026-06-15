@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { CircleCheck } from "lucide-react";
 import { DjUser } from "@/lib/data";
+import { formatNumber } from "@/lib/utils/currency";
 
 const DjCard = ({
   username,
@@ -34,10 +35,10 @@ const DjCard = ({
   };
 
   return (
-    <div className="bg-h_blackLight/50 rounded-xl p-4 flex flex-col gap-3 hover:ring-1 hover:ring-h_red hover:scale-[1.015] hover:shadow-lg hover:shadow-h_red/5 transition-all duration-200 relative group">
+    <div className="bg-h_blackLight/50 hover:ring-h_red hover:shadow-h_red/5 group relative flex flex-col gap-3 rounded-xl p-4 transition-all duration-200 hover:scale-[1.015] hover:shadow-lg hover:ring-1">
       <Link
         href={profileHref}
-        className="flex items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-h_red focus-visible:rounded-lg"
+        className="focus-visible:ring-h_red flex items-center gap-3 outline-none focus-visible:rounded-lg focus-visible:ring-2"
       >
         <div className="relative shrink-0">
           <Image
@@ -45,10 +46,10 @@ const DjCard = ({
             alt={stageName || username}
             width={56}
             height={56}
-            className="w-14 h-14 object-cover rounded-full ring-2 ring-h_red"
+            className="ring-h_red h-14 w-14 rounded-full object-cover ring-2"
           />
           {isPremium && (
-            <div className="absolute -bottom-1 -right-1 size-5 rounded-full bg-amber-400 border-2 border-black flex items-center justify-center">
+            <div className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border-2 border-black bg-amber-400">
               <FontAwesomeIcon
                 icon={faCrown}
                 className="h-2.5 w-2.5 text-black"
@@ -58,21 +59,21 @@ const DjCard = ({
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <h3 className="text-h_white font-semibold text-sm truncate">
+            <h3 className="text-h_white truncate text-sm font-semibold">
               {formatDjName(stageName || username)}
             </h3>
             {verified && (
-              <CircleCheck className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+              <CircleCheck className="h-3.5 w-3.5 shrink-0 text-blue-400" />
             )}
           </div>
           {(city || country) && (
-            <p className="text-gray-400 text-xs truncate">
+            <p className="truncate text-xs text-gray-400">
               {[city, country].filter(Boolean).join(", ")}
             </p>
           )}
           {_count !== undefined && (
-            <p className="text-gray-500 text-xs">
-              {_count.followers.toLocaleString()} followers
+            <p className="text-xs text-gray-500">
+              {formatNumber(_count.followers)} followers
             </p>
           )}
         </div>
@@ -83,7 +84,7 @@ const DjCard = ({
           {genreList.slice(0, 3).map((genre) => (
             <span
               key={genre}
-              className="text-xs bg-h_redDark/60 text-red-200 px-2 py-0.5 rounded-full"
+              className="bg-h_redDark/60 rounded-full px-2 py-0.5 text-xs text-red-200"
             >
               {genre}
             </span>
@@ -93,7 +94,7 @@ const DjCard = ({
 
       <Link
         href={profileHref}
-        className="mt-auto bg-h_red hover:bg-h_redDark active:scale-95 text-white text-xs px-3 py-1.5 rounded-md w-full transition-all text-center cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-h_red"
+        className="bg-h_red hover:bg-h_redDark focus-visible:ring-h_red mt-auto w-full cursor-pointer rounded-md px-3 py-1.5 text-center text-xs text-white transition-all outline-none focus-visible:ring-2 focus-visible:ring-offset-1 active:scale-95"
       >
         View Profile
       </Link>

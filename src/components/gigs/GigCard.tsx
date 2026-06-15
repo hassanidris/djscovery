@@ -6,6 +6,7 @@ import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import type { OrganizerGigListItem } from "@/lib/queries/gigs";
 import type { DjGigListItem } from "@/lib/queries/gigs";
 import type { BudgetType } from "@prisma/client";
+import { formatNumber } from "@/lib/utils/currency";
 
 // ─── Budget formatter ─────────────────────────────────────────────────────────
 
@@ -18,9 +19,9 @@ function formatBudget(
   if (budgetType === "NEGOTIABLE") return "Negotiable";
   if (budgetType === "TBA") return "Budget TBA";
   if (budgetType === "FIXED" && budgetMin != null)
-    return `${currency} ${budgetMin.toLocaleString()}`;
+    return `${currency} ${formatNumber(budgetMin)}`;
   if (budgetType === "RANGE" && budgetMin != null && budgetMax != null)
-    return `${currency} ${budgetMin.toLocaleString()} – ${budgetMax.toLocaleString()}`;
+    return `${currency} ${formatNumber(budgetMin)} – ${formatNumber(budgetMax)}`;
   return "Budget TBA";
 }
 

@@ -1,4 +1,5 @@
 import type { DjDemoData } from "@/types/dj-demo";
+import { formatNumber } from "@/lib/utils/currency";
 import { Newspaper } from "lucide-react";
 import {
   REVIEWER_AVATARS,
@@ -35,8 +36,8 @@ export function mapFreeDjToProps(d: DjDemoData) {
     bookingEmail: d.booking.email,
     bookingPhone: d.booking.phone,
     website: d.booking.website,
-    minFee: `${d.booking.feeRange.currency}${d.booking.feeRange.min.toLocaleString()}`,
-    maxFee: `${d.booking.feeRange.currency}${d.booking.feeRange.max.toLocaleString()}`,
+    minFee: `${d.booking.feeRange.currency}${formatNumber(d.booking.feeRange.min)}`,
+    maxFee: `${d.booking.feeRange.currency}${formatNumber(d.booking.feeRange.max)}`,
     djTypes: d.specialties,
   };
 }
@@ -117,8 +118,8 @@ export function mapPremiumDjToProps(d: DjDemoData) {
     bookingEmail: d.booking.email,
     bookingPhone: d.booking.phone,
     website: d.booking.website,
-    minFee: `${d.booking.feeRange.currency}${d.booking.feeRange.min.toLocaleString()}`,
-    maxFee: `${d.booking.feeRange.currency}${d.booking.feeRange.max.toLocaleString()}`,
+    minFee: `${d.booking.feeRange.currency}${formatNumber(d.booking.feeRange.min)}`,
+    maxFee: `${d.booking.feeRange.currency}${formatNumber(d.booking.feeRange.max)}`,
     djTypes: d.specialties,
     manager: {
       name: d.team.manager.name,
@@ -222,7 +223,7 @@ export function mapPackagesFromData(d: DjDemoData) {
     name: pkg.name,
     icon:
       PACKAGE_ICON_MAP[pkg.name] ?? HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
-    price: `From ${pkg.currency}${pkg.priceFrom.toLocaleString()}`,
+    price: `From ${pkg.currency}${formatNumber(pkg.priceFrom)}`,
     duration: pkg.features[0] ?? "",
     includes: pkg.features.slice(1),
     color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",

@@ -49,7 +49,14 @@ export const COUNTRY_CURRENCY_MAP: Record<string, string> = {
   PK: "PKR",
 };
 
-export function currencyForCountryCode(code: string | null | undefined): string {
+export function currencyForCountryCode(
+  code: string | null | undefined,
+): string {
   if (!code) return "SEK";
   return COUNTRY_CURRENCY_MAP[code.toUpperCase()] ?? "SEK";
+}
+
+/** Always use en-US locale to prevent server/client hydration mismatches */
+export function formatNumber(n: number): string {
+  return new Intl.NumberFormat("en-US").format(n);
 }

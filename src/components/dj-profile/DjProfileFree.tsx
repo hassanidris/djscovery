@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils/currency";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   MapPin,
@@ -256,7 +257,7 @@ export default function DjProfileFree({
           <div className="grid grid-cols-3 py-5">
             {[
               {
-                val: DJ.followerCount.toLocaleString(),
+                val: formatNumber(DJ.followerCount),
                 label: "Followers",
                 icon: Users,
               },
