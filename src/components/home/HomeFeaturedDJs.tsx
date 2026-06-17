@@ -51,8 +51,8 @@ export default function HomeFeaturedDJs() {
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {FEATURED_DJS.map((dj) => (
-            <Link key={dj.slug} href={`/djs/${dj.slug}`}>
-              <Card className="bg-h_blackLight/50 hover:ring-h_red gap-0 overflow-hidden p-0 ring-white/5 transition-all">
+            <Link key={dj.slug} href={`/djs/${dj.slug}`} className="h-full">
+              <Card className="bg-h_blackLight/50 hover:ring-h_red flex h-full flex-col gap-0 overflow-hidden p-0 ring-white/5 transition-all">
                 <div className="from-h_cyanDark relative h-24 bg-linear-to-r to-black">
                   <div className="absolute -bottom-8 left-4">
                     <div className="relative">
@@ -75,10 +75,10 @@ export default function HomeFeaturedDJs() {
                   </Badge>
                 </div>
 
-                <div className="flex flex-col gap-3 px-4 pt-10 pb-4">
+                <div className="flex flex-1 flex-col gap-3 px-4 pt-10 pb-4">
                   <div>
                     <p className="text-lg leading-tight font-bold text-white">
-                      {dj.stageName}
+                      Dj. {dj.stageName}
                     </p>
                     <p className="mt-0.5 text-xs text-gray-500">
                       📍 {dj.city}, {dj.country}

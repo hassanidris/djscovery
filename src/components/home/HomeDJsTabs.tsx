@@ -149,7 +149,7 @@ function DJCard({
           </div>
           <div>
             <p className="mx-auto w-40 truncate text-sm leading-tight font-semibold text-white">
-              {dj.stageName}
+              Dj. {dj.stageName}
             </p>
             <p className="mt-0.5 text-xs text-gray-500">
               📍 {dj.city}, {dj.country}
