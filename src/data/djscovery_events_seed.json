@@ -2,7 +2,7 @@
   {
     "id": "demo-event-001",
     "slug": "mira-sol-sunset-grooves-lisbon-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-001/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/sunset-grooves-lisbon.jpg",
     "djSlug": "mira-sol",
     "title": "Sunset Grooves Lisbon",
     "eventType": "PUBLIC",
@@ -21,7 +21,7 @@
   {
     "id": "demo-event-002",
     "slug": "mira-sol-deep-pulse-ibiza-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-002/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/deep-pulse-ibiza.jpg",
     "djSlug": "mira-sol",
     "title": "Deep Pulse Ibiza",
     "eventType": "PUBLIC",
@@ -40,7 +40,7 @@
   {
     "id": "demo-event-003",
     "slug": "kai-frequency-neon-circuit-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-003/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/neon-circuit.jpg",
     "djSlug": "kai-frequency",
     "title": "Neon Circuit",
     "eventType": "PUBLIC",
@@ -59,7 +59,7 @@
   {
     "id": "demo-event-004",
     "slug": "kai-frequency-warehouse-frequency-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-004/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/warehouse-frequency.jpg",
     "djSlug": "kai-frequency",
     "title": "Warehouse Frequency",
     "eventType": "PUBLIC",
@@ -78,7 +78,7 @@
   {
     "id": "demo-event-005",
     "slug": "sahara-beats-desert-echoes-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-005/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/desert-echoes.jpg",
     "djSlug": "sahara-beats",
     "title": "Desert Echoes",
     "eventType": "PUBLIC",
@@ -97,7 +97,7 @@
   {
     "id": "demo-event-006",
     "slug": "sahara-beats-oasis-sunset-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-006/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/oasis-sunset.jpg",
     "djSlug": "sahara-beats",
     "title": "Oasis Sunset",
     "eventType": "PUBLIC",
@@ -116,7 +116,7 @@
   {
     "id": "demo-event-007",
     "slug": "rio-noir-rio-bass-carnival-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-007/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/rio-bass-carnival.jpg",
     "djSlug": "rio-noir",
     "title": "Rio Bass Carnival",
     "eventType": "PUBLIC",
@@ -135,7 +135,7 @@
   {
     "id": "demo-event-008",
     "slug": "rio-noir-favela-nights-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-008/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/favela-nights.jpg",
     "djSlug": "rio-noir",
     "title": "Favela Nights",
     "eventType": "PUBLIC",
@@ -154,7 +154,7 @@
   {
     "id": "demo-event-009",
     "slug": "zara-luxe-luxury-white-party-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-009/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/luxury-white-party.jpg",
     "djSlug": "zara-luxe",
     "title": "Luxury White Party",
     "eventType": "PUBLIC",
@@ -173,7 +173,7 @@
   {
     "id": "demo-event-010",
     "slug": "zara-luxe-skyline-sessions-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-010/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/skyline-sessions.jpg",
     "djSlug": "zara-luxe",
     "title": "Skyline Sessions",
     "eventType": "PRIVATE",
@@ -192,7 +192,7 @@
   {
     "id": "demo-event-011",
     "slug": "armin-van-buuren-asot-stockholm-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-011/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/asot-stockholm.jpg",
     "djSlug": "armin-van-buuren",
     "title": "A State of Trance Stockholm",
     "eventType": "PUBLIC",
@@ -211,7 +211,7 @@
   {
     "id": "demo-event-012",
     "slug": "armin-van-buuren-trance-universe-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-012/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/trance-universe.jpg",
     "djSlug": "armin-van-buuren",
     "title": "Trance Universe",
     "eventType": "PUBLIC",
@@ -230,7 +230,7 @@
   {
     "id": "demo-event-013",
     "slug": "tiesto-future-lights-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-013/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/future-lights.jpg",
     "djSlug": "tiesto",
     "title": "Future Lights",
     "eventType": "PUBLIC",
@@ -249,7 +249,7 @@
   {
     "id": "demo-event-014",
     "slug": "tiesto-summer-edm-weekend-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-014/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/summer-edm-weekend.jpg",
     "djSlug": "tiesto",
     "title": "Summer EDM Weekend",
     "eventType": "PUBLIC",
@@ -268,7 +268,7 @@
   {
     "id": "demo-event-015",
     "slug": "david-guetta-famous-ibiza-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-015/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/famous-ibiza.jpg",
     "djSlug": "david-guetta",
     "title": "F*** Me I'm Famous",
     "eventType": "PUBLIC",
@@ -287,7 +287,7 @@
   {
     "id": "demo-event-016",
     "slug": "david-guetta-united-we-dance-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-016/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/united-we-dance.jpg",
     "djSlug": "david-guetta",
     "title": "United We Dance",
     "eventType": "PUBLIC",
@@ -306,7 +306,7 @@
   {
     "id": "demo-event-017",
     "slug": "alok-brazilian-bass-experience-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-017/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/brazilian-bass-nation.jpg",
     "djSlug": "alok",
     "title": "Brazilian Bass Experience",
     "eventType": "PUBLIC",
@@ -325,7 +325,7 @@
   {
     "id": "demo-event-018",
     "slug": "alok-amazon-beats-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-018/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/amazon-beats.jpg",
     "djSlug": "alok",
     "title": "Amazon Beats",
     "eventType": "PUBLIC",
@@ -344,7 +344,7 @@
   {
     "id": "demo-event-019",
     "slug": "don-diablo-future-house-universe-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-019/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/future-house-universe.jpg",
     "djSlug": "don-diablo",
     "title": "Future House Universe",
     "eventType": "PUBLIC",
@@ -363,7 +363,7 @@
   {
     "id": "demo-event-020",
     "slug": "don-diablo-hexagon-live-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-020/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/hexagon-future-fest.jpg",
     "djSlug": "don-diablo",
     "title": "Hexagon Live",
     "eventType": "PUBLIC",
@@ -382,7 +382,7 @@
   {
     "id": "demo-event-021",
     "slug": "kai-frequency-melodic-nexus-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-021/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/melodic-nexus.jpg",
     "djSlug": "kai-frequency",
     "title": "Melodic Nexus",
     "eventType": "PUBLIC",
@@ -401,7 +401,7 @@
   {
     "id": "demo-event-022",
     "slug": "kai-frequency-techno-horizons-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-022/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/techno-horizons.jpg",
     "djSlug": "kai-frequency",
     "title": "Techno Horizons",
     "eventType": "PUBLIC",
@@ -420,7 +420,7 @@
   {
     "id": "demo-event-023",
     "slug": "sahara-beats-afro-desert-festival-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-023/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/afro-desert-festival.jpg",
     "djSlug": "sahara-beats",
     "title": "Afro Desert Festival",
     "eventType": "PUBLIC",
@@ -439,7 +439,7 @@
   {
     "id": "demo-event-024",
     "slug": "sahara-beats-arabian-groove-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-024/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/arabian-groove.jpg",
     "djSlug": "sahara-beats",
     "title": "Arabian Groove Nights",
     "eventType": "PUBLIC",
@@ -458,7 +458,7 @@
   {
     "id": "demo-event-025",
     "slug": "rio-noir-latin-heat-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-025/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/latin-heat.jpg",
     "djSlug": "rio-noir",
     "title": "Latin Heat",
     "eventType": "PUBLIC",
@@ -477,7 +477,7 @@
   {
     "id": "demo-event-026",
     "slug": "rio-noir-favela-rooftop-sessions-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-026/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/favela-rooftop.jpg",
     "djSlug": "rio-noir",
     "title": "Favela Rooftop Sessions",
     "eventType": "PUBLIC",
@@ -496,7 +496,7 @@
   {
     "id": "demo-event-027",
     "slug": "zara-luxe-diamond-nights-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-027/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/diamond-nights.jpg",
     "djSlug": "zara-luxe",
     "title": "Diamond Nights",
     "eventType": "PUBLIC",
@@ -515,7 +515,7 @@
   {
     "id": "demo-event-028",
     "slug": "zara-luxe-golden-sands-beach-party-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-028/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/golden-sands.jpg",
     "djSlug": "zara-luxe",
     "title": "Golden Sands Beach Party",
     "eventType": "PUBLIC",
@@ -534,7 +534,7 @@
   {
     "id": "demo-event-029",
     "slug": "armin-van-buuren-asot-amsterdam-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-029/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/asot-amsterdam.jpg",
     "djSlug": "armin-van-buuren",
     "title": "A State Of Trance Amsterdam",
     "eventType": "PUBLIC",
@@ -553,7 +553,7 @@
   {
     "id": "demo-event-030",
     "slug": "tiesto-future-energy-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-030/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/future-energy.jpg",
     "djSlug": "tiesto",
     "title": "Future Energy",
     "eventType": "PUBLIC",
@@ -572,7 +572,7 @@
   {
     "id": "demo-event-031",
     "slug": "david-guetta-united-at-the-beach-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-031/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/united-at-the-beach.jpg",
     "djSlug": "david-guetta",
     "title": "United At The Beach",
     "eventType": "PUBLIC",
@@ -591,7 +591,7 @@
   {
     "id": "demo-event-032",
     "slug": "alok-brazilian-bass-nation-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-032/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/brazilian-bass-nation.jpg",
     "djSlug": "alok",
     "title": "Brazilian Bass Nation",
     "eventType": "PUBLIC",
@@ -610,7 +610,7 @@
   {
     "id": "demo-event-033",
     "slug": "don-diablo-hexagon-future-fest-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-033/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/hexagon-future-fest.jpg",
     "djSlug": "don-diablo",
     "title": "HEXAGON Future Fest",
     "eventType": "PUBLIC",
@@ -629,7 +629,7 @@
   {
     "id": "demo-event-034",
     "slug": "luna-vega-moonlight-house-sessions-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-034/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/moonlight-house-sessions.jpg",
     "djSlug": "luna-vega",
     "title": "Moonlight House Sessions",
     "eventType": "PUBLIC",
@@ -648,7 +648,7 @@
   {
     "id": "demo-event-035",
     "slug": "marcus-blaze-fire-and-bass-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-035/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/fire-and-bass.jpg",
     "djSlug": "marcus-blaze",
     "title": "Fire & Bass",
     "eventType": "PUBLIC",
@@ -667,7 +667,7 @@
   {
     "id": "demo-event-036",
     "slug": "elena-pulse-electric-dreams-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-036/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/electric-dreams.jpg",
     "djSlug": "elena-pulse",
     "title": "Electric Dreams",
     "eventType": "PUBLIC",
@@ -686,7 +686,7 @@
   {
     "id": "demo-event-037",
     "slug": "dj-nova-galaxy-frequencies-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-037/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/galaxy-frequencies.jpg",
     "djSlug": "dj-nova",
     "title": "Galaxy Frequencies",
     "eventType": "PUBLIC",
@@ -705,7 +705,7 @@
   {
     "id": "demo-event-038",
     "slug": "sofia-rhythm-afro-pulse-stockholm-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-038/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/afro-pulse-stockholm.jpg",
     "djSlug": "sofia-rhythm",
     "title": "Afro Pulse Stockholm",
     "eventType": "PUBLIC",
@@ -724,7 +724,7 @@
   {
     "id": "demo-event-039",
     "slug": "ethan-groove-deep-connections-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-039/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/deep-connections.jpg",
     "djSlug": "ethan-groove",
     "title": "Deep Connections",
     "eventType": "PUBLIC",
@@ -743,7 +743,7 @@
   {
     "id": "demo-event-040",
     "slug": "maya-beats-sunrise-frequencies-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-040/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/sunrise-frequencies.jpg",
     "djSlug": "maya-beats",
     "title": "Sunrise Frequencies",
     "eventType": "PUBLIC",
@@ -762,7 +762,7 @@
   {
     "id": "demo-event-041",
     "slug": "victor-vibe-tech-house-district-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-041/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/tech-house-district.jpg",
     "djSlug": "victor-vibe",
     "title": "Tech House District",
     "eventType": "PUBLIC",
@@ -781,7 +781,7 @@
   {
     "id": "demo-event-042",
     "slug": "ava-noir-midnight-velvet-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-042/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/midnight-velvet.jpg",
     "djSlug": "ava-noir",
     "title": "Midnight Velvet",
     "eventType": "PRIVATE",
@@ -800,7 +800,7 @@
   {
     "id": "demo-event-043",
     "slug": "leo-sound-summer-closing-festival-demo",
-    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/events/demo/demo-event-043/poster.jpg",
+    "posterUrl": "https://jarmybsjvztwrmsdcnje.supabase.co/storage/v1/object/public/djscovery-media/demo/event-poster/summer-closing-festival.jpeg",
     "djSlug": "leo-sound",
     "title": "Summer Closing Festival",
     "eventType": "PUBLIC",
