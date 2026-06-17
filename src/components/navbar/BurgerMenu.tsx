@@ -25,6 +25,7 @@ import {
   LogIn,
   UserPlus,
   Briefcase,
+  CalendarDays,
 } from "lucide-react";
 import { desktopNavByRole } from "@/config/navigation";
 import { signOut } from "@/lib/actions/auth";
@@ -230,6 +231,36 @@ export default function BurgerMenu({
                         </SheetClose>
                       );
                     })()}
+
+                  {(navRole === "dj" || navRole === "admin") && (
+                    <SheetClose asChild>
+                      <Link
+                        href="/dashboard/dj/events"
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                          pathname.startsWith("/dashboard/dj/events")
+                            ? "bg-white/5 text-white"
+                            : "text-gray-400 hover:bg-white/5 hover:text-white",
+                        )}
+                        aria-current={
+                          pathname.startsWith("/dashboard/dj/events")
+                            ? "page"
+                            : undefined
+                        }
+                      >
+                        <CalendarDays
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            pathname.startsWith("/dashboard/dj/events")
+                              ? "text-h_red"
+                              : "",
+                          )}
+                          aria-hidden
+                        />
+                        <span>My Events</span>
+                      </Link>
+                    </SheetClose>
+                  )}
 
                   {isOrganizer && (
                     <SheetClose asChild>

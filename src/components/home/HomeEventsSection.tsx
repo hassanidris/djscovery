@@ -1,84 +1,112 @@
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import prisma from "@/lib/client";
+import { getDemoEvents } from "@/data/events-demo";
+import { EventCard, type EventCardItem } from "@/components/events/EventCard";
 
-type DemoEvent = {
-  id: number;
-  title: string;
-  venue: string;
-  city: string;
-  country: string;
-  date: string;
-  dj: string;
+type Props = {
+  userCountryName?: string | null;
 };
 
-const DEMO_EVENTS: DemoEvent[] = [
-  {
-    id: 1,
-    title: "NEON NIGHTS",
-    venue: "Berghain",
-    city: "Berlin",
-    country: "Germany",
-    date: "2025-07-15",
-    dj: "DJ Echo",
-  },
-  {
-    id: 2,
-    title: "DEEP PULSE",
-    venue: "Fabric",
-    city: "London",
-    country: "UK",
-    date: "2025-07-22",
-    dj: "NightOwl",
-  },
-  {
-    id: 3,
-    title: "SUNSET SESSIONS",
-    venue: "Pacha",
-    city: "Ibiza",
-    country: "Spain",
-    date: "2025-08-01",
-    dj: "Peggy Gou",
-  },
-  {
-    id: 4,
-    title: "AFRO FUSION NIGHT",
-    venue: "Alliance Française",
-    city: "Lagos",
-    country: "Nigeria",
-    date: "2025-08-08",
-    dj: "Amara Pulse",
-  },
-  {
-    id: 5,
-    title: "TECHNO UNDERGROUND",
-    venue: "Club Rex",
-    city: "Paris",
-    country: "France",
-    date: "2025-08-14",
-    dj: "DJ Storm",
-  },
-  {
-    id: 6,
-    title: "GROOVE GARDEN",
-    venue: "Berns",
-    city: "Stockholm",
-    country: "Sweden",
-    date: "2025-08-20",
-    dj: "DJ Nova",
-  },
-];
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+function slugToName(slug: string): string {
+  return slug
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
-export default function HomeEventsSection() {
+export default async function HomeEventsSection({ userCountryName }: Props) {
+  const now = new Date();
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  let dbEvents: EventCardItem[] = [];
+
+  try {
+    const rows = await prisma.event.findMany({
+      where: {
+        status: "PUBLISHED",
+        deletedAt: null,
+        eventType: "PUBLIC",
+        startDate: { gte: now },
+      },
+      orderBy: { startDate: "asc" },
+      take: 20,
+      select: {
+        slug: true,
+        title: true,
+        eventType: true,
+        category: true,
+        startDate: true,
+        posterUrl: true,
+        venue: true,
+        city: { select: { name: true } },
+        country: { select: { name: true } },
+        ownerDj: { select: { stageName: true, slug: true } },
+      },
+    });
+
+    dbEvents = rows.map((e) => ({
+      slug: e.slug,
+      title: e.title,
+      eventType: e.eventType,
+      category: e.category ?? "OTHER",
+      startDate: e.startDate,
+      posterUrl: e.posterUrl ?? null,
+      location: [e.venue, e.city?.name, e.country?.name]
+        .filter(Boolean)
+        .join(", "),
+      djName: e.ownerDj.stageName,
+      djSlug: e.ownerDj.slug,
+    }));
+  } catch {
+    // DB unavailable — fall through to demo
+  }
+
+  let events: EventCardItem[] = [...dbEvents];
+
+  if (isStaging) {
+    const dbSlugs = new Set(dbEvents.map((e) => e.slug));
+    const demoUpcoming = getDemoEvents()
+      .filter((e) => e.daysOffset > 0 && !dbSlugs.has(e.slug))
+      .map(
+        (e): EventCardItem => ({
+          slug: e.slug,
+          title: e.title,
+          eventType: e.eventType,
+          category: e.category,
+          startDate: e.eventDate,
+          posterUrl: e.posterUrl ?? null,
+          location: [e.city, e.country].filter(Boolean).join(", "),
+          djName: slugToName(e.djSlug),
+          djSlug: e.djSlug,
+          isDemo: true,
+        }),
+      );
+
+    events = [...events, ...demoUpcoming];
+  }
+
+  // Sort: user's country first, then by date
+  if (userCountryName) {
+    events.sort((a, b) => {
+      const aLocal = a.location
+        .toLowerCase()
+        .includes(userCountryName.toLowerCase());
+      const bLocal = b.location
+        .toLowerCase()
+        .includes(userCountryName.toLowerCase());
+      if (aLocal && !bLocal) return -1;
+      if (!aLocal && bLocal) return 1;
+      return a.startDate.getTime() - b.startDate.getTime();
+    });
+  } else {
+    events.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+  }
+
+  const displayed = events.slice(0, 6);
+
+  if (displayed.length === 0) return null;
+
   return (
     <section className="border-t border-white/5 px-4 py-12 md:px-8">
       <div className="mx-auto max-w-7xl">
@@ -97,40 +125,13 @@ export default function HomeEventsSection() {
             size="sm"
             className="text-h_red hover:text-h_red hover:bg-white/5"
           >
-            <Link href="/directory">View all →</Link>
+            <Link href="/events">View all →</Link>
           </Button>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {DEMO_EVENTS.map((event) => (
-            <Link key={event.id} href={`/events/${event.id}`}>
-              <Card className="bg-h_blackLight/50 hover:ring-h_red cursor-pointer gap-0 overflow-hidden p-0 ring-white/5 transition-all">
-                {/* Header */}
-                <div className="bg-h_redDark/20 relative flex h-28 items-end overflow-hidden p-4">
-                  <div className="from-h_redDark/40 absolute inset-0 bg-linear-to-br to-transparent" />
-                  <div className="via-h_red/50 absolute top-0 right-0 left-0 h-px bg-linear-to-r from-transparent to-transparent" />
-                  <h3 className="relative text-xl leading-none font-bold tracking-wider text-white">
-                    {event.title}
-                  </h3>
-                </div>
-
-                <div className="flex flex-col gap-2 p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <span>📅</span>
-                    <span>{formatDate(event.date)}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <span>📍</span>
-                    <span className="truncate">
-                      {event.venue} · {event.city}, {event.country}
-                    </span>
-                  </div>
-                  <Badge className="bg-h_redDark/60 mt-1 w-fit border-0 text-red-300">
-                    🎧 {event.dj}
-                  </Badge>
-                </div>
-              </Card>
-            </Link>
+          {displayed.map((event) => (
+            <EventCard key={event.slug} event={event} />
           ))}
         </div>
       </div>

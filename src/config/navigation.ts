@@ -37,9 +37,8 @@ const orgGigs: NavItem = {
 const events: NavItem = {
   id: "events",
   label: "Events",
-  href: null,
+  href: "/events",
   icon: CalendarDays,
-  comingSoon: true,
 };
 
 const profile: NavItem = {
@@ -96,6 +95,7 @@ export function getFooterProfessionalLinks(opts: {
     return [
       ...(djSlug ? [{ label: "My DJ Profile", href: `/djs/${djSlug}` }] : []),
       { label: "My Gigs", href: "/dashboard/dj/gigs" },
+      { label: "My Events", href: "/dashboard/dj/events" },
       { label: "Applications", href: "/dashboard/dj/applications" },
       { label: "Account Settings", href: "/settings" },
       ...(!isOrganizer

@@ -45,6 +45,12 @@ enum EventStatus {
   PUBLISHED
   CANCELLED
   COMPLETED
+  ARCHIVED
+}
+
+enum EventType {
+  PUBLIC
+  PRIVATE
 }
 
 enum GigStatus {
@@ -530,12 +536,25 @@ model PostCommentLike {
 // Only DJs create events. Owner DJ controls the event.
 model Event {
   id          Int         @id @default(autoincrement())
+  slug        String      @unique // URL-friendly: /events/[slug]
   title       String
   description String?
-  image       String? // Supabase Storage URL
+  eventType   EventType   @default(PUBLIC)
+  category    String      @default("OTHER") // App-layer validated against VALID_EVENT_CATEGORIES
+  posterUrl   String? // Supabase Storage public URL (renamed from image)
+  posterPath  String? // Supabase Storage path (for deletion on re-upload)
   venue       String?
   startDate   DateTime
   endDate     DateTime?
+  startTime   String? // e.g. "22:00" — stored as string to avoid TZ complexity
+  endTime     String? // e.g. "05:00"
+  ticketUrl   String? // PUBLIC events only
+  recap       String? // Post-event write-up (unlocked after COMPLETED)
+  audioLink   String? // External URL: SoundCloud / Mixcloud
+  videoLink   String? // External URL: YouTube / Vimeo (Premium only)
+  featured    Boolean     @default(false) // DJ pins as Featured Performance (max 3)
+  viewCount   Int         @default(0)
+  genres      String[] // e.g. ["Afro House", "Melodic Techno"]
   status      EventStatus @default(DRAFT)
   deletedAt   DateTime?
 
@@ -547,24 +566,45 @@ model Event {
   city      City?     @relation(fields: [cityId], references: [id])
 
   participants EventDj[]
+  gallery      EventMedia[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([slug])
   @@index([ownerDjId])
+  @@index([ownerDjId, status])
   @@index([status])
   @@index([startDate])
+  @@index([featured])
   @@index([countryId])
+  @@index([cityId])
 }
 
-// Junction: multiple DJs per event
+// Junction: multiple DJs per event (co-performers)
 model EventDj {
   eventId     Int
   event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
   djProfileId Int
   djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  role        String? // e.g. "Headliner", "Support", "B2B"
 
   @@id([eventId, djProfileId])
+}
+
+// Gallery photos uploaded after event is COMPLETED
+model EventMedia {
+  id        Int    @id @default(autoincrement())
+  eventId   Int
+  event     Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  url       String // Supabase Storage public URL
+  path      String // Supabase Storage path (for deletion)
+  caption   String?
+  sortOrder Int      @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
 }
 
 // ------ GIGS MARKETPLACE ------
