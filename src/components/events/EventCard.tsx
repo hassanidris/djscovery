@@ -102,7 +102,7 @@ export function EventCard({ event }: { event: EventCardItem }) {
           )}
           {event.djName && (
             <Badge className="bg-h_redDark/60 mt-1 w-fit border-0 text-red-300">
-              🎧 DJ. {event.djName}
+              🎧 Dj. {event.djName}
             </Badge>
           )}
         </div>
