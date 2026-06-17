@@ -1,4 +1,5 @@
 import type { DjDemoData } from "@/types/dj-demo";
+import { getDemoEventsByDjSlug } from "@/data/events-demo";
 import { formatNumber } from "@/lib/utils/currency";
 import { Newspaper } from "lucide-react";
 import {
@@ -43,17 +44,15 @@ export function mapFreeDjToProps(d: DjDemoData) {
 }
 
 export function mapFreeEventsFromData(d: DjDemoData) {
-  const normalizeEventDate = (value: string) =>
-    value.includes("T") ? value : `${value}T20:00:00Z`;
-  return d.upcomingEvents.map((e, i) => ({
+  return getDemoEventsByDjSlug(d.slug).map((e, i) => ({
     id: i + 1,
     title: e.title,
-    date: normalizeEventDate(e.date),
-    venue: e.venue,
+    date: e.eventDate.toISOString(),
+    venue: e.venue ?? "",
     city: e.city,
-    country: "",
+    country: e.country,
     slug: e.slug,
-    isPast: e.isPast,
+    isPast: e.daysOffset <= 0,
   }));
 }
 
@@ -137,16 +136,16 @@ export function mapPremiumDjToProps(d: DjDemoData) {
 }
 
 export function mapPremiumEventsFromData(d: DjDemoData) {
-  const normalizeEventDate = (value: string) =>
-    value.includes("T") ? value : `${value}T20:00:00Z`;
-  return d.upcomingEvents.map((e, i) => ({
+  return getDemoEventsByDjSlug(d.slug).map((e, i) => ({
     id: i + 1,
     title: e.title,
-    date: normalizeEventDate(e.date),
-    venue: e.venue,
+    date: e.eventDate.toISOString(),
+    venue: e.venue ?? "",
     city: e.city,
-    country: "",
+    country: e.country,
+    slug: e.slug,
     status: "confirmed" as const,
+    isPast: e.daysOffset <= 0,
   }));
 }
 
