@@ -234,12 +234,14 @@ model DjProfile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  stageName  String
-  slug       String          @unique // URL-friendly: /djs/[slug]
-  avatar     String? // Supabase Storage URL
-  coverImage String? // Supabase Storage URL
-  bio        String?
-  status     DjProfileStatus @default(PENDING_APPROVAL)
+  stageName      String
+  slug           String          @unique // URL-friendly: /djs/[slug]
+  avatar         String? // Supabase Storage public URL
+  avatarPath     String? // Supabase Storage path (for deletion on re-upload)
+  coverImage     String? // Supabase Storage public URL
+  coverImagePath String? // Supabase Storage path (for deletion on re-upload)
+  bio            String?
+  status         DjProfileStatus @default(PENDING_APPROVAL)
 
   countryId Int?
   country   Country? @relation(fields: [countryId], references: [id])

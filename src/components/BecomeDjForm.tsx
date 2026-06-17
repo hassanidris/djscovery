@@ -3,12 +3,12 @@
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
 import {
   createDjProfile,
   getCitiesByCountry,
   getOrCreateGenre,
 } from "@/lib/actions/profile";
+import { uploadDjMediaTemp } from "@/lib/actions/dj-upload";
 import {
   Camera,
   Plus,
@@ -205,19 +205,13 @@ export default function BecomeDjForm({
 
   async function uploadFile(
     file: File,
-    folder: string,
+    type: "avatar" | "gallery",
   ): Promise<{ url: string; path: string; bucket: string }> {
-    const supabase = createClient();
-    const ext = file.name.split(".").pop() ?? "bin";
-    const path = `${folder}/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const { data, error } = await supabase.storage
-      .from("djscovery-media")
-      .upload(path, file, { upsert: true });
-    if (error) throw new Error(error.message);
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("djscovery-media").getPublicUrl(data.path);
-    return { url: publicUrl, path: data.path, bucket: "djscovery-media" };
+    const fd = new FormData();
+    fd.append("file", file);
+    const result = await uploadDjMediaTemp(fd, type);
+    if ("error" in result) throw new Error(result.error);
+    return result;
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -253,6 +247,7 @@ export default function BecomeDjForm({
 
       async function cleanupUploads() {
         if (uploadedPaths.length === 0) return;
+        const { createClient } = await import("@/lib/supabase/client");
         const supabase = createClient();
         const byBucket = uploadedPaths.reduce<Record<string, string[]>>(
           (acc, { path, bucket }) => {
@@ -272,7 +267,7 @@ export default function BecomeDjForm({
         let avatarUrl: string | undefined;
         if (avatarFile) {
           toast.loading("Uploading avatar...", { id: toastId });
-          const uploaded = await uploadFile(avatarFile, "dj-avatars");
+          const uploaded = await uploadFile(avatarFile, "avatar");
           uploadedPaths.push({ path: uploaded.path, bucket: uploaded.bucket });
           avatarUrl = uploaded.url;
         }
@@ -289,7 +284,7 @@ export default function BecomeDjForm({
             `Uploading image ${i + 1} of ${galleryFiles.length}...`,
             { id: toastId },
           );
-          const m = await uploadFile(galleryFiles[i], "dj-gallery");
+          const m = await uploadFile(galleryFiles[i], "gallery");
           uploadedPaths.push({ path: m.path, bucket: m.bucket });
           media.push({ type: "IMAGE", ...m });
         }
