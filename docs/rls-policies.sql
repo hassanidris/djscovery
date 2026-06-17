@@ -43,6 +43,9 @@ ALTER TABLE "Message"                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "EventAttendance"         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Hire"                    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "OrganizerSocialLink"     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "EventMedia"              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Gig"                     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "GigApplication"          ENABLE ROW LEVEL SECURITY;
 
 
 -- ============================================================
@@ -330,6 +333,69 @@ CREATE POLICY "Organizer can delete own social links"
       WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
     )
   );
+
+-- ============================================================
+-- STEP 9 (cont): Gig & GigApplication RLS
+-- ============================================================
+
+CREATE POLICY "Public read published gigs"
+  ON "Gig" FOR SELECT
+  USING (status = 'PUBLISHED' AND "deletedAt" IS NULL);
+
+CREATE POLICY "Organizer can read own gigs"
+  ON "Gig" FOR SELECT
+  USING (
+    "organizerProfileId" IN (
+      SELECT id FROM "OrganizerProfile" WHERE "userId" = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Public read event media for published events"
+  ON "EventMedia" FOR SELECT
+  USING (
+    "eventId" IN (
+      SELECT id FROM "Event"
+      WHERE status = 'PUBLISHED' AND "deletedAt" IS NULL
+    )
+  );
+
+CREATE POLICY "DJ can read own gig applications"
+  ON "GigApplication" FOR SELECT
+  USING (
+    "djProfileId" IN (
+      SELECT id FROM "DjProfile" WHERE "userId" = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Organizer can read applications for own gigs"
+  ON "GigApplication" FOR SELECT
+  USING (
+    "gigId" IN (
+      SELECT g.id FROM "Gig" g
+      JOIN "OrganizerProfile" op ON g."organizerProfileId" = op.id
+      WHERE op."userId" = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "DJ can apply to gigs"
+  ON "GigApplication" FOR INSERT
+  WITH CHECK (
+    "djProfileId" IN (
+      SELECT id FROM "DjProfile" WHERE "userId" = auth.uid()::text
+    )
+    AND EXISTS (
+      SELECT 1 FROM "UserRole" WHERE "userId" = auth.uid()::text AND role = 'DJ'
+    )
+  );
+
+CREATE POLICY "DJ can withdraw own application"
+  ON "GigApplication" FOR DELETE
+  USING (
+    "djProfileId" IN (
+      SELECT id FROM "DjProfile" WHERE "userId" = auth.uid()::text
+    )
+  );
+
 
 -- JobApplication: applicant reads own records.
 -- Organizer access is enforced server-side via Prisma (bypasses RLS) — no policy needed here.
