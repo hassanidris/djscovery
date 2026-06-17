@@ -411,25 +411,85 @@ CREATE POLICY "Authenticated user can remove attendance"
 
 
 -- ============================================================
--- STEP 9: Supabase Storage — organizer images in djscovery-media
+-- STEP 9: Supabase Storage — djscovery-media bucket
 -- ============================================================
--- All organizer images go into the shared djscovery-media bucket
--- (same bucket as dj-avatars / dj-covers / dj-gallery).
--- Path convention: org-avatar/{userId}/{timestamp}.{ext}
---                  org-cover/{userId}/{timestamp}.{ext}
+-- Single public bucket: djscovery-media
 --
--- If djscovery-media already has broad SELECT/INSERT policies from
--- the DJ upload setup, these may already be covered. Run only if
--- organizer uploads are still being blocked.
+-- Folder structure (all under djscovery-media):
+--   djs/{userId}/avatar/
+--   djs/{userId}/cover/
+--   djs/{userId}/gallery/
+--   djs/{userId}/audio/
+--   djs/{userId}/video/
+--   organizers/{userId}/logo/
+--   organizers/{userId}/cover/
+--   events/{eventId}/poster/
+--   events/{eventId}/gallery/
+--
+-- userId = Supabase Auth UUID (used for both DJ and Organizer paths
+-- because the integer DB id does not exist during initial profile creation).
+--
+-- Run these in the Supabase SQL Editor under Storage > Policies.
 -- ============================================================
 
--- Allow authenticated users to upload under org-avatar/{their uid}/
-CREATE POLICY "Organizer can upload own logo"
+-- ── Public read ───────────────────────────────────────────────────────────────
+
+CREATE POLICY "Public can read djscovery-media"
+  ON storage.objects FOR SELECT
+  TO public
+  USING (bucket_id = 'djscovery-media');
+
+
+-- ── DJ uploads — djs/{userId}/* ───────────────────────────────────────────────
+
+CREATE POLICY "DJ can upload own media"
   ON storage.objects FOR INSERT
   TO authenticated
   WITH CHECK (
     bucket_id = 'djscovery-media'
-    AND (storage.foldername(name))[1] = 'org-avatar'
+    AND (storage.foldername(name))[1] = 'djs'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'DJ'
+    )
+  );
+
+CREATE POLICY "DJ can update own media"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'djs'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'DJ'
+    )
+  );
+
+CREATE POLICY "DJ can delete own media"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'djs'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'DJ'
+    )
+  );
+
+
+-- ── Organizer uploads — organizers/{userId}/* ─────────────────────────────────
+
+CREATE POLICY "Organizer can upload own media"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'organizers'
     AND (storage.foldername(name))[2] = auth.uid()::text
     AND EXISTS (
       SELECT 1 FROM "UserRole"
@@ -437,31 +497,12 @@ CREATE POLICY "Organizer can upload own logo"
     )
   );
 
-CREATE POLICY "Organizer can update own logo"
+CREATE POLICY "Organizer can update own media"
   ON storage.objects FOR UPDATE
   TO authenticated
   USING (
     bucket_id = 'djscovery-media'
-    AND (storage.foldername(name))[1] = 'org-avatar'
-    AND (storage.foldername(name))[2] = auth.uid()::text
-  );
-
-CREATE POLICY "Organizer can delete own logo"
-  ON storage.objects FOR DELETE
-  TO authenticated
-  USING (
-    bucket_id = 'djscovery-media'
-    AND (storage.foldername(name))[1] = 'org-avatar'
-    AND (storage.foldername(name))[2] = auth.uid()::text
-  );
-
--- Allow authenticated users to upload under org-cover/{their uid}/
-CREATE POLICY "Organizer can upload own cover"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    bucket_id = 'djscovery-media'
-    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[1] = 'organizers'
     AND (storage.foldername(name))[2] = auth.uid()::text
     AND EXISTS (
       SELECT 1 FROM "UserRole"
@@ -469,26 +510,119 @@ CREATE POLICY "Organizer can upload own cover"
     )
   );
 
-CREATE POLICY "Organizer can update own cover"
-  ON storage.objects FOR UPDATE
-  TO authenticated
-  USING (
-    bucket_id = 'djscovery-media'
-    AND (storage.foldername(name))[1] = 'org-cover'
-    AND (storage.foldername(name))[2] = auth.uid()::text
-  );
-
-CREATE POLICY "Organizer can delete own cover"
+CREATE POLICY "Organizer can delete own media"
   ON storage.objects FOR DELETE
   TO authenticated
   USING (
     bucket_id = 'djscovery-media'
-    AND (storage.foldername(name))[1] = 'org-cover'
+    AND (storage.foldername(name))[1] = 'organizers'
     AND (storage.foldername(name))[2] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'ORGANIZER'
+    )
   );
 
--- Public SELECT is already covered by the broad djscovery-media policy.
--- Only add this if public reads are missing:
--- CREATE POLICY "Public can read organizer images"
---   ON storage.objects FOR SELECT TO public
---   USING (bucket_id = 'djscovery-media');
+
+-- ── Event uploads — events/{eventId}/poster/ ──────────────────────────────────
+
+CREATE POLICY "Event owner can upload poster"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'events'
+    AND (storage.foldername(name))[3] = 'poster'
+    AND EXISTS (
+      SELECT 1 FROM "Event" e
+      JOIN "DjProfile" dp ON e."ownerDjId" = dp.id
+      WHERE e.id::text = (storage.foldername(name))[2]
+        AND dp."userId" = auth.uid()::text
+    )
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'DJ'
+    )
+  );
+
+CREATE POLICY "Event owner can update poster"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'events'
+    AND (storage.foldername(name))[3] = 'poster'
+    AND EXISTS (
+      SELECT 1 FROM "Event" e
+      JOIN "DjProfile" dp ON e."ownerDjId" = dp.id
+      WHERE e.id::text = (storage.foldername(name))[2]
+        AND dp."userId" = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Event owner can delete poster"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'events'
+    AND (storage.foldername(name))[3] = 'poster'
+    AND EXISTS (
+      SELECT 1 FROM "Event" e
+      JOIN "DjProfile" dp ON e."ownerDjId" = dp.id
+      WHERE e.id::text = (storage.foldername(name))[2]
+        AND dp."userId" = auth.uid()::text
+    )
+  );
+
+
+-- ── Event uploads — events/{eventId}/gallery/ ─────────────────────────────────
+
+CREATE POLICY "Event owner can upload gallery image"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'events'
+    AND (storage.foldername(name))[3] = 'gallery'
+    AND EXISTS (
+      SELECT 1 FROM "Event" e
+      JOIN "DjProfile" dp ON e."ownerDjId" = dp.id
+      WHERE e.id::text = (storage.foldername(name))[2]
+        AND dp."userId" = auth.uid()::text
+    )
+    AND EXISTS (
+      SELECT 1 FROM "UserRole"
+      WHERE "userId" = auth.uid()::text AND role = 'DJ'
+    )
+  );
+
+CREATE POLICY "Event owner can update gallery image"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'events'
+    AND (storage.foldername(name))[3] = 'gallery'
+    AND EXISTS (
+      SELECT 1 FROM "Event" e
+      JOIN "DjProfile" dp ON e."ownerDjId" = dp.id
+      WHERE e.id::text = (storage.foldername(name))[2]
+        AND dp."userId" = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Event owner can delete gallery image"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'events'
+    AND (storage.foldername(name))[3] = 'gallery'
+    AND EXISTS (
+      SELECT 1 FROM "Event" e
+      JOIN "DjProfile" dp ON e."ownerDjId" = dp.id
+      WHERE e.id::text = (storage.foldername(name))[2]
+        AND dp."userId" = auth.uid()::text
+    )
+  );

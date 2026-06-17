@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 import { X, Plus, Loader2, Camera, ArrowLeft } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,12 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { updateDjProfile, getCitiesByCountry } from "@/lib/actions/profile";
 import {
-  updateDjProfile,
-  addGalleryImage,
+  uploadDjAvatar,
+  uploadDjCover,
+  uploadDjGalleryImage,
   deleteGalleryImage,
-  getCitiesByCountry,
-} from "@/lib/actions/profile";
+} from "@/lib/actions/dj-upload";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -309,30 +309,15 @@ export default function EditDjProfileForm({
     );
   }
 
-  async function uploadFile(
-    file: File,
-    folder: string,
-    filename: string,
-  ): Promise<string> {
-    const supabase = createClient();
-    const ext = file.name.split(".").pop() ?? "bin";
-    const path = `${folder}/${userId}/${filename}.${ext}`;
-    const { data, error } = await supabase.storage
-      .from("djscovery-media")
-      .upload(path, file, { upsert: true });
-    if (error) throw new Error(error.message);
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("djscovery-media").getPublicUrl(data.path);
-    return publicUrl;
-  }
-
   async function handleAvatarChange(file: File | undefined) {
     if (!file) return;
     setIsUploadingAvatar(true);
     try {
-      const url = await uploadFile(file, "dj-avatars", "avatar");
-      setAvatarUrl(url);
+      const fd = new FormData();
+      fd.append("file", file);
+      const result = await uploadDjAvatar(fd);
+      if ("error" in result) throw new Error(result.error);
+      setAvatarUrl(result.url);
       toast.success("Avatar updated");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
@@ -345,8 +330,11 @@ export default function EditDjProfileForm({
     if (!file) return;
     setIsUploadingCover(true);
     try {
-      const url = await uploadFile(file, "dj-covers", "cover");
-      setCoverImageUrl(url);
+      const fd = new FormData();
+      fd.append("file", file);
+      const result = await uploadDjCover(fd);
+      if ("error" in result) throw new Error(result.error);
+      setCoverImageUrl(result.url);
       toast.success("Cover image updated");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
@@ -359,21 +347,9 @@ export default function EditDjProfileForm({
     if (!file) return;
     setIsUploadingGallery(true);
     try {
-      const supabase = createClient();
-      const ext = file.name.split(".").pop() ?? "bin";
-      const path = `dj-gallery/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { data, error } = await supabase.storage
-        .from("djscovery-media")
-        .upload(path, file, { upsert: false });
-      if (error) throw new Error(error.message);
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("djscovery-media").getPublicUrl(data.path);
-      const result = await addGalleryImage({
-        url: publicUrl,
-        path: data.path,
-        bucket: "djscovery-media",
-      });
+      const fd = new FormData();
+      fd.append("file", file);
+      const result = await uploadDjGalleryImage(fd);
       if ("error" in result) throw new Error(result.error);
       setGallery((prev) => [result, ...prev]);
       toast.success("Photo added");

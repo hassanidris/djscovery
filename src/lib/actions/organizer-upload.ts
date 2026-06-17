@@ -2,55 +2,42 @@
 
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import {
+  BUCKET,
+  getPublicMediaUrl,
+  validateImageFile,
+  buildOrganizerLogoPath,
+  buildOrganizerCoverPath,
+} from "@/lib/storage";
 
-// All organizer images live in the shared djscovery-media bucket under these folder prefixes
-const BUCKET = "djscovery-media";
-const FOLDERS = {
-  avatar: "org-avatar",
-  cover: "org-cover",
-} as const;
-
-type FolderKey = keyof typeof FOLDERS;
-
-const MAX_SIZE: Record<FolderKey, number> = {
-  avatar: 5 * 1024 * 1024, // 5 MB
-  cover: 10 * 1024 * 1024, // 10 MB
-};
-
-const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"];
+const MAX_LOGO_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_COVER_BYTES = 10 * 1024 * 1024; // 10 MB
 
 async function uploadOrganizerImage(
   file: File,
-  folderKey: FolderKey,
+  type: "logo" | "cover",
   userId: string,
 ): Promise<{ url: string; path: string } | { error: string }> {
   const supabase = await createClient();
 
-  if (!ALLOWED_MIME.includes(file.type)) {
-    return { error: "Only JPEG, PNG, and WebP images are allowed." };
-  }
-  if (file.size > MAX_SIZE[folderKey]) {
-    const maxMB = MAX_SIZE[folderKey] / (1024 * 1024);
-    return { error: `Image must be under ${maxMB} MB.` };
-  }
+  const maxBytes = type === "logo" ? MAX_LOGO_BYTES : MAX_COVER_BYTES;
+  const validationError = validateImageFile(file, maxBytes);
+  if (validationError) return validationError;
 
-  const ext = file.name.split(".").pop() ?? "jpg";
-  // Path: org-avatar/{userId}/{timestamp}.{ext}  (mirrors dj-avatars/{userId}/...)
-  const path = `${FOLDERS[folderKey]}/${userId}/${Date.now()}.${ext}`;
+  const path =
+    type === "logo"
+      ? buildOrganizerLogoPath(userId, file)
+      : buildOrganizerCoverPath(userId, file);
 
   const { data, error: uploadError } = await supabase.storage
     .from(BUCKET)
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(path, file, { upsert: false, contentType: file.type });
 
   if (uploadError) {
     return { error: `Upload failed: ${uploadError.message}` };
   }
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from(BUCKET).getPublicUrl(data.path);
-
-  return { url: publicUrl, path: data.path };
+  return { url: getPublicMediaUrl(data.path), path: data.path };
 }
 
 export async function uploadOrganizerLogo(
@@ -76,7 +63,7 @@ export async function uploadOrganizerLogo(
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
 
-  const result = await uploadOrganizerImage(file, "avatar", user.id);
+  const result = await uploadOrganizerImage(file, "logo", user.id);
   if ("error" in result) return result;
 
   // Persist the URL and Storage path to the organizer profile
