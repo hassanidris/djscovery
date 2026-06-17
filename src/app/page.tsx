@@ -156,7 +156,7 @@ const Homepage = async () => {
       <HomeDJsTabs newDJs={newDJs} trendingDJs={trendingDJs} />
 
       {/* Upcoming Events */}
-      <HomeEventsSection />
+      <HomeEventsSection userCountryName={djCountryName} />
 
       {/* Open Gigs — visible to DJs only, filtered by DJ's country */}
       <HomeOpenGigsSection
@@ -166,7 +166,7 @@ const Homepage = async () => {
       />
 
       {/* Community Highlights */}
-      <HomeCommunityHighlights />
+      {/* <HomeCommunityHighlights /> */}
 
       {/* CTA Banner */}
       <HomeCtaBanner />

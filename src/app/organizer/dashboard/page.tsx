@@ -113,7 +113,7 @@ export default async function OrganizerDashboardPage() {
               </Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/organizer/settings">
+              <Link href="/settings/organizer">
                 <Settings className="h-4 w-4" />
                 Edit Profile
               </Link>
@@ -194,7 +194,7 @@ export default async function OrganizerDashboardPage() {
               </ul>
 
               <Button variant="outline" size="sm" asChild>
-                <Link href="/organizer/settings">
+                <Link href="/settings/organizer">
                   <Settings className="h-3.5 w-3.5" />
                   Complete profile
                 </Link>
@@ -251,7 +251,7 @@ export default async function OrganizerDashboardPage() {
                 </p>
               </div>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/organizer/settings">Go →</Link>
+                <Link href="/settings/organizer">Go →</Link>
               </Button>
             </CardContent>
           </Card>

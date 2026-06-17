@@ -38,6 +38,8 @@ export type EventItem = {
   city: string;
   status?: string;
   country?: string;
+  slug?: string;
+  isPast?: boolean;
 };
 
 export type HeroStat = {

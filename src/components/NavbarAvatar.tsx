@@ -94,7 +94,7 @@ export default function NavbarAvatar({
             asChild
             className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
           >
-            <Link href="/settings">Settings</Link>
+            <Link href="/settings/account">Settings</Link>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="bg-white/10" />
