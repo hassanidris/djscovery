@@ -131,5 +131,7 @@ export interface DjDemoData {
     venue: string;
     city: string;
     date: string;
+    slug?: string;
+    isPast?: boolean;
   }>;
 }

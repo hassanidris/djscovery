@@ -433,11 +433,11 @@ CREATE POLICY "Authenticated user can remove attendance"
 -- ============================================================
 
 -- ── Public read ───────────────────────────────────────────────────────────────
-
-CREATE POLICY "Public can read djscovery-media"
-  ON storage.objects FOR SELECT
-  TO public
-  USING (bucket_id = 'djscovery-media');
+-- NOTE: No SELECT policy needed. djscovery-media is a PUBLIC bucket, so
+-- individual files are accessible via their direct URLs without any RLS policy.
+-- A broad SELECT policy would additionally allow clients to LIST all files
+-- (enumerate paths), which is unnecessary and exposes internal structure.
+-- File URLs are constructed via getPublicMediaUrl(path) — no .list() calls.
 
 
 -- ── DJ uploads — djs/{userId}/* ───────────────────────────────────────────────

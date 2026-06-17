@@ -17,7 +17,7 @@ export default async function DjProfilePage({
   if (slug === "demo-free") {
     return (
       <div>
-        <div className="bg-h_blackLight/60 border-b border-white/8 text-gray-300 text-xs text-center py-2 px-4 font-medium tracking-wide flex items-center justify-center gap-4">
+        <div className="bg-h_blackLight/60 flex items-center justify-center gap-4 border-b border-white/8 px-4 py-2 text-center text-xs font-medium tracking-wide text-gray-300">
           <span className="opacity-60">Version 1 — Free DJ Profile</span>
           <span className="opacity-30">·</span>
           <Link
@@ -35,7 +35,7 @@ export default async function DjProfilePage({
   if (slug === "demo-premium") {
     return (
       <div>
-        <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-300 text-xs text-center py-2 px-4 font-medium tracking-wide flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium tracking-wide text-amber-300">
           <span className="opacity-80">Version 2 — Premium DJ Profile</span>
           <span className="opacity-30">·</span>
           <Link
@@ -87,8 +87,8 @@ export default async function DjProfilePage({
         orderBy: { createdAt: "desc" },
       },
       eventsOwned: {
-        where: { status: "PUBLISHED", deletedAt: null },
-        take: 6,
+        where: { status: { in: ["PUBLISHED", "COMPLETED"] }, deletedAt: null },
+        take: 15,
         orderBy: { startDate: "asc" },
         include: { city: true, country: true },
       },
@@ -233,6 +233,8 @@ export default async function DjProfilePage({
       venue: e.venue ?? "",
       city: e.city?.name ?? "",
       date: e.startDate.toISOString().split("T")[0],
+      slug: e.slug,
+      isPast: e.status === "COMPLETED",
     })),
   };
 
@@ -241,7 +243,7 @@ export default async function DjProfilePage({
   return (
     <div>
       {dj.status === "PENDING_APPROVAL" && (
-        <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-400 text-sm text-center py-2.5 px-4">
+        <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-center text-sm text-amber-400">
           ⏳ Your profile is pending admin approval and is only visible to you.
         </div>
       )}

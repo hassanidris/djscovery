@@ -52,6 +52,8 @@ export function mapFreeEventsFromData(d: DjDemoData) {
     venue: e.venue,
     city: e.city,
     country: "",
+    slug: e.slug,
+    isPast: e.isPast,
   }));
 }
 

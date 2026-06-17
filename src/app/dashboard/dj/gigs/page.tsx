@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { Briefcase } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
 import { getPublishedGigsForDj } from "@/lib/queries/gigs";
 import type { DjGigListItem } from "@/lib/queries/gigs";
-import { DjGigCard } from "@/components/gigs/GigCard";
+import { GigGrid } from "@/components/gigs/GigGrid";
 import { GigFilters } from "@/components/gigs/GigFilters";
 import {
   GigType,
@@ -114,17 +116,46 @@ export default async function DjGigMarketplacePage({
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-5xl px-4 py-10 md:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">Gigs</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {gigs.length === 0
-              ? "No gigs available right now."
-              : `${gigs.length} gig${gigs.length !== 1 ? "s" : ""} available`}
-          </p>
+      {/* Hero Banner */}
+      <section className="w-full">
+        {/* Cover image + gradient overlays */}
+        <div className="relative h-52 w-full overflow-hidden md:h-72">
+          <Image
+            src="/cover-hero.png"
+            alt=""
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-linear-to-t from-black via-black/70 to-transparent" />
+          <div className="from-h_red/8 absolute inset-0 bg-linear-to-r to-transparent" />
         </div>
 
+        {/* Title row — outside image, pulled up with negative margin to overlap */}
+        <div className="mx-auto max-w-5xl px-4 md:px-8">
+          <div className="-mt-14 flex flex-col gap-3 pb-6 sm:-mt-12 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-h_red/10 border-h_red/20 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border">
+                <Briefcase className="text-h_red h-5 w-5" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-white md:text-4xl">
+                  Open <span className="text-h_red/80">Gigs</span>
+                </h1>
+                <p className="text-sm leading-relaxed text-gray-400">
+                  Browse available gigs and find your next booking.
+                </p>
+              </div>
+            </div>
+            <Badge className="bg-h_red/10 text-h_red border-h_red/20 w-fit shrink-0 gap-1.5 border px-3 py-1">
+              <Briefcase className="h-3 w-3" /> {gigs.length} gig
+              {gigs.length !== 1 ? "s" : ""} available
+            </Badge>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-5xl px-4 py-10 md:px-8">
         {/* Filters */}
         <Suspense
           fallback={
@@ -145,14 +176,8 @@ export default async function DjGigMarketplacePage({
           </div>
         )}
 
-        {/* Gig grid */}
-        {gigs.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {gigs.map((gig) => (
-              <DjGigCard key={gig.slug} gig={gig} isDemo={!!gig.isDemo} />
-            ))}
-          </div>
-        )}
+        {/* Gig grid with load-more */}
+        {gigs.length > 0 && <GigGrid gigs={gigs} />}
       </div>
     </div>
   );
