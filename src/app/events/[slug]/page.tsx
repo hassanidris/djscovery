@@ -13,6 +13,7 @@ import {
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import { getDemoEventBySlug } from "@/data/events-demo";
+import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
 
 export const revalidate = 60;
@@ -248,246 +249,257 @@ function EventDetailView(props: {
 
   return (
     <div className="min-h-screen bg-black pb-20">
-      {/* Hero */}
-      <div className="relative h-64 w-full overflow-hidden sm:h-80 md:h-96">
-        {posterUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={posterUrl}
-            alt={title}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="h-full w-full bg-linear-to-br from-zinc-800 via-zinc-900 to-black" />
-        )}
-        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-
-        {/* Back link */}
-        <Link
-          href="/events"
-          className="absolute top-4 left-4 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 text-xs text-zinc-300 backdrop-blur-sm hover:text-white"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Events
-        </Link>
-
-        {/* Owner edit link */}
-        {isOwner && editHref && (
+      {/* Top nav bar */}
+      <div className="sticky top-0 z-10 border-b border-zinc-800/60 bg-black/80 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
           <Link
-            href={editHref}
-            className="absolute top-4 right-4 rounded-full bg-black/50 px-3 py-1.5 text-xs text-zinc-300 backdrop-blur-sm hover:text-white"
+            href="/events"
+            className="flex items-center gap-1.5 text-xs text-zinc-400 transition-colors hover:text-white"
           >
-            Edit Event
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to Events
           </Link>
-        )}
+          {isOwner && editHref && (
+            <Link
+              href={editHref}
+              className="rounded-full border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+            >
+              Edit Event
+            </Link>
+          )}
+        </div>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 py-8 md:px-8">
-        {/* Badge row */}
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? STATUS_STYLES.PUBLISHED}`}
-          >
-            {status === "COMPLETED"
-              ? "Past Event"
-              : isUpcoming
-                ? "Upcoming"
-                : status.charAt(0) + status.slice(1).toLowerCase()}
-          </span>
-          {isPrivate && (
-            <span className="flex items-center gap-1 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
-              <Lock className="h-3 w-3" /> Private
-            </span>
-          )}
-          {category && (
-            <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-400">
-              {CATEGORY_LABELS[category] ?? category}
-            </span>
-          )}
-        </div>
-
-        {/* Title */}
-        <h1 className="mb-6 text-3xl font-bold text-white md:text-4xl">
-          {title}
-        </h1>
-
-        {/* Meta */}
-        <div className="mb-8 space-y-3">
-          <div className="flex items-start gap-2.5 text-sm text-zinc-300">
-            <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-            <div>
-              <p>{formatDate(startDate)}</p>
-              {endDate &&
-                endDate.toDateString() !== startDate.toDateString() && (
-                  <p className="text-zinc-500">to {formatDate(endDate)}</p>
-                )}
+      <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
+        <div className="flex flex-col gap-8 md:flex-row md:items-start">
+          {/* ── Left column: Poster ── */}
+          <div className="w-full shrink-0 md:sticky md:top-20 md:w-70 lg:w-80">
+            <div className="aspect-2/3 w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl">
+              {posterUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={posterUrl}
+                  alt={title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-linear-to-br from-zinc-800 via-zinc-900 to-black">
+                  <Music className="h-14 w-14 text-zinc-700" />
+                  <p className="text-xs text-zinc-600">No poster</p>
+                </div>
+              )}
             </div>
-          </div>
 
-          {(startTime || endTime) && (
-            <div className="flex items-center gap-2.5 text-sm text-zinc-300">
-              <Clock className="h-4 w-4 shrink-0 text-zinc-500" />
-              <span>
-                {startTime}
-                {endTime ? ` – ${endTime}` : ""}
-              </span>
-            </div>
-          )}
-
-          {(location || venue) && (
-            <div className="flex items-start gap-2.5 text-sm text-zinc-300">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-              <div>
-                {venue && <p>{venue}</p>}
-                {location && (
-                  <p className={venue ? "text-zinc-500" : ""}>{location}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {isPrivate && !venue && (
-            <div className="flex items-center gap-2.5 text-sm text-zinc-500">
-              <Lock className="h-4 w-4 shrink-0" />
-              <span>Venue hidden — private event</span>
-            </div>
-          )}
-        </div>
-
-        {/* Ticket CTA */}
-        {ticketUrl && isUpcoming && (
-          <a
-            href={ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mb-8 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
-          >
-            <Ticket className="h-4 w-4" />
-            Get Tickets
-            <ExternalLink className="h-3.5 w-3.5 opacity-60" />
-          </a>
-        )}
-
-        {/* Description */}
-        {description && (
-          <div className="mb-8">
-            <h2 className="mb-2 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-              About
-            </h2>
-            <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
-              {description}
-            </p>
-          </div>
-        )}
-
-        {/* Genres */}
-        {genres.length > 0 && (
-          <div className="mb-8">
-            <h2 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-              <Music className="h-3.5 w-3.5" /> Genres
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {genres.map((g) => (
-                <span
-                  key={g}
-                  className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-300"
-                >
-                  {g}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Performers */}
-        {allPerformers.length > 0 && (
-          <div className="mb-8">
-            <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-              Line-up
-            </h2>
-            <div className="space-y-2">
-              {allPerformers.map((dj) => (
-                <Link
-                  key={dj.slug}
-                  href={`/djs/${dj.slug}`}
-                  className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 transition-colors hover:border-zinc-700"
-                >
-                  <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                    {dj.avatar ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={dj.avatar}
-                        alt={dj.stageName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
-                        {dj.stageName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-white">
-                      DJ. {dj.stageName}
-                    </p>
-                    {dj.role && (
-                      <p className="text-xs text-zinc-500">{dj.role}</p>
-                    )}
-                  </div>
-                  <ExternalLink className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Post-event recap */}
-        {recap && (
-          <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-            <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-              Event Recap
-            </h2>
-            <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
-              {recap}
-            </p>
-            {audioLink && (
+            {/* Ticket CTA — below poster on all screen sizes */}
+            {ticketUrl && isUpcoming && (
               <a
-                href={audioLink}
+                href={ticketUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
               >
-                <Music className="h-4 w-4" />
-                Listen to the set
+                <Ticket className="h-4 w-4" />
+                Get Tickets
                 <ExternalLink className="h-3.5 w-3.5 opacity-60" />
               </a>
             )}
           </div>
-        )}
 
-        {/* Gallery */}
-        {gallery.length > 0 && (
-          <div>
-            <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-              Photos
-            </h2>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {gallery.map((img) => (
-                <div
-                  key={img.id}
-                  className="aspect-square overflow-hidden rounded-lg"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={img.url}
-                    alt={img.caption ?? title}
-                    className="h-full w-full object-cover transition-transform hover:scale-105"
-                  />
-                </div>
-              ))}
+          {/* ── Right column: Details ── */}
+          <div className="min-w-0 flex-1">
+            {/* Badge row */}
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? STATUS_STYLES.PUBLISHED}`}
+              >
+                {status === "COMPLETED"
+                  ? "Past Event"
+                  : isUpcoming
+                    ? "Upcoming"
+                    : status.charAt(0) + status.slice(1).toLowerCase()}
+              </span>
+              {isPrivate && (
+                <span className="flex items-center gap-1 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
+                  <Lock className="h-3 w-3" /> Private
+                </span>
+              )}
+              {category && (
+                <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-400">
+                  {CATEGORY_LABELS[category] ?? category}
+                </span>
+              )}
             </div>
+
+            {/* Title */}
+            <h1 className="mb-6 text-3xl font-bold text-white md:text-4xl">
+              {title}
+            </h1>
+
+            {/* Meta */}
+            <div className="mb-8 space-y-3">
+              <div className="flex items-start gap-2.5 text-sm text-zinc-300">
+                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
+                <div>
+                  <p>{formatDate(startDate)}</p>
+                  {endDate &&
+                    endDate.toDateString() !== startDate.toDateString() && (
+                      <p className="text-zinc-500">to {formatDate(endDate)}</p>
+                    )}
+                </div>
+              </div>
+
+              {(startTime || endTime) && (
+                <div className="flex items-center gap-2.5 text-sm text-zinc-300">
+                  <Clock className="h-4 w-4 shrink-0 text-zinc-500" />
+                  <span>
+                    {startTime}
+                    {endTime ? ` – ${endTime}` : ""}
+                  </span>
+                </div>
+              )}
+
+              {(location || venue) && (
+                <div className="flex items-start gap-2.5 text-sm text-zinc-300">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
+                  <div>
+                    {venue && <p>{venue}</p>}
+                    {location && (
+                      <p className={venue ? "text-zinc-500" : ""}>{location}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {isPrivate && !venue && (
+                <div className="flex items-center gap-2.5 text-sm text-zinc-500">
+                  <Lock className="h-4 w-4 shrink-0" />
+                  <span>Venue hidden — private event</span>
+                </div>
+              )}
+            </div>
+
+            {/* Description */}
+            {description && (
+              <div className="mb-8">
+                <h2 className="mb-2 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  About
+                </h2>
+                <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
+                  {description}
+                </p>
+              </div>
+            )}
+
+            {/* Genres */}
+            {genres.length > 0 && (
+              <div className="mb-8">
+                <h2 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  <Music className="h-3.5 w-3.5" /> Genres
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {genres.map((g) => (
+                    <span
+                      key={g}
+                      className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-300"
+                    >
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Performers */}
+            {allPerformers.length > 0 && (
+              <div className="mb-8">
+                <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  Line-up
+                </h2>
+                <div className="space-y-2">
+                  {allPerformers.map((dj) => (
+                    <Link
+                      key={dj.slug}
+                      href={`/djs/${dj.slug}`}
+                      className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 transition-colors hover:border-zinc-700"
+                    >
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                        {dj.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={dj.avatar}
+                            alt={dj.stageName}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
+                            {dj.stageName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-white">
+                          DJ. {dj.stageName}
+                        </p>
+                        {dj.role && (
+                          <p className="text-xs text-zinc-500">{dj.role}</p>
+                        )}
+                      </div>
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Post-event recap */}
+            {recap && (
+              <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+                <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  Event Recap
+                </h2>
+                <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
+                  {recap}
+                </p>
+                {audioLink && (
+                  <a
+                    href={audioLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
+                  >
+                    <Music className="h-4 w-4" />
+                    Listen to the set
+                    <ExternalLink className="h-3.5 w-3.5 opacity-60" />
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Gallery */}
+            {gallery.length > 0 && (
+              <div>
+                <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  Photos
+                </h2>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {gallery.map((img) => (
+                    <div
+                      key={img.id}
+                      className="aspect-square overflow-hidden rounded-lg"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={img.url}
+                        alt={img.caption ?? title}
+                        className="h-full w-full object-cover transition-transform hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -498,6 +510,7 @@ function EventDetailView(props: {
 function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
   const isUpcoming = event.daysOffset > 0;
   const location = [event.city, event.country].filter(Boolean).join(", ");
+  const demoDj = getDemodjBySlug(event.djSlug);
 
   return (
     <EventDetailView
@@ -517,12 +530,12 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       genres={event.genres}
       recap={null}
       audioLink={null}
-      posterUrl={null}
+      posterUrl={event.posterUrl ?? null}
       isUpcoming={isUpcoming}
       ownerDj={{
         slug: event.djSlug,
-        stageName: slugToName(event.djSlug),
-        avatar: null,
+        stageName: demoDj?.stageName ?? slugToName(event.djSlug),
+        avatar: demoDj?.avatar.url ?? null,
       }}
       participants={[]}
       gallery={[]}

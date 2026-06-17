@@ -3,8 +3,8 @@ import { Music2, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import prisma from "@/lib/client";
 import { getDemoEvents } from "@/data/events-demo";
-import { EventCard } from "@/components/events/EventCard";
 import type { EventCardItem } from "@/components/events/EventCard";
+import { EventGrid } from "@/components/events/EventGrid";
 
 export const metadata = { title: "Events — DJscovery" };
 export const revalidate = 60;
@@ -166,16 +166,8 @@ export default async function EventsPage({
           </div>
         )}
 
-        {/* Grid */}
-        {events.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {events.map((event) => (
-                <EventCard key={event.slug} event={event} />
-              ))}
-            </div>
-          </>
-        )}
+        {/* Grid with load-more */}
+        {events.length > 0 && <EventGrid events={events} />}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getPublishedGigsForDj } from "@/lib/queries/gigs";
 import type { DjGigListItem } from "@/lib/queries/gigs";
-import { DjGigCard } from "@/components/gigs/GigCard";
+import { GigGrid } from "@/components/gigs/GigGrid";
 import { GigFilters } from "@/components/gigs/GigFilters";
 import {
   GigType,
@@ -145,14 +145,8 @@ export default async function DjGigMarketplacePage({
           </div>
         )}
 
-        {/* Gig grid */}
-        {gigs.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {gigs.map((gig) => (
-              <DjGigCard key={gig.slug} gig={gig} isDemo={!!gig.isDemo} />
-            ))}
-          </div>
-        )}
+        {/* Gig grid with load-more */}
+        {gigs.length > 0 && <GigGrid gigs={gigs} />}
       </div>
     </div>
   );
