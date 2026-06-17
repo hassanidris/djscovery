@@ -28,8 +28,11 @@ export const BUCKET = "djscovery-media" as const;
 // ── Public URL helper ─────────────────────────────────────────────────────────
 
 export function getPublicMediaUrl(path: string): string {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${path}`;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set");
+  }
+  return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/${BUCKET}/${path}`;
 }
 
 // ── Allowed MIME types ────────────────────────────────────────────────────────
@@ -42,10 +45,7 @@ export const ALLOWED_IMAGE_TYPES = [
 
 export const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/wav"] as const;
 
-export const ALLOWED_VIDEO_TYPES = [
-  "video/mp4",
-  "video/quicktime",
-] as const;
+export const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime"] as const;
 
 // ── File validation ───────────────────────────────────────────────────────────
 
