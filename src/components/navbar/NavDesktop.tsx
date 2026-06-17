@@ -89,7 +89,7 @@ export default function NavDesktop({
               key={item.id}
               href={item.href}
               className={cn(
-                "focus-visible:ring-h_red relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-150 focus-visible:ring-2 focus-visible:outline-none",
+                "focus-visible:ring-h_red relative flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition-all duration-150 focus-visible:ring-2 focus-visible:outline-none",
                 isActive
                   ? "text-white"
                   : "text-gray-400 hover:bg-white/5 hover:text-white",
