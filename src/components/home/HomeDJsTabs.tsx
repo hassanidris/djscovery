@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
@@ -18,10 +19,18 @@ type Props = {
 };
 
 export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
+  const [activeTab, setActiveTab] = useState<"new" | "trending">("new");
+
+  const viewAllHref =
+    activeTab === "new" ? "/directory?sort=new" : "/directory?sort=trending";
+
   return (
     <section className="border-t border-white/5 px-4 py-12 md:px-8">
       <div className="mx-auto max-w-7xl">
-        <Tabs defaultValue="new">
+        <Tabs
+          defaultValue="new"
+          onValueChange={(v) => setActiveTab(v as "new" | "trending")}
+        >
           <div className="mb-6 flex items-center justify-between">
             <div className="flex flex-wrap items-center gap-4">
               <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
@@ -33,12 +42,18 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
                   className="data-[state=active]:bg-h_red data-[state=active]:text-white"
                 >
                   Just Joined
+                  <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
+                    {newDJs.length}
+                  </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="trending"
                   className="data-[state=active]:bg-h_red data-[state=active]:text-white"
                 >
                   Trending
+                  <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
+                    {trendingDJs.length}
+                  </span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -48,11 +63,14 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
               size="sm"
               className="text-h_red hover:text-h_red hover:bg-white/5"
             >
-              <Link href="/directory">View all →</Link>
+              <Link href={viewAllHref}>View all →</Link>
             </Button>
           </div>
 
-          <TabsContent value="new">
+          <TabsContent
+            value="new"
+            className="data-[state=active]:animate-in data-[state=active]:fade-in data-[state=active]:duration-200"
+          >
             <ScrollArea className="w-full">
               <div className="flex items-stretch gap-4 px-1 pt-1 pb-4">
                 {newDJs.map((dj) => (
@@ -63,7 +81,10 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="trending">
+          <TabsContent
+            value="trending"
+            className="data-[state=active]:animate-in data-[state=active]:fade-in data-[state=active]:duration-200"
+          >
             <ScrollArea className="w-full">
               <div className="flex items-stretch gap-4 px-1 pt-1 pb-4">
                 {trendingDJs.map((dj, index) => (
@@ -136,10 +157,13 @@ function DJCard({
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-1">
+        <div className="flex justify-center gap-1">
           {dj.genres.slice(0, 2).map((g) => (
-            <Badge key={g} className="bg-h_redDark/60 border-0 text-red-300">
-              {g}
+            <Badge
+              key={g}
+              className="bg-h_redDark/60 border-0 whitespace-nowrap text-red-300"
+            >
+              {g.length > 11 ? `${g.slice(0, 10)}…` : g}
             </Badge>
           ))}
         </div>
