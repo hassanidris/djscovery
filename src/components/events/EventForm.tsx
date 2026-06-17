@@ -28,7 +28,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCitiesForCountry } from "@/lib/actions/locations";
-import { createEvent, updateEvent, VALID_EVENT_CATEGORIES } from "@/lib/actions/event";
+import {
+  createEvent,
+  updateEvent,
+  VALID_EVENT_CATEGORIES,
+} from "@/lib/actions/event";
 import type { EventCategory } from "@/lib/actions/event";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -122,7 +126,9 @@ export function EventForm(props: EventFormProps) {
         };
 
   const [data, setData] = useState<EventFormData>(defaults);
-  const [errors, setErrors] = useState<Partial<Record<keyof EventFormData, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof EventFormData, string>>
+  >({});
   const [genreInput, setGenreInput] = useState("");
   const [cities, setCities] = useState<CityOption[]>(
     props.mode === "edit" ? (props.initialCities ?? []) : [],
@@ -201,7 +207,10 @@ export function EventForm(props: EventFormProps) {
         cityId: data.cityId ? Number(data.cityId) : null,
         venue: data.venue.trim() || null,
         description: data.description.trim() || null,
-        ticketUrl: data.eventType === "PUBLIC" && data.ticketUrl.trim() ? data.ticketUrl.trim() : null,
+        ticketUrl:
+          data.eventType === "PUBLIC" && data.ticketUrl.trim()
+            ? data.ticketUrl.trim()
+            : null,
         genres: data.genres,
         ...(isCompleted && {
           recap: data.recap.trim() || null,
@@ -235,7 +244,7 @@ export function EventForm(props: EventFormProps) {
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* ── Basic Info ── */}
       <section className="space-y-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-400">
+        <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
           <FileText className="h-4 w-4" /> Basic Info
         </h2>
 
@@ -251,7 +260,9 @@ export function EventForm(props: EventFormProps) {
             placeholder="e.g. Sunset Grooves Lisbon"
             className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
           />
-          {errors.title && <p className="text-xs text-red-400">{errors.title}</p>}
+          {errors.title && (
+            <p className="text-xs text-red-400">{errors.title}</p>
+          )}
         </div>
 
         {/* Event Type toggle */}
@@ -309,7 +320,9 @@ export function EventForm(props: EventFormProps) {
               ))}
             </SelectContent>
           </Select>
-          {errors.category && <p className="text-xs text-red-400">{errors.category}</p>}
+          {errors.category && (
+            <p className="text-xs text-red-400">{errors.category}</p>
+          )}
         </div>
       </section>
 
@@ -317,7 +330,7 @@ export function EventForm(props: EventFormProps) {
 
       {/* ── Date & Time ── */}
       <section className="space-y-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-400">
+        <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
           <CalendarDays className="h-4 w-4" /> Date &amp; Time
         </h2>
 
@@ -331,9 +344,11 @@ export function EventForm(props: EventFormProps) {
               type="date"
               value={data.startDate}
               onChange={(e) => set("startDate", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white [color-scheme:dark] focus:border-zinc-500"
+              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
             />
-            {errors.startDate && <p className="text-xs text-red-400">{errors.startDate}</p>}
+            {errors.startDate && (
+              <p className="text-xs text-red-400">{errors.startDate}</p>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -345,14 +360,17 @@ export function EventForm(props: EventFormProps) {
               type="date"
               value={data.endDate}
               onChange={(e) => set("endDate", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white [color-scheme:dark] focus:border-zinc-500"
+              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="startTime" className="flex items-center gap-1 text-zinc-300">
+            <Label
+              htmlFor="startTime"
+              className="flex items-center gap-1 text-zinc-300"
+            >
               <Clock className="h-3.5 w-3.5" /> Start Time
             </Label>
             <Input
@@ -360,13 +378,18 @@ export function EventForm(props: EventFormProps) {
               type="time"
               value={data.startTime}
               onChange={(e) => set("startTime", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white [color-scheme:dark] focus:border-zinc-500"
+              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
             />
-            {errors.startTime && <p className="text-xs text-red-400">{errors.startTime}</p>}
+            {errors.startTime && (
+              <p className="text-xs text-red-400">{errors.startTime}</p>
+            )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="endTime" className="flex items-center gap-1 text-zinc-300">
+            <Label
+              htmlFor="endTime"
+              className="flex items-center gap-1 text-zinc-300"
+            >
               <Clock className="h-3.5 w-3.5" /> End Time
             </Label>
             <Input
@@ -374,9 +397,11 @@ export function EventForm(props: EventFormProps) {
               type="time"
               value={data.endTime}
               onChange={(e) => set("endTime", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white [color-scheme:dark] focus:border-zinc-500"
+              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
             />
-            {errors.endTime && <p className="text-xs text-red-400">{errors.endTime}</p>}
+            {errors.endTime && (
+              <p className="text-xs text-red-400">{errors.endTime}</p>
+            )}
           </div>
         </div>
       </section>
@@ -385,14 +410,18 @@ export function EventForm(props: EventFormProps) {
 
       {/* ── Location ── */}
       <section className="space-y-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-400">
+        <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
           <MapPin className="h-4 w-4" /> Location
         </h2>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="countryId" className="flex items-center gap-1 text-zinc-300">
-              <Globe className="h-3.5 w-3.5" /> Country <span className="text-red-500">*</span>
+            <Label
+              htmlFor="countryId"
+              className="flex items-center gap-1 text-zinc-300"
+            >
+              <Globe className="h-3.5 w-3.5" /> Country{" "}
+              <span className="text-red-500">*</span>
             </Label>
             <Select
               value={data.countryId}
@@ -416,7 +445,9 @@ export function EventForm(props: EventFormProps) {
                 ))}
               </SelectContent>
             </Select>
-            {errors.countryId && <p className="text-xs text-red-400">{errors.countryId}</p>}
+            {errors.countryId && (
+              <p className="text-xs text-red-400">{errors.countryId}</p>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -432,7 +463,13 @@ export function EventForm(props: EventFormProps) {
                 id="cityId"
                 className="border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500 disabled:opacity-40"
               >
-                <SelectValue placeholder={cities.length === 0 ? "Select country first" : "Select city…"} />
+                <SelectValue
+                  placeholder={
+                    cities.length === 0
+                      ? "Select country first"
+                      : "Select city…"
+                  }
+                />
               </SelectTrigger>
               <SelectContent className="border-zinc-700 bg-zinc-900">
                 {cities.map((c) => (
@@ -467,7 +504,7 @@ export function EventForm(props: EventFormProps) {
 
       {/* ── Details ── */}
       <section className="space-y-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-400">
+        <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
           <Tag className="h-4 w-4" /> Details
         </h2>
 
@@ -547,7 +584,7 @@ export function EventForm(props: EventFormProps) {
         <>
           <hr className="border-zinc-800" />
           <section className="space-y-4">
-            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-400">
+            <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
               <Ticket className="h-4 w-4" /> Tickets
             </h2>
             <div className="space-y-1.5">
@@ -574,7 +611,7 @@ export function EventForm(props: EventFormProps) {
         <>
           <hr className="border-zinc-800" />
           <section className="space-y-4">
-            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-400">
+            <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
               <Link2 className="h-4 w-4" /> Post-Event
             </h2>
             <p className="text-xs text-zinc-500">
@@ -594,7 +631,9 @@ export function EventForm(props: EventFormProps) {
                 maxLength={2000}
                 className="resize-none border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
               />
-              <p className="text-right text-xs text-zinc-600">{data.recap.length}/2000</p>
+              <p className="text-right text-xs text-zinc-600">
+                {data.recap.length}/2000
+              </p>
             </div>
 
             <div className="space-y-1.5">

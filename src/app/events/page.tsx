@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Music2 } from "lucide-react";
+import { Music2, CalendarDays } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import prisma from "@/lib/client";
 import { getDemoEvents } from "@/data/events-demo";
 import { EventCard } from "@/components/events/EventCard";
@@ -105,15 +106,32 @@ export default async function EventsPage({
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Events</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Discover DJ events happening around the world.
-          </p>
+      {/* Hero Banner */}
+      <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
+          <div className="flex items-center gap-4">
+            <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
+              <CalendarDays className="text-h_red h-6 w-6" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-h_white text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+                DJ <span className="text-h_red/80">Events</span>
+              </h1>
+              <p className="text-sm leading-relaxed text-gray-400">
+                Discover DJ events happening around the world.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="bg-h_red/10 text-h_red border-h_red/20 gap-1.5 border px-3 py-1">
+              <CalendarDays className="h-3 w-3" /> {events.length} event
+              {events.length !== 1 ? "s" : ""}
+            </Badge>
+          </div>
         </div>
+      </section>
 
+      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
         {/* Tabs */}
         <div className="mb-8 flex gap-1 border-b border-zinc-800">
           {(["upcoming", "past"] as const).map((tab) => (
@@ -151,9 +169,6 @@ export default async function EventsPage({
         {/* Grid */}
         {events.length > 0 && (
           <>
-            <p className="text-muted-foreground mb-4 text-xs">
-              {events.length} event{events.length !== 1 ? "s" : ""}
-            </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {events.map((event) => (
                 <EventCard key={event.slug} event={event} />
