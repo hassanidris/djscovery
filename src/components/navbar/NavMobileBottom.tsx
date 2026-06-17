@@ -9,9 +9,17 @@ type Props = {
   navRole: NavRole;
   username: string | null;
   djSlug: string | null;
+  avatarSrc: string | null;
+  initials: string;
 };
 
-export default function NavMobileBottom({ navRole, username, djSlug }: Props) {
+export default function NavMobileBottom({
+  navRole,
+  username,
+  djSlug,
+  avatarSrc,
+  initials,
+}: Props) {
   const pathname = usePathname();
   const items = bottomNavByRole[navRole];
 
@@ -67,18 +75,30 @@ export default function NavMobileBottom({ navRole, username, djSlug }: Props) {
                     ? "text-white"
                     : "text-gray-500 hover:text-gray-300 active:text-gray-200",
                 )}
-                aria-label={item.label}
+                aria-label="You"
                 aria-current={isActive ? "page" : undefined}
               >
-                <Icon
+                <div
                   className={cn(
-                    "h-5.5 w-5.5 shrink-0 transition-colors",
-                    isActive ? "text-h_red" : "",
+                    "h-5.5 w-5.5 shrink-0 overflow-hidden rounded-full",
+                    isActive ? "ring-h_red ring-1" : "ring-1 ring-white/25",
                   )}
-                  aria-hidden
-                />
+                >
+                  {avatarSrc ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={avatarSrc}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="bg-h_redDark flex h-full w-full items-center justify-center text-[8px] font-bold text-white">
+                      {initials}
+                    </div>
+                  )}
+                </div>
                 <span className="text-[11px] leading-none font-medium">
-                  {item.label}
+                  You
                 </span>
               </Link>
             );
