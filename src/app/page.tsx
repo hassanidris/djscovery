@@ -166,7 +166,7 @@ const Homepage = async () => {
       />
 
       {/* Community Highlights */}
-      <HomeCommunityHighlights />
+      {/* <HomeCommunityHighlights /> */}
 
       {/* CTA Banner */}
       <HomeCtaBanner />

@@ -97,7 +97,7 @@ export function getFooterProfessionalLinks(opts: {
       { label: "My Gigs", href: "/dashboard/dj/gigs" },
       { label: "My Events", href: "/dashboard/dj/events" },
       { label: "Applications", href: "/dashboard/dj/applications" },
-      { label: "Account Settings", href: "/settings" },
+      { label: "Settings", href: "/settings/account" },
       ...(!isOrganizer
         ? [{ label: "Become an Organizer", href: "/become-organizer" }]
         : [{ label: "Organizer Dashboard", href: "/organizer/dashboard" }]),

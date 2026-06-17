@@ -297,21 +297,21 @@ export default function BurgerMenu({
 
                   <SheetClose asChild>
                     <Link
-                      href="/settings"
+                      href="/settings/account"
                       className={cn(
                         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                        pathname === "/settings"
+                        pathname.startsWith("/settings")
                           ? "bg-white/5 text-white"
                           : "text-gray-400 hover:bg-white/5 hover:text-white",
                       )}
                       aria-current={
-                        pathname === "/settings" ? "page" : undefined
+                        pathname.startsWith("/settings") ? "page" : undefined
                       }
                     >
                       <Settings
                         className={cn(
                           "h-4 w-4 shrink-0",
-                          pathname === "/settings" ? "text-h_red" : "",
+                          pathname.startsWith("/settings") ? "text-h_red" : "",
                         )}
                         aria-hidden
                       />

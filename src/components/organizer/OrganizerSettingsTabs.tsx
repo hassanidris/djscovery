@@ -274,7 +274,7 @@ function ProfileTab({
         toast.error(result.error);
       } else {
         toast.success("Profile updated.");
-        if (result.newSlug) router.push("/organizer/settings");
+        if (result.newSlug) router.push("/settings/organizer");
       }
     });
   }
