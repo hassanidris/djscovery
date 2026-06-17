@@ -301,6 +301,46 @@ export default function DjProfileFree({
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* Main Column */}
           <div className="flex flex-col gap-12 lg:col-span-2">
+            {/* ── MOBILE BOOK CTA ── */}
+            <div className="lg:hidden">
+              <Card className="from-h_red/10 border-h_red/20 gap-0 bg-linear-to-b to-transparent p-5">
+                <h3 className="mb-1 text-sm font-semibold text-white">
+                  Book {DJ.stageName}
+                </h3>
+                <p className="mb-4 text-xs text-gray-400">
+                  For clubs, festivals, events &amp; more
+                </p>
+                <Button
+                  className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white"
+                  asChild
+                >
+                  <a href={bookingHref}>
+                    <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
+                    Book / Hire DJ
+                  </a>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full border-white/15 text-gray-300 hover:bg-white/5"
+                  asChild
+                >
+                  <a href={bookingHref}>
+                    <Mail className="mr-1.5 h-3.5 w-3.5" />
+                    Send Inquiry
+                  </a>
+                </Button>
+              </Card>
+            </div>
+
+            <ProfileAbout
+              bio={DJ.bio}
+              djTypes={DJ.djTypes}
+              bioExpanded={bioExpanded}
+              onToggleBio={() => setBioExpanded(!bioExpanded)}
+            />
+
+            <Separator className="bg-white/8" />
+
             {/* ── SPOTLIGHT ── */}
             {(hasSpotlight || isOwner) && (
               <section>
@@ -420,15 +460,6 @@ export default function DjProfileFree({
 
             {(hasSpotlight || isOwner) && <Separator className="bg-white/8" />}
 
-            <ProfileAbout
-              bio={DJ.bio}
-              djTypes={DJ.djTypes}
-              bioExpanded={bioExpanded}
-              onToggleBio={() => setBioExpanded(!bioExpanded)}
-            />
-
-            <Separator className="bg-white/8" />
-
             {/* ── MY SOUND ── */}
             {(hasMixes || isOwner) && (
               <section>
@@ -507,6 +538,15 @@ export default function DjProfileFree({
             {hasVenues && <ProfileVenues venues={VENUES} />}
 
             {hasVenues && <Separator className="bg-white/8" />}
+
+            {/* ── MOBILE EVENTS ── */}
+            <div className="lg:hidden">
+              <ProfileEventsSidebar events={EVENTS} isOwner={isOwner} />
+            </div>
+
+            <div className="lg:hidden">
+              <Separator className="bg-white/8" />
+            </div>
 
             <ProfileReviews
               avgRating={DJ.avgRating}
@@ -598,56 +638,40 @@ export default function DjProfileFree({
 
           {/* ── SIDEBAR ── */}
           <aside className="sticky top-28 flex h-fit flex-col gap-5">
-            {/* Book CTA */}
-            <Card className="from-h_red/10 border-h_red/20 gap-0 bg-linear-to-b to-transparent p-5">
-              <h3 className="mb-1 text-sm font-semibold text-white">
-                Book {DJ.stageName}
-              </h3>
-              <p className="mb-4 text-xs text-gray-400">
-                For clubs, festivals, events & more
-              </p>
-              <Button
-                className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white"
-                asChild
-              >
-                <a href={bookingHref}>
-                  <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
-                  Book / Hire DJ
-                </a>
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full border-white/15 text-gray-300 hover:bg-white/5"
-                asChild
-              >
-                <a href={bookingHref}>
-                  <Mail className="mr-1.5 h-3.5 w-3.5" />
-                  Send Inquiry
-                </a>
-              </Button>
-            </Card>
+            {/* Book CTA — desktop only; mobile version is inline above */}
+            <div className="hidden lg:block">
+              <Card className="from-h_red/10 border-h_red/20 gap-0 bg-linear-to-b to-transparent p-5">
+                <h3 className="mb-1 text-sm font-semibold text-white">
+                  Book {DJ.stageName}
+                </h3>
+                <p className="mb-4 text-xs text-gray-400">
+                  For clubs, festivals, events & more
+                </p>
+                <Button
+                  className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white"
+                  asChild
+                >
+                  <a href={bookingHref}>
+                    <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
+                    Book / Hire DJ
+                  </a>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full border-white/15 text-gray-300 hover:bg-white/5"
+                  asChild
+                >
+                  <a href={bookingHref}>
+                    <Mail className="mr-1.5 h-3.5 w-3.5" />
+                    Send Inquiry
+                  </a>
+                </Button>
+              </Card>
+            </div>
 
-            <ProfileEventsSidebar events={EVENTS} isOwner={isOwner} />
-
-            <Separator className="bg-white/8" />
-
-            {/* Specializes In */}
-            <div>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
-                <Music className="text-h_red h-3 w-3" />
-                Specializes In
-              </h3>
-              <div className="flex flex-wrap gap-1.5">
-                {DJ.djTypes.map((t) => (
-                  <Badge
-                    key={t}
-                    variant="outline"
-                    className="border-white/15 text-xs text-gray-300"
-                  >
-                    {t}
-                  </Badge>
-                ))}
-              </div>
+            {/* Events — desktop only; mobile version is inline above */}
+            <div className="hidden lg:block">
+              <ProfileEventsSidebar events={EVENTS} isOwner={isOwner} />
             </div>
 
             <Separator className="bg-white/8" />

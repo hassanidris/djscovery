@@ -336,6 +336,47 @@ export default function DjProfilePremium({
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* ── MAIN COLUMN ── */}
           <div className="flex flex-col gap-12 lg:col-span-2">
+            {/* ── MOBILE BOOK CTA ── */}
+            <div className="lg:hidden">
+              <Card className="to-h_blackLight/30 gap-0 overflow-hidden border-amber-500/25 bg-linear-to-b from-amber-500/8 p-5">
+                <div className="mb-1 flex items-center gap-2">
+                  <Rocket className="h-3.5 w-3.5 text-amber-400" />
+                  <span className="text-xs font-semibold tracking-wider text-amber-400 uppercase">
+                    Priority Booking
+                  </span>
+                </div>
+                <h3 className="mb-1 text-sm font-semibold text-white">
+                  Book {DJ.stageName}
+                </h3>
+                <div className="mb-4 flex items-center gap-2">
+                  <div className="size-2 animate-pulse rounded-full bg-emerald-400" />
+                  <span className="text-xs font-medium text-emerald-400">
+                    Responding within 2 hours
+                  </span>
+                </div>
+                <Button className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white">
+                  <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
+                  Book / Hire DJ
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full border-white/15 text-gray-300 hover:bg-white/5"
+                >
+                  <Mail className="mr-1.5 h-3.5 w-3.5" />
+                  Send Inquiry
+                </Button>
+              </Card>
+            </div>
+
+            <ProfileAbout
+              bio={DJ.bio}
+              djTypes={DJ.djTypes}
+              bioExpanded={bioExpanded}
+              onToggleBio={() => setBioExpanded(!bioExpanded)}
+            />
+
+            <Separator className="bg-white/8" />
+
             {/* ── SPOTLIGHT ── */}
             <section>
               <SectionHeading sub="Curated featured content">
@@ -504,129 +545,6 @@ export default function DjProfilePremium({
                 </div>
               </section>
             )}
-
-            <Separator className="bg-white/8" />
-
-            {/* ── AVAILABILITY CALENDAR ── */}
-            <section>
-              <SectionHeading sub={`${calendarLabel} availability`}>
-                Availability Calendar
-              </SectionHeading>
-              <div className="mb-4 flex items-center gap-4">
-                {[
-                  { color: "bg-emerald-500", label: "Available" },
-                  { color: "bg-h_red", label: "Booked" },
-                  { color: "bg-amber-500", label: "Tentative" },
-                ].map((l) => (
-                  <div key={l.label} className="flex items-center gap-1.5">
-                    <div className={cn("size-2.5 rounded-full", l.color)} />
-                    <span className="text-xs text-gray-400">{l.label}</span>
-                  </div>
-                ))}
-              </div>
-              <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
-                <div className="grid grid-cols-7 gap-1.5">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (d) => (
-                      <div
-                        key={d}
-                        className="pb-1 text-center text-[11px] font-semibold text-gray-600"
-                      >
-                        {d}
-                      </div>
-                    ),
-                  )}
-                  {/* Empty cells for day alignment */}
-                  {Array.from({ length: 0 }).map((_, i) => (
-                    <div key={`e${i}`} />
-                  ))}
-                  {CALENDAR_DAYS.map(({ day, status }) => (
-                    <div
-                      key={day}
-                      className={cn(
-                        "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
-                        status === "booked" &&
-                          "bg-h_red/20 text-h_red border-h_red/30 border",
-                        status === "tentative" &&
-                          "border border-amber-500/30 bg-amber-500/20 text-amber-400",
-                        status === "available" &&
-                          "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
-                        status === "free" && "text-gray-600 hover:bg-white/5",
-                      )}
-                    >
-                      {day}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            {/* ── BOOKING PACKAGES ── */}
-            <section>
-              <SectionHeading sub="Tailored options for every event type">
-                Booking Packages
-              </SectionHeading>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {PACKAGES.map((pkg) => (
-                  <Card
-                    key={pkg.name}
-                    className={cn(
-                      "relative flex flex-col gap-0 overflow-hidden border-white/8 p-5",
-                      pkg.featured
-                        ? "to-h_blackLight/30 border-amber-500/30 bg-linear-to-b from-amber-500/10"
-                        : "bg-h_blackLight/30",
-                    )}
-                  >
-                    {pkg.featured && (
-                      <Badge className="absolute top-3 right-3 border-amber-500/25 bg-amber-500/15 text-[11px] text-amber-400">
-                        Most Popular
-                      </Badge>
-                    )}
-                    <div className="bg-h_red/10 border-h_red/20 mb-3 flex size-10 items-center justify-center rounded-lg border">
-                      {(() => {
-                        const PkgIcon = pkg.icon;
-                        return <PkgIcon className="text-h_red h-4 w-4" />;
-                      })()}
-                    </div>
-                    <p className="text-sm font-semibold text-white">
-                      {pkg.name}
-                    </p>
-                    <p className="text-h_red mt-1 text-lg font-bold">
-                      {pkg.price}
-                    </p>
-                    <p className="mb-3 text-xs text-gray-500">{pkg.duration}</p>
-                    <ul className="flex flex-1 flex-col gap-1.5">
-                      {pkg.includes.map((item) => (
-                        <li
-                          key={item}
-                          className="flex items-center gap-1.5 text-xs text-gray-400"
-                        >
-                          <CircleCheck className="h-3 w-3 shrink-0 text-emerald-500" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      className="bg-h_red hover:bg-h_redDark mt-4 w-full font-semibold text-white"
-                      size="sm"
-                    >
-                      Enquire
-                    </Button>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            <ProfileAbout
-              bio={DJ.bio}
-              djTypes={DJ.djTypes}
-              bioExpanded={bioExpanded}
-              onToggleBio={() => setBioExpanded(!bioExpanded)}
-            />
 
             <Separator className="bg-white/8" />
 
@@ -827,9 +745,132 @@ export default function DjProfilePremium({
 
             <Separator className="bg-white/8" />
 
+            {/* ── BOOKING PACKAGES ── */}
+            <section>
+              <SectionHeading sub="Tailored options for every event type">
+                Booking Packages
+              </SectionHeading>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {PACKAGES.map((pkg) => (
+                  <Card
+                    key={pkg.name}
+                    className={cn(
+                      "relative flex flex-col gap-0 overflow-hidden border-white/8 p-5",
+                      pkg.featured
+                        ? "to-h_blackLight/30 border-amber-500/30 bg-linear-to-b from-amber-500/10"
+                        : "bg-h_blackLight/30",
+                    )}
+                  >
+                    {pkg.featured && (
+                      <Badge className="absolute top-3 right-3 border-amber-500/25 bg-amber-500/15 text-[11px] text-amber-400">
+                        Most Popular
+                      </Badge>
+                    )}
+                    <div className="bg-h_red/10 border-h_red/20 mb-3 flex size-10 items-center justify-center rounded-lg border">
+                      {(() => {
+                        const PkgIcon = pkg.icon;
+                        return <PkgIcon className="text-h_red h-4 w-4" />;
+                      })()}
+                    </div>
+                    <p className="text-sm font-semibold text-white">
+                      {pkg.name}
+                    </p>
+                    <p className="text-h_red mt-1 text-lg font-bold">
+                      {pkg.price}
+                    </p>
+                    <p className="mb-3 text-xs text-gray-500">{pkg.duration}</p>
+                    <ul className="flex flex-1 flex-col gap-1.5">
+                      {pkg.includes.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-center gap-1.5 text-xs text-gray-400"
+                        >
+                          <CircleCheck className="h-3 w-3 shrink-0 text-emerald-500" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      className="bg-h_red hover:bg-h_redDark mt-4 w-full font-semibold text-white"
+                      size="sm"
+                    >
+                      Enquire
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            </section>
+
+            <Separator className="bg-white/8" />
+
+            {/* ── AVAILABILITY CALENDAR ── */}
+            <section>
+              <SectionHeading sub={`${calendarLabel} availability`}>
+                Availability Calendar
+              </SectionHeading>
+              <div className="mb-4 flex items-center gap-4">
+                {[
+                  { color: "bg-emerald-500", label: "Available" },
+                  { color: "bg-h_red", label: "Booked" },
+                  { color: "bg-amber-500", label: "Tentative" },
+                ].map((l) => (
+                  <div key={l.label} className="flex items-center gap-1.5">
+                    <div className={cn("size-2.5 rounded-full", l.color)} />
+                    <span className="text-xs text-gray-400">{l.label}</span>
+                  </div>
+                ))}
+              </div>
+              <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
+                <div className="grid grid-cols-7 gap-1.5">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                    (d) => (
+                      <div
+                        key={d}
+                        className="pb-1 text-center text-[11px] font-semibold text-gray-600"
+                      >
+                        {d}
+                      </div>
+                    ),
+                  )}
+                  {/* Empty cells for day alignment */}
+                  {Array.from({ length: 0 }).map((_, i) => (
+                    <div key={`e${i}`} />
+                  ))}
+                  {CALENDAR_DAYS.map(({ day, status }) => (
+                    <div
+                      key={day}
+                      className={cn(
+                        "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
+                        status === "booked" &&
+                          "bg-h_red/20 text-h_red border-h_red/30 border",
+                        status === "tentative" &&
+                          "border border-amber-500/30 bg-amber-500/20 text-amber-400",
+                        status === "available" &&
+                          "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
+                        status === "free" && "text-gray-600 hover:bg-white/5",
+                      )}
+                    >
+                      {day}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </section>
+
+            <Separator className="bg-white/8" />
+
             <ProfileVenues venues={VENUES} />
 
             <Separator className="bg-white/8" />
+
+            {/* ── MOBILE EVENTS ── */}
+            <div className="lg:hidden">
+              <ProfileEventsSidebar events={EVENTS} />
+            </div>
+
+            <div className="lg:hidden">
+              <Separator className="bg-white/8" />
+            </div>
 
             <ProfileReviews
               avgRating={DJ.avgRating}
@@ -840,57 +881,62 @@ export default function DjProfilePremium({
 
           {/* ── SIDEBAR ── */}
           <aside className="sticky top-28 flex h-fit flex-col gap-5">
-            {/* Priority Booking CTA */}
-            <Card className="to-h_blackLight/30 gap-0 overflow-hidden border-amber-500/25 bg-linear-to-b from-amber-500/8">
-              <div className="px-5 pt-5 pb-3">
-                <div className="mb-1 flex items-center gap-2">
-                  <Rocket className="h-3.5 w-3.5 text-amber-400" />
-                  <span className="text-xs font-semibold tracking-wider text-amber-400 uppercase">
-                    Priority Booking
-                  </span>
+            {/* Priority Booking CTA — desktop only; mobile version is inline above */}
+            <div className="hidden lg:block">
+              <Card className="to-h_blackLight/30 gap-0 overflow-hidden border-amber-500/25 bg-linear-to-b from-amber-500/8">
+                <div className="px-5 pt-5 pb-3">
+                  <div className="mb-1 flex items-center gap-2">
+                    <Rocket className="h-3.5 w-3.5 text-amber-400" />
+                    <span className="text-xs font-semibold tracking-wider text-amber-400 uppercase">
+                      Priority Booking
+                    </span>
+                  </div>
+                  <h3 className="mb-1 text-sm font-semibold text-white">
+                    Book {DJ.stageName}
+                  </h3>
+                  <div className="mb-4 flex items-center gap-2">
+                    <div className="size-2 animate-pulse rounded-full bg-emerald-400" />
+                    <span className="text-xs font-medium text-emerald-400">
+                      Responding within 2 hours
+                    </span>
+                  </div>
+                  <Button className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white">
+                    <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
+                    Book / Hire DJ
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full border-white/15 text-gray-300 hover:bg-white/5"
+                  >
+                    <Mail className="mr-1.5 h-3.5 w-3.5" />
+                    Send Inquiry
+                  </Button>
                 </div>
-                <h3 className="mb-1 text-sm font-semibold text-white">
-                  Book {DJ.stageName}
-                </h3>
-                <div className="mb-4 flex items-center gap-2">
-                  <div className="size-2 animate-pulse rounded-full bg-emerald-400" />
-                  <span className="text-xs font-medium text-emerald-400">
-                    Responding within 2 hours
-                  </span>
+                <div className="flex justify-between border-t border-white/5 px-5 py-3">
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-white">
+                      {DJ.responseRate}%
+                    </p>
+                    <p className="text-[11px] text-gray-500">Response Rate</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-white">
+                      {DJ.bookingSuccessRate}%
+                    </p>
+                    <p className="text-[11px] text-gray-500">Booking Rate</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-white">&lt;2h</p>
+                    <p className="text-[11px] text-gray-500">Reply Time</p>
+                  </div>
                 </div>
-                <Button className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white">
-                  <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
-                  Book / Hire DJ
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full border-white/15 text-gray-300 hover:bg-white/5"
-                >
-                  <Mail className="mr-1.5 h-3.5 w-3.5" />
-                  Send Inquiry
-                </Button>
-              </div>
-              <div className="flex justify-between border-t border-white/5 px-5 py-3">
-                <div className="text-center">
-                  <p className="text-sm font-bold text-white">
-                    {DJ.responseRate}%
-                  </p>
-                  <p className="text-[11px] text-gray-500">Response Rate</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-bold text-white">
-                    {DJ.bookingSuccessRate}%
-                  </p>
-                  <p className="text-[11px] text-gray-500">Booking Rate</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-bold text-white">&lt;2h</p>
-                  <p className="text-[11px] text-gray-500">Reply Time</p>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
 
-            <ProfileEventsSidebar events={EVENTS} />
+            {/* Events — desktop only; mobile version is inline above */}
+            <div className="hidden lg:block">
+              <ProfileEventsSidebar events={EVENTS} />
+            </div>
 
             <Separator className="bg-white/8" />
 
