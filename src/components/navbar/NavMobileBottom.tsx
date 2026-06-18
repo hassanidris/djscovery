@@ -57,12 +57,10 @@ export default function NavMobileBottom({
                 ? `/djs/${djSlug}`
                 : navRole === "dj"
                   ? "/become-dj"
-                  : username
-                    ? `/profile/${username}`
-                    : "/settings";
+                  : "/account";
             const isActive =
               pathname.startsWith("/djs/") ||
-              pathname.startsWith("/profile") ||
+              pathname.startsWith("/account") ||
               pathname === "/settings";
 
             return (

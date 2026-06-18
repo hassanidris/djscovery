@@ -19,7 +19,13 @@ export default async function AccountSettingsPage() {
   const [dbUser, countries] = await Promise.all([
     prisma.user.findUnique({
       where: { id: authUser.id },
-      select: { name: true, countryId: true, cityId: true },
+      select: {
+        name: true,
+        username: true,
+        image: true,
+        countryId: true,
+        cityId: true,
+      },
     }),
     getCountries(),
   ]);
@@ -32,7 +38,9 @@ export default async function AccountSettingsPage() {
     <div className="flex flex-col gap-10">
       <ProfileSettingsForm
         currentEmail={authUser.email ?? ""}
-        initialName={dbUser?.name ?? ""}
+        initialName={dbUser?.name ?? dbUser?.username ?? ""}
+        username={dbUser?.username ?? ""}
+        currentAvatar={dbUser?.image ?? null}
         initialCountryId={dbUser?.countryId ?? null}
         initialCityId={dbUser?.cityId ?? null}
         countries={countries}

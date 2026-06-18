@@ -193,7 +193,7 @@ export default function BurgerMenu({
                     Account
                   </p>
 
-                  {(username || djSlug || organizerSlug) &&
+                  {navRole !== "guest" &&
                     (() => {
                       const profileHref =
                         navRole === "dj" && djSlug
@@ -202,11 +202,11 @@ export default function BurgerMenu({
                             ? "/become-dj"
                             : isOrganizer && organizerSlug
                               ? `/organizers/${organizerSlug}`
-                              : `/profile/${username}`;
+                              : "/account";
                       const isProfileActive =
                         pathname.startsWith("/djs/") ||
                         pathname.startsWith("/organizers/") ||
-                        pathname.startsWith("/profile");
+                        pathname.startsWith("/account");
                       return (
                         <SheetClose asChild>
                           <Link

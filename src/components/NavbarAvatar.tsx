@@ -60,7 +60,7 @@ export default function NavbarAvatar({
           sideOffset={8}
           className="bg-h_blackLight w-52 border border-white/10 text-white"
         >
-          {(username || djSlug || organizerSlug) && (
+          {navRole !== "guest" && (
             <DropdownMenuItem
               asChild
               className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
@@ -73,7 +73,7 @@ export default function NavbarAvatar({
                       ? "/become-dj"
                       : isOrganizer && organizerSlug
                         ? `/organizers/${organizerSlug}`
-                        : `/profile/${username}`
+                        : "/account"
                 }
               >
                 My Profile

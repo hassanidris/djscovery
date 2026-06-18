@@ -55,6 +55,7 @@ const CommentsList = ({
         email: user.email ?? "",
         name: null,
         image: null,
+        imagePath: null,
         status: "ACTIVE",
         countryId: null,
         cityId: null,
