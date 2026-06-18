@@ -60,7 +60,13 @@ async function makeUniqueEventSlug(
 type AuthError = { error: string };
 type AuthSuccess = {
   user: { id: string };
-  djProfile: { id: number; slug: string; plan: string };
+  djProfile: {
+    id: number;
+    slug: string;
+    plan: string;
+    userId: string;
+    stageName: string;
+  };
 };
 
 async function getAuthUserAndDjProfile(): Promise<AuthError | AuthSuccess> {
@@ -72,7 +78,7 @@ async function getAuthUserAndDjProfile(): Promise<AuthError | AuthSuccess> {
 
   const djProfile = await prisma.djProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true, slug: true, plan: true },
+    select: { id: true, slug: true, plan: true, userId: true, stageName: true },
   });
   if (!djProfile) return { error: "DJ profile not found" };
 
@@ -355,6 +361,33 @@ export async function publishEvent(
     data: { status: "PUBLISHED" },
     select: { slug: true },
   });
+
+  // Fan-out DJ_NEW_EVENT notifications to all followers (non-blocking)
+  try {
+    const followers = await prisma.follower.findMany({
+      where: { followingId: djProfile.userId },
+      select: { followerId: true },
+    });
+
+    if (followers.length > 0) {
+      await prisma.notification.createMany({
+        data: followers.map((f) => ({
+          type: "DJ_NEW_EVENT" as const,
+          recipientId: f.followerId,
+          senderId: djProfile.userId,
+          data: {
+            eventId,
+            eventSlug: updated.slug,
+            djSlug: djProfile.slug,
+            djName: djProfile.stageName,
+          },
+        })),
+        skipDuplicates: true,
+      });
+    }
+  } catch {
+    // Notification failures must never block publish
+  }
 
   return { success: true, slug: updated.slug };
 }

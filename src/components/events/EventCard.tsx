@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import SaveEventButton from "@/components/events/SaveEventButton";
 
 // ── Type ──────────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ export type EventCardItem = {
   djName: string;
   djSlug: string | null;
   isDemo?: boolean;
+  eventId?: number;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -45,7 +47,13 @@ function formatDate(date: Date): string {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function EventCard({ event }: { event: EventCardItem }) {
+export function EventCard({
+  event,
+  isSaved = false,
+}: {
+  event: EventCardItem;
+  isSaved?: boolean;
+}) {
   const isPrivate = event.eventType === "PRIVATE";
   const categoryLabel = CATEGORY_LABELS[event.category] ?? event.category;
 
@@ -68,6 +76,13 @@ export function EventCard({ event }: { event: EventCardItem }) {
           {/* Gradient overlay */}
           <div className="from-h_redDark/40 absolute inset-0 bg-linear-to-br to-transparent" />
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+
+          {/* Save button — top right, DB events only */}
+          {event.eventId !== undefined && (
+            <div className="absolute top-2 right-2 z-10">
+              <SaveEventButton eventId={event.eventId} isSaved={isSaved} />
+            </div>
+          )}
 
           {/* Top badges */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">

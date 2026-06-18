@@ -110,6 +110,7 @@ enum NotificationType {
   GIG_APPLICATION_ACCEPTED
   GIG_APPLICATION_REJECTED
   GIG_APPLICATION_WITHDRAWN
+  DJ_NEW_EVENT
 }
 
 enum DjType {
@@ -214,6 +215,9 @@ model User {
   followers  Follower[] @relation("UserFollowers")
   followings Follower[] @relation("UserFollowings")
 
+  savedDjs    SavedDj[]
+  savedEvents SavedEvent[]
+
   @@index([status])
   @@index([deletedAt])
   @@index([countryId])
@@ -249,10 +253,10 @@ model DjProfile {
   bio            String?
   status         DjProfileStatus @default(PENDING_APPROVAL)
 
-  countryId Int?
-  country   Country? @relation(fields: [countryId], references: [id])
-  cityId    Int?
-  city      City?    @relation(fields: [cityId], references: [id])
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+  cityId    Int
+  city      City    @relation(fields: [cityId], references: [id])
 
   plan         DjPlan  @default(FREE)
   verified     Boolean @default(false)
@@ -277,6 +281,7 @@ model DjProfile {
   events          EventDj[]
   eventsOwned     Event[]          @relation("EventOwner")
   gigApplications GigApplication[]
+  savedBy         SavedDj[]
 
   @@index([slug])
   @@index([status])
@@ -309,10 +314,10 @@ model OrganizerProfile {
   contactEmail   String? // PRIVATE — never rendered publicly
   phone          String?
 
-  countryId Int?
-  country   Country? @relation(fields: [countryId], references: [id])
-  cityId    Int?
-  city      City?    @relation(fields: [cityId], references: [id])
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+  cityId    Int
+  city      City    @relation(fields: [cityId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -567,6 +572,7 @@ model Event {
 
   participants EventDj[]
   gallery      EventMedia[]
+  savedBy      SavedEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -594,13 +600,13 @@ model EventDj {
 
 // Gallery photos uploaded after event is COMPLETED
 model EventMedia {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   eventId   Int
-  event     Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event     Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   url       String // Supabase Storage public URL
   path      String // Supabase Storage path (for deletion)
   caption   String?
-  sortOrder Int      @default(0)
+  sortOrder Int     @default(0)
 
   createdAt DateTime @default(now())
 
@@ -712,6 +718,34 @@ model Follower {
   createdAt   DateTime @default(now())
 
   @@id([followerId, followingId])
+}
+
+// ------ SAVED DJs ------
+
+model SavedDj {
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@id([userId, djProfileId])
+  @@index([userId])
+  @@index([djProfileId])
+}
+
+// ------ SAVED EVENTS ------
+
+model SavedEvent {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, eventId])
+  @@index([userId])
+  @@index([eventId])
 }
 
 // ------ NOTIFICATIONS ------

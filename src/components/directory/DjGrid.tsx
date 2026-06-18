@@ -8,9 +8,11 @@ const PAGE_SIZE = 9;
 
 type DjGridProps = {
   djs: DjUser[];
+  savedDjIds?: number[];
 };
 
-const DjGrid = ({ djs }: DjGridProps) => {
+const DjGrid = ({ djs, savedDjIds = [] }: DjGridProps) => {
+  const savedSet = new Set(savedDjIds);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const DjGrid = ({ djs }: DjGridProps) => {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-gray-500">
         <p className="text-lg">No DJs found</p>
-        <p className="text-sm mt-1">Try adjusting your filters</p>
+        <p className="mt-1 text-sm">Try adjusting your filters</p>
       </div>
     );
   }
@@ -31,9 +33,15 @@ const DjGrid = ({ djs }: DjGridProps) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map((dj) => (
-          <DjCard key={dj.id} {...dj} />
+          <DjCard
+            key={dj.id}
+            {...dj}
+            isSaved={
+              dj.djProfileId !== undefined && savedSet.has(dj.djProfileId)
+            }
+          />
         ))}
       </div>
 
@@ -41,7 +49,7 @@ const DjGrid = ({ djs }: DjGridProps) => {
         <div className="flex justify-center pt-2 pb-4">
           <button
             onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-            className="px-8 py-2.5 rounded-full bg-h_blackLight/60 ring-1 ring-gray-700 text-gray-300 text-sm hover:ring-h_red hover:text-white transition-all cursor-pointer"
+            className="bg-h_blackLight/60 hover:ring-h_red cursor-pointer rounded-full px-8 py-2.5 text-sm text-gray-300 ring-1 ring-gray-700 transition-all hover:text-white"
           >
             Load more ({djs.length - visibleCount} remaining)
           </button>

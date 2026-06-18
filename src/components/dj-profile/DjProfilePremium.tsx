@@ -56,6 +56,8 @@ import {
   SectionHeading,
   formatPlays,
 } from "@/components/dj-profile/dj-profile-shared";
+import SaveDjButton from "@/components/dj-profile/SaveDjButton";
+import FollowDjButton from "@/components/dj-profile/FollowDjButton";
 import {
   PREMIUM_DEFAULT_DJ,
   PREMIUM_DEFAULT_EVENTS,
@@ -113,10 +115,17 @@ function StatPill({
 export default function DjProfilePremium({
   djData,
   viewMode = "fan",
+  isSaved = false,
+  djUserId,
+  isFollowing = false,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
+  isSaved?: boolean;
+  djUserId?: string;
+  isFollowing?: boolean;
 } = {}) {
+  const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
   const [mediaTab, setMediaTab] = useState<"photos" | "videos" | "mixes">(
     "photos",
@@ -217,13 +226,20 @@ export default function DjProfilePremium({
                 <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
                 Book DJ
               </Button>
-              <Button
-                variant="outline"
-                className="border-white/20 text-gray-300 hover:bg-white/5"
-              >
-                <UserPlus className="mr-1.5 h-3.5 w-3.5" />
-                Follow
-              </Button>
+              {viewMode === "fan" && djUserId ? (
+                <FollowDjButton djUserId={djUserId} isFollowing={isFollowing} />
+              ) : viewMode === "fan" ? (
+                <Button
+                  variant="outline"
+                  className="border-white/20 text-gray-300 hover:bg-white/5"
+                >
+                  <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                  Follow
+                </Button>
+              ) : null}
+              {viewMode === "fan" && !isNaN(djProfileId) && (
+                <SaveDjButton djProfileId={djProfileId} isSaved={isSaved} />
+              )}
               <Button
                 variant="ghost"
                 size="icon"

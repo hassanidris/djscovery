@@ -1,25 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-
-export async function updateEmail(
-  formData: FormData,
-): Promise<{ error?: string; success?: boolean }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated." };
-
-  const email = (formData.get("email") as string | null)?.trim();
-  if (!email) return { error: "Email is required." };
-  if (email === user.email)
-    return { error: "This is already your current email." };
-
-  const { error } = await supabase.auth.updateUser({ email });
-  if (error) return { error: error.message };
-  return { success: true };
-}
+import prisma from "@/lib/client";
+import { revalidatePath } from "next/cache";
 
 export async function updatePassword(
   formData: FormData,
@@ -39,5 +22,37 @@ export async function updatePassword(
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function updateUserProfile(input: {
+  name?: string;
+  countryId?: number;
+  cityId?: number;
+}): Promise<{ error?: string; success?: boolean }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  const { name, countryId, cityId } = input;
+
+  if (name !== undefined && name.trim().length === 0) {
+    return { error: "Display name cannot be empty." };
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      ...(name !== undefined && { name: name.trim() }),
+      ...(countryId !== undefined && { countryId }),
+      ...(cityId !== undefined && { cityId }),
+      ...(countryId !== undefined && cityId === undefined && { cityId: null }),
+    },
+  });
+
+  revalidatePath("/account");
+  revalidatePath("/account/settings");
   return { success: true };
 }

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { CircleCheck } from "lucide-react";
 import { DjUser } from "@/lib/data";
+import SaveDjButton from "@/components/dj-profile/SaveDjButton";
 import { formatNumber } from "@/lib/utils/currency";
 
 const DjCard = ({
@@ -18,7 +19,9 @@ const DjCard = ({
   isFeatured,
   verified,
   _count,
-}: DjUser) => {
+  djProfileId,
+  isSaved = false,
+}: DjUser & { isSaved?: boolean }) => {
   const profileHref = slug ? `/djs/${slug}` : `/profile/${username}`;
   const genreList = genres
     ? genres
@@ -36,6 +39,11 @@ const DjCard = ({
 
   return (
     <div className="bg-h_blackLight/50 hover:ring-h_red hover:shadow-h_red/5 group relative flex flex-col gap-3 rounded-xl p-4 transition-all duration-200 hover:scale-[1.015] hover:shadow-lg hover:ring-1">
+      {djProfileId !== undefined && (
+        <div className="absolute top-3 right-3 z-10">
+          <SaveDjButton djProfileId={djProfileId} isSaved={isSaved} compact />
+        </div>
+      )}
       <Link
         href={profileHref}
         className="focus-visible:ring-h_red flex items-center gap-3 outline-none focus-visible:rounded-lg focus-visible:ring-2"
