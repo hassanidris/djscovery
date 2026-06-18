@@ -94,7 +94,15 @@ export default function NavbarAvatar({
             asChild
             className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
           >
-            <Link href="/settings/account">Settings</Link>
+            <Link
+              href={
+                navRole === "dj" || navRole === "admin"
+                  ? "/settings/account"
+                  : "/account/settings"
+              }
+            >
+              Settings
+            </Link>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="bg-white/10" />

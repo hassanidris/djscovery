@@ -3,13 +3,36 @@
 import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Lock, Loader2, User, MapPin, Camera } from "lucide-react";
+import {
+  Lock,
+  Loader2,
+  User,
+  MapPin,
+  Camera,
+  KeyRound,
+  AlertTriangle,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { updateUserProfile, uploadUserAvatar } from "@/lib/actions/account";
+import {
+  updateUserProfile,
+  uploadUserAvatar,
+  updatePassword,
+} from "@/lib/actions/account";
 import { getCitiesForCountry } from "@/lib/actions/locations";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type CountryOption = { id: number; name: string };
 type CityOption = { id: number; name: string };
@@ -43,6 +66,9 @@ export default function ProfileSettingsForm({
   const [cities, setCities] = useState<CityOption[]>(initialCities);
   const [isPending, startTransition] = useTransition();
   const [isUploading, startUpload] = useTransition();
+  const [pwPending, startPwTransition] = useTransition();
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const initials = (name || username).slice(0, 2).toUpperCase();
@@ -290,6 +316,121 @@ export default function ProfileSettingsForm({
           {isPending ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+
+      <Separator className="bg-white/8" />
+
+      {/* Password */}
+      <section className="flex flex-col gap-5">
+        <div>
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
+            <KeyRound className="h-4 w-4" />
+            Password
+          </h2>
+          <p className="mt-0.5 text-xs text-gray-500">
+            Change your password. Must be at least 8 characters.
+          </p>
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="password">New Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 8 characters"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="confirm">Confirm New Password</Label>
+            <Input
+              id="confirm"
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Repeat new password"
+            />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            disabled={pwPending || !password || !confirm}
+            onClick={() => {
+              startPwTransition(async () => {
+                const fd = new FormData();
+                fd.append("password", password);
+                fd.append("confirm", confirm);
+                const result = await updatePassword(fd);
+                if (result.error) {
+                  toast.error(result.error);
+                } else {
+                  toast.success("Password updated.");
+                  setPassword("");
+                  setConfirm("");
+                }
+              });
+            }}
+          >
+            {pwPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {pwPending ? "Saving..." : "Update Password"}
+          </Button>
+        </div>
+      </section>
+
+      <Separator className="bg-white/8" />
+
+      {/* Danger Zone */}
+      <section className="flex flex-col gap-5">
+        <div>
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-red-400">
+            <AlertTriangle className="h-4 w-4" />
+            Danger Zone
+          </h2>
+          <p className="mt-0.5 text-xs text-gray-500">
+            These actions are permanent and cannot be undone.
+          </p>
+        </div>
+        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-white">Delete Account</p>
+              <p className="mt-0.5 text-xs text-gray-500">
+                Permanently delete your account and all associated data.
+              </p>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" type="button">
+                  Delete Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete your DJscovery account,
+                    profile, and all your data. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() =>
+                      toast.info(
+                        "Account deletion coming soon. Please contact support.",
+                      )
+                    }
+                  >
+                    Delete Account
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

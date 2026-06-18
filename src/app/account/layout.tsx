@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/client";
 import { getNavUser } from "@/lib/auth/getNavUser";
 import AccountTabs from "@/components/account/AccountTabs";
 
@@ -16,9 +18,28 @@ export default async function AccountLayout({
   const { isLoggedIn, displayName, avatarSrc, initials } = await getNavUser();
   if (!isLoggedIn) redirect("/sign-in");
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const dbUser = user
+    ? await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          city: { select: { name: true } },
+          country: { select: { name: true } },
+        },
+      })
+    : null;
+
+  const location = [dbUser?.city?.name, dbUser?.country?.name]
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-3xl px-4 pb-24 pt-10 md:px-8">
+      <div className="mx-auto max-w-3xl px-4 pt-10 pb-24 md:px-8">
         <div className="mb-8 flex items-center gap-4">
           <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-white/10">
             {avatarSrc ? (
@@ -36,7 +57,9 @@ export default async function AccountLayout({
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">{displayName}</h1>
-            <p className="mt-0.5 text-sm text-gray-400">Your account</p>
+            <p className="mt-0.5 text-sm text-gray-400">
+              {location || "Your account"}
+            </p>
           </div>
         </div>
 

@@ -297,15 +297,23 @@ export default function BurgerMenu({
 
                   <SheetClose asChild>
                     <Link
-                      href="/settings/account"
+                      href={
+                        navRole === "dj" || navRole === "admin"
+                          ? "/settings/account"
+                          : "/account/settings"
+                      }
                       className={cn(
                         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                        pathname.startsWith("/settings")
+                        pathname.startsWith("/settings") ||
+                          pathname.startsWith("/account/settings")
                           ? "bg-white/5 text-white"
                           : "text-gray-400 hover:bg-white/5 hover:text-white",
                       )}
                       aria-current={
-                        pathname.startsWith("/settings") ? "page" : undefined
+                        pathname.startsWith("/settings") ||
+                        pathname.startsWith("/account/settings")
+                          ? "page"
+                          : undefined
                       }
                     >
                       <Settings
