@@ -90,7 +90,7 @@ const DjProfileInputSchema = z.object({
   avatarUrl: z.string().url().optional(),
   coverImageUrl: z.string().url().optional(),
   countryId: z.number().int().positive({ message: "Country is required" }),
-  cityId: z.number().int().positive().optional(),
+  cityId: z.number().int().positive(),
   genreIds: z
     .array(z.number().int().positive())
     .min(1, "Select at least one genre"),
@@ -124,8 +124,8 @@ const UpdateDjProfileSchema = z.object({
   bio: z.string().max(800).optional().nullable(),
   avatarUrl: z.string().url().optional().nullable(),
   coverImageUrl: z.string().url().optional().nullable(),
-  countryId: z.number().int().positive().optional().nullable(),
-  cityId: z.number().int().positive().optional().nullable(),
+  countryId: z.number().int().positive().optional(),
+  cityId: z.number().int().positive().optional(),
   genreNames: z.array(z.string().min(1).max(50)).max(12).optional(),
   socialLinks: z
     .array(
@@ -182,16 +182,14 @@ export async function createDjProfile(
     feeCurrency,
   } = parsed.data;
 
-  if (cityId) {
-    const city = await prisma.city.findFirst({
-      where: { id: cityId, countryId },
-      select: { id: true },
-    });
-    if (!city) {
-      return {
-        error: "The selected city does not belong to the selected country.",
-      };
-    }
+  const city = await prisma.city.findFirst({
+    where: { id: cityId, countryId },
+    select: { id: true },
+  });
+  if (!city) {
+    return {
+      error: "The selected city does not belong to the selected country.",
+    };
   }
 
   const slug = await makeUniqueSlug(stageName, user.id);
@@ -202,8 +200,8 @@ export async function createDjProfile(
       bio: bio ?? null,
       avatar: avatarUrl ?? null,
       coverImage: coverImageUrl ?? null,
-      countryId: countryId ?? null,
-      cityId: cityId ?? null,
+      countryId: countryId,
+      cityId: cityId,
       bookingEmail: bookingEmail ?? null,
       bookingPhone: bookingPhone ?? null,
       feeMin: feeMin ?? null,
@@ -425,8 +423,8 @@ const UpdateOrganizerSchema = z.object({
     .nullable(),
   logoUrl: z.string().url().optional().nullable(),
   coverImageUrl: z.string().url().optional().nullable(),
-  countryId: z.number().int().positive().optional().nullable(),
-  cityId: z.number().int().positive().optional().nullable(),
+  countryId: z.number().int().positive().optional(),
+  cityId: z.number().int().positive().optional(),
   socialLinks: z
     .array(
       z.object({
@@ -456,6 +454,15 @@ export async function createOrganizerProfile(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Not authenticated" };
+
+  const rawCountryId = parseInt(formData.get("countryId") as string, 10);
+  const rawCityId = parseInt(formData.get("cityId") as string, 10);
+  const countryId = isNaN(rawCountryId) ? undefined : rawCountryId;
+  const cityId = isNaN(rawCityId) ? undefined : rawCityId;
+
+  if (!countryId || !cityId) {
+    return { success: false, error: "Country and city are required." };
+  }
 
   const parsed = CreateOrganizerSchema.safeParse({
     displayName: formData.get("displayName"),
@@ -496,6 +503,8 @@ export async function createOrganizerProfile(
           slug,
           organizerType: parsed.data.organizerType,
           status: "ACTIVE",
+          countryId,
+          cityId,
         },
       });
 
@@ -594,11 +603,7 @@ export async function updateOrganizerProfile(
             coverImageUrl: data.coverImageUrl,
           }),
           ...(data.countryId !== undefined && { countryId: data.countryId }),
-          ...(data.cityId !== undefined
-            ? { cityId: data.cityId }
-            : data.countryId !== undefined
-              ? { cityId: null }
-              : {}),
+          ...(data.cityId !== undefined && { cityId: data.cityId }),
         },
       });
 

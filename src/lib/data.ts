@@ -276,6 +276,7 @@ export type DjUser = {
   verified?: boolean;
   djTypes?: string[];
   _count?: { followers: number };
+  djProfileId?: number;
 };
 
 const _DEMO_DJ_TYPES: string[][] = [

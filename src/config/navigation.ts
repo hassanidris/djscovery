@@ -43,8 +43,8 @@ const events: NavItem = {
 
 const profile: NavItem = {
   id: "profile",
-  label: "Profile",
-  href: "/profile",
+  label: "Account",
+  href: "/account",
   icon: User,
 };
 
@@ -123,9 +123,10 @@ export function getFooterProfessionalLinks(opts: {
 
   if (navRole === "fan") {
     return [
+      { label: "My Account", href: "/account" },
+      { label: "Saved DJs", href: "/account/saved-djs" },
       { label: "Become a DJ", href: "/become-dj" },
       { label: "Become an Organizer", href: "/become-organizer" },
-      { label: "Browse DJ Directory", href: "/directory" },
     ];
   }
 

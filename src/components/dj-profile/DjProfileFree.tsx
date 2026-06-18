@@ -38,6 +38,8 @@ import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
+import SaveDjButton from "@/components/dj-profile/SaveDjButton";
+import FollowDjButton from "@/components/dj-profile/FollowDjButton";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import ProfileVenues from "@/components/dj-profile/ProfileVenues";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
@@ -97,10 +99,17 @@ function EmptySectionState({
 export default function DjProfileFree({
   djData,
   viewMode = "fan",
+  isSaved = false,
+  djUserId,
+  isFollowing = false,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
+  isSaved?: boolean;
+  djUserId?: string;
+  isFollowing?: boolean;
 } = {}) {
+  const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
 
   const DJ = djData ? mapFreeDjToProps(djData) : FREE_DEFAULT_DJ;
@@ -202,13 +211,23 @@ export default function DjProfileFree({
                       Book DJ
                     </a>
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="border-white/20 text-gray-300 hover:bg-white/5"
-                  >
-                    <UserPlus className="mr-1.5 h-3.5 w-3.5" />
-                    Follow
-                  </Button>
+                  {viewMode === "fan" && djUserId ? (
+                    <FollowDjButton
+                      djUserId={djUserId}
+                      isFollowing={isFollowing}
+                    />
+                  ) : viewMode === "fan" ? (
+                    <Button
+                      variant="outline"
+                      className="border-white/20 text-gray-300 hover:bg-white/5"
+                    >
+                      <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                      Follow
+                    </Button>
+                  ) : null}
+                  {viewMode === "fan" && !isNaN(djProfileId) && (
+                    <SaveDjButton djProfileId={djProfileId} isSaved={isSaved} />
+                  )}
                 </>
               )}
               <Button

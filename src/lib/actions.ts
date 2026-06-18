@@ -21,6 +21,24 @@ async function getCurrentUserId(): Promise<string> {
 // FOLLOW
 // -------------------------------------------------------
 
+export const isFollowing = async (targetUserId: string): Promise<boolean> => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const existing = await prisma.follower.findUnique({
+    where: {
+      followerId_followingId: {
+        followerId: user.id,
+        followingId: targetUserId,
+      },
+    },
+  });
+  return !!existing;
+};
+
 export const switchFollow = async (targetUserId: string) => {
   const currentUserId = await getCurrentUserId();
 

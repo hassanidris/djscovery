@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Loader2, Mail, KeyRound, AlertTriangle } from "lucide-react";
+import { Loader2, Mail, KeyRound, AlertTriangle, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -18,31 +18,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { updateEmail, updatePassword } from "@/lib/actions/account";
+import { updatePassword } from "@/lib/actions/account";
 
 interface Props {
   currentEmail: string;
 }
 
 export default function AccountSettingsForm({ currentEmail }: Props) {
-  const [email, setEmail] = useState(currentEmail);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [emailPending, startEmailTransition] = useTransition();
   const [pwPending, startPwTransition] = useTransition();
-
-  function handleEmailSave() {
-    startEmailTransition(async () => {
-      const fd = new FormData();
-      fd.append("email", email);
-      const result = await updateEmail(fd);
-      if ("error" in result && result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Confirmation email sent to your new address.");
-      }
-    });
-  }
 
   function handlePasswordSave() {
     startPwTransition(async () => {
@@ -62,36 +47,20 @@ export default function AccountSettingsForm({ currentEmail }: Props) {
 
   return (
     <div className="flex flex-col gap-10">
-      {/* Email */}
-      <section className="flex flex-col gap-5">
+      {/* Email — read-only */}
+      <section className="flex flex-col gap-4">
         <div>
           <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
             <Mail className="h-4 w-4" />
             Email Address
           </h2>
           <p className="text-muted-foreground mt-0.5 text-xs">
-            A confirmation email will be sent to verify the change.
+            Your login email cannot be changed.
           </p>
         </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            maxLength={200}
-          />
-        </div>
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            onClick={handleEmailSave}
-            disabled={emailPending || email === currentEmail || !email.trim()}
-          >
-            {emailPending && <Loader2 className="h-4 w-4 animate-spin" />}
-            {emailPending ? "Saving..." : "Update Email"}
-          </Button>
+        <div className="flex items-center gap-2 rounded-lg border border-white/8 bg-white/3 px-3 py-2.5">
+          <Lock className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+          <span className="text-sm text-gray-300">{currentEmail}</span>
         </div>
       </section>
 
@@ -173,8 +142,8 @@ export default function AccountSettingsForm({ currentEmail }: Props) {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete your DJscovery account, profile,
-                    and all your data. This action cannot be undone.
+                    This will permanently delete your DJscovery account,
+                    profile, and all your data. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
