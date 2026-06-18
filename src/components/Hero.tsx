@@ -73,7 +73,7 @@ const Hero = async () => {
                     variant="outline"
                     className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
                   >
-                    <Link href="/gigs">Browse Gigs</Link>
+                    <Link href="/dashboard/dj/gigs">Browse Gigs</Link>
                   </Button>
                 </>
               ) : userRole?.role === "ORGANIZER" ? (
