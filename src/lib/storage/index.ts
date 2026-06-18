@@ -127,6 +127,10 @@ export function buildOrganizerCoverPath(userId: string, file: File): string {
   return `organizers/${userId}/cover/cover-${crypto.randomUUID()}.${fileExt(file)}`;
 }
 
+export function buildUserAvatarPath(userId: string, file: File): string {
+  return `users/${userId}/avatar/avatar-${crypto.randomUUID()}.${fileExt(file)}`;
+}
+
 export function buildEventPosterPath(eventId: string, file: File): string {
   return `events/${eventId}/poster/poster-${crypto.randomUUID()}.${fileExt(file)}`;
 }

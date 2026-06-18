@@ -40,6 +40,7 @@ export async function middleware(request: NextRequest) {
     "/organizer",
     "/settings",
     "/profile/edit",
+    "/account",
   ];
   const isProtected = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path),

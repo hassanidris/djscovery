@@ -4,6 +4,8 @@ import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
+import { isSavedDj } from "@/lib/actions/saves";
+import { isFollowing } from "@/lib/actions";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 
@@ -114,6 +116,10 @@ export default async function DjProfilePage({
       : 0;
 
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
+  const [savedDj, followingDj] =
+    viewMode === "fan"
+      ? await Promise.all([isSavedDj(dj.id), isFollowing(dj.userId)])
+      : [false, false];
 
   const djPlan = dj.plan;
   const djVerified = dj.verified;
@@ -248,9 +254,21 @@ export default async function DjProfilePage({
         </div>
       )}
       {isPremium ? (
-        <DjProfilePremium djData={djDemoData} viewMode={viewMode} />
+        <DjProfilePremium
+          djData={djDemoData}
+          viewMode={viewMode}
+          isSaved={savedDj}
+          djUserId={dj.userId}
+          isFollowing={followingDj}
+        />
       ) : (
-        <DjProfileFree djData={djDemoData} viewMode={viewMode} />
+        <DjProfileFree
+          djData={djDemoData}
+          viewMode={viewMode}
+          isSaved={savedDj}
+          djUserId={dj.userId}
+          isFollowing={followingDj}
+        />
       )}
     </div>
   );

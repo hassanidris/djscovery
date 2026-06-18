@@ -21,8 +21,33 @@ async function getCurrentUserId(): Promise<string> {
 // FOLLOW
 // -------------------------------------------------------
 
-export const switchFollow = async (targetUserId: string) => {
-  const currentUserId = await getCurrentUserId();
+export const isFollowing = async (targetUserId: string): Promise<boolean> => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const existing = await prisma.follower.findUnique({
+    where: {
+      followerId_followingId: {
+        followerId: user.id,
+        followingId: targetUserId,
+      },
+    },
+  });
+  return !!existing;
+};
+
+export const switchFollow = async (
+  targetUserId: string,
+): Promise<{ errorCode: "UNAUTHENTICATED" | "UNKNOWN" } | undefined> => {
+  let currentUserId: string;
+  try {
+    currentUserId = await getCurrentUserId();
+  } catch {
+    return { errorCode: "UNAUTHENTICATED" };
+  }
 
   try {
     const existingFollow = await prisma.follower.findUnique({
@@ -52,8 +77,8 @@ export const switchFollow = async (targetUserId: string) => {
       });
     }
   } catch (err) {
-    console.log(err);
-    throw new Error("Something went wrong!");
+    console.error(err);
+    return { errorCode: "UNKNOWN" };
   }
 };
 

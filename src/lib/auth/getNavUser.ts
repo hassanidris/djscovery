@@ -39,6 +39,8 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
     where: { id: user.id },
     select: {
       username: true,
+      name: true,
+      image: true,
       roles: { select: { role: true } },
       djProfile: { select: { avatar: true, stageName: true, slug: true } },
       organizerProfile: {
@@ -62,11 +64,15 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
   const displayName =
     profile?.djProfile?.stageName ??
     profile?.organizerProfile?.displayName ??
+    profile?.name ??
     profile?.username ??
     user.email ??
     "?";
   const avatarSrc =
-    profile?.djProfile?.avatar ?? profile?.organizerProfile?.logoUrl ?? null;
+    profile?.djProfile?.avatar ??
+    profile?.organizerProfile?.logoUrl ??
+    profile?.image ??
+    null;
   const initials = displayName.slice(0, 2).toUpperCase();
 
   const orgProfile = profile?.organizerProfile;

@@ -3,6 +3,7 @@ import { Music2, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import prisma from "@/lib/client";
 import { getDemoEvents } from "@/data/events-demo";
+import { getSavedEventIds } from "@/lib/actions/saves";
 import type { EventCardItem } from "@/components/events/EventCard";
 import { EventGrid } from "@/components/events/EventGrid";
 
@@ -43,6 +44,7 @@ export default async function EventsPage({
     orderBy: { startDate: activeTab === "upcoming" ? "asc" : "desc" },
     take: 60,
     select: {
+      id: true,
       slug: true,
       title: true,
       eventType: true,
@@ -56,6 +58,7 @@ export default async function EventsPage({
   });
 
   const toCard = (e: (typeof dbEvents)[number]): EventCardItem => ({
+    eventId: e.id,
     slug: e.slug,
     title: e.title,
     eventType: e.eventType,
@@ -67,6 +70,7 @@ export default async function EventsPage({
     djSlug: e.ownerDj.slug,
   });
 
+  const savedEventIds = await getSavedEventIds();
   let events: EventCardItem[] = dbEvents.map(toCard);
 
   // ── Staging: merge demo events ─────────────────────────────────────────────
@@ -167,7 +171,9 @@ export default async function EventsPage({
         )}
 
         {/* Grid with load-more */}
-        {events.length > 0 && <EventGrid events={events} />}
+        {events.length > 0 && (
+          <EventGrid events={events} savedEventIds={savedEventIds} />
+        )}
       </div>
     </div>
   );
