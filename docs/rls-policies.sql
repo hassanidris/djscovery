@@ -46,6 +46,8 @@ ALTER TABLE "OrganizerSocialLink"     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "EventMedia"              ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Gig"                     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "GigApplication"          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "SavedDj"                 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "SavedEvent"              ENABLE ROW LEVEL SECURITY;
 
 
 -- ============================================================
@@ -692,3 +694,62 @@ CREATE POLICY "Event owner can delete gallery image"
         AND dp."userId" = auth.uid()::text
     )
   );
+
+
+-- ── Fan avatar uploads — users/{userId}/avatar/ ───────────────────────────────
+
+CREATE POLICY "User can upload own avatar"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'users'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+CREATE POLICY "User can update own avatar"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'users'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+CREATE POLICY "User can delete own avatar"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'djscovery-media'
+    AND (storage.foldername(name))[1] = 'users'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+
+-- ============================================================
+-- STEP 10: SavedDj + SavedEvent — owner only
+-- ============================================================
+
+CREATE POLICY "User can read own saved DJs"
+  ON "SavedDj" FOR SELECT
+  USING (auth.uid()::text = "userId");
+
+CREATE POLICY "User can save a DJ"
+  ON "SavedDj" FOR INSERT
+  WITH CHECK (auth.uid()::text = "userId");
+
+CREATE POLICY "User can unsave a DJ"
+  ON "SavedDj" FOR DELETE
+  USING (auth.uid()::text = "userId");
+
+CREATE POLICY "User can read own saved events"
+  ON "SavedEvent" FOR SELECT
+  USING (auth.uid()::text = "userId");
+
+CREATE POLICY "User can save an event"
+  ON "SavedEvent" FOR INSERT
+  WITH CHECK (auth.uid()::text = "userId");
+
+CREATE POLICY "User can unsave an event"
+  ON "SavedEvent" FOR DELETE
+  USING (auth.uid()::text = "userId");
