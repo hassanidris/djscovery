@@ -40,17 +40,11 @@ export default function NavDesktop({
         className="focus-visible:ring-h_red shrink-0 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
       >
         <div className="flex items-center gap-1.5 py-1">
-          <Image
-            src="/dj-logo-red.svg"
-            alt=""
-            width={30}
-            height={34}
-            priority
-          />
-          <span className="font-heading text-2xl leading-none tracking-tight text-white">
+          <Image src="/logo_v2.svg" alt="" width={130} height={70} priority />
+          {/* <span className="font-heading text-2xl leading-none tracking-tight text-white">
             <span className="font-bold">DJ</span>
             <span className="font-semibold">scovery</span>
-          </span>
+          </span> */}
         </div>
       </Link>
 

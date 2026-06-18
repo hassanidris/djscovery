@@ -23,17 +23,11 @@ export default function NavMobileTop(props: NavUserData) {
         className="focus-visible:ring-h_red absolute left-1/2 -translate-x-1/2 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
       >
         <div className="flex items-center gap-2 py-1">
-          <Image
-            src="/dj-logo-red.svg"
-            alt=""
-            width={26}
-            height={30}
-            priority
-          />
-          <span className="font-heading text-xl leading-none tracking-tight text-white">
+          <Image src="/logo_v2.svg" alt="" width={130} height={70} priority />
+          {/* <span className="font-heading text-xl leading-none tracking-tight text-white">
             <span className="font-bold">DJ</span>
             <span className="font-semibold">scovery</span>
-          </span>
+          </span> */}
         </div>
       </Link>
 

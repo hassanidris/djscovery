@@ -74,16 +74,11 @@ export default function BurgerMenu({
               <SheetClose asChild>
                 <Link href="/" aria-label="DJscovery home">
                   <div className="flex items-center gap-2 py-1">
-                    <Image
-                      src="/dj-logo-red.svg"
-                      alt=""
-                      width={26}
-                      height={30}
-                    />
-                    <span className="font-heading text-xl leading-none tracking-tight text-white">
+                    <Image src="/logo_v2.svg" alt="" width={150} height={70} />
+                    {/* <span className="font-heading text-xl leading-none tracking-tight text-white">
                       <span className="font-bold">DJ</span>
                       <span className="font-semibold">covery</span>
-                    </span>
+                    </span> */}
                   </div>
                 </Link>
               </SheetClose>

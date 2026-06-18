@@ -91,16 +91,16 @@ const Footer = async () => {
               >
                 <div className="flex flex-col items-start gap-1.5 py-1">
                   <Image
-                    src="/dj-logo-red.svg"
+                    src="/logo_v2.svg"
                     alt=""
-                    width={90}
+                    width={200}
                     height={76}
                     priority
                   />
-                  <span className="font-heading mt-2 text-2xl leading-none tracking-tight text-white">
+                  {/* <span className="font-heading mt-2 text-2xl leading-none tracking-tight text-white">
                     <span className="font-bold">DJ</span>
                     <span className="font-semibold">covery</span>
-                  </span>
+                  </span> */}
                   <span className="mt-3 text-base font-thin text-[#A1A1AA]">
                     The Professional Network for DJs
                   </span>
