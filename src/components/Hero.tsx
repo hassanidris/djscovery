@@ -18,8 +18,8 @@ const Hero = async () => {
       })
     : null;
 
-  const djHref = user ? "/become-dj" : "/sign-up?role=dj";
-  const organizerHref = user ? "/become-organizer" : "/sign-up?role=organizer";
+  // const djHref = user ? "/become-dj" : "/sign-up?role=dj";
+  // const organizerHref = user ? "/become-organizer" : "/sign-up?role=organizer";
   return (
     <>
       <section className="relative h-[60vh] w-full bg-zinc-800 md:h-[50vh] lg:h-[55vh]">
@@ -46,7 +46,7 @@ const Hero = async () => {
         <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70"></div>
         <div className="absolute top-0 left-0 z-10 flex h-full w-full items-center">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-start px-4 text-white md:px-8">
-            <h1 className="max-w-xl text-2xl font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-3xl md:max-w-2xl md:text-4xl lg:max-w-3xl lg:text-5xl xl:text-6xl">
+            <h1 className="max-w-xl text-2xl leading-9 font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-3xl md:max-w-2xl md:text-4xl md:leading-16 lg:max-w-3xl lg:text-5xl xl:text-6xl">
               Get Discovered. <br />
               Get Booked.
               <br />
@@ -66,14 +66,14 @@ const Hero = async () => {
                     asChild
                     className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
                   >
-                    <Link href="/dj/dashboard">My DJ Dashboard</Link>
+                    <Link href="/dj/dashboard">Complete Your Profile</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
                     className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
                   >
-                    <Link href="/directory">Browse Open Gigs</Link>
+                    <Link href="/gigs">Browse Gigs</Link>
                   </Button>
                 </>
               ) : userRole?.role === "ORGANIZER" ? (
@@ -92,20 +92,38 @@ const Hero = async () => {
                     <Link href="/directory">Find DJs</Link>
                   </Button>
                 </>
-              ) : (
+              ) : !user ? (
                 <>
                   <Button
                     asChild
                     className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
                   >
-                    <Link href={djHref}>Join as DJ</Link>
+                    <Link href="/directory">Explore DJs</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
                     className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
                   >
-                    <Link href={organizerHref}>Join as Organizer</Link>
+                    <Link href="/events">Explore Events</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    asChild
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
+                  >
+                    <Link href="/directory">Discover DJs</Link>
+                    {/* <Link href={djHref}>Join as DJ</Link> */}
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
+                  >
+                    <Link href="/events">Upcoming Events</Link>
+                    {/* <Link href={organizerHref}>Join as Organizer</Link> */}
                   </Button>
                 </>
               )}
