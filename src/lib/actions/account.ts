@@ -82,8 +82,8 @@ export async function uploadUserAvatar(
 
 export async function updateUserProfile(input: {
   name?: string;
-  countryId?: number;
-  cityId?: number;
+  countryId?: number | null;
+  cityId?: number | null;
 }): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient();
   const {
@@ -97,13 +97,39 @@ export async function updateUserProfile(input: {
     return { error: "Display name cannot be empty." };
   }
 
+  if ("cityId" in input && cityId !== null) {
+    let effectiveCountryId: number | null | undefined =
+      "countryId" in input ? countryId : undefined;
+
+    if (effectiveCountryId === undefined) {
+      const existing = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { countryId: true },
+      });
+      effectiveCountryId = existing?.countryId ?? null;
+    }
+
+    if (!effectiveCountryId) {
+      return { error: "Please select a country before setting a city." };
+    }
+
+    const city = await prisma.city.findFirst({
+      where: { id: cityId, countryId: effectiveCountryId },
+      select: { id: true },
+    });
+    if (!city) {
+      return {
+        error: "The selected city does not belong to the chosen country.",
+      };
+    }
+  }
+
   await prisma.user.update({
     where: { id: user.id },
     data: {
       ...(name !== undefined && { name: name.trim() }),
-      ...(countryId !== undefined && { countryId }),
-      ...(cityId !== undefined && { cityId }),
-      ...(countryId !== undefined && cityId === undefined && { cityId: null }),
+      ...("countryId" in input && { countryId }),
+      ...("cityId" in input && { cityId }),
     },
   });
 

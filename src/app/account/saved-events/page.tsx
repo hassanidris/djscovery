@@ -83,11 +83,14 @@ export default async function SavedEventsPage() {
               </div>
             </Link>
 
-            <Link href={`/events/${event.slug}`} className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="truncate text-sm font-semibold text-white">
+                <Link
+                  href={`/events/${event.slug}`}
+                  className="truncate text-sm font-semibold text-white hover:underline"
+                >
                   {event.title}
-                </span>
+                </Link>
                 {badge && (
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${badge.className}`}
@@ -117,13 +120,12 @@ export default async function SavedEventsPage() {
                   <Link
                     href={`/djs/${event.ownerDj.slug}`}
                     className="text-gray-400 hover:text-white"
-                    onClick={(e) => e.stopPropagation()}
                   >
                     {event.ownerDj.stageName}
                   </Link>
                 </p>
               )}
-            </Link>
+            </div>
 
             <RemoveSavedEventButton eventId={event.id} />
           </div>

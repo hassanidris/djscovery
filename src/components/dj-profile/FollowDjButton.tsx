@@ -2,6 +2,7 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { UserPlus, UserCheck } from "lucide-react";
 import { switchFollow } from "@/lib/actions";
 
@@ -24,12 +25,15 @@ export default function FollowDjButton({
   const handleClick = () => {
     startTransition(async () => {
       toggleOptimistic(null);
-      try {
-        await switchFollow(djUserId);
-        setFollowing((prev) => !prev);
-      } catch {
+      const result = await switchFollow(djUserId);
+      if (result?.errorCode === "UNAUTHENTICATED") {
         toggleOptimistic(null);
         router.push("/sign-in");
+      } else if (result?.errorCode === "UNKNOWN") {
+        toggleOptimistic(null);
+        toast.error("Something went wrong. Please try again.");
+      } else {
+        setFollowing((prev) => !prev);
       }
     });
   };

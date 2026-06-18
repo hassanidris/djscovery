@@ -89,6 +89,7 @@ export default function ProfileSettingsForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const previousAvatar = avatarSrc;
     const preview = URL.createObjectURL(file);
     setAvatarSrc(preview);
 
@@ -99,11 +100,12 @@ export default function ProfileSettingsForm({
       const result = await uploadUserAvatar(fd);
       if ("error" in result) {
         toast.error(result.error);
-        setAvatarSrc(currentAvatar);
+        setAvatarSrc(previousAvatar);
       } else {
         toast.success("Avatar updated.");
         setAvatarSrc(result.url);
       }
+      URL.revokeObjectURL(preview);
     });
   }
 
@@ -118,8 +120,8 @@ export default function ProfileSettingsForm({
     startTransition(async () => {
       const result = await updateUserProfile({
         name: trimmed,
-        countryId: countryId ?? undefined,
-        cityId: cityId ?? undefined,
+        countryId,
+        cityId,
       });
       if (result.error) {
         toast.error(result.error);
@@ -148,7 +150,7 @@ export default function ProfileSettingsForm({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white/10 focus:outline-none disabled:opacity-60"
+            className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none disabled:opacity-60"
           >
             {avatarSrc ? (
               <Image
