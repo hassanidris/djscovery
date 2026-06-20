@@ -89,12 +89,12 @@ const Footer = async () => {
                 aria-label="DJscovery — Go to home"
                 className="focus-visible:ring-h_red shrink-0 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
               >
-                <div className="flex flex-col items-start gap-1.5 py-1">
+                <div className="flex flex-col items-start gap-0.5 py-1">
                   <Image
                     src="/logo_v2.svg"
                     alt="DJscovery Logo"
-                    width={200}
-                    height={47}
+                    width={230}
+                    height={60}
                     priority
                   />
                   {/* <span className="font-heading mt-2 text-2xl leading-none tracking-tight text-white">
