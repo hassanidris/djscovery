@@ -92,9 +92,9 @@ const Footer = async () => {
                 <div className="flex flex-col items-start gap-1.5 py-1">
                   <Image
                     src="/logo_v2.svg"
-                    alt=""
+                    alt="DJscovery Logo"
                     width={200}
-                    height={76}
+                    height={47}
                     priority
                   />
                   {/* <span className="font-heading mt-2 text-2xl leading-none tracking-tight text-white">
