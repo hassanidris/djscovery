@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import EditDjProfileForm from "@/components/dj-profile/EditDjProfileForm";
@@ -26,7 +26,7 @@ export default async function DjSettingsPage() {
     },
   });
 
-  if (!dj) return notFound();
+  if (!dj) redirect("/become-dj");
 
   const [countries, existingCities, galleryImages] = await Promise.all([
     prisma.country.findMany({

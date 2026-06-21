@@ -57,6 +57,7 @@ const CommentsList = ({
         image: null,
         imagePath: null,
         status: "ACTIVE",
+        onboardingComplete: false,
         countryId: null,
         cityId: null,
         createdAt: new Date(),
