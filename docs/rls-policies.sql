@@ -66,8 +66,9 @@ GRANT SELECT ON "User"             TO authenticated;
 GRANT SELECT ON "FanProfile"       TO authenticated;
 GRANT SELECT ON "GigApplication"   TO authenticated;
 GRANT SELECT ON "Gig"              TO authenticated;
-GRANT SELECT ON "Event"            TO authenticated;
-GRANT SELECT ON "EventDj"          TO authenticated;
+GRANT SELECT ON "Event"                   TO authenticated;
+GRANT SELECT ON "EventDj"                 TO authenticated;
+GRANT SELECT ON "ConversationParticipant" TO authenticated;
 
 
 -- ============================================================
