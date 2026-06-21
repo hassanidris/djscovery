@@ -64,10 +64,7 @@ export default function SignUpForm({
   const [selected, setSelected] = useState<Role>(defaultRole ?? "");
 
   return (
-    <form
-      action={signUp}
-      className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-white/20 bg-white/5 p-8"
-    >
+    <div className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-white/20 bg-white/5 p-8">
       <h1 className="text-center text-2xl font-bold text-white">
         Create Account
       </h1>
@@ -112,8 +109,6 @@ export default function SignUpForm({
         )}
       </div>
 
-      <input type="hidden" name="role" value={selected} />
-
       {/* Google OAuth */}
       <form action={signInWithGoogle}>
         <input type="hidden" name="role" value={selected} />
@@ -132,31 +127,35 @@ export default function SignUpForm({
         <div className="h-px flex-1 bg-white/10" />
       </div>
 
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        required
-        className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password (min 8 chars)"
-        minLength={8}
-        required
-        className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
-      />
+      {/* Email signup */}
+      <form action={signUp} className="flex flex-col gap-4">
+        <input type="hidden" name="role" value={selected} />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          required
+          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password (min 8 chars)"
+          minLength={8}
+          required
+          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
+        />
 
-      <SignUpSubmitBtn
-        label={
-          selected === "dj"
-            ? "Sign Up as DJ"
-            : selected === "organizer"
-              ? "Sign Up as Organizer"
-              : "Sign Up as Fan"
-        }
-      />
+        <SignUpSubmitBtn
+          label={
+            selected === "dj"
+              ? "Sign Up as DJ"
+              : selected === "organizer"
+                ? "Sign Up as Organizer"
+                : "Sign Up as Fan"
+          }
+        />
+      </form>
 
       <p className="text-center text-sm text-gray-400">
         Already have an account?{" "}
@@ -164,7 +163,7 @@ export default function SignUpForm({
           Sign in
         </Link>
       </p>
-    </form>
+    </div>
   );
 }
 

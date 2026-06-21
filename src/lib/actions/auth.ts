@@ -206,10 +206,15 @@ export async function signInWithGoogle(formData: FormData) {
   });
 
   const supabase = await createClient();
+  const callbackUrl = role
+    ? `${BASE_URL}/auth/callback?pending_role=${encodeURIComponent(role)}`
+    : `${BASE_URL}/auth/callback`;
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${BASE_URL}/auth/callback`,
+      redirectTo: callbackUrl,
+      queryParams: { prompt: "select_account" },
     },
   });
 
