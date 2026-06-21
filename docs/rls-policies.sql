@@ -52,6 +52,26 @@ ALTER TABLE "SavedEvent"              ENABLE ROW LEVEL SECURITY;
 
 
 -- ============================================================
+-- STEP 1b: Grant table-level SELECT to authenticated role
+-- Required so storage RLS policies can cross-reference these
+-- tables in their WITH CHECK / USING clauses.
+-- Without this GRANT, PostgreSQL throws "permission denied for
+-- table UserRole" before the row-level RLS policy is evaluated.
+-- ============================================================
+
+GRANT SELECT ON "UserRole"         TO authenticated;
+GRANT SELECT ON "DjProfile"        TO authenticated;
+GRANT SELECT ON "OrganizerProfile" TO authenticated;
+GRANT SELECT ON "User"             TO authenticated;
+GRANT SELECT ON "FanProfile"       TO authenticated;
+GRANT SELECT ON "GigApplication"   TO authenticated;
+GRANT SELECT ON "Gig"              TO authenticated;
+GRANT SELECT ON "Event"                   TO authenticated;
+GRANT SELECT ON "EventDj"                 TO authenticated;
+GRANT SELECT ON "ConversationParticipant" TO authenticated;
+
+
+-- ============================================================
 -- DROP ALL EXISTING POLICIES (idempotent re-run on any PG version)
 -- ============================================================
 
