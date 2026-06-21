@@ -52,6 +52,55 @@ ALTER TABLE "SavedEvent"              ENABLE ROW LEVEL SECURITY;
 
 
 -- ============================================================
+-- DROP ALL EXISTING POLICIES (idempotent re-run on any PG version)
+-- ============================================================
+
+DO $$
+DECLARE pol record;
+BEGIN
+  FOR pol IN
+    SELECT policyname, tablename
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename IN (
+        'Country','City','Genre',
+        'DjProfile','DjGenre','DjProfileType','SocialLink','Media',
+        'Post','PostComment','PostLike','PostCommentLike',
+        'DjComment','DjCommentLike','DjRating',
+        'Event','EventDj','EventMedia',
+        'FanProfile','EmailPreference',
+        'User','UserRole',
+        'OrganizerProfile','OrganizerSocialLink',
+        'Gig','GigApplication',
+        'Notification','Follower',
+        'Conversation','ConversationParticipant','Message',
+        'EventAttendance','Hire',
+        'SavedDj','SavedEvent'
+      )
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %I', pol.policyname, pol.tablename);
+  END LOOP;
+END;
+$$;
+
+DROP POLICY IF EXISTS "DJ can upload own media"             ON storage.objects;
+DROP POLICY IF EXISTS "DJ can update own media"             ON storage.objects;
+DROP POLICY IF EXISTS "DJ can delete own media"             ON storage.objects;
+DROP POLICY IF EXISTS "Organizer can upload own media"      ON storage.objects;
+DROP POLICY IF EXISTS "Organizer can update own media"      ON storage.objects;
+DROP POLICY IF EXISTS "Organizer can delete own media"      ON storage.objects;
+DROP POLICY IF EXISTS "Event owner can upload poster"       ON storage.objects;
+DROP POLICY IF EXISTS "Event owner can update poster"       ON storage.objects;
+DROP POLICY IF EXISTS "Event owner can delete poster"       ON storage.objects;
+DROP POLICY IF EXISTS "Event owner can upload gallery image" ON storage.objects;
+DROP POLICY IF EXISTS "Event owner can update gallery image" ON storage.objects;
+DROP POLICY IF EXISTS "Event owner can delete gallery image" ON storage.objects;
+DROP POLICY IF EXISTS "User can upload own avatar"          ON storage.objects;
+DROP POLICY IF EXISTS "User can update own avatar"          ON storage.objects;
+DROP POLICY IF EXISTS "User can delete own avatar"          ON storage.objects;
+
+
+-- ============================================================
 -- STEP 2: Public read — safe reference data (no auth needed)
 -- ============================================================
 

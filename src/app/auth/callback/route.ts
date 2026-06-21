@@ -40,7 +40,13 @@ export async function GET(request: Request) {
         const name = user.user_metadata?.name ?? email.split("@")[0];
         const userId = user.id;
 
-        // Cookie role (Google OAuth) takes priority over user_metadata role (email signup)
+        // Role resolution priority: URL param → cookie → user_metadata
+        // URL param is most reliable (survives cross-site OAuth redirect)
+        const rawUrlRole = searchParams.get("pending_role") ?? "";
+        const urlRole = roleSchema.safeParse(rawUrlRole).success
+          ? rawUrlRole
+          : "";
+
         const cookieStore = await cookies();
         const rawCookieRole = cookieStore.get("pending_role")?.value ?? "";
         const cookieRole = roleSchema.safeParse(rawCookieRole).success
@@ -50,7 +56,7 @@ export async function GET(request: Request) {
         const metaRole = roleSchema.safeParse(rawMetaRole).success
           ? rawMetaRole
           : "";
-        const role = cookieRole || metaRole;
+        const role = urlRole || cookieRole || metaRole;
         if (rawCookieRole) cookieStore.delete("pending_role");
 
         let dbRoles: string[] = [];
@@ -76,13 +82,11 @@ export async function GET(request: Request) {
               create: { userId },
             });
 
-            if (role === "" || role === "fan") {
-              const existing = await tx.fanProfile.findUnique({
-                where: { userId },
-              });
-              if (!existing) {
-                await tx.fanProfile.create({ data: { userId, name } });
-              }
+            // Only create fan profile for brand-new users with fan intent
+            // Returning incomplete users (e.g. DJ who never finished /become-dj)
+            // must not be silently converted to fans
+            if (isNewUser && (role === "" || role === "fan")) {
+              await tx.fanProfile.create({ data: { userId, name } });
             }
 
             const roleRecords = await tx.userRole.findMany({
@@ -117,6 +121,21 @@ export async function GET(request: Request) {
         if (role === "dj") return NextResponse.redirect(`${origin}/become-dj`);
         if (role === "organizer")
           return NextResponse.redirect(`${origin}/become-organizer`);
+
+        // Returning user with no roles and no fan profile = incomplete signup
+        // Send them back to choose their role
+        if (!isNewUser && dbRoles.length === 0) {
+          const hasFanProfile = await prisma.fanProfile.findUnique({
+            where: { userId },
+            select: { id: true },
+          });
+          if (!hasFanProfile) {
+            return NextResponse.redirect(
+              `${origin}/sign-up?message=${encodeURIComponent("Please complete your profile setup")}`,
+            );
+          }
+        }
+
         return NextResponse.redirect(`${origin}/`); // fan
       }
     }
