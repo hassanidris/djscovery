@@ -31,8 +31,9 @@ ALTER TABLE "PostLike"                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "PostCommentLike"         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Event"                   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "EventDj"                 ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "Job"                     ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "JobApplication"          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "FanProfile"              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "EmailPreference"         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "EmailLog"                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Follower"                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Notification"            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Country"                 ENABLE ROW LEVEL SECURITY;
@@ -223,12 +224,27 @@ CREATE POLICY "Public read event DJs"
 
 
 -- ============================================================
--- STEP 7: Jobs — public read for open jobs
+-- STEP 7: FanProfile — public read
 -- ============================================================
 
-CREATE POLICY "Public read open jobs"
-  ON "Job" FOR SELECT
-  USING (status = 'OPEN' AND "deletedAt" IS NULL);
+CREATE POLICY "Public read fan profiles"
+  ON "FanProfile" FOR SELECT
+  USING ("deletedAt" IS NULL);
+
+CREATE POLICY "Fan can update own profile"
+  ON "FanProfile" FOR UPDATE
+  USING (auth.uid()::text = "userId");
+
+-- EmailPreference: owner only
+CREATE POLICY "User can read own email preferences"
+  ON "EmailPreference" FOR SELECT
+  USING (auth.uid()::text = "userId");
+
+CREATE POLICY "User can update own email preferences"
+  ON "EmailPreference" FOR UPDATE
+  USING (auth.uid()::text = "userId");
+
+-- EmailLog: no direct access (server only — deny all by default) ✅
 
 
 -- ============================================================
@@ -398,16 +414,6 @@ CREATE POLICY "DJ can withdraw own application"
     )
   );
 
-
--- JobApplication: applicant reads own records.
--- Organizer access is enforced server-side via Prisma (bypasses RLS) — no policy needed here.
-CREATE POLICY "Applicant can read own applications"
-  ON "JobApplication" FOR SELECT
-  USING (auth.uid()::text = "applicantId");
-
-CREATE POLICY "Applicant can create application"
-  ON "JobApplication" FOR INSERT
-  WITH CHECK (auth.uid()::text = "applicantId");
 
 -- Notifications: recipient only
 CREATE POLICY "User can read own notifications"
