@@ -68,7 +68,7 @@ BEGIN
         'Post','PostComment','PostLike','PostCommentLike',
         'DjComment','DjCommentLike','DjRating',
         'Event','EventDj','EventMedia',
-        'FanProfile','EmailPreference',
+        'FanProfile','EmailPreference','EmailLog',
         'User','UserRole',
         'OrganizerProfile','OrganizerSocialLink',
         'Gig','GigApplication',
