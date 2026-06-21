@@ -111,6 +111,12 @@ enum NotificationType {
   GIG_APPLICATION_REJECTED
   GIG_APPLICATION_WITHDRAWN
   DJ_NEW_EVENT
+  WELCOME
+  PROFILE_APPROVED
+  PROFILE_REJECTED
+  GIG_NEW_MATCH
+  BOOKING_INQUIRY
+  ACCOUNT_SUSPENDED
 }
 
 enum DjType {
@@ -143,6 +149,25 @@ enum OrganizerStatus {
   SUSPENDED
 }
 
+enum EmailType {
+  WELCOME
+  PROFILE_APPROVED
+  PROFILE_REJECTED
+  GIG_APPLICATION_RECEIVED
+  GIG_APPLICATION_ACCEPTED
+  GIG_APPLICATION_REJECTED
+  BOOKING_INQUIRY
+  ACCOUNT_SUSPENDED
+  SECURITY_ALERT
+}
+
+enum EmailLogStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
 // ============================================================
 // SECTION 1: MVP MODELS
 // ============================================================
@@ -159,6 +184,7 @@ model Country {
   organizerProfiles OrganizerProfile[]
   events            Event[]
   gigs              Gig[]
+  fanProfiles       FanProfile[]
 
   @@index([name])
 }
@@ -181,16 +207,17 @@ model City {
 // ------ USER ------
 
 model User {
-  id        String     @id // Must match Supabase Auth user id
-  email     String     @unique
-  username  String     @unique
-  name      String?
-  image     String?
-  imagePath String?
-  status    UserStatus @default(ACTIVE)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  deletedAt DateTime?
+  id                 String     @id // Must match Supabase Auth user id
+  email              String     @unique
+  username           String     @unique
+  name               String?
+  image              String?
+  imagePath          String?
+  status             UserStatus @default(ACTIVE)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  deletedAt          DateTime?
+  onboardingComplete Boolean    @default(false)
 
   countryId Int?
   country   Country? @relation(fields: [countryId], references: [id])
@@ -200,6 +227,9 @@ model User {
   roles            UserRole[]
   djProfile        DjProfile?
   organizerProfile OrganizerProfile?
+  fanProfile       FanProfile?
+  emailPreference  EmailPreference?
+  emailLogs        EmailLog[]
 
   posts            Post[]
   postComments     PostComment[]
@@ -346,6 +376,29 @@ model OrganizerSocialLink {
 
   @@unique([organizerProfileId, platform])
   @@index([organizerProfileId])
+}
+
+// ------ FAN PROFILE ------
+
+model FanProfile {
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name       String
+  avatar     String? // Supabase Storage public URL
+  avatarPath String? // Supabase Storage path (for deletion on re-upload)
+  bio        String?
+
+  countryId Int?
+  country   Country? @relation(fields: [countryId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([userId])
+  @@index([countryId])
 }
 
 // ------ GENRES ------
@@ -751,15 +804,12 @@ model SavedEvent {
 
 // ------ NOTIFICATIONS ------
 
-// Database-only for MVP.
-// TODO: Integrate email notifications (e.g. Resend / SendGrid) by adding
-//       a background job that reads unread Notification rows and sends emails.
-//       Add an `emailSentAt DateTime?` column here when ready.
 model Notification {
-  id   Int              @id @default(autoincrement())
-  type NotificationType
-  read Boolean          @default(false)
-  data Json? // flexible payload (postId, djProfileId, jobId, etc.)
+  id          Int              @id @default(autoincrement())
+  type        NotificationType
+  read        Boolean          @default(false)
+  data        Json? // flexible payload (postId, djProfileId, gigId, etc.)
+  emailSentAt DateTime?
 
   recipientId String
   recipient   User   @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
@@ -772,6 +822,45 @@ model Notification {
 
   @@index([recipientId, read])
   @@index([recipientId, createdAt])
+}
+
+// ------ EMAIL PREFERENCES ------
+
+model EmailPreference {
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookingEmails     Boolean @default(true)
+  gigEmails         Boolean @default(true)
+  applicationEmails Boolean @default(true)
+  platformUpdates   Boolean @default(true)
+  marketingEmails   Boolean @default(false)
+  // verificationEmails, passwordReset, securityAlerts cannot be disabled (enforced app-layer)
+
+  @@index([userId])
+}
+
+// ------ EMAIL LOG ------
+
+model EmailLog {
+  id                Int            @id @default(autoincrement())
+  userId            String? // null = system email (no user associated)
+  user              User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  recipientEmail    String
+  emailType         EmailType
+  provider          String         @default("resend")
+  status            EmailLogStatus @default(PENDING)
+  providerMessageId String?
+  errorMessage      String?
+  retryCount        Int            @default(0)
+  lastAttemptAt     DateTime       @default(now())
+  createdAt         DateTime       @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@index([emailType])
+  @@index([createdAt])
 }
 
 // ============================================================

@@ -3,58 +3,222 @@
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { redirect } from "next/navigation";
+import {
+  signInSchema,
+  signUpSchema,
+  forgotPasswordSchema,
+  updatePasswordSchema,
+  roleSchema,
+} from "@/lib/validations/auth";
+import { cookies } from "next/headers";
+import { sendEmail } from "@/lib/email/sendEmail";
+import {
+  welcomeEmailSubject,
+  welcomeEmailHtml,
+} from "@/lib/email/templates/welcome";
+import {
+  securityAlertSubject,
+  securityAlertEmailHtml,
+} from "@/lib/email/templates/securityAlert";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com";
 
 export async function signIn(formData: FormData) {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+  const parsed = signInSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
   });
+  if (!parsed.success) {
+    const message = parsed.error.errors[0]?.message ?? "Invalid input";
+    redirect(`/sign-in?error=${encodeURIComponent(message)}`);
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
-  redirect("/");
+  if (!data.user) redirect("/sign-in?error=Authentication+failed");
+
+  // Role-aware redirect
+  const userRoles = await prisma.userRole.findMany({
+    where: { userId: data.user.id },
+    select: { role: true },
+  });
+  const roles = userRoles.map((r) => r.role);
+
+  if (roles.includes("ADMIN")) redirect("/admin");
+  if (roles.includes("DJ")) redirect("/dashboard");
+  if (roles.includes("ORGANIZER")) redirect("/organizer/dashboard");
+  redirect("/"); // fan
 }
 
 export async function signUp(formData: FormData) {
+  const parsed = signUpSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+    role: formData.get("role") ?? "",
+  });
+  if (!parsed.success) {
+    const message = parsed.error.errors[0]?.message ?? "Invalid input";
+    redirect(`/sign-up?error=${encodeURIComponent(message)}`);
+  }
+
+  const { email, password, role } = parsed.data;
   const supabase = await createClient();
-  const role = (formData.get("role") as string) ?? "";
 
   const { data, error } = await supabase.auth.signUp({
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+    email,
+    password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
+      data: { role }, // role stored in user_metadata — callback reads this (never from URL)
+      emailRedirectTo: `${BASE_URL}/auth/callback`,
     },
   });
   if (error) redirect(`/sign-up?error=${encodeURIComponent(error.message)}`);
 
-  // Email confirmation disabled — user is immediately signed in
+  // Email confirmation disabled (dev/local) — session returned immediately
   if (data.session && data.user) {
     const userId = data.user.id;
-    const email = data.user.email ?? "";
-    const username = `${email.split("@")[0]}-${userId.slice(0, 6)}`;
+    const userEmail = data.user.email ?? "";
+    const username = `${userEmail.split("@")[0]}-${userId.slice(0, 6)}`;
+    const name = userEmail.split("@")[0];
 
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {},
-      create: { id: userId, email, username },
-    });
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.user.upsert({
+          where: { id: userId },
+          update: {},
+          create: { id: userId, email: userEmail, username },
+        });
+        await tx.emailPreference.upsert({
+          where: { userId },
+          update: {},
+          create: { userId },
+        });
+        if (role === "") {
+          const existing = await tx.fanProfile.findUnique({
+            where: { userId },
+          });
+          if (!existing) {
+            await tx.fanProfile.create({ data: { userId, name } });
+          }
+        }
+      });
 
-    // Skip select-role — user already chose their role on the sign-up form
+      // Welcome email for immediate signup (no email confirmation)
+      await sendEmail({
+        to: userEmail,
+        userId,
+        emailType: "WELCOME",
+        subject: welcomeEmailSubject,
+        html: welcomeEmailHtml({ name }),
+      });
+    } catch {
+      await supabase.auth.signOut();
+      redirect("/sign-up?error=account_setup_failed");
+    }
+
     if (role === "dj") redirect("/become-dj");
     if (role === "organizer") redirect("/become-organizer");
-    redirect("/"); // Fan — go straight to the app
+    redirect("/");
   }
 
-  // Email confirmation required — pass role destination via callback `next`
-  const next =
-    role === "dj"
-      ? "/become-dj"
-      : role === "organizer"
-        ? "/become-organizer"
-        : "/";
+  // Email confirmation required — role is in user_metadata, no need to pass in URL
   redirect(
-    `/sign-in?message=Check your email to confirm your account&next=${encodeURIComponent(next)}`,
+    `/sign-in?message=${encodeURIComponent("Check your email to confirm your account")}`,
   );
+}
+
+export async function requestPasswordReset(formData: FormData) {
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get("email"),
+  });
+  if (!parsed.success) {
+    const message = parsed.error.errors[0]?.message ?? "Invalid email";
+    redirect(`/forgot-password?error=${encodeURIComponent(message)}`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    parsed.data.email,
+    {
+      redirectTo: `${BASE_URL}/auth/callback?next=/auth/reset-password`,
+    },
+  );
+
+  if (error)
+    redirect(`/forgot-password?error=${encodeURIComponent(error.message)}`);
+  redirect(
+    `/forgot-password?message=${encodeURIComponent("Check your email for a password reset link")}`,
+  );
+}
+
+export async function updatePassword(formData: FormData) {
+  const parsed = updatePasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.success) {
+    const message = parsed.error.errors[0]?.message ?? "Invalid input";
+    redirect(`/auth/reset-password?error=${encodeURIComponent(message)}`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+
+  if (error)
+    redirect(`/auth/reset-password?error=${encodeURIComponent(error.message)}`);
+
+  const {
+    data: { user: updatedUser },
+  } = await supabase.auth.getUser();
+  if (updatedUser?.email) {
+    const name =
+      updatedUser.user_metadata?.name ?? updatedUser.email.split("@")[0];
+    await sendEmail({
+      to: updatedUser.email,
+      userId: updatedUser.id,
+      emailType: "SECURITY_ALERT",
+      subject: securityAlertSubject,
+      html: securityAlertEmailHtml({ name }),
+    });
+  }
+
+  await supabase.auth.signOut();
+  redirect(
+    `/sign-in?message=${encodeURIComponent("Password updated — please sign in with your new password")}`,
+  );
+}
+
+export async function signInWithGoogle(formData: FormData) {
+  const rawRole = (formData.get("role") as string) ?? "";
+  const roleParsed = roleSchema.safeParse(rawRole);
+  const role = roleParsed.success ? roleParsed.data : "";
+
+  const cookieStore = await cookies();
+  cookieStore.set("pending_role", role, {
+    path: "/",
+    maxAge: 60 * 10, // 10 minutes
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${BASE_URL}/auth/callback`,
+    },
+  });
+
+  if (error || !data.url) {
+    redirect(
+      `/sign-in?error=${encodeURIComponent(error?.message ?? "Google sign-in failed")}`,
+    );
+  }
+  redirect(data.url);
 }
 
 export async function signOut() {

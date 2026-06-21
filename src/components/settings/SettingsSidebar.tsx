@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Disc3, Building2 } from "lucide-react";
+import { User, Disc3, Building2, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ALL_ITEMS = [
   { href: "/settings/account", label: "Account", icon: User, role: "all" },
+  {
+    href: "/settings/notifications",
+    label: "Notifications",
+    icon: Bell,
+    role: "all",
+  },
   { href: "/settings/dj", label: "DJ Profile", icon: Disc3, role: "dj" },
   {
     href: "/settings/organizer",
@@ -45,7 +51,7 @@ export default function SettingsSidebar({
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
               isActive
                 ? "bg-white/10 text-white"
                 : "text-gray-400 hover:bg-white/5 hover:text-white",

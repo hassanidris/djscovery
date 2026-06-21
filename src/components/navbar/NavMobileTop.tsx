@@ -3,13 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import NotificationBell from "@/components/notifications/NotificationBell";
+import { useIsDesktop } from "@/lib/hooks/useIsDesktop";
 import BurgerMenu from "@/components/navbar/BurgerMenu";
 import SearchModal from "@/components/navbar/SearchModal";
 import type { NavUserData } from "@/lib/auth/getNavUser";
 
 export default function NavMobileTop(props: NavUserData) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const isDesktop = useIsDesktop();
 
   return (
     <div className="relative flex h-14 items-center justify-between md:hidden">
@@ -47,18 +50,7 @@ export default function NavMobileTop(props: NavUserData) {
           <Search className="h-5 w-5" aria-hidden />
         </button>
 
-        {props.isLoggedIn && (
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            aria-label="Notifications — Coming Soon"
-            title="Notifications — Coming Soon"
-            className="flex size-9 cursor-not-allowed items-center justify-center rounded-lg text-gray-500"
-          >
-            <Bell className="h-5 w-5" aria-hidden />
-          </button>
-        )}
+        {props.isLoggedIn && !isDesktop && <NotificationBell />}
       </div>
 
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
