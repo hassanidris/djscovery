@@ -7,6 +7,7 @@ import {
   welcomeEmailSubject,
   welcomeEmailHtml,
 } from "@/lib/email/templates/welcome";
+import { roleSchema } from "@/lib/validations/auth";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -29,7 +30,10 @@ export async function GET(request: Request) {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const email = user.email ?? "";
+        const email = user.email;
+        if (!email) {
+          return NextResponse.redirect(`${origin}/sign-in?error=missing_email`);
+        }
         const username =
           user.user_metadata?.username ??
           email.split("@")[0] + "_" + user.id.slice(0, 6);
@@ -38,57 +42,67 @@ export async function GET(request: Request) {
 
         // Cookie role (Google OAuth) takes priority over user_metadata role (email signup)
         const cookieStore = await cookies();
-        const cookieRole = cookieStore.get("pending_role")?.value ?? "";
-        const metaRole = user.user_metadata?.role ?? "";
+        const rawCookieRole = cookieStore.get("pending_role")?.value ?? "";
+        const cookieRole = roleSchema.safeParse(rawCookieRole).success
+          ? rawCookieRole
+          : "";
+        const rawMetaRole = user.user_metadata?.role ?? "";
+        const metaRole = roleSchema.safeParse(rawMetaRole).success
+          ? rawMetaRole
+          : "";
         const role = cookieRole || metaRole;
-        if (cookieRole) cookieStore.delete("pending_role");
+        if (rawCookieRole) cookieStore.delete("pending_role");
 
         let dbRoles: string[] = [];
         let isNewUser = false;
 
-        await prisma.$transaction(async (tx) => {
-          const prior = await tx.user.findUnique({
-            where: { id: userId },
-            select: { id: true },
-          });
-          isNewUser = !prior;
-
-          await tx.user.upsert({
-            where: { id: userId },
-            update: { email },
-            create: { id: userId, email, username },
-          });
-
-          await tx.emailPreference.upsert({
-            where: { userId },
-            update: {},
-            create: { userId },
-          });
-
-          if (role === "" || role === "fan") {
-            const existing = await tx.fanProfile.findUnique({
-              where: { userId },
+        try {
+          await prisma.$transaction(async (tx) => {
+            const prior = await tx.user.findUnique({
+              where: { id: userId },
+              select: { id: true },
             });
-            if (!existing) {
-              await tx.fanProfile.create({ data: { userId, name } });
+            isNewUser = !prior;
+
+            await tx.user.upsert({
+              where: { id: userId },
+              update: { email },
+              create: { id: userId, email, username },
+            });
+
+            await tx.emailPreference.upsert({
+              where: { userId },
+              update: {},
+              create: { userId },
+            });
+
+            if (role === "" || role === "fan") {
+              const existing = await tx.fanProfile.findUnique({
+                where: { userId },
+              });
+              if (!existing) {
+                await tx.fanProfile.create({ data: { userId, name } });
+              }
             }
+
+            const roleRecords = await tx.userRole.findMany({
+              where: { userId },
+              select: { role: true },
+            });
+            dbRoles = roleRecords.map((r) => r.role);
+          });
+
+          if (isNewUser) {
+            await sendEmail({
+              to: email,
+              userId,
+              emailType: "WELCOME",
+              subject: welcomeEmailSubject,
+              html: welcomeEmailHtml({ name }),
+            });
           }
-
-          const roleRecords = await tx.userRole.findMany({
-            where: { userId },
-            select: { role: true },
-          });
-          dbRoles = roleRecords.map((r) => r.role);
-        });
-
-        if (isNewUser) {
-          await sendEmail({
-            to: email,
-            userId,
-            emailType: "WELCOME",
-            subject: welcomeEmailSubject,
-            html: welcomeEmailHtml({ name }),
-          });
+        } catch {
+          return NextResponse.redirect(`${origin}/sign-in?error=db_error`);
         }
 
         // Existing users → redirect to their dashboard

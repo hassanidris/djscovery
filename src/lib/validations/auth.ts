@@ -5,10 +5,13 @@ export const signInSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const roleSchema = z.enum(["", "dj", "organizer"]);
+export type AllowedRole = z.infer<typeof roleSchema>;
+
 export const signUpSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["", "dj", "organizer"]).default(""),
+  role: roleSchema.default(""),
 });
 
 export const forgotPasswordSchema = z.object({

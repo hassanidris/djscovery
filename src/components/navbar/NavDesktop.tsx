@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { MessageCircle, Search } from "lucide-react";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import { useIsDesktop } from "@/lib/hooks/useIsDesktop";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import NavbarAvatar from "@/components/NavbarAvatar";
@@ -24,6 +25,7 @@ export default function NavDesktop({
 }: NavUserData) {
   const pathname = usePathname();
   const router = useRouter();
+  const isDesktop = useIsDesktop();
   const items = desktopNavByRole[navRole];
 
   const handleDesktopSearch = (e: React.FormEvent<HTMLFormElement>) => {
@@ -137,7 +139,7 @@ export default function NavDesktop({
 
         {isLoggedIn ? (
           <div className="flex items-center gap-0.5">
-            <NotificationBell />
+            {isDesktop && <NotificationBell />}
             <button
               aria-label="Messages — Coming Soon"
               title="Messages — Coming Soon"

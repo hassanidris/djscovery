@@ -8,6 +8,7 @@ import {
   signUpSchema,
   forgotPasswordSchema,
   updatePasswordSchema,
+  roleSchema,
 } from "@/lib/validations/auth";
 import { cookies } from "next/headers";
 import { sendEmail } from "@/lib/email/sendEmail";
@@ -19,6 +20,8 @@ import {
   securityAlertSubject,
   securityAlertEmailHtml,
 } from "@/lib/email/templates/securityAlert";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com";
 
 export async function signIn(formData: FormData) {
   const parsed = signInSchema.safeParse({
@@ -67,7 +70,7 @@ export async function signUp(formData: FormData) {
     password,
     options: {
       data: { role }, // role stored in user_metadata — callback reads this (never from URL)
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
+      emailRedirectTo: `${BASE_URL}/auth/callback`,
     },
   });
   if (error) redirect(`/sign-up?error=${encodeURIComponent(error.message)}`);
@@ -79,33 +82,40 @@ export async function signUp(formData: FormData) {
     const username = `${userEmail.split("@")[0]}-${userId.slice(0, 6)}`;
     const name = userEmail.split("@")[0];
 
-    await prisma.$transaction(async (tx) => {
-      await tx.user.upsert({
-        where: { id: userId },
-        update: {},
-        create: { id: userId, email: userEmail, username },
-      });
-      await tx.emailPreference.upsert({
-        where: { userId },
-        update: {},
-        create: { userId },
-      });
-      if (role === "") {
-        const existing = await tx.fanProfile.findUnique({ where: { userId } });
-        if (!existing) {
-          await tx.fanProfile.create({ data: { userId, name } });
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.user.upsert({
+          where: { id: userId },
+          update: {},
+          create: { id: userId, email: userEmail, username },
+        });
+        await tx.emailPreference.upsert({
+          where: { userId },
+          update: {},
+          create: { userId },
+        });
+        if (role === "") {
+          const existing = await tx.fanProfile.findUnique({
+            where: { userId },
+          });
+          if (!existing) {
+            await tx.fanProfile.create({ data: { userId, name } });
+          }
         }
-      }
-    });
+      });
 
-    // Welcome email for immediate signup (no email confirmation)
-    await sendEmail({
-      to: userEmail,
-      userId,
-      emailType: "WELCOME",
-      subject: welcomeEmailSubject,
-      html: welcomeEmailHtml({ name }),
-    });
+      // Welcome email for immediate signup (no email confirmation)
+      await sendEmail({
+        to: userEmail,
+        userId,
+        emailType: "WELCOME",
+        subject: welcomeEmailSubject,
+        html: welcomeEmailHtml({ name }),
+      });
+    } catch {
+      await supabase.auth.signOut();
+      redirect("/sign-up?error=account_setup_failed");
+    }
 
     if (role === "dj") redirect("/become-dj");
     if (role === "organizer") redirect("/become-organizer");
@@ -131,7 +141,7 @@ export async function requestPasswordReset(formData: FormData) {
   const { error } = await supabase.auth.resetPasswordForEmail(
     parsed.data.email,
     {
-      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?next=/auth/reset-password`,
+      redirectTo: `${BASE_URL}/auth/callback?next=/auth/reset-password`,
     },
   );
 
@@ -182,7 +192,9 @@ export async function updatePassword(formData: FormData) {
 }
 
 export async function signInWithGoogle(formData: FormData) {
-  const role = (formData.get("role") as string) ?? "";
+  const rawRole = (formData.get("role") as string) ?? "";
+  const roleParsed = roleSchema.safeParse(rawRole);
+  const role = roleParsed.success ? roleParsed.data : "";
 
   const cookieStore = await cookies();
   cookieStore.set("pending_role", role, {
@@ -197,7 +209,7 @@ export async function signInWithGoogle(formData: FormData) {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
+      redirectTo: `${BASE_URL}/auth/callback`,
     },
   });
 

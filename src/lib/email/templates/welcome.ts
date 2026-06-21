@@ -1,10 +1,10 @@
-import { baseLayout } from "./base";
+import { baseLayout, escapeHtml } from "./base";
 
 export const welcomeEmailSubject = "Welcome to DJcovery 🎵";
 
 export function welcomeEmailHtml({ name }: { name: string }): string {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com";
-  const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+  const displayName = escapeHtml(name.charAt(0).toUpperCase() + name.slice(1));
 
   return baseLayout(`
     <h1 style="color:#ffffff;font-size:24px;font-weight:700;margin:0 0 12px;">

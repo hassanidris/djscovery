@@ -35,7 +35,10 @@ export async function getRecentNotifications() {
   return { notifications, unreadCount };
 }
 
-export async function getAllNotifications() {
+export async function getAllNotifications({
+  take = 50,
+  cursor,
+}: { take?: number; cursor?: number } = {}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -45,6 +48,8 @@ export async function getAllNotifications() {
   return prisma.notification.findMany({
     where: { recipientId: user.id },
     orderBy: { createdAt: "desc" },
+    take,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     select: {
       id: true,
       type: true,

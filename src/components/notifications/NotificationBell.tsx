@@ -18,7 +18,11 @@ type NotificationItem = {
   read: boolean;
   data: unknown;
   createdAt: Date;
-  sender: { username: string; name: string | null; image: string | null } | null;
+  sender: {
+    username: string;
+    name: string | null;
+    image: string | null;
+  } | null;
 };
 
 export default function NotificationBell() {
@@ -30,11 +34,27 @@ export default function NotificationBell() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getRecentNotifications().then(({ notifications: n, unreadCount: c }) => {
-      setNotifications(n as NotificationItem[]);
-      setUnreadCount(c);
-      setLoaded(true);
-    });
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const { notifications: n, unreadCount: c } =
+          await getRecentNotifications();
+        if (cancelled) return;
+        setNotifications(n as NotificationItem[]);
+        setUnreadCount(c);
+      } catch {
+        if (cancelled) return;
+        setNotifications([]);
+        setUnreadCount(0);
+      } finally {
+        if (!cancelled) setLoaded(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
