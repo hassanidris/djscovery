@@ -124,19 +124,19 @@ export async function GET(request: Request) {
         });
         dbRoles = roleRecords.map((r) => r.role);
       });
-
-      if (isNewUser) {
-        await sendEmail({
-          to: email,
-          userId,
-          emailType: "WELCOME",
-          subject: welcomeEmailSubject,
-          html: welcomeEmailHtml({ name }),
-        });
-      }
     } catch (err) {
       console.error("[auth/callback] DB transaction error:", err);
       return NextResponse.redirect(`${origin}/sign-in?error=db_error`);
+    }
+
+    if (isNewUser) {
+      await sendEmail({
+        to: email,
+        userId,
+        emailType: "WELCOME",
+        subject: welcomeEmailSubject,
+        html: welcomeEmailHtml({ name }),
+      });
     }
 
     // Existing users → redirect to their dashboard
