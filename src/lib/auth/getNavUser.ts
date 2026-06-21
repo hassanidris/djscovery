@@ -35,25 +35,32 @@ export const getNavUser = cache(async (): Promise<NavUserData> => {
     };
   }
 
-  const profile = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: {
-      username: true,
-      name: true,
-      image: true,
-      roles: { select: { role: true } },
-      djProfile: { select: { avatar: true, stageName: true, slug: true } },
-      organizerProfile: {
+  const profile = await (async () => {
+    try {
+      return await prisma.user.findUnique({
+        where: { id: user.id },
         select: {
-          slug: true,
-          status: true,
-          deletedAt: true,
-          logoUrl: true,
-          displayName: true,
+          username: true,
+          name: true,
+          image: true,
+          roles: { select: { role: true } },
+          djProfile: { select: { avatar: true, stageName: true, slug: true } },
+          organizerProfile: {
+            select: {
+              slug: true,
+              status: true,
+              deletedAt: true,
+              logoUrl: true,
+              displayName: true,
+            },
+          },
         },
-      },
-    },
-  });
+      });
+    } catch (err) {
+      console.error("[getNavUser] DB error:", err);
+      return null;
+    }
+  })();
 
   const roles = profile?.roles.map((r) => r.role) ?? [];
   let navRole: NavRole = "fan";
