@@ -22,13 +22,13 @@ export default function NavMobileTop(props: NavUserData) {
       {/* Center: Logo (absolutely centered to avoid flex offset) */}
       <Link
         href="/"
-        aria-label="DJscovery — Go to home"
+        aria-label="DJcovery — Go to home"
         className="focus-visible:ring-h_red absolute left-1/2 -translate-x-1/2 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
       >
         <div className="flex items-center gap-2 py-1">
           <Image
             src="/logo_v2.svg"
-            alt="DJscovery Logo"
+            alt="DJcovery Logo"
             width={130}
             height={31}
             priority

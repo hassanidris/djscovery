@@ -17,7 +17,7 @@ import AddPost from "./AddPost";
                        (fans can like, comment, and reply — just not post)
 
   WHY fans can't post:
-  DJscovery is a platform where DJs are the content creators.
+  DJcovery is a platform where DJs are the content creators.
   Letting everyone post would dilute the feed and make it a generic
   social network. Fans engage through reactions, which still keeps
   them active and connected without blurring that distinction.
@@ -52,24 +52,24 @@ const AddPostWrapper = async () => {
 
   // Fan (logged in, not a DJ) — show engagement info card
   return (
-    <div className="p-4 bg-h_blackLight/50 shadow-md rounded-lg flex items-center gap-4 border border-gray-800/60">
+    <div className="bg-h_blackLight/50 flex items-center gap-4 rounded-lg border border-gray-800/60 p-4 shadow-md">
       {/* Icons hint at what fans CAN do */}
-      <div className="flex items-center gap-2 shrink-0">
-        <div className="w-9 h-9 rounded-xl bg-h_red/10 border border-h_red/20 flex items-center justify-center">
-          <Music2 className="w-4 h-4 text-h_red" />
+      <div className="flex shrink-0 items-center gap-2">
+        <div className="bg-h_red/10 border-h_red/20 flex h-9 w-9 items-center justify-center rounded-xl border">
+          <Music2 className="text-h_red h-4 w-4" />
         </div>
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-h_white text-sm font-medium">Only DJs can post</p>
-        <p className="text-gray-400 text-xs mt-0.5">
+        <p className="mt-0.5 text-xs text-gray-400">
           You can{" "}
           <span className="inline-flex items-center gap-1 text-gray-300">
-            <Heart className="w-3 h-3 text-h_red" /> like
+            <Heart className="text-h_red h-3 w-3" /> like
           </span>
           ,{" "}
           <span className="inline-flex items-center gap-1 text-gray-300">
-            <MessageCircle className="w-3 h-3 text-blue-400" /> comment
+            <MessageCircle className="h-3 w-3 text-blue-400" /> comment
           </span>{" "}
           and reply to any post.
         </p>

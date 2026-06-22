@@ -457,7 +457,7 @@ export default function PrivacyPolicyPage() {
                 <SectionHeading number={11} title="Children's Privacy" />
                 <div className="flex flex-col gap-4 text-gray-400">
                   <p>
-                    DJcovery is not intended for children under the age of 16.
+                    DJcovery is not intended for children under the age of 18.
                   </p>
                   <p>
                     We do not knowingly collect personal information from

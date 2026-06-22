@@ -411,8 +411,8 @@ export default function ProfileSettingsForm({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete your DJscovery account,
-                    profile, and all your data. This action cannot be undone.
+                    This will permanently delete your DJcovery account, profile,
+                    and all your data. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

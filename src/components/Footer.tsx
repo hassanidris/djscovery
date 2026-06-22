@@ -19,10 +19,10 @@ import {
 } from "@/config/navigation";
 
 const companyLinks = [
-  { label: "About DJscovery", href: "/" },
+  { label: "About DJcovery", href: "/" },
   { label: "Contact Us", href: "/" },
   { label: "Privacy Policy", href: "/privacy-policy" },
-  { label: "Terms of Service", href: "/" },
+  { label: "Terms of Service", href: "/terms-of-service" },
   { label: "Cookie Policy", href: "/" },
 ];
 
@@ -77,7 +77,7 @@ const Footer = async () => {
               {/* <Link href="/" className="inline-block w-fit">
                 <Image
                   src="/dj-logo-blue.svg"
-                  alt="DJscovery"
+                  alt="DJcovery"
                   width={130}
                   height={110}
                   className="brightness-110"
@@ -86,13 +86,13 @@ const Footer = async () => {
 
               <Link
                 href="/"
-                aria-label="DJscovery — Go to home"
+                aria-label="DJcovery — Go to home"
                 className="focus-visible:ring-h_red shrink-0 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
               >
                 <div className="flex flex-col items-start gap-0.5 py-1">
                   <Image
                     src="/logo_v2.svg"
-                    alt="DJscovery Logo"
+                    alt="DJcovery Logo"
                     width={230}
                     height={60}
                     priority
@@ -244,7 +244,7 @@ const Footer = async () => {
       <div className="border-t border-white/5 py-5">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 text-xs text-gray-500 sm:flex-row md:px-8">
           <span>
-            &copy; {new Date().getFullYear()} DJscovery. All rights reserved.
+            &copy; {new Date().getFullYear()} DJcovery. All rights reserved.
             Built for the culture.
           </span>
           <div className="flex items-center gap-5">

@@ -488,7 +488,7 @@ export default function DjProfileComparePage() {
             Start Free. Upgrade When You&apos;re Ready.
           </h2>
           <p className="mx-auto mb-6 max-w-md text-sm text-gray-400">
-            Every DJ on DJscovery starts with a professional free profile.
+            Every DJ on DJcovery starts with a professional free profile.
             Premium unlocks the tools that turn visibility into bookings.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">

@@ -7,7 +7,7 @@ import { getSavedEventIds } from "@/lib/actions/saves";
 import type { EventCardItem } from "@/components/events/EventCard";
 import { EventGrid } from "@/components/events/EventGrid";
 
-export const metadata = { title: "Events — DJscovery" };
+export const metadata = { title: "Events — DJcovery" };
 export const revalidate = 60;
 
 function slugToName(slug: string): string {

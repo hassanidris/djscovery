@@ -7,7 +7,7 @@ import { getCountries } from "@/lib/actions/locations";
 import { GigForm } from "@/components/gigs/GigForm";
 import { currencyForCountryCode } from "@/lib/utils/currency";
 
-export const metadata = { title: "Post a Gig — DJscovery" };
+export const metadata = { title: "Post a Gig — DJcovery" };
 
 export default async function GigCreatePage() {
   const supabase = await createClient();

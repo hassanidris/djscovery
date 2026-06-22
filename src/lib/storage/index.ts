@@ -1,5 +1,5 @@
 // ============================================================
-// DJscovery Storage Utility Layer
+// DJcovery Storage Utility Layer
 // Bucket: djscovery-media (single public bucket)
 //
 // Folder structure:

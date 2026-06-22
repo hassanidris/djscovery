@@ -21,22 +21,22 @@ const sora = Sora({
 
 export const metadata: Metadata = {
   title: {
-    default: "DJscovery — Where DJs Get Discovered",
-    template: "%s | DJscovery",
+    default: "DJcovery — Where DJs Get Discovered",
+    template: "%s | DJcovery",
   },
   description:
     "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
   openGraph: {
-    siteName: "DJscovery",
+    siteName: "DJcovery",
     type: "website",
     locale: "en_US",
-    title: "DJscovery — Where DJs Get Discovered",
+    title: "DJcovery — Where DJs Get Discovered",
     description:
       "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DJscovery — Where DJs Get Discovered",
+    title: "DJcovery — Where DJs Get Discovered",
     description:
       "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
   },
