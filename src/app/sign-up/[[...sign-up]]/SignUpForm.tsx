@@ -176,7 +176,11 @@ export default function SignUpForm({
         <input
           type="text"
           name="displayName"
-          placeholder="Your name (e.g. DJ Hassan)"
+          placeholder={
+            selected === "dj"
+              ? "Your name (e.g. DJ John)"
+              : "Your name (e.g. John Doe)"
+          }
           maxLength={50}
           className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
         />
