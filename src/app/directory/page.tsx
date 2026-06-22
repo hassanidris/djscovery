@@ -41,6 +41,7 @@ const DirectoryPage = async ({
     const profiles = await prisma.djProfile.findMany({
       where: {
         deletedAt: null,
+        status: "APPROVED",
         ...(q
           ? {
               OR: [
@@ -184,6 +185,7 @@ const DirectoryPage = async ({
           some: {
             djProfile: {
               deletedAt: null,
+              status: "APPROVED",
               ...(country
                 ? {
                     country: {
@@ -238,6 +240,7 @@ const DirectoryPage = async ({
   try {
     const countryWhere = {
       deletedAt: null as null,
+      status: "APPROVED" as const,
       ...(genreList.length > 0
         ? { genres: { some: { genre: { name: { in: genreList } } } } }
         : {}),
