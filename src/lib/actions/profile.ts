@@ -243,11 +243,18 @@ export async function createDjProfile(
       });
       isNewProfile = true;
     } catch (error) {
-      // On unique(userId) conflict, treat as existing profile and update it.
-      profile = await tx.djProfile.update({
-        where: { userId: user.id },
-        data: profileData,
-      });
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        // Unique constraint on userId — profile already exists, update instead.
+        profile = await tx.djProfile.update({
+          where: { userId: user.id },
+          data: profileData,
+        });
+      } else {
+        throw error;
+      }
     }
 
     if (djTypes.length > 0) {
