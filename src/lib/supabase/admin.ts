@@ -26,7 +26,7 @@ export async function generateWelcomeCta(email: string): Promise<string> {
     const { data, error } = await admin.auth.admin.generateLink({
       type: "magiclink",
       email,
-      options: { redirectTo: `${baseUrl}/auth/callback` },
+      options: { redirectTo: `${baseUrl}/auth/callback?welcome=true` },
     });
     if (error || !data?.properties?.action_link) return baseUrl;
     return data.properties.action_link;
