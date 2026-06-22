@@ -93,12 +93,24 @@ const DjProfileInputSchema = z.object({
   cityId: z.number().int().positive(),
   genreIds: z
     .array(z.number().int().positive())
-    .min(1, "Select at least one genre"),
+    .min(1, "Select at least one genre")
+    .max(5, "Select up to 5 genres"),
   socialLinks: z
     .array(z.object({ platform: z.string(), url: z.string().url() }))
     .min(1, "Add at least one social media link"),
   djTypes: z
-    .array(z.enum(["CLUB", "WEDDING", "FESTIVAL", "CORPORATE", "BAR_LOUNGE"]))
+    .array(
+      z.enum([
+        "CLUB",
+        "WEDDING",
+        "FESTIVAL",
+        "CORPORATE",
+        "BAR_LOUNGE",
+        "PRIVATE_PARTY",
+        "BIRTHDAY",
+        "CULTURAL_EVENT",
+      ]),
+    )
     .min(1, "Select at least one DJ type"),
   media: z.array(
     z.object({
@@ -126,7 +138,10 @@ const UpdateDjProfileSchema = z.object({
   coverImageUrl: z.string().url().optional().nullable(),
   countryId: z.number().int().positive().optional(),
   cityId: z.number().int().positive().optional(),
-  genreNames: z.array(z.string().min(1).max(50)).max(12).optional(),
+  genreNames: z
+    .array(z.string().min(1).max(50))
+    .max(5, "Select up to 5 genres")
+    .optional(),
   socialLinks: z
     .array(
       z.object({
@@ -136,7 +151,18 @@ const UpdateDjProfileSchema = z.object({
     )
     .optional(),
   djTypes: z
-    .array(z.enum(["CLUB", "WEDDING", "FESTIVAL", "CORPORATE", "BAR_LOUNGE"]))
+    .array(
+      z.enum([
+        "CLUB",
+        "WEDDING",
+        "FESTIVAL",
+        "CORPORATE",
+        "BAR_LOUNGE",
+        "PRIVATE_PARTY",
+        "BIRTHDAY",
+        "CULTURAL_EVENT",
+      ]),
+    )
     .optional(),
   bookingEmail: z.string().email("Invalid email address").optional().nullable(),
   bookingPhone: z.string().max(30).optional().nullable(),

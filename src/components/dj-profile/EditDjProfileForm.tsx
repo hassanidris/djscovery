@@ -112,6 +112,9 @@ const DJ_TYPE_LABELS: Record<string, string> = {
   FESTIVAL: "Festival",
   CORPORATE: "Corporate Event",
   BAR_LOUNGE: "Bar / Lounge",
+  PRIVATE_PARTY: "Private Party",
+  BIRTHDAY: "Birthday",
+  CULTURAL_EVENT: "Cultural Event",
 };
 
 interface ProfileData {
@@ -275,6 +278,7 @@ export default function EditDjProfileForm({
 
   function addGenre() {
     const trimmed = genreInput.trim();
+    if (genreNames.length >= 5) return;
     if (trimmed && !genreNames.includes(trimmed)) {
       setGenreNames((prev) => [...prev, trimmed]);
     }
@@ -394,6 +398,9 @@ export default function EditDjProfileForm({
           | "FESTIVAL"
           | "CORPORATE"
           | "BAR_LOUNGE"
+          | "PRIVATE_PARTY"
+          | "BIRTHDAY"
+          | "CULTURAL_EVENT"
         )[],
         socialLinks: validLinks,
         bookingEmail: bookingEmail.trim() || null,
@@ -684,11 +691,15 @@ export default function EditDjProfileForm({
                 <Label className="text-xs text-gray-300">
                   Genres <span className="text-h_red">*</span>
                 </Label>
-                {submitted && genresError && (
-                  <span className="text-[11px] text-red-400">
-                    Add at least one genre
-                  </span>
-                )}
+                <span
+                  className={`text-[11px] ${genreNames.length >= 5 ? "text-amber-400" : "text-gray-600"}`}
+                >
+                  {submitted && genresError ? (
+                    <span className="text-red-400">Add at least one genre</span>
+                  ) : (
+                    `${genreNames.length}/5`
+                  )}
+                </span>
               </div>
               <div className="mb-2 flex flex-wrap gap-1.5">
                 {genreNames.map((g) => (
@@ -718,16 +729,22 @@ export default function EditDjProfileForm({
                       addGenre();
                     }
                   }}
-                  placeholder="Type a genre and press Enter"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  placeholder={
+                    genreNames.length >= 5
+                      ? "Max 5 genres reached"
+                      : "Type a genre and press Enter"
+                  }
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600 disabled:opacity-40"
                   maxLength={50}
+                  disabled={genreNames.length >= 5}
                 />
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={addGenre}
-                  className="shrink-0 border-white/15 text-gray-300 hover:bg-white/5"
+                  disabled={genreNames.length >= 5}
+                  className="shrink-0 border-white/15 text-gray-300 hover:bg-white/5 disabled:opacity-40"
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </Button>

@@ -164,7 +164,7 @@ export default function BecomeDjForm({
     setSelectedGenreIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
-      else next.add(id);
+      else if (next.size < 5) next.add(id);
       return next;
     });
   }
@@ -180,7 +180,9 @@ export default function BecomeDjForm({
           ? prev
           : [...prev, genre].sort((a, b) => a.name.localeCompare(b.name)),
       );
-      setSelectedGenreIds((prev) => new Set([...prev, genre.id]));
+      setSelectedGenreIds((prev) =>
+        prev.size >= 5 ? prev : new Set([...prev, genre.id]),
+      );
       setNewGenreInput("");
     } catch {
       // silently ignore — genre may already exist
@@ -548,11 +550,18 @@ export default function BecomeDjForm({
       <div
         className={`${sectionCls} ${fieldErrors.genres ? "border-red-500/40" : ""}`}
       >
-        <h2 className={sectionTitleCls}>
-          Genres <span className="text-h_red">*</span>
-        </h2>
+        <div className="mb-1 flex items-center justify-between border-b border-white/10 pb-3">
+          <h2 className="text-base font-semibold text-white">
+            Genres <span className="text-h_red">*</span>
+          </h2>
+          <span
+            className={`text-xs font-medium ${selectedGenreIds.size >= 5 ? "text-amber-400" : "text-gray-500"}`}
+          >
+            {selectedGenreIds.size}/5
+          </span>
+        </div>
         <p className="-mt-2 text-xs text-gray-400">
-          Select all genres that apply to your style.
+          Select up to 5 genres that apply to your style.
         </p>
 
         <div className="flex flex-wrap gap-2">
@@ -591,14 +600,21 @@ export default function BecomeDjForm({
                 handleAddGenre();
               }
             }}
-            placeholder='Not in the list? Add it as "Other" e.g. Cumbia...'
+            placeholder={
+              selectedGenreIds.size >= 5
+                ? "Max 5 genres reached"
+                : "Not in the list? Add e.g. Cumbia..."
+            }
             maxLength={50}
-            className="focus:ring-h_red flex-1 rounded-lg bg-white/10 px-4 py-2.5 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
+            disabled={selectedGenreIds.size >= 5}
+            className="focus:ring-h_red flex-1 rounded-lg bg-white/10 px-4 py-2.5 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none disabled:opacity-40"
           />
           <button
             type="button"
             onClick={handleAddGenre}
-            disabled={!newGenreInput.trim() || addingGenre}
+            disabled={
+              !newGenreInput.trim() || addingGenre || selectedGenreIds.size >= 5
+            }
             className="bg-h_red hover:bg-h_redDark flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50"
           >
             {addingGenre ? (
