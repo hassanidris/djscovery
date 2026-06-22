@@ -174,6 +174,13 @@ export default function SignUpForm({
       <form action={signUp} className="flex flex-col gap-4">
         <input type="hidden" name="role" value={selected} />
         <input
+          type="text"
+          name="displayName"
+          placeholder="Your name (e.g. DJ Hassan)"
+          maxLength={50}
+          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
+        />
+        <input
           type="email"
           name="email"
           placeholder="Email"

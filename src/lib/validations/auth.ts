@@ -21,6 +21,7 @@ export const signUpSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: passwordSchema,
   role: roleSchema.default(""),
+  displayName: z.string().max(50, "Display name is too long").optional(),
 });
 
 export const forgotPasswordSchema = z.object({

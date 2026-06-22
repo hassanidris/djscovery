@@ -2,8 +2,13 @@ import { baseLayout, escapeHtml } from "./base";
 
 export const welcomeEmailSubject = "Welcome to DJcovery 🎵";
 
-export function welcomeEmailHtml({ name }: { name: string }): string {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com";
+export function welcomeEmailHtml({
+  name,
+  ctaUrl,
+}: {
+  name: string;
+  ctaUrl: string;
+}): string {
   const displayName = escapeHtml(name.charAt(0).toUpperCase() + name.slice(1));
 
   return baseLayout(`
@@ -37,7 +42,7 @@ export function welcomeEmailHtml({ name }: { name: string }): string {
     <table cellpadding="0" cellspacing="0">
       <tr>
         <td>
-          <a href="${baseUrl}"
+          <a href="${ctaUrl}"
              style="display:inline-block;background:#e11d48;color:#ffffff;font-weight:700;font-size:14px;text-decoration:none;padding:12px 28px;border-radius:8px;">
             Explore DJcovery →
           </a>

@@ -16,6 +16,7 @@ import {
   welcomeEmailSubject,
   welcomeEmailHtml,
 } from "@/lib/email/templates/welcome";
+import { generateWelcomeCta } from "@/lib/supabase/admin";
 import {
   securityAlertSubject,
   securityAlertEmailHtml,
@@ -52,24 +53,28 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+  const rawDisplayName =
+    (formData.get("displayName") as string | null)?.trim() ?? "";
+
   const parsed = signUpSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
     role: formData.get("role") ?? "",
+    displayName: rawDisplayName || undefined,
   });
   if (!parsed.success) {
     const message = parsed.error.errors[0]?.message ?? "Invalid input";
     redirect(`/sign-up?error=${encodeURIComponent(message)}`);
   }
 
-  const { email, password, role } = parsed.data;
+  const { email, password, role, displayName } = parsed.data;
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { role }, // role stored in user_metadata — callback reads this (never from URL)
+      data: { role, displayName }, // stored in user_metadata — callback reads this
       emailRedirectTo: `${BASE_URL}/auth/callback`,
     },
   });
@@ -80,7 +85,8 @@ export async function signUp(formData: FormData) {
     const userId = data.user.id;
     const userEmail = data.user.email ?? "";
     const username = `${userEmail.split("@")[0]}-${userId.slice(0, 6)}`;
-    const name = userEmail.split("@")[0];
+    const emailPrefix = userEmail.split("@")[0];
+    const name = displayName || emailPrefix;
 
     try {
       await prisma.$transaction(async (tx) => {
@@ -104,13 +110,15 @@ export async function signUp(formData: FormData) {
         }
       });
 
+      const ctaUrl = await generateWelcomeCta(userEmail);
+
       // Welcome email for immediate signup (no email confirmation)
       await sendEmail({
         to: userEmail,
         userId,
         emailType: "WELCOME",
         subject: welcomeEmailSubject,
-        html: welcomeEmailHtml({ name }),
+        html: welcomeEmailHtml({ name, ctaUrl }),
       });
     } catch {
       await supabase.auth.signOut();

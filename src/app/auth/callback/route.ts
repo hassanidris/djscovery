@@ -8,6 +8,7 @@ import {
   welcomeEmailSubject,
   welcomeEmailHtml,
 } from "@/lib/email/templates/welcome";
+import { generateWelcomeCta } from "@/lib/supabase/admin";
 import { roleSchema } from "@/lib/validations/auth";
 
 export async function GET(request: Request) {
@@ -74,7 +75,10 @@ export async function GET(request: Request) {
     const username =
       user.user_metadata?.username ??
       email.split("@")[0] + "_" + user.id.slice(0, 6);
-    const name = user.user_metadata?.name ?? email.split("@")[0];
+    const name =
+      user.user_metadata?.displayName ??
+      user.user_metadata?.name ??
+      email.split("@")[0];
     const userId = user.id;
 
     // Role resolution priority: URL param → cookie → user_metadata
@@ -115,6 +119,17 @@ export async function GET(request: Request) {
         });
         isNewUser = !prior;
 
+        // If a stale DB record exists for this email under a different auth ID
+        // (can happen when the Supabase Auth account was deleted and re-created),
+        // remove it so the upsert create path doesn't hit the email unique constraint.
+        const stale = await tx.user.findUnique({
+          where: { email },
+          select: { id: true },
+        });
+        if (stale && stale.id !== userId) {
+          await tx.user.delete({ where: { id: stale.id } });
+        }
+
         await tx.user.upsert({
           where: { id: userId },
           update: { email },
@@ -141,17 +156,23 @@ export async function GET(request: Request) {
         dbRoles = roleRecords.map((r) => r.role);
       });
     } catch (err) {
-      console.error("[auth/callback] DB transaction error:", err);
-      return NextResponse.redirect(`${origin}/sign-in?error=db_error`);
+      const detail = err instanceof Error ? err.message : String(err);
+      console.error("[auth/callback] DB transaction error:", detail);
+      const msg =
+        process.env.NODE_ENV === "development"
+          ? encodeURIComponent(detail.slice(0, 150))
+          : "db_error";
+      return NextResponse.redirect(`${origin}/sign-in?error=${msg}`);
     }
 
     if (isNewUser) {
+      const ctaUrl = await generateWelcomeCta(email);
       await sendEmail({
         to: email,
         userId,
         emailType: "WELCOME",
         subject: welcomeEmailSubject,
-        html: welcomeEmailHtml({ name }),
+        html: welcomeEmailHtml({ name, ctaUrl }),
       });
     }
 
