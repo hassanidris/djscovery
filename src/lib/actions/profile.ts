@@ -4,6 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { sendEmail } from "@/lib/email/sendEmail";
+import {
+  adminDjRegistrationSubject,
+  adminDjRegistrationHtml,
+} from "@/lib/email/templates/adminDjRegistration";
 
 function makeSlugBase(stageName: string) {
   return stageName
@@ -220,9 +225,10 @@ export async function createDjProfile(
 
   const slug = await makeUniqueSlug(stageName, user.id);
 
-  await prisma.$transaction(async (tx) => {
-    let isNewProfile = false;
+  let isNewProfile = false;
+  let adminEmailsForNotify: string[] = [];
 
+  await prisma.$transaction(async (tx) => {
     const profileData = {
       stageName,
       bio: bio ?? null,
@@ -305,8 +311,9 @@ export async function createDjProfile(
     if (isNewProfile) {
       const admins = await tx.userRole.findMany({
         where: { role: "ADMIN" },
-        select: { userId: true },
+        select: { userId: true, user: { select: { email: true } } },
       });
+      adminEmailsForNotify = admins.map((a) => a.user.email);
       if (admins.length > 0) {
         await tx.notification.createMany({
           data: admins.map((a) => ({
@@ -320,6 +327,22 @@ export async function createDjProfile(
       }
     }
   });
+
+  if (isNewProfile && adminEmailsForNotify.length > 0) {
+    const adminUrl = `${
+      process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com"
+    }/admin/djs`;
+    await Promise.all(
+      adminEmailsForNotify.map((email) =>
+        sendEmail({
+          to: email,
+          emailType: "ADMIN_DJ_REGISTRATION",
+          subject: adminDjRegistrationSubject,
+          html: adminDjRegistrationHtml({ stageName, adminUrl }),
+        }),
+      ),
+    );
+  }
 
   return { success: true as const };
 }

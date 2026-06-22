@@ -33,7 +33,7 @@ export function baseLayout(content: string): string {
             <td align="center" style="padding-top:24px;">
               <p style="color:#6b7280;font-size:12px;margin:0;line-height:1.6;">
                 You received this email because you have an account at DJcovery.<br />
-                <a href="https://djcovery.com" style="color:#9ca3af;text-decoration:none;">djcovery.com</a>
+                <a href="https://djcovery.com" style="color:#9ca3af;text-decoration:none;">www.djcovery.com</a>
               </p>
             </td>
           </tr>

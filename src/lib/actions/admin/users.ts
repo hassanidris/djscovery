@@ -4,6 +4,11 @@ import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { SuspendUserSchema, ActivateUserSchema } from "@/lib/validations/admin";
 import { revalidatePath } from "next/cache";
+import { sendEmail } from "@/lib/email/sendEmail";
+import {
+  accountSuspendedSubject,
+  accountSuspendedHtml,
+} from "@/lib/email/templates/accountSuspended";
 
 type ActionResult = { success: true } | { error: string };
 
@@ -19,9 +24,15 @@ export async function suspendUser(formData: FormData): Promise<ActionResult> {
 
   const { userId, reason } = parsed.data;
 
-  if (userId === adminId) return { error: "You cannot suspend your own account" };
+  if (userId === adminId)
+    return { error: "You cannot suspend your own account" };
 
   try {
+    const target = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true },
+    });
+
     await prisma.$transaction([
       prisma.user.update({
         where: { id: userId },
@@ -37,6 +48,16 @@ export async function suspendUser(formData: FormData): Promise<ActionResult> {
         },
       }),
     ]);
+
+    if (target) {
+      await sendEmail({
+        to: target.email,
+        userId,
+        emailType: "ACCOUNT_SUSPENDED",
+        subject: accountSuspendedSubject,
+        html: accountSuspendedHtml({ name: target.name ?? "there", reason }),
+      });
+    }
 
     revalidatePath("/admin/users");
     return { success: true };
@@ -112,7 +133,9 @@ export async function getAdminUsers({
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     where: {
       deletedAt: null,
-      ...(status ? { status: status as "ACTIVE" | "SUSPENDED" | "PENDING" | "REJECTED" } : {}),
+      ...(status
+        ? { status: status as "ACTIVE" | "SUSPENDED" | "PENDING" | "REJECTED" }
+        : {}),
       ...(role
         ? { roles: { some: { role: role as "ADMIN" | "DJ" | "ORGANIZER" } } }
         : {}),
