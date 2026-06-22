@@ -117,6 +117,7 @@ enum NotificationType {
   GIG_NEW_MATCH
   BOOKING_INQUIRY
   ACCOUNT_SUSPENDED
+  REPORT_SUBMITTED // Admin receives this when a user submits a report
 }
 
 enum DjType {
@@ -147,6 +148,31 @@ enum OrganizerStatus {
   PENDING
   ACTIVE
   SUSPENDED
+}
+
+enum ReportReason {
+  FAKE_PROFILE
+  SPAM
+  INAPPROPRIATE_CONTENT
+  SCAM
+  HARASSMENT
+  WRONG_INFORMATION
+  OTHER
+}
+
+enum ReportTargetType {
+  DJ_PROFILE
+  ORGANIZER_PROFILE
+  GIG
+  REVIEW
+  MEDIA
+}
+
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
 }
 
 enum EmailType {
@@ -218,6 +244,7 @@ model User {
   updatedAt          DateTime   @updatedAt
   deletedAt          DateTime?
   onboardingComplete Boolean    @default(false)
+  lastLoginAt        DateTime?
 
   countryId Int?
   country   Country? @relation(fields: [countryId], references: [id])
@@ -248,6 +275,10 @@ model User {
 
   savedDjs    SavedDj[]
   savedEvents SavedEvent[]
+
+  reportsSubmitted Report[]         @relation("ReportSubmitter")
+  reportsReviewed  Report[]         @relation("ReportReviewer")
+  adminActionLogs  AdminActionLog[]
 
   @@index([status])
   @@index([deletedAt])
@@ -292,6 +323,7 @@ model DjProfile {
   plan         DjPlan  @default(FREE)
   verified     Boolean @default(false)
   featured     Boolean @default(false)
+  hidden       Boolean @default(false) // Admin can hide without changing approval status
   searchScore  Float   @default(0)
   bookingEmail String?
   bookingPhone String?
@@ -316,6 +348,7 @@ model DjProfile {
 
   @@index([slug])
   @@index([status])
+  @@index([hidden])
   @@index([plan])
   @@index([featured])
   @@index([searchScore])
@@ -344,6 +377,7 @@ model OrganizerProfile {
   website        String?
   contactEmail   String? // PRIVATE — never rendered publicly
   phone          String?
+  hidden         Boolean @default(false) // Admin can hide without suspending
 
   countryId Int
   country   Country @relation(fields: [countryId], references: [id])
@@ -359,6 +393,7 @@ model OrganizerProfile {
 
   @@index([slug])
   @@index([status])
+  @@index([hidden])
   @@index([organizerType])
   @@index([countryId])
   @@index([cityId])
@@ -721,6 +756,7 @@ model Gig {
   organizerContactEmail String?
 
   viewCount Int       @default(0)
+  hidden    Boolean   @default(false) // Admin can hide without cancelling
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -734,6 +770,7 @@ model Gig {
   @@index([cityId])
   @@index([countryId])
   @@index([applicationDeadline])
+  @@index([hidden])
   @@index([slug])
 }
 
@@ -860,6 +897,54 @@ model EmailLog {
   @@index([userId])
   @@index([status])
   @@index([emailType])
+  @@index([createdAt])
+}
+
+// ------ REPORTS ------
+
+model Report {
+  id          Int              @id @default(autoincrement())
+  targetType  ReportTargetType
+  targetId    String // Stringified — works for Int and String PKs
+  reason      ReportReason
+  description String?
+  status      ReportStatus     @default(OPEN)
+  adminNote   String?
+
+  reporterId String
+  reporter   User   @relation("ReportSubmitter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  reviewedById String?
+  reviewedBy   User?     @relation("ReportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([targetType, targetId])
+  @@index([reporterId])
+  @@index([reviewedById])
+}
+
+// ------ ADMIN ACTION LOG ------
+
+// Audit trail — every admin mutation writes one row here.
+model AdminActionLog {
+  id         Int    @id @default(autoincrement())
+  action     String // e.g. "SUSPEND_USER", "APPROVE_DJ", "HIDE_GIG"
+  targetType String // e.g. "User", "DjProfile", "Gig"
+  targetId   String // Stringified PK of the affected record
+  metadata   Json? // Extra context: reason, note, previous status
+
+  adminId String?
+  admin   User?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([targetType, targetId])
   @@index([createdAt])
 }
 

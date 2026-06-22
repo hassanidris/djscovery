@@ -63,6 +63,7 @@ const CommentsList = ({
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: null,
+        lastLoginAt: null,
       },
     });
     try {

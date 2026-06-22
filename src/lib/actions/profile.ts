@@ -221,6 +221,8 @@ export async function createDjProfile(
   const slug = await makeUniqueSlug(stageName, user.id);
 
   await prisma.$transaction(async (tx) => {
+    let isNewProfile = false;
+
     const profileData = {
       stageName,
       bio: bio ?? null,
@@ -234,11 +236,26 @@ export async function createDjProfile(
       feeMax: feeMax ?? null,
       feeCurrency: feeCurrency ?? null,
     };
-    const profile = await tx.djProfile.upsert({
-      where: { userId: user.id },
-      update: profileData,
-      create: { userId: user.id, slug, ...profileData },
-    });
+    let profile;
+    try {
+      profile = await tx.djProfile.create({
+        data: { userId: user.id, slug, ...profileData },
+      });
+      isNewProfile = true;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        // Unique constraint on userId — profile already exists, update instead.
+        profile = await tx.djProfile.update({
+          where: { userId: user.id },
+          data: profileData,
+        });
+      } else {
+        throw error;
+      }
+    }
 
     if (djTypes.length > 0) {
       await tx.djProfileType.createMany({
@@ -278,11 +295,30 @@ export async function createDjProfile(
     }
 
     // Grant DJ role only now — after the profile is fully saved.
+
     await tx.userRole.upsert({
       where: { userId_role: { userId: user.id, role: "DJ" } },
       update: {},
       create: { userId: user.id, role: "DJ" },
     });
+
+    if (isNewProfile) {
+      const admins = await tx.userRole.findMany({
+        where: { role: "ADMIN" },
+        select: { userId: true },
+      });
+      if (admins.length > 0) {
+        await tx.notification.createMany({
+          data: admins.map((a) => ({
+            type: "DJ_REGISTRATION" as const,
+            recipientId: a.userId,
+            senderId: user.id,
+            data: { djProfileId: profile.id, stageName },
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
   });
 
   return { success: true as const };
