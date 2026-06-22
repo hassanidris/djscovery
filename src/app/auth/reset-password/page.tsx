@@ -17,7 +17,9 @@ export default async function Page({
   if (!user) {
     redirect(
       "/forgot-password?error=" +
-        encodeURIComponent("Your reset link has expired. Please request a new one."),
+        encodeURIComponent(
+          "Your reset link has expired. Please request a new one.",
+        ),
     );
   }
 
@@ -47,19 +49,19 @@ export default async function Page({
           <input
             type="password"
             name="password"
-            placeholder="New password (min 8 chars)"
-            minLength={8}
+            placeholder="New password (min 12 chars)"
+            minLength={12}
             required
             autoFocus
-            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 outline-none ring-1 ring-white/20 transition-all"
+            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
           />
           <input
             type="password"
             name="confirmPassword"
             placeholder="Confirm new password"
-            minLength={8}
+            minLength={12}
             required
-            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 outline-none ring-1 ring-white/20 transition-all"
+            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
           />
           <ResetPasswordSubmitBtn />
         </form>
@@ -67,7 +69,7 @@ export default async function Page({
         <p className="text-center text-sm text-gray-400">
           <Link
             href="/forgot-password"
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-gray-400 transition-colors hover:text-white"
           >
             ← Request a new link
           </Link>

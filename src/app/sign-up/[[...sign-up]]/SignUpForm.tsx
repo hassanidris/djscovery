@@ -6,6 +6,48 @@ import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Loader2 } from "lucide-react";
 
+function getPasswordStrength(password: string): {
+  score: 0 | 1 | 2;
+  label: string;
+  color: string;
+  width: string;
+} {
+  if (password.length === 0)
+    return { score: 0, label: "", color: "", width: "w-0" };
+  const longEnough = password.length >= 12;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const allRules = longEnough && hasUpper && hasLower && hasNumber;
+  if (allRules) {
+    return {
+      score: 2,
+      label: "Strong",
+      color: "bg-green-500",
+      width: "w-full",
+    };
+  }
+  if (longEnough || (hasUpper && hasLower && hasNumber)) {
+    return { score: 1, label: "Fair", color: "bg-amber-400", width: "w-2/3" };
+  }
+  return { score: 0, label: "Weak", color: "bg-red-500", width: "w-1/3" };
+}
+
+function PasswordStrengthMeter({ password }: { password: string }) {
+  const { label, color, width } = getPasswordStrength(password);
+  if (!password) return null;
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="h-1.5 w-full rounded-full bg-white/10">
+        <div
+          className={`h-1.5 rounded-full transition-all duration-300 ${color} ${width}`}
+        />
+      </div>
+      <p className={`text-xs ${color.replace("bg-", "text-")}`}>{label}</p>
+    </div>
+  );
+}
+
 function SignUpSubmitBtn({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
@@ -62,6 +104,7 @@ export default function SignUpForm({
   defaultRole?: Role;
 }) {
   const [selected, setSelected] = useState<Role>(defaultRole ?? "");
+  const [password, setPassword] = useState("");
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-white/20 bg-white/5 p-8">
@@ -137,14 +180,19 @@ export default function SignUpForm({
           required
           className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password (min 8 chars)"
-          minLength={8}
-          required
-          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
-        />
+        <div className="flex flex-col gap-2">
+          <input
+            type="password"
+            name="password"
+            placeholder="Password (min 12 chars)"
+            minLength={12}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
+          />
+          <PasswordStrengthMeter password={password} />
+        </div>
 
         <SignUpSubmitBtn
           label={
