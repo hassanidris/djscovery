@@ -27,7 +27,7 @@ function getPasswordStrength(password: string): {
       width: "w-full",
     };
   }
-  if (longEnough || (hasUpper && hasLower && hasNumber)) {
+  if (longEnough && (hasUpper || hasLower || hasNumber)) {
     return { score: 1, label: "Fair", color: "bg-amber-400", width: "w-2/3" };
   }
   return { score: 0, label: "Weak", color: "bg-red-500", width: "w-1/3" };
