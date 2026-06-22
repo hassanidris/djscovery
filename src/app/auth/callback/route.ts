@@ -119,6 +119,17 @@ export async function GET(request: Request) {
         });
         isNewUser = !prior;
 
+        // If a stale DB record exists for this email under a different auth ID
+        // (can happen when the Supabase Auth account was deleted and re-created),
+        // remove it so the upsert create path doesn't hit the email unique constraint.
+        const stale = await tx.user.findUnique({
+          where: { email },
+          select: { id: true },
+        });
+        if (stale && stale.id !== userId) {
+          await tx.user.delete({ where: { id: stale.id } });
+        }
+
         await tx.user.upsert({
           where: { id: userId },
           update: { email },
@@ -145,8 +156,13 @@ export async function GET(request: Request) {
         dbRoles = roleRecords.map((r) => r.role);
       });
     } catch (err) {
-      console.error("[auth/callback] DB transaction error:", err);
-      return NextResponse.redirect(`${origin}/sign-in?error=db_error`);
+      const detail = err instanceof Error ? err.message : String(err);
+      console.error("[auth/callback] DB transaction error:", detail);
+      const msg =
+        process.env.NODE_ENV === "development"
+          ? encodeURIComponent(detail.slice(0, 150))
+          : "db_error";
+      return NextResponse.redirect(`${origin}/sign-in?error=${msg}`);
     }
 
     if (isNewUser) {
