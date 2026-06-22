@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/utils/currency";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { toast } from "sonner";
+import { uploadDjCover } from "@/lib/actions/dj-upload";
 import {
   MapPin,
   Users,
@@ -32,6 +34,8 @@ import {
   BriefcaseBusiness,
   Pencil,
   ImageIcon,
+  Camera,
+  Loader2,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
@@ -129,6 +133,32 @@ export default function DjProfileFree({
 
   const isOwner = viewMode === "dj-owner";
   const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
+
+  const [coverUrl, setCoverUrl] = useState(DJ.coverImage);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingCover(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const result = await uploadDjCover(fd);
+      if ("error" in result) {
+        toast.error(result.error);
+      } else {
+        setCoverUrl(result.url);
+        toast.success("Cover image updated");
+      }
+    } catch {
+      toast.error("Upload failed. Please try again.");
+    } finally {
+      setIsUploadingCover(false);
+      e.target.value = "";
+    }
+  }
   const bookingEmail = djData
     ? djData.booking.email
     : FREE_DEFAULT_DJ.bookingEmail;
@@ -156,7 +186,7 @@ export default function DjProfileFree({
       <section className="w-full">
         <div className="relative h-64 w-full overflow-hidden md:h-96">
           <Image
-            src={DJ.coverImage}
+            src={coverUrl}
             alt="cover"
             fill
             className="object-cover"
@@ -164,6 +194,30 @@ export default function DjProfileFree({
           />
           <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
           <div className="from-h_red/8 absolute inset-0 bg-linear-to-r to-transparent" />
+          {isOwner && (
+            <>
+              <button
+                type="button"
+                onClick={() => coverInputRef.current?.click()}
+                disabled={isUploadingCover}
+                className="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-lg bg-black/50 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-black/70 disabled:opacity-50"
+              >
+                {isUploadingCover ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Camera className="h-3.5 w-3.5" />
+                )}
+                Change Cover
+              </button>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleCoverChange}
+              />
+            </>
+          )}
         </div>
 
         <div className="mx-auto max-w-6xl px-4 md:px-8">
