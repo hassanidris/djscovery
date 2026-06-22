@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const passwordSchema = z
+  .string()
+  .min(12, "Password must be at least 12 characters")
+  .max(128, "Password is too long")
+  .refine(
+    (v) => /[a-z]/.test(v) && /[A-Z]/.test(v) && /\d/.test(v),
+    "Must contain uppercase, lowercase, and a number",
+  );
+
 export const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
@@ -10,7 +19,7 @@ export type AllowedRole = z.infer<typeof roleSchema>;
 
 export const signUpSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: passwordSchema,
   role: roleSchema.default(""),
 });
 
@@ -20,7 +29,7 @@ export const forgotPasswordSchema = z.object({
 
 export const updatePasswordSchema = z
   .object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
