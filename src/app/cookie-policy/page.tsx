@@ -87,10 +87,12 @@ export default function CookiePolicyPage() {
                 Welcome to{" "}
                 <span className="font-semibold text-white">DJcovery</span>{" "}
                 (&quot;DJcovery&quot;, &quot;we&quot;, &quot;our&quot;, or
-                &quot;us&quot;). By continuing to use our platform, you agree to
-                the use of cookies as described in this policy, unless you
-                disable them through your browser settings or cookie
-                preferences.
+                &quot;us&quot;). This Cookie Policy explains how we use cookies
+                and similar technologies when you visit and use our website,
+                mobile applications, and services available through DJcovery. By
+                continuing to use our platform, you agree to the use of cookies
+                as described in this policy, unless you disable them through
+                your browser settings or cookie preferences.
               </p>
 
               {/* 1 */}
@@ -217,54 +219,37 @@ export default function CookiePolicyPage() {
                       {
                         name: "Supabase",
                         desc: "Authentication & Database Services",
-                        planned: false,
                       },
                       {
                         name: "Google Analytics",
                         desc: "Website Analytics",
-                        planned: true,
                       },
                       {
                         name: "Vercel",
                         desc: "Hosting & Performance Monitoring",
-                        planned: false,
                       },
                       {
                         name: "Cloudflare",
                         desc: "Security & Content Delivery",
-                        planned: false,
                       },
                       {
                         name: "Resend",
                         desc: "Email Services",
-                        planned: false,
                       },
                     ].map((provider) => (
                       <div
                         key={provider.name}
                         className="rounded-xl border border-white/5 bg-white/2 px-4 py-3"
                       >
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-white">
-                            {provider.name}
-                          </p>
-                          {provider.planned && (
-                            <span className="border-h_red/30 bg-h_red/10 text-h_red rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
-                              Planned
-                            </span>
-                          )}
-                        </div>
+                        <p className="text-sm font-semibold text-white">
+                          {provider.name}
+                        </p>
                         <p className="mt-0.5 text-xs text-gray-500">
                           {provider.desc}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-600">
-                    * Services marked as{" "}
-                    <span className="font-medium text-gray-500">Planned</span>{" "}
-                    are not yet integrated but may be included in the future.
-                  </p>
                   <InfoNote>
                     These providers have their own privacy and cookie policies
                     governing how they process information.
