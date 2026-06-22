@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -38,6 +38,12 @@ export default function AdminFilters({
   const pathname = usePathname();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [searchValue, setSearchValue] = useState(currentSearch);
+
+  useEffect(() => {
+    setSearchValue(currentSearch);
+  }, [currentSearch]);
+
   const buildUrl = useCallback(
     (updates: Record<string, string>) => {
       const params = new URLSearchParams();
@@ -62,6 +68,7 @@ export default function AdminFilters({
 
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
+    setSearchValue(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       if (!searchKey) return;
@@ -88,7 +95,7 @@ export default function AdminFilters({
       {searchKey && (
         <Input
           placeholder={searchPlaceholder}
-          defaultValue={currentSearch}
+          value={searchValue}
           onChange={handleSearchChange}
           className="h-9 w-52 border-white/10 bg-white/5 text-white placeholder:text-gray-500 focus-visible:ring-white/20"
         />

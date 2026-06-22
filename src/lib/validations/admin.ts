@@ -3,12 +3,12 @@ import { z } from "zod";
 // ── Users ────────────────────────────────────────────────────
 
 export const SuspendUserSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
+  userId: z.string().uuid("Invalid user ID"),
   reason: z.string().max(500).optional(),
 });
 
 export const ActivateUserSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
+  userId: z.string().uuid("Invalid user ID"),
 });
 
 // ── DJ Profiles ──────────────────────────────────────────────

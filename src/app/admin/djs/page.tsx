@@ -30,7 +30,9 @@ export default async function AdminDjsPage({
   searchParams: Promise<Record<string, string>>;
 }) {
   const params = await searchParams;
-  const cursor = params.cursor ? Number(params.cursor) : undefined;
+  const cursorRaw = Number(params.cursor);
+  const cursor =
+    params.cursor && Number.isInteger(cursorRaw) ? cursorRaw : undefined;
   const status = params.status;
   const country = params.country;
 

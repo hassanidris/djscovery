@@ -187,6 +187,7 @@ const DirectoryPage = async ({
             djProfile: {
               deletedAt: null,
               status: "APPROVED",
+              hidden: false,
               ...(country
                 ? {
                     country: {
@@ -242,6 +243,7 @@ const DirectoryPage = async ({
     const countryWhere = {
       deletedAt: null as null,
       status: "APPROVED" as const,
+      hidden: false,
       ...(genreList.length > 0
         ? { genres: { some: { genre: { name: { in: genreList } } } } }
         : {}),

@@ -937,8 +937,8 @@ model AdminActionLog {
   targetId   String // Stringified PK of the affected record
   metadata   Json? // Extra context: reason, note, previous status
 
-  adminId String
-  admin   User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  adminId String?
+  admin   User?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 

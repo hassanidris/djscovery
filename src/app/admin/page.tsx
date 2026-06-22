@@ -89,8 +89,8 @@ export default async function AdminDashboardPage() {
         <div className="flex flex-wrap gap-3">
           {stats.pendingDjApprovals > 0 && (
             <Link
-              href="/admin/djs?status=pending"
-              className="border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
+              href="/admin/djs?status=PENDING_APPROVAL"
+              className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
             >
               <Clock className="h-4 w-4" />
               {stats.pendingDjApprovals} DJ profile
@@ -187,7 +187,7 @@ export default async function AdminDashboardPage() {
               label="DJs Awaiting Approval"
               value={stats.pendingDjApprovals}
               icon={<Clock className="h-5 w-5 text-amber-400" />}
-              href="/admin/djs?status=pending"
+              href="/admin/djs?status=PENDING_APPROVAL"
               badge="Pending"
             />
           </div>

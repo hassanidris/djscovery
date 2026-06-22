@@ -221,10 +221,7 @@ export async function createDjProfile(
   const slug = await makeUniqueSlug(stageName, user.id);
 
   await prisma.$transaction(async (tx) => {
-    const existingProfile = await tx.djProfile.findUnique({
-      where: { userId: user.id },
-      select: { id: true },
-    });
+    let isNewProfile = false;
 
     const profileData = {
       stageName,
@@ -239,11 +236,19 @@ export async function createDjProfile(
       feeMax: feeMax ?? null,
       feeCurrency: feeCurrency ?? null,
     };
-    const profile = await tx.djProfile.upsert({
-      where: { userId: user.id },
-      update: profileData,
-      create: { userId: user.id, slug, ...profileData },
-    });
+    let profile;
+    try {
+      profile = await tx.djProfile.create({
+        data: { userId: user.id, slug, ...profileData },
+      });
+      isNewProfile = true;
+    } catch (error) {
+      // On unique(userId) conflict, treat as existing profile and update it.
+      profile = await tx.djProfile.update({
+        where: { userId: user.id },
+        data: profileData,
+      });
+    }
 
     if (djTypes.length > 0) {
       await tx.djProfileType.createMany({
@@ -283,7 +288,7 @@ export async function createDjProfile(
     }
 
     // Grant DJ role only now — after the profile is fully saved.
-    const isNewProfile = !existingProfile;
+
     await tx.userRole.upsert({
       where: { userId_role: { userId: user.id, role: "DJ" } },
       update: {},

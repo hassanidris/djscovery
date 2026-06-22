@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
 
 // Load .env and .env.local relative to the project root (cwd)
+const inheritedEnvKeys = new Set(Object.keys(process.env));
 for (const file of [".env", ".env.local"]) {
   const filePath = resolve(process.cwd(), file);
   if (!existsSync(filePath)) continue;
@@ -15,7 +16,8 @@ for (const file of [".env", ".env.local"]) {
       .slice(eqIdx + 1)
       .trim()
       .replace(/^["']|["']$/g, "");
-    if (!(key in process.env)) process.env[key] = val;
+    if (inheritedEnvKeys.has(key)) continue; // keep explicitly provided env vars
+    process.env[key] = val; // allow .env.local to override .env
   }
 }
 
@@ -46,6 +48,11 @@ import { createClient } from "@supabase/supabase-js";
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
+
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  return `${local[0]}***@${domain}`;
+}
 
 function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -86,10 +93,20 @@ async function main() {
     console.error("❌  Password must be at least 12 characters.");
     process.exit(1);
   }
+  if (
+    !/[A-Z]/.test(password) ||
+    !/[a-z]/.test(password) ||
+    !/\d/.test(password)
+  ) {
+    console.error(
+      "❌  Password must include at least one uppercase letter, one lowercase letter, and one number.",
+    );
+    process.exit(1);
+  }
 
   const supabase = createAdminClient();
 
-  console.log(`\n🔐 Creating admin user: ${email}\n`);
+  console.log(`\n🔐 Creating admin user: ${maskEmail(email)}\n`);
 
   // ── Step 1: Check DB first to get the canonical user ID ───────────────────
   const username = email.split("@")[0].replace(/[^a-z0-9_]/gi, "") + "_admin";
@@ -175,7 +192,7 @@ async function main() {
 
   console.log(`  ✅ ADMIN role granted\n`);
   console.log(`🎉 Admin ready! Sign in at /sign-in with:`);
-  console.log(`   Email:    ${email}`);
+  console.log(`   Email:    ${maskEmail(email)}`);
   console.log(`   Password: (the one you provided)\n`);
 }
 

@@ -45,7 +45,11 @@ export default async function AdminReportsPage({
   searchParams: Promise<Record<string, string>>;
 }) {
   const params = await searchParams;
-  const cursor = params.cursor ? Number(params.cursor) : undefined;
+  const parsedCursor = params.cursor ? Number(params.cursor) : undefined;
+  const cursor =
+    parsedCursor !== undefined && Number.isFinite(parsedCursor)
+      ? parsedCursor
+      : undefined;
   const status = params.status;
   const targetType = params.targetType;
 

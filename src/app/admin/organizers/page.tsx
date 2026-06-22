@@ -25,13 +25,20 @@ const STATUS_COLORS: Record<string, string> = {
 export default async function AdminOrganizersPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string>>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const cursor = params.cursor ? Number(params.cursor) : undefined;
-  const status = params.status;
-  const type = params.type;
-  const country = params.country;
+  const first = (v: string | string[] | undefined) =>
+    Array.isArray(v) ? v[0] : v;
+
+  const rawCursor = first(params.cursor);
+  const cursor =
+    rawCursor && Number.isFinite(Number(rawCursor))
+      ? Number(rawCursor)
+      : undefined;
+  const status = first(params.status);
+  const type = first(params.type);
+  const country = first(params.country);
 
   const { organizers, nextCursor } = await getAdminOrganizers({
     cursor,

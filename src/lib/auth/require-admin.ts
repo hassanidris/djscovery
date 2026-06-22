@@ -19,8 +19,12 @@ export async function requireAdmin(): Promise<{ userId: string }> {
 
   if (!user) redirect("/sign-in");
 
-  const adminRole = await prisma.userRole.findUnique({
-    where: { userId_role: { userId: user.id, role: "ADMIN" } },
+  const adminRole = await prisma.userRole.findFirst({
+    where: {
+      userId: user.id,
+      role: "ADMIN",
+      user: { status: "ACTIVE", deletedAt: null },
+    },
     select: { role: true },
   });
 

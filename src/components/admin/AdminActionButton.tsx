@@ -44,14 +44,19 @@ export default function AdminActionButton({
   const [isPending, startTransition] = useTransition();
 
   function execute() {
+    if (isPending) return;
     startTransition(async () => {
-      const fd = new FormData();
-      Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
-      const result = await action(fd);
-      if ("error" in result) {
-        toast.error(result.error);
-      } else {
+      try {
+        const fd = new FormData();
+        Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
+        const result = await action(fd);
+        if ("error" in result) {
+          toast.error(result.error);
+          return;
+        }
         toast.success(successMessage);
+      } catch {
+        toast.error("Action failed. Please try again.");
       }
     });
   }
@@ -95,6 +100,7 @@ export default function AdminActionButton({
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={execute}
+            disabled={isPending}
             className="bg-h_red hover:bg-h_red/80 text-white"
           >
             {confirmLabel}
