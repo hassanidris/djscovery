@@ -47,6 +47,18 @@ export const CONSENT_CATEGORIES: {
   },
 ];
 
+function isValidConsent(value: unknown): value is CookieConsent {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    v.necessary === true &&
+    typeof v.analytics === "boolean" &&
+    typeof v.marketing === "boolean" &&
+    typeof v.preferences === "boolean" &&
+    typeof v.updatedAt === "string"
+  );
+}
+
 export function getStoredConsent(): CookieConsent | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie
@@ -54,7 +66,10 @@ export function getStoredConsent(): CookieConsent | null {
     .find((row) => row.startsWith(`${CONSENT_COOKIE_NAME}=`));
   if (!match) return null;
   try {
-    return JSON.parse(decodeURIComponent(match.split("=").slice(1).join("=")));
+    const parsed = JSON.parse(
+      decodeURIComponent(match.split("=").slice(1).join("=")),
+    );
+    return isValidConsent(parsed) ? parsed : null;
   } catch {
     return null;
   }
@@ -65,7 +80,11 @@ export function saveConsent(consent: Omit<CookieConsent, "updatedAt">): void {
     ...consent,
     updatedAt: new Date().toISOString(),
   };
-  document.cookie = `${CONSENT_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(value))}; path=/; max-age=${CONSENT_COOKIE_MAX_AGE}; SameSite=Lax`;
+  const secure =
+    typeof location !== "undefined" && location.protocol === "https:"
+      ? "; Secure"
+      : "";
+  document.cookie = `${CONSENT_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(value))}; path=/; max-age=${CONSENT_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
 }
 
 export function acceptAll(): void {

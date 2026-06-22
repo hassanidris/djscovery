@@ -255,7 +255,10 @@ const Footer = async () => {
               Privacy
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/" className="hover:text-h_red transition-colors">
+            <Link
+              href="/terms-of-service"
+              className="hover:text-h_red transition-colors"
+            >
               Terms
             </Link>
             <span className="text-white/10">|</span>
