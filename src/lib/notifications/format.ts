@@ -15,7 +15,10 @@ export function formatNotification(
     case "DJ_REGISTRATION":
       return { icon: "🎛️", message: "A new DJ has registered" };
     case "GIG_PUBLISHED":
-      return { icon: "📢", message: "A new gig matching your profile was posted" };
+      return {
+        icon: "📢",
+        message: "A new gig matching your profile was posted",
+      };
     case "GIG_APPLICATION_RECEIVED":
       return { icon: "📩", message: "Someone applied to your gig" };
     case "GIG_APPLICATION_SHORTLISTED":
@@ -40,6 +43,8 @@ export function formatNotification(
       return { icon: "📋", message: "You have a new booking inquiry" };
     case "ACCOUNT_SUSPENDED":
       return { icon: "⚠️", message: "Your account has been suspended" };
+    case "REPORT_SUBMITTED":
+      return { icon: "🚩", message: "A new report has been submitted" };
     default:
       return { icon: "🔔", message: "New notification" };
   }
