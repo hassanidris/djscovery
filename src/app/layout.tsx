@@ -7,6 +7,7 @@ import MobileBottomNavServer from "@/components/MobileBottomNavServer";
 import { Toaster } from "@/components/ui/sonner";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import { cn } from "@/lib/utils";
+import CookieBanner from "@/components/CookieBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -74,6 +75,7 @@ export default function RootLayout({
           closeButton
           offset={{ bottom: 80 }}
         />
+        <CookieBanner />
       </body>
     </html>
   );
