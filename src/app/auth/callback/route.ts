@@ -8,6 +8,7 @@ import {
   welcomeEmailSubject,
   welcomeEmailHtml,
 } from "@/lib/email/templates/welcome";
+import { generateWelcomeCta } from "@/lib/supabase/admin";
 import { roleSchema } from "@/lib/validations/auth";
 
 export async function GET(request: Request) {
@@ -74,7 +75,10 @@ export async function GET(request: Request) {
     const username =
       user.user_metadata?.username ??
       email.split("@")[0] + "_" + user.id.slice(0, 6);
-    const name = user.user_metadata?.name ?? email.split("@")[0];
+    const name =
+      user.user_metadata?.displayName ??
+      user.user_metadata?.name ??
+      email.split("@")[0];
     const userId = user.id;
 
     // Role resolution priority: URL param → cookie → user_metadata
@@ -146,12 +150,13 @@ export async function GET(request: Request) {
     }
 
     if (isNewUser) {
+      const ctaUrl = await generateWelcomeCta(email);
       await sendEmail({
         to: email,
         userId,
         emailType: "WELCOME",
         subject: welcomeEmailSubject,
-        html: welcomeEmailHtml({ name }),
+        html: welcomeEmailHtml({ name, ctaUrl }),
       });
     }
 
