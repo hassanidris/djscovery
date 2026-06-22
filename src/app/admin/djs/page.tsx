@@ -71,7 +71,7 @@ export default async function AdminDjsPage({
         <>
           <div className="overflow-hidden rounded-xl border border-white/8">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-160 text-sm">
                 <thead>
                   <tr className="border-b border-white/8 bg-white/2">
                     <th className="px-4 py-3 text-left font-medium text-gray-400">

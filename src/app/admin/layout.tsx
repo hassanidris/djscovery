@@ -30,7 +30,7 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-black">
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-0 lg:flex-row lg:gap-6">
           <AdminSidebar openReportCount={openReportCount} />
           <div className="min-w-0 flex-1">{children}</div>
         </div>
