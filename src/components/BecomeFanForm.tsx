@@ -11,9 +11,13 @@ const initialState = { success: false, error: null as string | null };
 
 export default function BecomeFanForm({
   initialName,
+  initialBio,
+  initialCountryId,
   countries,
 }: {
   initialName: string;
+  initialBio: string;
+  initialCountryId: number | null;
   countries: Country[];
 }) {
   const router = useRouter();
@@ -59,15 +63,16 @@ export default function BecomeFanForm({
       <div className="flex flex-col gap-1.5">
         <label htmlFor="bio" className="text-sm font-medium text-gray-300">
           Bio{" "}
-          <span className="text-gray-500 font-normal text-xs">(optional)</span>
+          <span className="text-xs font-normal text-gray-500">(optional)</span>
         </label>
         <textarea
           id="bio"
           name="bio"
+          defaultValue={initialBio}
           rows={3}
           maxLength={300}
           placeholder="Tell us a bit about yourself..."
-          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none resize-none"
+          className="focus:ring-h_red resize-none rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
         />
       </div>
 
@@ -77,12 +82,12 @@ export default function BecomeFanForm({
           className="text-sm font-medium text-gray-300"
         >
           Country{" "}
-          <span className="text-gray-500 font-normal text-xs">(optional)</span>
+          <span className="text-xs font-normal text-gray-500">(optional)</span>
         </label>
         <select
           id="countryId"
           name="countryId"
-          defaultValue=""
+          defaultValue={initialCountryId?.toString() ?? ""}
           className="focus:ring-h_red appearance-none rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 transition-all outline-none"
         >
           <option value="" className="bg-gray-900">
@@ -107,7 +112,7 @@ export default function BecomeFanForm({
       <button
         type="button"
         onClick={() => router.push("/")}
-        className="text-center text-sm text-gray-500 hover:text-gray-300 transition-colors"
+        className="text-center text-sm text-gray-500 transition-colors hover:text-gray-300"
       >
         Skip for now
       </button>

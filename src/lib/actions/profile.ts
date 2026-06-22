@@ -708,7 +708,7 @@ export async function setupFanProfile(
     await prisma.fanProfile.upsert({
       where: { userId: user.id },
       update: { name, bio, countryId },
-      create: { userId: user.id, name },
+      create: { userId: user.id, name, bio, countryId },
     });
     return { success: true, error: null };
   } catch {
