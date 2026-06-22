@@ -681,3 +681,40 @@ export async function deleteOrganizerProfile(): Promise<
     return { error: "Something went wrong. Please try again." };
   }
 }
+
+export async function setupFanProfile(
+  _prevState: { success: boolean; error: string | null },
+  formData: FormData,
+): Promise<{ success: boolean; error: string | null }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const name = (formData.get("name") as string)?.trim();
+  if (!name) return { success: false, error: "Name is required" };
+  if (name.length > 50)
+    return { success: false, error: "Name is too long (max 50 characters)" };
+
+  const bio = (formData.get("bio") as string)?.trim() || null;
+  const rawCountryId = formData.get("countryId");
+  const countryId =
+    rawCountryId && rawCountryId !== ""
+      ? parseInt(rawCountryId as string, 10)
+      : null;
+
+  try {
+    await prisma.fanProfile.upsert({
+      where: { userId: user.id },
+      update: { name, bio, countryId },
+      create: { userId: user.id, name, bio, countryId },
+    });
+    return { success: true, error: null };
+  } catch {
+    return {
+      success: false,
+      error: "Failed to save profile. Please try again.",
+    };
+  }
+}

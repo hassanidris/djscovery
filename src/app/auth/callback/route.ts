@@ -176,6 +176,20 @@ export async function GET(request: Request) {
       });
     }
 
+    // Welcome email CTA — role-aware redirect so users complete their profile
+    if (searchParams.get("welcome") === "true") {
+      if (dbRoles.includes("ADMIN"))
+        return NextResponse.redirect(`${origin}/admin`);
+      if (dbRoles.includes("DJ"))
+        return NextResponse.redirect(`${origin}/dashboard`);
+      if (dbRoles.includes("ORGANIZER"))
+        return NextResponse.redirect(`${origin}/organizer/dashboard`);
+      if (role === "dj") return NextResponse.redirect(`${origin}/become-dj`);
+      if (role === "organizer")
+        return NextResponse.redirect(`${origin}/become-organizer`);
+      return NextResponse.redirect(`${origin}/become-fan`);
+    }
+
     // Existing users → redirect to their dashboard
     if (dbRoles.includes("ADMIN"))
       return NextResponse.redirect(`${origin}/admin`);
