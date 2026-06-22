@@ -11,6 +11,19 @@ import {
   updateApplicationStatusSchema,
 } from "@/lib/validations/gig";
 import { isPrivateEventType } from "@/config/gig-type-fields";
+import { sendEmail } from "@/lib/email/sendEmail";
+import {
+  gigApplicationReceivedSubject,
+  gigApplicationReceivedHtml,
+} from "@/lib/email/templates/gigApplicationReceived";
+import {
+  gigApplicationAcceptedSubject,
+  gigApplicationAcceptedHtml,
+} from "@/lib/email/templates/gigApplicationAccepted";
+import {
+  gigApplicationRejectedSubject,
+  gigApplicationRejectedHtml,
+} from "@/lib/email/templates/gigApplicationRejected";
 
 // ============================================================
 // RESULT TYPE
@@ -458,9 +471,16 @@ export async function applyToGig(
     where: { id: gigId, deletedAt: null },
     select: {
       status: true,
+      title: true,
       eventDate: true,
       applicationDeadline: true,
-      organizerProfile: { select: { userId: true } },
+      organizerProfile: {
+        select: {
+          userId: true,
+          displayName: true,
+          user: { select: { email: true, name: true } },
+        },
+      },
     },
   });
 
@@ -517,6 +537,24 @@ export async function applyToGig(
       });
 
       return app;
+    });
+
+    const djStageName = await prisma.djProfile.findUnique({
+      where: { id: djProfile.id },
+      select: { stageName: true },
+    });
+
+    await sendEmail({
+      to: gig.organizerProfile.user.email,
+      userId: gig.organizerProfile.userId,
+      emailType: "GIG_APPLICATION_RECEIVED",
+      subject: gigApplicationReceivedSubject,
+      html: gigApplicationReceivedHtml({
+        organizerName:
+          gig.organizerProfile.user.name ?? gig.organizerProfile.displayName,
+        gigTitle: gig.title,
+        djName: djStageName?.stageName ?? user.email ?? "A DJ",
+      }),
     });
 
     return { success: true, data: { applicationId: application.id } };
@@ -617,8 +655,14 @@ export async function updateApplicationStatus(
     where: { id: applicationId },
     select: {
       status: true,
-      gig: { select: { id: true, organizerProfileId: true } },
-      djProfile: { select: { userId: true } },
+      gig: { select: { id: true, organizerProfileId: true, title: true } },
+      djProfile: {
+        select: {
+          userId: true,
+          stageName: true,
+          user: { select: { email: true, name: true } },
+        },
+      },
     },
   });
 
@@ -665,6 +709,33 @@ export async function updateApplicationStatus(
       },
     }),
   ]);
+
+  if (newStatus === "ACCEPTED" || newStatus === "REJECTED") {
+    const djName =
+      application.djProfile.user.name ?? application.djProfile.stageName;
+    await sendEmail({
+      to: application.djProfile.user.email,
+      userId: application.djProfile.userId,
+      emailType:
+        newStatus === "ACCEPTED"
+          ? "GIG_APPLICATION_ACCEPTED"
+          : "GIG_APPLICATION_REJECTED",
+      subject:
+        newStatus === "ACCEPTED"
+          ? gigApplicationAcceptedSubject
+          : gigApplicationRejectedSubject,
+      html:
+        newStatus === "ACCEPTED"
+          ? gigApplicationAcceptedHtml({
+              djName,
+              gigTitle: application.gig.title,
+            })
+          : gigApplicationRejectedHtml({
+              djName,
+              gigTitle: application.gig.title,
+            }),
+    });
+  }
 
   revalidatePath("/dashboard/organizer/gigs", "layout");
   return { success: true, data: undefined };

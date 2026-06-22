@@ -10,6 +10,19 @@ import {
   SuspendDjAccountSchema,
 } from "@/lib/validations/admin";
 import { revalidatePath } from "next/cache";
+import { sendEmail } from "@/lib/email/sendEmail";
+import {
+  profileApprovedSubject,
+  profileApprovedHtml,
+} from "@/lib/email/templates/profileApproved";
+import {
+  profileRejectedSubject,
+  profileRejectedHtml,
+} from "@/lib/email/templates/profileRejected";
+import {
+  accountSuspendedSubject,
+  accountSuspendedHtml,
+} from "@/lib/email/templates/accountSuspended";
 
 type ActionResult = { success: true } | { error: string };
 
@@ -29,7 +42,12 @@ export async function approveDjProfile(
   try {
     const profile = await prisma.djProfile.findUnique({
       where: { id: djProfileId },
-      select: { userId: true, slug: true },
+      select: {
+        userId: true,
+        slug: true,
+        stageName: true,
+        user: { select: { email: true, name: true } },
+      },
     });
     if (!profile) return { error: "DJ profile not found" };
 
@@ -54,6 +72,16 @@ export async function approveDjProfile(
         },
       }),
     ]);
+
+    await sendEmail({
+      to: profile.user.email,
+      userId: profile.userId,
+      emailType: "PROFILE_APPROVED",
+      subject: profileApprovedSubject,
+      html: profileApprovedHtml({
+        name: profile.user.name ?? profile.stageName,
+      }),
+    });
 
     revalidatePath("/admin/djs");
     revalidatePath(`/djs/${profile.slug}`);
@@ -81,7 +109,11 @@ export async function rejectDjProfile(
   try {
     const profile = await prisma.djProfile.findUnique({
       where: { id: djProfileId },
-      select: { userId: true },
+      select: {
+        userId: true,
+        stageName: true,
+        user: { select: { email: true, name: true } },
+      },
     });
     if (!profile) return { error: "DJ profile not found" };
 
@@ -108,6 +140,17 @@ export async function rejectDjProfile(
       }),
     ]);
 
+    await sendEmail({
+      to: profile.user.email,
+      userId: profile.userId,
+      emailType: "PROFILE_REJECTED",
+      subject: profileRejectedSubject,
+      html: profileRejectedHtml({
+        name: profile.user.name ?? profile.stageName,
+        reason,
+      }),
+    });
+
     revalidatePath("/admin/djs");
     return { success: true };
   } catch {
@@ -115,9 +158,7 @@ export async function rejectDjProfile(
   }
 }
 
-export async function hideDjProfile(
-  formData: FormData,
-): Promise<ActionResult> {
+export async function hideDjProfile(formData: FormData): Promise<ActionResult> {
   const { userId: adminId } = await requireAdmin();
 
   const parsed = HideDjSchema.safeParse({
@@ -220,7 +261,10 @@ export async function suspendDjAccount(
   try {
     const profile = await prisma.djProfile.findUnique({
       where: { id: djProfileId },
-      select: { userId: true },
+      select: {
+        userId: true,
+        user: { select: { email: true, name: true } },
+      },
     });
     if (!profile) return { error: "DJ profile not found" };
 
@@ -249,6 +293,17 @@ export async function suspendDjAccount(
         },
       }),
     ]);
+
+    await sendEmail({
+      to: profile.user.email,
+      userId: profile.userId,
+      emailType: "ACCOUNT_SUSPENDED",
+      subject: accountSuspendedSubject,
+      html: accountSuspendedHtml({
+        name: profile.user.name ?? "there",
+        reason,
+      }),
+    });
 
     revalidatePath("/admin/djs");
     revalidatePath("/admin/users");
@@ -293,10 +348,7 @@ export async function getAdminDjs({
       deletedAt: null,
       ...(status
         ? {
-            status: status as
-              | "PENDING_APPROVAL"
-              | "APPROVED"
-              | "REJECTED",
+            status: status as "PENDING_APPROVAL" | "APPROVED" | "REJECTED",
           }
         : {}),
       ...(country
