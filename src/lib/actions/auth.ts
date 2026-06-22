@@ -39,11 +39,17 @@ export async function signIn(formData: FormData) {
   if (error) redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
   if (!data.user) redirect("/sign-in?error=Authentication+failed");
 
-  // Role-aware redirect
-  const userRoles = await prisma.userRole.findMany({
-    where: { userId: data.user.id },
-    select: { role: true },
-  });
+  // Role-aware redirect + stamp lastLoginAt in one round-trip
+  const [userRoles] = await prisma.$transaction([
+    prisma.userRole.findMany({
+      where: { userId: data.user.id },
+      select: { role: true },
+    }),
+    prisma.user.update({
+      where: { id: data.user.id },
+      data: { lastLoginAt: new Date() },
+    }),
+  ]);
   const roles = userRoles.map((r) => r.role);
 
   if (roles.includes("ADMIN")) redirect("/admin");

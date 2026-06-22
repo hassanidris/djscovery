@@ -110,6 +110,8 @@ export default async function DjProfilePage({
   if (dj.status === "PENDING_APPROVAL" && authUser?.id !== dj.userId)
     return notFound();
 
+  if (dj.hidden && authUser?.id !== dj.userId) return notFound();
+
   const avgRating =
     dj.ratings.length > 0
       ? dj.ratings.reduce((sum, r) => sum + r.rating, 0) / dj.ratings.length

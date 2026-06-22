@@ -42,6 +42,7 @@ const DirectoryPage = async ({
       where: {
         deletedAt: null,
         status: "APPROVED",
+        hidden: false,
         ...(q
           ? {
               OR: [

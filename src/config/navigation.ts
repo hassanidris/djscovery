@@ -1,5 +1,12 @@
 import type { LucideIcon } from "lucide-react";
-import { Home, Headphones, Briefcase, CalendarDays, User } from "lucide-react";
+import {
+  Home,
+  Headphones,
+  Briefcase,
+  CalendarDays,
+  User,
+  ShieldCheck,
+} from "lucide-react";
 
 export type NavRole = "guest" | "fan" | "dj" | "organizer" | "admin";
 
@@ -55,12 +62,19 @@ const account: NavItem = {
   icon: User,
 };
 
+const adminPanel: NavItem = {
+  id: "admin",
+  label: "Admin",
+  href: "/admin",
+  icon: ShieldCheck,
+};
+
 export const desktopNavByRole: Record<NavRole, NavItem[]> = {
   guest: [directory, events],
   fan: [directory, events],
   dj: [directory, djGigs, events],
   organizer: [directory, orgGigs, events],
-  admin: [directory, djGigs, events],
+  admin: [adminPanel, directory, events],
 };
 
 export const bottomNavByRole: Record<NavRole, NavItem[]> = {
@@ -68,7 +82,7 @@ export const bottomNavByRole: Record<NavRole, NavItem[]> = {
   fan: [home, directory, events, profile],
   dj: [home, directory, djGigs, events, profile],
   organizer: [home, directory, orgGigs, events, profile],
-  admin: [home, directory, djGigs, events, profile],
+  admin: [home, adminPanel, directory, events, profile],
 };
 
 export type FooterProfessionalLink = {
