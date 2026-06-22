@@ -1,3 +1,4 @@
+import { type EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { cookies } from "next/headers";
@@ -12,9 +13,11 @@ import { roleSchema } from "@/lib/validations/auth";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const token_hash = searchParams.get("token_hash");
+  const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "";
 
-  if (!code) {
+  if (!code && !(token_hash && type)) {
     return NextResponse.redirect(
       `${origin}/sign-in?error=auth_callback_failed`,
     );
@@ -22,17 +25,30 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createClient();
-    const { error: exchangeError } =
-      await supabase.auth.exchangeCodeForSession(code);
 
-    if (exchangeError) {
-      console.error(
-        "[auth/callback] exchangeCodeForSession error:",
-        exchangeError.message,
-      );
-      return NextResponse.redirect(
-        `${origin}/sign-in?error=auth_callback_failed`,
-      );
+    if (token_hash && type) {
+      const { error: otpError } = await supabase.auth.verifyOtp({
+        type,
+        token_hash,
+      });
+      if (otpError) {
+        console.error("[auth/callback] verifyOtp error:", otpError.message);
+        return NextResponse.redirect(
+          `${origin}/sign-in?error=auth_callback_failed`,
+        );
+      }
+    } else {
+      const { error: exchangeError } =
+        await supabase.auth.exchangeCodeForSession(code!);
+      if (exchangeError) {
+        console.error(
+          "[auth/callback] exchangeCodeForSession error:",
+          exchangeError.message,
+        );
+        return NextResponse.redirect(
+          `${origin}/sign-in?error=auth_callback_failed`,
+        );
+      }
     }
 
     // Password recovery flow — session established, skip profile sync
