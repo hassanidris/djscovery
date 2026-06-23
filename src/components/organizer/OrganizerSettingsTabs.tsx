@@ -12,6 +12,7 @@ import {
   Globe,
   Lock,
   ExternalLink,
+  Info,
 } from "lucide-react";
 import {
   updateOrganizerProfile,
@@ -101,6 +102,23 @@ export default function OrganizerSettingsTabs({
 }: Props) {
   return (
     <Tabs defaultValue="profile">
+      {/* Info banner — distinguishes organizer profile from personal account */}
+      <div className="mb-6 flex items-start gap-3 rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
+        <p className="text-xs text-blue-300">
+          This is your <strong>public organizer profile</strong> — what DJs see
+          when you post a gig. For personal account settings (photo, display
+          name, password), visit{" "}
+          <a
+            href="/account/settings"
+            className="underline underline-offset-2 hover:text-blue-200"
+          >
+            My Account
+          </a>
+          .
+        </p>
+      </div>
+
       <TabsList variant="line" className="mb-8 w-full justify-start">
         <TabsTrigger value="profile">Profile</TabsTrigger>
         <TabsTrigger value="contact">Contact</TabsTrigger>
@@ -397,10 +415,10 @@ function ProfileTab({
         />
       </div>
 
-      {/* Display name */}
+      {/* Business / Brand Name */}
       <div className="flex flex-col gap-2">
         <Label htmlFor="displayName">
-          Display Name <span className="text-destructive">*</span>
+          Business / Brand Name <span className="text-destructive">*</span>
         </Label>
         <Input
           id="displayName"
@@ -409,7 +427,8 @@ function ProfileTab({
           maxLength={80}
         />
         <p className="text-muted-foreground text-xs">
-          Changing this regenerates your profile URL slug.
+          Shown publicly on gig listings and your organizer profile. Changing
+          this regenerates your profile URL.
         </p>
       </div>
 
@@ -447,51 +466,54 @@ function ProfileTab({
         </p>
       </div>
 
-      {/* Location */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2">
-          <Label>Country</Label>
-          <Select
-            value={countryId ? String(countryId) : ""}
-            onValueChange={handleCountryChange}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select country..." />
-            </SelectTrigger>
-            <SelectContent>
-              {countries.map((c) => (
-                <SelectItem key={c.id} value={String(c.id)}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label>City</Label>
-          {loadingCities ? (
-            <div className="border-input text-muted-foreground flex items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm">
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading cities...
-            </div>
-          ) : (
+      {/* Business Location */}
+      <div>
+        <p className="mb-3 text-sm font-medium text-white">Business Location</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <Label>Country</Label>
             <Select
-              value={cityId ? String(cityId) : ""}
-              onValueChange={(v) => setCityId(v ? Number(v) : null)}
-              disabled={!countryId}
+              value={countryId ? String(countryId) : ""}
+              onValueChange={handleCountryChange}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select city..." />
+                <SelectValue placeholder="Select country..." />
               </SelectTrigger>
               <SelectContent>
-                {cities.map((c) => (
+                {countries.map((c) => (
                   <SelectItem key={c.id} value={String(c.id)}>
                     {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>City</Label>
+            {loadingCities ? (
+              <div className="border-input text-muted-foreground flex items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading cities...
+              </div>
+            ) : (
+              <Select
+                value={cityId ? String(cityId) : ""}
+                onValueChange={(v) => setCityId(v ? Number(v) : null)}
+                disabled={!countryId}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select city..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
       </div>
 

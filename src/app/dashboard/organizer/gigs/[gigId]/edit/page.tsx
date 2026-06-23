@@ -34,6 +34,8 @@ function gigDetailToFormData(gig: OrganizerGigDetail): GigFormData {
     requiredGenres: gig.requiredGenres,
     requiredExperienceLevel: gig.requiredExperienceLevel,
     setDurationMinutes: gig.setDurationMinutes?.toString() ?? "",
+    setStartTime: "",
+    setEndTime: "",
     guestCount: gig.guestCount?.toString() ?? "",
     dressCode: gig.dressCode ?? "",
     mcRequired: gig.mcRequired,
