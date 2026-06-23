@@ -20,6 +20,7 @@ import {
 
 const companyLinks = [
   { label: "About DJcovery", href: "/about" },
+  { label: "FAQ", href: "/" },
   { label: "Contact Us", href: "/" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms of Service", href: "/terms-of-service" },
@@ -262,8 +263,11 @@ const Footer = async () => {
               Terms
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/" className="hover:text-h_red transition-colors">
-              Contact
+            <Link
+              href="/cookie-policy"
+              className="hover:text-h_red transition-colors"
+            >
+              Cookie
             </Link>
           </div>
         </div>

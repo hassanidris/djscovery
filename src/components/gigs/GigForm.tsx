@@ -29,6 +29,8 @@ export type GigFormData = {
   requiredGenres: string[];
   requiredExperienceLevel: ExperienceLevel;
   setDurationMinutes: string;
+  setStartTime: string;
+  setEndTime: string;
   guestCount: string;
   dressCode: string;
   mcRequired: boolean;
@@ -77,6 +79,8 @@ export const GIG_FORM_DEFAULT: GigFormData = {
   requiredGenres: [],
   requiredExperienceLevel: "OPEN",
   setDurationMinutes: "",
+  setStartTime: "",
+  setEndTime: "",
   guestCount: "",
   dressCode: "",
   mcRequired: false,

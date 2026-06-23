@@ -95,17 +95,62 @@ export function GigFormStep1({
         )}
       </div>
 
-      {/* Event Date */}
+      {/* Event Date & Time */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-white">
           Event Date &amp; Time <span className="text-red-400">*</span>
         </label>
-        <input
-          type="datetime-local"
-          value={data.eventDate}
-          onChange={(e) => onChange("eventDate", e.target.value)}
-          className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white scheme-dark focus:border-white/25 focus:outline-none"
-        />
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label
+              htmlFor="event-date"
+              className="mb-1 block text-xs text-gray-500"
+            >
+              Date
+            </label>
+            <input
+              id="event-date"
+              type="date"
+              value={data.eventDate ? data.eventDate.split("T")[0] : ""}
+              onChange={(e) => {
+                const datePart = e.target.value;
+                const timePart = data.eventDate
+                  ? (data.eventDate.split("T")[1] ?? "00:00")
+                  : "00:00";
+                onChange(
+                  "eventDate",
+                  datePart ? `${datePart}T${timePart}` : "",
+                );
+              }}
+              className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white focus:border-white/25 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="event-time"
+              className="mb-1 block text-xs text-gray-500"
+            >
+              Time
+            </label>
+            <input
+              id="event-time"
+              type="time"
+              value={
+                data.eventDate && data.eventDate.includes("T")
+                  ? data.eventDate.split("T")[1]
+                  : ""
+              }
+              onChange={(e) => {
+                const timePart = e.target.value;
+                const datePart = data.eventDate
+                  ? data.eventDate.split("T")[0]
+                  : "";
+                if (datePart) onChange("eventDate", `${datePart}T${timePart}`);
+              }}
+              className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white focus:border-white/25 focus:outline-none"
+            />
+          </div>
+        </div>
         {errors.eventDate && (
           <p className="mt-1 text-xs text-red-400">{errors.eventDate}</p>
         )}
