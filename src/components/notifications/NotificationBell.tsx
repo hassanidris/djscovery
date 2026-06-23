@@ -146,16 +146,19 @@ export default function NotificationBell() {
 
             {loaded &&
               notifications.map((n) => {
-                const { icon, message } = formatNotification(n.type);
-                return (
-                  <button
-                    key={n.id}
-                    type="button"
-                    onClick={() => !n.read && handleMarkRead(n.id)}
-                    className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${
-                      !n.read ? "bg-white/3" : ""
-                    }`}
-                  >
+                const { icon, message, link } = formatNotification(
+                  n.type,
+                  n.data,
+                );
+                const itemClass = `flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${
+                  !n.read ? "bg-white/3" : ""
+                }`;
+                const handleClick = () => {
+                  if (!n.read) handleMarkRead(n.id);
+                  setOpen(false);
+                };
+                const content = (
+                  <>
                     <span className="mt-0.5 shrink-0 text-base">{icon}</span>
                     <div className="min-w-0 flex-1">
                       <p
@@ -177,6 +180,25 @@ export default function NotificationBell() {
                         aria-hidden
                       />
                     )}
+                  </>
+                );
+                return link ? (
+                  <Link
+                    key={n.id}
+                    href={link}
+                    onClick={handleClick}
+                    className={itemClass}
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <button
+                    key={n.id}
+                    type="button"
+                    onClick={handleClick}
+                    className={itemClass}
+                  >
+                    {content}
                   </button>
                 );
               })}

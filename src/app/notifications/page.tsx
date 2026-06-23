@@ -1,9 +1,8 @@
-import { getAllNotifications, markNotificationRead } from "@/lib/actions/notifications";
-import { formatNotification } from "@/lib/notifications/format";
+import { getAllNotifications } from "@/lib/actions/notifications";
 import { createClient } from "@/lib/supabase/server";
-import { formatDistanceToNow } from "date-fns";
 import { redirect } from "next/navigation";
 import NotificationsMarkAll from "./NotificationsMarkAll";
+import NotificationItem from "./NotificationItem";
 
 export default async function Page() {
   const supabase = await createClient();
@@ -21,9 +20,7 @@ export default async function Page() {
         <div>
           <h1 className="text-2xl font-bold text-white">Notifications</h1>
           {unreadCount > 0 && (
-            <p className="mt-1 text-sm text-gray-400">
-              {unreadCount} unread
-            </p>
+            <p className="mt-1 text-sm text-gray-400">{unreadCount} unread</p>
           )}
         </div>
         {unreadCount > 0 && <NotificationsMarkAll />}
@@ -38,49 +35,17 @@ export default async function Page() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-1 rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-          {notifications.map((n) => {
-            const { icon, message } = formatNotification(n.type);
-            return (
-              <form
-                key={n.id}
-                action={markNotificationRead.bind(null, n.id)}
-                className={`flex items-start gap-4 px-5 py-4 transition-colors hover:bg-white/5 ${
-                  !n.read ? "bg-white/[0.03]" : ""
-                }`}
-              >
-                <span className="mt-0.5 shrink-0 text-xl">{icon}</span>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={`text-sm ${
-                      n.read ? "text-gray-400" : "font-medium text-white"
-                    }`}
-                  >
-                    {message}
-                  </p>
-                  <p className="mt-0.5 text-xs text-gray-600">
-                    {formatDistanceToNow(new Date(n.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </p>
-                </div>
-                {!n.read && (
-                  <div className="flex shrink-0 items-center gap-2 pt-0.5">
-                    <span
-                      className="bg-h_red h-2 w-2 rounded-full"
-                      aria-hidden
-                    />
-                    <button
-                      type="submit"
-                      className="text-h_red hover:text-h_redDark text-xs transition-colors"
-                    >
-                      Mark read
-                    </button>
-                  </div>
-                )}
-              </form>
-            );
-          })}
+        <div className="flex flex-col gap-1 overflow-hidden rounded-xl border border-white/10 bg-white/5">
+          {notifications.map((n) => (
+            <NotificationItem
+              key={n.id}
+              id={n.id}
+              type={n.type}
+              read={n.read}
+              data={n.data}
+              createdAt={n.createdAt}
+            />
+          ))}
         </div>
       )}
     </div>
