@@ -76,7 +76,11 @@ export default async function OrganizerDashboardPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Overview</h2>
         <Button variant="outline" size="sm" asChild>
-          <Link href={`/organizers/${profile.slug}`} target="_blank">
+          <Link
+            href={`/organizers/${profile.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <ExternalLink className="h-4 w-4" />
             View Profile
           </Link>
