@@ -107,13 +107,12 @@ export default function OrganizerSettingsTabs({
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
         <p className="text-xs text-blue-300">
           This is your <strong>public organizer profile</strong> — what DJs see
-          when you post a gig. For personal account settings (photo, display
-          name, password), visit{" "}
+          when you post a gig. For security settings (password), visit{" "}
           <a
             href="/account/settings"
             className="underline underline-offset-2 hover:text-blue-200"
           >
-            My Account
+            Account Settings
           </a>
           .
         </p>
@@ -292,7 +291,7 @@ function ProfileTab({
         toast.error(result.error);
       } else {
         toast.success("Profile updated.");
-        if (result.newSlug) router.push("/settings/organizer");
+        if (result.newSlug) router.push("/organizer/settings");
       }
     });
   }
