@@ -166,7 +166,7 @@ export default function DjProfileFree({
     ? djData.booking.phone
     : FREE_DEFAULT_DJ.bookingPhone;
   const bookingHref = bookingEmail
-    ? `mailto:${bookingEmail}?subject=Booking%20Enquiry%20via%20DJscovery`
+    ? `mailto:${bookingEmail}?subject=Booking%20Enquiry%20via%20DJcovery`
     : bookingPhone
       ? `tel:${bookingPhone}`
       : "#";

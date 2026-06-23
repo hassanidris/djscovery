@@ -6,7 +6,7 @@ import prisma from "@/lib/client";
 import { Button } from "@/components/ui/button";
 import { EventActions } from "@/components/events/EventActions";
 
-export const metadata = { title: "My Events — DJscovery" };
+export const metadata = { title: "My Events — DJcovery" };
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 

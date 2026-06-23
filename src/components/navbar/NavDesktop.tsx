@@ -39,13 +39,13 @@ export default function NavDesktop({
       {/* Logo */}
       <Link
         href="/"
-        aria-label="DJscovery — Go to home"
+        aria-label="DJcovery — Go to home"
         className="focus-visible:ring-h_red shrink-0 rounded-sm focus-visible:ring-2 focus-visible:outline-none"
       >
         <div className="flex items-center gap-1.5 py-1">
           <Image
             src="/logo_v2.svg"
-            alt="DJscovery Logo"
+            alt="DJcovery Logo"
             width={130}
             height={31}
             priority
@@ -124,7 +124,7 @@ export default function NavDesktop({
         <form
           onSubmit={handleDesktopSearch}
           role="search"
-          aria-label="Search DJscovery"
+          aria-label="Search DJcovery"
           className="focus-within:ring-h_red/50 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 ring-1 ring-white/8 transition-all"
         >
           <Search className="h-3.5 w-3.5 shrink-0 text-gray-500" aria-hidden />

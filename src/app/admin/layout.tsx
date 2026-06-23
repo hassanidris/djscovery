@@ -6,7 +6,7 @@ import prisma from "@/lib/client";
 export const metadata: Metadata = {
   title: {
     default: "Admin",
-    template: "%s | Admin — DJscovery",
+    template: "%s | Admin — DJcovery",
   },
 };
 

@@ -16,7 +16,7 @@ import {
 
   Everything else that was here (My Posts, Albums, Videos, News,
   Marketplace) linked to "/" with dead routes and described features
-  that don't exist in DJscovery. Removed to reduce noise.
+  that don't exist in DJcovery. Removed to reduce noise.
 */
 
 const LeftMenu = ({ type }: { type: "home" | "profile" }) => {

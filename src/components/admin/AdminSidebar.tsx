@@ -86,7 +86,7 @@ function SidebarHeader() {
       </div>
       <div>
         <p className="text-sm font-semibold text-white">Admin Panel</p>
-        <p className="text-muted-foreground text-xs">DJscovery</p>
+        <p className="text-muted-foreground text-xs">DJcovery</p>
       </div>
     </div>
   );

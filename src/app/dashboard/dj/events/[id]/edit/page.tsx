@@ -7,7 +7,7 @@ import { getCountries, getCitiesForCountry } from "@/lib/actions/locations";
 import { EventForm } from "@/components/events/EventForm";
 import type { EventCategory } from "@/lib/actions/event";
 
-export const metadata = { title: "Edit Event — DJscovery" };
+export const metadata = { title: "Edit Event — DJcovery" };
 
 export default async function EventEditPage({
   params,

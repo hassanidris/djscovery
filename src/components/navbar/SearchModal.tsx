@@ -35,28 +35,28 @@ export default function SearchModal({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
         showCloseButton={false}
-        className="bg-h_blackLight border border-white/10 text-white max-w-lg p-0 gap-0 overflow-hidden"
+        className="bg-h_blackLight max-w-lg gap-0 overflow-hidden border border-white/10 p-0 text-white"
       >
-        <DialogTitle className="sr-only">Search DJscovery</DialogTitle>
+        <DialogTitle className="sr-only">Search DJcovery</DialogTitle>
         <form
           onSubmit={handleSearch}
-          className="flex items-center gap-3 px-4 py-3 border-b border-white/8"
+          className="flex items-center gap-3 border-b border-white/8 px-4 py-3"
         >
-          <Search className="h-5 w-5 text-gray-400 shrink-0" aria-hidden />
+          <Search className="h-5 w-5 shrink-0 text-gray-400" aria-hidden />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search DJs, genres, events..."
-            className="flex-1 bg-transparent outline-none text-white placeholder:text-gray-500 text-base"
-            aria-label="Search DJscovery"
+            className="flex-1 bg-transparent text-base text-white outline-none placeholder:text-gray-500"
+            aria-label="Search DJcovery"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search"
-              className="text-gray-500 hover:text-white transition-colors"
+              className="text-gray-500 transition-colors hover:text-white"
             >
               <X className="h-4 w-4" aria-hidden />
             </button>
@@ -72,9 +72,9 @@ export default function SearchModal({ open, onClose }: Props) {
           )}
         </form>
         <div className="px-4 py-3">
-          <p className="text-gray-500 text-xs">
+          <p className="text-xs text-gray-500">
             Search across the DJ directory, genres, and more. Press{" "}
-            <kbd className="px-1 py-0.5 text-[10px] bg-white/5 border border-white/10 rounded text-gray-400">
+            <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5 text-[10px] text-gray-400">
               Enter
             </kbd>{" "}
             to search.

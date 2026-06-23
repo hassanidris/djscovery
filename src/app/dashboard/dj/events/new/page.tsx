@@ -6,7 +6,7 @@ import prisma from "@/lib/client";
 import { getCountries } from "@/lib/actions/locations";
 import { EventForm } from "@/components/events/EventForm";
 
-export const metadata = { title: "Create Event — DJscovery" };
+export const metadata = { title: "Create Event — DJcovery" };
 
 export default async function EventCreatePage() {
   const supabase = await createClient();
@@ -26,7 +26,11 @@ export default async function EventCreatePage() {
     },
   });
 
-  if (!djProfile || djProfile.status !== "APPROVED" || djProfile.deletedAt !== null)
+  if (
+    !djProfile ||
+    djProfile.status !== "APPROVED" ||
+    djProfile.deletedAt !== null
+  )
     redirect("/become-dj");
 
   const countries = await getCountries();

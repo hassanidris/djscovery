@@ -64,17 +64,17 @@ export async function generateMetadata({
   });
 
   if (!profile) {
-    return { title: "Organizer not found — DJscovery" };
+    return { title: "Organizer not found — DJcovery" };
   }
 
   const typeLabel = ORGANIZER_TYPE_LABELS[profile.organizerType] ?? "";
   return {
-    title: `${profile.displayName} · ${typeLabel} on DJscovery`,
+    title: `${profile.displayName} · ${typeLabel} on DJcovery`,
     description:
       profile.bio?.slice(0, 155) ??
-      `${profile.displayName} books and hires DJs on DJscovery.`,
+      `${profile.displayName} books and hires DJs on DJcovery.`,
     openGraph: {
-      title: `${profile.displayName} on DJscovery`,
+      title: `${profile.displayName} on DJcovery`,
       description: profile.bio?.slice(0, 155) ?? "",
       images: profile.logoUrl ? [{ url: profile.logoUrl }] : [],
     },

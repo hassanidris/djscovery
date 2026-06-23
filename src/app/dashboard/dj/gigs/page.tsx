@@ -17,7 +17,7 @@ import {
 import { getDemoGigs } from "@/data/gigs-demo";
 import { getDemoOrganizerBySlug } from "@/data/organizers";
 
-export const metadata = { title: "Gigs — DJscovery" };
+export const metadata = { title: "Gigs — DJcovery" };
 
 export default async function DjGigMarketplacePage({
   searchParams,

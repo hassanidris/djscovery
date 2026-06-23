@@ -72,11 +72,11 @@ export default function BurgerMenu({
 
             <div className="flex items-center justify-between">
               <SheetClose asChild>
-                <Link href="/" aria-label="DJscovery home">
+                <Link href="/" aria-label="DJcovery home">
                   <div className="flex items-center gap-2 py-1">
                     <Image
                       src="/logo_v2.svg"
-                      alt="DJscovery Logo"
+                      alt="DJcovery Logo"
                       width={150}
                       height={35}
                     />
@@ -120,7 +120,7 @@ export default function BurgerMenu({
                 </div>
               </div>
             ) : (
-              <p className="mt-4 text-sm text-gray-400">Welcome to DJscovery</p>
+              <p className="mt-4 text-sm text-gray-400">Welcome to DJcovery</p>
             )}
           </SheetHeader>
 

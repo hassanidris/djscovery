@@ -34,8 +34,8 @@ export default async function HomeCtaBanner() {
               Ready to make your mark?
             </h2>
             <p className="max-w-xl text-base text-gray-400">
-              Whether you spin records or book talent — DJscovery has a place
-              for you.
+              Whether you spin records or book talent — DJcovery has a place for
+              you.
             </p>
           </div>
 

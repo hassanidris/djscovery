@@ -3,7 +3,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 /*
   WHY: The original Stories component was a generic white card with
-  9 identical "Ricky" placeholders. For DJscovery, this should
+  9 identical "Ricky" placeholders. For DJcovery, this should
   reflect active DJs — the platform's core identity.
 
   COMPONENTS USED:

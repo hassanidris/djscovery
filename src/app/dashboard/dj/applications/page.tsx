@@ -11,7 +11,7 @@ import {
 } from "@/components/gigs/GigStatusBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 
-export const metadata = { title: "My Applications — DJscovery" };
+export const metadata = { title: "My Applications — DJcovery" };
 
 export default async function DjMyApplicationsPage() {
   const supabase = await createClient();
@@ -66,7 +66,7 @@ export default async function DjMyApplicationsPage() {
 
         {accepted.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Accepted 🎉
             </h2>
             <div className="flex flex-col gap-3">
@@ -79,7 +79,7 @@ export default async function DjMyApplicationsPage() {
 
         {active.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Under Review
             </h2>
             <div className="flex flex-col gap-3">
@@ -92,7 +92,7 @@ export default async function DjMyApplicationsPage() {
 
         {past.length > 0 && (
           <section>
-            <h2 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+            <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
               Past
             </h2>
             <div className="flex flex-col gap-3">
@@ -135,7 +135,7 @@ function ApplicationRow({ app }: { app: AppItem }) {
         </div>
       )}
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="truncate font-medium text-white">
             {app.gig.title}
