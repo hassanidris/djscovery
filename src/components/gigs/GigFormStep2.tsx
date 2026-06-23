@@ -141,7 +141,7 @@ export function GigFormStep2({
                 id="required-genres-listbox"
                 role="listbox"
                 aria-multiselectable="true"
-                className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-[`#111`] py-1 shadow-xl"
+                className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-zinc-950 py-1 shadow-xl"
               >
                 {genres.length === 0 ? (
                   <p className="px-3 py-2 text-xs text-gray-500">
@@ -241,9 +241,95 @@ export function GigFormStep2({
         </div>
       )}
 
-      {/* Set Duration */}
+      {/* Set Duration / Set Hours */}
       {show("setDuration") &&
         (() => {
+          const gigTypeStr = data.gigType as GigType | "";
+          const useTimeRange =
+            !!gigTypeStr &&
+            (["CLUB", "RESTAURANT", "BAR", "LOUNGE"] as GigType[]).includes(
+              gigTypeStr as GigType,
+            );
+
+          if (useTimeRange) {
+            const totalMin = parseInt(data.setDurationMinutes) || 0;
+            const dHrs = Math.floor(totalMin / 60);
+            const dMins = totalMin % 60;
+
+            function calcDiff(start: string, end: string) {
+              const [sh, sm] = start.split(":").map(Number);
+              const [eh, em] = end.split(":").map(Number);
+              const s = sh * 60 + sm;
+              const e = eh * 60 + em;
+              return e >= s ? e - s : 24 * 60 - s + e;
+            }
+
+            return (
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-white">
+                  Set Hours{" "}
+                  <span className="font-normal text-gray-500">(optional)</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="mb-1 text-xs text-gray-500">Start Time</p>
+                    <input
+                      type="time"
+                      value={data.setStartTime}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onChange("setStartTime", val);
+                        if (val && data.setEndTime) {
+                          const diff = calcDiff(val, data.setEndTime);
+                          onChange(
+                            "setDurationMinutes",
+                            diff > 0 ? String(diff) : "",
+                          );
+                        }
+                      }}
+                      className={inputCls}
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs text-gray-500">End Time</p>
+                    <input
+                      type="time"
+                      value={data.setEndTime}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onChange("setEndTime", val);
+                        if (data.setStartTime && val) {
+                          const diff = calcDiff(data.setStartTime, val);
+                          onChange(
+                            "setDurationMinutes",
+                            diff > 0 ? String(diff) : "",
+                          );
+                        }
+                      }}
+                      className={inputCls}
+                    />
+                  </div>
+                </div>
+                {totalMin > 0 && (
+                  <p className="mt-1.5 text-xs text-gray-500">
+                    Duration: {dHrs > 0 ? `${dHrs}h ` : ""}
+                    {dMins > 0 ? `${dMins}min` : ""}
+                    {data.setEndTime < data.setStartTime &&
+                    data.setStartTime &&
+                    data.setEndTime
+                      ? " (overnight)"
+                      : ""}
+                  </p>
+                )}
+                {errors.setDurationMinutes && (
+                  <p className="mt-1 text-xs text-red-400">
+                    {errors.setDurationMinutes}
+                  </p>
+                )}
+              </div>
+            );
+          }
+
           const totalMin = parseInt(data.setDurationMinutes) || 0;
           const dHrs = Math.floor(totalMin / 60);
           const dMins = totalMin % 60;
