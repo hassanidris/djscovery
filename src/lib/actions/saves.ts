@@ -43,6 +43,7 @@ export async function toggleSaveDj(
         where: { userId_djProfileId: { userId, djProfileId } },
       });
       revalidatePath("/account");
+      revalidatePath("/organizer/saved-djs");
       return { saved: false };
     }
 
@@ -56,6 +57,7 @@ export async function toggleSaveDj(
 
     await prisma.savedDj.create({ data: { userId, djProfileId } });
     revalidatePath("/account");
+    revalidatePath("/organizer/saved-djs");
     return { saved: true };
   } catch {
     return { saved: false, error: "Something went wrong. Please try again." };
@@ -146,6 +148,7 @@ export async function removeSavedDj(
       where: { userId_djProfileId: { userId, djProfileId } },
     });
     revalidatePath("/account");
+    revalidatePath("/organizer/saved-djs");
     return {};
   } catch {
     return { error: "Something went wrong. Please try again." };

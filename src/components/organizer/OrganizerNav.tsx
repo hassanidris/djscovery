@@ -2,49 +2,53 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Disc3, Building2, Bell } from "lucide-react";
+import {
+  LayoutDashboard,
+  Briefcase,
+  Bookmark,
+  Settings,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const ALL_ITEMS = [
-  { href: "/settings/account", label: "Account", icon: User, role: "all" },
+const NAV_ITEMS = [
   {
-    href: "/settings/notifications",
-    label: "Notifications",
-    icon: Bell,
-    role: "all",
+    href: "/organizer/dashboard",
+    label: "Overview",
+    icon: LayoutDashboard,
+    exact: true,
   },
-  { href: "/settings/dj", label: "DJ Profile", icon: Disc3, role: "dj" },
+  {
+    href: "/dashboard/organizer/gigs",
+    label: "My Gigs",
+    icon: Briefcase,
+    exact: false,
+  },
+  {
+    href: "/organizer/saved-djs",
+    label: "Saved DJs",
+    icon: Bookmark,
+    exact: false,
+  },
   {
     href: "/organizer/settings",
-    label: "Organizer",
-    icon: Building2,
-    role: "organizer",
+    label: "Profile Settings",
+    icon: Settings,
+    exact: false,
   },
 ] as const;
 
-export default function SettingsSidebar({
-  isDj,
-  isOrganizer,
-}: {
-  isDj: boolean;
-  isOrganizer: boolean;
-}) {
+export default function OrganizerNav() {
   const pathname = usePathname();
-
-  const visible = ALL_ITEMS.filter((item) => {
-    if (item.role === "dj") return isDj;
-    if (item.role === "organizer") return isOrganizer;
-    return true;
-  });
 
   return (
     <nav
-      aria-label="Settings navigation"
+      aria-label="Organizer navigation"
       className="flex shrink-0 flex-row gap-1 overflow-x-auto pb-1 md:w-52 md:flex-col md:pb-0"
     >
-      {visible.map((item) => {
-        const isActive =
-          pathname === item.href || pathname.startsWith(item.href + "/");
+      {NAV_ITEMS.map((item) => {
+        const isActive = item.exact
+          ? pathname === item.href
+          : pathname === item.href || pathname.startsWith(item.href + "/");
         const Icon = item.icon;
         return (
           <Link
