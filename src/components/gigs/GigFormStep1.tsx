@@ -102,8 +102,14 @@ export function GigFormStep1({
         </label>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="mb-1 text-xs text-gray-500">Date</p>
+            <label
+              htmlFor="event-date"
+              className="mb-1 block text-xs text-gray-500"
+            >
+              Date
+            </label>
             <input
+              id="event-date"
               type="date"
               value={data.eventDate ? data.eventDate.split("T")[0] : ""}
               onChange={(e) => {
@@ -120,8 +126,14 @@ export function GigFormStep1({
             />
           </div>
           <div>
-            <p className="mb-1 text-xs text-gray-500">Time</p>
+            <label
+              htmlFor="event-time"
+              className="mb-1 block text-xs text-gray-500"
+            >
+              Time
+            </label>
             <input
+              id="event-time"
               type="time"
               value={
                 data.eventDate && data.eventDate.includes("T")

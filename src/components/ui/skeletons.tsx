@@ -724,31 +724,35 @@ export function OrganizerDashboardSkeleton() {
 // ── Organizer Settings Skeleton ───────────────────────────────────────────────
 export function OrganizerSettingsSkeleton() {
   return (
-    <div className="flex flex-col gap-7">
-      <div className="flex gap-2 border-b border-white/10 pb-0">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-9 w-24 rounded-t" />
-        ))}
-      </div>
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-4 w-24 rounded" />
-        <Skeleton className="h-40 w-full rounded-xl" />
-      </div>
-      <div className="flex items-center gap-4">
-        <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
-        <div className="flex flex-col gap-2">
-          <Skeleton className="h-8 w-40 rounded-lg" />
-          <Skeleton className="h-8 w-24 rounded-lg" />
+    <div className="min-h-screen bg-black">
+      <div className="mx-auto max-w-4xl px-4 py-10 md:px-8">
+        <div className="flex flex-col gap-7">
+          <div className="flex gap-2 border-b border-white/10 pb-0">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-9 w-24 rounded-t" />
+            ))}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-4 w-24 rounded" />
+            <Skeleton className="h-40 w-full rounded-xl" />
+          </div>
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-8 w-40 rounded-lg" />
+              <Skeleton className="h-8 w-24 rounded-lg" />
+            </div>
+          </div>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-28 rounded" />
+              <Skeleton className="h-10 w-full rounded-md" />
+            </div>
+          ))}
+          <div className="flex justify-end">
+            <Skeleton className="h-10 w-28 rounded-lg" />
+          </div>
         </div>
-      </div>
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex flex-col gap-2">
-          <Skeleton className="h-4 w-28 rounded" />
-          <Skeleton className="h-10 w-full rounded-md" />
-        </div>
-      ))}
-      <div className="flex justify-end">
-        <Skeleton className="h-10 w-28 rounded-lg" />
       </div>
     </div>
   );

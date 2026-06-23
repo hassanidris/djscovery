@@ -285,6 +285,8 @@ export function GigFormStep2({
                             "setDurationMinutes",
                             diff > 0 ? String(diff) : "",
                           );
+                        } else {
+                          onChange("setDurationMinutes", "");
                         }
                       }}
                       className={inputCls}
@@ -304,6 +306,8 @@ export function GigFormStep2({
                             "setDurationMinutes",
                             diff > 0 ? String(diff) : "",
                           );
+                        } else {
+                          onChange("setDurationMinutes", "");
                         }
                       }}
                       className={inputCls}
