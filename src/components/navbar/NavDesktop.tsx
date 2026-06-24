@@ -44,7 +44,7 @@ export default function NavDesktop({
       >
         <div className="flex items-center gap-1.5 py-1">
           <Image
-            src="/logo_v2.svg"
+            src="/dj_logo-new.svg"
             alt="DJcovery Logo"
             width={130}
             height={31}
@@ -59,7 +59,7 @@ export default function NavDesktop({
 
       {/* Primary Navigation */}
       <nav
-        className="flex flex-1 items-center gap-0.5"
+        className="mt-2 flex flex-1 items-center gap-0.5"
         aria-label="Primary navigation"
       >
         {items.map((item) => {

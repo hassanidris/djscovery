@@ -5,6 +5,7 @@ import {
   Briefcase,
   CalendarDays,
   User,
+  AudioLines,
   ShieldCheck,
 } from "lucide-react";
 
@@ -22,9 +23,9 @@ const home: NavItem = { id: "home", label: "Home", href: "/", icon: Home };
 
 const directory: NavItem = {
   id: "directory",
-  label: "Directory",
+  label: "DJs",
   href: "/directory",
-  icon: Headphones,
+  icon: AudioLines,
 };
 
 const djGigs: NavItem = {

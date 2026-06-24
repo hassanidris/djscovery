@@ -92,7 +92,7 @@ const Footer = async () => {
               >
                 <div className="flex flex-col items-start gap-0.5 py-1">
                   <Image
-                    src="/logo_v2.svg"
+                    src="/dj_logo-new.svg"
                     alt="DJcovery Logo"
                     width={230}
                     height={60}
