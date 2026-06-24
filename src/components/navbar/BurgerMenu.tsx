@@ -75,7 +75,7 @@ export default function BurgerMenu({
                 <Link href="/" aria-label="DJcovery home">
                   <div className="flex items-center gap-2 py-1">
                     <Image
-                      src="/logo_v2.svg"
+                      src="/dj_logo-new.svg"
                       alt="DJcovery Logo"
                       width={150}
                       height={35}

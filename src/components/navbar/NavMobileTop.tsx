@@ -27,7 +27,7 @@ export default function NavMobileTop(props: NavUserData) {
       >
         <div className="flex items-center gap-2 py-1">
           <Image
-            src="/logo_v2.svg"
+            src="/dj_logo-new.svg"
             alt="DJcovery Logo"
             width={130}
             height={31}
