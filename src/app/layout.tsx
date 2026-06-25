@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import { cn } from "@/lib/utils";
 import CookieBanner from "@/components/CookieBanner";
+import { indexingEnabled } from "@/lib/seo/indexing";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,6 +41,26 @@ export const metadata: Metadata = {
     description:
       "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
   },
+
+  // the below for no-indexing
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://djcovery.com",
+  ),
+  robots: indexingEnabled
+    ? {
+        index: true,
+        follow: true,
+      }
+    : {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+        },
+      },
 };
 
 export default function RootLayout({
