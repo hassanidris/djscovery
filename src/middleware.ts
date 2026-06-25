@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { indexingEnabled } from "./lib/seo/indexing";
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -53,6 +54,16 @@ export async function middleware(request: NextRequest) {
     url.pathname = "/sign-in";
     return NextResponse.redirect(url);
   }
+
+  // Add X-Robots-Tag header when indexing is disabled
+
+  if (!indexingEnabled) {
+    supabaseResponse.headers.set(
+      "X-Robots-Tag",
+      "noindex, nofollow, noarchive, nosnippet",
+    );
+  }
+  // noindexing code end here
 
   return supabaseResponse;
 }
