@@ -9,7 +9,7 @@ import {
   faTiktok,
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { House, Mic, Mail } from "lucide-react";
+import { House, Mic, Mail, Info, CircleHelp } from "lucide-react";
 import { getNavUser } from "@/lib/auth/getNavUser";
 import {
   desktopNavByRole,
@@ -19,9 +19,9 @@ import {
 } from "@/config/navigation";
 
 const companyLinks = [
-  { label: "About DJcovery", href: "/about" },
-  { label: "FAQ", href: "/" },
-  { label: "Contact Us", href: "/" },
+  { label: "About DJcovery", href: "/about", icon: Info },
+  { label: "FAQ", href: "/", icon: CircleHelp },
+  { label: "Contact Us", href: "/", icon: Mail },
   // { label: "Privacy Policy", href: "/privacy-policy" },
   // { label: "Terms of Service", href: "/terms-of-service" },
   // { label: "Cookie Policy", href: "/cookie-policy" },
@@ -209,14 +209,17 @@ const Footer = async () => {
               <h4 className="text-xs font-semibold tracking-[0.15em] text-white uppercase">
                 Company
               </h4>
-              <ul className="flex flex-col">
+              <ul className="flex flex-col gap-4">
                 {companyLinks.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="hover:text-h_red text-sm text-gray-400 transition-colors"
+                      className="hover:text-h_red group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                     >
-                      {link.label}
+                      {link.icon && (
+                        <link.icon className="text-h_redDark h-3.5 w-3.5" />
+                      )}
+                      <span>{link.label}</span>
                     </Link>
                   </li>
                 ))}
