@@ -10,7 +10,7 @@ import ActiveFilterBadges from "@/components/directory/ActiveFilterBadges";
 import EventCalendar from "@/components/directory/EventCalendar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadphones } from "@fortawesome/free-solid-svg-icons";
-import { Headphones } from "lucide-react";
+import { AudioLines, Headphones } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type SearchParams = {
@@ -304,7 +304,7 @@ const DirectoryPage = async ({
         <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
-              <Headphones className="text-h_red h-6 w-6" />
+              <AudioLines className="text-h_red h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
               <h1 className="text-h_white text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl">

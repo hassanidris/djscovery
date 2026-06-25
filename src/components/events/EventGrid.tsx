@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { EventCard, type EventCardItem } from "./EventCard";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 
 export function EventGrid({
   events,

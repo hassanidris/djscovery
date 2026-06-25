@@ -209,7 +209,7 @@ const Footer = async () => {
               <h4 className="text-xs font-semibold tracking-[0.15em] text-white uppercase">
                 Company
               </h4>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col">
                 {companyLinks.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -223,7 +223,7 @@ const Footer = async () => {
               </ul>
 
               {/* App badge placeholder */}
-              <div className="mt-4 flex flex-col gap-2">
+              <div className="mt-5 flex flex-col gap-2">
                 <p className="text-xs tracking-widest text-gray-600 uppercase">
                   Coming soon
                 </p>
