@@ -1,5 +1,5 @@
 import { DjGridSkeleton, FilterPanelSkeleton } from "@/components/ui/skeletons";
-import { Headphones } from "lucide-react";
+import { AudioLines, Headphones } from "lucide-react";
 
 export default function DirectoryLoading() {
   return (
@@ -10,7 +10,7 @@ export default function DirectoryLoading() {
           {/* Left — icon box + title + subtitle */}
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
-              <Headphones className="text-h_red h-6 w-6" />
+              <AudioLines className="text-h_red h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
               <h1 className="text-h_white text-3xl font-bold md:text-5xl">
