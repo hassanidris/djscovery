@@ -4,9 +4,9 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { X } from "lucide-react";
-import { removeSavedDj } from "@/lib/actions/saves";
+import { unfollowDj } from "@/lib/actions/saves";
 
-export default function RemoveSavedDjButton({
+export default function UnfollowDjButton({
   djProfileId,
 }: {
   djProfileId: number;
@@ -16,11 +16,11 @@ export default function RemoveSavedDjButton({
 
   return (
     <button
-      aria-label="Remove saved DJ"
+      aria-label="Unfollow DJ"
       disabled={isPending}
       onClick={() =>
         startTransition(async () => {
-          const result = await removeSavedDj(djProfileId);
+          const result = await unfollowDj(djProfileId);
           if (result && "error" in result) {
             if (result.error === "Not authenticated.") {
               router.push("/sign-in");

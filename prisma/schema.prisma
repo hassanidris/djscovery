@@ -111,6 +111,8 @@ enum NotificationType {
   GIG_APPLICATION_REJECTED
   GIG_APPLICATION_WITHDRAWN
   DJ_NEW_EVENT
+  DJ_NEW_MEDIA
+  DJ_PROFILE_UPDATED
   WELCOME
   PROFILE_APPROVED
   PROFILE_REJECTED
@@ -226,6 +228,7 @@ model City {
   organizerProfiles OrganizerProfile[]
   events            Event[]
   gigs              Gig[]
+  fanProfiles       FanProfile[]
 
   @@unique([name, countryId])
   @@index([countryId])
@@ -274,7 +277,7 @@ model User {
   followers  Follower[] @relation("UserFollowers")
   followings Follower[] @relation("UserFollowings")
 
-  savedDjs    SavedDj[]
+  followedDjs DjFollow[]
   savedEvents SavedEvent[]
 
   reportsSubmitted Report[]         @relation("ReportSubmitter")
@@ -345,7 +348,7 @@ model DjProfile {
   events          EventDj[]
   eventsOwned     Event[]          @relation("EventOwner")
   gigApplications GigApplication[]
-  savedBy         SavedDj[]
+  followers        DjFollow[]
 
   @@index([slug])
   @@index([status])
@@ -428,6 +431,8 @@ model FanProfile {
 
   countryId Int?
   country   Country? @relation(fields: [countryId], references: [id])
+  cityId    Int?
+  city      City?    @relation(fields: [cityId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -435,6 +440,7 @@ model FanProfile {
 
   @@index([userId])
   @@index([countryId])
+  @@index([cityId])
 }
 
 // ------ GENRES ------
@@ -812,9 +818,9 @@ model Follower {
   @@id([followerId, followingId])
 }
 
-// ------ SAVED DJs ------
+// ------ DJ FOLLOWS ------
 
-model SavedDj {
+model DjFollow {
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   djProfileId Int

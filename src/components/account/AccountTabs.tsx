@@ -2,14 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bookmark, CalendarHeart, Star, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/account/saved-djs", label: "Saved DJs", icon: Bookmark },
-  { href: "/account/saved-events", label: "Saved Events", icon: CalendarHeart },
-  { href: "/account/reviews", label: "Reviews", icon: Star },
-  { href: "/account/settings", label: "Settings", icon: Settings },
+  { href: "/account/settings", label: "Account Settings", icon: Settings },
 ] as const;
 
 export default function AccountTabs() {
@@ -28,7 +25,7 @@ export default function AccountTabs() {
             key={tab.href}
             href={tab.href}
             className={cn(
-              "flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors",
+              "flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors",
               isActive
                 ? "border-white text-white"
                 : "border-transparent text-gray-400 hover:text-white",

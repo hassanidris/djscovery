@@ -2,13 +2,13 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Bookmark } from "lucide-react";
+import { UserPlus, UserMinus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toggleSaveDj } from "@/lib/actions/saves";
+import { toggleFollowDj } from "@/lib/actions/saves";
 
 export default function SaveDjButton({
   djProfileId,
-  isSaved: initialIsSaved,
+  isSaved: initialIsFollowing,
   compact = false,
 }: {
   djProfileId: number;
@@ -16,11 +16,11 @@ export default function SaveDjButton({
   compact?: boolean;
 }) {
   const router = useRouter();
-  const [saved, setSaved] = useState(initialIsSaved);
+  const [following, setFollowing] = useState(initialIsFollowing);
   const [isPending, startTransition] = useTransition();
 
-  const [optimisticSaved, toggleOptimistic] = useOptimistic(
-    saved,
+  const [optimisticFollowing, toggleOptimistic] = useOptimistic(
+    following,
     (state) => !state,
   );
 
@@ -30,14 +30,14 @@ export default function SaveDjButton({
     startTransition(async () => {
       toggleOptimistic(null);
       try {
-        const result = await toggleSaveDj(djProfileId);
+        const result = await toggleFollowDj(djProfileId);
         if (result.error === "Not authenticated.") {
           toggleOptimistic(null);
           router.push("/sign-in");
           return;
         }
         if (!result.error) {
-          setSaved(result.saved);
+          setFollowing(result.following);
         } else {
           toggleOptimistic(null);
         }
@@ -52,17 +52,17 @@ export default function SaveDjButton({
       <button
         onClick={handleClick}
         disabled={isPending}
-        aria-label={optimisticSaved ? "Unsave DJ" : "Save DJ"}
+        aria-label={optimisticFollowing ? "Unfollow DJ" : "Follow DJ"}
         className={cn(
           "flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-40",
-          optimisticSaved
-            ? "text-white"
-            : "text-gray-500 hover:text-white",
+          optimisticFollowing ? "text-white" : "text-gray-500 hover:text-white",
         )}
       >
-        <Bookmark
-          className={cn("h-4 w-4", optimisticSaved && "fill-current")}
-        />
+        {optimisticFollowing ? (
+          <UserMinus className="h-4 w-4" />
+        ) : (
+          <UserPlus className="h-4 w-4" />
+        )}
       </button>
     );
   }
@@ -73,15 +73,17 @@ export default function SaveDjButton({
       disabled={isPending}
       className={cn(
         "flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60",
-        optimisticSaved
+        optimisticFollowing
           ? "border-white/30 bg-white/10 text-white"
           : "border-white/20 text-gray-300 hover:bg-white/5",
       )}
     >
-      <Bookmark
-        className={cn("h-3.5 w-3.5", optimisticSaved && "fill-current")}
-      />
-      {optimisticSaved ? "Saved" : "Save"}
+      {optimisticFollowing ? (
+        <UserMinus className="h-3.5 w-3.5" />
+      ) : (
+        <UserPlus className="h-3.5 w-3.5" />
+      )}
+      {optimisticFollowing ? "Following" : "Follow"}
     </button>
   );
 }

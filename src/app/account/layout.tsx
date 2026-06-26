@@ -15,7 +15,8 @@ export default async function AccountLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoggedIn, displayName, avatarSrc, initials } = await getNavUser();
+  const { isLoggedIn, displayName, avatarSrc, initials, isOrganizer, navRole } =
+    await getNavUser();
   if (!isLoggedIn) redirect("/sign-in");
 
   const supabase = await createClient();
@@ -23,19 +24,34 @@ export default async function AccountLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const dbUser = user
-    ? await prisma.user.findUnique({
+  const isOrganizerOnly = isOrganizer && navRole === "organizer";
+
+  let location = "";
+  if (user) {
+    if (isOrganizerOnly) {
+      const orgProfile = await prisma.organizerProfile.findUnique({
+        where: { userId: user.id },
+        select: {
+          city: { select: { name: true } },
+          country: { select: { name: true } },
+        },
+      });
+      location = [orgProfile?.city?.name, orgProfile?.country?.name]
+        .filter(Boolean)
+        .join(", ");
+    } else {
+      const dbUser = await prisma.user.findUnique({
         where: { id: user.id },
         select: {
           city: { select: { name: true } },
           country: { select: { name: true } },
         },
-      })
-    : null;
-
-  const location = [dbUser?.city?.name, dbUser?.country?.name]
-    .filter(Boolean)
-    .join(", ");
+      });
+      location = [dbUser?.city?.name, dbUser?.country?.name]
+        .filter(Boolean)
+        .join(", ");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-black">

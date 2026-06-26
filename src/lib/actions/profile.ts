@@ -762,12 +762,15 @@ export async function setupFanProfile(
     rawCountryId && rawCountryId !== ""
       ? parseInt(rawCountryId as string, 10)
       : null;
+  const rawCityId = formData.get("cityId");
+  const cityId =
+    rawCityId && rawCityId !== "" ? parseInt(rawCityId as string, 10) : null;
 
   try {
     await prisma.fanProfile.upsert({
       where: { userId: user.id },
-      update: { name, bio, countryId },
-      create: { userId: user.id, name, bio, countryId },
+      update: { name, bio, countryId, cityId },
+      create: { userId: user.id, name, bio, countryId, cityId },
     });
     return { success: true, error: null };
   } catch {
