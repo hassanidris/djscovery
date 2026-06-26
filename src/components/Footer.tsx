@@ -20,7 +20,7 @@ import {
 
 const companyLinks = [
   { label: "About DJcovery", href: "/about", icon: Info },
-  { label: "FAQ", href: "/", icon: CircleHelp },
+  { label: "FAQ", href: "/faq", icon: CircleHelp },
   { label: "Contact Us", href: "/", icon: Mail },
   // { label: "Privacy Policy", href: "/privacy-policy" },
   // { label: "Terms of Service", href: "/terms-of-service" },

@@ -38,6 +38,7 @@ export async function middleware(request: NextRequest) {
     "/become-dj",
     "/become-organizer",
     "/become-fan",
+    "/fan",
     "/organizer",
     "/settings",
     "/profile/edit",

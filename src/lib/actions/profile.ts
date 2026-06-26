@@ -766,11 +766,20 @@ export async function setupFanProfile(
   const cityId =
     rawCityId && rawCityId !== "" ? parseInt(rawCityId as string, 10) : null;
 
+  if (!countryId) return { success: false, error: "Country is required" };
+  if (!cityId) return { success: false, error: "City is required" };
+
   try {
-    await prisma.fanProfile.upsert({
-      where: { userId: user.id },
-      update: { name, bio, countryId, cityId },
-      create: { userId: user.id, name, bio, countryId, cityId },
+    await prisma.$transaction(async (tx) => {
+      await tx.fanProfile.upsert({
+        where: { userId: user.id },
+        update: { name, bio, countryId, cityId },
+        create: { userId: user.id, name, bio, countryId, cityId },
+      });
+      await tx.user.update({
+        where: { id: user.id },
+        data: { name, countryId, cityId },
+      });
     });
     return { success: true, error: null };
   } catch {

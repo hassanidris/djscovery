@@ -60,10 +60,11 @@ export async function generateMetadata({
       bio: true,
       logoUrl: true,
       organizerType: true,
+      _count: { select: { gigs: { where: { deletedAt: null } } } },
     },
   });
 
-  if (!profile) {
+  if (!profile || profile._count.gigs === 0) {
     return { title: "Organizer not found — DJcovery" };
   }
 
@@ -110,10 +111,14 @@ export default async function OrganizerPublicProfilePage({
         select: { platform: true, url: true },
         orderBy: { id: "asc" },
       },
+      _count: { select: { gigs: { where: { deletedAt: null } } } },
     },
   });
 
   if (!profile) return notFound();
+
+  // Profile is only publicly visible after the organizer has posted at least one gig
+  if (profile._count.gigs === 0) return notFound();
 
   const activeGigs = await prisma.gig.findMany({
     where: {
