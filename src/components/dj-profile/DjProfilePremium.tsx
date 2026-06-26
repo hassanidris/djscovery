@@ -119,13 +119,13 @@ function StatPill({
 export default function DjProfilePremium({
   djData,
   viewMode = "fan",
-  isSaved = false,
+  isFollowed = false,
   djUserId,
   isFollowing = false,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
-  isSaved?: boolean;
+  isFollowed?: boolean;
   djUserId?: string;
   isFollowing?: boolean;
 } = {}) {
@@ -294,7 +294,10 @@ export default function DjProfilePremium({
                 </Button>
               ) : null}
               {viewMode === "fan" && !isNaN(djProfileId) && (
-                <SaveDjButton djProfileId={djProfileId} isSaved={isSaved} />
+                <SaveDjButton
+                  djProfileId={djProfileId}
+                  isFollowed={isFollowed}
+                />
               )}
               <Button
                 variant="ghost"

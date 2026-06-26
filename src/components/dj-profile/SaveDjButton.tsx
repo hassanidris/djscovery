@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 import { UserPlus, UserMinus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toggleFollowDj } from "@/lib/actions/saves";
+import { toast } from "sonner";
 
 export default function SaveDjButton({
   djProfileId,
-  isSaved: initialIsFollowing,
+  isFollowed: initialIsFollowing,
   compact = false,
 }: {
   djProfileId: number;
-  isSaved: boolean;
+  isFollowed: boolean;
   compact?: boolean;
 }) {
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function SaveDjButton({
           setFollowing(result.following);
         } else {
           toggleOptimistic(null);
+          toast.error(result.error);
         }
       } catch {
         toggleOptimistic(null);

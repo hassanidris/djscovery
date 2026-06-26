@@ -118,7 +118,7 @@ export default async function DjProfilePage({
       : 0;
 
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
-  const [savedDj, followingDj] =
+  const [isFollowedDj, followingDj] =
     viewMode === "fan"
       ? await Promise.all([isFollowingDj(dj.id), isFollowing(dj.userId)])
       : [false, false];
@@ -259,7 +259,7 @@ export default async function DjProfilePage({
         <DjProfilePremium
           djData={djDemoData}
           viewMode={viewMode}
-          isSaved={savedDj}
+          isFollowed={isFollowedDj}
           djUserId={dj.userId}
           isFollowing={followingDj}
         />
@@ -267,7 +267,7 @@ export default async function DjProfilePage({
         <DjProfileFree
           djData={djDemoData}
           viewMode={viewMode}
-          isSaved={savedDj}
+          isFollowed={isFollowedDj}
           djUserId={dj.userId}
           isFollowing={followingDj}
         />

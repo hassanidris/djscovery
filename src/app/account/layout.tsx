@@ -39,6 +39,17 @@ export default async function AccountLayout({
       location = [orgProfile?.city?.name, orgProfile?.country?.name]
         .filter(Boolean)
         .join(", ");
+    } else if (navRole === "fan") {
+      const fanProfile = await prisma.fanProfile.findUnique({
+        where: { userId: user.id },
+        select: {
+          city: { select: { name: true } },
+          country: { select: { name: true } },
+        },
+      });
+      location = [fanProfile?.city?.name, fanProfile?.country?.name]
+        .filter(Boolean)
+        .join(", ");
     } else {
       const dbUser = await prisma.user.findUnique({
         where: { id: user.id },

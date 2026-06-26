@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { setupFanProfile } from "@/lib/actions/profile";
@@ -38,10 +38,13 @@ export default function BecomeFanForm({
   const [cities, setCities] = useState<City[]>(initialCities);
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  const cityRequestId = useRef(0);
+
   useEffect(() => {
     if (state.success) {
       if (isSettingsMode) {
         toast.success("Profile updated.");
+        router.refresh();
       } else {
         toast.success("Profile saved! Welcome to DJcovery 🎉");
         router.push("/fan/profile");
@@ -53,15 +56,19 @@ export default function BecomeFanForm({
   }, [state, router, isSettingsMode]);
 
   async function handleCountryChange(value: string) {
-    const id = value ? parseInt(value) : null;
+    const id = value ? Number.parseInt(value, 10) : null;
     setCountryId(id);
     setCityId(null);
     setValidationError(null);
+    setCities([]);
+    const requestId = ++cityRequestId.current;
     if (id) {
       const fetched = await getCitiesForCountry(id);
-      setCities(fetched);
+      if (requestId === cityRequestId.current) {
+        setCities(fetched);
+      }
     } else {
-      setCities([]);
+      cityRequestId.current++;
     }
   }
 

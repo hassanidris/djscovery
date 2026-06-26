@@ -20,8 +20,8 @@ const DjCard = ({
   verified,
   _count,
   djProfileId,
-  isSaved = false,
-}: DjUser & { isSaved?: boolean }) => {
+  isFollowed = false,
+}: DjUser & { isFollowed?: boolean }) => {
   const profileHref = slug ? `/djs/${slug}` : `/profile/${username}`;
   const genreList = genres
     ? genres
@@ -41,7 +41,11 @@ const DjCard = ({
     <div className="bg-h_blackLight/50 hover:ring-h_red hover:shadow-h_red/5 group relative flex flex-col gap-3 rounded-xl p-4 transition-all duration-200 hover:scale-[1.015] hover:shadow-lg hover:ring-1">
       {djProfileId !== undefined && (
         <div className="absolute top-3 right-3 z-10">
-          <SaveDjButton djProfileId={djProfileId} isSaved={isSaved} compact />
+          <SaveDjButton
+            djProfileId={djProfileId}
+            isFollowed={isFollowed}
+            compact
+          />
         </div>
       )}
       <Link

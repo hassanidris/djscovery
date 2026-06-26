@@ -103,13 +103,13 @@ function EmptySectionState({
 export default function DjProfileFree({
   djData,
   viewMode = "fan",
-  isSaved = false,
+  isFollowed = false,
   djUserId,
   isFollowing = false,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
-  isSaved?: boolean;
+  isFollowed?: boolean;
   djUserId?: string;
   isFollowing?: boolean;
 } = {}) {
@@ -280,7 +280,10 @@ export default function DjProfileFree({
                     </Button>
                   ) : null}
                   {viewMode === "fan" && !isNaN(djProfileId) && (
-                    <SaveDjButton djProfileId={djProfileId} isSaved={isSaved} />
+                    <SaveDjButton
+                      djProfileId={djProfileId}
+                      isFollowed={isFollowed}
+                    />
                   )}
                 </>
               )}

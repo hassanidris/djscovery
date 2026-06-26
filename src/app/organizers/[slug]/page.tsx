@@ -60,7 +60,16 @@ export async function generateMetadata({
       bio: true,
       logoUrl: true,
       organizerType: true,
-      _count: { select: { gigs: { where: { deletedAt: null } } } },
+      _count: {
+        select: {
+          gigs: {
+            where: {
+              deletedAt: null,
+              status: { in: ["PUBLISHED", "FILLED", "CANCELLED", "EXPIRED"] },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -111,7 +120,16 @@ export default async function OrganizerPublicProfilePage({
         select: { platform: true, url: true },
         orderBy: { id: "asc" },
       },
-      _count: { select: { gigs: { where: { deletedAt: null } } } },
+      _count: {
+        select: {
+          gigs: {
+            where: {
+              deletedAt: null,
+              status: { in: ["PUBLISHED", "FILLED", "CANCELLED", "EXPIRED"] },
+            },
+          },
+        },
+      },
     },
   });
 

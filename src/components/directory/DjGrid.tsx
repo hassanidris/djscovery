@@ -8,11 +8,11 @@ const PAGE_SIZE = 9;
 
 type DjGridProps = {
   djs: DjUser[];
-  savedDjIds?: number[];
+  followedDjIds?: number[];
 };
 
-const DjGrid = ({ djs, savedDjIds = [] }: DjGridProps) => {
-  const savedSet = new Set(savedDjIds);
+const DjGrid = ({ djs, followedDjIds = [] }: DjGridProps) => {
+  const followedSet = new Set(followedDjIds);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
@@ -38,8 +38,8 @@ const DjGrid = ({ djs, savedDjIds = [] }: DjGridProps) => {
           <DjCard
             key={dj.id}
             {...dj}
-            isSaved={
-              dj.djProfileId !== undefined && savedSet.has(dj.djProfileId)
+            isFollowed={
+              dj.djProfileId !== undefined && followedSet.has(dj.djProfileId)
             }
           />
         ))}

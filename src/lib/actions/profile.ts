@@ -769,6 +769,17 @@ export async function setupFanProfile(
   if (!countryId) return { success: false, error: "Country is required" };
   if (!cityId) return { success: false, error: "City is required" };
 
+  const city = await prisma.city.findFirst({
+    where: { id: cityId, countryId },
+    select: { id: true },
+  });
+  if (!city) {
+    return {
+      success: false,
+      error: "Please select a valid city for that country.",
+    };
+  }
+
   try {
     await prisma.$transaction(async (tx) => {
       await tx.fanProfile.upsert({

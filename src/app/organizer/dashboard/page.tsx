@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   Briefcase,
   Settings,
-  ExternalLink,
+  ArrowRight,
   User,
   CheckCircle2,
   AlertCircle,
@@ -77,7 +77,7 @@ export default async function OrganizerDashboardPage() {
         <h2 className="text-lg font-semibold text-white">Overview</h2>
         <Button variant="outline" size="sm" asChild>
           <Link href={`/organizers/${profile.slug}`}>
-            <ExternalLink className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" />
             View Profile
           </Link>
         </Button>

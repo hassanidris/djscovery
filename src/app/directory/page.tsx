@@ -167,7 +167,7 @@ const DirectoryPage = async ({
     return list;
   };
 
-  const savedDjIds = await getFollowedDjIds();
+  const followedDjIds = await getFollowedDjIds();
 
   const filteredDemoDjs = filterDemoDjs(demoDjs);
   const dbIds = new Set(djs.map((d) => d.id));
@@ -356,7 +356,7 @@ const DirectoryPage = async ({
             <Suspense fallback={null}>
               <ActiveFilterBadges />
             </Suspense>
-            <DjGrid djs={displayDjs} savedDjIds={savedDjIds} />
+            <DjGrid djs={displayDjs} followedDjIds={followedDjIds} />
           </div>
         </div>
       </div>
