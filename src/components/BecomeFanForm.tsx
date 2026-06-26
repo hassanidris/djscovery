@@ -18,6 +18,7 @@ export default function BecomeFanForm({
   initialCityId,
   countries,
   initialCities,
+  isSettingsMode = false,
 }: {
   initialName: string;
   initialBio: string;
@@ -25,6 +26,7 @@ export default function BecomeFanForm({
   initialCityId: number | null;
   countries: Country[];
   initialCities: City[];
+  isSettingsMode?: boolean;
 }) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(
@@ -34,21 +36,27 @@ export default function BecomeFanForm({
   const [countryId, setCountryId] = useState<number | null>(initialCountryId);
   const [cityId, setCityId] = useState<number | null>(initialCityId);
   const [cities, setCities] = useState<City[]>(initialCities);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Profile saved! Welcome to DJcovery 🎉");
-      router.push("/");
+      if (isSettingsMode) {
+        toast.success("Profile updated.");
+      } else {
+        toast.success("Profile saved! Welcome to DJcovery 🎉");
+        router.push("/fan/profile");
+      }
     }
     if (state.error) {
       toast.error(state.error);
     }
-  }, [state, router]);
+  }, [state, router, isSettingsMode]);
 
   async function handleCountryChange(value: string) {
     const id = value ? parseInt(value) : null;
     setCountryId(id);
     setCityId(null);
+    setValidationError(null);
     if (id) {
       const fetched = await getCitiesForCountry(id);
       setCities(fetched);
@@ -57,9 +65,24 @@ export default function BecomeFanForm({
     }
   }
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    if (!countryId) {
+      e.preventDefault();
+      setValidationError("Please select your country.");
+      return;
+    }
+    if (!cityId) {
+      e.preventDefault();
+      setValidationError("Please select your city.");
+      return;
+    }
+    setValidationError(null);
+  }
+
   return (
     <form
       action={formAction}
+      onSubmit={handleSubmit}
       className="flex flex-col gap-5 rounded-xl border border-white/10 bg-white/5 p-8"
     >
       <input type="hidden" name="countryId" value={countryId ?? ""} />
@@ -106,10 +129,7 @@ export default function BecomeFanForm({
             htmlFor="countryId"
             className="text-sm font-medium text-gray-300"
           >
-            Country{" "}
-            <span className="text-xs font-normal text-gray-500">
-              (optional)
-            </span>
+            Country <span className="text-h_red">*</span>
           </label>
           <select
             id="countryId"
@@ -130,10 +150,7 @@ export default function BecomeFanForm({
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="cityId" className="text-sm font-medium text-gray-300">
-            City{" "}
-            <span className="text-xs font-normal text-gray-500">
-              (optional)
-            </span>
+            City <span className="text-h_red">*</span>
           </label>
           <select
             id="cityId"
@@ -156,21 +173,31 @@ export default function BecomeFanForm({
         </div>
       </div>
 
+      {validationError && (
+        <p className="text-sm text-red-400">{validationError}</p>
+      )}
+
       <button
         type="submit"
         disabled={isPending}
         className="bg-h_red hover:bg-h_redDark w-full rounded-lg py-3 font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Saving..." : "Get started →"}
+        {isPending
+          ? "Saving..."
+          : isSettingsMode
+            ? "Save Changes"
+            : "Get started →"}
       </button>
 
-      <button
-        type="button"
-        onClick={() => router.push("/")}
-        className="text-center text-sm text-gray-500 transition-colors hover:text-gray-300"
-      >
-        Skip for now
-      </button>
+      {!isSettingsMode && (
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          className="text-center text-sm text-gray-500 transition-colors hover:text-gray-300"
+        >
+          Skip for now
+        </button>
+      )}
     </form>
   );
 }
