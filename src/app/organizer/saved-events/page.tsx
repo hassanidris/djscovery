@@ -27,7 +27,7 @@ export default async function OrganizerSavedEventsPage() {
             >
               upcoming events
             </Link>{" "}
-            and save ones you're interested in.
+            and save ones you&apos;re interested in.
           </p>
         </div>
       </div>
