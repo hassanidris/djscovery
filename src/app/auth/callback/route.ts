@@ -202,6 +202,7 @@ export async function GET(request: Request) {
     if (role === "dj") return NextResponse.redirect(`${origin}/become-dj`);
     if (role === "organizer")
       return NextResponse.redirect(`${origin}/become-organizer`);
+    if (isNewUser) return NextResponse.redirect(`${origin}/become-fan`);
 
     // Returning user with no roles and no fan profile = incomplete signup
     // Send them back to choose their role
