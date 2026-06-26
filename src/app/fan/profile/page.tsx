@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/client";
 import {
-  Briefcase,
   Settings,
-  ArrowRight,
-  User,
+  Users,
+  CalendarHeart,
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
@@ -16,21 +15,19 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 
+export const metadata = { title: "My Profile" };
+
 function profileCompleteness(profile: {
   bio: string | null;
-  logoUrl: string | null;
-  coverImageUrl: string | null;
-  website: string | null;
+  avatar: string | null;
   countryId: number | null;
-  socialLinks: unknown[];
+  cityId: number | null;
 }): { score: number; missing: string[] } {
   const checks: [boolean, string][] = [
     [!!profile.bio, "Add a bio"],
-    [!!profile.logoUrl, "Upload your avatar / logo"],
-    [!!profile.coverImageUrl, "Upload a cover image"],
-    [!!profile.website, "Add your website"],
-    [!!profile.countryId, "Set your location"],
-    [profile.socialLinks.length > 0, "Add at least one social link"],
+    [!!profile.avatar, "Upload a profile photo"],
+    [!!profile.countryId, "Set your country"],
+    [!!profile.cityId, "Set your city"],
   ];
   const missing = checks.filter(([ok]) => !ok).map(([, label]) => label);
   const score = Math.round(
@@ -39,82 +36,68 @@ function profileCompleteness(profile: {
   return { score, missing };
 }
 
-export default async function OrganizerDashboardPage() {
+export default async function FanProfilePage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/sign-in");
 
-  const profile = await prisma.organizerProfile.findUnique({
+  const fanProfile = await prisma.fanProfile.findUnique({
     where: { userId: user.id },
-    include: {
-      socialLinks: { select: { id: true } },
+    select: {
+      name: true,
+      bio: true,
+      avatar: true,
+      countryId: true,
+      cityId: true,
       country: { select: { name: true } },
       city: { select: { name: true } },
-      _count: {
-        select: {
-          gigs: {
-            where: {
-              status: { in: ["PUBLISHED", "UNDER_REVIEW"] },
-              deletedAt: null,
-            },
-          },
-        },
-      },
     },
   });
 
-  if (!profile) redirect("/become-organizer");
-  if (profile.status !== "ACTIVE" || profile.deletedAt !== null)
-    redirect("/become-organizer");
+  if (!fanProfile) redirect("/become-fan");
 
-  const { score, missing } = profileCompleteness(profile);
+  const [followedDjsCount, savedEventsCount] = await Promise.all([
+    prisma.djFollow.count({ where: { userId: user.id } }),
+    prisma.savedEvent.count({ where: { userId: user.id } }),
+  ]);
+
+  const { score, missing } = profileCompleteness(fanProfile);
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Actions row */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Overview</h2>
         <Button variant="outline" size="sm" asChild>
-          <Link href={`/organizers/${profile.slug}`}>
-            <ArrowRight className="h-4 w-4" />
-            View Profile
+          <Link href="/fan/settings">
+            <Settings className="h-4 w-4" />
+            Edit Profile
           </Link>
         </Button>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4">
         <Card size="sm">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-              Active Gigs
+              Followed DJs
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{profile._count.gigs}</p>
+            <p className="text-3xl font-bold">{followedDjsCount}</p>
           </CardContent>
         </Card>
 
         <Card size="sm">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-              Profile Score
+              Saved Events
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{score}%</p>
-          </CardContent>
-        </Card>
-
-        <Card size="sm" className="col-span-2 sm:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-              Social Links
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{profile.socialLinks.length}</p>
+            <p className="text-3xl font-bold">{savedEventsCount}</p>
           </CardContent>
         </Card>
       </div>
@@ -127,7 +110,7 @@ export default async function OrganizerDashboardPage() {
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-amber-400" />
                 <span className="text-sm font-medium text-amber-300">
-                  Complete your profile to build trust with DJs
+                  Complete your profile
                 </span>
               </div>
               <Badge
@@ -156,7 +139,7 @@ export default async function OrganizerDashboardPage() {
             </ul>
 
             <Button variant="outline" size="sm" asChild>
-              <Link href="/organizer/settings">
+              <Link href="/fan/settings">
                 <Settings className="h-3.5 w-3.5" />
                 Complete profile
               </Link>
@@ -170,8 +153,7 @@ export default async function OrganizerDashboardPage() {
           <CardContent className="flex items-center gap-2 py-4">
             <CheckCircle2 className="h-5 w-5 text-green-400" />
             <span className="text-sm font-medium text-green-300">
-              Your profile is 100% complete — DJs can see everything they need
-              to trust you.
+              Your profile is 100% complete.
             </span>
           </CardContent>
         </Card>
@@ -179,24 +161,24 @@ export default async function OrganizerDashboardPage() {
 
       <Separator />
 
-      {/* Quick actions */}
+      {/* Quick links */}
       <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
-        Quick Actions
+        Quick Links
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card className="hover:border-h_red/40 hover:bg-h_red/5 transition-colors">
           <CardContent className="flex items-center gap-4 py-5">
             <div className="bg-h_red/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-              <Briefcase className="text-h_red h-5 w-5" />
+              <Users className="text-h_red h-5 w-5" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold">Post a Gig</p>
+              <p className="font-semibold">Browse DJs</p>
               <p className="text-muted-foreground mt-0.5 text-sm">
-                Find the right DJ for your event
+                Discover and follow DJs you love
               </p>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/organizer/gigs/new">Go →</Link>
+              <Link href="/directory">Go →</Link>
             </Button>
           </CardContent>
         </Card>
@@ -204,16 +186,16 @@ export default async function OrganizerDashboardPage() {
         <Card className="hover:border-foreground/20 transition-colors">
           <CardContent className="flex items-center gap-4 py-5">
             <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-              <User className="text-muted-foreground h-5 w-5" />
+              <CalendarHeart className="text-muted-foreground h-5 w-5" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold">Edit Profile</p>
+              <p className="font-semibold">Browse Events</p>
               <p className="text-muted-foreground mt-0.5 text-sm">
-                Update bio, location, and social links
+                Find upcoming events near you
               </p>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/organizer/settings">Go →</Link>
+              <Link href="/events">Go →</Link>
             </Button>
           </CardContent>
         </Card>

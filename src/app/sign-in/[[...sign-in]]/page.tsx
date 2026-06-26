@@ -2,12 +2,24 @@ import { signIn, signInWithGoogle } from "@/lib/actions/auth";
 import Link from "next/link";
 import { SignInSubmitBtn } from "./SignInSubmitBtn";
 
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  auth_callback_failed:
+    "Email confirmation failed. The link may have expired — please sign up again.",
+  invalid_credentials: "Incorrect email or password.",
+  email_not_confirmed: "Please confirm your email address before signing in.",
+  session_expired: "Your session has expired. Please sign in again.",
+  oauth_error: "Sign-in with Google failed. Please try again.",
+};
+
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; message?: string }>;
 }) {
-  const { error, message } = await searchParams;
+  const { error: rawError, message } = await searchParams;
+  const error = rawError
+    ? (AUTH_ERROR_MESSAGES[rawError] ?? rawError.replace(/_/g, " "))
+    : undefined;
 
   return (
     <div className="flex h-[calc(100vh-136px)] flex-col items-center justify-center">

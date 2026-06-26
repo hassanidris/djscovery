@@ -2,54 +2,36 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Briefcase,
-  Users,
-  CalendarHeart,
-  SlidersHorizontal,
-} from "lucide-react";
+import { LayoutDashboard, SlidersHorizontal, KeyRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   {
-    href: "/organizer/dashboard",
+    href: "/fan/profile",
     label: "Overview",
     icon: LayoutDashboard,
-    exact: true,
-  },
-  {
-    href: "/organizer/gigs",
-    label: "My Gigs",
-    icon: Briefcase,
     exact: false,
   },
   {
-    href: "/organizer/followed-djs",
-    label: "Followed DJs",
-    icon: Users,
-    exact: false,
-  },
-  {
-    href: "/organizer/saved-events",
-    label: "Saved Events",
-    icon: CalendarHeart,
-    exact: false,
-  },
-  {
-    href: "/organizer/settings",
+    href: "/fan/settings",
     label: "Profile Settings",
     icon: SlidersHorizontal,
     exact: false,
   },
+  {
+    href: "/account/settings",
+    label: "Account Settings",
+    icon: KeyRound,
+    exact: false,
+  },
 ] as const;
 
-export default function OrganizerNav() {
+export default function FanNav() {
   const pathname = usePathname();
 
   return (
     <nav
-      aria-label="Organizer navigation"
+      aria-label="Fan navigation"
       className="flex shrink-0 flex-row gap-1 overflow-x-auto pb-1 md:w-52 md:flex-col md:pb-0"
     >
       {NAV_ITEMS.map((item) => {

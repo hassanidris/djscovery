@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { Briefcase } from "lucide-react";
 
 // ── Home: Featured DJs Skeleton ───────────────────────────────────────────────
 export function HomeFeaturedDJsSkeleton() {
@@ -516,9 +517,21 @@ export function BecomeDjSkeleton() {
 export function GigListingPageSkeleton() {
   return (
     <div className="min-h-screen bg-black">
-      <div className="relative h-52 w-full overflow-hidden md:h-72">
-        <Skeleton className="h-full w-full rounded-none" />
-      </div>
+      {/* Hero Banner — flat icon style, mirrors /dashboard/dj/gigs page */}
+      <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
+          <div className="flex items-center gap-4">
+            <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
+              <Briefcase className="text-h_red h-6 w-6" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-9 w-40 rounded" />
+              <Skeleton className="mt-1 h-4 w-64 rounded" />
+            </div>
+          </div>
+          <div className="h-7 w-32 animate-pulse rounded-full bg-white/5" />
+        </div>
+      </section>
       <div className="mx-auto max-w-5xl px-4 py-10 md:px-8">
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <Skeleton className="h-10 min-w-48 flex-1 rounded-lg" />
@@ -546,6 +559,122 @@ export function GigListingPageSkeleton() {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Organizer Hub: My Gigs Content Skeleton ─────────────────────────────────
+export function OrganizerGigsContentSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1.5">
+          <Skeleton className="h-5 w-24 rounded" />
+          <Skeleton className="h-4 w-36 rounded" />
+        </div>
+        <Skeleton className="h-9 w-28 rounded-lg" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Skeleton className="mb-1 h-3 w-12 rounded" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-3 rounded-xl bg-white/5 p-4 ring-1 ring-white/10 sm:flex-row sm:items-start"
+          >
+            <div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="h-4 w-16 rounded-full" />
+              <Skeleton className="h-4 w-2/3 rounded" />
+              <div className="flex gap-1.5">
+                <Skeleton className="h-4 w-14 rounded-full" />
+                <Skeleton className="h-4 w-12 rounded-full" />
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col gap-1.5 sm:items-end">
+              <Skeleton className="h-4 w-20 rounded" />
+              <Skeleton className="h-4 w-28 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Organizer Hub: Followed DJs Content Skeleton ──────────────────────────────
+export function FollowedDjsContentSkeleton() {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-5 w-28 rounded" />
+        <Skeleton className="h-4 w-24 rounded" />
+      </div>
+      <div className="flex flex-col gap-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 rounded-xl border border-white/6 bg-white/3 px-4 py-3"
+          >
+            <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <Skeleton className="h-4 w-32 rounded" />
+              <Skeleton className="h-3 w-24 rounded" />
+              <div className="flex gap-1">
+                <Skeleton className="h-4 w-14 rounded-full" />
+                <Skeleton className="h-4 w-12 rounded-full" />
+              </div>
+            </div>
+            <Skeleton className="h-8 w-24 shrink-0 rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Organizer Hub: Saved Events Content Skeleton ──────────────────────────────
+export function SavedEventsContentSkeleton() {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-5 w-28 rounded" />
+        <Skeleton className="h-4 w-24 rounded" />
+      </div>
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 rounded-xl border border-white/6 bg-white/3 px-4 py-4"
+          >
+            <Skeleton className="h-14 w-14 shrink-0 rounded-lg" />
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <Skeleton className="h-4 w-2/3 rounded" />
+              <div className="flex gap-3">
+                <Skeleton className="h-3 w-24 rounded" />
+                <Skeleton className="h-3 w-20 rounded" />
+              </div>
+              <Skeleton className="h-3 w-16 rounded" />
+            </div>
+            <Skeleton className="h-6 w-12 shrink-0 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Settings Form Content Skeleton ───────────────────────────────────────────
+export function SettingsFormSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-28 rounded" />
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
+      ))}
+      <div className="flex justify-end">
+        <Skeleton className="h-10 w-28 rounded-lg" />
       </div>
     </div>
   );

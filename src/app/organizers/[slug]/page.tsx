@@ -60,10 +60,20 @@ export async function generateMetadata({
       bio: true,
       logoUrl: true,
       organizerType: true,
+      _count: {
+        select: {
+          gigs: {
+            where: {
+              deletedAt: null,
+              status: { in: ["PUBLISHED", "FILLED", "CANCELLED", "EXPIRED"] },
+            },
+          },
+        },
+      },
     },
   });
 
-  if (!profile) {
+  if (!profile || profile._count.gigs === 0) {
     return { title: "Organizer not found — DJcovery" };
   }
 
@@ -110,10 +120,23 @@ export default async function OrganizerPublicProfilePage({
         select: { platform: true, url: true },
         orderBy: { id: "asc" },
       },
+      _count: {
+        select: {
+          gigs: {
+            where: {
+              deletedAt: null,
+              status: { in: ["PUBLISHED", "FILLED", "CANCELLED", "EXPIRED"] },
+            },
+          },
+        },
+      },
     },
   });
 
   if (!profile) return notFound();
+
+  // Profile is only publicly visible after the organizer has posted at least one gig
+  if (profile._count.gigs === 0) return notFound();
 
   const activeGigs = await prisma.gig.findMany({
     where: {
@@ -160,7 +183,7 @@ export default async function OrganizerPublicProfilePage({
   return (
     <div className="min-h-screen bg-black">
       {/* Cover image */}
-      <div className="relative h-64 w-full overflow-hidden bg-linear-to-br from-white/5 to-white/2 md:h-96">
+      <div className="relative h-48 w-full overflow-hidden bg-linear-to-br from-white/5 to-white/2 sm:h-64 md:h-80">
         {profile.coverImageUrl && (
           <Image
             src={profile.coverImageUrl}
@@ -170,13 +193,12 @@ export default async function OrganizerPublicProfilePage({
             priority
           />
         )}
-        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-        <div className="from-h_red/8 absolute inset-0 bg-linear-to-r to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
       </div>
 
       <div className="mx-auto max-w-3xl px-4 md:px-8">
-        {/* Hero section */}
-        <div className="-mt-12 mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+        {/* Hero section — sits below cover with logo overlapping */}
+        <div className="relative z-10 -mt-14 mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
           {/* Logo */}
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-black bg-white/10 shadow-xl">
             {profile.logoUrl ? (
@@ -194,8 +216,8 @@ export default async function OrganizerPublicProfilePage({
           </div>
 
           {/* Name + meta */}
-          <div className="flex flex-1 flex-col gap-1 pb-1">
-            <div className="z-10 flex flex-wrap items-center gap-2">
+          <div className="flex flex-1 flex-col gap-1 pt-2 pb-1 sm:pt-0">
+            <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-bold text-white">
                 {profile.displayName}
               </h1>

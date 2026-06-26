@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import prisma from "@/lib/client";
 import { DjType } from "@prisma/client";
 import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
-import { getSavedDjIds } from "@/lib/actions/saves";
+import { getFollowedDjIds } from "@/lib/actions/saves";
 import FilterPanel from "@/components/directory/FilterPanel";
 import FilterBottomSheet from "@/components/directory/FilterBottomSheet";
 import DjGrid from "@/components/directory/DjGrid";
@@ -167,7 +167,7 @@ const DirectoryPage = async ({
     return list;
   };
 
-  const savedDjIds = await getSavedDjIds();
+  const followedDjIds = await getFollowedDjIds();
 
   const filteredDemoDjs = filterDemoDjs(demoDjs);
   const dbIds = new Set(djs.map((d) => d.id));
@@ -356,7 +356,7 @@ const DirectoryPage = async ({
             <Suspense fallback={null}>
               <ActiveFilterBadges />
             </Suspense>
-            <DjGrid djs={displayDjs} savedDjIds={savedDjIds} />
+            <DjGrid djs={displayDjs} followedDjIds={followedDjIds} />
           </div>
         </div>
       </div>

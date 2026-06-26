@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { redirect } from "next/navigation";
-import { getCountries } from "@/lib/actions/locations";
+import { getCountries, getCitiesForCountry } from "@/lib/actions/locations";
 import BecomeFanForm from "@/components/BecomeFanForm";
 import Footer from "@/components/Footer";
 
@@ -18,10 +18,14 @@ export default async function BecomeFanPage() {
   const [fanProfile, countries] = await Promise.all([
     prisma.fanProfile.findUnique({
       where: { userId: user.id },
-      select: { name: true, bio: true, countryId: true },
+      select: { name: true, bio: true, countryId: true, cityId: true },
     }),
     getCountries(),
   ]);
+
+  const initialCities = fanProfile?.countryId
+    ? await getCitiesForCountry(fanProfile.countryId)
+    : [];
 
   return (
     <>
@@ -44,7 +48,9 @@ export default async function BecomeFanPage() {
             initialName={fanProfile?.name ?? ""}
             initialBio={fanProfile?.bio ?? ""}
             initialCountryId={fanProfile?.countryId ?? null}
+            initialCityId={fanProfile?.cityId ?? null}
             countries={countries}
+            initialCities={initialCities}
           />
         </div>
       </div>

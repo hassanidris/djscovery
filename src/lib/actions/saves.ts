@@ -4,6 +4,7 @@ import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
+const FOLLOWS_LIMIT = 200;
 const SAVES_LIMIT = 50;
 
 // -------------------------------------------------------
@@ -20,51 +21,54 @@ async function getAuthUserId(): Promise<string> {
 }
 
 // -------------------------------------------------------
-// SAVED DJs
+// FOLLOWED DJs
 // -------------------------------------------------------
 
-export async function toggleSaveDj(
+export async function toggleFollowDj(
   djProfileId: number,
-): Promise<{ saved: boolean; error?: string }> {
+): Promise<{ following: boolean; error?: string }> {
   let userId: string;
   try {
     userId = await getAuthUserId();
   } catch {
-    return { saved: false, error: "Not authenticated." };
+    return { following: false, error: "Not authenticated." };
   }
 
   try {
-    const existing = await prisma.savedDj.findUnique({
+    const existing = await prisma.djFollow.findUnique({
       where: { userId_djProfileId: { userId, djProfileId } },
     });
 
     if (existing) {
-      await prisma.savedDj.delete({
+      await prisma.djFollow.delete({
         where: { userId_djProfileId: { userId, djProfileId } },
       });
-      revalidatePath("/account");
-      revalidatePath("/organizer/saved-djs");
-      return { saved: false };
+      revalidatePath("/organizer/followed-djs");
+      revalidatePath("/account/followed-djs");
+      return { following: false };
     }
 
-    const count = await prisma.savedDj.count({ where: { userId } });
-    if (count >= SAVES_LIMIT) {
+    const count = await prisma.djFollow.count({ where: { userId } });
+    if (count >= FOLLOWS_LIMIT) {
       return {
-        saved: false,
-        error: `You can save up to ${SAVES_LIMIT} DJs. Remove one to add more.`,
+        following: false,
+        error: `You can follow up to ${FOLLOWS_LIMIT} DJs.`,
       };
     }
 
-    await prisma.savedDj.create({ data: { userId, djProfileId } });
-    revalidatePath("/account");
-    revalidatePath("/organizer/saved-djs");
-    return { saved: true };
+    await prisma.djFollow.create({ data: { userId, djProfileId } });
+    revalidatePath("/organizer/followed-djs");
+    revalidatePath("/account/followed-djs");
+    return { following: true };
   } catch {
-    return { saved: false, error: "Something went wrong. Please try again." };
+    return {
+      following: false,
+      error: "Something went wrong. Please try again.",
+    };
   }
 }
 
-export async function isSavedDj(djProfileId: number): Promise<boolean> {
+export async function isFollowingDj(djProfileId: number): Promise<boolean> {
   let userId: string;
   try {
     userId = await getAuthUserId();
@@ -72,13 +76,13 @@ export async function isSavedDj(djProfileId: number): Promise<boolean> {
     return false;
   }
 
-  const existing = await prisma.savedDj.findUnique({
+  const existing = await prisma.djFollow.findUnique({
     where: { userId_djProfileId: { userId, djProfileId } },
   });
   return !!existing;
 }
 
-export async function getSavedDjIds(): Promise<number[]> {
+export async function getFollowedDjIds(): Promise<number[]> {
   let userId: string;
   try {
     userId = await getAuthUserId();
@@ -86,7 +90,7 @@ export async function getSavedDjIds(): Promise<number[]> {
     return [];
   }
 
-  const rows = await prisma.savedDj.findMany({
+  const rows = await prisma.djFollow.findMany({
     where: { userId },
     select: { djProfileId: true },
     orderBy: { createdAt: "desc" },
@@ -94,7 +98,7 @@ export async function getSavedDjIds(): Promise<number[]> {
   return rows.map((r) => r.djProfileId);
 }
 
-export async function getSavedDjs() {
+export async function getFollowedDjs() {
   let userId: string;
   try {
     userId = await getAuthUserId();
@@ -102,7 +106,7 @@ export async function getSavedDjs() {
     return [];
   }
 
-  const rows = await prisma.savedDj.findMany({
+  const rows = await prisma.djFollow.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
     select: {
@@ -127,13 +131,13 @@ export async function getSavedDjs() {
   });
 
   return rows.map((r) => ({
-    savedAt: r.createdAt,
+    followedAt: r.createdAt,
     ...r.djProfile,
     genres: r.djProfile.genres.map((g) => g.genre.name),
   }));
 }
 
-export async function removeSavedDj(
+export async function unfollowDj(
   djProfileId: number,
 ): Promise<{ error?: string }> {
   let userId: string;
@@ -144,11 +148,11 @@ export async function removeSavedDj(
   }
 
   try {
-    await prisma.savedDj.delete({
+    await prisma.djFollow.delete({
       where: { userId_djProfileId: { userId, djProfileId } },
     });
-    revalidatePath("/account");
-    revalidatePath("/organizer/saved-djs");
+    revalidatePath("/organizer/followed-djs");
+    revalidatePath("/account/followed-djs");
     return {};
   } catch {
     return { error: "Something went wrong. Please try again." };
