@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Briefcase,
-  Bookmark,
-  Settings,
+  Users,
+  CalendarHeart,
+  SlidersHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,21 +19,27 @@ const NAV_ITEMS = [
     exact: true,
   },
   {
-    href: "/dashboard/organizer/gigs",
+    href: "/organizer/gigs",
     label: "My Gigs",
     icon: Briefcase,
     exact: false,
   },
   {
-    href: "/organizer/saved-djs",
-    label: "Saved DJs",
-    icon: Bookmark,
+    href: "/organizer/followed-djs",
+    label: "Followed DJs",
+    icon: Users,
+    exact: false,
+  },
+  {
+    href: "/organizer/saved-events",
+    label: "Saved Events",
+    icon: CalendarHeart,
     exact: false,
   },
   {
     href: "/organizer/settings",
     label: "Profile Settings",
-    icon: Settings,
+    icon: SlidersHorizontal,
     exact: false,
   },
 ] as const;

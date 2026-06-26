@@ -1,21 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, CircleCheck, MapPin } from "lucide-react";
-import { getSavedDjs } from "@/lib/actions/saves";
-import RemoveSavedDjButton from "@/components/account/RemoveSavedDjButton";
+import { Users, CircleCheck, MapPin } from "lucide-react";
+import { getFollowedDjs } from "@/lib/actions/saves";
+import UnfollowDjButton from "@/components/account/RemoveSavedDjButton";
 
-export const metadata = { title: "Saved DJs" };
+export const metadata = { title: "Followed DJs" };
 
-export default async function SavedDjsPage() {
-  const savedDjs = await getSavedDjs();
+export default async function FollowedDjsPage() {
+  const savedDjs = await getFollowedDjs();
 
   if (savedDjs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
-          <Bookmark className="h-6 w-6 text-gray-500" />
+          <Users className="h-6 w-6 text-gray-500" />
         </div>
-        <p className="text-sm font-medium text-white">No saved DJs yet</p>
+        <p className="text-sm font-medium text-white">No followed DJs yet</p>
         <p className="mt-1 text-sm text-gray-500">
           Browse the{" "}
           <Link
@@ -24,7 +24,7 @@ export default async function SavedDjsPage() {
           >
             DJ directory
           </Link>{" "}
-          and save DJs you love.
+          and follow DJs you love.
         </p>
       </div>
     );
@@ -33,7 +33,7 @@ export default async function SavedDjsPage() {
   return (
     <div className="flex flex-col gap-1">
       <p className="mb-4 text-sm text-gray-500">
-        {savedDjs.length} saved {savedDjs.length === 1 ? "DJ" : "DJs"}
+        Following {savedDjs.length} {savedDjs.length === 1 ? "DJ" : "DJs"}
       </p>
       {savedDjs.map((dj) => (
         <div
@@ -84,7 +84,7 @@ export default async function SavedDjsPage() {
             )}
           </Link>
 
-          <RemoveSavedDjButton djProfileId={dj.id} />
+          <UnfollowDjButton djProfileId={dj.id} />
         </div>
       ))}
     </div>

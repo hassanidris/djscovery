@@ -85,7 +85,9 @@ export async function signUp(formData: FormData) {
     password,
     options: {
       data: { role, displayName }, // stored in user_metadata — callback reads this
-      emailRedirectTo: `${BASE_URL}/auth/callback`,
+      emailRedirectTo: role
+        ? `${BASE_URL}/auth/callback?pending_role=${encodeURIComponent(role)}`
+        : `${BASE_URL}/auth/callback`,
     },
   });
   if (error) redirect(`/sign-up?error=${encodeURIComponent(error.message)}`);
