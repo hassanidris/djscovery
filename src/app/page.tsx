@@ -7,6 +7,7 @@ import HomeEventsSection from "@/components/home/HomeEventsSection";
 import HomeOpenGigsSection from "@/components/home/HomeOpenGigsSection";
 import HomeGenresSection from "@/components/home/HomeGenresSection";
 import HomeCtaBanner from "@/components/home/HomeCtaBanner";
+import HomeFaqSection from "@/components/home/HomeFaqSection";
 import {
   HomeDJsTabsSkeleton,
   HomeEventsSectionSkeleton,
@@ -45,6 +46,9 @@ const Homepage = async () => {
           />
         </Suspense>
       )}
+
+      {/* FAQ — remove objections before final CTA */}
+      <HomeFaqSection />
 
       {/* CTA Banner */}
       <HomeCtaBanner />
