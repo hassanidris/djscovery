@@ -15,7 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDemoEventBySlug } from "@/data/events-demo";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
-import { EventReviewSection } from "@/components/events/EventReviewSection";
+import { EventReviewSection } from "@/components/reputation/EventReviewSection";
 
 export const revalidate = 60;
 

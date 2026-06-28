@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getGigReviewContextBySlug } from "@/lib/queries/gigs";
-import { GigReviewCard } from "@/components/gigs/GigReviewCard";
+import { GigReviewForm } from "@/components/reputation/GigReviewForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Clock } from "lucide-react";
@@ -35,7 +35,12 @@ export default async function GigReviewPage({
   return (
     <div className="min-h-screen bg-black">
       <div className="mx-auto max-w-2xl px-4 py-10 md:px-8">
-        <Button variant="ghost" size="sm" asChild className="mb-6 text-gray-500 hover:text-white">
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="mb-6 text-gray-500 hover:text-white"
+        >
           <Link href={`/gigs/${slug}`}>
             <ArrowLeft className="mr-1.5 h-4 w-4" />
             Back to gig
@@ -78,7 +83,7 @@ export default async function GigReviewPage({
                 {context.daysRemaining} days left to review
               </div>
             )}
-            <GigReviewCard
+            <GigReviewForm
               gigId={context.gigId}
               djProfileId={context.djProfileId}
               djName={context.djName}
