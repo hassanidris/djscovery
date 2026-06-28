@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Star,
   Clock,
+  Bell,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,13 @@ import { Separator } from "@/components/ui/separator";
 import { getAttendedEventsWithPendingReviews } from "@/lib/queries/events";
 
 export const metadata = { title: "My Profile" };
+
+type EventCompletedNotificationData = {
+  eventId?: number;
+  eventSlug?: string;
+  eventTitle?: string;
+  djCount?: number;
+};
 
 function profileCompleteness(profile: {
   bio: string | null;
@@ -62,12 +70,26 @@ export default async function FanProfilePage() {
 
   if (!fanProfile) redirect("/become-fan");
 
-  const [followedDjsCount, savedEventsCount, pendingEventReviews] =
-    await Promise.all([
-      prisma.djFollow.count({ where: { userId: user.id } }),
-      prisma.savedEvent.count({ where: { userId: user.id } }),
-      getAttendedEventsWithPendingReviews(user.id),
-    ]);
+  const [
+    followedDjsCount,
+    savedEventsCount,
+    pendingEventReviews,
+    eventNotifications,
+  ] = await Promise.all([
+    prisma.djFollow.count({ where: { userId: user.id } }),
+    prisma.savedEvent.count({ where: { userId: user.id } }),
+    getAttendedEventsWithPendingReviews(user.id),
+    prisma.notification.findMany({
+      where: {
+        recipientId: user.id,
+        type: "EVENT_COMPLETED",
+        read: false,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      select: { id: true, data: true, createdAt: true },
+    }),
+  ]);
 
   const { score, missing } = profileCompleteness(fanProfile);
 
@@ -107,6 +129,47 @@ export default async function FanProfilePage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* EVENT_COMPLETED notification reminders */}
+      {eventNotifications.length > 0 && (
+        <section className="space-y-3">
+          {eventNotifications.map((n) => {
+            const data = (n.data ?? {}) as EventCompletedNotificationData;
+            return (
+              <Card key={n.id} className="border-blue-500/20 bg-blue-500/5">
+                <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/20">
+                      <Bell className="h-5 w-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {data.eventTitle ?? "Event completed"}
+                      </p>
+                      <p className="text-xs text-zinc-400">
+                        {data.djCount ?? 0} DJ{data.djCount === 1 ? "" : "s"} is
+                        waiting for your review
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 justify-end">
+                    <Button
+                      size="sm"
+                      className="bg-blue-500 text-white hover:bg-blue-600"
+                      asChild
+                    >
+                      <Link href={`/events/${data.eventSlug ?? ""}`}>
+                        <Star className="mr-1.5 h-3.5 w-3.5" />
+                        Leave Review
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
+      )}
 
       {/* Events to review */}
       {pendingEventReviews.length > 0 && (
