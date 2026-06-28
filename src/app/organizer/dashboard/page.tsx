@@ -9,12 +9,16 @@ import {
   User,
   CheckCircle2,
   AlertCircle,
+  Clock,
+  Star,
 } from "lucide-react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { getPendingGigReviewsForOrganizer } from "@/lib/queries/gigs";
 
 function profileCompleteness(profile: {
   bio: string | null;
@@ -70,6 +74,7 @@ export default async function OrganizerDashboardPage() {
     redirect("/become-organizer");
 
   const { score, missing } = profileCompleteness(profile);
+  const pendingReviews = await getPendingGigReviewsForOrganizer(user.id);
   return (
     <div className="flex flex-col gap-6">
       {/* Actions row */}
@@ -118,6 +123,69 @@ export default async function OrganizerDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Pending gig reviews */}
+      {pendingReviews.length > 0 && (
+        <section>
+          <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
+            Pending Reviews
+          </h2>
+          <div className="grid gap-4">
+            {pendingReviews.map((review) => (
+              <Card key={review.gigId} className="border-white/8 bg-white/3">
+                <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white/5">
+                      {review.djAvatar ? (
+                        <Image
+                          src={review.djAvatar}
+                          alt={review.djName}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-400">
+                          {review.djName.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {review.gigTitle}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        with DJ{" "}
+                        <Link
+                          href={`/djs/${review.djSlug}`}
+                          className="text-h_red hover:underline"
+                        >
+                          {review.djName}
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 items-center justify-between gap-4 sm:justify-end">
+                    <div className="flex items-center gap-1.5 text-xs text-amber-400">
+                      <Clock className="h-3.5 w-3.5" />
+                      {review.daysRemaining} days left to review
+                    </div>
+                    <Button
+                      size="sm"
+                      className="bg-h_red hover:bg-h_redDark text-white"
+                      asChild
+                    >
+                      <Link href={`/gigs/${review.gigSlug}/review`}>
+                        <Star className="mr-1.5 h-3.5 w-3.5" />
+                        Leave Review
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Profile completeness */}
       {missing.length > 0 && (

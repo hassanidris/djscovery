@@ -9,6 +9,7 @@ import {
   adminDjRegistrationSubject,
   adminDjRegistrationHtml,
 } from "@/lib/email/templates/adminDjRegistration";
+import { updateReputationScore } from "@/lib/reputation/update";
 
 function makeSlugBase(stageName: string) {
   return stageName
@@ -467,6 +468,7 @@ export async function updateDjProfile(
     });
 
     const slugChanged = newSlug !== existing.slug;
+    await updateReputationScore(existing.id, "PROFILE_UPDATED");
     return { success: true as const, ...(slugChanged && { newSlug }) };
   } catch {
     return { error: "Something went wrong. Please try again." };

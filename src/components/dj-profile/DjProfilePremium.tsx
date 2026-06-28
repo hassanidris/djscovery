@@ -54,6 +54,8 @@ import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import ProfileVenues from "@/components/dj-profile/ProfileVenues";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
+import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
   SOCIAL_ICONS,
   Stars,
@@ -122,12 +124,26 @@ export default function DjProfilePremium({
   isFollowed = false,
   djUserId,
   isFollowing = false,
+  reputationScore,
+  reputationDetail,
+  status,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
   isFollowed?: boolean;
   djUserId?: string;
   isFollowing?: boolean;
+  reputationScore?: number;
+  reputationDetail?: {
+    totalScore: number;
+    profileQualityScore: number;
+    verificationScore: number;
+    reviewScore: number;
+    reliabilityScore: number;
+    activityScore: number;
+    newTalentBoost: number;
+  } | null;
+  status?: string;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -262,15 +278,29 @@ export default function DjProfilePremium({
                   Dj {DJ.stageName}
                 </h1>
                 <div className="flex items-center gap-1.5">
-                  <Badge className="h-5.5 border-blue-500/25 bg-blue-500/15 text-xs text-blue-400">
-                    <CircleCheck className="mr-1 h-2.5 w-2.5" />
-                    Verified
-                  </Badge>
+                  {status === "APPROVED" && (
+                    <Badge className="h-5.5 border-blue-500/25 bg-blue-500/15 text-xs text-blue-400">
+                      <CircleCheck className="mr-1 h-2.5 w-2.5" />
+                      Verified
+                    </Badge>
+                  )}
                   <Badge className="h-5.5 border-amber-500/25 bg-amber-500/15 text-xs text-amber-400">
                     <Crown className="mr-1 h-2.5 w-2.5" />
                     Premium
                   </Badge>
                 </div>
+                {reputationScore !== undefined && (
+                  <ReputationBadge
+                    score={reputationScore}
+                    variant="subtle"
+                    showScore={false}
+                  />
+                )}
+                {isOwner && reputationDetail && (
+                  <div className="mt-2">
+                    <ScoreBreakdown reputationDetail={reputationDetail} />
+                  </div>
+                )}
               </div>
               <p className="flex items-center gap-1.5 text-sm text-gray-400">
                 <MapPin className="text-h_red h-3 w-3" /> {location}

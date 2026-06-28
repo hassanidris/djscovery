@@ -273,10 +273,14 @@ export type DjUser = {
   slug?: string;
   isPremium?: boolean;
   isFeatured?: boolean;
-  verified?: boolean;
+  status?: string;
   djTypes?: string[];
   _count?: { followers: number };
   djProfileId?: number;
+  reputationScore?: number;
+  gigReviews?: { id: number | string }[];
+  eventReviews?: { id: number | string }[];
+  ratings?: { id: number | string }[];
 };
 
 const _DEMO_DJ_TYPES: string[][] = [
@@ -302,9 +306,13 @@ export function demoDJsAsDjUsers(): DjUser[] {
     slug: dj.slug,
     isPremium: dj.plan === "premium",
     isFeatured: dj.featured,
-    verified: dj.verified,
+    status: "APPROVED",
     djTypes: _DEMO_DJ_TYPES[i % _DEMO_DJ_TYPES.length],
     _count: { followers: dj.stats.followers },
+    reputationScore: 0,
+    gigReviews: [],
+    eventReviews: [],
+    ratings: [],
   }));
 }
 

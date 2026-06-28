@@ -365,3 +365,145 @@ export type GigApplicantsResult = NonNullable<
   Awaited<ReturnType<typeof getGigApplicants>>
 >;
 export type GigApplicant = GigApplicantsResult["applications"][number];
+
+// ============================================================
+// 7. GIG REVIEW CONTEXT
+// Data needed to render the organizer review prompt for a
+// specific gig. Returns null if the current user is not the gig
+// owner or if there is no accepted DJ.
+// ============================================================
+
+export async function getGigReviewContextBySlug(slug: string, userId: string) {
+  const gig = await prisma.gig.findUnique({
+    where: { slug, deletedAt: null },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      status: true,
+      eventDate: true,
+      organizerProfile: { select: { id: true, userId: true } },
+      applications: {
+        where: { status: "ACCEPTED" },
+        select: {
+          id: true,
+          djProfile: {
+            select: { id: true, stageName: true, slug: true, avatar: true },
+          },
+          hire: { select: { id: true, status: true, completedAt: true } },
+        },
+      },
+      gigReviews: { select: { id: true } },
+    },
+  });
+
+  if (!gig || gig.organizerProfile.userId !== userId) return null;
+  const accepted = gig.applications[0];
+  if (!accepted) return null;
+
+  const hire = accepted.hire;
+  const completedAt = hire?.completedAt ?? gig.eventDate;
+  const isCompleted =
+    gig.status === "COMPLETED" && hire?.status === "COMPLETED";
+  const alreadyReviewed = gig.gigReviews.length > 0;
+  const daysRemaining = isCompleted
+    ? Math.max(
+        0,
+        30 -
+          Math.floor(
+            (Date.now() - new Date(completedAt).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
+      )
+    : null;
+
+  return {
+    gigId: gig.id,
+    gigTitle: gig.title,
+    gigSlug: gig.slug,
+    djProfileId: accepted.djProfile.id,
+    djName: accepted.djProfile.stageName,
+    djSlug: accepted.djProfile.slug,
+    djAvatar: accepted.djProfile.avatar,
+    isCompleted,
+    alreadyReviewed,
+    daysRemaining,
+  };
+}
+
+export type GigReviewContext = NonNullable<
+  Awaited<ReturnType<typeof getGigReviewContextBySlug>>
+>;
+
+// ============================================================
+// 8. ORGANIZER — PENDING GIG REVIEWS
+// Completed gigs with an accepted DJ, no review yet, and within
+// the 30-day review window.
+// ============================================================
+
+export async function getPendingGigReviewsForOrganizer(userId: string) {
+  const orgProfile = await prisma.organizerProfile.findUnique({
+    where: { userId },
+    select: { id: true },
+  });
+  if (!orgProfile) return [];
+
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const gigs = await prisma.gig.findMany({
+    where: {
+      organizerProfileId: orgProfile.id,
+      status: "COMPLETED",
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      eventDate: true,
+      applications: {
+        where: { status: "ACCEPTED" },
+        select: {
+          djProfile: {
+            select: { id: true, stageName: true, slug: true, avatar: true },
+          },
+          hire: { select: { completedAt: true } },
+        },
+      },
+      gigReviews: { select: { id: true } },
+    },
+  });
+
+  return gigs
+    .filter((g) => {
+      if (g.applications.length === 0 || g.gigReviews.length > 0) return false;
+      const completedAt = g.applications[0]?.hire?.completedAt ?? g.eventDate;
+      return new Date(completedAt) >= thirtyDaysAgo;
+    })
+    .map((g) => {
+      const a = g.applications[0]!;
+      const completedAt = a.hire?.completedAt ?? g.eventDate;
+      const daysRemaining = Math.max(
+        0,
+        30 -
+          Math.floor(
+            (Date.now() - new Date(completedAt).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
+      );
+      return {
+        gigId: g.id,
+        gigSlug: g.slug,
+        gigTitle: g.title,
+        completedAt,
+        daysRemaining,
+        djProfileId: a.djProfile.id,
+        djName: a.djProfile.stageName,
+        djSlug: a.djProfile.slug,
+        djAvatar: a.djProfile.avatar,
+      };
+    });
+}
+
+export type PendingGigReview = Awaited<
+  ReturnType<typeof getPendingGigReviewsForOrganizer>
+>[number];

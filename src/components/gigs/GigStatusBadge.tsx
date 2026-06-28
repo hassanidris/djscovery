@@ -1,9 +1,6 @@
 import type { GigStatus, GigApplicationStatus } from "@prisma/client";
 
-const GIG_STATUS: Record<
-  GigStatus,
-  { label: string; className: string }
-> = {
+const GIG_STATUS: Record<GigStatus, { label: string; className: string }> = {
   DRAFT: {
     label: "Draft",
     className: "border-white/10 bg-white/5 text-gray-500",
@@ -23,6 +20,10 @@ const GIG_STATUS: Record<
   CANCELLED: {
     label: "Cancelled",
     className: "border-red-500/30 bg-red-500/10 text-red-400",
+  },
+  COMPLETED: {
+    label: "Completed",
+    className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
   },
   EXPIRED: {
     label: "Expired",

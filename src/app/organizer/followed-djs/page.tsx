@@ -18,9 +18,7 @@ export default async function OrganizerFollowedDjsPage() {
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
             <Users className="h-6 w-6 text-gray-500" />
           </div>
-          <p className="text-sm font-medium text-white">
-            No followed DJs yet
-          </p>
+          <p className="text-sm font-medium text-white">No followed DJs yet</p>
           <p className="mt-1 text-sm text-gray-500">
             Browse the{" "}
             <Link
@@ -71,8 +69,11 @@ export default async function OrganizerFollowedDjsPage() {
                 <span className="truncate text-sm font-semibold text-white">
                   {dj.stageName}
                 </span>
-                {dj.verified && (
-                  <CircleCheck className="h-3.5 w-3.5 shrink-0 text-blue-400" />
+                {dj.status === "APPROVED" && (
+                  <CircleCheck
+                    className="h-3.5 w-3.5 shrink-0 text-blue-400"
+                    aria-label="Admin approved"
+                  />
                 )}
               </div>
               {(dj.city || dj.country) && (

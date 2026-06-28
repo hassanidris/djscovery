@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import {
@@ -8,12 +9,15 @@ import {
   CalendarHeart,
   CheckCircle2,
   AlertCircle,
+  Star,
+  Clock,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { getAttendedEventsWithPendingReviews } from "@/lib/queries/events";
 
 export const metadata = { title: "My Profile" };
 
@@ -58,10 +62,12 @@ export default async function FanProfilePage() {
 
   if (!fanProfile) redirect("/become-fan");
 
-  const [followedDjsCount, savedEventsCount] = await Promise.all([
-    prisma.djFollow.count({ where: { userId: user.id } }),
-    prisma.savedEvent.count({ where: { userId: user.id } }),
-  ]);
+  const [followedDjsCount, savedEventsCount, pendingEventReviews] =
+    await Promise.all([
+      prisma.djFollow.count({ where: { userId: user.id } }),
+      prisma.savedEvent.count({ where: { userId: user.id } }),
+      getAttendedEventsWithPendingReviews(user.id),
+    ]);
 
   const { score, missing } = profileCompleteness(fanProfile);
 
@@ -101,6 +107,85 @@ export default async function FanProfilePage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Events to review */}
+      {pendingEventReviews.length > 0 && (
+        <section>
+          <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
+            Events You Attended — Leave a Review
+          </h2>
+          <div className="grid gap-4">
+            {pendingEventReviews.map((event) => {
+              const daysRemaining = Math.max(
+                0,
+                30 -
+                  Math.floor(
+                    (Date.now() - new Date(event.startDate).getTime()) /
+                      (1000 * 60 * 60 * 24),
+                  ),
+              );
+              return (
+                <Card key={event.eventId} className="border-white/8 bg-white/3">
+                  <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="relative h-14 w-10 overflow-hidden rounded-md bg-white/5">
+                        {event.posterUrl ? (
+                          <Image
+                            src={event.posterUrl}
+                            alt={event.title}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-gray-500">
+                            {event.title.slice(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white">
+                          {event.title}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(event.startDate).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
+                        </p>
+                        <p className="mt-1 text-xs text-zinc-400">
+                          {event.pendingDjs
+                            .map((dj) => `DJ. ${dj.stageName}`)
+                            .join(", ")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-1 items-center justify-between gap-4 sm:justify-end">
+                      <div className="flex items-center gap-1.5 text-xs text-amber-400">
+                        <Clock className="h-3.5 w-3.5" />
+                        {daysRemaining} days left
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-h_red hover:bg-h_redDark text-white"
+                        asChild
+                      >
+                        <Link href={`/events/${event.slug}`}>
+                          <Star className="mr-1.5 h-3.5 w-3.5" />
+                          Leave Review
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Profile completeness */}
       {missing.length > 0 && (

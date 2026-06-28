@@ -60,8 +60,11 @@ export default async function FollowedDjsPage() {
               <span className="truncate text-sm font-semibold text-white">
                 {dj.stageName}
               </span>
-              {dj.verified && (
-                <CircleCheck className="h-3.5 w-3.5 shrink-0 text-blue-400" />
+              {dj.status === "APPROVED" && (
+                <CircleCheck
+                  className="h-3.5 w-3.5 shrink-0 text-blue-400"
+                  aria-label="Admin approved"
+                />
               )}
             </div>
             {(dj.city || dj.country) && (

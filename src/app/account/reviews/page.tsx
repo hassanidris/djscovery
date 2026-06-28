@@ -88,8 +88,11 @@ export default async function ReviewsPage() {
                   <span className="text-sm font-semibold text-white">
                     {r.djProfile.stageName}
                   </span>
-                  {r.djProfile.verified && (
-                    <CircleCheck className="h-3.5 w-3.5 shrink-0 text-blue-400" />
+                  {r.djProfile.status === "APPROVED" && (
+                    <CircleCheck
+                      className="h-3.5 w-3.5 shrink-0 text-blue-400"
+                      aria-label="Admin approved"
+                    />
                   )}
                 </div>
                 {(r.djProfile.city || r.djProfile.country) && (

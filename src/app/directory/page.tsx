@@ -88,7 +88,7 @@ const DirectoryPage = async ({
           ? { stageName: "asc" }
           : sort === "z-a"
             ? { stageName: "desc" }
-            : { createdAt: "desc" },
+            : [{ searchScore: "desc" }, { reputationScore: "desc" }],
       include: {
         user: {
           include: { _count: { select: { followers: true } } },
@@ -97,6 +97,9 @@ const DirectoryPage = async ({
         city: { select: { name: true } },
         genres: { include: { genre: { select: { name: true } } } },
         djTypes: { select: { type: true } },
+        gigReviews: { select: { id: true } },
+        eventReviews: { select: { id: true } },
+        ratings: { select: { id: true } },
       },
     });
 
@@ -112,9 +115,13 @@ const DirectoryPage = async ({
       slug: p.slug,
       isPremium: p.plan === "PREMIUM",
       isFeatured: p.featured,
-      verified: p.verified,
+      status: p.status,
       djTypes: p.djTypes.map((t) => t.type),
       _count: { followers: p.user._count.followers },
+      reputationScore: p.reputationScore,
+      gigReviews: p.gigReviews,
+      eventReviews: p.eventReviews,
+      ratings: p.ratings,
     }));
   } catch {
     // fetchError
