@@ -9,6 +9,9 @@ import {
   publishGigSchema,
   applyToGigSchema,
   updateApplicationStatusSchema,
+  completeGigSchema,
+  cancelHireSchema,
+  reportNoShowSchema,
 } from "@/lib/validations/gig";
 import { isPrivateEventType } from "@/config/gig-type-fields";
 import { sendEmail } from "@/lib/email/sendEmail";
@@ -654,6 +657,7 @@ export async function updateApplicationStatus(
   const application = await prisma.gigApplication.findUnique({
     where: { id: applicationId },
     select: {
+      id: true,
       status: true,
       gig: { select: { id: true, organizerProfileId: true, title: true } },
       djProfile: {
@@ -708,6 +712,15 @@ export async function updateApplicationStatus(
         data: { gigId: application.gig.id, applicationId },
       },
     }),
+    ...(newStatus === "ACCEPTED"
+      ? [
+          prisma.hire.create({
+            data: {
+              applicationId: application.id,
+            },
+          }),
+        ]
+      : []),
   ]);
 
   if (newStatus === "ACCEPTED" || newStatus === "REJECTED") {
@@ -739,4 +752,252 @@ export async function updateApplicationStatus(
 
   revalidatePath("/dashboard/organizer/gigs", "layout");
   return { success: true, data: undefined };
+}
+
+// ============================================================
+// completeGig
+// Organizer marks a gig as performed. Only gigs with an active
+// hire (accepted application) can be completed.
+// Updates: Gig.status = COMPLETED, Hire.status = COMPLETED,
+// Hire.completedAt = now(). This is the trigger for gig review
+// eligibility and DJ reliability scoring.
+// ============================================================
+
+export async function completeGig(
+  input: unknown,
+): Promise<ActionResult<{ gigId: number; hireId: number }>> {
+  const user = await getAuthUser();
+  if (!user) return { success: false, error: "You must be signed in." };
+
+  const roles = await getRoles(user.id);
+  if (!roles.includes("ORGANIZER"))
+    return { success: false, error: "Only organizers can complete gigs." };
+
+  const orgProfile = await getActiveOrganizerProfile(user.id);
+  if (
+    !orgProfile ||
+    orgProfile.status !== "ACTIVE" ||
+    orgProfile.deletedAt !== null
+  )
+    return { success: false, error: "Active organizer profile required." };
+
+  const parsed = completeGigSchema.safeParse(input);
+  if (!parsed.success)
+    return {
+      success: false,
+      error: parsed.error.errors[0]?.message ?? "Invalid input.",
+    };
+
+  const { gigId } = parsed.data;
+
+  const gig = await prisma.gig.findUnique({
+    where: { id: gigId },
+    select: {
+      id: true,
+      status: true,
+      organizerProfileId: true,
+      applications: {
+        where: { status: "ACCEPTED" },
+        select: {
+          hire: { select: { id: true, status: true } },
+        },
+      },
+    },
+  });
+
+  if (!gig) return { success: false, error: "Gig not found." };
+  if (gig.organizerProfileId !== orgProfile.id)
+    return { success: false, error: "You can only complete your own gigs." };
+
+  if (gig.status === "COMPLETED" || gig.status === "CANCELLED")
+    return {
+      success: false,
+      error: "Gig is already finalized.",
+    };
+
+  const acceptedApplication = gig.applications[0];
+  if (!acceptedApplication?.hire)
+    return {
+      success: false,
+      error: "This gig does not have an accepted hire to complete.",
+    };
+
+  const hire = acceptedApplication.hire;
+  if (hire.status !== "ACTIVE")
+    return {
+      success: false,
+      error: "Only active hires can be completed.",
+    };
+
+  const now = new Date();
+
+  await prisma.$transaction([
+    prisma.gig.update({
+      where: { id: gigId },
+      data: { status: "COMPLETED" },
+    }),
+    prisma.hire.update({
+      where: { id: hire.id },
+      data: { status: "COMPLETED", completedAt: now },
+    }),
+  ]);
+
+  revalidatePath("/organizer/gigs", "layout");
+  return { success: true, data: { gigId, hireId: hire.id } };
+}
+
+// ============================================================
+// cancelHire
+// DJ or organizer cancels an active hire after acceptance.
+// Sets Hire.status to CANCELLED_BY_DJ or CANCELLED_BY_ORGANIZER,
+// records the reason and timestamp.
+// ============================================================
+
+export async function cancelHire(
+  input: unknown,
+): Promise<ActionResult<{ hireId: number }>> {
+  const user = await getAuthUser();
+  if (!user) return { success: false, error: "You must be signed in." };
+
+  const parsed = cancelHireSchema.safeParse(input);
+  if (!parsed.success)
+    return {
+      success: false,
+      error: parsed.error.errors[0]?.message ?? "Invalid input.",
+    };
+
+  const { hireId, reason, cancelledBy } = parsed.data;
+
+  const hire = await prisma.hire.findUnique({
+    where: { id: hireId },
+    select: {
+      id: true,
+      status: true,
+      application: {
+        select: {
+          gig: {
+            select: {
+              id: true,
+              organizerProfileId: true,
+              organizerProfile: { select: { userId: true } },
+            },
+          },
+          djProfile: { select: { userId: true } },
+        },
+      },
+    },
+  });
+
+  if (!hire) return { success: false, error: "Hire not found." };
+  if (hire.status !== "ACTIVE")
+    return {
+      success: false,
+      error: "Only active hires can be cancelled.",
+    };
+
+  const { gig, djProfile } = hire.application;
+
+  if (cancelledBy === "ORGANIZER") {
+    const roles = await getRoles(user.id);
+    if (!roles.includes("ORGANIZER"))
+      return {
+        success: false,
+        error: "Only organizers can cancel on behalf of an organizer.",
+      };
+    if (gig.organizerProfile.userId !== user.id)
+      return {
+        success: false,
+        error: "You can only cancel hires for your own gigs.",
+      };
+  } else {
+    if (djProfile.userId !== user.id)
+      return {
+        success: false,
+        error: "You can only cancel your own hire.",
+      };
+  }
+
+  const now = new Date();
+  const status =
+    cancelledBy === "ORGANIZER" ? "CANCELLED_BY_ORGANIZER" : "CANCELLED_BY_DJ";
+
+  await prisma.hire.update({
+    where: { id: hireId },
+    data: {
+      status,
+      cancelledAt: now,
+      cancellationReason: reason ?? null,
+    },
+  });
+
+  revalidatePath("/organizer/gigs", "layout");
+  return { success: true, data: { hireId } };
+}
+
+// ============================================================
+// reportNoShow
+// Organizer flags the DJ as a no-show. Sets Hire.noShow = true
+// and Hire.status = NO_SHOW.
+// ============================================================
+
+export async function reportNoShow(
+  input: unknown,
+): Promise<ActionResult<{ hireId: number }>> {
+  const user = await getAuthUser();
+  if (!user) return { success: false, error: "You must be signed in." };
+
+  const roles = await getRoles(user.id);
+  if (!roles.includes("ORGANIZER"))
+    return {
+      success: false,
+      error: "Only organizers can report a no-show.",
+    };
+
+  const parsed = reportNoShowSchema.safeParse(input);
+  if (!parsed.success)
+    return {
+      success: false,
+      error: parsed.error.errors[0]?.message ?? "Invalid input.",
+    };
+
+  const { hireId } = parsed.data;
+
+  const hire = await prisma.hire.findUnique({
+    where: { id: hireId },
+    select: {
+      id: true,
+      status: true,
+      application: {
+        select: {
+          gig: {
+            select: {
+              id: true,
+              organizerProfile: { select: { userId: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!hire) return { success: false, error: "Hire not found." };
+  if (hire.status !== "ACTIVE")
+    return {
+      success: false,
+      error: "Only active hires can be reported as no-show.",
+    };
+
+  if (hire.application.gig.organizerProfile.userId !== user.id)
+    return {
+      success: false,
+      error: "You can only report no-shows for your own gigs.",
+    };
+
+  await prisma.hire.update({
+    where: { id: hireId },
+    data: { noShow: true, status: "NO_SHOW" },
+  });
+
+  revalidatePath("/organizer/gigs", "layout");
+  return { success: true, data: { hireId } };
 }

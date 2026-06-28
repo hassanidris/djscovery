@@ -47,6 +47,8 @@ import FollowDjButton from "@/components/dj-profile/FollowDjButton";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import ProfileVenues from "@/components/dj-profile/ProfileVenues";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
+import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
   SOCIAL_ICONS,
   SectionHeading,
@@ -106,12 +108,24 @@ export default function DjProfileFree({
   isFollowed = false,
   djUserId,
   isFollowing = false,
+  reputationScore,
+  reputationDetail,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
   isFollowed?: boolean;
   djUserId?: string;
   isFollowing?: boolean;
+  reputationScore?: number;
+  reputationDetail?: {
+    totalScore: number;
+    profileQualityScore: number;
+    verificationScore: number;
+    reviewScore: number;
+    reliabilityScore: number;
+    activityScore: number;
+    newTalentBoost: number;
+  } | null;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -240,6 +254,20 @@ export default function DjProfileFree({
               <p className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-400">
                 <MapPin className="text-h_red h-3 w-3" /> {location}
               </p>
+              {reputationScore !== undefined && (
+                <div className="mt-2">
+                  <ReputationBadge
+                    score={reputationScore}
+                    variant="subtle"
+                    showScore={false}
+                  />
+                </div>
+              )}
+              {isOwner && reputationDetail && (
+                <div className="mt-2">
+                  <ScoreBreakdown reputationDetail={reputationDetail} />
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2 sm:pb-2">
               {isOwner && djData?.slug ? (

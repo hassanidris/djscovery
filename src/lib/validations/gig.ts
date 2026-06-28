@@ -274,6 +274,28 @@ export const updateApplicationStatusSchema = z.object({
 });
 
 // ============================================================
+// HIRE LIFECYCLE SCHEMAS
+// ============================================================
+
+export const completeGigSchema = z.object({
+  gigId: z.number().int().positive("Invalid gig"),
+});
+
+export const cancelHireSchema = z.object({
+  hireId: z.number().int().positive("Invalid hire"),
+  reason: z
+    .string()
+    .max(1000, "Reason must be at most 1000 characters")
+    .optional()
+    .nullable(),
+  cancelledBy: z.enum(["DJ", "ORGANIZER"]),
+});
+
+export const reportNoShowSchema = z.object({
+  hireId: z.number().int().positive("Invalid hire"),
+});
+
+// ============================================================
 // INFERRED TYPES
 // ============================================================
 
@@ -283,3 +305,6 @@ export type ApplyToGigInput = z.infer<typeof applyToGigSchema>;
 export type UpdateApplicationStatusInput = z.infer<
   typeof updateApplicationStatusSchema
 >;
+export type CompleteGigInput = z.infer<typeof completeGigSchema>;
+export type CancelHireInput = z.infer<typeof cancelHireSchema>;
+export type ReportNoShowInput = z.infer<typeof reportNoShowSchema>;

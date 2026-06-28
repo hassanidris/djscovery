@@ -118,7 +118,7 @@ export async function getFollowedDjs() {
           stageName: true,
           avatar: true,
           plan: true,
-          verified: true,
+          status: true,
           city: { select: { name: true } },
           country: { select: { name: true } },
           genres: {
@@ -324,7 +324,7 @@ export async function getMyReviews() {
           slug: true,
           stageName: true,
           avatar: true,
-          verified: true,
+          status: true,
           city: { select: { name: true } },
           country: { select: { name: true } },
         },

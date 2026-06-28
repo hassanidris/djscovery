@@ -15,6 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDemoEventBySlug } from "@/data/events-demo";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
+import { EventReviewSection } from "@/components/events/EventReviewSection";
 
 export const revalidate = 60;
 
@@ -103,6 +104,10 @@ export default async function EventDetailPage({
           userId: true,
         },
       },
+      eventReviews: {
+        where: user ? { userId: user.id } : { userId: "" },
+        select: { djProfileId: true },
+      },
       country: { select: { name: true } },
       city: { select: { name: true } },
       participants: {
@@ -123,6 +128,13 @@ export default async function EventDetailPage({
   // ── Visibility guard for DB events ───────────────────────────────────────
   if (dbEvent) {
     const isOwner = user ? dbEvent.ownerDj.userId === user.id : false;
+    const attendance = user
+      ? await prisma.eventAttendance.findUnique({
+          where: { eventId_userId: { eventId: dbEvent.id, userId: user.id } },
+        })
+      : null;
+    const hasAttended = attendance?.status === "ATTENDED";
+    const reviewedDjIds = dbEvent.eventReviews.map((r) => r.djProfileId);
 
     if (dbEvent.status === "DRAFT" || dbEvent.status === "ARCHIVED") {
       if (isOwner) redirect(`/dashboard/dj/events/${dbEvent.id}/edit`);
@@ -157,11 +169,13 @@ export default async function EventDetailPage({
         posterUrl={dbEvent.posterUrl ?? null}
         isUpcoming={isUpcoming}
         ownerDj={{
+          djProfileId: dbEvent.ownerDj.id,
           slug: dbEvent.ownerDj.slug,
           stageName: dbEvent.ownerDj.stageName,
           avatar: dbEvent.ownerDj.avatar ?? null,
         }}
         participants={dbEvent.participants.map((p) => ({
+          djProfileId: p.djProfile.id,
           role: p.role ?? null,
           slug: p.djProfile.slug,
           stageName: p.djProfile.stageName,
@@ -170,6 +184,9 @@ export default async function EventDetailPage({
         gallery={dbEvent.gallery}
         isOwner={isOwner}
         editHref={isOwner ? `/dashboard/dj/events/${dbEvent.id}/edit` : null}
+        eventId={dbEvent.id}
+        hasAttended={hasAttended}
+        reviewedDjIds={reviewedDjIds}
       />
     );
   }
@@ -188,7 +205,12 @@ export default async function EventDetailPage({
 
 // ── Shared detail view ────────────────────────────────────────────────────────
 
-type DjMini = { slug: string; stageName: string; avatar: string | null };
+type DjMini = {
+  djProfileId: number;
+  slug: string;
+  stageName: string;
+  avatar: string | null;
+};
 type GalleryItem = { id: number; url: string; caption: string | null };
 
 function EventDetailView(props: {
@@ -215,6 +237,9 @@ function EventDetailView(props: {
   gallery: GalleryItem[];
   isOwner: boolean;
   editHref: string | null;
+  eventId: number;
+  hasAttended: boolean;
+  reviewedDjIds: number[];
 }) {
   const {
     title,
@@ -240,6 +265,9 @@ function EventDetailView(props: {
     gallery,
     isOwner,
     editHref,
+    eventId,
+    hasAttended,
+    reviewedDjIds,
   } = props;
 
   const allPerformers = [
@@ -451,6 +479,20 @@ function EventDetailView(props: {
               </div>
             )}
 
+            {/* Fan reviews */}
+            {status === "COMPLETED" && hasAttended && (
+              <EventReviewSection
+                eventId={eventId}
+                djs={allPerformers.map((dj) => ({
+                  djProfileId: dj.djProfileId,
+                  slug: dj.slug,
+                  stageName: dj.stageName,
+                  avatar: dj.avatar,
+                }))}
+                reviewedDjIds={reviewedDjIds}
+              />
+            )}
+
             {/* Post-event recap */}
             {recap && (
               <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
@@ -533,6 +575,7 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       posterUrl={event.posterUrl ?? null}
       isUpcoming={isUpcoming}
       ownerDj={{
+        djProfileId: 0,
         slug: event.djSlug,
         stageName: demoDj?.stageName ?? slugToName(event.djSlug),
         avatar: demoDj?.avatar.url ?? null,
@@ -541,6 +584,9 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       gallery={[]}
       isOwner={false}
       editHref={null}
+      eventId={0}
+      hasAttended={false}
+      reviewedDjIds={[]}
     />
   );
 }
