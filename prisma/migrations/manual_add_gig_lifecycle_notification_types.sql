@@ -1,0 +1,2 @@
+ALTER TYPE "NotificationType" ADD VALUE 'GIG_CANCELLED';
+ALTER TYPE "NotificationType" ADD VALUE 'GIG_NO_SHOW';

@@ -8,14 +8,17 @@ import { unfollowDj } from "@/lib/actions/saves";
 
 export default function UnfollowDjButton({
   djProfileId,
+  onSuccess,
 }: {
   djProfileId: number;
+  onSuccess?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   return (
     <button
+      type="button"
       aria-label="Unfollow DJ"
       disabled={isPending}
       onClick={() =>
@@ -27,7 +30,9 @@ export default function UnfollowDjButton({
             } else {
               toast.error(result.error);
             }
+            return;
           }
+          onSuccess?.();
         })
       }
       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-40"

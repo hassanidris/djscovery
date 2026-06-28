@@ -1,9 +1,17 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { setupFanProfile } from "@/lib/actions/profile";
+import { Camera, Loader2 } from "lucide-react";
+import { setupFanProfile, uploadFanAvatar } from "@/lib/actions/profile";
 import { getCitiesForCountry } from "@/lib/actions/locations";
 
 type Country = { id: number; name: string };
@@ -14,6 +22,7 @@ const initialState = { success: false, error: null as string | null };
 export default function BecomeFanForm({
   initialName,
   initialBio,
+  initialAvatar = null,
   initialCountryId,
   initialCityId,
   countries,
@@ -22,6 +31,7 @@ export default function BecomeFanForm({
 }: {
   initialName: string;
   initialBio: string;
+  initialAvatar?: string | null;
   initialCountryId: number | null;
   initialCityId: number | null;
   countries: Country[];
@@ -37,7 +47,9 @@ export default function BecomeFanForm({
   const [cityId, setCityId] = useState<number | null>(initialCityId);
   const [cities, setCities] = useState<City[]>(initialCities);
   const [validationError, setValidationError] = useState<string | null>(null);
-
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(initialAvatar);
+  const [isUploading, startUpload] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const cityRequestId = useRef(0);
 
   useEffect(() => {
@@ -72,6 +84,30 @@ export default function BecomeFanForm({
     }
   }
 
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previousAvatar = avatarSrc;
+    const preview = URL.createObjectURL(file);
+    setAvatarSrc(preview);
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    startUpload(async () => {
+      const result = await uploadFanAvatar(fd);
+      if ("error" in result) {
+        toast.error(result.error);
+        setAvatarSrc(previousAvatar);
+      } else {
+        toast.success("Avatar updated.");
+        setAvatarSrc(result.url);
+      }
+      URL.revokeObjectURL(preview);
+    });
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     if (!countryId) {
       e.preventDefault();
@@ -94,6 +130,78 @@ export default function BecomeFanForm({
     >
       <input type="hidden" name="countryId" value={countryId ?? ""} />
       <input type="hidden" name="cityId" value={cityId ?? ""} />
+
+      {isSettingsMode && (
+        <div className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-300">
+              Profile Photo
+            </h2>
+            <p className="mt-0.5 text-xs text-gray-500">
+              JPG, PNG or WebP · max 5 MB
+            </p>
+          </div>
+
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none disabled:opacity-60"
+            >
+              {avatarSrc ? (
+                <Image
+                  src={avatarSrc}
+                  alt="avatar"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center bg-zinc-800 text-xl font-bold text-white">
+                  {initialName.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+              <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                {isUploading ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-white" />
+                ) : (
+                  <Camera className="h-5 w-5 text-white" />
+                )}
+              </span>
+            </button>
+
+            <div className="flex flex-col gap-1.5">
+              <button
+                type="button"
+                disabled={isUploading}
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center justify-center rounded-md border border-white/20 px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 disabled:opacity-60"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Uploading…
+                  </>
+                ) : (
+                  "Change photo"
+                )}
+              </button>
+              <p className="text-xs text-gray-600">
+                Click the photo or button to upload
+              </p>
+            </div>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+        </div>
+      )}
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="name" className="text-sm font-medium text-gray-300">

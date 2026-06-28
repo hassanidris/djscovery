@@ -5,6 +5,7 @@ import { getCountries, getCitiesForCountry } from "@/lib/actions/locations";
 import { getNavUser } from "@/lib/auth/getNavUser";
 import ProfileSettingsForm from "@/components/account/ProfileSettingsForm";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Account Settings" };
 
 export default async function AccountSettingsPage() {
@@ -16,6 +17,8 @@ export default async function AccountSettingsPage() {
 
   const { isOrganizer, navRole } = await getNavUser();
   const isOrganizerOnly = isOrganizer && navRole === "organizer";
+
+  if (navRole === "fan") redirect("/fan/account");
 
   const [dbUser, countries] = await Promise.all([
     prisma.user.findUnique({

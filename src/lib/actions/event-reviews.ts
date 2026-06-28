@@ -29,7 +29,7 @@ export async function createEventReview(
 
   const event = await prisma.event.findUnique({
     where: { id: eventId },
-    select: { slug: true, status: true, startDate: true },
+    select: { slug: true, title: true, status: true, startDate: true },
   });
   if (!event) throw new Error("Event not found");
   if (event.status !== "COMPLETED") {
@@ -50,7 +50,8 @@ export async function createEventReview(
       },
     },
   });
-  if (existingReview) throw new Error("You have already reviewed this DJ for this event");
+  if (existingReview)
+    throw new Error("You have already reviewed this DJ for this event");
 
   const daysSince =
     (Date.now() - new Date(event.startDate).getTime()) / (1000 * 60 * 60 * 24);
@@ -71,6 +72,26 @@ export async function createEventReview(
   });
 
   await updateReputationScore(djProfileId, "EVENT_REVIEW_ADDED");
+
+  const djProfile = await prisma.djProfile.findUnique({
+    where: { id: djProfileId },
+    select: { userId: true },
+  });
+
+  if (djProfile) {
+    await prisma.notification.create({
+      data: {
+        type: "NEW_RATING",
+        recipientId: djProfile.userId,
+        data: {
+          eventId,
+          eventTitle: event.title,
+          rating: data.rating,
+          reviewerType: "fan",
+        },
+      },
+    });
+  }
 
   revalidatePath(`/events/${event.slug}`);
   revalidatePath("/fan/profile");

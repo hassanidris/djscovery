@@ -138,8 +138,8 @@ export function getFooterProfessionalLinks(opts: {
 
   if (navRole === "fan") {
     return [
-      { label: "My Account", href: "/account" },
-      { label: "Followed DJs", href: "/account/followed-djs" },
+      { label: "Fan Dashboard", href: "/fan/profile" },
+      { label: "Followed DJs", href: "/fan/followed-djs" },
       { label: "Become a DJ", href: "/become-dj" },
       { label: "Become an Organizer", href: "/become-organizer" },
     ];

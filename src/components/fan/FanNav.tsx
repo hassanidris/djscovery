@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, SlidersHorizontal, KeyRound } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  CalendarHeart,
+  Star,
+  SlidersHorizontal,
+  KeyRound,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -13,13 +20,31 @@ const NAV_ITEMS = [
     exact: false,
   },
   {
+    href: "/fan/followed-djs",
+    label: "Followed DJs",
+    icon: Users,
+    exact: false,
+  },
+  {
+    href: "/fan/saved-events",
+    label: "Saved Events",
+    icon: CalendarHeart,
+    exact: false,
+  },
+  {
+    href: "/fan/reviews",
+    label: "My Reviews",
+    icon: Star,
+    exact: false,
+  },
+  {
     href: "/fan/settings",
     label: "Profile Settings",
     icon: SlidersHorizontal,
     exact: false,
   },
   {
-    href: "/account/settings",
+    href: "/fan/account",
     label: "Account Settings",
     icon: KeyRound,
     exact: false,
