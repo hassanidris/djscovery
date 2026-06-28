@@ -794,12 +794,15 @@ export async function completeGig(
     where: { id: gigId },
     select: {
       id: true,
+      slug: true,
+      title: true,
       status: true,
       organizerProfileId: true,
       applications: {
         where: { status: "ACCEPTED" },
         select: {
           hire: { select: { id: true, status: true } },
+          djProfile: { select: { id: true, stageName: true } },
         },
       },
     },
@@ -842,7 +845,22 @@ export async function completeGig(
     }),
   ]);
 
+  await prisma.notification.create({
+    data: {
+      type: "GIG_COMPLETED",
+      recipientId: user.id,
+      data: {
+        gigId: gig.id,
+        gigSlug: gig.slug,
+        gigTitle: gig.title,
+        djProfileId: acceptedApplication.djProfile.id,
+        djName: acceptedApplication.djProfile.stageName,
+      },
+    },
+  });
+
   revalidatePath("/organizer/gigs", "layout");
+  revalidatePath("/organizer/dashboard");
   return { success: true, data: { gigId, hireId: hire.id } };
 }
 
