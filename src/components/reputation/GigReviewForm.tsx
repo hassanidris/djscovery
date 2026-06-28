@@ -1,56 +1,22 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Image from "next/image";
 import { Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { createEventReview } from "@/lib/actions/event-reviews";
+import { createGigReview } from "@/lib/actions/gig-reviews";
 
-export type ReviewableDj = {
+export function GigReviewForm({
+  gigId,
+  djProfileId,
+  djName,
+  gigTitle,
+}: {
+  gigId: number;
   djProfileId: number;
-  slug: string;
-  stageName: string;
-  avatar: string | null;
-};
-
-export function EventReviewSection({
-  eventId,
-  djs,
-  reviewedDjIds,
-}: {
-  eventId: number;
-  djs: ReviewableDj[];
-  reviewedDjIds: number[];
-}) {
-  return (
-    <section className="mb-8">
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-        Review the DJs
-      </h2>
-      <div className="space-y-4">
-        {djs.map((dj) => (
-          <DjReviewCard
-            key={dj.djProfileId}
-            eventId={eventId}
-            dj={dj}
-            alreadyReviewed={reviewedDjIds.includes(dj.djProfileId)}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function DjReviewCard({
-  eventId,
-  dj,
-  alreadyReviewed,
-}: {
-  eventId: number;
-  dj: ReviewableDj;
-  alreadyReviewed: boolean;
+  djName: string;
+  gigTitle?: string;
 }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -76,7 +42,7 @@ function DjReviewCard({
 
     startTransition(async () => {
       try {
-        await createEventReview(eventId, dj.djProfileId, {
+        await createGigReview(gigId, djProfileId, {
           rating,
           review: review.trim(),
         });
@@ -89,21 +55,12 @@ function DjReviewCard({
     });
   }
 
-  if (alreadyReviewed || success) {
+  if (success) {
     return (
       <Card className="border-green-500/20 bg-green-500/5">
-        <CardContent className="flex items-center gap-3 py-4">
-          <div className="relative h-10 w-10 overflow-hidden rounded-full bg-zinc-800">
-            {dj.avatar ? (
-              <Image src={dj.avatar} alt={dj.stageName} fill className="object-cover" />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center text-xs font-bold text-zinc-400">
-                {dj.stageName.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
+        <CardContent className="py-5">
           <p className="text-sm font-medium text-green-300">
-            {alreadyReviewed ? "Reviewed" : "Thanks!"} — DJ. {dj.stageName}
+            Thanks! Your review has been submitted.
           </p>
         </CardContent>
       </Card>
@@ -111,22 +68,17 @@ function DjReviewCard({
   }
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/50">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-3">
-          <div className="relative h-10 w-10 overflow-hidden rounded-full bg-zinc-800">
-            {dj.avatar ? (
-              <Image src={dj.avatar} alt={dj.stageName} fill className="object-cover" />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center text-xs font-bold text-zinc-400">
-                {dj.stageName.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-          <CardTitle className="text-sm font-semibold text-white">
-            DJ. {dj.stageName}
-          </CardTitle>
-        </div>
+    <Card className="border-white/8 bg-white/3">
+      <CardHeader>
+        <CardTitle className="text-sm font-semibold text-white">
+          Rate your experience with {djName}
+        </CardTitle>
+        {gigTitle && (
+          <p className="text-xs text-gray-500">
+            How did {djName} perform at{" "}
+            <strong className="text-gray-300">{gigTitle}</strong>?
+          </p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-1">
@@ -138,19 +90,19 @@ function DjReviewCard({
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
               onClick={() => setRating(star)}
-              className="rounded p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
+              className="focus-visible:ring-h_red rounded p-0.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
               aria-label={`Rate ${star} stars`}
             >
               <Star
                 className={`h-6 w-6 ${
                   star <= activeRating
                     ? "fill-amber-400 text-amber-400"
-                    : "text-zinc-600"
+                    : "text-gray-600"
                 }`}
               />
             </button>
           ))}
-          <span className="ml-2 text-xs text-zinc-500">
+          <span className="ml-2 text-xs text-gray-500">
             {activeRating > 0 ? `${activeRating} / 5` : "Select a rating"}
           </span>
         </div>
@@ -158,15 +110,15 @@ function DjReviewCard({
         <Textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
-          placeholder={`How was DJ. ${dj.stageName} at this event?`}
+          placeholder="Tell us about the DJ's performance, professionalism, and how they fit the event..."
           disabled={isPending}
-          className="min-h-24 border-zinc-700 bg-zinc-950 text-sm text-white placeholder:text-zinc-600 focus-visible:ring-h_red"
+          className="focus-visible:ring-h_red min-h-25 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-600"
         />
 
         {error && <p className="text-xs text-red-400">{error}</p>}
 
         <div className="flex items-center justify-between">
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-gray-500">
             {review.trim().length}/30 characters minimum
           </p>
           <Button

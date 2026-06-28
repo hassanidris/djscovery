@@ -1,22 +1,25 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { createGigReview } from "@/lib/actions/gig-reviews";
+import { createEventReview } from "@/lib/actions/event-reviews";
 
-export function GigReviewCard({
-  gigId,
+export function EventReviewForm({
+  eventId,
   djProfileId,
   djName,
-  gigTitle,
+  djAvatar,
+  alreadyReviewed,
 }: {
-  gigId: number;
+  eventId: number;
   djProfileId: number;
   djName: string;
-  gigTitle: string;
+  djAvatar?: string | null;
+  alreadyReviewed?: boolean;
 }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -42,7 +45,7 @@ export function GigReviewCard({
 
     startTransition(async () => {
       try {
-        await createGigReview(gigId, djProfileId, {
+        await createEventReview(eventId, djProfileId, {
           rating,
           review: review.trim(),
         });
@@ -55,12 +58,13 @@ export function GigReviewCard({
     });
   }
 
-  if (success) {
+  if (alreadyReviewed || success) {
     return (
       <Card className="border-green-500/20 bg-green-500/5">
-        <CardContent className="py-5">
+        <CardContent className="flex items-center gap-3 py-4">
+          <DjAvatar djName={djName} djAvatar={djAvatar} />
           <p className="text-sm font-medium text-green-300">
-            Thanks! Your review has been submitted.
+            {alreadyReviewed ? "Reviewed" : "Thanks!"} — DJ. {djName}
           </p>
         </CardContent>
       </Card>
@@ -68,15 +72,14 @@ export function GigReviewCard({
   }
 
   return (
-    <Card className="border-white/8 bg-white/3">
-      <CardHeader>
-        <CardTitle className="text-sm font-semibold text-white">
-          Rate your experience with {djName}
-        </CardTitle>
-        <p className="text-xs text-gray-500">
-          How did {djName} perform at{" "}
-          <strong className="text-gray-300">{gigTitle}</strong>?
-        </p>
+    <Card className="border-zinc-800 bg-zinc-900/50">
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-3">
+          <DjAvatar djName={djName} djAvatar={djAvatar} />
+          <CardTitle className="text-sm font-semibold text-white">
+            DJ. {djName}
+          </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-1">
@@ -88,19 +91,19 @@ export function GigReviewCard({
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
               onClick={() => setRating(star)}
-              className="focus-visible:ring-h_red rounded p-0.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="rounded p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
               aria-label={`Rate ${star} stars`}
             >
               <Star
                 className={`h-6 w-6 ${
                   star <= activeRating
                     ? "fill-amber-400 text-amber-400"
-                    : "text-gray-600"
+                    : "text-zinc-600"
                 }`}
               />
             </button>
           ))}
-          <span className="ml-2 text-xs text-gray-500">
+          <span className="ml-2 text-xs text-zinc-500">
             {activeRating > 0 ? `${activeRating} / 5` : "Select a rating"}
           </span>
         </div>
@@ -108,15 +111,15 @@ export function GigReviewCard({
         <Textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
-          placeholder="Tell us about the DJ's performance, professionalism, and how they fit the event..."
+          placeholder={`How was DJ. ${djName} at this event?`}
           disabled={isPending}
-          className="focus-visible:ring-h_red min-h-25 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-600"
+          className="min-h-24 border-zinc-700 bg-zinc-950 text-sm text-white placeholder:text-zinc-600 focus-visible:ring-h_red"
         />
 
         {error && <p className="text-xs text-red-400">{error}</p>}
 
         <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-zinc-500">
             {review.trim().length}/30 characters minimum
           </p>
           <Button
@@ -129,5 +132,25 @@ export function GigReviewCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function DjAvatar({
+  djName,
+  djAvatar,
+}: {
+  djName: string;
+  djAvatar?: string | null;
+}) {
+  return (
+    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-800">
+      {djAvatar ? (
+        <Image src={djAvatar} alt={djName} fill className="object-cover" />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center text-xs font-bold text-zinc-400">
+          {djName.charAt(0).toUpperCase()}
+        </span>
+      )}
+    </div>
   );
 }

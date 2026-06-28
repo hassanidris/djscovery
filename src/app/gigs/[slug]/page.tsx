@@ -14,7 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
-import { GigReviewCard } from "@/components/gigs/GigReviewCard";
+import { GigReviewForm } from "@/components/reputation/GigReviewForm";
 import { Button } from "@/components/ui/button";
 import { formatDuration } from "@/lib/utils/duration";
 import { formatNumber } from "@/lib/utils/currency";
@@ -155,7 +155,7 @@ export default async function GigDetailPage({
                 {daysRemaining} days left to review
               </div>
             )}
-            <GigReviewCard
+            <GigReviewForm
               gigId={gig.id}
               djProfileId={accepted.djProfile.id}
               djName={accepted.djProfile.stageName}
