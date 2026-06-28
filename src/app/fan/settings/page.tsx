@@ -16,7 +16,13 @@ export default async function FanSettingsPage() {
   const [fanProfile, countries] = await Promise.all([
     prisma.fanProfile.findUnique({
       where: { userId: user.id },
-      select: { name: true, bio: true, countryId: true, cityId: true },
+      select: {
+        name: true,
+        bio: true,
+        avatar: true,
+        countryId: true,
+        cityId: true,
+      },
     }),
     getCountries(),
   ]);
@@ -39,6 +45,7 @@ export default async function FanSettingsPage() {
       <BecomeFanForm
         initialName={fanProfile.name}
         initialBio={fanProfile.bio ?? ""}
+        initialAvatar={fanProfile.avatar ?? null}
         initialCountryId={fanProfile.countryId}
         initialCityId={fanProfile.cityId}
         countries={countries}

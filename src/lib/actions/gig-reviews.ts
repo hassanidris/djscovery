@@ -45,6 +45,7 @@ export async function createGigReview(
       organizerProfile: true,
       applications: {
         where: { djProfileId, status: "ACCEPTED" },
+        include: { djProfile: { select: { id: true, userId: true } } },
       },
       gigReviews: {
         where: { djProfileId },
@@ -64,8 +65,9 @@ export async function createGigReview(
     throw new Error("No accepted application found");
   }
 
+  const application = gig.applications[0];
   const hire = await prisma.hire.findUnique({
-    where: { applicationId: gig.applications[0].id },
+    where: { applicationId: application.id },
   });
 
   if (!hire || hire.status !== "COMPLETED") {
@@ -98,6 +100,19 @@ export async function createGigReview(
   });
 
   await updateReputationScore(djProfileId, "GIG_REVIEW_ADDED");
+
+  await prisma.notification.create({
+    data: {
+      type: "NEW_RATING",
+      recipientId: application.djProfile.userId,
+      data: {
+        gigId: gig.id,
+        gigTitle: gig.title,
+        rating: data.rating,
+        reviewerName: gig.organizerProfile.displayName,
+      },
+    },
+  });
 
   revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath(`/gigs/${gig.slug}/review`);

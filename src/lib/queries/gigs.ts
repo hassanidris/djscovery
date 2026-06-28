@@ -494,6 +494,7 @@ export async function getPendingGigReviewsForOrganizer(userId: string) {
         gigId: g.id,
         gigSlug: g.slug,
         gigTitle: g.title,
+        eventDate: g.eventDate,
         completedAt,
         daysRemaining,
         djProfileId: a.djProfile.id,

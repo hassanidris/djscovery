@@ -29,11 +29,13 @@ export async function getAttendedEventsWithPendingReviews(userId: string) {
       title: true,
       startDate: true,
       posterUrl: true,
+      city: { select: { name: true } },
       ownerDj: {
         select: { id: true, slug: true, stageName: true, avatar: true },
       },
       participants: {
         select: {
+          role: true,
           djProfile: {
             select: { id: true, slug: true, stageName: true, avatar: true },
           },
@@ -48,19 +50,40 @@ export async function getAttendedEventsWithPendingReviews(userId: string) {
 
   return events
     .map((e) => {
-      const allDjs = [
-        e.ownerDj,
-        ...e.participants.map((p) => p.djProfile),
-      ];
+      const ownerDj = e.ownerDj
+        ? { ...e.ownerDj, role: "Owner" as const }
+        : null;
+      const participantDjs = e.participants.map((p) => ({
+        ...p.djProfile,
+        role: p.role,
+      }));
+      const allDjs = ownerDj ? [ownerDj, ...participantDjs] : participantDjs;
       const reviewedIds = new Set(e.eventReviews.map((r) => r.djProfileId));
-      const pendingDjs = allDjs.filter((dj) => !reviewedIds.has(dj.id));
+      const djs = allDjs.map((dj) => ({
+        ...dj,
+        reviewed: reviewedIds.has(dj.id),
+      }));
+      const pendingDjs = djs.filter((dj) => !dj.reviewed);
+      const daysRemaining = Math.max(
+        0,
+        30 -
+          Math.floor(
+            (Date.now() - new Date(e.startDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
+      );
       return {
         eventId: e.id,
         slug: e.slug,
         title: e.title,
         startDate: e.startDate,
         posterUrl: e.posterUrl,
+        cityName: e.city?.name ?? null,
+        djs,
         pendingDjs,
+        reviewedCount: djs.filter((dj) => dj.reviewed).length,
+        totalDjCount: djs.length,
+        daysRemaining,
       };
     })
     .filter((e) => e.pendingDjs.length > 0);

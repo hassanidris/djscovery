@@ -8,14 +8,17 @@ import { removeSavedEvent } from "@/lib/actions/saves";
 
 export default function RemoveSavedEventButton({
   eventId,
+  onSuccess,
 }: {
   eventId: number;
+  onSuccess?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   return (
     <button
+      type="button"
       aria-label="Remove saved event"
       disabled={isPending}
       onClick={() =>
@@ -27,7 +30,9 @@ export default function RemoveSavedEventButton({
             } else {
               toast.error(result.error);
             }
+            return;
           }
+          onSuccess?.();
         })
       }
       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-40"

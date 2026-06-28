@@ -25,12 +25,26 @@ export function formatNotification(
         message: "Someone replied to your comment",
         link: "/community",
       };
-    case "NEW_RATING":
+    case "NEW_RATING": {
+      const rating = typeof d.rating === "number" ? d.rating : null;
+      const gigTitle = typeof d.gigTitle === "string" ? d.gigTitle : null;
+      const eventTitle = typeof d.eventTitle === "string" ? d.eventTitle : null;
+      const reviewerName =
+        typeof d.reviewerName === "string" ? d.reviewerName : null;
+      const reviewerType =
+        typeof d.reviewerType === "string" ? d.reviewerType : null;
+      const title = gigTitle ?? eventTitle ?? "a gig/event";
+      const source = reviewerName
+        ? `${reviewerName} left a ${rating ?? "new"}-star review`
+        : reviewerType === "fan"
+          ? `A fan left a ${rating ?? "new"}-star review`
+          : "You received a new rating";
       return {
         icon: "⭐",
-        message: "You received a new rating",
+        message: `${source} for "${title}".`,
         link: "/dashboard/dj",
       };
+    }
     case "DJ_REGISTRATION":
       return {
         icon: "🎛️",
@@ -135,6 +149,78 @@ export function formatNotification(
         message: "A new report has been submitted",
         link: "/admin/reports",
       };
+    case "GIG_COMPLETED": {
+      const gigTitle = typeof d.gigTitle === "string" ? d.gigTitle : "Your gig";
+      const djName = typeof d.djName === "string" ? d.djName : "the DJ";
+      const gigSlug = typeof d.gigSlug === "string" ? d.gigSlug : null;
+      return {
+        icon: "🎉",
+        message: `Your gig "${gigTitle}" was marked complete. Leave a review for ${djName}.`,
+        link: gigSlug ? `/gigs/${gigSlug}/review` : null,
+      };
+    }
+    case "GIG_CANCELLED": {
+      const gigTitle = typeof d.gigTitle === "string" ? d.gigTitle : "A gig";
+      const cancelledBy =
+        typeof d.cancelledBy === "string" ? d.cancelledBy : null;
+      const gigSlug = typeof d.gigSlug === "string" ? d.gigSlug : null;
+      return {
+        icon: "❌",
+        message: cancelledBy
+          ? `Gig "${gigTitle}" was cancelled by the ${cancelledBy.toLowerCase()}.`
+          : `Gig "${gigTitle}" was cancelled.`,
+        link: gigSlug ? `/gigs/${gigSlug}` : "/organizer/gigs",
+      };
+    }
+    case "GIG_NO_SHOW": {
+      const gigTitle = typeof d.gigTitle === "string" ? d.gigTitle : "A gig";
+      const gigSlug = typeof d.gigSlug === "string" ? d.gigSlug : null;
+      return {
+        icon: "🚫",
+        message: `You were reported as a no-show for "${gigTitle}".`,
+        link: gigSlug ? `/gigs/${gigSlug}` : null,
+      };
+    }
+    case "EVENT_COMPLETED": {
+      const eventTitle =
+        typeof d.eventTitle === "string" ? d.eventTitle : "The event";
+      const eventSlug = typeof d.eventSlug === "string" ? d.eventSlug : null;
+      return {
+        icon: "🎉",
+        message: `Event "${eventTitle}" is over. Review the DJs you saw.`,
+        link: eventSlug ? `/events/${eventSlug}` : null,
+      };
+    }
+    case "REVIEW_REMINDER": {
+      const daysLeft = typeof d.daysLeft === "number" ? d.daysLeft : 0;
+      const djName = typeof d.djName === "string" ? d.djName : "the DJ";
+      const gigSlug = typeof d.gigSlug === "string" ? d.gigSlug : null;
+      const eventSlug = typeof d.eventSlug === "string" ? d.eventSlug : null;
+      return {
+        icon: "⏰",
+        message: `Reminder: You have ${daysLeft} days left to review ${djName}.`,
+        link: gigSlug
+          ? `/gigs/${gigSlug}/review`
+          : eventSlug
+            ? `/events/${eventSlug}`
+            : null,
+      };
+    }
+    case "REVIEW_EXPIRING": {
+      const daysLeft = typeof d.daysLeft === "number" ? d.daysLeft : 0;
+      const djName = typeof d.djName === "string" ? d.djName : "the DJ";
+      const gigSlug = typeof d.gigSlug === "string" ? d.gigSlug : null;
+      const eventSlug = typeof d.eventSlug === "string" ? d.eventSlug : null;
+      return {
+        icon: "⏰",
+        message: `Your review window for ${djName} expires in ${daysLeft} days.`,
+        link: gigSlug
+          ? `/gigs/${gigSlug}/review`
+          : eventSlug
+            ? `/events/${eventSlug}`
+            : null,
+      };
+    }
     default:
       return { icon: "🔔", message: "New notification", link: null };
   }

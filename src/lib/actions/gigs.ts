@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import { updateReputationScore } from "@/lib/reputation/update";
 import {
   createGigSchema,
   updateGigSchema,
@@ -773,14 +774,6 @@ export async function completeGig(
   if (!roles.includes("ORGANIZER"))
     return { success: false, error: "Only organizers can complete gigs." };
 
-  const orgProfile = await getActiveOrganizerProfile(user.id);
-  if (
-    !orgProfile ||
-    orgProfile.status !== "ACTIVE" ||
-    orgProfile.deletedAt !== null
-  )
-    return { success: false, error: "Active organizer profile required." };
-
   const parsed = completeGigSchema.safeParse(input);
   if (!parsed.success)
     return {
@@ -792,73 +785,71 @@ export async function completeGig(
 
   const gig = await prisma.gig.findUnique({
     where: { id: gigId },
-    select: {
-      id: true,
-      slug: true,
-      title: true,
-      status: true,
-      organizerProfileId: true,
+    include: {
+      organizerProfile: { select: { userId: true } },
       applications: {
         where: { status: "ACCEPTED" },
-        select: {
-          hire: { select: { id: true, status: true } },
-          djProfile: { select: { id: true, stageName: true } },
-        },
+        include: { hire: true, djProfile: true },
       },
     },
   });
 
   if (!gig) return { success: false, error: "Gig not found." };
-  if (gig.organizerProfileId !== orgProfile.id)
+  if (gig.organizerProfile.userId !== user.id)
     return { success: false, error: "You can only complete your own gigs." };
-
   if (gig.status === "COMPLETED" || gig.status === "CANCELLED")
-    return {
-      success: false,
-      error: "Gig is already finalized.",
-    };
+    return { success: false, error: "Gig is already finalized." };
 
-  const acceptedApplication = gig.applications[0];
-  if (!acceptedApplication?.hire)
-    return {
-      success: false,
-      error: "This gig does not have an accepted hire to complete.",
-    };
-
-  const hire = acceptedApplication.hire;
-  if (hire.status !== "ACTIVE")
-    return {
-      success: false,
-      error: "Only active hires can be completed.",
-    };
+  const application = gig.applications[0];
+  if (!application)
+    return { success: false, error: "No accepted DJ to complete." };
 
   const now = new Date();
 
-  await prisma.$transaction([
-    prisma.gig.update({
+  const { hire } = await prisma.$transaction(async (tx) => {
+    // Ensure Hire exists (fixes the missing creation bug)
+    if (!application.hire) {
+      await tx.hire.create({
+        data: {
+          applicationId: application.id,
+          status: "ACTIVE",
+        },
+      });
+    }
+
+    const updatedHire = await tx.hire.update({
+      where: { applicationId: application.id },
+      data: {
+        status: "COMPLETED",
+        completedAt: now,
+      },
+    });
+
+    await tx.gig.update({
       where: { id: gigId },
       data: { status: "COMPLETED" },
-    }),
-    prisma.hire.update({
-      where: { id: hire.id },
-      data: { status: "COMPLETED", completedAt: now },
-    }),
-  ]);
+    });
 
-  await prisma.notification.create({
-    data: {
-      type: "GIG_COMPLETED",
-      recipientId: user.id,
+    await tx.notification.create({
       data: {
-        gigId: gig.id,
-        gigSlug: gig.slug,
-        gigTitle: gig.title,
-        djProfileId: acceptedApplication.djProfile.id,
-        djName: acceptedApplication.djProfile.stageName,
+        type: "GIG_COMPLETED",
+        recipientId: gig.organizerProfile.userId,
+        data: {
+          gigId: gig.id,
+          gigSlug: gig.slug,
+          gigTitle: gig.title,
+          djName: application.djProfile.stageName,
+          djProfileId: application.djProfile.id,
+        },
       },
-    },
+    });
+
+    return { hire: updatedHire };
   });
 
+  await updateReputationScore(application.djProfile.id, "GIG_COMPLETED");
+
+  revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath("/organizer/gigs", "layout");
   revalidatePath("/organizer/dashboard");
   return { success: true, data: { gigId, hireId: hire.id } };
@@ -888,19 +879,15 @@ export async function cancelHire(
 
   const hire = await prisma.hire.findUnique({
     where: { id: hireId },
-    select: {
-      id: true,
-      status: true,
+    include: {
       application: {
-        select: {
+        include: {
+          djProfile: { select: { id: true, userId: true } },
           gig: {
-            select: {
-              id: true,
-              organizerProfileId: true,
-              organizerProfile: { select: { userId: true } },
+            include: {
+              organizerProfile: { select: { id: true, userId: true } },
             },
           },
-          djProfile: { select: { userId: true } },
         },
       },
     },
@@ -948,6 +935,25 @@ export async function cancelHire(
     },
   });
 
+  await prisma.notification.create({
+    data: {
+      type:
+        cancelledBy === "DJ" ? "GIG_APPLICATION_WITHDRAWN" : "GIG_CANCELLED",
+      recipientId:
+        cancelledBy === "DJ" ? gig.organizerProfile.userId : djProfile.userId,
+      data: {
+        gigId: gig.id,
+        gigSlug: gig.slug,
+        gigTitle: gig.title,
+        cancelledBy,
+        reason: reason ?? null,
+      },
+    },
+  });
+
+  await updateReputationScore(djProfile.id, "HIRE_CANCELLED");
+
+  revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath("/organizer/gigs", "layout");
   return { success: true, data: { hireId } };
 }
@@ -982,14 +988,12 @@ export async function reportNoShow(
 
   const hire = await prisma.hire.findUnique({
     where: { id: hireId },
-    select: {
-      id: true,
-      status: true,
+    include: {
       application: {
-        select: {
+        include: {
+          djProfile: { select: { id: true, userId: true } },
           gig: {
-            select: {
-              id: true,
+            include: {
               organizerProfile: { select: { userId: true } },
             },
           },
@@ -1005,7 +1009,9 @@ export async function reportNoShow(
       error: "Only active hires can be reported as no-show.",
     };
 
-  if (hire.application.gig.organizerProfile.userId !== user.id)
+  const { gig, djProfile } = hire.application;
+
+  if (gig.organizerProfile.userId !== user.id)
     return {
       success: false,
       error: "You can only report no-shows for your own gigs.",
@@ -1016,6 +1022,22 @@ export async function reportNoShow(
     data: { noShow: true, status: "NO_SHOW" },
   });
 
+  await prisma.notification.create({
+    data: {
+      type: "GIG_NO_SHOW",
+      recipientId: djProfile.userId,
+      data: {
+        gigId: gig.id,
+        gigSlug: gig.slug,
+        gigTitle: gig.title,
+        message: "You were reported as a no-show for a gig.",
+      },
+    },
+  });
+
+  await updateReputationScore(djProfile.id, "NO_SHOW_REPORTED");
+
+  revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath("/organizer/gigs", "layout");
   return { success: true, data: { hireId } };
 }

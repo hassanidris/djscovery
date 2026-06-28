@@ -7,16 +7,12 @@ import {
   Settings,
   Users,
   CalendarHeart,
-  CheckCircle2,
-  AlertCircle,
   Star,
   Clock,
   Bell,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { getAttendedEventsWithPendingReviews } from "@/lib/queries/events";
 
@@ -29,25 +25,6 @@ type EventCompletedNotificationData = {
   djCount?: number;
 };
 
-function profileCompleteness(profile: {
-  bio: string | null;
-  avatar: string | null;
-  countryId: number | null;
-  cityId: number | null;
-}): { score: number; missing: string[] } {
-  const checks: [boolean, string][] = [
-    [!!profile.bio, "Add a bio"],
-    [!!profile.avatar, "Upload a profile photo"],
-    [!!profile.countryId, "Set your country"],
-    [!!profile.cityId, "Set your city"],
-  ];
-  const missing = checks.filter(([ok]) => !ok).map(([, label]) => label);
-  const score = Math.round(
-    ((checks.length - missing.length) / checks.length) * 100,
-  );
-  return { score, missing };
-}
-
 export default async function FanProfilePage() {
   const supabase = await createClient();
   const {
@@ -57,15 +34,7 @@ export default async function FanProfilePage() {
 
   const fanProfile = await prisma.fanProfile.findUnique({
     where: { userId: user.id },
-    select: {
-      name: true,
-      bio: true,
-      avatar: true,
-      countryId: true,
-      cityId: true,
-      country: { select: { name: true } },
-      city: { select: { name: true } },
-    },
+    select: { id: true },
   });
 
   if (!fanProfile) redirect("/become-fan");
@@ -90,8 +59,6 @@ export default async function FanProfilePage() {
       select: { id: true, data: true, createdAt: true },
     }),
   ]);
-
-  const { score, missing } = profileCompleteness(fanProfile);
 
   return (
     <div className="flex flex-col gap-6">
@@ -178,133 +145,69 @@ export default async function FanProfilePage() {
             Events You Attended — Leave a Review
           </h2>
           <div className="grid gap-4">
-            {pendingEventReviews.map((event) => {
-              const daysRemaining = Math.max(
-                0,
-                30 -
-                  Math.floor(
-                    (Date.now() - new Date(event.startDate).getTime()) /
-                      (1000 * 60 * 60 * 24),
-                  ),
-              );
-              return (
-                <Card key={event.eventId} className="border-white/8 bg-white/3">
-                  <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="relative h-14 w-10 overflow-hidden rounded-md bg-white/5">
-                        {event.posterUrl ? (
-                          <Image
-                            src={event.posterUrl}
-                            alt={event.title}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-gray-500">
-                            {event.title.slice(0, 2).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          {event.title}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(event.startDate).toLocaleDateString(
-                            "en-GB",
-                            {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            },
-                          )}
-                        </p>
-                        <p className="mt-1 text-xs text-zinc-400">
-                          {event.pendingDjs
-                            .map((dj) => `DJ. ${dj.stageName}`)
-                            .join(", ")}
-                        </p>
-                      </div>
+            {pendingEventReviews.map((event) => (
+              <Card key={event.eventId} className="border-white/8 bg-white/3">
+                <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-14 w-10 overflow-hidden rounded-md bg-white/5">
+                      {event.posterUrl ? (
+                        <Image
+                          src={event.posterUrl}
+                          alt={event.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-gray-500">
+                          {event.title.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex flex-1 items-center justify-between gap-4 sm:justify-end">
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {event.title}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(event.startDate).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                        {event.cityName && ` • ${event.cityName}`}
+                      </p>
+                      <p className="mt-1 text-xs text-zinc-400">
+                        {event.pendingDjs
+                          .map((dj) => `DJ. ${dj.stageName}`)
+                          .join(", ")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 items-center justify-between gap-4 sm:justify-end">
+                    <div className="flex flex-col items-end gap-0.5">
                       <div className="flex items-center gap-1.5 text-xs text-amber-400">
                         <Clock className="h-3.5 w-3.5" />
-                        {daysRemaining} days left
+                        {event.daysRemaining} days left
                       </div>
-                      <Button
-                        size="sm"
-                        className="bg-h_red hover:bg-h_redDark text-white"
-                        asChild
-                      >
-                        <Link href={`/events/${event.slug}`}>
-                          <Star className="mr-1.5 h-3.5 w-3.5" />
-                          Leave Review
-                        </Link>
-                      </Button>
+                      <p className="text-xs text-zinc-500">
+                        {event.reviewedCount} of {event.totalDjCount} reviewed
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    <Button
+                      size="sm"
+                      className="bg-h_red hover:bg-h_redDark text-white"
+                      asChild
+                    >
+                      <Link href={`/events/${event.slug}`}>
+                        <Star className="mr-1.5 h-3.5 w-3.5" />
+                        Leave Review
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </section>
-      )}
-
-      {/* Profile completeness */}
-      {missing.length > 0 && (
-        <Card className="border-amber-500/20 bg-amber-500/5">
-          <CardContent className="pt-5">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-amber-400" />
-                <span className="text-sm font-medium text-amber-300">
-                  Complete your profile
-                </span>
-              </div>
-              <Badge
-                variant="outline"
-                className="border-amber-500/40 text-amber-400"
-              >
-                {score}%
-              </Badge>
-            </div>
-
-            <Progress
-              value={score}
-              className="mb-4 h-1.5 bg-white/10 *:data-[slot=progress-indicator]:bg-amber-400"
-            />
-
-            <ul className="mb-4 flex flex-col gap-1.5">
-              {missing.map((item) => (
-                <li
-                  key={item}
-                  className="text-muted-foreground flex items-center gap-2 text-sm"
-                >
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500/60" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/fan/settings">
-                <Settings className="h-3.5 w-3.5" />
-                Complete profile
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {score === 100 && (
-        <Card className="border-green-500/20 bg-green-500/5">
-          <CardContent className="flex items-center gap-2 py-4">
-            <CheckCircle2 className="h-5 w-5 text-green-400" />
-            <span className="text-sm font-medium text-green-300">
-              Your profile is 100% complete.
-            </span>
-          </CardContent>
-        </Card>
       )}
 
       <Separator />
