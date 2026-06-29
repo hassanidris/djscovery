@@ -45,6 +45,7 @@ export async function toggleFollowDj(
       });
       revalidatePath("/organizer/followed-djs");
       revalidatePath("/account/followed-djs");
+      revalidatePath("/fan/followed-djs");
       return { following: false };
     }
 
@@ -59,6 +60,7 @@ export async function toggleFollowDj(
     await prisma.djFollow.create({ data: { userId, djProfileId } });
     revalidatePath("/organizer/followed-djs");
     revalidatePath("/account/followed-djs");
+    revalidatePath("/fan/followed-djs");
     return { following: true };
   } catch {
     return {
@@ -118,7 +120,7 @@ export async function getFollowedDjs() {
           stageName: true,
           avatar: true,
           plan: true,
-          verified: true,
+          status: true,
           city: { select: { name: true } },
           country: { select: { name: true } },
           genres: {
@@ -153,6 +155,7 @@ export async function unfollowDj(
     });
     revalidatePath("/organizer/followed-djs");
     revalidatePath("/account/followed-djs");
+    revalidatePath("/fan/followed-djs");
     return {};
   } catch {
     return { error: "Something went wrong. Please try again." };
@@ -183,6 +186,8 @@ export async function toggleSaveEvent(
         where: { userId_eventId: { userId, eventId } },
       });
       revalidatePath("/account");
+      revalidatePath("/organizer/saved-events");
+      revalidatePath("/fan/saved-events");
       return { saved: false };
     }
 
@@ -196,6 +201,8 @@ export async function toggleSaveEvent(
 
     await prisma.savedEvent.create({ data: { userId, eventId } });
     revalidatePath("/account");
+    revalidatePath("/organizer/saved-events");
+    revalidatePath("/fan/saved-events");
     return { saved: true };
   } catch {
     return { saved: false, error: "Something went wrong. Please try again." };
@@ -291,6 +298,8 @@ export async function removeSavedEvent(
       where: { userId_eventId: { userId, eventId } },
     });
     revalidatePath("/account");
+    revalidatePath("/organizer/saved-events");
+    revalidatePath("/fan/saved-events");
     return {};
   } catch {
     return { error: "Something went wrong. Please try again." };
@@ -324,7 +333,7 @@ export async function getMyReviews() {
           slug: true,
           stageName: true,
           avatar: true,
-          verified: true,
+          status: true,
           city: { select: { name: true } },
           country: { select: { name: true } },
         },

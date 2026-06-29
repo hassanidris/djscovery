@@ -58,7 +58,9 @@ export default async function DjProfilePage({
     if (demoDj.plan === "free") {
       return <DjProfileFree djData={demoDj} viewMode="fan" />;
     }
-    return <DjProfilePremium djData={demoDj} viewMode="fan" />;
+    return (
+      <DjProfilePremium djData={demoDj} viewMode="fan" status="APPROVED" />
+    );
   }
 
   // ── Prisma DB lookup (production) ─────────────────────────────────────────
@@ -94,6 +96,7 @@ export default async function DjProfilePage({
         orderBy: { startDate: "asc" },
         include: { city: true, country: true },
       },
+      reputationDetail: true,
       _count: {
         select: { ratings: true, eventsOwned: true },
       },
@@ -124,7 +127,7 @@ export default async function DjProfilePage({
       : [false, false];
 
   const djPlan = dj.plan;
-  const djVerified = dj.verified;
+  const djVerified = dj.status === "APPROVED";
   const djFeatured = dj.featured;
   const djBookingEmail = dj.bookingEmail ?? "";
   const djBookingPhone = dj.bookingPhone ?? "";
@@ -262,6 +265,9 @@ export default async function DjProfilePage({
           isFollowed={isFollowedDj}
           djUserId={dj.userId}
           isFollowing={followingDj}
+          reputationScore={dj.reputationScore}
+          reputationDetail={dj.reputationDetail}
+          status={dj.status}
         />
       ) : (
         <DjProfileFree
@@ -270,6 +276,8 @@ export default async function DjProfilePage({
           isFollowed={isFollowedDj}
           djUserId={dj.userId}
           isFollowing={followingDj}
+          reputationScore={dj.reputationScore}
+          reputationDetail={dj.reputationDetail}
         />
       )}
     </div>

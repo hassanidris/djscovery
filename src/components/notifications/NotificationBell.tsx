@@ -9,7 +9,7 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/lib/actions/notifications";
-import { formatNotification } from "@/lib/notifications/format";
+import { getNotificationMeta } from "@/lib/notifications/meta";
 import type { NotificationType } from "@prisma/client";
 
 type NotificationItem = {
@@ -146,10 +146,8 @@ export default function NotificationBell() {
 
             {loaded &&
               notifications.map((n) => {
-                const { icon, message, link } = formatNotification(
-                  n.type,
-                  n.data,
-                );
+                const meta = getNotificationMeta(n.type, n.data);
+                const Icon = meta.icon;
                 const itemClass = `flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${
                   !n.read ? "bg-white/3" : ""
                 }`;
@@ -159,14 +157,18 @@ export default function NotificationBell() {
                 };
                 const content = (
                   <>
-                    <span className="mt-0.5 shrink-0 text-base">{icon}</span>
+                    <div
+                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${meta.bgColor}`}
+                    >
+                      <Icon className={`h-4 w-4 ${meta.iconColor}`} />
+                    </div>
                     <div className="min-w-0 flex-1">
                       <p
                         className={`truncate text-sm ${
                           n.read ? "text-gray-400" : "font-medium text-white"
                         }`}
                       >
-                        {message}
+                        {meta.title}
                       </p>
                       <p className="mt-0.5 text-xs text-gray-600">
                         {formatDistanceToNow(new Date(n.createdAt), {
@@ -182,10 +184,10 @@ export default function NotificationBell() {
                     )}
                   </>
                 );
-                return link ? (
+                return meta.href ? (
                   <Link
                     key={n.id}
-                    href={link}
+                    href={meta.href}
                     onClick={handleClick}
                     className={itemClass}
                   >

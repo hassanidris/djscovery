@@ -9,12 +9,25 @@ import {
   User,
   CheckCircle2,
   AlertCircle,
+  Clock,
+  Star,
+  Bell,
 } from "lucide-react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { getPendingGigReviewsForOrganizer } from "@/lib/queries/gigs";
+
+type CompletedGigNotificationData = {
+  gigId?: number;
+  gigSlug?: string;
+  gigTitle?: string;
+  djProfileId?: number;
+  djName?: string;
+};
 
 function profileCompleteness(profile: {
   bio: string | null;
@@ -70,6 +83,19 @@ export default async function OrganizerDashboardPage() {
     redirect("/become-organizer");
 
   const { score, missing } = profileCompleteness(profile);
+  const [pendingReviews, completedNotifications] = await Promise.all([
+    getPendingGigReviewsForOrganizer(user.id),
+    prisma.notification.findMany({
+      where: {
+        recipientId: user.id,
+        type: "GIG_COMPLETED",
+        read: false,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      select: { id: true, data: true, createdAt: true },
+    }),
+  ]);
   return (
     <div className="flex flex-col gap-6">
       {/* Actions row */}
@@ -82,6 +108,47 @@ export default async function OrganizerDashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {/* GIG_COMPLETED notification reminders */}
+      {completedNotifications.length > 0 && (
+        <section className="space-y-3">
+          {completedNotifications.map((n) => {
+            const data = (n.data ?? {}) as CompletedGigNotificationData;
+            return (
+              <Card key={n.id} className="border-blue-500/20 bg-blue-500/5">
+                <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/20">
+                      <Bell className="h-5 w-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {data.gigTitle ?? "Gig completed"}
+                      </p>
+                      <p className="text-xs text-zinc-400">
+                        Leave a review for DJ{" "}
+                        <span className="text-white">{data.djName ?? ""}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 justify-end">
+                    <Button
+                      size="sm"
+                      className="bg-blue-500 text-white hover:bg-blue-600"
+                      asChild
+                    >
+                      <Link href={`/gigs/${data.gigSlug ?? ""}/review`}>
+                        <Star className="mr-1.5 h-3.5 w-3.5" />
+                        Leave Review
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
+      )}
 
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -118,6 +185,69 @@ export default async function OrganizerDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Pending gig reviews */}
+      {pendingReviews.length > 0 && (
+        <section>
+          <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
+            Pending Reviews
+          </h2>
+          <div className="grid gap-4">
+            {pendingReviews.map((review) => (
+              <Card key={review.gigId} className="border-white/8 bg-white/3">
+                <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white/5">
+                      {review.djAvatar ? (
+                        <Image
+                          src={review.djAvatar}
+                          alt={review.djName}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-400">
+                          {review.djName.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {review.gigTitle}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        with DJ{" "}
+                        <Link
+                          href={`/djs/${review.djSlug}`}
+                          className="text-h_red hover:underline"
+                        >
+                          {review.djName}
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 items-center justify-between gap-4 sm:justify-end">
+                    <div className="flex items-center gap-1.5 text-xs text-amber-400">
+                      <Clock className="h-3.5 w-3.5" />
+                      {review.daysRemaining} days left to review
+                    </div>
+                    <Button
+                      size="sm"
+                      className="bg-h_red hover:bg-h_redDark text-white"
+                      asChild
+                    >
+                      <Link href={`/gigs/${review.gigSlug}/review`}>
+                        <Star className="mr-1.5 h-3.5 w-3.5" />
+                        Leave Review
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Profile completeness */}
       {missing.length > 0 && (

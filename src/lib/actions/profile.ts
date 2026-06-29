@@ -4,11 +4,19 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 import { sendEmail } from "@/lib/email/sendEmail";
+import {
+  BUCKET,
+  buildUserAvatarPath,
+  getPublicMediaUrl,
+  validateImageFile,
+} from "@/lib/storage";
 import {
   adminDjRegistrationSubject,
   adminDjRegistrationHtml,
 } from "@/lib/email/templates/adminDjRegistration";
+import { updateReputationScore } from "@/lib/reputation/update";
 
 function makeSlugBase(stageName: string) {
   return stageName
@@ -467,6 +475,14 @@ export async function updateDjProfile(
     });
 
     const slugChanged = newSlug !== existing.slug;
+    try {
+      await updateReputationScore(existing.id, "PROFILE_UPDATED");
+    } catch (error) {
+      console.error("Failed to refresh DJ reputation after profile update", {
+        djProfileId: existing.id,
+        error,
+      });
+    }
     return { success: true as const, ...(slugChanged && { newSlug }) };
   } catch {
     return { error: "Something went wrong. Please try again." };
@@ -799,4 +815,54 @@ export async function setupFanProfile(
       error: "Failed to save profile. Please try again.",
     };
   }
+}
+
+export async function uploadFanAvatar(
+  formData: FormData,
+): Promise<{ url: string } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  const file = formData.get("file");
+  if (!(file instanceof File)) return { error: "No file provided." };
+
+  const validationError = validateImageFile(file, 5 * 1024 * 1024);
+  if (validationError) return validationError;
+
+  const existing = await prisma.fanProfile.findUnique({
+    where: { userId: user.id },
+    select: { avatarPath: true },
+  });
+
+  const path = buildUserAvatarPath(user.id, file);
+
+  const { data, error: uploadError } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, file, { upsert: false, contentType: file.type });
+
+  if (uploadError) return { error: `Upload failed: ${uploadError.message}` };
+
+  const url = getPublicMediaUrl(data.path);
+
+  try {
+    await prisma.fanProfile.update({
+      where: { userId: user.id },
+      data: { avatar: url, avatarPath: data.path },
+    });
+  } catch {
+    await supabase.storage.from(BUCKET).remove([data.path]);
+    return { error: "Image uploaded but failed to save. Please try again." };
+  }
+
+  if (existing?.avatarPath) {
+    await supabase.storage.from(BUCKET).remove([existing.avatarPath]);
+  }
+
+  revalidatePath("/fan/profile");
+  revalidatePath("/fan/settings");
+  revalidatePath("/account");
+  return { url };
 }

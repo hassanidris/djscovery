@@ -624,10 +624,48 @@ export function FollowedDjsContentSkeleton() {
                 <Skeleton className="h-4 w-12 rounded-full" />
               </div>
             </div>
-            <Skeleton className="h-8 w-24 shrink-0 rounded-lg" />
+            <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ── My Reviews Content Skeleton ──────────────────────────────────────────────
+export function MyReviewsContentSkeleton() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Skeleton className="mb-1 h-4 w-32 rounded" />
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-xl border border-white/6 bg-white/3 px-4 py-4"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+              <div className="flex flex-col gap-1.5">
+                <Skeleton className="h-4 w-32 rounded" />
+                <Skeleton className="h-3 w-24 rounded" />
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <Skeleton key={j} className="h-3.5 w-3.5 rounded" />
+                ))}
+              </div>
+              <Skeleton className="h-3 w-16 rounded" />
+            </div>
+          </div>
+          <Skeleton className="mt-3 h-px w-full rounded" />
+          <div className="mt-3 flex flex-col gap-2">
+            <Skeleton className="h-4 w-full rounded" />
+            <Skeleton className="h-4 w-3/4 rounded" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -644,18 +682,19 @@ export function SavedEventsContentSkeleton() {
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 rounded-xl border border-white/6 bg-white/3 px-4 py-4"
+            className="flex items-center gap-3 rounded-xl border border-white/6 bg-white/3 px-4 py-3"
           >
             <Skeleton className="h-14 w-14 shrink-0 rounded-lg" />
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <Skeleton className="h-4 w-2/3 rounded" />
-              <div className="flex gap-3">
-                <Skeleton className="h-3 w-24 rounded" />
-                <Skeleton className="h-3 w-20 rounded" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-40 rounded" />
+                <Skeleton className="h-4 w-16 rounded-full" />
               </div>
-              <Skeleton className="h-3 w-16 rounded" />
+              <Skeleton className="h-3 w-28 rounded" />
+              <Skeleton className="h-3 w-24 rounded" />
+              <Skeleton className="h-3 w-32 rounded" />
             </div>
-            <Skeleton className="h-6 w-12 shrink-0 rounded-full" />
+            <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
           </div>
         ))}
       </div>
@@ -675,6 +714,135 @@ export function SettingsFormSkeleton() {
       ))}
       <div className="flex justify-end">
         <Skeleton className="h-10 w-28 rounded-lg" />
+      </div>
+    </div>
+  );
+}
+
+// ── Fan Settings Skeleton ───────────────────────────────────────────────────
+export function FanSettingsSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-7 w-40 rounded" />
+        <Skeleton className="h-4 w-64 rounded" />
+      </div>
+
+      <div className="flex flex-col gap-5 rounded-xl border border-white/10 bg-white/5 p-8">
+        <div className="flex flex-col gap-1">
+          <Skeleton className="h-4 w-28 rounded" />
+          <Skeleton className="h-3 w-32 rounded" />
+        </div>
+
+        <div className="flex items-center gap-5">
+          <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
+          <Skeleton className="h-9 w-28 rounded-md" />
+        </div>
+
+        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-24 w-full rounded-md" />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Skeleton className="h-10 w-full rounded-md" />
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
+
+        <div className="flex justify-end">
+          <Skeleton className="h-10 w-28 rounded-lg" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Fan Account Settings Skeleton ────────────────────────────────────────────
+export function FanAccountSettingsSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-7 w-44 rounded" />
+        <Skeleton className="h-4 w-56 rounded" />
+      </div>
+
+      <div className="flex flex-col gap-10">
+        <section className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <Skeleton className="h-4 w-32 rounded" />
+            <Skeleton className="h-3 w-48 rounded" />
+          </div>
+          <Skeleton className="h-10 w-full rounded-lg" />
+        </section>
+
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-col gap-1">
+            <Skeleton className="h-4 w-24 rounded" />
+            <Skeleton className="h-3 w-48 rounded" />
+          </div>
+          <Skeleton className="h-10 w-full rounded-md" />
+          <Skeleton className="h-10 w-full rounded-md" />
+          <div className="flex justify-end">
+            <Skeleton className="h-10 w-36 rounded-lg" />
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-col gap-1">
+            <Skeleton className="h-4 w-24 rounded" />
+            <Skeleton className="h-3 w-48 rounded" />
+          </div>
+          <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-4 w-32 rounded" />
+                <Skeleton className="h-3 w-48 rounded" />
+              </div>
+              <Skeleton className="h-8 w-28 rounded-md" />
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+// ── Event Detail Skeleton ─────────────────────────────────────────────────────
+export function EventDetailSkeleton() {
+  return (
+    <div className="min-h-screen bg-black pb-20">
+      {/* Top nav bar */}
+      <div className="border-b border-zinc-800/60 bg-black/80 px-4 py-3 backdrop-blur-sm md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <Skeleton className="h-4 w-28 rounded" />
+          <Skeleton className="h-7 w-20 rounded-full" />
+        </div>
+      </div>
+
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 md:flex-row md:px-8">
+        {/* Left poster */}
+        <div className="w-full shrink-0 md:w-70 lg:w-80">
+          <Skeleton className="aspect-2/3 w-full rounded-2xl" />
+          <Skeleton className="mt-4 h-11 w-full rounded-xl" />
+        </div>
+
+        {/* Right details */}
+        <div className="min-w-0 flex-1">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-5 w-20 rounded-full" />
+            ))}
+          </div>
+          <Skeleton className="mb-6 h-9 w-3/4 rounded md:h-11" />
+          <div className="mb-8 space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-4 w-48 rounded" />
+            ))}
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-4 w-full rounded" />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -712,6 +880,33 @@ export function EventListingPageSkeleton() {
               <Skeleton className="h-8 w-8 shrink-0 rounded" />
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Gig Review Page Skeleton ──────────────────────────────────────────────────
+export function GigReviewPageSkeleton() {
+  return (
+    <div className="min-h-screen bg-black">
+      <div className="mx-auto max-w-2xl px-4 py-10 md:px-8">
+        <Skeleton className="mb-6 h-8 w-32 rounded" />
+        <Skeleton className="mb-2 h-8 w-64 rounded" />
+        <Skeleton className="mb-6 h-4 w-48 rounded" />
+        <div className="rounded-xl border border-white/8 bg-white/3 p-5">
+          <Skeleton className="mb-4 h-4 w-48 rounded" />
+          <Skeleton className="mb-4 h-4 w-64 rounded" />
+          <div className="mb-4 flex items-center gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-6 w-6 rounded" />
+            ))}
+          </div>
+          <Skeleton className="mb-4 h-32 w-full rounded-lg" />
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-3 w-32 rounded" />
+            <Skeleton className="h-9 w-28 rounded-lg" />
+          </div>
         </div>
       </div>
     </div>
@@ -793,58 +988,218 @@ export function OrganizerProfilePageSkeleton() {
   );
 }
 
-// ── Organizer Dashboard Skeleton ──────────────────────────────────────────────
-export function OrganizerDashboardSkeleton() {
+// ── Notifications Page Skeleton ───────────────────────────────────────────────
+export function NotificationsPageSkeleton() {
   return (
-    <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-4xl px-4 py-10 md:px-8">
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-1.5">
-            <Skeleton className="h-8 w-52 rounded" />
-            <Skeleton className="h-4 w-36 rounded" />
-          </div>
-          <div className="flex gap-2">
-            <Skeleton className="h-9 w-28 rounded-lg" />
-            <Skeleton className="h-9 w-28 rounded-lg" />
-          </div>
+    <div className="w-full overflow-hidden rounded-xl border border-white/10 bg-white/5">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-5 w-5 rounded" />
+          <Skeleton className="h-5 w-28 rounded" />
+          <Skeleton className="h-5 w-6 rounded-full" />
         </div>
-        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-white/10 p-4">
-              <Skeleton className="mb-2 h-3 w-20 rounded" />
-              <Skeleton className="h-8 w-12 rounded" />
+        <Skeleton className="h-4 w-24 rounded" />
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-white/10">
+        <Skeleton className="h-10 flex-1 rounded-none" />
+        <Skeleton className="h-10 flex-1 rounded-none" />
+      </div>
+
+      {/* Rows */}
+      <div className="flex flex-col">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-start gap-4 border-b border-white/10 px-5 py-4 last:border-b-0"
+          >
+            <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <Skeleton className="h-4 w-32 rounded" />
+              <Skeleton className="h-4 w-full rounded" />
+              <div className="mt-1 flex items-center gap-3">
+                <Skeleton className="h-4 w-20 rounded" />
+                <Skeleton className="h-3 w-16 rounded" />
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="mb-6 rounded-xl border border-white/10 p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <Skeleton className="h-4 w-56 rounded" />
-            <Skeleton className="h-5 w-12 rounded-full" />
           </div>
-          <Skeleton className="mb-4 h-1.5 w-full rounded-full" />
-          <div className="mb-4 flex flex-col gap-1.5">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-40 rounded" />
-            ))}
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Fan Profile Skeleton ─────────────────────────────────────────────────────
+export function FanProfileSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-7 w-32 rounded" />
+        <Skeleton className="h-9 w-28 rounded-lg" />
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="rounded-xl border border-white/10 p-4">
+            <Skeleton className="mb-2 h-3 w-24 rounded" />
+            <Skeleton className="h-8 w-12 rounded" />
           </div>
-          <Skeleton className="h-8 w-36 rounded-lg" />
+        ))}
+      </div>
+
+      {/* Notification reminder placeholder */}
+      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-4 w-48 rounded" />
+              <Skeleton className="h-3 w-32 rounded" />
+            </div>
+          </div>
+          <Skeleton className="h-8 w-28 rounded-lg" />
         </div>
-        <Skeleton className="mb-4 h-4 w-28 rounded" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      </div>
+
+      {/* Pending event reviews */}
+      <div>
+        <Skeleton className="mb-4 h-4 w-48 rounded" />
+        <div className="grid gap-4">
           {Array.from({ length: 2 }).map((_, i) => (
             <div
               key={i}
-              className="flex items-center gap-4 rounded-xl border border-white/10 p-5"
+              className="flex flex-col gap-4 rounded-xl border border-white/8 bg-white/3 p-4 sm:flex-row sm:items-center"
             >
-              <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
-              <div className="flex flex-1 flex-col gap-1">
-                <Skeleton className="h-4 w-24 rounded" />
-                <Skeleton className="h-3 w-40 rounded" />
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-14 w-10 shrink-0 rounded-md" />
+                <div className="flex flex-col gap-1">
+                  <Skeleton className="h-4 w-40 rounded" />
+                  <Skeleton className="h-3 w-28 rounded" />
+                  <Skeleton className="h-3 w-32 rounded" />
+                </div>
               </div>
-              <Skeleton className="h-8 w-12 rounded" />
+              <div className="flex flex-1 items-center justify-between gap-4 sm:justify-end">
+                <div className="flex flex-col items-end gap-0.5">
+                  <Skeleton className="h-3 w-20 rounded" />
+                  <Skeleton className="h-3 w-24 rounded" />
+                </div>
+                <Skeleton className="h-8 w-24 rounded-lg" />
+              </div>
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Quick links */}
+      <Skeleton className="mb-0 h-4 w-28 rounded" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 rounded-xl border border-white/10 p-5"
+          >
+            <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="h-3 w-40 rounded" />
+            </div>
+            <Skeleton className="h-8 w-12 shrink-0 rounded" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Organizer Dashboard Skeleton ──────────────────────────────────────────────
+export function OrganizerDashboardSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-7 w-32 rounded" />
+        <Skeleton className="h-9 w-28 rounded-lg" />
+      </div>
+
+      {/* Notification reminder placeholder */}
+      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-4 w-48 rounded" />
+              <Skeleton className="h-3 w-32 rounded" />
+            </div>
+          </div>
+          <Skeleton className="h-8 w-28 rounded-lg" />
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="rounded-xl border border-white/10 p-4">
+            <Skeleton className="mb-2 h-3 w-20 rounded" />
+            <Skeleton className="h-8 w-12 rounded" />
+          </div>
+        ))}
+      </div>
+
+      {/* Pending reviews */}
+      <div>
+        <Skeleton className="mb-4 h-4 w-32 rounded" />
+        <div className="grid gap-4">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-4 rounded-xl border border-white/8 bg-white/3 p-4"
+            >
+              <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <Skeleton className="h-4 w-48 rounded" />
+                <Skeleton className="h-3 w-32 rounded" />
+              </div>
+              <Skeleton className="h-8 w-24 shrink-0 rounded-lg" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Profile completeness */}
+      <div className="rounded-xl border border-white/10 p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <Skeleton className="h-4 w-56 rounded" />
+          <Skeleton className="h-5 w-12 rounded-full" />
+        </div>
+        <Skeleton className="mb-4 h-1.5 w-full rounded-full" />
+        <div className="mb-4 flex flex-col gap-1.5">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-4 w-40 rounded" />
+          ))}
+        </div>
+        <Skeleton className="h-8 w-36 rounded-lg" />
+      </div>
+
+      {/* Quick actions */}
+      <Skeleton className="mb-0 h-4 w-28 rounded" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 rounded-xl border border-white/10 p-5"
+          >
+            <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="h-3 w-40 rounded" />
+            </div>
+            <Skeleton className="h-8 w-12 shrink-0 rounded" />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -853,35 +1208,31 @@ export function OrganizerDashboardSkeleton() {
 // ── Organizer Settings Skeleton ───────────────────────────────────────────────
 export function OrganizerSettingsSkeleton() {
   return (
-    <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-4xl px-4 py-10 md:px-8">
-        <div className="flex flex-col gap-7">
-          <div className="flex gap-2 border-b border-white/10 pb-0">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-9 w-24 rounded-t" />
-            ))}
-          </div>
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-4 w-24 rounded" />
-            <Skeleton className="h-40 w-full rounded-xl" />
-          </div>
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-8 w-40 rounded-lg" />
-              <Skeleton className="h-8 w-24 rounded-lg" />
-            </div>
-          </div>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-2">
-              <Skeleton className="h-4 w-28 rounded" />
-              <Skeleton className="h-10 w-full rounded-md" />
-            </div>
-          ))}
-          <div className="flex justify-end">
-            <Skeleton className="h-10 w-28 rounded-lg" />
-          </div>
+    <div className="flex flex-col gap-7">
+      <div className="flex gap-2 border-b border-white/10 pb-0">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-9 w-24 rounded-t" />
+        ))}
+      </div>
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-24 rounded" />
+        <Skeleton className="h-40 w-full rounded-xl" />
+      </div>
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-8 w-40 rounded-lg" />
+          <Skeleton className="h-8 w-24 rounded-lg" />
         </div>
+      </div>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-28 rounded" />
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
+      ))}
+      <div className="flex justify-end">
+        <Skeleton className="h-10 w-28 rounded-lg" />
       </div>
     </div>
   );
@@ -890,30 +1241,14 @@ export function OrganizerSettingsSkeleton() {
 // ── Account Settings Skeleton ─────────────────────────────────────────────────
 export function AccountSettingsSkeleton() {
   return (
-    <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-3xl px-4 pt-10 pb-24 md:px-8">
-        <div className="mb-8 flex items-center gap-4">
-          <Skeleton className="h-14 w-14 shrink-0 rounded-full" />
-          <div className="flex flex-col gap-1.5">
-            <Skeleton className="h-5 w-32 rounded" />
-            <Skeleton className="h-3.5 w-24 rounded" />
-          </div>
+    <div className="flex flex-col gap-10">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="flex flex-col gap-4">
+          <Skeleton className="h-4 w-36 rounded" />
+          <Skeleton className="h-10 w-full rounded-md" />
         </div>
-        <div className="mb-8 flex gap-1 overflow-x-auto border-b border-white/10">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-10 w-28 shrink-0 rounded-t" />
-          ))}
-        </div>
-        <div className="flex flex-col gap-10">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-4">
-              <Skeleton className="h-4 w-36 rounded" />
-              <Skeleton className="h-10 w-full rounded-md" />
-            </div>
-          ))}
-          <Skeleton className="h-10 w-28 self-end rounded-lg" />
-        </div>
-      </div>
+      ))}
+      <Skeleton className="h-10 w-28 self-end rounded-lg" />
     </div>
   );
 }

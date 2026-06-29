@@ -58,8 +58,18 @@ enum GigStatus {
   PUBLISHED
   UNDER_REVIEW
   FILLED
+  COMPLETED
   CANCELLED
   EXPIRED
+}
+
+// Add HireStatus enum
+enum HireStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED_BY_DJ
+  CANCELLED_BY_ORGANIZER
+  NO_SHOW
 }
 
 enum GigApplicationStatus {
@@ -110,6 +120,12 @@ enum NotificationType {
   GIG_APPLICATION_ACCEPTED
   GIG_APPLICATION_REJECTED
   GIG_APPLICATION_WITHDRAWN
+  GIG_COMPLETED
+  GIG_CANCELLED
+  GIG_NO_SHOW
+  EVENT_COMPLETED
+  REVIEW_REMINDER
+  REVIEW_EXPIRING
   DJ_NEW_EVENT
   DJ_NEW_MEDIA
   DJ_PROFILE_UPDATED
@@ -284,6 +300,9 @@ model User {
   reportsReviewed  Report[]         @relation("ReportReviewer")
   adminActionLogs  AdminActionLog[]
 
+  gigReviews   GigReview[]
+  eventReviews EventReview[]
+
   @@index([status])
   @@index([deletedAt])
   @@index([countryId])
@@ -325,7 +344,7 @@ model DjProfile {
   city      City    @relation(fields: [cityId], references: [id])
 
   plan         DjPlan  @default(FREE)
-  verified     Boolean @default(false)
+  verified     Boolean @default(false) // DEPRECATED: use status === APPROVED instead
   featured     Boolean @default(false)
   hidden       Boolean @default(false) // Admin can hide without changing approval status
   searchScore  Float   @default(0)
@@ -335,20 +354,25 @@ model DjProfile {
   feeMax       Int?
   feeCurrency  String?
 
+  reputationScore Int @default(0) // 0-1000, denormalized for fast search
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  genres          DjGenre[]
-  djTypes         DjProfileType[]
-  socialLinks     SocialLink[]
-  ratings         DjRating[]
-  comments        DjComment[]
-  media           Media[]
-  events          EventDj[]
-  eventsOwned     Event[]          @relation("EventOwner")
-  gigApplications GigApplication[]
+  genres           DjGenre[]
+  djTypes          DjProfileType[]
+  socialLinks      SocialLink[]
+  ratings          DjRating[]
+  comments         DjComment[]
+  media            Media[]
+  events           EventDj[]
+  eventsOwned      Event[]          @relation("EventOwner")
+  gigApplications  GigApplication[]
   followers        DjFollow[]
+  gigReviews       GigReview[]
+  eventReviews     EventReview[]
+  reputationDetail ReputationScore?
 
   @@index([slug])
   @@index([status])
@@ -670,6 +694,8 @@ model Event {
   gallery      EventMedia[]
   savedBy      SavedEvent[]
 
+  eventReviews EventReview[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -769,6 +795,7 @@ model Gig {
   updatedAt DateTime  @updatedAt
 
   applications GigApplication[]
+  gigReviews   GigReview[]
 
   @@index([status])
   @@index([gigType])
@@ -792,6 +819,8 @@ model GigApplication {
   djProfileId Int
   djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
 
+  hire Hire?
+
   shortlistedAt DateTime?
   acceptedAt    DateTime?
   rejectedAt    DateTime?
@@ -804,6 +833,92 @@ model GigApplication {
   @@index([gigId])
   @@index([djProfileId])
   @@index([status])
+}
+
+model GigReview {
+  id     Int     @id @default(autoincrement())
+  rating Int // 1-5
+  review String?
+
+  gigId       Int
+  gig         Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  organizerId String
+  organizer   User      @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  // Anti-gaming audit
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gigId, djProfileId]) // one review per gig per DJ
+  @@index([djProfileId])
+  @@index([organizerId])
+  @@index([gigId])
+  @@index([createdAt])
+}
+
+model EventReview {
+  id     Int     @id @default(autoincrement())
+  rating Int // 1-5
+  review String?
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId     Int
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, eventId, djProfileId])
+  @@index([eventId])
+  @@index([djProfileId])
+  @@index([userId])
+}
+
+model ReputationScore {
+  id          Int       @id @default(autoincrement())
+  djProfileId Int       @unique
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  totalScore          Int @default(0) // 0-1000
+  profileQualityScore Int @default(0) // 0-150
+  verificationScore   Int @default(0) // 0-50
+  reviewScore         Int @default(0) // 0-550
+  reliabilityScore    Int @default(0) // 0-150
+  activityScore       Int @default(0) // 0-100
+  newTalentBoost      Int @default(0) // 0-50
+
+  confidenceLevel Float  @default(0) // 0.0-1.0
+  trendDirection  String @default("STABLE") // RISING, STABLE, FALLING
+
+  calculatedAt        DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  reputationHistories ReputationHistory[]
+
+  @@index([totalScore])
+  @@index([djProfileId])
+}
+
+model ReputationHistory {
+  id                Int             @id @default(autoincrement())
+  reputationScoreId Int
+  reputationScore   ReputationScore @relation(fields: [reputationScoreId], references: [id], onDelete: Cascade)
+
+  previousTotal Int
+  newTotal      Int
+  changeReason  String // REVIEW_ADDED, PROFILE_UPDATED, GIG_COMPLETED, etc.
+
+  createdAt DateTime @default(now())
+
+  @@index([reputationScoreId])
+  @@index([createdAt])
 }
 
 // ------ FOLLOWERS ------
@@ -1018,13 +1133,18 @@ model EventAttendance {
 
 // Created automatically when a GigApplication is ACCEPTED
 model Hire {
-  id            Int      @id @default(autoincrement())
-  applicationId Int      @unique
-  agreedRate    Decimal?
-  notes         String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 Int            @id @default(autoincrement())
+  applicationId      Int            @unique
+  application        GigApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  agreedRate         Decimal?
+  notes              String?
+  status             HireStatus     @default(ACTIVE)
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  noShow             Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   @@index([applicationId])
 }

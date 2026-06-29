@@ -5,6 +5,7 @@ import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { CircleCheck } from "lucide-react";
 import { DjUser } from "@/lib/data";
 import SaveDjButton from "@/components/dj-profile/SaveDjButton";
+import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { formatNumber } from "@/lib/utils/currency";
 
 const DjCard = ({
@@ -17,10 +18,14 @@ const DjCard = ({
   slug,
   isPremium,
   isFeatured,
-  verified,
+  status,
   _count,
   djProfileId,
   isFollowed = false,
+  reputationScore = 0,
+  gigReviews = [],
+  eventReviews = [],
+  ratings = [],
 }: DjUser & { isFollowed?: boolean }) => {
   const profileHref = slug ? `/djs/${slug}` : `/profile/${username}`;
   const genreList = genres
@@ -74,8 +79,10 @@ const DjCard = ({
             <h3 className="text-h_white truncate text-sm font-semibold">
               {formatDjName(stageName || username)}
             </h3>
-            {verified && (
-              <CircleCheck className="h-3.5 w-3.5 shrink-0 text-blue-400" />
+            {status === "APPROVED" && (
+              <span title="Admin approved">
+                <CircleCheck className="h-3.5 w-3.5 shrink-0 text-blue-500" />
+              </span>
             )}
           </div>
           {(city || country) && (
@@ -83,16 +90,27 @@ const DjCard = ({
               {[city, country].filter(Boolean).join(", ")}
             </p>
           )}
-          {_count !== undefined && (
-            <p className="text-xs text-gray-500">
-              {formatNumber(_count.followers)} followers
-            </p>
-          )}
+          <div className="mt-1 flex items-center gap-2">
+            <ReputationBadge
+              score={reputationScore}
+              variant="subtle"
+              showScore={false}
+              className="px-2 py-0.5 text-xs"
+            />
+            <span className="text-xs text-gray-500">
+              {gigReviews.length + eventReviews.length + ratings.length} reviews
+            </span>
+            {_count !== undefined && (
+              <span className="text-xs text-gray-500">
+                • {formatNumber(_count.followers)} followers
+              </span>
+            )}
+          </div>
         </div>
       </Link>
 
       {genreList.length > 0 && (
-        <div className="flex flex-wrap gap-1">
+        <div className="mt-1 flex flex-wrap gap-1">
           {genreList.slice(0, 3).map((genre) => (
             <span
               key={genre}
