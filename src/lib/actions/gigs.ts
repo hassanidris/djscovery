@@ -805,8 +805,13 @@ export async function completeGig(
     return { success: false, error: "No accepted DJ to complete." };
 
   const now = new Date();
+  if (gig.eventDate > now)
+    return {
+      success: false,
+      error: "Gig cannot be completed before its event date.",
+    };
 
-  const { hire } = await prisma.$transaction(async (tx) => {
+  const { hire, completed } = await prisma.$transaction(async (tx) => {
     // Ensure Hire exists (fixes the missing creation bug)
     if (!application.hire) {
       await tx.hire.create({
@@ -815,6 +820,13 @@ export async function completeGig(
           status: "ACTIVE",
         },
       });
+    } else if (
+      application.hire.status === "CANCELLED_BY_DJ" ||
+      application.hire.status === "CANCELLED_BY_ORGANIZER" ||
+      application.hire.status === "NO_SHOW"
+    ) {
+      // Preserve cancelled/no-show hires and abort completion
+      return { hire: application.hire, completed: false };
     }
 
     const updatedHire = await tx.hire.update({
@@ -844,8 +856,16 @@ export async function completeGig(
       },
     });
 
-    return { hire: updatedHire };
+    return { hire: updatedHire, completed: true };
   });
+
+  if (!completed) {
+    return {
+      success: false,
+      error:
+        "Hire cannot be completed because it was cancelled or marked as no-show.",
+    };
+  }
 
   await updateReputationScore(application.djProfile.id, "GIG_COMPLETED");
 
@@ -926,29 +946,31 @@ export async function cancelHire(
   const status =
     cancelledBy === "ORGANIZER" ? "CANCELLED_BY_ORGANIZER" : "CANCELLED_BY_DJ";
 
-  await prisma.hire.update({
-    where: { id: hireId },
-    data: {
-      status,
-      cancelledAt: now,
-      cancellationReason: reason ?? null,
-    },
-  });
-
-  await prisma.notification.create({
-    data: {
-      type:
-        cancelledBy === "DJ" ? "GIG_APPLICATION_WITHDRAWN" : "GIG_CANCELLED",
-      recipientId:
-        cancelledBy === "DJ" ? gig.organizerProfile.userId : djProfile.userId,
+  await prisma.$transaction(async (tx) => {
+    await tx.hire.update({
+      where: { id: hireId },
       data: {
-        gigId: gig.id,
-        gigSlug: gig.slug,
-        gigTitle: gig.title,
-        cancelledBy,
-        reason: reason ?? null,
+        status,
+        cancelledAt: now,
+        cancellationReason: reason ?? null,
       },
-    },
+    });
+
+    await tx.notification.create({
+      data: {
+        type:
+          cancelledBy === "DJ" ? "GIG_APPLICATION_WITHDRAWN" : "GIG_CANCELLED",
+        recipientId:
+          cancelledBy === "DJ" ? gig.organizerProfile.userId : djProfile.userId,
+        data: {
+          gigId: gig.id,
+          gigSlug: gig.slug,
+          gigTitle: gig.title,
+          cancelledBy,
+          reason: reason ?? null,
+        },
+      },
+    });
   });
 
   await updateReputationScore(djProfile.id, "HIRE_CANCELLED");
@@ -1017,22 +1039,24 @@ export async function reportNoShow(
       error: "You can only report no-shows for your own gigs.",
     };
 
-  await prisma.hire.update({
-    where: { id: hireId },
-    data: { noShow: true, status: "NO_SHOW" },
-  });
+  await prisma.$transaction(async (tx) => {
+    await tx.hire.update({
+      where: { id: hireId },
+      data: { noShow: true, status: "NO_SHOW" },
+    });
 
-  await prisma.notification.create({
-    data: {
-      type: "GIG_NO_SHOW",
-      recipientId: djProfile.userId,
+    await tx.notification.create({
       data: {
-        gigId: gig.id,
-        gigSlug: gig.slug,
-        gigTitle: gig.title,
-        message: "You were reported as a no-show for a gig.",
+        type: "GIG_NO_SHOW",
+        recipientId: djProfile.userId,
+        data: {
+          gigId: gig.id,
+          gigSlug: gig.slug,
+          gigTitle: gig.title,
+          message: "You were reported as a no-show for a gig.",
+        },
       },
-    },
+    });
   });
 
   await updateReputationScore(djProfile.id, "NO_SHOW_REPORTED");

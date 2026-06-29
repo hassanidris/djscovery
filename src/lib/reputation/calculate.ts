@@ -73,9 +73,15 @@ export async function calculateReputationScore(djProfileId: number) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
-  const {
-    data: { user },
-  } = await supabase.auth.admin.getUserById(djProfile.userId);
+  const { data, error } = await supabase.auth.admin.getUserById(
+    djProfile.userId,
+  );
+  if (error || !data.user) {
+    throw new Error(
+      `Supabase user lookup failed for DJ ${djProfile.userId}: ${error?.message ?? "user not found"}`,
+    );
+  }
+  const user = data.user;
 
   let verificationScore = 0;
   if (user?.email_confirmed_at) verificationScore += 15;
@@ -111,7 +117,28 @@ export async function calculateReputationScore(djProfileId: number) {
     );
   }
 
-  // 4. Reliability (0-150) — MVP proxy until Hire tracking is live
+  // 4. Reliability (0-150) — based on Hire lifecycle outcomes
+  const hires = await prisma.hire.findMany({
+    where: { application: { djProfileId } },
+  });
+  const completed = hires.filter((h) => h.status === "COMPLETED").length;
+  const cancelledByDj = hires.filter(
+    (h) => h.status === "CANCELLED_BY_DJ",
+  ).length;
+  const noShows = hires.filter((h) => h.noShow).length;
+  const totalHires = hires.length;
+
+  let reliabilityScore = 0;
+  if (totalHires > 0) {
+    const rate = completed / totalHires;
+    const penalty = (cancelledByDj * 0.5 + noShows * 1.0) / totalHires;
+    reliabilityScore = Math.round(
+      Math.max(0, rate - penalty) * WEIGHTS.reliability,
+    );
+  }
+
+  // Old application-based proxy (removed):
+  /*
   const totalApplications = await prisma.gigApplication.count({
     where: { djProfileId },
   });
@@ -125,7 +152,6 @@ export async function calculateReputationScore(djProfileId: number) {
     where: { djProfileId, status: "WITHDRAWN" },
   });
 
-  let reliabilityScore = 0;
   if (totalApplications > 0) {
     const completionRate = acceptedApps / totalApplications;
     const penalty =
@@ -133,22 +159,6 @@ export async function calculateReputationScore(djProfileId: number) {
     reliabilityScore = Math.round(
       Math.max(0, completionRate - penalty) * WEIGHTS.reliability,
     );
-  }
-
-  // Once Hire tracking is built, replace the above with:
-  /*
-  const hires = await prisma.hire.findMany({
-    where: { application: { djProfileId } }
-  });
-  const completed = hires.filter(h => h.status === 'COMPLETED').length;
-  const cancelledByDj = hires.filter(h => h.status === 'CANCELLED_BY_DJ').length;
-  const noShows = hires.filter(h => h.noShow).length;
-  const totalHires = hires.length;
-  
-  if (totalHires > 0) {
-    const rate = completed / totalHires;
-    const penalty = (cancelledByDj * 0.5 + noShows * 1.0) / totalHires;
-    reliabilityScore = Math.round(Math.max(0, rate - penalty) * WEIGHTS.reliability);
   }
   */
 
@@ -195,7 +205,7 @@ export async function calculateReputationScore(djProfileId: number) {
   const confidenceLevel = Math.min(
     1,
     (totalReviewCount / 10) * 0.5 +
-      (totalApplications / 5) * 0.3 +
+      (totalHires / 5) * 0.3 +
       (user?.identities?.length ? 0.2 : 0),
   );
 

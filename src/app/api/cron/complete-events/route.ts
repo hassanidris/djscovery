@@ -2,19 +2,27 @@ import prisma from "@/lib/client";
 
 export async function GET(request: Request) {
   // Verify cron secret
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return new Response("Cron secret is not configured", { status: 500 });
+  }
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000); // 48h after start
+  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000); // 48h after event ends
+  const completionWindow = [
+    { endDate: null, startDate: { lt: cutoff } },
+    { endDate: { lt: cutoff } },
+  ];
 
   // Find the events that are about to be marked completed so we can
   // notify attendees exactly once per event.
   const eventsToComplete = await prisma.event.findMany({
     where: {
       status: "PUBLISHED",
-      startDate: { lt: cutoff },
+      OR: completionWindow,
     },
     select: {
       id: true,
@@ -27,33 +35,34 @@ export async function GET(request: Request) {
   });
 
   if (eventsToComplete.length > 0) {
-    await prisma.event.updateMany({
-      where: {
-        id: { in: eventsToComplete.map((e) => e.id) },
-      },
-      data: { status: "COMPLETED" },
-    });
-
     for (const event of eventsToComplete) {
-      const attendees = await prisma.eventAttendance.findMany({
-        where: { eventId: event.id, status: "ATTENDED" },
-        select: { userId: true },
-      });
-
-      if (attendees.length > 0) {
-        await prisma.notification.createMany({
-          data: attendees.map((attendee) => ({
-            type: "EVENT_COMPLETED" as const,
-            recipientId: attendee.userId,
-            data: {
-              eventId: event.id,
-              eventSlug: event.slug,
-              eventTitle: event.title,
-              djCount: event.participants.length + 1, // owner + participants
-            },
-          })),
+      await prisma.$transaction(async (tx) => {
+        const { count } = await tx.event.updateMany({
+          where: { id: event.id, status: "PUBLISHED", OR: completionWindow },
+          data: { status: "COMPLETED" },
         });
-      }
+        if (count !== 1) return;
+
+        const attendees = await tx.eventAttendance.findMany({
+          where: { eventId: event.id, status: "ATTENDED" },
+          select: { userId: true },
+        });
+
+        if (attendees.length > 0) {
+          await tx.notification.createMany({
+            data: attendees.map((attendee) => ({
+              type: "EVENT_COMPLETED" as const,
+              recipientId: attendee.userId,
+              data: {
+                eventId: event.id,
+                eventSlug: event.slug,
+                eventTitle: event.title,
+                djCount: event.participants.length + 1, // owner + participants
+              },
+            })),
+          });
+        }
+      });
     }
   }
 

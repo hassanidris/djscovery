@@ -62,19 +62,18 @@ export async function POST(
     return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
 
-  const isCompleted =
-    event.status === "COMPLETED" || new Date(event.startDate) < new Date();
-  if (!isCompleted) {
+  if (event.status !== "COMPLETED") {
     return NextResponse.json(
       { error: "Event must be completed before reviewing" },
       { status: 403 },
     );
   }
 
-  const isParticipant = await prisma.eventDj.findUnique({
+  const participant = await prisma.eventDj.findUnique({
     where: { eventId_djProfileId: { eventId, djProfileId } },
   });
-  if (!isParticipant) {
+  const canReviewDj = event.ownerDjId === djProfileId || Boolean(participant);
+  if (!canReviewDj) {
     return NextResponse.json(
       { error: "DJ did not perform at this event" },
       { status: 403 },

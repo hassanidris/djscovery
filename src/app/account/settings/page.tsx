@@ -18,7 +18,7 @@ export default async function AccountSettingsPage() {
   const { isOrganizer, navRole } = await getNavUser();
   const isOrganizerOnly = isOrganizer && navRole === "organizer";
 
-  if (navRole === "fan") redirect("/fan/account");
+  if (navRole === "fan") redirect("/fan/settings");
 
   const [dbUser, countries] = await Promise.all([
     prisma.user.findUnique({

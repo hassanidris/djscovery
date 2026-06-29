@@ -59,13 +59,7 @@ export default function NotificationItem({
 
         <div className="mt-2 flex items-center gap-3">
           {meta.href && meta.cta && (
-            <Link
-              href={meta.href}
-              className="text-h_red hover:text-h_redDark text-sm font-medium"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {meta.cta} →
-            </Link>
+            <span className="text-h_red text-sm font-medium">{meta.cta} →</span>
           )}
           <span className="text-xs text-zinc-600">
             {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}

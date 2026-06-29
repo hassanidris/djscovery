@@ -406,7 +406,15 @@ export async function getGigReviewContextBySlug(slug: string, userId: string) {
   const isCompleted =
     gig.status === "COMPLETED" && hire?.status === "COMPLETED";
   const alreadyReviewed = gig.gigReviews.length > 0;
-  const daysRemaining = isCompleted
+  const deadline = isCompleted
+    ? new Date(new Date(completedAt).getTime() + 30 * 24 * 60 * 60 * 1000)
+    : null;
+  const reviewWindowOpen =
+    isCompleted &&
+    !alreadyReviewed &&
+    deadline !== null &&
+    Date.now() <= deadline.getTime();
+  const daysRemaining = deadline
     ? Math.max(
         0,
         30 -
@@ -427,6 +435,8 @@ export async function getGigReviewContextBySlug(slug: string, userId: string) {
     djAvatar: accepted.djProfile.avatar,
     isCompleted,
     alreadyReviewed,
+    reviewWindowOpen,
+    reviewDeadline: deadline,
     daysRemaining,
   };
 }

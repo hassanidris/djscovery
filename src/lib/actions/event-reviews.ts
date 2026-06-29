@@ -29,17 +29,24 @@ export async function createEventReview(
 
   const event = await prisma.event.findUnique({
     where: { id: eventId },
-    select: { slug: true, title: true, status: true, startDate: true },
+    select: {
+      slug: true,
+      title: true,
+      status: true,
+      startDate: true,
+      ownerDjId: true,
+    },
   });
   if (!event) throw new Error("Event not found");
   if (event.status !== "COMPLETED") {
     throw new Error("Event must be completed before reviewing");
   }
 
-  const isParticipant = await prisma.eventDj.findUnique({
+  const participant = await prisma.eventDj.findUnique({
     where: { eventId_djProfileId: { eventId, djProfileId } },
   });
-  if (!isParticipant) throw new Error("DJ did not perform at this event");
+  const canReviewDj = event.ownerDjId === djProfileId || Boolean(participant);
+  if (!canReviewDj) throw new Error("DJ did not perform at this event");
 
   const existingReview = await prisma.eventReview.findUnique({
     where: {

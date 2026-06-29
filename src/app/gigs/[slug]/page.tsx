@@ -62,7 +62,13 @@ export default async function GigDetailPage({
         select: {
           id: true,
           djProfile: {
-            select: { id: true, stageName: true, slug: true, avatar: true },
+            select: {
+              id: true,
+              userId: true,
+              stageName: true,
+              slug: true,
+              avatar: true,
+            },
           },
           hire: { select: { status: true, completedAt: true } },
         },
@@ -75,13 +81,15 @@ export default async function GigDetailPage({
   if (!gig) return notFound();
 
   const isOrganizer = user?.id === gig.organizerProfile.userId;
-  if (!isOrganizer && gig.status !== "PUBLISHED") return notFound();
+  const accepted = gig.applications[0];
+  const isAcceptedDj = user?.id === accepted?.djProfile.userId;
+  if (!isOrganizer && !isAcceptedDj && gig.status !== "PUBLISHED")
+    return notFound();
 
   const typeLabel = GIG_TYPE_FIELDS[gig.gigType].label;
   const location = [gig.city?.name, gig.country?.name]
     .filter(Boolean)
     .join(", ");
-  const accepted = gig.applications[0];
 
   function formatDate(d: Date) {
     return new Date(d).toLocaleDateString("en-US", {
@@ -343,8 +351,8 @@ export default async function GigDetailPage({
           </section>
         )}
 
-        {/* Private logistics — organizer only */}
-        {isOrganizer && (
+        {/* Private logistics — organizer and accepted DJ */}
+        {(isOrganizer || isAcceptedDj) && (
           <section className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/5 p-5">
             <div className="mb-4 flex items-center gap-2">
               <div className="rounded bg-amber-500/10 p-1">
@@ -353,7 +361,7 @@ export default async function GigDetailPage({
                 </span>
               </div>
               <h2 className="text-sm font-semibold text-amber-300">
-                Details (visible to accepted DJ only)
+                Private details
               </h2>
             </div>
             <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">

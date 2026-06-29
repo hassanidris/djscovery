@@ -475,7 +475,14 @@ export async function updateDjProfile(
     });
 
     const slugChanged = newSlug !== existing.slug;
-    await updateReputationScore(existing.id, "PROFILE_UPDATED");
+    try {
+      await updateReputationScore(existing.id, "PROFILE_UPDATED");
+    } catch (error) {
+      console.error("Failed to refresh DJ reputation after profile update", {
+        djProfileId: existing.id,
+        error,
+      });
+    }
     return { success: true as const, ...(slugChanged && { newSlug }) };
   } catch {
     return { error: "Something went wrong. Please try again." };

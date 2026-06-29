@@ -75,7 +75,7 @@ export default async function GigReviewPage({
           </Card>
         )}
 
-        {context.isCompleted && !context.alreadyReviewed && (
+        {context.reviewWindowOpen && (
           <>
             {context.daysRemaining !== null && context.daysRemaining <= 7 && (
               <div className="mb-4 flex items-center gap-2 text-xs text-amber-400">
@@ -91,6 +91,18 @@ export default async function GigReviewPage({
             />
           </>
         )}
+
+        {context.isCompleted &&
+          !context.alreadyReviewed &&
+          !context.reviewWindowOpen && (
+            <Card className="border-gray-500/20 bg-gray-500/5">
+              <CardContent className="py-5">
+                <p className="text-sm text-gray-300">
+                  The review window has expired.
+                </p>
+              </CardContent>
+            </Card>
+          )}
       </div>
     </div>
   );
