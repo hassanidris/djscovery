@@ -1,5 +1,11 @@
 import prisma from "@/lib/client";
-import { createClient } from "@supabase/supabase-js";
+import { PrismaClient } from "@prisma/client";
+import { createClient, User } from "@supabase/supabase-js";
+
+type PrismaTransactionClient = Omit<
+  PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$use" | "$extends"
+>;
 
 const WEIGHTS = {
   profileQuality: 150,
@@ -21,8 +27,12 @@ function bayesianAverage(ratings: number[], priorCount: number, priorMean = 3) {
   return (sum + priorCount * priorMean) / (ratings.length + priorCount);
 }
 
-export async function calculateReputationScore(djProfileId: number) {
-  const djProfile = await prisma.djProfile.findUnique({
+export async function calculateReputationScore(
+  djProfileId: number,
+  client: PrismaClient | PrismaTransactionClient = prisma,
+  user?: User,
+) {
+  const djProfile = await client.djProfile.findUnique({
     where: { id: djProfileId },
     include: {
       gigReviews: true,
@@ -69,23 +79,26 @@ export async function calculateReputationScore(djProfileId: number) {
   );
 
   // 2. Verification (0-50)
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-  const { data, error } = await supabase.auth.admin.getUserById(
-    djProfile.userId,
-  );
-  if (error || !data.user) {
-    throw new Error(
-      `Supabase user lookup failed for DJ ${djProfile.userId}: ${error?.message ?? "user not found"}`,
+  let authUser = user;
+  if (!authUser) {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
     );
+    const { data, error } = await supabase.auth.admin.getUserById(
+      djProfile.userId,
+    );
+    if (error || !data.user) {
+      throw new Error(
+        `Supabase user lookup failed for DJ profile ${djProfileId}: ${error?.message ?? "user not found"}`,
+      );
+    }
+    authUser = data.user;
   }
-  const user = data.user;
 
   let verificationScore = 0;
-  if (user?.email_confirmed_at) verificationScore += 15;
-  if (user?.identities?.some((i) => i.provider === "google"))
+  if (authUser?.email_confirmed_at) verificationScore += 15;
+  if (authUser?.identities?.some((i) => i.provider === "google"))
     verificationScore += 25;
   if (djProfile.status === "APPROVED") verificationScore += 10;
 
@@ -118,15 +131,23 @@ export async function calculateReputationScore(djProfileId: number) {
   }
 
   // 4. Reliability (0-150) — based on Hire lifecycle outcomes
-  const hires = await prisma.hire.findMany({
+  const hires = await client.hire.findMany({
     where: { application: { djProfileId } },
   });
-  const completed = hires.filter((h) => h.status === "COMPLETED").length;
-  const cancelledByDj = hires.filter(
+  const finalizedHires = hires.filter(
+    (h) =>
+      h.status === "COMPLETED" ||
+      h.status === "CANCELLED_BY_DJ" ||
+      h.status === "NO_SHOW",
+  );
+  const completed = finalizedHires.filter(
+    (h) => h.status === "COMPLETED",
+  ).length;
+  const cancelledByDj = finalizedHires.filter(
     (h) => h.status === "CANCELLED_BY_DJ",
   ).length;
-  const noShows = hires.filter((h) => h.noShow).length;
-  const totalHires = hires.length;
+  const noShows = finalizedHires.filter((h) => h.status === "NO_SHOW").length;
+  const totalHires = finalizedHires.length;
 
   let reliabilityScore = 0;
   if (totalHires > 0) {
@@ -166,12 +187,12 @@ export async function calculateReputationScore(djProfileId: number) {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const recentApplications = await prisma.gigApplication.count({
+  const recentApplications = await client.gigApplication.count({
     where: { djProfileId, createdAt: { gte: thirtyDaysAgo } },
   });
   const hasUpdatedProfile = djProfile.updatedAt > thirtyDaysAgo;
-  const hasRecentLogin = user?.last_sign_in_at
-    ? new Date(user.last_sign_in_at) > thirtyDaysAgo
+  const hasRecentLogin = authUser?.last_sign_in_at
+    ? new Date(authUser.last_sign_in_at) > thirtyDaysAgo
     : false;
 
   const activityScore = Math.min(
@@ -206,7 +227,7 @@ export async function calculateReputationScore(djProfileId: number) {
     1,
     (totalReviewCount / 10) * 0.5 +
       (totalHires / 5) * 0.3 +
-      (user?.identities?.length ? 0.2 : 0),
+      (authUser?.identities?.length ? 0.2 : 0),
   );
 
   return {

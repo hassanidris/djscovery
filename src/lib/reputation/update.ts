@@ -1,4 +1,5 @@
 import prisma from "@/lib/client";
+import { createClient } from "@supabase/supabase-js";
 import { calculateReputationScore } from "./calculate";
 import { updateSearchScore } from "@/lib/search/composite-score";
 
@@ -6,6 +7,38 @@ export async function updateReputationScore(
   djProfileId: number,
   changeReason: string,
 ) {
+  // Preload auth data outside the transaction so the advisory lock and DB
+  // connection are not held during the Supabase admin lookup.
+  let user;
+  try {
+    const djProfile = await prisma.djProfile.findUnique({
+      where: { id: djProfileId },
+      select: { userId: true },
+    });
+    if (!djProfile) throw new Error(`DJ profile not found: ${djProfileId}`);
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    );
+    const { data, error } = await supabase.auth.admin.getUserById(
+      djProfile.userId,
+    );
+    if (error || !data.user) {
+      throw new Error(
+        `Supabase user lookup failed for DJ profile ${djProfileId}: ${error?.message ?? "user not found"}`,
+      );
+    }
+    user = data.user;
+  } catch (e) {
+    const message =
+      e instanceof Error
+        ? e.message
+        : "Failed to preload auth data for reputation update.";
+    console.error(message);
+    return;
+  }
+
   try {
     await prisma.$transaction(async (tx) => {
       // Serialize reputation recomputes for this DJ so concurrent calls cannot
@@ -15,8 +48,8 @@ export async function updateReputationScore(
         djProfileId,
       );
 
-      // Compute and read while holding the lock.
-      const newScores = await calculateReputationScore(djProfileId);
+      // Compute and read while holding the lock, using the preloaded user.
+      const newScores = await calculateReputationScore(djProfileId, tx, user);
 
       const existing = await tx.reputationScore.findUnique({
         where: { djProfileId },
