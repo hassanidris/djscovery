@@ -204,6 +204,8 @@ enum EmailType {
   ACCOUNT_SUSPENDED
   SECURITY_ALERT
   ADMIN_DJ_REGISTRATION
+  CONTACT_FORM_INTERNAL
+  CONTACT_FORM_AUTO_REPLY
 }
 
 enum EmailLogStatus {
@@ -271,12 +273,13 @@ model User {
   cityId    Int?
   city      City?    @relation(fields: [cityId], references: [id])
 
-  roles            UserRole[]
-  djProfile        DjProfile?
-  organizerProfile OrganizerProfile?
-  fanProfile       FanProfile?
-  emailPreference  EmailPreference?
-  emailLogs        EmailLog[]
+  roles              UserRole[]
+  djProfile          DjProfile?
+  organizerProfile   OrganizerProfile?
+  fanProfile         FanProfile?
+  emailPreference    EmailPreference?
+  emailLogs          EmailLog[]
+  contactSubmissions ContactSubmission[]
 
   posts            Post[]
   postComments     PostComment[]
@@ -1019,6 +1022,27 @@ model EmailLog {
   @@index([userId])
   @@index([status])
   @@index([emailType])
+  @@index([createdAt])
+}
+
+// ------ CONTACT SUBMISSIONS ------
+
+model ContactSubmission {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  category  String
+  message   String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([email])
+  @@index([category])
   @@index([createdAt])
 }
 
