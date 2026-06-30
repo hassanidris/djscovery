@@ -15,12 +15,15 @@ import {
   type PremiumMediaItem,
 } from "@/data/dj-profile-defaults";
 
-// ── Free plan mappers ───────────────────────────────────────────────────────────
+// ── Shared base mappers ───────────────────────────────────────────────────────
 
-export function mapFreeDjToProps(d: DjDemoData) {
-  const socialLinks = Object.entries(d.socials)
+function mapSocialLinks(d: DjDemoData) {
+  return Object.entries(d.socials)
     .filter(([, url]) => Boolean(url))
     .map(([platform, url]) => ({ platform, url: url as string }));
+}
+
+export function mapDjToProps(d: DjDemoData) {
   return {
     stageName: d.stageName,
     avatar: d.avatar.url,
@@ -29,7 +32,7 @@ export function mapFreeDjToProps(d: DjDemoData) {
     city: d.location.city,
     country: d.location.country,
     genres: d.genres,
-    socialLinks,
+    socialLinks: mapSocialLinks(d),
     avgRating: d.stats.rating,
     ratingCount: d.stats.reviews,
     followerCount: d.stats.followers,
@@ -43,7 +46,10 @@ export function mapFreeDjToProps(d: DjDemoData) {
   };
 }
 
-export function mapFreeEventsFromData(d: DjDemoData) {
+export function mapEventsFromData(
+  d: DjDemoData,
+  opts?: { withStatus?: boolean },
+) {
   return getDemoEventsByDjSlug(d.slug).map((e, i) => ({
     id: i + 1,
     title: e.title,
@@ -53,19 +59,23 @@ export function mapFreeEventsFromData(d: DjDemoData) {
     country: e.country,
     slug: e.slug,
     isPast: e.daysOffset <= 0,
+    ...(opts?.withStatus ? { status: "confirmed" as const } : {}),
   }));
 }
 
-export function mapFreeVenuesFromData(d: DjDemoData) {
+export function mapVenuesFromData(
+  d: DjDemoData,
+  opts?: { withCountry?: boolean },
+) {
   return d.venuesPlayed.map((v) => ({
     name: v.venue,
     city: v.city,
-    country: "",
+    country: opts?.withCountry ? "" : undefined,
     count: v.timesPlayed,
   }));
 }
 
-export function mapFreeReviewsFromData(d: DjDemoData) {
+export function mapReviewsFromData(d: DjDemoData) {
   return d.reviewsList.map((r, i) => ({
     id: i + 1,
     rating: r.rating,
@@ -78,11 +88,11 @@ export function mapFreeReviewsFromData(d: DjDemoData) {
   }));
 }
 
-export function mapFreeMediaFromData(d: DjDemoData) {
+export function mapMediaFromData(d: DjDemoData) {
   return d.media.photos.map((url, i) => ({ id: i + 1, url }));
 }
 
-export function mapFreeFeaturedMix(d: DjDemoData) {
+export function mapFeaturedMix(d: DjDemoData) {
   const fm = d.spotlight.featuredMix;
   return {
     title: fm.title,
@@ -94,34 +104,40 @@ export function mapFreeFeaturedMix(d: DjDemoData) {
   };
 }
 
+// ── Free plan wrappers (backward-compatible) ───────────────────────────────────
+
+export function mapFreeDjToProps(d: DjDemoData) {
+  return mapDjToProps(d);
+}
+
+export function mapFreeEventsFromData(d: DjDemoData) {
+  return mapEventsFromData(d);
+}
+
+export function mapFreeVenuesFromData(d: DjDemoData) {
+  return mapVenuesFromData(d, { withCountry: true });
+}
+
+export function mapFreeReviewsFromData(d: DjDemoData) {
+  return mapReviewsFromData(d);
+}
+
+export function mapFreeMediaFromData(d: DjDemoData) {
+  return mapMediaFromData(d);
+}
+
+export function mapFreeFeaturedMix(d: DjDemoData) {
+  return mapFeaturedMix(d);
+}
+
 // ── Premium plan mappers ────────────────────────────────────────────────────────
 
 export function mapPremiumDjToProps(d: DjDemoData) {
-  const socialLinks = Object.entries(d.socials)
-    .filter(([, url]) => Boolean(url))
-    .map(([platform, url]) => ({ platform, url: url as string }));
   return {
-    stageName: d.stageName,
-    avatar: d.avatar.url,
-    coverImage: d.coverImage.url,
-    bio: d.bio,
-    city: d.location.city,
-    country: d.location.country,
-    genres: d.genres,
-    socialLinks,
-    avgRating: d.stats.rating,
-    ratingCount: d.stats.reviews,
-    followerCount: d.stats.followers,
-    eventsCount: d.stats.events,
+    ...mapDjToProps(d),
     responseRate: d.stats.responseRate,
     bookingSuccessRate: d.stats.bookingRate,
     profileViews: d.stats.monthlyViews,
-    bookingEmail: d.booking.email,
-    bookingPhone: d.booking.phone,
-    website: d.booking.website,
-    minFee: `${d.booking.feeRange.currency}${formatNumber(d.booking.feeRange.min)}`,
-    maxFee: `${d.booking.feeRange.currency}${formatNumber(d.booking.feeRange.max)}`,
-    djTypes: d.specialties,
     manager: {
       name: d.team.manager.name,
       email: d.team.manager.email,
@@ -136,38 +152,15 @@ export function mapPremiumDjToProps(d: DjDemoData) {
 }
 
 export function mapPremiumEventsFromData(d: DjDemoData) {
-  return getDemoEventsByDjSlug(d.slug).map((e, i) => ({
-    id: i + 1,
-    title: e.title,
-    date: e.eventDate.toISOString(),
-    venue: e.venue ?? "",
-    city: e.city,
-    country: e.country,
-    slug: e.slug,
-    status: "confirmed" as const,
-    isPast: e.daysOffset <= 0,
-  }));
+  return mapEventsFromData(d, { withStatus: true });
 }
 
 export function mapPremiumVenuesFromData(d: DjDemoData) {
-  return d.venuesPlayed.map((v) => ({
-    name: v.venue,
-    city: v.city,
-    count: v.timesPlayed,
-  }));
+  return mapVenuesFromData(d);
 }
 
 export function mapPremiumReviewsFromData(d: DjDemoData) {
-  return d.reviewsList.map((r, i) => ({
-    id: i + 1,
-    rating: r.rating,
-    review: r.comment,
-    date: r.date,
-    user: {
-      name: r.name,
-      image: REVIEWER_AVATARS[i % REVIEWER_AVATARS.length],
-    },
-  }));
+  return mapReviewsFromData(d);
 }
 
 export function mapPremiumMediaFromData(d: DjDemoData): PremiumMediaItem[] {
@@ -233,14 +226,7 @@ export function mapPackagesFromData(d: DjDemoData) {
 }
 
 export function mapMixesFromData(d: DjDemoData) {
-  const fm = d.spotlight.featuredMix;
-  const featured = {
-    title: fm.title,
-    duration: fm.duration,
-    plays: formatPlays(fm.plays),
-    platform: getPlatformFromUrl(fm.audioUrl),
-    audioUrl: fm.audioUrl,
-  };
+  const featured = mapFeaturedMix(d);
   const rest = d.media.mixes.map((m) => ({
     title: m.title,
     duration: "",

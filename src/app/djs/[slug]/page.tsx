@@ -70,7 +70,6 @@ export default async function DjProfilePage({
       user: {
         select: {
           id: true,
-          _count: { select: { followers: true } },
         },
       },
       city: true,
@@ -98,7 +97,7 @@ export default async function DjProfilePage({
       },
       reputationDetail: true,
       _count: {
-        select: { ratings: true, eventsOwned: true },
+        select: { ratings: true, followers: true },
       },
     },
   });
@@ -115,10 +114,22 @@ export default async function DjProfilePage({
 
   if (dj.hidden && authUser?.id !== dj.userId) return notFound();
 
-  const avgRating =
-    dj.ratings.length > 0
-      ? dj.ratings.reduce((sum, r) => sum + r.rating, 0) / dj.ratings.length
-      : 0;
+  // Accurate aggregates: avg rating over ALL ratings (not just the fetched 20),
+  // and event count limited to publicly visible events (matches the list shown).
+  const [ratingAgg, publicEventsCount] = await Promise.all([
+    prisma.djRating.aggregate({
+      where: { djProfileId: dj.id },
+      _avg: { rating: true },
+    }),
+    prisma.event.count({
+      where: {
+        ownerDjId: dj.id,
+        status: { in: ["PUBLISHED", "COMPLETED"] },
+        deletedAt: null,
+      },
+    }),
+  ]);
+  const avgRating = ratingAgg._avg.rating ?? 0;
 
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
   const [isFollowedDj, followingDj] =
@@ -165,10 +176,10 @@ export default async function DjProfilePage({
       {},
     ),
     stats: {
-      followers: dj.user._count.followers,
+      followers: dj._count.followers,
       rating: avgRating,
       reviews: dj._count.ratings,
-      events: dj._count.eventsOwned,
+      events: publicEventsCount,
       responseRate: 0,
       bookingRate: 0,
       monthlyViews: 0,

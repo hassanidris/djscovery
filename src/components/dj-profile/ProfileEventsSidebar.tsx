@@ -9,6 +9,7 @@ type Props = {
   events: EventItem[];
   showStatus?: boolean;
   isOwner?: boolean;
+  djName?: string;
 };
 
 function EventRow({ e, showStatus }: { e: EventItem; showStatus: boolean }) {
@@ -62,6 +63,7 @@ export default function ProfileEventsSidebar({
   events,
   showStatus = false,
   isOwner = false,
+  djName,
 }: Props) {
   const upcoming = events.filter((e) => !e.isPast);
   const past = events.filter((e) => e.isPast);
@@ -93,7 +95,7 @@ export default function ProfileEventsSidebar({
               <CalendarDays className="h-4 w-4 text-gray-600" />
             </div>
             <p className="text-xs font-medium text-gray-500">
-              No upcoming events
+              No upcoming events for Dj. {djName || "Unknown"}
             </p>
           </div>
         ) : (
