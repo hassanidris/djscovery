@@ -59,6 +59,11 @@ type FormState = {
 const CUSTOM_VENUE_VALUE = "__CUSTOM__";
 const MIN_MESSAGE_LENGTH = 50;
 
+const DEFAULT_VIEWER: BookingViewerContext = {
+  role: "guest",
+  isAuthenticated: false,
+};
+
 type Props = {
   stageName: string;
   djProfileId?: number;
@@ -80,18 +85,13 @@ export function BookCTA({
   bookingSuccessRate = 0,
   bookingOptions,
 }: Props) {
-  const ctx: BookingViewerContext = useMemo(
-    () =>
-      viewer ?? {
-        role: "guest",
-        isAuthenticated: false,
-      },
-    [viewer],
-  );
+  const resolvedViewer = viewer ?? DEFAULT_VIEWER;
 
-  if (ctx.role === "dj-owner") {
+  if (resolvedViewer.role === "dj-owner") {
     return null;
   }
+
+  const ctx: BookingViewerContext = resolvedViewer;
 
   const countries = bookingOptions?.countries ?? [];
   const defaultCountryValue = bookingOptions?.defaultCountryId
