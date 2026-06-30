@@ -237,6 +237,8 @@ export async function createDjProfile(
   let adminEmailsForNotify: string[] = [];
 
   await prisma.$transaction(async (tx) => {
+    const effectiveBookingEmail = bookingEmail ?? user.email;
+
     const profileData = {
       stageName,
       bio: bio ?? null,
@@ -244,7 +246,7 @@ export async function createDjProfile(
       coverImage: coverImageUrl ?? null,
       countryId: countryId,
       cityId: cityId,
-      bookingEmail: bookingEmail ?? null,
+      bookingEmail: effectiveBookingEmail,
       bookingPhone: bookingPhone ?? null,
       feeMin: feeMin ?? null,
       feeMax: feeMax ?? null,

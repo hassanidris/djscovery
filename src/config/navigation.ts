@@ -7,6 +7,7 @@ import {
   User,
   AudioLines,
   ShieldCheck,
+  Handshake,
 } from "lucide-react";
 
 export type NavRole = "guest" | "fan" | "dj" | "organizer" | "admin";
@@ -35,11 +36,25 @@ const djGigs: NavItem = {
   icon: Briefcase,
 };
 
+const djBookings: NavItem = {
+  id: "bookings",
+  label: "Bookings",
+  href: "/dashboard/dj/bookings",
+  icon: Handshake,
+};
+
 const orgGigs: NavItem = {
   id: "gigs",
   label: "My Gigs",
   href: "/dashboard/organizer/gigs",
   icon: Briefcase,
+};
+
+const orgBookings: NavItem = {
+  id: "bookings",
+  label: "Bookings",
+  href: "/organizer/bookings",
+  icon: Handshake,
 };
 
 const events: NavItem = {
@@ -73,16 +88,16 @@ const adminPanel: NavItem = {
 export const desktopNavByRole: Record<NavRole, NavItem[]> = {
   guest: [directory, events],
   fan: [directory, events],
-  dj: [directory, djGigs, events],
-  organizer: [directory, orgGigs, events],
+  dj: [directory, djBookings, djGigs, events],
+  organizer: [directory, orgBookings, orgGigs, events],
   admin: [adminPanel, directory, events],
 };
 
 export const bottomNavByRole: Record<NavRole, NavItem[]> = {
   guest: [home, directory, events, account],
   fan: [home, directory, events, profile],
-  dj: [home, directory, djGigs, events, profile],
-  organizer: [home, directory, orgGigs, events, profile],
+  dj: [home, directory, djBookings, djGigs, events, profile],
+  organizer: [home, directory, orgBookings, orgGigs, events, profile],
   admin: [home, adminPanel, directory, events, profile],
 };
 
@@ -109,6 +124,7 @@ export function getFooterProfessionalLinks(opts: {
   if (navRole === "dj" || navRole === "admin") {
     return [
       ...(djSlug ? [{ label: "My DJ Profile", href: `/djs/${djSlug}` }] : []),
+      { label: "Bookings", href: "/dashboard/dj/bookings" },
       { label: "My Gigs", href: "/dashboard/dj/gigs" },
       { label: "My Events", href: "/dashboard/dj/events" },
       { label: "Applications", href: "/dashboard/dj/applications" },
@@ -130,6 +146,7 @@ export function getFooterProfessionalLinks(opts: {
           ]
         : []),
       { label: "Organizer Dashboard", href: "/organizer/dashboard" },
+      { label: "Bookings", href: "/organizer/bookings" },
       { label: "Post a Gig", href: "/dashboard/organizer/gigs/new" },
       { label: "My Gigs", href: "/dashboard/organizer/gigs" },
       { label: "Become a DJ", href: "/become-dj" },

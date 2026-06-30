@@ -16,3 +16,32 @@ export async function getCitiesForCountry(countryId: number) {
     orderBy: { name: "asc" },
   });
 }
+
+export async function getVenuesForCity(cityId: number, limit = 40) {
+  const [gigs, events] = await Promise.all([
+    prisma.gig.findMany({
+      where: { cityId, venueName: { not: null } },
+      select: { venueName: true },
+      take: limit * 2,
+    }),
+    prisma.event.findMany({
+      where: { cityId, venue: { not: null } },
+      select: { venue: true },
+      take: limit * 2,
+    }),
+  ]);
+
+  const names = new Set<string>();
+  for (const record of gigs) {
+    const name = record.venueName?.trim();
+    if (name) names.add(name);
+  }
+  for (const record of events) {
+    const name = record.venue?.trim();
+    if (name) names.add(name);
+  }
+
+  return Array.from(names)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(0, limit);
+}
