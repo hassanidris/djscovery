@@ -170,7 +170,7 @@ function DJCard({
 
         <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-2 text-xs text-gray-400">
           <span>⭐ {dj.rating}</span>
-          <span>{formatNumber(dj.followers)} fans</span>
+          <span>{formatNumber(dj.followers)} followers</span>
         </div>
       </Card>
     </Link>

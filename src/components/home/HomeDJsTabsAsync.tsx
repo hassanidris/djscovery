@@ -38,21 +38,23 @@ export default async function HomeDJsTabsAsync() {
         orderBy: { createdAt: "desc" },
         take: 8,
         include: {
-          user: { include: { _count: { select: { followers: true } } } },
+          user: true,
           country: { select: { name: true } },
           city: { select: { name: true } },
           genres: { include: { genre: { select: { name: true } } } },
           ratings: { select: { rating: true } },
+          _count: { select: { followers: true } },
         },
       }),
       prisma.djProfile.findMany({
         where: { deletedAt: null, status: "APPROVED" },
         include: {
-          user: { include: { _count: { select: { followers: true } } } },
+          user: true,
           country: { select: { name: true } },
           city: { select: { name: true } },
           genres: { include: { genre: { select: { name: true } } } },
           ratings: { select: { rating: true } },
+          _count: { select: { followers: true } },
         },
       }),
     ]);
@@ -72,7 +74,7 @@ export default async function HomeDJsTabsAsync() {
                 10,
             ) / 10
           : 0,
-      followers: p.user._count.followers,
+      followers: p._count.followers,
       slug: p.slug,
       isPremium: p.plan === "PREMIUM",
     });
