@@ -90,9 +90,7 @@ const DirectoryPage = async ({
             ? { stageName: "desc" }
             : [{ searchScore: "desc" }, { reputationScore: "desc" }],
       include: {
-        user: {
-          include: { _count: { select: { followers: true } } },
-        },
+        user: true,
         country: { select: { name: true } },
         city: { select: { name: true } },
         genres: { include: { genre: { select: { name: true } } } },
@@ -100,6 +98,7 @@ const DirectoryPage = async ({
         gigReviews: { select: { id: true } },
         eventReviews: { select: { id: true } },
         ratings: { select: { id: true } },
+        _count: { select: { followers: true } },
       },
     });
 
@@ -117,7 +116,7 @@ const DirectoryPage = async ({
       isFeatured: p.featured,
       status: p.status,
       djTypes: p.djTypes.map((t) => t.type),
-      _count: { followers: p.user._count.followers },
+      _count: { followers: p._count.followers },
       reputationScore: p.reputationScore,
       gigReviews: p.gigReviews,
       eventReviews: p.eventReviews,
