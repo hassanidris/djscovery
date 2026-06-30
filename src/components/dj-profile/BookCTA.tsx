@@ -440,12 +440,12 @@ export function BookCTA({
               <DialogFooter className="flex flex-col gap-3 sm:flex-row">
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full sm:flex-1"
                   onClick={() => setModal("none")}
                 >
                   Cancel
                 </Button>
-                <Button className="w-full" asChild>
+                <Button className="w-full sm:flex-1" asChild>
                   <Link
                     href={`/sign-in?returnTo=${encodeURIComponent(window.location.pathname)}`}
                   >
@@ -476,12 +476,12 @@ export function BookCTA({
               <DialogFooter className="flex flex-col gap-3 sm:flex-row">
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full sm:flex-1"
                   onClick={() => setModal("none")}
                 >
                   Maybe later
                 </Button>
-                <Button className="w-full" asChild>
+                <Button className="w-full sm:flex-1" asChild>
                   <Link href="/become-organizer">Become an Organizer</Link>
                 </Button>
               </DialogFooter>

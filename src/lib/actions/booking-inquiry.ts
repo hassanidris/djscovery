@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
@@ -125,6 +126,20 @@ function truncatePreview(message: string): string {
   const trimmed = message.trim();
   if (trimmed.length <= 200) return trimmed;
   return `${trimmed.slice(0, 197)}…`;
+}
+
+function isUnknownLocationArgumentError(
+  error: unknown,
+): error is Prisma.PrismaClientValidationError {
+  if (!(error instanceof Prisma.PrismaClientValidationError)) return false;
+  const message = error.message ?? "";
+  if (!message.includes("Unknown argument")) return false;
+  return (
+    message.includes("countryId") ||
+    message.includes("cityId") ||
+    message.includes("countryName") ||
+    message.includes("cityName")
+  );
 }
 
 async function getAuthUser() {
@@ -320,25 +335,52 @@ export async function submitBookingInquiry(
 
   await prisma.$transaction(async (tx) => {
     const txUnsafe = tx as Record<string, any>;
-    createdInquiry = await txUnsafe.bookingInquiry.create({
-      data: {
-        djProfileId: payload.djProfileId,
-        organizerId: user.id,
-        eventName: payload.eventName,
-        eventDate: eventDateValue,
-        venue: payload.venue,
-        countryId: countryRecord.id,
-        countryName: countryRecord.name,
-        cityId: cityRecord.id,
-        cityName: cityRecord.name,
-        crowdSize: payload.crowdSize,
-        budgetType: payload.budgetType,
-        budgetMin,
-        budgetMax,
-        budgetCurrency: budgetCurrency.toUpperCase(),
-        message: payload.message,
-      },
-    });
+
+    const baseCreateData = {
+      djProfileId: payload.djProfileId,
+      organizerId: user.id,
+      eventName: payload.eventName,
+      eventDate: eventDateValue,
+      venue: payload.venue,
+      crowdSize: payload.crowdSize,
+      budgetType: payload.budgetType,
+      budgetMin,
+      budgetMax,
+      budgetCurrency: budgetCurrency.toUpperCase(),
+      message: payload.message,
+    } satisfies Record<string, unknown>;
+
+    const locationCreateData = {
+      countryId: countryRecord.id,
+      countryName: countryRecord.name,
+      cityId: cityRecord.id,
+      cityName: cityRecord.name,
+    } satisfies Record<string, unknown>;
+
+    try {
+      createdInquiry = await txUnsafe.bookingInquiry.create({
+        data: {
+          ...baseCreateData,
+          ...locationCreateData,
+        },
+      });
+    } catch (error) {
+      if (!isUnknownLocationArgumentError(error)) {
+        throw error;
+      }
+
+      console.warn(
+        "Prisma schema for BookingInquiry appears out of date. Falling back to legacy location fields. Please run `npx prisma db push && npx prisma generate`.",
+      );
+
+      createdInquiry = await txUnsafe.bookingInquiry.create({
+        data: {
+          ...baseCreateData,
+          country: countryRecord.name,
+          city: cityRecord.name,
+        },
+      });
+    }
 
     await txUnsafe.bookingInquiryMessage.create({
       data: {
