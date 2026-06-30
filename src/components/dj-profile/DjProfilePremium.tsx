@@ -93,6 +93,7 @@ import {
   buildCalendarFromData,
   getCalendarMonthLabel,
 } from "@/lib/dj-profile-mappers";
+import type { BookingViewerContext } from "@/types/booking";
 
 function StatPill({
   value,
@@ -127,6 +128,7 @@ export default function DjProfilePremium({
   reputationScore,
   reputationDetail,
   status,
+  viewerContext,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
@@ -144,6 +146,7 @@ export default function DjProfilePremium({
     newTalentBoost: number;
   } | null;
   status?: string;
+  viewerContext?: BookingViewerContext;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -184,13 +187,10 @@ export default function DjProfilePremium({
   const SPOTLIGHT = djData ? djData.spotlight : PREMIUM_DEFAULT_SPOTLIGHT;
   const location = `${DJ.city}, ${DJ.country}`;
 
-  const bookingEmail = djData ? djData.booking.email : "";
-  const bookingPhone = djData ? djData.booking.phone : "";
-  const bookingHref = bookingEmail
-    ? `mailto:${bookingEmail}?subject=Booking%20Enquiry%20via%20DJcovery`
-    : bookingPhone
-      ? `tel:${bookingPhone}`
-      : "#";
+  const bookingContext: BookingViewerContext = viewerContext ?? {
+    role: "guest",
+    isAuthenticated: false,
+  };
 
   const isOwner = viewMode === "dj-owner";
 
@@ -225,9 +225,12 @@ export default function DjProfilePremium({
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
               stageName={`Dj. ${DJ.stageName}`}
-              bookingHref={bookingHref}
+              djProfileId={djProfileId}
+              viewer={bookingContext}
               variant="premium"
               layout="mobile"
+              responseRate={DJ.responseRate}
+              bookingSuccessRate={DJ.bookingSuccessRate}
             />
 
             <ProfileAbout
@@ -746,7 +749,8 @@ export default function DjProfilePremium({
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
               stageName={`Dj. ${DJ.stageName}`}
-              bookingHref={bookingHref}
+              djProfileId={djProfileId}
+              viewer={bookingContext}
               variant="premium"
               layout="desktop"
               responseRate={DJ.responseRate}

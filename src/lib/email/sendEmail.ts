@@ -8,10 +8,16 @@ function maskEmail(email: string): string {
   return `${local[0]}***@${domain}`;
 }
 
+type ExtendedEmailType =
+  | EmailType
+  | "BOOKING_INQUIRY"
+  | "BOOKING_INQUIRY_RESPONSE"
+  | "BOOKING_INQUIRY_MESSAGE";
+
 interface SendEmailParams {
   to: string;
   userId?: string;
-  emailType: EmailType;
+  emailType: ExtendedEmailType;
   subject: string;
   html: string;
   replyTo?: string;
@@ -26,7 +32,8 @@ export async function sendEmail({
   html,
   replyTo,
   from: fromOverride,
-}: SendEmailParams): Promise<{ success: boolean; error?: string }> {
+}: SendEmailParams): Promise<void> {
+  const prismaEmailType = emailType as EmailType;
   if (!process.env.RESEND_API_KEY) {
     console.log(
       `[sendEmail] RESEND_API_KEY not set — skipping: ${emailType} → ${maskEmail(to)}`,
@@ -36,7 +43,7 @@ export async function sendEmail({
         data: {
           userId: userId ?? null,
           recipientEmail: to,
-          emailType,
+          emailType: prismaEmailType,
           status: "FAILED",
           errorMessage: "RESEND_API_KEY not configured",
           lastAttemptAt: new Date(),
@@ -48,7 +55,6 @@ export async function sendEmail({
         emailType,
       });
     }
-    return { success: false, error: "RESEND_API_KEY not configured" };
   }
 
   const from =
@@ -80,7 +86,7 @@ export async function sendEmail({
       data: {
         userId: userId ?? null,
         recipientEmail: to,
-        emailType,
+        emailType: prismaEmailType,
         status,
         providerMessageId,
         errorMessage,
@@ -95,8 +101,11 @@ export async function sendEmail({
     });
   }
 
-  if (status === "SENT") {
-    return { success: true };
+  if (status !== "SENT") {
+    console.error("[sendEmail] Email send failed", {
+      to: maskEmail(to),
+      emailType,
+      errorMessage,
+    });
   }
-  return { success: false, error: errorMessage };
 }

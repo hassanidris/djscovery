@@ -70,6 +70,7 @@ import {
   mapFreeFeaturedMix,
 } from "@/lib/dj-profile-mappers";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
+import type { BookingViewerContext } from "@/types/booking";
 
 function EmptySectionState({
   icon: Icon,
@@ -110,6 +111,7 @@ export default function DjProfileFree({
   isFollowing = false,
   reputationScore,
   reputationDetail,
+  viewerContext,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
@@ -126,6 +128,7 @@ export default function DjProfileFree({
     activityScore: number;
     newTalentBoost: number;
   } | null;
+  viewerContext?: BookingViewerContext;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -147,17 +150,10 @@ export default function DjProfileFree({
 
   const isOwner = viewMode === "dj-owner";
   const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
-  const bookingEmail = djData
-    ? djData.booking.email
-    : FREE_DEFAULT_DJ.bookingEmail;
-  const bookingPhone = djData
-    ? djData.booking.phone
-    : FREE_DEFAULT_DJ.bookingPhone;
-  const bookingHref = bookingEmail
-    ? `mailto:${bookingEmail}?subject=Booking%20Enquiry%20via%20DJcovery`
-    : bookingPhone
-      ? `tel:${bookingPhone}`
-      : "#";
+  const bookingContext: BookingViewerContext = viewerContext ?? {
+    role: "guest",
+    isAuthenticated: false,
+  };
 
   const hasFeaturedMix = FEATURED_MIX.audioUrl !== "";
   const hasFeaturedVideo = !!djData?.spotlight.featuredVideo.videoUrl;
@@ -198,7 +194,8 @@ export default function DjProfileFree({
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
               stageName={`Dj. ${DJ.stageName}`}
-              bookingHref={bookingHref}
+              djProfileId={djProfileId}
+              viewer={bookingContext}
               variant="free"
               layout="mobile"
             />
@@ -515,7 +512,8 @@ export default function DjProfileFree({
             {/* Book CTA — desktop only; mobile version is inline above */}
             <BookCTA
               stageName={`Dj. ${DJ.stageName}`}
-              bookingHref={bookingHref}
+              djProfileId={djProfileId}
+              viewer={bookingContext}
               variant="free"
               layout="desktop"
             />

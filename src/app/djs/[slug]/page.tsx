@@ -8,6 +8,7 @@ import { isFollowingDj } from "@/lib/actions/saves";
 import { isFollowing } from "@/lib/actions";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
+import type { BookingViewerContext } from "@/types/booking";
 
 export default async function DjProfilePage({
   params,
@@ -136,6 +137,37 @@ export default async function DjProfilePage({
     viewMode === "fan"
       ? await Promise.all([isFollowingDj(dj.id), isFollowing(dj.userId)])
       : [false, false];
+
+  let viewerContext: BookingViewerContext = {
+    role: "guest",
+    isAuthenticated: false,
+  };
+
+  if (authUser) {
+    const [roleRows, organizerProfile] = await Promise.all([
+      prisma.userRole.findMany({
+        where: { userId: authUser.id },
+        select: { role: true },
+      }),
+      prisma.organizerProfile.findUnique({
+        where: { userId: authUser.id },
+        select: { displayName: true, contactEmail: true },
+      }),
+    ]);
+
+    const roleSet = new Set(roleRows.map((r) => r.role));
+    let bookingRole: BookingViewerContext["role"] = "fan";
+    if (authUser.id === dj.userId) bookingRole = "dj-owner";
+    else if (roleSet.has("ADMIN")) bookingRole = "admin";
+    else if (roleSet.has("ORGANIZER")) bookingRole = "organizer";
+
+    viewerContext = {
+      role: bookingRole,
+      isAuthenticated: true,
+      organizerDisplayName: organizerProfile?.displayName ?? undefined,
+      organizerContactEmail: organizerProfile?.contactEmail ?? undefined,
+    };
+  }
 
   const djPlan = dj.plan;
   const djVerified = dj.status === "APPROVED";
@@ -279,6 +311,7 @@ export default async function DjProfilePage({
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
           status={dj.status}
+          viewerContext={viewerContext}
         />
       ) : (
         <DjProfileFree
@@ -289,6 +322,7 @@ export default async function DjProfilePage({
           isFollowing={followingDj}
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
+          viewerContext={viewerContext}
         />
       )}
     </div>
