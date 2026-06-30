@@ -529,27 +529,31 @@ export default function DjProfileFree({
               />
             </div>
 
-            <Separator className="bg-white/8" />
+            {isOwner && (
+              <>
+                <Separator className="bg-white/8" />
 
-            {/* Profile completion prompt */}
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-medium text-gray-400">
-                  Profile Strength
-                </span>
-                <span className="text-xs font-bold text-white">
-                  {completion ? `${completion.percentage}%` : "68%"}
-                </span>
-              </div>
-              <Progress
-                value={completion?.percentage ?? 68}
-                className="mb-2 h-1.5 bg-white/8"
-              />
-              <p className="text-xs text-gray-500">
-                {completion?.suggestions[0] ??
-                  "Add more photos & connect Spotify to reach 100%."}
-              </p>
-            </div>
+                {/* Profile completion prompt (owner only) */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-xs font-medium text-gray-400">
+                      Profile Strength
+                    </span>
+                    <span className="text-xs font-bold text-white">
+                      {completion ? `${completion.percentage}%` : "68%"}
+                    </span>
+                  </div>
+                  <Progress
+                    value={completion?.percentage ?? 68}
+                    className="mb-2 h-1.5 bg-white/8"
+                  />
+                  <p className="text-xs text-gray-500">
+                    {completion?.suggestions[0] ??
+                      "Add more photos & connect Spotify to reach 100%."}
+                  </p>
+                </div>
+              </>
+            )}
           </aside>
         </div>
       </div>
