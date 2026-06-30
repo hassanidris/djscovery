@@ -25,7 +25,7 @@ const infoCards = [
   {
     icon: ShieldCheck,
     title: "Your privacy",
-    body: "Your details are only used to respond to your enquiry.",
+    body: "Your details are used to respond to your enquiry. We also store your IP address and browser info for spam prevention.",
   },
   {
     icon: Headphones,

@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { headers } from "next/headers";
 import prisma from "@/lib/client";
+import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/sendEmail";
 import {
   contactInternalEmailSubject,
@@ -10,7 +11,11 @@ import {
   contactAutoReplySubject,
   contactAutoReplyHtml,
 } from "@/lib/email/templates/contact";
-import { CONTACT_CATEGORIES, type ContactFormState } from "./contact.constants";
+import {
+  CONTACT_CATEGORIES,
+  CONTACT_CATEGORY_TO_ENUM,
+  type ContactFormState,
+} from "./contact.constants";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -27,14 +32,6 @@ const contactSchema = z.object({
 
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
-
-async function isRateLimited(email: string): Promise<boolean> {
-  const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
-  const count = await prisma.contactSubmission.count({
-    where: { email, createdAt: { gte: since } },
-  });
-  return count >= RATE_LIMIT_MAX;
-}
 
 export async function submitContactForm(
   _prevState: ContactFormState,
@@ -61,14 +58,6 @@ export async function submitContactForm(
 
   const { name, email, category, message } = parsed.data;
 
-  if (await isRateLimited(email)) {
-    return {
-      success: false,
-      message:
-        "Too many messages from this email — please wait an hour before trying again.",
-    };
-  }
-
   const headersList = await headers();
   const ipAddress =
     headersList.get("x-forwarded-for")?.split(",")[0].trim() ??
@@ -76,13 +65,50 @@ export async function submitContactForm(
     "unknown";
   const userAgent = headersList.get("user-agent") ?? undefined;
 
-  await prisma.contactSubmission.create({
-    data: { name, email, category, message, ipAddress, userAgent },
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
+
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${email}))`;
+
+    const count = await tx.contactSubmission.count({
+      where: { email, createdAt: { gte: since } },
+    });
+
+    if (count >= RATE_LIMIT_MAX) {
+      return { rateLimited: true as const };
+    }
+
+    await tx.contactSubmission.create({
+      data: {
+        name,
+        email,
+        category: CONTACT_CATEGORY_TO_ENUM[category],
+        message,
+        ipAddress,
+        userAgent,
+        userId: user?.id,
+      },
+    });
+
+    return { rateLimited: false as const };
   });
+
+  if (result.rateLimited) {
+    return {
+      success: false,
+      message:
+        "Too many messages from this email — please wait an hour before trying again.",
+    };
+  }
 
   const contactTo = process.env.RESEND_CONTACT_TO ?? "support@djcovery.com";
 
-  await Promise.allSettled([
+  const [internalResult, autoReplyResult] = await Promise.all([
     sendEmail({
       to: contactTo,
       emailType: "CONTACT_FORM_INTERNAL",
@@ -98,6 +124,18 @@ export async function submitContactForm(
       replyTo: contactTo,
     }),
   ]);
+
+  if (!internalResult.success || !autoReplyResult.success) {
+    console.error("[contact] Email delivery failure:", {
+      internal: internalResult,
+      autoReply: autoReplyResult,
+    });
+    return {
+      success: false,
+      message:
+        "Your message was saved, but we couldn't send a confirmation email. We'll still get back to you.",
+    };
+  }
 
   return { success: true };
 }

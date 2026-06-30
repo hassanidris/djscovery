@@ -444,10 +444,11 @@ export default function DjProfileFree({
                     </p>
                   </div>
                   <Button
+                    asChild
                     size="sm"
                     className="shrink-0 bg-amber-500 text-xs font-semibold text-black hover:bg-amber-600"
                   >
-                    Upgrade Now
+                    <Link href="/djs/compare">Upgrade Now</Link>
                   </Button>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -513,7 +514,7 @@ export default function DjProfileFree({
           <aside className="sticky top-28 flex h-fit flex-col gap-5">
             {/* Book CTA — desktop only; mobile version is inline above */}
             <BookCTA
-              stageName={DJ.stageName}
+              stageName={`Dj. ${DJ.stageName}`}
               bookingHref={bookingHref}
               variant="free"
               layout="desktop"

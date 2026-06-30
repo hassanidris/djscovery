@@ -26,7 +26,7 @@ export async function sendEmail({
   html,
   replyTo,
   from: fromOverride,
-}: SendEmailParams): Promise<void> {
+}: SendEmailParams): Promise<{ success: boolean; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
     console.log(
       `[sendEmail] RESEND_API_KEY not set — skipping: ${emailType} → ${maskEmail(to)}`,
@@ -48,7 +48,7 @@ export async function sendEmail({
         emailType,
       });
     }
-    return;
+    return { success: false, error: "RESEND_API_KEY not configured" };
   }
 
   const from =
@@ -94,4 +94,9 @@ export async function sendEmail({
       status,
     });
   }
+
+  if (status === "SENT") {
+    return { success: true };
+  }
+  return { success: false, error: errorMessage };
 }

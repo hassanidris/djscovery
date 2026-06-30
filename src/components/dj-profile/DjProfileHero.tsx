@@ -11,7 +11,6 @@ import {
   Users,
   CalendarDays,
   UserPlus,
-  Share2,
   Star,
   Crown,
   CircleCheck,
@@ -24,6 +23,7 @@ import { SOCIAL_ICONS } from "./dj-profile-shared";
 import { ReputationBadge } from "./ReputationBadge";
 import { ScoreBreakdown } from "./ScoreBreakdown";
 import SaveDjButton from "./SaveDjButton";
+import { ShareButton } from "./ShareButton";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 
 type HeroVariant = "free" | "premium";
@@ -226,14 +226,7 @@ function DjProfileHero({
                 ) : null}
               </>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-gray-400 hover:text-white"
-              aria-label="Share"
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
+            <ShareButton />
           </div>
         </div>
 

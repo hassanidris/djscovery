@@ -215,6 +215,14 @@ enum EmailLogStatus {
   BOUNCED
 }
 
+enum ContactCategory {
+  GENERAL_ENQUIRY
+  SUPPORT
+  REPORT_A_PROBLEM
+  BUSINESS_PARTNERSHIPS
+  PRESS_MEDIA
+}
+
 // ============================================================
 // SECTION 1: MVP MODELS
 // ============================================================
@@ -1028,17 +1036,17 @@ model EmailLog {
 // ------ CONTACT SUBMISSIONS ------
 
 model ContactSubmission {
-  id        Int      @id @default(autoincrement())
+  id        Int             @id @default(autoincrement())
   name      String
   email     String
-  category  String
+  category  ContactCategory
   message   String
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
   ipAddress String?
   userAgent String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 
   @@index([userId])
   @@index([email])

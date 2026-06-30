@@ -74,7 +74,7 @@ export default function SaveDjButton({
       onClick={handleClick}
       disabled={isPending}
       aria-pressed={optimisticFollowing}
-      aria-label={optimisticFollowing ? "Unfollow DJ" : "Follow DJ"}
+      aria-label="Follow DJ"
       className={cn(
         "group flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60",
         "focus-visible:ring-h_red focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none",

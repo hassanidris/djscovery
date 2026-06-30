@@ -224,7 +224,7 @@ export default function DjProfilePremium({
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
-              stageName={DJ.stageName}
+              stageName={`Dj. ${DJ.stageName}`}
               bookingHref={bookingHref}
               variant="premium"
               layout="mobile"
@@ -745,7 +745,7 @@ export default function DjProfilePremium({
           <aside className="sticky top-28 flex h-fit flex-col gap-5">
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
-              stageName={DJ.stageName}
+              stageName={`Dj. ${DJ.stageName}`}
               bookingHref={bookingHref}
               variant="premium"
               layout="desktop"
@@ -755,7 +755,11 @@ export default function DjProfilePremium({
 
             {/* Events — desktop only; mobile version is inline above */}
             <div className="hidden lg:block">
-              <ProfileEventsSidebar events={EVENTS} djName={DJ.stageName} />
+              <ProfileEventsSidebar
+                events={EVENTS}
+                isOwner={isOwner}
+                djName={DJ.stageName}
+              />
             </div>
 
             <Separator className="bg-white/8" />
