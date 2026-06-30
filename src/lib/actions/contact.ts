@@ -108,7 +108,7 @@ export async function submitContactForm(
 
   const contactTo = process.env.RESEND_CONTACT_TO ?? "support@djcovery.com";
 
-  const [internalResult, autoReplyResult] = await Promise.all([
+  const [internalResult, autoReplyResult] = await Promise.allSettled([
     sendEmail({
       to: contactTo,
       emailType: "CONTACT_FORM_INTERNAL",
@@ -125,7 +125,10 @@ export async function submitContactForm(
     }),
   ]);
 
-  if (!internalResult.success || !autoReplyResult.success) {
+  if (
+    internalResult.status !== "fulfilled" ||
+    autoReplyResult.status !== "fulfilled"
+  ) {
     console.error("[contact] Email delivery failure:", {
       internal: internalResult,
       autoReply: autoReplyResult,
