@@ -87,10 +87,6 @@ export function BookCTA({
 }: Props) {
   const resolvedViewer = viewer ?? DEFAULT_VIEWER;
 
-  if (resolvedViewer.role === "dj-owner") {
-    return null;
-  }
-
   const ctx: BookingViewerContext = resolvedViewer;
 
   const countries = bookingOptions?.countries ?? [];
@@ -174,6 +170,10 @@ export function BookCTA({
   const isDesktop = layout === "desktop";
   const isOrganizer = ctx.role === "organizer" || ctx.role === "admin";
   const isDemoProfile = Number.isNaN(djProfileId) || djProfileId === undefined;
+
+  if (ctx.role === "dj-owner") {
+    return null;
+  }
 
   const messageLength = form.message.trim().length;
   const messageTooShort = messageLength < MIN_MESSAGE_LENGTH;
