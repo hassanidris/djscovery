@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/utils/currency";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "sonner";
-import { uploadDjCover } from "@/lib/actions/dj-upload";
 import {
   MapPin,
   Users,
@@ -34,10 +33,11 @@ import {
   BriefcaseBusiness,
   Pencil,
   ImageIcon,
-  Camera,
-  Loader2,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
+import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
+import { BookCTA } from "@/components/dj-profile/BookCTA";
+import { OwnerOnlySection } from "@/components/dj-profile/OwnerOnlySection";
 import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
@@ -147,32 +147,6 @@ export default function DjProfileFree({
 
   const isOwner = viewMode === "dj-owner";
   const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
-
-  const [coverUrl, setCoverUrl] = useState(DJ.coverImage);
-  const [isUploadingCover, setIsUploadingCover] = useState(false);
-  const coverInputRef = useRef<HTMLInputElement>(null);
-
-  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setIsUploadingCover(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const result = await uploadDjCover(fd);
-      if ("error" in result) {
-        toast.error(result.error);
-      } else {
-        setCoverUrl(result.url);
-        toast.success("Cover image updated");
-      }
-    } catch {
-      toast.error("Upload failed. Please try again.");
-    } finally {
-      setIsUploadingCover(false);
-      e.target.value = "";
-    }
-  }
   const bookingEmail = djData
     ? djData.booking.email
     : FREE_DEFAULT_DJ.bookingEmail;
@@ -194,211 +168,27 @@ export default function DjProfileFree({
 
   const completion = djData ? calculateProfileCompletion(djData) : null;
 
+  if (!djData) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <p className="text-gray-400">Loading profile...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black">
       {/* ── HERO ── */}
-      <section className="w-full">
-        <div className="relative h-64 w-full overflow-hidden md:h-96">
-          <Image
-            src={coverUrl}
-            alt="cover"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-          <div className="from-h_red/8 absolute inset-0 bg-linear-to-r to-transparent" />
-          {isOwner && (
-            <>
-              <button
-                type="button"
-                onClick={() => coverInputRef.current?.click()}
-                disabled={isUploadingCover}
-                className="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-lg bg-black/50 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-black/70 disabled:opacity-50"
-              >
-                {isUploadingCover ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Camera className="h-3.5 w-3.5" />
-                )}
-                Change Cover
-              </button>
-              <input
-                ref={coverInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={handleCoverChange}
-              />
-            </>
-          )}
-        </div>
-
-        <div className="mx-auto max-w-6xl px-4 md:px-8">
-          <div className="-mt-16 flex flex-col gap-4 pb-5 sm:-mt-14 sm:flex-row sm:items-end">
-            <div className="relative z-10 shrink-0">
-              <div className="ring-h_red h-28 w-28 overflow-hidden rounded-full ring-4 ring-offset-2 ring-offset-black sm:h-32 sm:w-32">
-                <Image
-                  src={DJ.avatar}
-                  alt={DJ.stageName}
-                  width={128}
-                  height={128}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </div>
-            <div className="z-10 min-w-0 flex-1 pt-1 sm:pb-2">
-              <h1 className="font-heading text-2xl font-bold tracking-tight text-white md:text-4xl">
-                Dj {DJ.stageName}
-              </h1>
-              <p className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-400">
-                <MapPin className="text-h_red h-3 w-3" /> {location}
-              </p>
-              {reputationScore !== undefined && (
-                <div className="mt-2">
-                  <ReputationBadge
-                    score={reputationScore}
-                    variant="subtle"
-                    showScore={false}
-                  />
-                </div>
-              )}
-              {isOwner && reputationDetail && (
-                <div className="mt-2">
-                  <ScoreBreakdown reputationDetail={reputationDetail} />
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-2 sm:pb-2">
-              {isOwner && djData?.slug ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-amber-500/50 text-amber-300 hover:bg-amber-500/10"
-                  asChild
-                >
-                  <Link href={editHref}>
-                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                    Edit Profile
-                  </Link>
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    className="bg-h_red hover:bg-h_redDark font-semibold text-white"
-                    asChild
-                  >
-                    <a href={bookingHref}>
-                      <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
-                      Book DJ
-                    </a>
-                  </Button>
-                  {viewMode === "fan" && djUserId ? (
-                    <FollowDjButton
-                      djUserId={djUserId}
-                      isFollowing={isFollowing}
-                    />
-                  ) : viewMode === "fan" ? (
-                    <Button
-                      variant="outline"
-                      className="border-white/20 text-gray-300 hover:bg-white/5"
-                    >
-                      <UserPlus className="mr-1.5 h-3.5 w-3.5" />
-                      Follow
-                    </Button>
-                  ) : null}
-                  {viewMode === "fan" && !isNaN(djProfileId) && (
-                    <SaveDjButton
-                      djProfileId={djProfileId}
-                      isFollowed={isFollowed}
-                    />
-                  )}
-                </>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-400 hover:text-white"
-                aria-label="Share"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Genres */}
-          <div className="mb-4 flex flex-wrap gap-2">
-            {DJ.genres.map((g) => (
-              <Badge
-                key={g}
-                className="bg-h_redDark/50 h-6 border-0 text-red-100"
-              >
-                {g}
-              </Badge>
-            ))}
-          </div>
-
-          {/* Social */}
-          <div className="mb-6 flex items-center gap-2">
-            {DJ.socialLinks.map((l) => {
-              const icon = SOCIAL_ICONS[l.platform];
-              if (!icon) return null;
-              return (
-                <a
-                  key={l.platform}
-                  href={l.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex size-9 items-center justify-center rounded-full border border-white/8 bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
-                >
-                  <FontAwesomeIcon icon={icon} className="h-4 w-4" />
-                </a>
-              );
-            })}
-          </div>
-
-          <Separator className="bg-white/10" />
-          <div className="grid grid-cols-3 py-5">
-            {[
-              {
-                val: formatNumber(DJ.followerCount),
-                label: "Followers",
-                icon: Users,
-              },
-              {
-                val: DJ.avgRating.toFixed(1),
-                label: `${DJ.ratingCount} reviews`,
-                icon: Star,
-              },
-              {
-                val: DJ.eventsCount.toString(),
-                label: "Events",
-                icon: CalendarDays,
-              },
-            ].map((s, i) => {
-              const SIcon = s.icon;
-              return (
-                <div
-                  key={i}
-                  className={cn(
-                    "flex flex-col items-center",
-                    i < 2 && "border-r border-white/10",
-                  )}
-                >
-                  <span className="text-2xl font-bold text-white">{s.val}</span>
-                  <span className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-                    <SIcon
-                      className={cn("h-3 w-3", i === 1 && "text-amber-400")}
-                    />
-                    {s.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          <Separator className="bg-white/10" />
-        </div>
-      </section>
+      <DjProfileHero
+        djData={djData}
+        viewMode={viewMode}
+        isFollowed={isFollowed}
+        djUserId={djUserId}
+        isFollowing={isFollowing}
+        reputationScore={reputationScore}
+        reputationDetail={reputationDetail}
+        variant="free"
+      />
 
       {/* ── PAGE BODY ── */}
       <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
@@ -406,35 +196,12 @@ export default function DjProfileFree({
           {/* Main Column */}
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── MOBILE BOOK CTA ── */}
-            <div className="lg:hidden">
-              <Card className="from-h_red/10 border-h_red/20 gap-0 bg-linear-to-b to-transparent p-5">
-                <h3 className="mb-1 text-sm font-semibold text-white">
-                  Book {DJ.stageName}
-                </h3>
-                <p className="mb-4 text-xs text-gray-400">
-                  For clubs, festivals, events &amp; more
-                </p>
-                <Button
-                  className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white"
-                  asChild
-                >
-                  <a href={bookingHref}>
-                    <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
-                    Book / Hire DJ
-                  </a>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full border-white/15 text-gray-300 hover:bg-white/5"
-                  asChild
-                >
-                  <a href={bookingHref}>
-                    <Mail className="mr-1.5 h-3.5 w-3.5" />
-                    Send Inquiry
-                  </a>
-                </Button>
-              </Card>
-            </div>
+            <BookCTA
+              stageName={`Dj. ${DJ.stageName}`}
+              bookingHref={bookingHref}
+              variant="free"
+              layout="mobile"
+            />
 
             <ProfileAbout
               bio={DJ.bio}
@@ -645,7 +412,11 @@ export default function DjProfileFree({
 
             {/* ── MOBILE EVENTS ── */}
             <div className="lg:hidden">
-              <ProfileEventsSidebar events={EVENTS} isOwner={isOwner} />
+              <ProfileEventsSidebar
+                events={EVENTS}
+                isOwner={isOwner}
+                djName={DJ.stageName}
+              />
             </div>
 
             <div className="lg:hidden">
@@ -659,123 +430,103 @@ export default function DjProfileFree({
             />
 
             {/* ── LOCKED PREMIUM TEASERS (DJ owner only) ── */}
-            {viewMode === "dj-owner" && (
-              <>
-                <Separator className="bg-white/8" />
-                <section>
-                  <div className="mb-5 flex items-center justify-between">
-                    <div>
-                      <h2 className="font-heading flex items-center gap-2 text-xl text-white">
-                        <Crown className="h-4 w-4 text-amber-400" />
-                        Unlock Premium Features
-                      </h2>
-                      <p className="mt-0.5 text-xs text-gray-500">
-                        Upgrade to share more and grow your bookings
-                      </p>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="shrink-0 bg-amber-500 text-xs font-semibold text-black hover:bg-amber-600"
-                    >
-                      Upgrade Now
-                    </Button>
+            <OwnerOnlySection viewMode={viewMode}>
+              <Separator className="bg-white/8" />
+              <section>
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <h2 className="font-heading flex items-center gap-2 text-xl text-white">
+                      <Crown className="h-4 w-4 text-amber-400" />
+                      Unlock Premium Features
+                    </h2>
+                    <p className="mt-0.5 text-xs text-gray-500">
+                      Upgrade to share more and grow your bookings
+                    </p>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {(
-                      [
-                        {
-                          title: "Performance Insights",
-                          desc: "Analytics, profile views & booking stats",
-                          icon: ChartLine,
-                        },
-                        {
-                          title: "Availability Calendar",
-                          desc: "Show your available & booked dates",
-                          icon: CalendarDays,
-                        },
-                        {
-                          title: "Booking Packages",
-                          desc: "Offer tailored packages to clients",
-                          icon: BriefcaseBusiness,
-                        },
-                        {
-                          title: "Career Highlights",
-                          desc: "Showcase your biggest achievements",
-                          icon: Trophy,
-                        },
-                        {
-                          title: "Industry Endorsements",
-                          desc: "Display testimonials from venues & promoters",
-                          icon: Star,
-                        },
-                        {
-                          title: "Press & Media",
-                          desc: "Link your features, interviews & podcasts",
-                          icon: Newspaper,
-                        },
-                      ] as const
-                    ).map((f) => {
-                      const FIcon = f.icon;
-                      return (
-                        <div
-                          key={f.title}
-                          className="flex items-center gap-3 rounded-lg border border-amber-500/15 bg-amber-500/5 p-3"
-                        >
-                          <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-amber-500/20 bg-amber-500/10">
-                            <FIcon className="h-3.5 w-3.5 text-amber-400" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-white">
-                              {f.title}
-                            </p>
-                            <p className="text-xs text-gray-500">{f.desc}</p>
-                          </div>
-                          <Lock className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+                  <Button
+                    asChild
+                    size="sm"
+                    className="shrink-0 bg-amber-500 text-xs font-semibold text-black hover:bg-amber-600"
+                  >
+                    <Link href="/djs/compare">Upgrade Now</Link>
+                  </Button>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(
+                    [
+                      {
+                        title: "Performance Insights",
+                        desc: "Analytics, profile views & booking stats",
+                        icon: ChartLine,
+                      },
+                      {
+                        title: "Availability Calendar",
+                        desc: "Show your available & booked dates",
+                        icon: CalendarDays,
+                      },
+                      {
+                        title: "Booking Packages",
+                        desc: "Offer tailored packages to clients",
+                        icon: BriefcaseBusiness,
+                      },
+                      {
+                        title: "Career Highlights",
+                        desc: "Showcase your biggest achievements",
+                        icon: Trophy,
+                      },
+                      {
+                        title: "Industry Endorsements",
+                        desc: "Display testimonials from venues & promoters",
+                        icon: Star,
+                      },
+                      {
+                        title: "Press & Media",
+                        desc: "Link your features, interviews & podcasts",
+                        icon: Newspaper,
+                      },
+                    ] as const
+                  ).map((f) => {
+                    const FIcon = f.icon;
+                    return (
+                      <div
+                        key={f.title}
+                        className="flex items-center gap-3 rounded-lg border border-amber-500/15 bg-amber-500/5 p-3"
+                      >
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-amber-500/20 bg-amber-500/10">
+                          <FIcon className="h-3.5 w-3.5 text-amber-400" />
                         </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              </>
-            )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-white">
+                            {f.title}
+                          </p>
+                          <p className="text-xs text-gray-500">{f.desc}</p>
+                        </div>
+                        <Lock className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            </OwnerOnlySection>
           </div>
 
           {/* ── SIDEBAR ── */}
           <aside className="sticky top-28 flex h-fit flex-col gap-5">
             {/* Book CTA — desktop only; mobile version is inline above */}
-            <div className="hidden lg:block">
-              <Card className="from-h_red/10 border-h_red/20 gap-0 bg-linear-to-b to-transparent p-5">
-                <h3 className="mb-1 text-sm font-semibold text-white">
-                  Book {DJ.stageName}
-                </h3>
-                <p className="mb-4 text-xs text-gray-400">
-                  For clubs, festivals, events & more
-                </p>
-                <Button
-                  className="bg-h_red hover:bg-h_redDark mb-2 w-full font-semibold text-white"
-                  asChild
-                >
-                  <a href={bookingHref}>
-                    <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
-                    Book / Hire DJ
-                  </a>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full border-white/15 text-gray-300 hover:bg-white/5"
-                  asChild
-                >
-                  <a href={bookingHref}>
-                    <Mail className="mr-1.5 h-3.5 w-3.5" />
-                    Send Inquiry
-                  </a>
-                </Button>
-              </Card>
-            </div>
+            <BookCTA
+              stageName={`Dj. ${DJ.stageName}`}
+              bookingHref={bookingHref}
+              variant="free"
+              layout="desktop"
+            />
 
             {/* Events — desktop only; mobile version is inline above */}
             <div className="hidden lg:block">
-              <ProfileEventsSidebar events={EVENTS} isOwner={isOwner} />
+              <ProfileEventsSidebar
+                events={EVENTS}
+                isOwner={isOwner}
+                djName={DJ.stageName}
+              />
             </div>
 
             <Separator className="bg-white/8" />

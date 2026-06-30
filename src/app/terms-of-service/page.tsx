@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ScrollText, Mail, Globe } from "lucide-react";
+import { ScrollText, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -127,12 +127,12 @@ export default function TermsOfServicePage() {
                 <div className="flex flex-col gap-4 text-gray-400">
                   <p>
                     You must be at least{" "}
-                    <span className="font-semibold text-white">18 years old</span>{" "}
+                    <span className="font-semibold text-white">
+                      18 years old
+                    </span>{" "}
                     to create an account and use DJcovery.
                   </p>
-                  <p>
-                    By using the Platform, you represent and warrant that:
-                  </p>
+                  <p>By using the Platform, you represent and warrant that:</p>
                   <PolicyList
                     items={[
                       "You are legally capable of entering into binding agreements.",
@@ -424,10 +424,7 @@ export default function TermsOfServicePage() {
 
               {/* 14 */}
               <section id="limitation-of-liability" className="scroll-mt-24">
-                <SectionHeading
-                  number={14}
-                  title="Limitation of Liability"
-                />
+                <SectionHeading number={14} title="Limitation of Liability" />
                 <div className="flex flex-col gap-4 text-gray-400">
                   <p>
                     To the maximum extent permitted by law, DJcovery shall not
@@ -487,8 +484,9 @@ export default function TermsOfServicePage() {
                 <div className="flex flex-col gap-4 text-gray-400">
                   <p>
                     We may update these Terms from time to time. When material
-                    changes are made, we will update the &quot;Last Updated&quot;
-                    date and may notify users through the Platform.
+                    changes are made, we will update the &quot;Last
+                    Updated&quot; date and may notify users through the
+                    Platform.
                   </p>
                   <InfoNote>
                     Continued use of DJcovery after changes become effective
@@ -520,36 +518,26 @@ export default function TermsOfServicePage() {
                     If you have questions regarding these Terms, please contact
                     us:
                   </p>
-                  <div className="rounded-2xl border border-white/8 bg-white/3 p-6">
-                    <p className="mb-5 text-lg font-semibold text-white">
-                      DJcovery
-                    </p>
-                    <div className="flex flex-col gap-4">
-                      <a
-                        href="mailto:legal@djcovery.com"
-                        className="hover:text-h_red group flex items-center gap-3 transition-colors"
-                      >
-                        <span className="bg-h_red/10 flex size-8 items-center justify-center rounded-lg">
-                          <Mail className="text-h_red h-4 w-4" />
-                        </span>
-                        <span className="text-sm">legal@djcovery.com</span>
-                      </a>
-                      <Link
-                        href="/"
-                        className="hover:text-h_red group flex items-center gap-3 transition-colors"
-                      >
-                        <span className="bg-h_red/10 flex size-8 items-center justify-center rounded-lg">
-                          <Globe className="text-h_red h-4 w-4" />
-                        </span>
-                        <span className="text-sm">djcovery.com</span>
-                      </Link>
+                  <Link
+                    href="/contact?category=General+enquiry"
+                    className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 p-6 transition-colors hover:border-white/10 hover:bg-white/5"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <p className="text-base font-semibold text-white">
+                        Get in touch
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Use our contact form — we typically reply within 1–2
+                        business days.
+                      </p>
                     </div>
-                  </div>
+                    <ArrowRight className="text-h_red h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
                 </div>
               </section>
 
               {/* Bottom acknowledgement + divider */}
-              <div className="border-t border-white/5 pt-6 flex flex-col gap-3">
+              <div className="flex flex-col gap-3 border-t border-white/5 pt-6">
                 <InfoNote>
                   By using DJcovery, you acknowledge that you have read,
                   understood, and agree to these Terms of Service.

@@ -14,6 +14,8 @@ interface SendEmailParams {
   emailType: EmailType;
   subject: string;
   html: string;
+  replyTo?: string;
+  from?: string;
 }
 
 export async function sendEmail({
@@ -22,7 +24,9 @@ export async function sendEmail({
   emailType,
   subject,
   html,
-}: SendEmailParams): Promise<void> {
+  replyTo,
+  from: fromOverride,
+}: SendEmailParams): Promise<{ success: boolean; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
     console.log(
       `[sendEmail] RESEND_API_KEY not set — skipping: ${emailType} → ${maskEmail(to)}`,
@@ -44,10 +48,11 @@ export async function sendEmail({
         emailType,
       });
     }
-    return;
+    return { success: false, error: "RESEND_API_KEY not configured" };
   }
 
-  const from = process.env.RESEND_FROM_EMAIL ?? "noreply@djcovery.com";
+  const from =
+    fromOverride ?? process.env.RESEND_FROM_EMAIL ?? "noreply@djcovery.com";
   let status: "SENT" | "FAILED" = "FAILED";
   let providerMessageId: string | undefined;
   let errorMessage: string | undefined;
@@ -58,6 +63,7 @@ export async function sendEmail({
       to,
       subject,
       html,
+      ...(replyTo ? { replyTo } : {}),
     });
     if (error) {
       errorMessage = error.message;
@@ -88,4 +94,9 @@ export async function sendEmail({
       status,
     });
   }
+
+  if (status === "SENT") {
+    return { success: true };
+  }
+  return { success: false, error: errorMessage };
 }

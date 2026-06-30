@@ -2,7 +2,7 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { UserPlus, UserMinus } from "lucide-react";
+import { UserPlus, UserMinus, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toggleFollowDj } from "@/lib/actions/saves";
 import { toast } from "sonner";
@@ -73,19 +73,35 @@ export default function SaveDjButton({
     <button
       onClick={handleClick}
       disabled={isPending}
+      aria-pressed={optimisticFollowing}
+      aria-label="Follow DJ"
       className={cn(
-        "flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60",
+        "group flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60",
+        "focus-visible:ring-h_red focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none",
         optimisticFollowing
-          ? "border-white/30 bg-white/10 text-white"
-          : "border-white/20 text-gray-300 hover:bg-white/5",
+          ? "border-white/30 bg-white/10 text-white hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400 focus-visible:border-red-500/40 focus-visible:bg-red-500/10 focus-visible:text-red-400"
+          : "bg-h_red hover:bg-h_redDark border-transparent text-white",
       )}
     >
       {optimisticFollowing ? (
-        <UserMinus className="h-3.5 w-3.5" />
+        <>
+          {/* Default state: "Following" */}
+          <span className="flex items-center gap-1.5 group-hover:hidden group-focus-visible:hidden">
+            <UserCheck className="h-3.5 w-3.5" />
+            Following
+          </span>
+          {/* Hover/focus state: "Unfollow" */}
+          <span className="hidden items-center gap-1.5 group-hover:flex group-focus-visible:flex">
+            <UserMinus className="h-3.5 w-3.5" />
+            Unfollow
+          </span>
+        </>
       ) : (
-        <UserPlus className="h-3.5 w-3.5" />
+        <>
+          <UserPlus className="h-3.5 w-3.5" />
+          Follow
+        </>
       )}
-      {optimisticFollowing ? "Following" : "Follow"}
     </button>
   );
 }
