@@ -93,7 +93,7 @@ import {
   buildCalendarFromData,
   getCalendarMonthLabel,
 } from "@/lib/dj-profile-mappers";
-import type { BookingViewerContext } from "@/types/booking";
+import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 
 function StatPill({
   value,
@@ -129,6 +129,7 @@ export default function DjProfilePremium({
   reputationDetail,
   status,
   viewerContext,
+  bookingOptions,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
@@ -147,6 +148,7 @@ export default function DjProfilePremium({
   } | null;
   status?: string;
   viewerContext?: BookingViewerContext;
+  bookingOptions?: BookingFormOptions;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -231,6 +233,7 @@ export default function DjProfilePremium({
               layout="mobile"
               responseRate={DJ.responseRate}
               bookingSuccessRate={DJ.bookingSuccessRate}
+              bookingOptions={bookingOptions}
             />
 
             <ProfileAbout
@@ -755,6 +758,7 @@ export default function DjProfilePremium({
               layout="desktop"
               responseRate={DJ.responseRate}
               bookingSuccessRate={DJ.bookingSuccessRate}
+              bookingOptions={bookingOptions}
             />
 
             {/* Events — desktop only; mobile version is inline above */}

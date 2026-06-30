@@ -8,7 +8,8 @@ import { isFollowingDj } from "@/lib/actions/saves";
 import { isFollowing } from "@/lib/actions";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
-import type { BookingViewerContext } from "@/types/booking";
+import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
+import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
 
 export default async function DjProfilePage({
   params,
@@ -143,6 +144,13 @@ export default async function DjProfilePage({
     isAuthenticated: false,
   };
 
+  let bookingOptions: BookingFormOptions = {
+    countries: await prisma.country.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  };
+
   if (authUser) {
     const [roleRows, organizerProfile] = await Promise.all([
       prisma.userRole.findMany({
@@ -151,7 +159,12 @@ export default async function DjProfilePage({
       }),
       prisma.organizerProfile.findUnique({
         where: { userId: authUser.id },
-        select: { displayName: true, contactEmail: true },
+        select: {
+          displayName: true,
+          contactEmail: true,
+          countryId: true,
+          cityId: true,
+        },
       }),
     ]);
 
@@ -167,6 +180,21 @@ export default async function DjProfilePage({
       organizerDisplayName: organizerProfile?.displayName ?? undefined,
       organizerContactEmail: organizerProfile?.contactEmail ?? undefined,
     };
+
+    if (organizerProfile?.countryId && organizerProfile?.cityId) {
+      const [initialCities, initialVenues] = await Promise.all([
+        getCitiesForCountry(organizerProfile.countryId),
+        getVenuesForCity(organizerProfile.cityId),
+      ]);
+
+      bookingOptions = {
+        ...bookingOptions,
+        initialCities,
+        initialVenues,
+        defaultCountryId: organizerProfile.countryId,
+        defaultCityId: organizerProfile.cityId,
+      };
+    }
   }
 
   const djPlan = dj.plan;
@@ -312,6 +340,7 @@ export default async function DjProfilePage({
           reputationDetail={dj.reputationDetail}
           status={dj.status}
           viewerContext={viewerContext}
+          bookingOptions={bookingOptions}
         />
       ) : (
         <DjProfileFree
@@ -323,6 +352,7 @@ export default async function DjProfilePage({
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
           viewerContext={viewerContext}
+          bookingOptions={bookingOptions}
         />
       )}
     </div>

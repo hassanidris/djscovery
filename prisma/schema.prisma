@@ -10,14 +10,21 @@ model BookingInquiry {
   eventName         String
   eventDate         DateTime?
   venue             String?
-  city              String?
+  countryName       String?
+  cityName          String?
   crowdSize         Int?
+  budgetType        BudgetType           @default(NEGOTIABLE)
   budgetMin         Int?
   budgetMax         Int?
   budgetCurrency    String?              @db.VarChar(10)
   message           String
   contactReleasedAt DateTime?
   lastRespondedAt   DateTime?
+
+  countryId Int?
+  country   Country? @relation(fields: [countryId], references: [id])
+  cityId    Int?
+  city      City?    @relation(fields: [cityId], references: [id])
 
   djProfileId Int
   djProfile   DjProfile @relation("DjProfileBookingInquiries", fields: [djProfileId], references: [id], onDelete: Cascade)
@@ -309,6 +316,7 @@ model Country {
   events            Event[]
   gigs              Gig[]
   fanProfiles       FanProfile[]
+  bookingInquiries  BookingInquiry[]
 
   @@index([name])
 }
@@ -324,6 +332,7 @@ model City {
   events            Event[]
   gigs              Gig[]
   fanProfiles       FanProfile[]
+  bookingInquiries  BookingInquiry[]
 
   @@unique([name, countryId])
   @@index([countryId])

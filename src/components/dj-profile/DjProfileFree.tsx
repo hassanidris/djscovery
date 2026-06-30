@@ -70,7 +70,7 @@ import {
   mapFreeFeaturedMix,
 } from "@/lib/dj-profile-mappers";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
-import type { BookingViewerContext } from "@/types/booking";
+import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 
 function EmptySectionState({
   icon: Icon,
@@ -112,6 +112,7 @@ export default function DjProfileFree({
   reputationScore,
   reputationDetail,
   viewerContext,
+  bookingOptions,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
@@ -129,6 +130,7 @@ export default function DjProfileFree({
     newTalentBoost: number;
   } | null;
   viewerContext?: BookingViewerContext;
+  bookingOptions?: BookingFormOptions;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -198,6 +200,7 @@ export default function DjProfileFree({
               viewer={bookingContext}
               variant="free"
               layout="mobile"
+              bookingOptions={bookingOptions}
             />
 
             <ProfileAbout
@@ -516,6 +519,7 @@ export default function DjProfileFree({
               viewer={bookingContext}
               variant="free"
               layout="desktop"
+              bookingOptions={bookingOptions}
             />
 
             {/* Events — desktop only; mobile version is inline above */}

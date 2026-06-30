@@ -7,18 +7,21 @@ export function bookingInquiryReceivedHtml({
   organizerName,
   eventName,
   eventDate,
+  location,
   ctaUrl,
 }: {
   djName: string;
   organizerName: string;
   eventName: string;
   eventDate?: string | null;
+  location?: string | null;
   ctaUrl: string;
 }): string {
   const safeDj = escapeHtml(djName);
   const safeOrganizer = escapeHtml(organizerName);
   const safeEvent = escapeHtml(eventName);
   const safeDate = eventDate ? escapeHtml(eventDate) : null;
+  const safeLocation = location ? escapeHtml(location) : null;
 
   return baseLayout(`
     <h1 style="color:#ffffff;font-size:24px;font-weight:700;margin:0 0 12px;">
@@ -32,6 +35,13 @@ export function bookingInquiryReceivedHtml({
       safeDate
         ? `<p style="color:#9ca3af;font-size:15px;line-height:1.7;margin:0 0 18px;">
             Requested date: <strong style="color:#d1d5db;">${safeDate}</strong>
+          </p>`
+        : ""
+    }
+    ${
+      safeLocation
+        ? `<p style="color:#9ca3af;font-size:15px;line-height:1.7;margin:0 0 18px;">
+            Location: <strong style="color:#d1d5db;">${safeLocation}</strong>
           </p>`
         : ""
     }

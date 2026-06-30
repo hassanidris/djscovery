@@ -75,7 +75,7 @@ export default async function OrganizerBookingsPage() {
         ? new Date(inquiry.eventDate).toISOString()
         : null,
       venue: inquiry.venue,
-      city: inquiry.city,
+      city: [inquiry.cityName, inquiry.countryName].filter(Boolean).join(", "),
       createdAt: inquiry.createdAt.toISOString(),
       lastRespondedAt: inquiry.lastRespondedAt
         ? inquiry.lastRespondedAt.toISOString()

@@ -29,46 +29,69 @@ export type ActionResult<T = undefined> =
 type BookingInquiryStatus = "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
 type BookingInquiryParticipantRole = "DJ" | "ORGANIZER";
 
+const BUDGET_TYPES = ["FIXED", "RANGE", "NEGOTIABLE", "TBA"] as const;
+const budgetTypeSchema = z.enum(BUDGET_TYPES);
+
 const submitBookingInquirySchema = z
   .object({
     djProfileId: z.number().int().positive(),
     eventName: z.string().trim().min(3).max(80),
-    eventDate: z
-      .union([z.date(), z.string().trim().min(4), z.null()])
-      .optional(),
-    venue: z.string().trim().max(120).optional().nullable(),
-    city: z.string().trim().max(120).optional().nullable(),
-    crowdSize: z.number().int().positive().max(200000).optional().nullable(),
-    budgetMin: z
-      .number()
-      .int()
-      .nonnegative()
-      .max(1_000_000)
-      .optional()
-      .nullable(),
-    budgetMax: z
-      .number()
-      .int()
-      .nonnegative()
-      .max(1_000_000)
-      .optional()
-      .nullable(),
-    budgetCurrency: z.string().trim().min(2).max(10).optional().nullable(),
-    message: z.string().trim().min(30).max(1500),
+    eventDate: z.string().trim().min(4),
+    venue: z.string().trim().min(2).max(120),
+    countryId: z.number().int().positive(),
+    cityId: z.number().int().positive(),
+    crowdSize: z.number().int().positive().max(200000),
+    budgetType: budgetTypeSchema,
+    budgetMin: z.number().int().nonnegative().max(1_000_000).nullable(),
+    budgetMax: z.number().int().nonnegative().max(1_000_000).nullable(),
+    budgetCurrency: z.string().trim().min(2).max(10),
+    message: z.string().trim().min(50).max(1500),
   })
   .superRefine((value, ctx) => {
-    if (
-      value.budgetMin !== null &&
-      value.budgetMin !== undefined &&
-      value.budgetMax !== null &&
-      value.budgetMax !== undefined &&
-      value.budgetMax < value.budgetMin
-    ) {
+    const eventDate = new Date(value.eventDate);
+    if (Number.isNaN(eventDate.getTime())) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Budget max must be greater than or equal to budget min.",
-        path: ["budgetMax"],
+        message: "Event date is invalid.",
+        path: ["eventDate"],
       });
+    }
+
+    if (value.budgetType === "FIXED") {
+      if (value.budgetMin === null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Fixed budget amount is required.",
+          path: ["budgetMin"],
+        });
+      }
+    }
+
+    if (value.budgetType === "RANGE") {
+      if (value.budgetMin === null || value.budgetMax === null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Provide both minimum and maximum amounts for range budgets.",
+          path: value.budgetMin === null ? ["budgetMin"] : ["budgetMax"],
+        });
+      } else if (value.budgetMax < value.budgetMin) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Budget max must be greater than or equal to budget min.",
+          path: ["budgetMax"],
+        });
+      }
+    }
+
+    if (value.budgetType === "NEGOTIABLE" || value.budgetType === "TBA") {
+      if (value.budgetMin !== null || value.budgetMax !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Do not provide amounts for negotiable or TBA budgets.",
+          path: value.budgetMin !== null ? ["budgetMin"] : ["budgetMax"],
+        });
+      }
     }
   });
 
@@ -203,7 +226,61 @@ export async function submitBookingInquiry(
     return { success: false, error: message };
   }
 
-  const eventDate = formatDateLabel(payload.eventDate ?? null);
+  const eventDateValue = new Date(payload.eventDate);
+  const eventDateLabel = formatDateLabel(eventDateValue);
+
+  const cityRecord = await prisma.city.findUnique({
+    where: { id: payload.cityId },
+    select: {
+      id: true,
+      name: true,
+      countryId: true,
+      country: { select: { id: true, name: true } },
+    },
+  });
+
+  if (!cityRecord) {
+    return {
+      success: false,
+      error:
+        "Selected city is no longer available. Please refresh and try again.",
+    };
+  }
+
+  if (cityRecord.countryId !== payload.countryId) {
+    return {
+      success: false,
+      error: "City does not belong to the selected country.",
+    };
+  }
+
+  const countryRecord =
+    cityRecord.country ??
+    (await prisma.country.findUnique({
+      where: { id: payload.countryId },
+      select: { id: true, name: true },
+    }));
+
+  if (!countryRecord) {
+    return {
+      success: false,
+      error: "Selected country is no longer available.",
+    };
+  }
+
+  let budgetMin = payload.budgetMin;
+  let budgetMax = payload.budgetMax;
+
+  if (payload.budgetType === "FIXED") {
+    budgetMax = budgetMin;
+  }
+
+  if (payload.budgetType === "NEGOTIABLE" || payload.budgetType === "TBA") {
+    budgetMin = null;
+    budgetMax = null;
+  }
+
+  const budgetCurrency = payload.budgetCurrency || "SEK";
 
   const djProfile = await getDjProfileForInquiry(payload.djProfileId);
   if (!djProfile) {
@@ -248,18 +325,17 @@ export async function submitBookingInquiry(
         djProfileId: payload.djProfileId,
         organizerId: user.id,
         eventName: payload.eventName,
-        eventDate:
-          payload.eventDate instanceof Date
-            ? payload.eventDate
-            : payload.eventDate
-              ? new Date(payload.eventDate)
-              : null,
-        venue: payload.venue ?? null,
-        city: payload.city ?? null,
-        crowdSize: payload.crowdSize ?? null,
-        budgetMin: payload.budgetMin ?? null,
-        budgetMax: payload.budgetMax ?? null,
-        budgetCurrency: payload.budgetCurrency?.toUpperCase() ?? null,
+        eventDate: eventDateValue,
+        venue: payload.venue,
+        countryId: countryRecord.id,
+        countryName: countryRecord.name,
+        cityId: cityRecord.id,
+        cityName: cityRecord.name,
+        crowdSize: payload.crowdSize,
+        budgetType: payload.budgetType,
+        budgetMin,
+        budgetMax,
+        budgetCurrency: budgetCurrency.toUpperCase(),
         message: payload.message,
       },
     });
@@ -281,6 +357,8 @@ export async function submitBookingInquiry(
         data: {
           inquiryId: createdInquiry.id,
           eventName: payload.eventName,
+          cityName: cityRecord.name,
+          countryName: countryRecord.name,
           organizerName: organizerProfile.displayName,
           stageName: djProfile.stageName,
         },
@@ -305,7 +383,10 @@ export async function submitBookingInquiry(
         djName: djProfile.stageName,
         organizerName,
         eventName: payload.eventName,
-        eventDate,
+        eventDate: eventDateLabel,
+        location: [cityRecord.name, countryRecord.name]
+          .filter(Boolean)
+          .join(", "),
         ctaUrl: `${BASE_URL}/dashboard/dj/bookings?inquiry=${createdInquiry.id}`,
       }),
     });
@@ -346,6 +427,8 @@ export async function respondToBookingInquiry(
           user: { select: { id: true, email: true, name: true } },
         },
       },
+      country: { select: { id: true, name: true } },
+      city: { select: { id: true, name: true } },
       organizer: {
         select: {
           id: true,
@@ -469,6 +552,8 @@ export async function sendBookingInquiryMessage(
           user: { select: { id: true, email: true, name: true } },
         },
       },
+      country: { select: { id: true, name: true } },
+      city: { select: { id: true, name: true } },
       organizer: {
         select: {
           id: true,
@@ -558,6 +643,7 @@ export async function sendBookingInquiryMessage(
         data: {
           inquiryId: inquiry.id,
           eventName: inquiry.eventName,
+          cityName: inquiry.cityName,
           senderRole,
           senderName,
         },
