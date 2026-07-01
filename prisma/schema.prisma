@@ -449,6 +449,33 @@ model DjProfile {
 
   reputationScore Int @default(0) // 0-1000, denormalized for fast search
 
+  // Premium: Team contacts
+  managerName  String?
+  managerEmail String?
+  managerPhone String?
+  agentName    String?
+  agentAgency  String?
+  agentEmail   String?
+
+  // Premium: Availability calendar
+  availabilityTimezone String?
+  availabilityMonth    String? // e.g. "2025-09"
+  availabilityDays     Json? // [{day: 1, status: "available"}, ...]
+
+  // Premium: Spotlight
+  featuredMixTitle       String?
+  featuredMixAudioUrl    String?
+  featuredMixDuration    String?
+  featuredMixPlays       Int     @default(0)
+  featuredVideoTitle     String?
+  featuredVideoUrl       String?
+  featuredVideoThumbnail String?
+  featuredVideoDuration  String?
+  featuredVideoViews     Int     @default(0)
+
+  // Premium: Analytics (denormalized)
+  monthlyViews Int @default(0)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -460,13 +487,18 @@ model DjProfile {
   comments         DjComment[]
   media            Media[]
   events           EventDj[]
-  eventsOwned      Event[]          @relation("EventOwner")
+  eventsOwned      Event[]             @relation("EventOwner")
   gigApplications  GigApplication[]
   followers        DjFollow[]
   gigReviews       GigReview[]
   eventReviews     EventReview[]
   reputationDetail ReputationScore?
-  bookingInquiries BookingInquiry[] @relation("DjProfileBookingInquiries")
+  bookingInquiries BookingInquiry[]    @relation("DjProfileBookingInquiries")
+  packages         DjPackage[]
+  highlights       DjCareerHighlight[]
+  endorsements     DjEndorsement[]
+  pressItems       DjPress[]
+  profileViews     ProfileView[]
 
   @@index([slug])
   @@index([status])
@@ -476,6 +508,100 @@ model DjProfile {
   @@index([searchScore])
   @@index([countryId])
   @@index([cityId])
+}
+
+// ------ DJ PREMIUM: PACKAGES ------
+
+model DjPackage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  priceFrom Int
+  priceTo   Int?
+  currency  String   @default("USD")
+  duration  String?
+  features  String[]
+  popular   Boolean  @default(false)
+  sortOrder Int      @default(0)
+
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([djProfileId])
+}
+
+// ------ DJ PREMIUM: CAREER HIGHLIGHTS ------
+
+model DjCareerHighlight {
+  id          Int     @id @default(autoincrement())
+  year        String
+  title       String
+  description String?
+
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([djProfileId])
+}
+
+// ------ DJ PREMIUM: ENDORSEMENTS ------
+
+model DjEndorsement {
+  id      Int     @id @default(autoincrement())
+  name    String
+  role    String
+  company String?
+  quote   String
+  avatar  String?
+
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([djProfileId])
+}
+
+// ------ DJ PREMIUM: PRESS & MEDIA ------
+
+model DjPress {
+  id     Int     @id @default(autoincrement())
+  source String
+  type   String // Feature, Interview, Podcast
+  title  String
+  date   String?
+  url    String?
+
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([djProfileId])
+}
+
+// ------ DJ ANALYTICS: PROFILE VIEWS ------
+
+model ProfileView {
+  id       Int     @id @default(autoincrement())
+  viewerId String? // user id if logged in
+  viewerIp String?
+  source   String? // direct, search, social, referral
+  city     String?
+  country  String?
+
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([djProfileId])
+  @@index([createdAt])
+  @@index([viewerId])
 }
 
 // ------ ORGANIZER PROFILE ------
@@ -765,8 +891,9 @@ model Event {
   venue       String?
   startDate   DateTime
   endDate     DateTime?
-  startTime   String? // e.g. "22:00" — stored as string to avoid TZ complexity
+  startTime   String? // e.g. "22:00" — local to event timezone
   endTime     String? // e.g. "05:00"
+  timezone    String? // e.g. "Europe/Stockholm"
   ticketUrl   String? // PUBLIC events only
   recap       String? // Post-event write-up (unlocked after COMPLETED)
   audioLink   String? // External URL: SoundCloud / Mixcloud

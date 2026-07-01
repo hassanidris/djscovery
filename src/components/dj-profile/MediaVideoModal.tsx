@@ -18,6 +18,7 @@ type VideoEmbedInfo = {
   provider: VideoProvider;
   embedUrl: string | null;
   iframeAllow?: string;
+  videoId?: string;
 };
 
 const PROVIDER_LABELS: Record<VideoProvider, string> = {
@@ -47,6 +48,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
           provider: "youtube",
           embedUrl: `https://www.youtube.com/embed/${videoId}`,
           iframeAllow: "autoplay; encrypted-media; fullscreen",
+          videoId,
         };
       }
     }
@@ -64,6 +66,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
           provider: "youtube",
           embedUrl: `https://www.youtube.com/embed/${videoId}`,
           iframeAllow: "autoplay; encrypted-media; fullscreen",
+          videoId,
         };
       }
     }
@@ -78,6 +81,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
           provider: "vimeo",
           embedUrl: `https://player.vimeo.com/video/${numericSegment}`,
           iframeAllow: "autoplay; fullscreen; picture-in-picture",
+          videoId: numericSegment,
         };
       }
     }
@@ -128,6 +132,29 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
   return { provider: "unknown", embedUrl: null };
 }
 
+function buildEmbedUrl(info: VideoEmbedInfo): string | null {
+  if (!info.embedUrl) return null;
+
+  if (info.provider === "youtube") {
+    // Minimal chrome: small logo, no related videos, no annotations, inline mobile playback
+    return `${info.embedUrl}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1`;
+  }
+
+  if (info.provider === "vimeo") {
+    // Remove title, byline, portrait and disable tracking
+    return `${info.embedUrl}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`;
+  }
+
+  return info.embedUrl;
+}
+
+function getVideoThumbnailUrl(info: VideoEmbedInfo): string | null {
+  if (info.provider === "youtube" && info.videoId) {
+    return `https://img.youtube.com/vi/${info.videoId}/maxresdefault.jpg`;
+  }
+  return null;
+}
+
 type Props = {
   videoUrl: string;
   thumbnail: string;
@@ -144,6 +171,8 @@ export default function MediaVideoModal({
   const [open, setOpen] = useState(false);
   const embedInfo = getVideoEmbedInfo(videoUrl);
   const providerLabel = PROVIDER_LABELS[embedInfo.provider];
+  const autoThumbnail = getVideoThumbnailUrl(embedInfo);
+  const effectiveThumbnail = thumbnail || autoThumbnail || "/noCover.png";
 
   return (
     <>
@@ -184,12 +213,7 @@ export default function MediaVideoModal({
             <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
               {embedInfo.embedUrl ? (
                 <iframe
-                  src={
-                    embedInfo.provider === "youtube" ||
-                    embedInfo.provider === "vimeo"
-                      ? `${embedInfo.embedUrl}?autoplay=1`
-                      : embedInfo.embedUrl
-                  }
+                  src={buildEmbedUrl(embedInfo) ?? embedInfo.embedUrl}
                   title={title}
                   allow={
                     embedInfo.iframeAllow ??
@@ -201,7 +225,7 @@ export default function MediaVideoModal({
               ) : (
                 <>
                   <Image
-                    src={thumbnail}
+                    src={effectiveThumbnail}
                     alt={title}
                     fill
                     className="object-cover opacity-40"

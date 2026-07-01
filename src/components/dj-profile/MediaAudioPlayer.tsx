@@ -1,15 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 
 type Props = {
   audioUrl: string;
   title: string;
+  thumbnailUrl?: string;
   children: React.ReactNode;
 };
 
-export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
+export default function MediaAudioPlayer({
+  audioUrl,
+  title,
+  thumbnailUrl,
+  children,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   let isSoundCloud = false;
@@ -39,30 +46,42 @@ export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
             setOpen(true);
           }
         }}
-        className="cursor-pointer h-full"
+        className="h-full cursor-pointer"
       >
         {children}
       </div>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/88"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/88 p-4 sm:items-center"
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-xl bg-[#111] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
+            className="w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-[#111] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
-              <p className="text-white text-sm font-semibold truncate flex-1 mr-4">
-                {title}
-              </p>
+            <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                {thumbnailUrl && (
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md">
+                    <Image
+                      src={thumbnailUrl}
+                      alt={title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                <p className="truncate text-sm font-semibold text-white">
+                  {title}
+                </p>
+              </div>
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close audio player"
-                className="size-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0"
+                className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
@@ -76,11 +95,11 @@ export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
                   allow="autoplay"
                   src={embedUrl}
                   title={title}
-                  className="rounded-lg w-full"
+                  className="w-full rounded-lg"
                 />
               ) : (
-                <div className="text-center py-6">
-                  <p className="text-gray-400 text-sm mb-3">
+                <div className="py-6 text-center">
+                  <p className="mb-3 text-sm text-gray-400">
                     This track is hosted on an external platform.
                   </p>
                   <a

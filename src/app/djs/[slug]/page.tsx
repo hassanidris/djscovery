@@ -4,6 +4,7 @@ import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
+import { ProfileViewTracker } from "@/components/dj-profile/ProfileViewTracker";
 import { isFollowingDj } from "@/lib/actions/saves";
 import { isFollowing } from "@/lib/actions";
 import { getDemodjBySlug } from "@/data/djs";
@@ -37,6 +38,8 @@ export default async function DjProfilePage({
   }
 
   if (slug === "demo-premium") {
+    const demoDj = getDemodjBySlug("amara-pulse");
+    if (!demoDj) return notFound();
     return (
       <div>
         <div className="flex items-center justify-center gap-4 border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium tracking-wide text-amber-300">
@@ -49,7 +52,7 @@ export default async function DjProfilePage({
             ← Switch to Free Version
           </Link>
         </div>
-        <DjProfilePremium />
+        <DjProfilePremium djData={demoDj} viewMode="fan" status="APPROVED" />
       </div>
     );
   }
@@ -87,10 +90,13 @@ export default async function DjProfilePage({
         },
       },
       media: {
-        where: { type: "IMAGE" },
-        take: 24,
+        take: 50,
         orderBy: { createdAt: "desc" },
       },
+      packages: true,
+      highlights: true,
+      endorsements: true,
+      pressItems: true,
       eventsOwned: {
         where: { status: { in: ["PUBLISHED", "COMPLETED"] }, deletedAt: null },
         take: 15,
@@ -115,6 +121,8 @@ export default async function DjProfilePage({
     return notFound();
 
   if (dj.hidden && authUser?.id !== dj.userId) return notFound();
+
+  // Profile view tracking moved to client-side to avoid firing during prefetch/re-renders
 
   // Accurate aggregates: avg rating over ALL ratings (not just the fetched 20),
   // and event count limited to publicly visible events (matches the list shown).
@@ -223,11 +231,11 @@ export default async function DjProfilePage({
       country: dj.country?.name ?? "",
     },
     avatar: {
-      url: dj.avatar ?? "/noAvatar.png",
+      url: dj.avatar || "/noAvatar.png",
       alt: dj.stageName,
     },
     coverImage: {
-      url: dj.coverImage ?? "/noCover.png",
+      url: dj.coverImage || "/noCover.png",
       alt: `${dj.stageName} cover`,
     },
     genres: dj.genres.map((g) => g.genre.name),
@@ -242,28 +250,28 @@ export default async function DjProfilePage({
       events: publicEventsCount,
       responseRate: 0,
       bookingRate: 0,
-      monthlyViews: 0,
+      monthlyViews: dj.monthlyViews ?? 0,
     },
     spotlight: {
       featuredMix: {
-        title: "",
-        duration: "",
-        plays: 0,
+        title: dj.featuredMixTitle ?? "",
+        duration: dj.featuredMixDuration ?? "",
+        plays: dj.featuredMixPlays ?? 0,
         genres: [],
-        audioUrl: "",
-        coverImage: dj.coverImage ?? "/noCover.png",
+        audioUrl: dj.featuredMixAudioUrl ?? "",
+        coverImage: dj.coverImage || "/noCover.png",
       },
       featuredVideo: {
-        title: "",
+        title: dj.featuredVideoTitle ?? "",
         subtitle: "",
-        duration: "",
-        views: 0,
-        thumbnail: dj.coverImage ?? "/noCover.png",
-        videoUrl: "",
+        duration: dj.featuredVideoDuration ?? "",
+        views: dj.featuredVideoViews ?? 0,
+        thumbnail: dj.featuredVideoThumbnail || dj.coverImage || "/noCover.png",
+        videoUrl: dj.featuredVideoUrl ?? "",
       },
     },
     analytics: {
-      profileViews: { value: 0, growth: 0 },
+      profileViews: { value: dj.monthlyViews ?? 0, growth: 0 },
       bookingRequests: { value: 0, growth: 0 },
       newFollowers: { value: 0, growth: 0 },
       bookingRate: 0,
@@ -272,23 +280,70 @@ export default async function DjProfilePage({
       trafficSources: [],
     },
     availability: {
-      timezone: "",
-      month: "",
-      availableDays: [],
-      bookedDays: [],
-      tentativeDays: [],
+      timezone: dj.availabilityTimezone ?? "",
+      month: dj.availabilityMonth ?? "",
+      availableDays:
+        (
+          dj.availabilityDays as Array<{
+            day: number;
+            status: string;
+          }> | null
+        )
+          ?.filter((d) => d.status === "available")
+          .map((d) => d.day) ?? [],
+      bookedDays:
+        (
+          dj.availabilityDays as Array<{
+            day: number;
+            status: string;
+          }> | null
+        )
+          ?.filter((d) => d.status === "booked")
+          .map((d) => d.day) ?? [],
+      tentativeDays:
+        (
+          dj.availabilityDays as Array<{
+            day: number;
+            status: string;
+          }> | null
+        )
+          ?.filter((d) => d.status === "tentative")
+          .map((d) => d.day) ?? [],
     },
-    packages: [],
+    packages: dj.packages.map((p) => ({
+      name: p.name,
+      priceFrom: p.priceFrom,
+      currency: p.currency,
+      features: p.features,
+      popular: p.popular,
+    })),
     bio: dj.bio ?? "",
     specialties: dj.djTypes.map((t) => t.type),
     media: {
-      photos: dj.media.map((m) => m.url),
-      videos: [],
-      mixes: [],
+      photos: dj.media.filter((m) => m.type === "IMAGE").map((m) => m.url),
+      videos: dj.media
+        .filter((m) => m.type === "VIDEO")
+        .map((m) => ({ title: "", url: m.url })),
+      mixes: dj.media
+        .filter((m) => m.type === "AUDIO")
+        .map((m) => ({ title: "", url: m.url })),
     },
-    careerHighlights: [],
-    endorsements: [],
-    press: [],
+    careerHighlights: dj.highlights.map((h) => ({
+      title: h.title,
+      year: parseInt(h.year, 10),
+    })),
+    endorsements: dj.endorsements.map((e) => ({
+      name: e.name,
+      role: e.role,
+      company: e.company ?? "",
+      quote: e.quote,
+    })),
+    press: dj.pressItems.map((p) => ({
+      source: p.source,
+      type: p.type,
+      title: p.title,
+      date: p.date ?? "",
+    })),
     venuesPlayed: dj.eventsOwned.map((e) => ({
       venue: e.venue ?? e.title,
       city: e.city?.name ?? "",
@@ -301,8 +356,12 @@ export default async function DjProfilePage({
       comment: r.review ?? "",
     })),
     team: {
-      manager: { name: "", email: "" },
-      bookingAgent: { name: "", agency: "", email: "" },
+      manager: { name: dj.managerName ?? "", email: dj.managerEmail ?? "" },
+      bookingAgent: {
+        name: dj.agentName ?? "",
+        agency: dj.agentAgency ?? "",
+        email: dj.agentEmail ?? "",
+      },
     },
     booking: {
       email: djBookingEmail,
@@ -324,6 +383,11 @@ export default async function DjProfilePage({
 
   return (
     <div>
+      <ProfileViewTracker
+        djProfileId={dj.id}
+        status={dj.status}
+        hidden={dj.hidden}
+      />
       {dj.status === "PENDING_APPROVAL" && (
         <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-center text-sm text-amber-400">
           ⏳ Your profile is pending admin approval and is only visible to you.

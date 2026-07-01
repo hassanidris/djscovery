@@ -8,6 +8,7 @@ import {
   AudioLines,
   ShieldCheck,
   Handshake,
+  BarChart3,
 } from "lucide-react";
 
 export type NavRole = "guest" | "fan" | "dj" | "organizer" | "admin";
@@ -41,6 +42,13 @@ const djBookings: NavItem = {
   label: "Bookings",
   href: "/dashboard/dj/bookings",
   icon: Handshake,
+};
+
+const djAnalytics: NavItem = {
+  id: "analytics",
+  label: "Analytics",
+  href: "/dashboard/dj/analytics",
+  icon: BarChart3,
 };
 
 const orgGigs: NavItem = {
@@ -88,7 +96,7 @@ const adminPanel: NavItem = {
 export const desktopNavByRole: Record<NavRole, NavItem[]> = {
   guest: [directory, events],
   fan: [directory, events],
-  dj: [directory, djBookings, djGigs, events],
+  dj: [directory, djBookings, djGigs, djAnalytics, events],
   organizer: [directory, orgBookings, orgGigs, events],
   admin: [adminPanel, directory, events],
 };
@@ -126,6 +134,7 @@ export function getFooterProfessionalLinks(opts: {
       ...(djSlug ? [{ label: "My DJ Profile", href: `/djs/${djSlug}` }] : []),
       { label: "Bookings", href: "/dashboard/dj/bookings" },
       { label: "My Gigs", href: "/dashboard/dj/gigs" },
+      { label: "Analytics", href: "/dashboard/dj/analytics" },
       { label: "My Events", href: "/dashboard/dj/events" },
       { label: "Applications", href: "/dashboard/dj/applications" },
       { label: "Settings", href: "/settings/account" },

@@ -10,6 +10,7 @@ import {
   buildDjCoverPath,
   buildDjGalleryPath,
 } from "@/lib/storage";
+import { getMediaLimit, normalisePlan } from "@/lib/plan-features";
 
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024; // 5 MB
 const MAX_COVER_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -128,9 +129,10 @@ export async function uploadDjCover(
 // ── uploadDjGalleryImage ──────────────────────────────────────────────────────
 // Validates, uploads to djs/{userId}/gallery/, and creates a Media record.
 
-export async function uploadDjGalleryImage(formData: FormData): Promise<
-  | { id: number; url: string; path: string; bucket: string }
-  | { error: string }
+export async function uploadDjGalleryImage(
+  formData: FormData,
+): Promise<
+  { id: number; url: string; path: string; bucket: string } | { error: string }
 > {
   const supabase = await createClient();
   const {
@@ -146,9 +148,22 @@ export async function uploadDjGalleryImage(formData: FormData): Promise<
 
   const profile = await prisma.djProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true },
+    select: { id: true, plan: true },
   });
   if (!profile) return { error: "DJ profile not found." };
+
+  const plan = normalisePlan(profile.plan);
+  const photoLimit = getMediaLimit(plan, "photos");
+  if (photoLimit !== Infinity) {
+    const currentCount = await prisma.media.count({
+      where: { djProfileId: profile.id, type: "IMAGE" },
+    });
+    if (currentCount >= photoLimit) {
+      return {
+        error: `Your ${plan} plan allows up to ${photoLimit} photos. Upgrade to Premium for unlimited uploads.`,
+      };
+    }
+  }
 
   const path = buildDjGalleryPath(user.id, file);
 
@@ -161,6 +176,20 @@ export async function uploadDjGalleryImage(formData: FormData): Promise<
   const url = getPublicMediaUrl(data.path);
 
   try {
+    // Re-check limit transactionally to prevent race conditions with concurrent uploads
+    if (photoLimit !== Infinity) {
+      const currentCount = await prisma.media.count({
+        where: { djProfileId: profile.id, type: "IMAGE" },
+      });
+      if (currentCount >= photoLimit) {
+        // Clean up the uploaded file since limit is exceeded
+        await supabase.storage.from(BUCKET).remove([data.path]);
+        return {
+          error: `Your ${plan} plan allows up to ${photoLimit} photos. Upgrade to Premium for unlimited uploads.`,
+        };
+      }
+    }
+
     const media = await prisma.media.create({
       data: {
         type: "IMAGE",

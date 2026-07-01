@@ -237,8 +237,19 @@ export function mapMixesFromData(d: DjDemoData) {
   return [featured, ...rest];
 }
 
+function isValidMonthFormat(monthStr: string): boolean {
+  if (!monthStr || !monthStr.includes("-")) return false;
+  const [y, m] = monthStr.split("-").map(Number);
+  if (!y || !m || Number.isNaN(y) || Number.isNaN(m)) return false;
+  return m >= 1 && m <= 12 && y >= 2000 && y <= 2100;
+}
+
 export function buildCalendarFromData(d: DjDemoData) {
-  const [y, mo] = d.availability.month.split("-").map(Number);
+  const monthStr = d.availability.month;
+  if (!isValidMonthFormat(monthStr)) {
+    return [];
+  }
+  const [y, mo] = monthStr.split("-").map(Number);
   const daysInMonth = new Date(y, mo, 0).getDate();
   const { availableDays, bookedDays, tentativeDays } = d.availability;
   return Array.from({ length: daysInMonth }, (_, i) => {
@@ -255,7 +266,11 @@ export function buildCalendarFromData(d: DjDemoData) {
 }
 
 export function getCalendarMonthLabel(d: DjDemoData): string {
-  const [y, mo] = d.availability.month.split("-").map(Number);
+  const monthStr = d.availability.month;
+  if (!isValidMonthFormat(monthStr)) {
+    return "Select a month";
+  }
+  const [y, mo] = monthStr.split("-").map(Number);
   return new Intl.DateTimeFormat("en-GB", {
     month: "long",
     year: "numeric",

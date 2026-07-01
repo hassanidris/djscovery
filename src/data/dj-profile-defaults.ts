@@ -119,7 +119,7 @@ export const FREE_DEFAULT_FEATURED_MIX = {
   plays: "38.2k",
   platform: "SoundCloud",
   genres: ["Afrobeats", "Amapiano"],
-  audioUrl: "",
+  audioUrl: "https://soundcloud.com/soundcloud-shine/soundcloud-2025",
 };
 
 // ── Premium plan defaults ───────────────────────────────────────────────────────
@@ -254,8 +254,20 @@ export const PREMIUM_DEFAULT_MEDIA: PremiumMediaItem[] = [
   { id: 4, url: "/gallery-4.png", type: "photo" },
   { id: 5, url: "/rated-9.webp", type: "photo" },
   { id: 6, url: "/rated-10.webp", type: "photo" },
-  { id: 7, url: "/gallery-1.png", videoUrl: "", title: "Video 1", type: "video" },
-  { id: 8, url: "/gallery-2.png", videoUrl: "", title: "Video 2", type: "video" },
+  {
+    id: 7,
+    url: "/gallery-1.png",
+    videoUrl: "",
+    title: "Video 1",
+    type: "video",
+  },
+  {
+    id: 8,
+    url: "/gallery-2.png",
+    videoUrl: "",
+    title: "Video 2",
+    type: "video",
+  },
 ];
 
 export const PREMIUM_DEFAULT_ENDORSEMENTS = [
@@ -413,7 +425,7 @@ export const PREMIUM_DEFAULT_SPOTLIGHT = {
     duration: "1h 24m",
     plays: 82400,
     genres: ["Afrobeats", "Amapiano"],
-    audioUrl: "#",
+    audioUrl: "https://soundcloud.com/soundcloud-shine/soundcloud-2025",
     coverImage: "/gallery-1.png",
   },
   featuredVideo: {
@@ -421,8 +433,8 @@ export const PREMIUM_DEFAULT_SPOTLIGHT = {
     subtitle: "Live @ Berghain 2024",
     duration: "45 min",
     views: 211000,
-    thumbnail: "/gallery-1.png",
-    videoUrl: "#",
+    thumbnail: "",
+    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   },
 };
 
