@@ -34,9 +34,7 @@ const SubmitReportSchema = z.object({
   description: z.string().max(1000).optional(),
 });
 
-export async function submitReport(
-  formData: FormData,
-): Promise<ActionResult> {
+export async function submitReport(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -124,9 +122,7 @@ export async function markReportUnderReview(
   }
 }
 
-export async function resolveReport(
-  formData: FormData,
-): Promise<ActionResult> {
+export async function resolveReport(formData: FormData): Promise<ActionResult> {
   const { userId: adminId } = await requireAdmin();
 
   const parsed = ResolveReportSchema.safeParse({
@@ -167,9 +163,7 @@ export async function resolveReport(
   }
 }
 
-export async function dismissReport(
-  formData: FormData,
-): Promise<ActionResult> {
+export async function dismissReport(formData: FormData): Promise<ActionResult> {
   const { userId: adminId } = await requireAdmin();
 
   const parsed = DismissReportSchema.safeParse({
@@ -221,6 +215,14 @@ export type AdminReport = {
   createdAt: Date;
   reporter: { username: string; name: string | null; image: string | null };
   reviewedBy: { username: string } | null;
+};
+
+export type DashboardReport = {
+  id: number;
+  targetType: string;
+  reason: string;
+  status: string;
+  createdAt: Date;
 };
 
 export async function getAdminReports({
@@ -280,8 +282,28 @@ export async function getAdminReports({
 
   return {
     reports,
-    nextCursor: hasNextPage
-      ? (reports[reports.length - 1]?.id ?? null)
-      : null,
+    nextCursor: hasNextPage ? (reports[reports.length - 1]?.id ?? null) : null,
   };
+}
+
+export async function getRecentReports({
+  limit = 5,
+}: {
+  limit?: number;
+} = {}): Promise<DashboardReport[]> {
+  await requireAdmin();
+
+  const reports = await prisma.report.findMany({
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      targetType: true,
+      reason: true,
+      status: true,
+      createdAt: true,
+    },
+  });
+
+  return reports;
 }

@@ -328,6 +328,17 @@ export type AdminDj = {
   user: { status: string };
 };
 
+export type PendingDjApproval = {
+  id: number;
+  stageName: string;
+  slug: string;
+  avatar: string | null;
+  city: string | null;
+  country: string | null;
+  genres: string[];
+  submittedAt: Date;
+};
+
 export async function getAdminDjs({
   cursor,
   take = 20,
@@ -389,4 +400,48 @@ export async function getAdminDjs({
     djs: djsWithAvg,
     nextCursor: hasNextPage ? (djs[djs.length - 1]?.id ?? null) : null,
   };
+}
+
+export async function getPendingDjApprovals({
+  limit = 5,
+}: {
+  limit?: number;
+} = {}): Promise<PendingDjApproval[]> {
+  await requireAdmin();
+
+  const pending = await prisma.djProfile.findMany({
+    where: {
+      deletedAt: null,
+      status: "PENDING_APPROVAL",
+    },
+    orderBy: { createdAt: "asc" },
+    take: limit,
+    select: {
+      id: true,
+      stageName: true,
+      slug: true,
+      avatar: true,
+      createdAt: true,
+      city: { select: { name: true } },
+      country: { select: { name: true } },
+      genres: {
+        select: {
+          genre: {
+            select: { name: true },
+          },
+        },
+      },
+    },
+  });
+
+  return pending.map((dj) => ({
+    id: dj.id,
+    stageName: dj.stageName,
+    slug: dj.slug,
+    avatar: dj.avatar,
+    city: dj.city?.name ?? null,
+    country: dj.country?.name ?? null,
+    genres: dj.genres.map((g) => g.genre.name),
+    submittedAt: dj.createdAt,
+  }));
 }
