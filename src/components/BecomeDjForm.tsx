@@ -353,7 +353,7 @@ export default function BecomeDjForm({
           >
             {avatarPreview ? (
               <img
-                src={avatarPreview}
+                src={avatarPreview.startsWith("blob:") ? avatarPreview : ""}
                 alt="Avatar preview"
                 className="h-full w-full object-cover"
               />
