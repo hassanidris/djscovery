@@ -18,16 +18,20 @@ export async function getCitiesForCountry(countryId: number) {
 }
 
 export async function getVenuesForCity(cityId: number, limit = 40) {
+  const fetchLimit = Math.max(limit * 4, limit);
+
   const [gigs, events] = await Promise.all([
     prisma.gig.findMany({
       where: { cityId, venueName: { not: null } },
       select: { venueName: true },
-      take: limit * 2,
+      take: fetchLimit,
+      orderBy: [{ venueName: "asc" }, { createdAt: "desc" }],
     }),
     prisma.event.findMany({
       where: { cityId, venue: { not: null } },
       select: { venue: true },
-      take: limit * 2,
+      take: fetchLimit,
+      orderBy: [{ venue: "asc" }, { createdAt: "desc" }],
     }),
   ]);
 

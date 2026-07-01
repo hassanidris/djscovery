@@ -318,6 +318,11 @@ export async function createDjProfile(
       create: { userId: user.id, role: "DJ" },
     });
 
+    await tx.user.update({
+      where: { id: user.id },
+      data: { onboardingComplete: true },
+    });
+
     if (isNewProfile) {
       const admins = await tx.userRole.findMany({
         where: { role: "ADMIN" },
@@ -617,6 +622,11 @@ export async function createOrganizerProfile(
         update: {},
         create: { userId: user.id, role: "ORGANIZER" },
       });
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: { onboardingComplete: true },
+      });
     });
 
     return { success: true, error: null };
@@ -807,7 +817,7 @@ export async function setupFanProfile(
       });
       await tx.user.update({
         where: { id: user.id },
-        data: { name, countryId, cityId },
+        data: { name, countryId, cityId, onboardingComplete: true },
       });
     });
     return { success: true, error: null };

@@ -39,27 +39,34 @@ export async function signIn(formData: FormData) {
   if (error) redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
   if (!data.user) redirect("/sign-in?error=Authentication+failed");
 
-  // Role-aware redirect + stamp lastLoginAt in one round-trip
-  const [userRoles, stamp] = await prisma.$transaction([
-    prisma.userRole.findMany({
-      where: { userId: data.user.id },
-      select: { role: true },
-    }),
-    prisma.user.updateMany({
-      where: { id: data.user.id },
-      data: { lastLoginAt: new Date() },
-    }),
-  ]);
-  if (stamp.count === 0) {
-    // Handle provisioning drift explicitly (log/reconcile/redirect),
-    // but don't crash sign-in due to missing local row.
-  }
-  const roles = userRoles.map((r) => r.role);
+  const { roles, onboardingComplete } = await prisma.$transaction(
+    async (tx) => {
+      const userRecord = await tx.user.findUnique({
+        where: { id: data.user.id },
+        select: { onboardingComplete: true },
+      });
+      const roleRecords = await tx.userRole.findMany({
+        where: { userId: data.user.id },
+        select: { role: true },
+      });
+
+      await tx.user.update({
+        where: { id: data.user.id },
+        data: { lastLoginAt: new Date() },
+      });
+
+      return {
+        roles: roleRecords.map((r) => r.role),
+        onboardingComplete: userRecord?.onboardingComplete ?? false,
+      };
+    },
+  );
 
   if (roles.includes("ADMIN")) redirect("/admin");
-  if (roles.includes("DJ")) redirect("/dashboard");
-  if (roles.includes("ORGANIZER")) redirect("/organizer/dashboard");
-  redirect("/"); // fan
+  const hasCompletedOnboarding =
+    onboardingComplete || roles.includes("DJ") || roles.includes("ORGANIZER");
+  if (!hasCompletedOnboarding) redirect("/select-role");
+  redirect("/");
 }
 
 export async function signUp(formData: FormData) {

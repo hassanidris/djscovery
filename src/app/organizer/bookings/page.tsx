@@ -53,18 +53,22 @@ export default async function OrganizerBookingsPage() {
     const contactVisible = Boolean(inquiry.contactReleasedAt);
 
     const messages: BookingMessage[] = (inquiry.messages ?? []).map(
-      (message: any) => ({
-        id: message.id,
-        body: message.body,
-        senderRole: message.senderRole,
-        senderName:
-          message.sender?.name ??
-          message.sender?.email ??
-          (message.senderRole === "DJ"
-            ? inquiry.djProfile.stageName
-            : "Organizer"),
-        createdAt: message.createdAt.toISOString(),
-      }),
+      (message: any) => {
+        const senderStageName = inquiry.djProfile.stageName?.trim() || "DJ";
+        const isDjSender = message.senderRole === "DJ";
+        const fallbackRoleName = isDjSender ? senderStageName : "Organizer";
+        const senderName = isDjSender
+          ? senderStageName
+          : message.sender?.name?.trim() || fallbackRoleName;
+
+        return {
+          id: message.id,
+          body: message.body,
+          senderRole: message.senderRole,
+          senderName,
+          createdAt: message.createdAt.toISOString(),
+        } satisfies BookingMessage;
+      },
     );
 
     return {

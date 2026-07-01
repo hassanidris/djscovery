@@ -262,7 +262,9 @@ export async function submitBookingInquiry(
     };
   }
 
-  if (cityRecord.countryId !== payload.countryId) {
+  const normalizedCountryId = cityRecord.countryId;
+
+  if (normalizedCountryId !== payload.countryId) {
     return {
       success: false,
       error: "City does not belong to the selected country.",
@@ -272,7 +274,7 @@ export async function submitBookingInquiry(
   const countryRecord =
     cityRecord.country ??
     (await prisma.country.findUnique({
-      where: { id: payload.countryId },
+      where: { id: normalizedCountryId },
       select: { id: true, name: true },
     }));
 
@@ -335,6 +337,21 @@ export async function submitBookingInquiry(
 
   await prisma.$transaction(async (tx) => {
     const txUnsafe = tx as Record<string, any>;
+    await tx.$executeRaw`
+      SELECT pg_advisory_xact_lock(hashtext(${`${user.id}:${payload.djProfileId}`}))
+    `;
+
+    const recentInquiry = await txUnsafe.bookingInquiry.findFirst({
+      where: {
+        organizerId: user.id,
+        djProfileId: payload.djProfileId,
+        createdAt: { gte: windowStart },
+      },
+      select: { id: true },
+    });
+    if (recentInquiry) {
+      throw new Error("RATE_LIMITED_BOOKING_INQUIRY");
+    }
 
     const baseCreateData = {
       djProfileId: payload.djProfileId,
@@ -351,7 +368,7 @@ export async function submitBookingInquiry(
     } satisfies Record<string, unknown>;
 
     const locationCreateData = {
-      countryId: countryRecord.id,
+      countryId: normalizedCountryId,
       countryName: countryRecord.name,
       cityId: cityRecord.id,
       cityName: cityRecord.name,
@@ -498,6 +515,13 @@ export async function respondToBookingInquiry(
   const newStatus: BookingInquiryStatus =
     payload.decision === "ACCEPT" ? "ACCEPTED" : "DECLINED";
   const now = new Date();
+
+  if (inquiry.status !== "PENDING") {
+    return {
+      success: false,
+      error: "This booking inquiry has already been responded to.",
+    };
+  }
 
   await prisma.$transaction(async (tx) => {
     const txUnsafe = tx as Record<string, any>;

@@ -22,9 +22,9 @@ model BookingInquiry {
   lastRespondedAt   DateTime?
 
   countryId Int?
-  country   Country? @relation(fields: [countryId], references: [id])
+  country   Country? @relation("BookingInquiryCountry", fields: [countryId], references: [id])
   cityId    Int?
-  city      City?    @relation(fields: [cityId], references: [id])
+  city      City?    @relation("BookingInquiryCity", fields: [cityId, countryId], references: [id, countryId])
 
   djProfileId Int
   djProfile   DjProfile @relation("DjProfileBookingInquiries", fields: [djProfileId], references: [id], onDelete: Cascade)
@@ -316,7 +316,7 @@ model Country {
   events            Event[]
   gigs              Gig[]
   fanProfiles       FanProfile[]
-  bookingInquiries  BookingInquiry[]
+  bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCountry")
 
   @@index([name])
 }
@@ -332,9 +332,10 @@ model City {
   events            Event[]
   gigs              Gig[]
   fanProfiles       FanProfile[]
-  bookingInquiries  BookingInquiry[]
+  bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCity")
 
   @@unique([name, countryId])
+  @@unique([id, countryId])
   @@index([countryId])
 }
 

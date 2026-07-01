@@ -98,24 +98,30 @@ export function BookingInquiryCard({
 
   const handleDecision = (decision: "ACCEPT" | "DECLINE") => {
     startRespondTransition(async () => {
-      const result = await respondToBookingInquiry({
-        inquiryId: inquiry.id,
-        decision,
-        note: note.trim() ? note.trim() : undefined,
-      });
+      try {
+        const result = await respondToBookingInquiry({
+          inquiryId: inquiry.id,
+          decision,
+          note: note.trim() ? note.trim() : undefined,
+        });
 
-      if (!result.success) {
-        toast.error(result.error);
-        return;
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+
+        toast.success(
+          decision === "ACCEPT"
+            ? "Booking request accepted"
+            : "Booking request declined",
+        );
+        setNote("");
+        router.refresh();
+      } catch (error) {
+        console.error("Failed to respond to booking inquiry", error);
+        toast.error("Something went wrong. Please refresh and try again.");
+        router.refresh();
       }
-
-      toast.success(
-        decision === "ACCEPT"
-          ? "Booking request accepted"
-          : "Booking request declined",
-      );
-      setNote("");
-      router.refresh();
     });
   };
 
@@ -125,17 +131,23 @@ export function BookingInquiryCard({
       return;
     }
     startMessageTransition(async () => {
-      const result = await sendBookingInquiryMessage({
-        inquiryId: inquiry.id,
-        message: message.trim(),
-      });
-      if (!result.success) {
-        toast.error(result.error);
-        return;
+      try {
+        const result = await sendBookingInquiryMessage({
+          inquiryId: inquiry.id,
+          message: message.trim(),
+        });
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        toast.success("Message sent");
+        setMessage("");
+        router.refresh();
+      } catch (error) {
+        console.error("Failed to send booking inquiry message", error);
+        toast.error("Something went wrong. Please refresh and try again.");
+        router.refresh();
       }
-      toast.success("Message sent");
-      setMessage("");
-      router.refresh();
     });
   };
 

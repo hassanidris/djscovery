@@ -262,13 +262,6 @@ function getBaseMeta(
         cta: "Get Started",
         ...zinc,
       };
-    case "BOOKING_INQUIRY":
-      return {
-        icon: Mail,
-        title: "Booking Inquiry",
-        cta: "View",
-        ...blue,
-      };
     default:
       return {
         icon: Star,

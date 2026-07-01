@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -127,6 +127,9 @@ export function BookCTA({
     (bookingOptions?.initialVenues ?? []).length === 0,
   );
 
+  const latestCountryRequestIdRef = useRef(0);
+  const latestCityRequestIdRef = useRef(0);
+
   useEffect(() => {
     setForm(initialFormState);
     setCities(bookingOptions?.initialCities ?? []);
@@ -139,9 +142,15 @@ export function BookCTA({
     if (!bookingOptions) return;
     if (!form.cityId) return;
     if (venues.length > 0) return;
+    const requestId = ++latestCityRequestIdRef.current;
+    const cityId = form.cityId;
+
     startVenueTransition(async () => {
       try {
-        const fetched = await getVenuesForCity(Number(form.cityId));
+        const fetched = await getVenuesForCity(Number(cityId));
+        if (latestCityRequestIdRef.current !== requestId) {
+          return;
+        }
         setVenues(fetched);
         if (fetched.length === 0) {
           setVenueSelection(CUSTOM_VENUE_VALUE);
@@ -149,6 +158,9 @@ export function BookCTA({
         }
       } catch {
         // Ignore fetch errors here; user can still enter manually.
+        if (latestCityRequestIdRef.current !== requestId) {
+          return;
+        }
       }
     });
   }, [bookingOptions, form.cityId, venues.length]);
@@ -192,13 +204,27 @@ export function BookCTA({
 
     if (!value) return;
 
+    const requestId = ++latestCountryRequestIdRef.current;
+
     startCityTransition(async () => {
       try {
         const fetchedCities = await getCitiesForCountry(Number(value));
+        if (latestCountryRequestIdRef.current !== requestId) {
+          return;
+        }
+
         setCities(fetchedCities);
 
         if (fetchedCities.length === 0) {
-          setForm((prev) => ({ ...prev, cityId: "" }));
+          setForm((prev) => {
+            if (latestCountryRequestIdRef.current !== requestId) {
+              return prev;
+            }
+            return { ...prev, cityId: "" };
+          });
+          if (latestCountryRequestIdRef.current !== requestId) {
+            return;
+          }
           setVenues([]);
           setVenueSelection(CUSTOM_VENUE_VALUE);
           setIsCustomVenue(true);
@@ -206,28 +232,61 @@ export function BookCTA({
         }
 
         const firstCityId = String(fetchedCities[0].id);
-        setForm((prev) => ({ ...prev, cityId: firstCityId }));
+        setForm((prev) => {
+          if (latestCountryRequestIdRef.current !== requestId) {
+            return prev;
+          }
+          return { ...prev, cityId: firstCityId };
+        });
+        if (latestCountryRequestIdRef.current !== requestId) {
+          return;
+        }
         setVenueSelection("");
         setIsCustomVenue(true);
 
+        const venueRequestId = ++latestCityRequestIdRef.current;
         startVenueTransition(async () => {
           try {
             const fetchedVenues = await getVenuesForCity(Number(firstCityId));
+            if (
+              latestCountryRequestIdRef.current !== requestId ||
+              latestCityRequestIdRef.current !== venueRequestId
+            ) {
+              return;
+            }
             setVenues(fetchedVenues);
             if (fetchedVenues.length === 0) {
               setVenueSelection(CUSTOM_VENUE_VALUE);
               setIsCustomVenue(true);
             } else {
+              setForm((prev) => {
+                if (
+                  latestCountryRequestIdRef.current !== requestId ||
+                  latestCityRequestIdRef.current !== venueRequestId
+                ) {
+                  return prev;
+                }
+                return { ...prev, venue: "" };
+              });
               setVenueSelection("");
               setIsCustomVenue(false);
             }
           } catch {
+            if (
+              latestCountryRequestIdRef.current !== requestId ||
+              latestCityRequestIdRef.current !== venueRequestId
+            ) {
+              return;
+            }
             setVenues([]);
             setVenueSelection(CUSTOM_VENUE_VALUE);
             setIsCustomVenue(true);
           }
         });
       } catch {
+        if (latestCountryRequestIdRef.current !== requestId) {
+          return;
+        }
         toast.error(
           "Could not load cities for that country. Please try again.",
         );
@@ -243,18 +302,32 @@ export function BookCTA({
 
     if (!value) return;
 
+    const requestId = ++latestCityRequestIdRef.current;
+
     startVenueTransition(async () => {
       try {
         const fetchedVenues = await getVenuesForCity(Number(value));
+        if (latestCityRequestIdRef.current !== requestId) {
+          return;
+        }
         setVenues(fetchedVenues);
         if (fetchedVenues.length === 0) {
           setVenueSelection(CUSTOM_VENUE_VALUE);
           setIsCustomVenue(true);
         } else {
+          setForm((prev) => {
+            if (latestCityRequestIdRef.current !== requestId) {
+              return prev;
+            }
+            return { ...prev, venue: "" };
+          });
           setVenueSelection("");
           setIsCustomVenue(false);
         }
       } catch {
+        if (latestCityRequestIdRef.current !== requestId) {
+          return;
+        }
         toast.error("Could not load venues for that city. Enter one manually.");
         setVenues([]);
         setVenueSelection(CUSTOM_VENUE_VALUE);

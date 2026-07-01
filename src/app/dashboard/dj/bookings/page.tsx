@@ -53,24 +53,29 @@ export default async function DjBookingsPage() {
   const viewModels: BookingInquiryViewModel[] = inquiries.map((inquiry) => {
     const organizerProfile = inquiry.organizer.organizerProfile;
     const organizerDisplayName =
-      organizerProfile?.displayName ??
-      inquiry.organizer.name ??
-      inquiry.organizer.email;
-    const organizerEmail =
-      organizerProfile?.contactEmail ?? inquiry.organizer.email;
+      organizerProfile?.displayName ?? inquiry.organizer.name ?? "Organizer";
     const contactVisible = Boolean(inquiry.contactReleasedAt);
+    const organizerEmail = contactVisible
+      ? (organizerProfile?.contactEmail ?? inquiry.organizer.email ?? undefined)
+      : undefined;
 
     const messages: BookingMessage[] = (inquiry.messages ?? []).map(
-      (message: any) => ({
-        id: message.id,
-        body: message.body,
-        senderRole: message.senderRole,
-        senderName:
-          message.sender?.name ??
-          message.sender?.email ??
-          (message.senderRole === "DJ" ? "DJ" : "Organizer"),
-        createdAt: message.createdAt.toISOString(),
-      }),
+      (message: any) => {
+        const fallbackRoleName =
+          message.senderRole === "DJ" ? "DJ" : "Organizer";
+        const senderName =
+          message.sender?.name?.trim() !== ""
+            ? message.sender.name
+            : fallbackRoleName;
+
+        return {
+          id: message.id,
+          body: message.body,
+          senderRole: message.senderRole,
+          senderName,
+          createdAt: message.createdAt.toISOString(),
+        } satisfies BookingMessage;
+      },
     );
 
     return {
@@ -87,7 +92,7 @@ export default async function DjBookingsPage() {
         ? inquiry.lastRespondedAt.toISOString()
         : null,
       counterpartyName: organizerDisplayName,
-      counterpartyEmail: contactVisible ? organizerEmail : undefined,
+      counterpartyEmail: organizerEmail,
       contactVisible,
       messages,
     };

@@ -196,12 +196,6 @@ export function formatNotification(
         link: gigId ? `/dashboard/dj/gigs/${gigId}` : "/dashboard/dj/gigs",
       };
     }
-    case "BOOKING_INQUIRY":
-      return {
-        icon: "📋",
-        message: "You have a new booking inquiry",
-        link: "/dashboard",
-      };
     case "ACCOUNT_SUSPENDED":
       return {
         icon: "⚠️",

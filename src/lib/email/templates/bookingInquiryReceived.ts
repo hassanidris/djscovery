@@ -46,7 +46,7 @@ export function bookingInquiryReceivedHtml({
         : ""
     }
     <p style="color:#9ca3af;font-size:15px;line-height:1.7;margin:0 0 24px;">
-      Review the details and respond inside DJcovery within 48 hours.
+      Review the details and respond inside DJcovery when you're ready.
       All messages stay on-platform until you accept the booking.
     </p>
     <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
