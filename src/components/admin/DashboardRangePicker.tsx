@@ -47,9 +47,12 @@ export function DashboardRangePicker({
           size="sm"
           className="h-10 rounded-xl border-white/10 bg-white/5 text-xs font-medium text-white hover:bg-white/10"
         >
-          <CalendarRange className="mr-2 h-4 w-4" aria-hidden />
-          {getLabel(currentRange)}
-          <ChevronDown className="ml-2 h-3 w-3 text-gray-400" aria-hidden />
+          <CalendarRange className="mr-0 h-4 w-4 sm:mr-2" aria-hidden />
+          <span className="hidden sm:inline">{getLabel(currentRange)}</span>
+          <ChevronDown
+            className="ml-0 h-3 w-3 text-gray-400 sm:ml-2"
+            aria-hidden
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
