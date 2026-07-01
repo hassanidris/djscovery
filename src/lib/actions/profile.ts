@@ -182,6 +182,37 @@ const UpdateDjProfileSchema = z.object({
   feeMin: z.number().int().nonnegative().optional().nullable(),
   feeMax: z.number().int().nonnegative().optional().nullable(),
   feeCurrency: z.string().max(3).optional().nullable(),
+
+  // Team contacts
+  managerName: z.string().max(60).optional().nullable(),
+  managerEmail: z.string().email().optional().nullable(),
+  managerPhone: z.string().max(30).optional().nullable(),
+  agentName: z.string().max(60).optional().nullable(),
+  agentAgency: z.string().max(60).optional().nullable(),
+  agentEmail: z.string().email().optional().nullable(),
+
+  // Availability
+  availabilityTimezone: z.string().max(50).optional().nullable(),
+  availabilityMonth: z.string().max(7).optional().nullable(),
+  availabilityDays: z
+    .array(
+      z.object({
+        day: z.number().int().min(1).max(31),
+        status: z.enum(["available", "booked", "tentative", "free"]),
+      }),
+    )
+    .optional(),
+
+  // Spotlight
+  featuredMixTitle: z.string().max(120).optional().nullable(),
+  featuredMixAudioUrl: z.string().url().optional().nullable(),
+  featuredMixDuration: z.string().max(20).optional().nullable(),
+  featuredMixPlays: z.number().int().nonnegative().optional(),
+  featuredVideoTitle: z.string().max(120).optional().nullable(),
+  featuredVideoUrl: z.string().url().optional().nullable(),
+  featuredVideoThumbnail: z.string().url().optional().nullable(),
+  featuredVideoDuration: z.string().max(20).optional().nullable(),
+  featuredVideoViews: z.number().int().nonnegative().optional(),
 });
 
 export type UpdateDjProfileInput = z.infer<typeof UpdateDjProfileSchema>;
@@ -439,6 +470,66 @@ export async function updateDjProfile(
           ...(data.feeMax !== undefined && { feeMax: data.feeMax }),
           ...(data.feeCurrency !== undefined && {
             feeCurrency: data.feeCurrency,
+          }),
+
+          // Team contacts
+          ...(data.managerName !== undefined && {
+            managerName: data.managerName,
+          }),
+          ...(data.managerEmail !== undefined && {
+            managerEmail: data.managerEmail,
+          }),
+          ...(data.managerPhone !== undefined && {
+            managerPhone: data.managerPhone,
+          }),
+          ...(data.agentName !== undefined && {
+            agentName: data.agentName,
+          }),
+          ...(data.agentAgency !== undefined && {
+            agentAgency: data.agentAgency,
+          }),
+          ...(data.agentEmail !== undefined && {
+            agentEmail: data.agentEmail,
+          }),
+
+          // Availability
+          ...(data.availabilityTimezone !== undefined && {
+            availabilityTimezone: data.availabilityTimezone,
+          }),
+          ...(data.availabilityMonth !== undefined && {
+            availabilityMonth: data.availabilityMonth,
+          }),
+          ...(data.availabilityDays !== undefined && {
+            availabilityDays: data.availabilityDays,
+          }),
+
+          // Spotlight
+          ...(data.featuredMixTitle !== undefined && {
+            featuredMixTitle: data.featuredMixTitle,
+          }),
+          ...(data.featuredMixAudioUrl !== undefined && {
+            featuredMixAudioUrl: data.featuredMixAudioUrl,
+          }),
+          ...(data.featuredMixDuration !== undefined && {
+            featuredMixDuration: data.featuredMixDuration,
+          }),
+          ...(data.featuredMixPlays !== undefined && {
+            featuredMixPlays: data.featuredMixPlays,
+          }),
+          ...(data.featuredVideoTitle !== undefined && {
+            featuredVideoTitle: data.featuredVideoTitle,
+          }),
+          ...(data.featuredVideoUrl !== undefined && {
+            featuredVideoUrl: data.featuredVideoUrl,
+          }),
+          ...(data.featuredVideoThumbnail !== undefined && {
+            featuredVideoThumbnail: data.featuredVideoThumbnail,
+          }),
+          ...(data.featuredVideoDuration !== undefined && {
+            featuredVideoDuration: data.featuredVideoDuration,
+          }),
+          ...(data.featuredVideoViews !== undefined && {
+            featuredVideoViews: data.featuredVideoViews,
           }),
         },
       });

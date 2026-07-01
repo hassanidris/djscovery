@@ -50,6 +50,8 @@ export default async function EditDjProfilePage({
     select: { id: true, url: true, path: true, bucket: true },
   });
 
+  const plan = (dj.plan ?? "FREE") as "FREE" | "PREMIUM";
+
   const profileData = {
     stageName: dj.stageName,
     bio: dj.bio ?? "",
@@ -68,6 +70,29 @@ export default async function EditDjProfilePage({
     feeMax: dj.feeMax ?? null,
     feeCurrency: dj.feeCurrency ?? "USD",
     slug: dj.slug,
+    plan,
+    managerName: dj.managerName ?? "",
+    managerEmail: dj.managerEmail ?? "",
+    managerPhone: dj.managerPhone ?? "",
+    agentName: dj.agentName ?? "",
+    agentAgency: dj.agentAgency ?? "",
+    agentEmail: dj.agentEmail ?? "",
+    featuredMixTitle: dj.featuredMixTitle ?? "",
+    featuredMixAudioUrl: dj.featuredMixAudioUrl ?? "",
+    featuredMixDuration: dj.featuredMixDuration ?? "",
+    featuredMixPlays: dj.featuredMixPlays ?? 0,
+    featuredVideoTitle: dj.featuredVideoTitle ?? "",
+    featuredVideoUrl: dj.featuredVideoUrl ?? "",
+    featuredVideoThumbnail: dj.featuredVideoThumbnail ?? "",
+    featuredVideoDuration: dj.featuredVideoDuration ?? "",
+    featuredVideoViews: dj.featuredVideoViews ?? 0,
+    availabilityTimezone: dj.availabilityTimezone ?? "",
+    availabilityMonth: dj.availabilityMonth ?? "",
+    availabilityDays:
+      (dj.availabilityDays as Array<{
+        day: number;
+        status: string;
+      }> | null) ?? [],
   };
 
   return (

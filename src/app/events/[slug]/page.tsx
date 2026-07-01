@@ -86,6 +86,7 @@ export default async function EventDetailPage({
       endDate: true,
       startTime: true,
       endTime: true,
+      timezone: true,
       venue: true,
       description: true,
       ticketUrl: true,
@@ -158,6 +159,7 @@ export default async function EventDetailPage({
         endDate={dbEvent.endDate ?? null}
         startTime={dbEvent.startTime ?? null}
         endTime={dbEvent.endTime ?? null}
+        timezone={dbEvent.timezone ?? null}
         location={location}
         venue={showVenue ? (dbEvent.venue ?? null) : null}
         isPrivate={isPrivate}
@@ -222,6 +224,7 @@ function EventDetailView(props: {
   endDate: Date | null;
   startTime: string | null;
   endTime: string | null;
+  timezone: string | null;
   location: string;
   venue: string | null;
   isPrivate: boolean;
@@ -250,6 +253,7 @@ function EventDetailView(props: {
     endDate,
     startTime,
     endTime,
+    timezone,
     location,
     venue,
     isPrivate,
@@ -382,6 +386,9 @@ function EventDetailView(props: {
                   <span>
                     {startTime}
                     {endTime ? ` – ${endTime}` : ""}
+                    {timezone && (
+                      <span className="ml-1 text-zinc-500">({timezone})</span>
+                    )}
                   </span>
                 </div>
               )}
@@ -564,6 +571,7 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       endDate={null}
       startTime={event.startTime}
       endTime={event.endTime}
+      timezone={null}
       location={location}
       venue={event.venue}
       isPrivate={event.eventType === "PRIVATE"}

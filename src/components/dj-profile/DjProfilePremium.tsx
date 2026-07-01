@@ -196,19 +196,11 @@ export default function DjProfilePremium({
 
   const isOwner = viewMode === "dj-owner";
 
-  if (!djData) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <p className="text-gray-400">Loading profile...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black">
       {/* ── PREMIUM HERO ── */}
       <DjProfileHero
-        djData={djData}
+        djData={djData as DjDemoData}
         viewMode={viewMode}
         isFollowed={isFollowed}
         djUserId={djUserId}

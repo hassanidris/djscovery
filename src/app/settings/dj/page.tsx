@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import EditDjProfileForm from "@/components/dj-profile/EditDjProfileForm";
+import PremiumProfileManager from "@/components/dj-profile/PremiumProfileManager";
 
 export const metadata: Metadata = {
   title: "DJ Profile Settings",
@@ -25,6 +26,8 @@ export default async function DjSettingsPage() {
       country: { select: { id: true, name: true } },
     },
   });
+
+  const plan = (dj?.plan ?? "FREE") as "FREE" | "PREMIUM";
 
   if (!dj) redirect("/become-dj");
 
@@ -65,15 +68,44 @@ export default async function DjSettingsPage() {
     feeMax: dj.feeMax ?? null,
     feeCurrency: dj.feeCurrency ?? "USD",
     slug: dj.slug,
+    plan,
+    // Team
+    managerName: dj.managerName ?? "",
+    managerEmail: dj.managerEmail ?? "",
+    managerPhone: dj.managerPhone ?? "",
+    agentName: dj.agentName ?? "",
+    agentAgency: dj.agentAgency ?? "",
+    agentEmail: dj.agentEmail ?? "",
+    // Spotlight
+    featuredMixTitle: dj.featuredMixTitle ?? "",
+    featuredMixAudioUrl: dj.featuredMixAudioUrl ?? "",
+    featuredMixDuration: dj.featuredMixDuration ?? "",
+    featuredMixPlays: dj.featuredMixPlays ?? 0,
+    featuredVideoTitle: dj.featuredVideoTitle ?? "",
+    featuredVideoUrl: dj.featuredVideoUrl ?? "",
+    featuredVideoThumbnail: dj.featuredVideoThumbnail ?? "",
+    featuredVideoDuration: dj.featuredVideoDuration ?? "",
+    featuredVideoViews: dj.featuredVideoViews ?? 0,
+    // Availability
+    availabilityTimezone: dj.availabilityTimezone ?? "",
+    availabilityMonth: dj.availabilityMonth ?? "",
+    availabilityDays:
+      (dj.availabilityDays as Array<{
+        day: number;
+        status: string;
+      }> | null) ?? [],
   };
 
   return (
-    <EditDjProfileForm
-      profile={profileData}
-      countries={countries}
-      initialCities={existingCities}
-      userId={user.id}
-      galleryImages={galleryImages}
-    />
+    <div className="flex flex-col gap-8">
+      <EditDjProfileForm
+        profile={profileData}
+        countries={countries}
+        initialCities={existingCities}
+        userId={user.id}
+        galleryImages={galleryImages}
+      />
+      <PremiumProfileManager djProfileId={dj.id} plan={plan} />
+    </div>
   );
 }

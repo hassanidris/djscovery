@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { getCountries, getCitiesForCountry } from "@/lib/actions/locations";
 import { EventForm } from "@/components/events/EventForm";
-import type { EventCategory } from "@/lib/actions/event";
+import type { EventCategory } from "@/lib/event-categories";
 
 export const metadata = { title: "Edit Event — DJcovery" };
 
@@ -46,6 +46,7 @@ export default async function EventEditPage({
       endDate: true,
       startTime: true,
       endTime: true,
+      timezone: true,
       countryId: true,
       cityId: true,
       venue: true,
@@ -55,16 +56,29 @@ export default async function EventEditPage({
       recap: true,
       audioLink: true,
       status: true,
+      posterUrl: true,
     },
   });
   if (!event) notFound();
 
-  const [countries, initialCities] = await Promise.all([
-    getCountries(),
-    event.countryId
-      ? getCitiesForCountry(event.countryId)
-      : Promise.resolve([]),
-  ]);
+  const [countries, initialCities, galleryImages, allGenres] =
+    await Promise.all([
+      getCountries(),
+      event.countryId
+        ? getCitiesForCountry(event.countryId)
+        : Promise.resolve([]),
+      prisma.eventMedia.findMany({
+        where: { eventId: event.id },
+        orderBy: { sortOrder: "asc" },
+        select: { id: true, url: true },
+      }),
+      prisma.genre.findMany({
+        orderBy: { name: "asc" },
+        select: { name: true },
+      }),
+    ]);
+
+  const genreNames = allGenres.map((g) => g.name);
 
   const initialData = {
     title: event.title,
@@ -74,6 +88,7 @@ export default async function EventEditPage({
     endDate: event.endDate ? event.endDate.toISOString().split("T")[0] : "",
     startTime: event.startTime ?? "",
     endTime: event.endTime ?? "",
+    timezone: event.timezone ?? "",
     countryId: event.countryId?.toString() ?? "",
     cityId: event.cityId?.toString() ?? "",
     venue: event.venue ?? "",
@@ -110,6 +125,9 @@ export default async function EventEditPage({
           initialData={initialData}
           countries={countries}
           initialCities={initialCities}
+          posterUrl={event.posterUrl}
+          galleryImages={galleryImages}
+          allGenres={genreNames}
         />
       </div>
     </div>
