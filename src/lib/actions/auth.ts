@@ -39,25 +39,53 @@ export async function signIn(formData: FormData) {
   if (error) redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
   if (!data.user) redirect("/sign-in?error=Authentication+failed");
 
+  const supabaseUser = data.user;
   const { roles, onboardingComplete } = await prisma.$transaction(
     async (tx) => {
       const userRecord = await tx.user.findUnique({
-        where: { id: data.user.id },
+        where: { id: supabaseUser.id },
         select: { onboardingComplete: true },
       });
       const roleRecords = await tx.userRole.findMany({
-        where: { userId: data.user.id },
+        where: { userId: supabaseUser.id },
         select: { role: true },
       });
 
-      await tx.user.update({
-        where: { id: data.user.id },
-        data: { lastLoginAt: new Date() },
+      const lastLoginAt = new Date();
+      const updated = await tx.user.updateMany({
+        where: { id: supabaseUser.id },
+        data: { lastLoginAt },
       });
+
+      let onboardingFlag = userRecord?.onboardingComplete ?? false;
+
+      if (updated.count === 0) {
+        const fallbackEmail =
+          supabaseUser.email ?? `${supabaseUser.id}@auth.djcovery`;
+        const usernameBase =
+          supabaseUser.user_metadata?.username ??
+          supabaseUser.user_metadata?.displayName ??
+          fallbackEmail.split("@")[0] ??
+          "djcovery-user";
+        const safeUsername = `${usernameBase}`.replace(/\s+/g, "-");
+
+        await tx.user.create({
+          data: {
+            id: supabaseUser.id,
+            email: fallbackEmail,
+            username:
+              `${safeUsername}-${supabaseUser.id.slice(0, 6)}`.toLowerCase(),
+            onboardingComplete: false,
+            lastLoginAt,
+          },
+        });
+
+        onboardingFlag = false;
+      }
 
       return {
         roles: roleRecords.map((r) => r.role),
-        onboardingComplete: userRecord?.onboardingComplete ?? false,
+        onboardingComplete: onboardingFlag,
       };
     },
   );
