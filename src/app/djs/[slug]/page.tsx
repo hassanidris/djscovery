@@ -8,6 +8,8 @@ import { isFollowingDj } from "@/lib/actions/saves";
 import { isFollowing } from "@/lib/actions";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
+import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
+import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
 
 export default async function DjProfilePage({
   params,
@@ -136,6 +138,64 @@ export default async function DjProfilePage({
     viewMode === "fan"
       ? await Promise.all([isFollowingDj(dj.id), isFollowing(dj.userId)])
       : [false, false];
+
+  let viewerContext: BookingViewerContext = {
+    role: "guest",
+    isAuthenticated: false,
+  };
+
+  let bookingOptions: BookingFormOptions = {
+    countries: await prisma.country.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  };
+
+  if (authUser) {
+    const [roleRows, organizerProfile] = await Promise.all([
+      prisma.userRole.findMany({
+        where: { userId: authUser.id },
+        select: { role: true },
+      }),
+      prisma.organizerProfile.findUnique({
+        where: { userId: authUser.id },
+        select: {
+          displayName: true,
+          contactEmail: true,
+          countryId: true,
+          cityId: true,
+        },
+      }),
+    ]);
+
+    const roleSet = new Set(roleRows.map((r) => r.role));
+    let bookingRole: BookingViewerContext["role"] = "fan";
+    if (authUser.id === dj.userId) bookingRole = "dj-owner";
+    else if (roleSet.has("ADMIN")) bookingRole = "admin";
+    else if (roleSet.has("ORGANIZER")) bookingRole = "organizer";
+
+    viewerContext = {
+      role: bookingRole,
+      isAuthenticated: true,
+      organizerDisplayName: organizerProfile?.displayName ?? undefined,
+      organizerContactEmail: organizerProfile?.contactEmail ?? undefined,
+    };
+
+    if (organizerProfile?.countryId && organizerProfile?.cityId) {
+      const [initialCities, initialVenues] = await Promise.all([
+        getCitiesForCountry(organizerProfile.countryId),
+        getVenuesForCity(organizerProfile.cityId),
+      ]);
+
+      bookingOptions = {
+        ...bookingOptions,
+        initialCities,
+        initialVenues,
+        defaultCountryId: organizerProfile.countryId,
+        defaultCityId: organizerProfile.cityId,
+      };
+    }
+  }
 
   const djPlan = dj.plan;
   const djVerified = dj.status === "APPROVED";
@@ -279,6 +339,8 @@ export default async function DjProfilePage({
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
           status={dj.status}
+          viewerContext={viewerContext}
+          bookingOptions={bookingOptions}
         />
       ) : (
         <DjProfileFree
@@ -289,6 +351,8 @@ export default async function DjProfilePage({
           isFollowing={followingDj}
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
+          viewerContext={viewerContext}
+          bookingOptions={bookingOptions}
         />
       )}
     </div>

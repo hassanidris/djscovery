@@ -1,5 +1,3 @@
-import type { NotificationType } from "@prisma/client";
-
 type FormattedNotification = {
   icon: string;
   message: string;
@@ -7,12 +5,13 @@ type FormattedNotification = {
 };
 
 export function formatNotification(
-  type: NotificationType,
+  type: unknown,
   data?: unknown,
 ): FormattedNotification {
   const d = (data ?? {}) as Record<string, unknown>;
+  const normalizedType = typeof type === "string" ? type : "UNKNOWN";
 
-  switch (type) {
+  switch (normalizedType) {
     case "NEW_COMMENT":
       return {
         icon: "💬",
@@ -25,6 +24,72 @@ export function formatNotification(
         message: "Someone replied to your comment",
         link: "/community",
       };
+    case "BOOKING_INQUIRY": {
+      const inquiryId = typeof d.inquiryId === "number" ? d.inquiryId : null;
+      const organizerName =
+        typeof d.organizerName === "string" && d.organizerName.length > 0
+          ? d.organizerName
+          : "An organizer";
+      const eventName =
+        typeof d.eventName === "string" && d.eventName.length > 0
+          ? d.eventName
+          : "a booking";
+      return {
+        icon: "📆",
+        message: `${organizerName} wants to book you for "${eventName}".`,
+        link: inquiryId
+          ? `/dashboard/dj/bookings?inquiry=${inquiryId}`
+          : "/dashboard/dj/bookings",
+      };
+    }
+    case "BOOKING_INQUIRY_RESPONSE": {
+      const inquiryId = typeof d.inquiryId === "number" ? d.inquiryId : null;
+      const eventName =
+        typeof d.eventName === "string" && d.eventName.length > 0
+          ? d.eventName
+          : "your booking";
+      const status =
+        typeof d.status === "string" && d.status.length > 0
+          ? d.status
+          : "UPDATED";
+      const djName =
+        typeof d.djName === "string" && d.djName.length > 0
+          ? d.djName
+          : "The DJ";
+      const statusLabel =
+        status === "ACCEPTED"
+          ? "accepted"
+          : status === "DECLINED"
+            ? "declined"
+            : "updated";
+      return {
+        icon:
+          status === "ACCEPTED" ? "✅" : status === "DECLINED" ? "❌" : "📨",
+        message: `${djName} ${statusLabel} your request for "${eventName}".`,
+        link: inquiryId
+          ? `/organizer/bookings?inquiry=${inquiryId}`
+          : "/organizer/bookings",
+      };
+    }
+    case "BOOKING_INQUIRY_MESSAGE": {
+      const inquiryId = typeof d.inquiryId === "number" ? d.inquiryId : null;
+      const eventName =
+        typeof d.eventName === "string" && d.eventName.length > 0
+          ? d.eventName
+          : "your booking";
+      const senderName =
+        typeof d.senderName === "string" && d.senderName.length > 0
+          ? d.senderName
+          : "Someone";
+      const senderRole = d.senderRole === "DJ" ? "DJ" : "organizer";
+      const linkBase =
+        senderRole === "DJ" ? "/organizer/bookings" : "/dashboard/dj/bookings";
+      return {
+        icon: "💬",
+        message: `${senderName} replied in the "${eventName}" booking.`,
+        link: inquiryId ? `${linkBase}?inquiry=${inquiryId}` : linkBase,
+      };
+    }
     case "NEW_RATING": {
       const rating = typeof d.rating === "number" ? d.rating : null;
       const gigTitle = typeof d.gigTitle === "string" ? d.gigTitle : null;
@@ -131,12 +196,6 @@ export function formatNotification(
         link: gigId ? `/dashboard/dj/gigs/${gigId}` : "/dashboard/dj/gigs",
       };
     }
-    case "BOOKING_INQUIRY":
-      return {
-        icon: "📋",
-        message: "You have a new booking inquiry",
-        link: "/dashboard",
-      };
     case "ACCOUNT_SUSPENDED":
       return {
         icon: "⚠️",

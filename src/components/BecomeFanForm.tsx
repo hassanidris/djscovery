@@ -126,7 +126,7 @@ export default function BecomeFanForm({
     <form
       action={formAction}
       onSubmit={handleSubmit}
-      className="flex flex-col gap-5 rounded-xl border border-white/10 bg-white/5 p-8"
+      className="flex w-full flex-col gap-5 overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8"
     >
       <input type="hidden" name="countryId" value={countryId ?? ""} />
       <input type="hidden" name="cityId" value={cityId ?? ""} />

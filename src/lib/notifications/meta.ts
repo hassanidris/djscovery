@@ -1,4 +1,3 @@
-import type { NotificationType } from "@prisma/client";
 import type { LucideIcon } from "lucide-react";
 import {
   AlertCircle,
@@ -37,8 +36,14 @@ export type NotificationMeta = {
   href: string | null;
 };
 
+type NotificationTypeLocal =
+  | "BOOKING_INQUIRY"
+  | "BOOKING_INQUIRY_RESPONSE"
+  | "BOOKING_INQUIRY_MESSAGE"
+  | string;
+
 export function getNotificationMeta(
-  type: NotificationType,
+  type: NotificationTypeLocal,
   data?: unknown,
 ): NotificationMeta {
   const { message, link } = formatNotification(type, data);
@@ -47,8 +52,9 @@ export function getNotificationMeta(
 }
 
 function getBaseMeta(
-  type: NotificationType,
+  type: NotificationTypeLocal,
 ): Omit<NotificationMeta, "body" | "href"> {
+  const normalizedType = typeof type === "string" ? type : "UNKNOWN";
   const green = {
     iconColor: "text-green-400",
     bgColor: "bg-green-500/10",
@@ -74,7 +80,7 @@ function getBaseMeta(
     bgColor: "bg-zinc-500/10",
   } as const;
 
-  switch (type) {
+  switch (normalizedType) {
     case "GIG_COMPLETED":
       return {
         icon: PartyPopper,
@@ -87,7 +93,9 @@ function getBaseMeta(
       return {
         icon: CheckCircle2,
         title:
-          type === "GIG_APPLICATION_ACCEPTED" ? "Application Accepted" : "Profile Approved",
+          normalizedType === "GIG_APPLICATION_ACCEPTED"
+            ? "Application Accepted"
+            : "Profile Approved",
         cta: "View",
         ...green,
       };
@@ -133,24 +141,26 @@ function getBaseMeta(
     case "ACCOUNT_SUSPENDED":
       return {
         icon:
-          type === "GIG_APPLICATION_REJECTED" || type === "GIG_CANCELLED"
+          normalizedType === "GIG_APPLICATION_REJECTED" ||
+          normalizedType === "GIG_CANCELLED"
             ? XCircle
-            : type === "GIG_NO_SHOW"
+            : normalizedType === "GIG_NO_SHOW"
               ? Ban
-              : type === "ACCOUNT_SUSPENDED"
+              : normalizedType === "ACCOUNT_SUSPENDED"
                 ? ShieldAlert
                 : Flag,
         title:
-          type === "GIG_APPLICATION_REJECTED"
+          normalizedType === "GIG_APPLICATION_REJECTED"
             ? "Application Not Selected"
-            : type === "GIG_CANCELLED"
+            : normalizedType === "GIG_CANCELLED"
               ? "Gig Cancelled"
-              : type === "GIG_NO_SHOW"
+              : normalizedType === "GIG_NO_SHOW"
                 ? "No-Show Reported"
-                : type === "ACCOUNT_SUSPENDED"
+                : normalizedType === "ACCOUNT_SUSPENDED"
                   ? "Account Suspended"
                   : "Report Submitted",
-        cta: type === "ACCOUNT_SUSPENDED" ? "Contact Support" : "View",
+        cta:
+          normalizedType === "ACCOUNT_SUSPENDED" ? "Contact Support" : "View",
         ...red,
       };
     case "NEW_RATING":
@@ -181,6 +191,27 @@ function getBaseMeta(
         cta: "View",
         ...zinc,
       };
+    case "BOOKING_INQUIRY":
+      return {
+        icon: Inbox,
+        title: "New Booking Request",
+        cta: "Review",
+        ...blue,
+      };
+    case "BOOKING_INQUIRY_RESPONSE":
+      return {
+        icon: CheckCircle2,
+        title: "Booking Update",
+        cta: "Open",
+        ...green,
+      };
+    case "BOOKING_INQUIRY_MESSAGE":
+      return {
+        icon: MessageCircle,
+        title: "New Booking Message",
+        cta: "Reply",
+        ...purple,
+      };
     case "NEW_COMMENT":
       return {
         icon: MessageCircle,
@@ -205,7 +236,7 @@ function getBaseMeta(
     case "GIG_PUBLISHED":
     case "GIG_NEW_MATCH":
       return {
-        icon: type === "GIG_PUBLISHED" ? Megaphone : Target,
+        icon: normalizedType === "GIG_PUBLISHED" ? Megaphone : Target,
         title: "New Gig Match",
         cta: "View",
         ...blue,
@@ -230,13 +261,6 @@ function getBaseMeta(
         title: "Welcome",
         cta: "Get Started",
         ...zinc,
-      };
-    case "BOOKING_INQUIRY":
-      return {
-        icon: Mail,
-        title: "Booking Inquiry",
-        cta: "View",
-        ...blue,
       };
     default:
       return {

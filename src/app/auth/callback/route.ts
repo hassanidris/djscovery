@@ -110,14 +110,16 @@ export async function GET(request: Request) {
 
     let dbRoles: string[] = [];
     let isNewUser = false;
+    let onboardingComplete = false;
 
     try {
       await prisma.$transaction(async (tx) => {
         const prior = await tx.user.findUnique({
           where: { id: userId },
-          select: { id: true },
+          select: { id: true, onboardingComplete: true },
         });
         isNewUser = !prior;
+        onboardingComplete = prior?.onboardingComplete ?? false;
 
         // If a stale DB record exists for this email under a different auth ID
         // (can happen when the Supabase Auth account was deleted and re-created),
@@ -180,49 +182,20 @@ export async function GET(request: Request) {
     if (searchParams.get("welcome") === "true") {
       if (dbRoles.includes("ADMIN"))
         return NextResponse.redirect(`${origin}/admin`);
-      if (dbRoles.includes("DJ"))
-        return NextResponse.redirect(`${origin}/dashboard`);
-      if (dbRoles.includes("ORGANIZER"))
-        return NextResponse.redirect(`${origin}/organizer/dashboard`);
-      if (role === "dj") return NextResponse.redirect(`${origin}/become-dj`);
-      if (role === "organizer")
-        return NextResponse.redirect(`${origin}/become-organizer`);
-      return NextResponse.redirect(`${origin}/become-fan`);
+      return NextResponse.redirect(`${origin}/select-role`);
     }
 
-    // Existing users → redirect to their dashboard
     if (dbRoles.includes("ADMIN"))
       return NextResponse.redirect(`${origin}/admin`);
-    if (dbRoles.includes("DJ"))
-      return NextResponse.redirect(`${origin}/dashboard`);
-    if (dbRoles.includes("ORGANIZER"))
-      return NextResponse.redirect(`${origin}/organizer/dashboard`);
 
-    // New users → redirect based on signup intent
-    if (role === "dj") return NextResponse.redirect(`${origin}/become-dj`);
-    if (role === "organizer")
-      return NextResponse.redirect(`${origin}/become-organizer`);
-    if (isNewUser) return NextResponse.redirect(`${origin}/become-fan`);
+    const isOnboarded =
+      onboardingComplete ||
+      dbRoles.includes("DJ") ||
+      dbRoles.includes("ORGANIZER");
 
-    // Returning user with no roles and no fan profile = incomplete signup
-    // Send them back to choose their role
-    if (!isNewUser && dbRoles.length === 0) {
-      try {
-        const hasFanProfile = await prisma.fanProfile.findUnique({
-          where: { userId },
-          select: { id: true },
-        });
-        if (!hasFanProfile) {
-          return NextResponse.redirect(
-            `${origin}/sign-up?message=${encodeURIComponent("Please complete your profile setup")}`,
-          );
-        }
-      } catch (err) {
-        console.error("[auth/callback] fanProfile lookup error:", err);
-      }
-    }
+    if (!isOnboarded) return NextResponse.redirect(`${origin}/select-role`);
 
-    return NextResponse.redirect(`${origin}/`); // fan
+    return NextResponse.redirect(`${origin}/`);
   } catch (err) {
     console.error("[auth/callback] Unhandled error:", err);
     return NextResponse.redirect(`${origin}/sign-in?error=auth_error`);

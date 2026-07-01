@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Briefcase,
+  Handshake,
   Users,
   CalendarHeart,
   SlidersHorizontal,
@@ -22,6 +23,12 @@ const NAV_ITEMS = [
     href: "/organizer/gigs",
     label: "My Gigs",
     icon: Briefcase,
+    exact: false,
+  },
+  {
+    href: "/organizer/bookings",
+    label: "Bookings",
+    icon: Handshake,
     exact: false,
   },
   {

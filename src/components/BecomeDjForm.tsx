@@ -46,7 +46,7 @@ const inputCls =
   "bg-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none ring-1 ring-white/20 focus:ring-h_red transition-all w-full";
 const labelCls = "text-sm text-gray-300 font-medium";
 const sectionCls =
-  "bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col gap-4";
+  "bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col gap-4 w-full overflow-hidden";
 const sectionTitleCls =
   "text-base font-semibold text-white border-b border-white/10 pb-3 mb-1";
 
@@ -338,11 +338,14 @@ export default function BecomeDjForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form
+      onSubmit={handleSubmit}
+      className="flex w-full flex-col gap-6 overflow-hidden"
+    >
       {/* ── Avatar ── */}
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>Profile Photo</h2>
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
           <button
             type="button"
             onClick={() => avatarInputRef.current?.click()}
