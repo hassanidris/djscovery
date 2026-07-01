@@ -328,7 +328,9 @@ export async function createDjProfile(
         where: { role: "ADMIN" },
         select: { userId: true, user: { select: { email: true } } },
       });
-      adminEmailsForNotify = admins.map((a) => a.user.email);
+      adminEmailsForNotify = admins
+        .map((a) => a.user.email)
+        .filter((email): email is string => Boolean(email));
       if (admins.length > 0) {
         await tx.notification.createMany({
           data: admins.map((a) => ({
@@ -347,8 +349,9 @@ export async function createDjProfile(
     const adminUrl = `${
       process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com"
     }/admin/djs`;
+    const uniqueEmails = Array.from(new Set(adminEmailsForNotify));
     await Promise.all(
-      adminEmailsForNotify.map((email) =>
+      uniqueEmails.map((email) =>
         sendEmail({
           to: email,
           emailType: "ADMIN_DJ_REGISTRATION",
@@ -357,6 +360,11 @@ export async function createDjProfile(
         }),
       ),
     );
+  }
+
+  if (isNewProfile) {
+    revalidatePath("/admin/djs");
+    revalidatePath("/admin");
   }
 
   return { success: true as const };

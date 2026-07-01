@@ -15,11 +15,16 @@ export type DashboardStats = {
   pendingDjApprovals: number;
 };
 
-export async function getDashboardStats(): Promise<DashboardStats> {
+export async function getDashboardStats({
+  range = "7d",
+}: {
+  range?: "7d" | "30d" | "90d";
+} = {}): Promise<DashboardStats> {
   await requireAdmin();
 
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const days = range === "90d" ? 90 : range === "30d" ? 30 : 7;
+  const rangeStart = new Date();
+  rangeStart.setDate(rangeStart.getDate() - days);
 
   const [
     totalUsers,
@@ -44,7 +49,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     }),
     prisma.report.count({ where: { status: "OPEN" } }),
     prisma.user.count({
-      where: { deletedAt: null, createdAt: { gte: thirtyDaysAgo } },
+      where: { deletedAt: null, createdAt: { gte: rangeStart } },
     }),
     prisma.djProfile.count({
       where: { deletedAt: null, status: "PENDING_APPROVAL" },
