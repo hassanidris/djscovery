@@ -25,7 +25,8 @@ export async function createDjPressItem(
     select: { id: true, plan: true },
   });
   if (!profile) return { error: "DJ profile not found" };
-  if (profile.plan !== "PREMIUM") return { error: "Press items require Premium" };
+  if (profile.plan !== "PREMIUM")
+    return { error: "Press items require Premium" };
 
   const source = (formData.get("source") as string)?.trim();
   const type = (formData.get("type") as string)?.trim();
@@ -48,7 +49,7 @@ export async function createDjPressItem(
     },
   });
 
-  revalidatePath("/djs/[slug]");
+  revalidatePath("/djs/[slug]", "page");
   return { success: true as const, id: press.id };
 }
 

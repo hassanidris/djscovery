@@ -14,15 +14,17 @@ export async function createGenre(
 
   const trimmed = name.trim();
   if (!trimmed) return { error: "Genre name is required" };
-  if (trimmed.length > 30) return { error: "Genre name too long (max 30 chars)" };
+  if (trimmed.length > 30)
+    return { error: "Genre name too long (max 30 chars)" };
 
-  // Check for existing (case-insensitive)
-  const existing = await prisma.genre.findFirst({
-    where: {
-      name: { equals: trimmed, mode: "insensitive" },
-    },
-    select: { name: true },
-  });
+  // Normalize to match client-side rule: lowercase and strip non-alphanumerics
+  const normalized = trimmed.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  // Check for existing by normalized form to prevent duplicates like "Deep House" vs "Deep-House"
+  const allGenres = await prisma.genre.findMany({ select: { name: true } });
+  const existing = allGenres.find(
+    (g) => g.name.toLowerCase().replace(/[^a-z0-9]/g, "") === normalized,
+  );
   if (existing) {
     return { success: true as const, name: existing.name };
   }

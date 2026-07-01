@@ -19,6 +19,7 @@ import {
   uploadDjGalleryImage,
   deleteGalleryImage,
 } from "@/lib/actions/dj-upload";
+import { getMediaLimit, normalisePlan } from "@/lib/plan-features";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -199,6 +200,9 @@ export default function EditDjProfileForm({
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const plan = normalisePlan(profile.plan);
+  const galleryLimit = getMediaLimit(plan, "photos");
 
   const [stageName, setStageName] = useState(profile.stageName);
   const [bio, setBio] = useState(profile.bio);
@@ -467,17 +471,22 @@ export default function EditDjProfileForm({
     toast.success("Photo removed", { id: toastId });
   }
 
-  function daysInMonth(monthStr: string): number {
-    if (!monthStr || !monthStr.includes("-")) return 30;
+  function isValidMonthFormat(monthStr: string): boolean {
+    if (!monthStr || !monthStr.includes("-")) return false;
     const [y, m] = monthStr.split("-").map(Number);
-    if (!y || !m) return 30;
+    if (!y || !m || Number.isNaN(y) || Number.isNaN(m)) return false;
+    return m >= 1 && m <= 12 && y >= 2000 && y <= 2100;
+  }
+
+  function daysInMonth(monthStr: string): number | null {
+    if (!isValidMonthFormat(monthStr)) return null;
+    const [y, m] = monthStr.split("-").map(Number);
     return new Date(y, m, 0).getDate();
   }
 
-  function firstDayOffset(monthStr: string): number {
-    if (!monthStr || !monthStr.includes("-")) return 0;
+  function firstDayOffset(monthStr: string): number | null {
+    if (!isValidMonthFormat(monthStr)) return null;
     const [y, m] = monthStr.split("-").map(Number);
-    if (!y || !m) return 0;
     const dow = new Date(y, m - 1, 1).getDay(); // 0=Sun, 1=Mon
     return dow === 0 ? 6 : dow - 1; // shift so Mon=0
   }
@@ -555,8 +564,7 @@ export default function EditDjProfileForm({
         // Availability
         availabilityTimezone: availabilityTimezone.trim() || null,
         availabilityMonth: availabilityMonth.trim() || null,
-        availabilityDays:
-          availabilityDays.length > 0 ? availabilityDays : undefined,
+        availabilityDays: availabilityDays,
       });
 
       if ("error" in result) {
@@ -1071,7 +1079,11 @@ export default function EditDjProfileForm({
         {/* Photo Gallery */}
         <SectionCard
           title="Photo Gallery"
-          subtitle="Showcase your work — up to 12 photos"
+          subtitle={
+            galleryLimit === Infinity
+              ? "Showcase your work — unlimited photos"
+              : `Showcase your work — up to ${galleryLimit} photos`
+          }
         >
           <div>
             <div className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
@@ -1096,7 +1108,7 @@ export default function EditDjProfileForm({
                   </button>
                 </div>
               ))}
-              {gallery.length < 12 && (
+              {gallery.length < galleryLimit && (
                 <button
                   type="button"
                   onClick={() => galleryInputRef.current?.click()}
@@ -1127,7 +1139,9 @@ export default function EditDjProfileForm({
               }}
             />
             <p className="text-[11px] text-gray-600">
-              {gallery.length}/12 photos
+              {galleryLimit === Infinity
+                ? `${gallery.length} photos`
+                : `${gallery.length}/${galleryLimit} photos`}
             </p>
           </div>
         </SectionCard>
@@ -1382,7 +1396,7 @@ export default function EditDjProfileForm({
               </div>
             </div>
 
-            {availabilityMonth && (
+            {availabilityMonth && isValidMonthFormat(availabilityMonth) && (
               <div>
                 <div className="mb-2 flex items-center gap-4">
                   {[
@@ -1409,12 +1423,12 @@ export default function EditDjProfileForm({
                     ),
                   )}
                   {Array.from({
-                    length: firstDayOffset(availabilityMonth),
+                    length: firstDayOffset(availabilityMonth) ?? 0,
                   }).map((_, i) => (
                     <div key={`e${i}`} />
                   ))}
                   {Array.from({
-                    length: daysInMonth(availabilityMonth),
+                    length: daysInMonth(availabilityMonth) ?? 0,
                   }).map((_, i) => {
                     const day = i + 1;
                     const status = getDayStatus(day);

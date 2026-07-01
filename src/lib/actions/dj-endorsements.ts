@@ -49,7 +49,7 @@ export async function createDjEndorsement(
     },
   });
 
-  revalidatePath("/djs/[slug]");
+  revalidatePath("/djs/[slug]", "page");
   return { success: true as const, id: endorsement.id };
 }
 

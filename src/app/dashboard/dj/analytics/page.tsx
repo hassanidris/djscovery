@@ -39,7 +39,8 @@ function GrowthBadge({ value }: { value: number }) {
     );
   return (
     <span className="flex items-center gap-0.5 text-[11px] font-semibold text-gray-500">
-      <Minus className="h-3 w-3" />0%
+      <Minus className="h-3 w-3" />
+      0%
     </span>
   );
 }
@@ -123,7 +124,7 @@ export default async function DjAnalyticsPage() {
               href={`/djs/${dj.slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-h_red hover:underline"
+              className="text-h_red flex items-center gap-1 text-xs hover:underline"
             >
               View public profile
               <ArrowUpRight className="h-3 w-3" />
@@ -149,7 +150,7 @@ export default async function DjAnalyticsPage() {
         )}
 
         {isPremium && !stats && (
-          <Card className="gap-0 border-white/8 bg-h_blackLight/40 p-6">
+          <Card className="bg-h_blackLight/40 gap-0 border-white/8 p-6">
             <p className="text-sm text-gray-400">
               No analytics data yet. Profile views and booking activity will
               appear here once fans and organizers start interacting with your
@@ -209,17 +210,22 @@ export default async function DjAnalyticsPage() {
                   <div className="flex flex-col gap-3">
                     {(() => {
                       const max = Math.max(
-                        ...stats.topCities.map((c) => c.percentage),
+                        ...stats.topCities.map(
+                          (c: { city: string; percentage: number }) =>
+                            c.percentage,
+                        ),
                         1,
                       );
-                      return stats.topCities.map((c) => (
-                        <ProgressBar
-                          key={c.city}
-                          label={c.city}
-                          value={c.percentage}
-                          max={max}
-                        />
-                      ));
+                      return stats.topCities.map(
+                        (c: { city: string; percentage: number }) => (
+                          <ProgressBar
+                            key={c.city}
+                            label={c.city}
+                            value={c.percentage}
+                            max={max}
+                          />
+                        ),
+                      );
                     })()}
                   </div>
                 )}
@@ -245,17 +251,22 @@ export default async function DjAnalyticsPage() {
                   <div className="flex flex-col gap-3">
                     {(() => {
                       const max = Math.max(
-                        ...stats.trafficSources.map((s) => s.percentage),
+                        ...stats.trafficSources.map(
+                          (s: { source: string; percentage: number }) =>
+                            s.percentage,
+                        ),
                         1,
                       );
-                      return stats.trafficSources.map((s) => (
-                        <ProgressBar
-                          key={s.source}
-                          label={s.source}
-                          value={s.percentage}
-                          max={max}
-                        />
-                      ));
+                      return stats.trafficSources.map(
+                        (s: { source: string; percentage: number }) => (
+                          <ProgressBar
+                            key={s.source}
+                            label={s.source}
+                            value={s.percentage}
+                            max={max}
+                          />
+                        ),
+                      );
                     })()}
                   </div>
                 )}
@@ -263,7 +274,7 @@ export default async function DjAnalyticsPage() {
             </div>
 
             {/* Quick tips */}
-            <Card className="mt-6 gap-0 border-white/8 bg-h_blackLight/40 p-6">
+            <Card className="bg-h_blackLight/40 mt-6 gap-0 border-white/8 p-6">
               <h2 className="mb-3 text-sm font-semibold text-white">
                 Tips to grow your profile
               </h2>
@@ -278,7 +289,7 @@ export default async function DjAnalyticsPage() {
                     key={i}
                     className="flex items-start gap-2 text-xs text-gray-400"
                   >
-                    <span className="mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-h_red/15 text-[10px] font-semibold text-h_red">
+                    <span className="bg-h_red/15 text-h_red mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
                       {i + 1}
                     </span>
                     {tip}

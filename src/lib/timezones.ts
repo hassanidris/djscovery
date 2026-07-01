@@ -86,3 +86,9 @@ export function getTimezoneOffsetLabel(tz: string): string {
     return "";
   }
 }
+
+export const VALID_TIMEZONES = new Set(Object.values(COUNTRY_TIMEZONES));
+
+export function isValidTimezone(tz: string): boolean {
+  return VALID_TIMEZONES.has(tz);
+}

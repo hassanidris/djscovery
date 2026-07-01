@@ -35,7 +35,10 @@ export async function createDjPackage(
   const duration = (formData.get("duration") as string)?.trim() || null;
   const featuresRaw = (formData.get("features") as string)?.trim();
   const features = featuresRaw
-    ? featuresRaw.split("\n").map((f) => f.trim()).filter(Boolean)
+    ? featuresRaw
+        .split("\n")
+        .map((f) => f.trim())
+        .filter(Boolean)
     : [];
   const popular = formData.get("popular") === "true";
 
@@ -56,7 +59,7 @@ export async function createDjPackage(
     },
   });
 
-  revalidatePath("/djs/[slug]");
+  revalidatePath("/djs/[slug]", "page");
   return { success: true as const, id: pkg.id };
 }
 
@@ -81,19 +84,25 @@ export async function updateDjPackage(
   const priceFromRaw = formData.get("priceFrom");
   const priceFrom = priceFromRaw ? parseInt(priceFromRaw as string, 10) : null;
   const priceToRaw = formData.get("priceTo");
-  const priceTo = priceToRaw ? parseInt(priceToRaw as string, 10) : null;
   const currency = (formData.get("currency") as string)?.trim() || null;
   const duration = (formData.get("duration") as string)?.trim() || null;
   const featuresRaw = (formData.get("features") as string)?.trim();
   const features = featuresRaw
-    ? featuresRaw.split("\n").map((f) => f.trim()).filter(Boolean)
+    ? featuresRaw
+        .split("\n")
+        .map((f) => f.trim())
+        .filter(Boolean)
     : undefined;
   const popular = formData.get("popular");
 
   const data: Record<string, unknown> = {};
   if (name !== undefined && name !== "") data.name = name;
   if (priceFrom !== null) data.priceFrom = priceFrom;
-  if (priceTo !== null) data.priceTo = priceTo;
+  // Distinguish between field absent (leave unchanged) vs field present but empty (clear to null)
+  if (priceToRaw !== null) {
+    data.priceTo =
+      priceToRaw === "" ? null : parseInt(priceToRaw as string, 10);
+  }
   if (currency !== null) data.currency = currency;
   if (duration !== undefined) data.duration = duration || null;
   if (features !== undefined) data.features = features;

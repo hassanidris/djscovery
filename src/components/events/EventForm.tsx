@@ -165,10 +165,17 @@ export function EventForm(props: EventFormProps) {
   );
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
 
-  // Auto-fetch cities when country is preselected (e.g. from DJ profile defaults)
+  // Auto-fetch cities and timezone when country is preselected (e.g. from DJ profile defaults)
   useEffect(() => {
     if (data.countryId && cities.length === 0) {
       getCitiesForCountry(Number(data.countryId)).then(setCities);
+      const country = props.countries.find(
+        (c) => String(c.id) === data.countryId,
+      );
+      if (country?.code) {
+        const tz = getTimezoneByCountryCode(country.code);
+        if (tz && !data.timezone) set("timezone", tz);
+      }
     }
   }, []);
 
@@ -197,32 +204,42 @@ export function EventForm(props: EventFormProps) {
   async function handlePosterUpload(file: File | undefined) {
     if (!file || props.mode !== "edit") return;
     setIsUploadingPoster(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("eventId", String(props.eventId));
-    const res = await uploadEventPoster(fd);
-    setIsUploadingPoster(false);
-    if ("error" in res) {
-      toast.error(res.error);
-    } else {
-      setPosterUrl(res.url);
-      toast.success("Poster uploaded");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("eventId", String(props.eventId));
+      const res = await uploadEventPoster(fd);
+      if ("error" in res) {
+        toast.error(res.error);
+      } else {
+        setPosterUrl(res.url);
+        toast.success("Poster uploaded");
+      }
+    } catch (error) {
+      toast.error("Failed to upload poster");
+    } finally {
+      setIsUploadingPoster(false);
     }
   }
 
   async function handleGalleryUpload(file: File | undefined) {
     if (!file || props.mode !== "edit") return;
     setIsUploadingGallery(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("eventId", String(props.eventId));
-    const res = await uploadEventGalleryImage(fd);
-    setIsUploadingGallery(false);
-    if ("error" in res) {
-      toast.error(res.error);
-    } else {
-      setGallery((prev) => [...prev, { id: res.id, url: res.url }]);
-      toast.success("Photo added to gallery");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("eventId", String(props.eventId));
+      const res = await uploadEventGalleryImage(fd);
+      if ("error" in res) {
+        toast.error(res.error);
+      } else {
+        setGallery((prev) => [...prev, { id: res.id, url: res.url }]);
+        toast.success("Photo added to gallery");
+      }
+    } catch (error) {
+      toast.error("Failed to upload photo");
+    } finally {
+      setIsUploadingGallery(false);
     }
   }
 
@@ -302,20 +319,24 @@ export function EventForm(props: EventFormProps) {
 
     // 3. Create new genre
     const toastId = toast.loading("Adding genre...");
-    const res = await createGenre(trimmed);
-    if ("error" in res) {
-      toast.error(res.error, { id: toastId });
-      return;
+    try {
+      const res = await createGenre(trimmed);
+      if ("error" in res) {
+        toast.error(res.error, { id: toastId });
+        return;
+      }
+      setAvailableGenres((prev) =>
+        prev.includes(res.name) ? prev : [...prev, res.name],
+      );
+      if (!data.genres.includes(res.name) && data.genres.length < 8) {
+        set("genres", [...data.genres, res.name]);
+      }
+      toast.success(`"${res.name}" added`, { id: toastId });
+      setCustomGenreInput("");
+      setGenreSuggestion(null);
+    } catch (error) {
+      toast.error("Failed to add genre", { id: toastId });
     }
-    setAvailableGenres((prev) =>
-      prev.includes(res.name) ? prev : [...prev, res.name],
-    );
-    if (!data.genres.includes(res.name) && data.genres.length < 8) {
-      set("genres", [...data.genres, res.name]);
-    }
-    toast.success(`"${res.name}" added`, { id: toastId });
-    setCustomGenreInput("");
-    setGenreSuggestion(null);
   }
 
   function validate(): boolean {

@@ -25,7 +25,7 @@ export async function trackProfileView(
     data: {
       djProfileId,
       viewerId: user?.id ?? null,
-      source: source ?? null,
+      source: source ?? "direct",
     },
   });
 
@@ -61,8 +61,6 @@ export async function getProfileStats(djProfileId: number) {
     previousBookings,
     currentFollowers,
     previousFollowers,
-    topCities,
-    trafficSources,
   ] = await Promise.all([
     prisma.profileView.count({
       where: { djProfileId, createdAt: { gte: thirtyDaysAgo } },
@@ -91,28 +89,6 @@ export async function getProfileStats(djProfileId: number) {
         createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
       },
     }),
-    // Top cities from profile views
-    prisma.$queryRaw<Array<{ city: string; count: number }>>`
-      SELECT city, COUNT(*) as count
-      FROM "ProfileView"
-      WHERE "djProfileId" = ${djProfileId}
-        AND "createdAt" >= ${thirtyDaysAgo}
-        AND city IS NOT NULL
-      GROUP BY city
-      ORDER BY count DESC
-      LIMIT 5
-    `,
-    // Traffic sources from profile views
-    prisma.$queryRaw<Array<{ source: string; count: number }>>`
-      SELECT source, COUNT(*) as count
-      FROM "ProfileView"
-      WHERE "djProfileId" = ${djProfileId}
-        AND "createdAt" >= ${thirtyDaysAgo}
-        AND source IS NOT NULL
-      GROUP BY source
-      ORDER BY count DESC
-      LIMIT 4
-    `,
   ]);
 
   const pct = (curr: number, prev: number) => {
@@ -136,20 +112,16 @@ export async function getProfileStats(djProfileId: number) {
     },
   });
   const bookingRate =
-    totalBookings > 0 ? Math.round((acceptedBookings / totalBookings) * 100) : 0;
+    totalBookings > 0
+      ? Math.round((acceptedBookings / totalBookings) * 100)
+      : 0;
 
   return {
     profileViews: { value: totalViews, growth: viewGrowth },
     bookingRequests: { value: totalBookings, growth: bookingGrowth },
     newFollowers: { value: totalFollowers, growth: followerGrowth },
     bookingRate,
-    topCities: topCities.map((c) => ({
-      city: c.city,
-      percentage: Number(c.count),
-    })),
-    trafficSources: trafficSources.map((s) => ({
-      source: s.source,
-      percentage: Number(s.count),
-    })),
+    topCities: [],
+    trafficSources: [],
   };
 }

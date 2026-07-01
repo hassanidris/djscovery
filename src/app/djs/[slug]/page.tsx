@@ -4,13 +4,13 @@ import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
+import { ProfileViewTracker } from "@/components/dj-profile/ProfileViewTracker";
 import { isFollowingDj } from "@/lib/actions/saves";
 import { isFollowing } from "@/lib/actions";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
-import { trackProfileView } from "@/lib/actions/dj-analytics";
 
 export default async function DjProfilePage({
   params,
@@ -122,10 +122,7 @@ export default async function DjProfilePage({
 
   if (dj.hidden && authUser?.id !== dj.userId) return notFound();
 
-  // Track profile view (fire-and-forget; does not block render)
-  if (dj.status === "APPROVED" && !dj.hidden) {
-    void trackProfileView(dj.id);
-  }
+  // Profile view tracking moved to client-side to avoid firing during prefetch/re-renders
 
   // Accurate aggregates: avg rating over ALL ratings (not just the fetched 20),
   // and event count limited to publicly visible events (matches the list shown).
@@ -386,6 +383,11 @@ export default async function DjProfilePage({
 
   return (
     <div>
+      <ProfileViewTracker
+        djProfileId={dj.id}
+        status={dj.status}
+        hidden={dj.hidden}
+      />
       {dj.status === "PENDING_APPROVAL" && (
         <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-center text-sm text-amber-400">
           ⏳ Your profile is pending admin approval and is only visible to you.

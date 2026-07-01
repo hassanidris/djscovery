@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { z } from "zod";
 import { VALID_EVENT_CATEGORIES } from "@/lib/event-categories";
+import { isValidTimezone } from "@/lib/timezones";
 
 // ── Slug helpers ──────────────────────────────────────────────────────────────
 
@@ -122,7 +123,12 @@ const CreateEventSchema = z.object({
     .nullable(),
   ticketUrl: z.string().url("Invalid ticket URL").optional().nullable(),
   genres: z.array(z.string().min(1).max(50)).max(8).default([]),
-  timezone: z.string().max(50).optional().nullable(),
+  timezone: z
+    .string()
+    .max(50)
+    .optional()
+    .nullable()
+    .refine((tz) => !tz || isValidTimezone(tz), "Invalid timezone"),
 });
 
 const UpdateEventSchema = z.object({
@@ -145,7 +151,12 @@ const UpdateEventSchema = z.object({
     .regex(/^\d{2}:\d{2}$/)
     .optional()
     .nullable(),
-  timezone: z.string().max(50).optional().nullable(),
+  timezone: z
+    .string()
+    .max(50)
+    .optional()
+    .nullable()
+    .refine((tz) => !tz || isValidTimezone(tz), "Invalid timezone"),
   ticketUrl: z.string().url().optional().nullable(),
   genres: z.array(z.string().min(1).max(50)).max(8).optional(),
   recap: z.string().max(2000).optional().nullable(),

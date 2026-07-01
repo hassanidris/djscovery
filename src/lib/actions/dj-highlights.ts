@@ -25,7 +25,8 @@ export async function createDjHighlight(
     select: { id: true, plan: true },
   });
   if (!profile) return { error: "DJ profile not found" };
-  if (profile.plan !== "PREMIUM") return { error: "Highlights require Premium" };
+  if (profile.plan !== "PREMIUM")
+    return { error: "Highlights require Premium" };
 
   const year = (formData.get("year") as string)?.trim();
   const title = (formData.get("title") as string)?.trim();
@@ -44,7 +45,7 @@ export async function createDjHighlight(
     },
   });
 
-  revalidatePath("/djs/[slug]");
+  revalidatePath("/djs/[slug]", "page");
   return { success: true as const, id: highlight.id };
 }
 
@@ -76,7 +77,7 @@ export async function updateDjHighlight(
 
   await prisma.djCareerHighlight.update({ where: { id }, data });
 
-  revalidatePath("/djs/[slug]");
+  revalidatePath("/djs/[slug]", "page");
   return { success: true as const };
 }
 
@@ -98,6 +99,6 @@ export async function deleteDjHighlight(
 
   await prisma.djCareerHighlight.delete({ where: { id } });
 
-  revalidatePath("/djs/[slug]");
+  revalidatePath("/djs/[slug]", "page");
   return { success: true as const };
 }

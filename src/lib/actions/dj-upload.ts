@@ -176,6 +176,20 @@ export async function uploadDjGalleryImage(
   const url = getPublicMediaUrl(data.path);
 
   try {
+    // Re-check limit transactionally to prevent race conditions with concurrent uploads
+    if (photoLimit !== Infinity) {
+      const currentCount = await prisma.media.count({
+        where: { djProfileId: profile.id, type: "IMAGE" },
+      });
+      if (currentCount >= photoLimit) {
+        // Clean up the uploaded file since limit is exceeded
+        await supabase.storage.from(BUCKET).remove([data.path]);
+        return {
+          error: `Your ${plan} plan allows up to ${photoLimit} photos. Upgrade to Premium for unlimited uploads.`,
+        };
+      }
+    }
+
     const media = await prisma.media.create({
       data: {
         type: "IMAGE",
