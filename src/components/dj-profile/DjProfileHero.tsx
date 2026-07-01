@@ -123,7 +123,7 @@ function DjProfileHero({
       <div className="mx-auto max-w-6xl px-4 md:px-8">
         <div
           className={cn(
-            "-mt-16 flex flex-col gap-4 pb-5 sm:-mt-14 sm:flex-row sm:items-end",
+            "relative z-10 -mt-16 flex flex-col gap-4 pb-5 sm:-mt-14 sm:flex-row sm:items-end",
             isPremium && "-mt-20",
           )}
         >
@@ -188,7 +188,7 @@ function DjProfileHero({
             </p>
 
             {isOwner && reputationDetail && (
-              <div className="mt-2">
+              <div className="mt-3">
                 <ScoreBreakdown reputationDetail={reputationDetail} />
               </div>
             )}

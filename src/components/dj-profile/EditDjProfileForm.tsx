@@ -13,6 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { updateDjProfile, getCitiesByCountry } from "@/lib/actions/profile";
+import { getGenres } from "@/lib/actions/genre";
 import {
   uploadDjAvatar,
   uploadDjCover,
@@ -213,6 +214,27 @@ export default function EditDjProfileForm({
   const [cities, setCities] = useState<City[]>(initialCities);
   const [genreNames, setGenreNames] = useState<string[]>(profile.genres);
   const [genreInput, setGenreInput] = useState("");
+  const [availableGenres, setAvailableGenres] = useState<string[]>([]);
+  const [showGenreDropdown, setShowGenreDropdown] = useState(false);
+
+  // Fetch genres on mount
+  useEffect(() => {
+    getGenres().then(setAvailableGenres);
+  }, []);
+
+  // Filter genres for dropdown
+  const filteredGenres = availableGenres
+    .filter((g) => {
+      if (!genreInput.trim()) return true;
+      const norm = g.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const inputNorm = genreInput.toLowerCase().replace(/[^a-z0-9]/g, "");
+      return (
+        norm.includes(inputNorm) ||
+        g.toLowerCase().includes(genreInput.toLowerCase())
+      );
+    })
+    .filter((g) => !genreNames.includes(g))
+    .slice(0, 10);
   const [djTypes, setDjTypes] = useState<string[]>(profile.djTypes);
   const [socialLinks, setSocialLinks] = useState<
     { platform: string; url: string }[]
@@ -876,10 +898,17 @@ export default function EditDjProfileForm({
                   </span>
                 ))}
               </div>
-              <div className="flex gap-2">
+              <div className="relative">
                 <Input
                   value={genreInput}
-                  onChange={(e) => setGenreInput(e.target.value)}
+                  onChange={(e) => {
+                    setGenreInput(e.target.value);
+                    setShowGenreDropdown(e.target.value.length > 0);
+                  }}
+                  onFocus={() => setShowGenreDropdown(genreInput.length > 0)}
+                  onBlur={() =>
+                    setTimeout(() => setShowGenreDropdown(false), 200)
+                  }
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -889,22 +918,30 @@ export default function EditDjProfileForm({
                   placeholder={
                     genreNames.length >= 5
                       ? "Max 5 genres reached"
-                      : "Type a genre and press Enter"
+                      : "Add a genre..."
                   }
                   className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600 disabled:opacity-40"
                   maxLength={50}
                   disabled={genreNames.length >= 5}
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addGenre}
-                  disabled={genreNames.length >= 5}
-                  className="shrink-0 border-white/15 text-gray-300 hover:bg-white/5 disabled:opacity-40"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </Button>
+                {showGenreDropdown && filteredGenres.length > 0 && (
+                  <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-white/10 bg-[#1a1a1a] shadow-lg">
+                    {filteredGenres.map((genre) => (
+                      <button
+                        key={genre}
+                        type="button"
+                        onClick={() => {
+                          setGenreNames((prev) => [...prev, genre]);
+                          setGenreInput("");
+                          setShowGenreDropdown(false);
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 hover:text-white"
+                      >
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

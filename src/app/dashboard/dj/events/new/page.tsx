@@ -33,12 +33,7 @@ export default async function EventCreatePage() {
   )
     redirect("/become-dj");
 
-  const [countries, allGenres] = await Promise.all([
-    getCountries(),
-    prisma.genre.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
-  ]);
-
-  const genreNames = allGenres.map((g) => g.name);
+  const countries = await getCountries();
 
   return (
     <div className="min-h-screen bg-black">
@@ -63,7 +58,6 @@ export default async function EventCreatePage() {
             countryId: djProfile.countryId?.toString() ?? "",
             cityId: djProfile.cityId?.toString() ?? "",
           }}
-          allGenres={genreNames}
         />
       </div>
     </div>

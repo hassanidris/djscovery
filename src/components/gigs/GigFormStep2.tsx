@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { X, ChevronDown, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X } from "lucide-react";
 import { isFieldVisible } from "@/config/gig-type-fields";
+import { getGenres } from "@/lib/actions/genre";
 import type { StepProps } from "./GigForm";
 import type { ExperienceLevel, GigType } from "@prisma/client";
 import type { GigFieldKey } from "@/config/gig-type-fields";
@@ -23,26 +24,30 @@ export function GigFormStep2({
   onChange,
   onNext,
   onBack,
-  genres,
 }: StepProps) {
-  const [genreOpen, setGenreOpen] = useState(false);
+  const [availableGenres, setAvailableGenres] = useState<string[]>([]);
+  const [genreInput, setGenreInput] = useState("");
+  const [showGenreDropdown, setShowGenreDropdown] = useState(false);
   const [langInput, setLangInput] = useState("");
-  const genreDropdownRef = useRef<HTMLDivElement>(null);
 
+  // Fetch genres on mount
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (
-        genreDropdownRef.current &&
-        !genreDropdownRef.current.contains(e.target as Node)
-      ) {
-        setGenreOpen(false);
-      }
-    }
-    if (genreOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [genreOpen]);
+    getGenres().then(setAvailableGenres);
+  }, []);
+
+  // Filter genres for dropdown
+  const filteredGenres = availableGenres
+    .filter((g) => {
+      if (!genreInput.trim()) return true;
+      const norm = g.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const inputNorm = genreInput.toLowerCase().replace(/[^a-z0-9]/g, "");
+      return (
+        norm.includes(inputNorm) ||
+        g.toLowerCase().includes(genreInput.toLowerCase())
+      );
+    })
+    .filter((g) => !data.requiredGenres.includes(g))
+    .slice(0, 10);
 
   function toggleGenre(name: string) {
     const current = data.requiredGenres;
@@ -111,81 +116,58 @@ export function GigFormStep2({
               (optional, up to {MAX_GENRES})
             </span>
           </label>
-          <div ref={genreDropdownRef} className="relative">
-            <button
-              type="button"
-              onClick={() => setGenreOpen((o) => !o)}
-              aria-haspopup="listbox"
-              aria-expanded={genreOpen}
-              aria-controls="required-genres-listbox"
-              className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white transition-colors hover:border-white/25 focus:outline-none"
-            >
-              <span
-                className={
-                  data.requiredGenres.length === 0
-                    ? "text-gray-600"
-                    : "text-white"
+          <div className="relative">
+            <input
+              type="text"
+              value={genreInput}
+              onChange={(e) => {
+                setGenreInput(e.target.value);
+                setShowGenreDropdown(e.target.value.length > 0);
+              }}
+              onFocus={() => setShowGenreDropdown(genreInput.length > 0)}
+              onBlur={() => setTimeout(() => setShowGenreDropdown(false), 200)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const trimmed = genreInput.trim();
+                  if (
+                    trimmed &&
+                    !data.requiredGenres.includes(trimmed) &&
+                    data.requiredGenres.length < MAX_GENRES
+                  ) {
+                    onChange("requiredGenres", [
+                      ...data.requiredGenres,
+                      trimmed,
+                    ]);
+                  }
+                  setGenreInput("");
                 }
-              >
-                {data.requiredGenres.length === 0
-                  ? "Select genres…"
-                  : `${data.requiredGenres.length} genre${data.requiredGenres.length > 1 ? "s" : ""} selected`}
-              </span>
-              <ChevronDown
-                className={`h-4 w-4 text-gray-500 transition-transform ${genreOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-
-            {genreOpen && (
-              <div
-                id="required-genres-listbox"
-                role="listbox"
-                aria-multiselectable="true"
-                className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-zinc-950 py-1 shadow-xl"
-              >
-                {genres.length === 0 ? (
-                  <p className="px-3 py-2 text-xs text-gray-500">
-                    No genres available
-                  </p>
-                ) : (
-                  genres.map((genre) => {
-                    const selected = data.requiredGenres.includes(genre.name);
-                    const atMax =
-                      !selected && data.requiredGenres.length >= MAX_GENRES;
-                    return (
-                      <button
-                        key={genre.id}
-                        type="button"
-                        role="option"
-                        aria-selected={selected}
-                        disabled={atMax}
-                        onClick={() => toggleGenre(genre.name)}
-                        className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors ${
-                          atMax
-                            ? "cursor-not-allowed opacity-40"
-                            : "hover:bg-white/5"
-                        }`}
-                      >
-                        <span
-                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
-                            selected
-                              ? "border-white bg-white"
-                              : "border-white/30 bg-transparent"
-                          }`}
-                        >
-                          {selected && (
-                            <Check className="h-2.5 w-2.5 text-black" />
-                          )}
-                        </span>
-                        <span
-                          className={selected ? "text-white" : "text-gray-400"}
-                        >
-                          {genre.name}
-                        </span>
-                      </button>
-                    );
-                  })
-                )}
+              }}
+              placeholder={
+                data.requiredGenres.length >= MAX_GENRES
+                  ? "Max 5 genres reached"
+                  : "Add a genre..."
+              }
+              maxLength={50}
+              disabled={data.requiredGenres.length >= MAX_GENRES}
+              className={`${inputCls} disabled:opacity-40`}
+            />
+            {showGenreDropdown && filteredGenres.length > 0 && (
+              <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-zinc-950 py-1 shadow-xl">
+                {filteredGenres.map((genre) => (
+                  <button
+                    key={genre}
+                    type="button"
+                    onClick={() => {
+                      toggleGenre(genre);
+                      setGenreInput("");
+                      setShowGenreDropdown(false);
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    {genre}
+                  </button>
+                ))}
               </div>
             )}
           </div>

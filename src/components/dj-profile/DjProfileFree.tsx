@@ -70,6 +70,10 @@ import {
   mapFreeFeaturedMix,
 } from "@/lib/dj-profile-mappers";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
+import {
+  getVideoThumbnailUrl,
+  useAudioThumbnail,
+} from "@/lib/media-thumbnails";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 
 function EmptySectionState({
@@ -145,9 +149,11 @@ export default function DjProfileFree({
   const FEATURED_MIX = djData
     ? mapFreeFeaturedMix(djData)
     : FREE_DEFAULT_FEATURED_MIX;
-  const videoThumb = djData
-    ? djData.spotlight.featuredVideo.thumbnail
-    : "/gallery-2.png";
+  const videoUrl = djData?.spotlight.featuredVideo.videoUrl ?? "";
+  const videoThumb =
+    djData?.spotlight.featuredVideo.thumbnail ||
+    getVideoThumbnailUrl(videoUrl) ||
+    "/gallery-2.png";
   const location = `${DJ.city}, ${DJ.country}`;
 
   const isOwner = viewMode === "dj-owner";
@@ -163,6 +169,9 @@ export default function DjProfileFree({
   const hasMixes = hasFeaturedMix;
   const hasPhotos = MEDIA.length > 0;
   const hasVenues = VENUES.length > 0;
+
+  const featuredMixAudioUrl = FEATURED_MIX.audioUrl;
+  const featuredMixThumb = useAudioThumbnail(featuredMixAudioUrl);
 
   const completion = djData ? calculateProfileCompletion(djData) : null;
 
@@ -225,9 +234,18 @@ export default function DjProfileFree({
                       <MediaAudioPlayer
                         audioUrl={FEATURED_MIX.audioUrl}
                         title={FEATURED_MIX.title}
+                        thumbnailUrl={featuredMixThumb || undefined}
                       >
                         <Card className="bg-h_blackLight/30 group hover:border-h_red/30 flex h-full cursor-pointer flex-col gap-0 overflow-hidden border-white/8 transition-all">
                           <div className="from-h_red/20 relative h-40 shrink-0 bg-linear-to-br to-black">
+                            {featuredMixThumb ? (
+                              <Image
+                                src={featuredMixThumb}
+                                alt={FEATURED_MIX.title}
+                                fill
+                                className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                              />
+                            ) : null}
                             <div className="absolute inset-0 flex items-center justify-center">
                               <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
                                 <Play className="ml-0.5 h-5 w-5 text-white" />
@@ -341,11 +359,21 @@ export default function DjProfileFree({
                   <MediaAudioPlayer
                     audioUrl={FEATURED_MIX.audioUrl}
                     title={FEATURED_MIX.title}
+                    thumbnailUrl={featuredMixThumb || undefined}
                   >
                     <Card className="bg-h_blackLight/30 cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
                       <div className="flex items-center gap-4">
-                        <div className="from-h_red/30 to-h_redDark/10 flex size-14 shrink-0 items-center justify-center rounded-lg border border-white/8 bg-linear-to-br">
-                          <Music className="text-h_red h-5 w-5" />
+                        <div className="from-h_red/30 to-h_redDark/10 relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/8 bg-linear-to-br">
+                          {featuredMixThumb ? (
+                            <Image
+                              src={featuredMixThumb}
+                              alt={FEATURED_MIX.title}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <Music className="text-h_red h-5 w-5" />
+                          )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold text-white">

@@ -20,6 +20,7 @@ import {
   Trash2,
   ImageIcon,
   Plus,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ import {
   uploadEventGalleryImage,
   deleteEventGalleryImage,
 } from "@/lib/actions/event-upload";
-import { createGenre } from "@/lib/actions/genre";
+import { createGenre, getGenres } from "@/lib/actions/genre";
 import {
   VALID_EVENT_CATEGORIES,
   type EventCategory,
@@ -77,7 +78,6 @@ type EventFormProps =
       mode: "create";
       countries: CountryOption[];
       djDefaults?: { countryId?: string; cityId?: string };
-      allGenres: string[];
     }
   | {
       mode: "edit";
@@ -88,7 +88,6 @@ type EventFormProps =
       initialCities?: CityOption[];
       posterUrl?: string | null;
       galleryImages?: GalleryImage[];
-      allGenres: string[];
     };
 
 // ── Labels ────────────────────────────────────────────────────────────────────
@@ -253,11 +252,29 @@ export function EventForm(props: EventFormProps) {
     }
   }
 
-  const [availableGenres, setAvailableGenres] = useState<string[]>(
-    props.allGenres,
-  );
+  const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [customGenreInput, setCustomGenreInput] = useState("");
   const [genreSuggestion, setGenreSuggestion] = useState<string | null>(null);
+  const [showGenreDropdown, setShowGenreDropdown] = useState(false);
+
+  // Fetch genres on mount
+  useEffect(() => {
+    getGenres().then(setAvailableGenres);
+  }, []);
+
+  // Filter genres for dropdown
+  const filteredGenres = availableGenres
+    .filter((g) => {
+      if (!customGenreInput.trim()) return true;
+      const norm = normalizeGenre(g);
+      const inputNorm = normalizeGenre(customGenreInput);
+      return (
+        norm.includes(inputNorm) ||
+        g.toLowerCase().includes(customGenreInput.toLowerCase())
+      );
+    })
+    .filter((g) => !data.genres.includes(g))
+    .slice(0, 10); // Limit to 10 suggestions
 
   function normalizeGenre(s: string): string {
     return s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -772,25 +789,24 @@ export function EventForm(props: EventFormProps) {
               {data.genres.length}/8 selected
             </span>
           </div>
+          {/* Selected genres */}
           <div className="flex flex-wrap gap-2">
-            {availableGenres.map((genre) => {
-              const selected = data.genres.includes(genre);
-              return (
+            {data.genres.map((genre) => (
+              <span
+                key={genre}
+                className="inline-flex items-center gap-1 rounded-full border border-h_red bg-h_red/15 px-3 py-1 text-xs font-medium text-h_red"
+              >
+                {genre}
                 <button
-                  key={genre}
                   type="button"
                   onClick={() => toggleGenre(genre)}
-                  disabled={!selected && data.genres.length >= 8}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
-                    selected
-                      ? "border-h_red bg-h_red/15 text-h_red"
-                      : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-500 hover:text-white"
-                  } disabled:cursor-not-allowed disabled:opacity-40`}
+                  className="ml-1 hover:text-white"
+                  aria-label={`Remove ${genre}`}
                 >
-                  {genre}
+                  <X className="h-3 w-3" />
                 </button>
-              );
-            })}
+              </span>
+            ))}
           </div>
 
           {/* Custom genre input */}
@@ -822,13 +838,20 @@ export function EventForm(props: EventFormProps) {
                   </button>
                 </div>
               )}
-              <div className="flex gap-2">
+              <div className="relative">
                 <Input
                   value={customGenreInput}
                   onChange={(e) => {
                     setCustomGenreInput(e.target.value);
                     if (genreSuggestion) setGenreSuggestion(null);
+                    setShowGenreDropdown(e.target.value.length > 0);
                   }}
+                  onFocus={() =>
+                    setShowGenreDropdown(customGenreInput.length > 0)
+                  }
+                  onBlur={() =>
+                    setTimeout(() => setShowGenreDropdown(false), 200)
+                  }
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -838,18 +861,36 @@ export function EventForm(props: EventFormProps) {
                   placeholder="Add a custom genre…"
                   className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddCustomGenre}
-                  disabled={!customGenreInput.trim() || data.genres.length >= 8}
-                  className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-                >
-                  <Plus className="mr-1 h-3.5 w-3.5" />
-                  Add
-                </Button>
+                {showGenreDropdown && filteredGenres.length > 0 && (
+                  <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-zinc-700 bg-zinc-900 shadow-lg">
+                    {filteredGenres.map((genre) => (
+                      <button
+                        key={genre}
+                        type="button"
+                        onClick={() => {
+                          toggleGenre(genre);
+                          setCustomGenreInput("");
+                          setShowGenreDropdown(false);
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                      >
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddCustomGenre}
+                disabled={!customGenreInput.trim() || data.genres.length >= 8}
+                className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              >
+                <Plus className="mr-1 h-3.5 w-3.5" />
+                Add
+              </Button>
             </div>
           )}
         </div>

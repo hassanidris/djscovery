@@ -3,6 +3,14 @@
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 
+export async function getGenres(): Promise<string[]> {
+  const genres = await prisma.genre.findMany({
+    select: { name: true },
+    orderBy: { name: "asc" },
+  });
+  return genres.map((g) => g.name);
+}
+
 export async function createGenre(
   name: string,
 ): Promise<{ success: true; name: string } | { error: string }> {

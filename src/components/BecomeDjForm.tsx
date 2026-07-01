@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -8,6 +8,7 @@ import {
   getCitiesByCountry,
   getOrCreateGenre,
 } from "@/lib/actions/profile";
+import { getGenres } from "@/lib/actions/genre";
 import { uploadDjMediaTemp } from "@/lib/actions/dj-upload";
 import {
   Camera,
@@ -38,7 +39,6 @@ const SOCIAL_PLATFORMS = [
 
 interface BecomeDjFormProps {
   countries: Country[];
-  initialGenres: Genre[];
   userId: string;
 }
 
@@ -50,11 +50,7 @@ const sectionCls =
 const sectionTitleCls =
   "text-base font-semibold text-white border-b border-white/10 pb-3 mb-1";
 
-export default function BecomeDjForm({
-  countries,
-  initialGenres,
-  userId,
-}: BecomeDjFormProps) {
+export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   const [isPending, startTransition] = useTransition();
 
   // Basic info
@@ -74,12 +70,18 @@ export default function BecomeDjForm({
   const cityRequestId = useRef(0);
 
   // Genres
-  const [allGenres, setAllGenres] = useState<Genre[]>(initialGenres);
-  const [selectedGenreIds, setSelectedGenreIds] = useState<Set<number>>(
+  const [availableGenres, setAvailableGenres] = useState<string[]>([]);
+  const [selectedGenreNames, setSelectedGenreNames] = useState<Set<string>>(
     new Set(),
   );
   const [newGenreInput, setNewGenreInput] = useState("");
   const [addingGenre, setAddingGenre] = useState(false);
+  const [showGenreDropdown, setShowGenreDropdown] = useState(false);
+
+  // Fetch genres on mount
+  useEffect(() => {
+    getGenres().then(setAvailableGenres);
+  }, []);
 
   // Social links
   const [socialLinks, setSocialLinks] = useState<
@@ -159,12 +161,26 @@ export default function BecomeDjForm({
     }
   }
 
-  function toggleGenre(id: number) {
+  // Filter genres for dropdown
+  const filteredGenres = availableGenres
+    .filter((g) => {
+      if (!newGenreInput.trim()) return true;
+      const norm = g.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const inputNorm = newGenreInput.toLowerCase().replace(/[^a-z0-9]/g, "");
+      return (
+        norm.includes(inputNorm) ||
+        g.toLowerCase().includes(newGenreInput.toLowerCase())
+      );
+    })
+    .filter((g) => !selectedGenreNames.has(g))
+    .slice(0, 10);
+
+  function toggleGenre(name: string) {
     setFieldErrors((prev) => ({ ...prev, genres: undefined }));
-    setSelectedGenreIds((prev) => {
+    setSelectedGenreNames((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < 5) next.add(id);
+      if (next.has(name)) next.delete(name);
+      else if (next.size < 5) next.add(name);
       return next;
     });
   }
@@ -175,13 +191,13 @@ export default function BecomeDjForm({
     setAddingGenre(true);
     try {
       const genre = await getOrCreateGenre(name);
-      setAllGenres((prev) =>
-        prev.some((g) => g.id === genre.id)
+      setAvailableGenres((prev) =>
+        prev.includes(genre.name)
           ? prev
-          : [...prev, genre].sort((a, b) => a.name.localeCompare(b.name)),
+          : [...prev, genre.name].sort((a, b) => a.localeCompare(b)),
       );
-      setSelectedGenreIds((prev) =>
-        prev.size >= 5 ? prev : new Set([...prev, genre.id]),
+      setSelectedGenreNames((prev) =>
+        prev.size >= 5 ? prev : new Set([...prev, genre.name]),
       );
       setNewGenreInput("");
     } catch {
@@ -234,7 +250,7 @@ export default function BecomeDjForm({
     } = {};
     if (selectedDjTypes.size === 0) fe.djTypes = "Select at least one DJ type.";
     if (!countryId) fe.country = "Country is required.";
-    if (selectedGenreIds.size === 0) fe.genres = "Select at least one genre.";
+    if (selectedGenreNames.size === 0) fe.genres = "Select at least one genre.";
     if (socialLinks.filter((l) => l.url.trim()).length === 0)
       fe.social = "Add at least one social media link.";
     if (Object.keys(fe).length > 0) {
@@ -307,7 +323,7 @@ export default function BecomeDjForm({
           avatarUrl,
           countryId: countryId ?? undefined,
           cityId: cityId ?? undefined,
-          genreIds: Array.from(selectedGenreIds),
+          genreIds: Array.from(selectedGenreNames),
           djTypes: Array.from(selectedDjTypes),
           socialLinks: socialLinks.filter((l) => l.url.trim()),
           media,
@@ -558,45 +574,49 @@ export default function BecomeDjForm({
             Genres <span className="text-h_red">*</span>
           </h2>
           <span
-            className={`text-xs font-medium ${selectedGenreIds.size >= 5 ? "text-amber-400" : "text-gray-500"}`}
+            className={`text-xs font-medium ${selectedGenreNames.size >= 5 ? "text-amber-400" : "text-gray-500"}`}
           >
-            {selectedGenreIds.size}/5
+            {selectedGenreNames.size}/5
           </span>
         </div>
         <p className="-mt-2 text-xs text-gray-400">
           Select up to 5 genres that apply to your style.
         </p>
 
+        {/* Selected genres */}
         <div className="flex flex-wrap gap-2">
-          {allGenres.map((genre) => {
-            const selected = selectedGenreIds.has(genre.id);
-            return (
+          {Array.from(selectedGenreNames).map((genre) => (
+            <span
+              key={genre}
+              className="border-h_red bg-h_red/20 inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-medium text-white"
+            >
+              {genre}
               <button
-                key={genre.id}
                 type="button"
-                onClick={() => toggleGenre(genre.id)}
-                className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${
-                  selected
-                    ? "bg-h_red/20 border-h_red text-white"
-                    : "border-white/20 bg-white/5 text-gray-400 hover:border-white/40 hover:text-gray-200"
-                }`}
+                onClick={() => toggleGenre(genre)}
+                className="ml-1 hover:text-gray-300"
+                aria-label={`Remove ${genre}`}
               >
-                {selected && <Check className="h-3 w-3" />}
-                {genre.name}
+                <X className="h-3 w-3" />
               </button>
-            );
-          })}
+            </span>
+          ))}
         </div>
 
         {fieldErrors.genres && (
           <p className="-mt-2 text-xs text-red-400">{fieldErrors.genres}</p>
         )}
 
-        <div className="flex gap-2">
+        <div className="relative">
           <input
             type="text"
             value={newGenreInput}
-            onChange={(e) => setNewGenreInput(e.target.value)}
+            onChange={(e) => {
+              setNewGenreInput(e.target.value);
+              setShowGenreDropdown(e.target.value.length > 0);
+            }}
+            onFocus={() => setShowGenreDropdown(newGenreInput.length > 0)}
+            onBlur={() => setTimeout(() => setShowGenreDropdown(false), 200)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -604,29 +624,32 @@ export default function BecomeDjForm({
               }
             }}
             placeholder={
-              selectedGenreIds.size >= 5
+              selectedGenreNames.size >= 5
                 ? "Max 5 genres reached"
-                : "Not in the list? Add e.g. Cumbia..."
+                : "Add a genre..."
             }
             maxLength={50}
-            disabled={selectedGenreIds.size >= 5}
-            className="focus:ring-h_red flex-1 rounded-lg bg-white/10 px-4 py-2.5 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none disabled:opacity-40"
+            disabled={selectedGenreNames.size >= 5}
+            className="focus:ring-h_red w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none disabled:opacity-40"
           />
-          <button
-            type="button"
-            onClick={handleAddGenre}
-            disabled={
-              !newGenreInput.trim() || addingGenre || selectedGenreIds.size >= 5
-            }
-            className="bg-h_red hover:bg-h_redDark flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50"
-          >
-            {addingGenre ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4" />
-            )}
-            Add
-          </button>
+          {showGenreDropdown && filteredGenres.length > 0 && (
+            <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-white/20 bg-[#1a1a1a] shadow-lg">
+              {filteredGenres.map((genre) => (
+                <button
+                  key={genre}
+                  type="button"
+                  onClick={() => {
+                    toggleGenre(genre);
+                    setNewGenreInput("");
+                    setShowGenreDropdown(false);
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 hover:text-white"
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <p className="-mt-1 text-xs text-gray-600">
           New genres are saved to the database and will appear for future DJs.

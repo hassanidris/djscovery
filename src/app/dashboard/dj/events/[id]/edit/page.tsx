@@ -61,24 +61,17 @@ export default async function EventEditPage({
   });
   if (!event) notFound();
 
-  const [countries, initialCities, galleryImages, allGenres] =
-    await Promise.all([
-      getCountries(),
-      event.countryId
-        ? getCitiesForCountry(event.countryId)
-        : Promise.resolve([]),
-      prisma.eventMedia.findMany({
-        where: { eventId: event.id },
-        orderBy: { sortOrder: "asc" },
-        select: { id: true, url: true },
-      }),
-      prisma.genre.findMany({
-        orderBy: { name: "asc" },
-        select: { name: true },
-      }),
-    ]);
-
-  const genreNames = allGenres.map((g) => g.name);
+  const [countries, initialCities, galleryImages] = await Promise.all([
+    getCountries(),
+    event.countryId
+      ? getCitiesForCountry(event.countryId)
+      : Promise.resolve([]),
+    prisma.eventMedia.findMany({
+      where: { eventId: event.id },
+      orderBy: { sortOrder: "asc" },
+      select: { id: true, url: true },
+    }),
+  ]);
 
   const initialData = {
     title: event.title,
@@ -127,7 +120,6 @@ export default async function EventEditPage({
           initialCities={initialCities}
           posterUrl={event.posterUrl}
           galleryImages={galleryImages}
-          allGenres={genreNames}
         />
       </div>
     </div>

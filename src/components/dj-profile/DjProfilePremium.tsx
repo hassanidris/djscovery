@@ -93,6 +93,10 @@ import {
   buildCalendarFromData,
   getCalendarMonthLabel,
 } from "@/lib/dj-profile-mappers";
+import {
+  getVideoThumbnailUrl,
+  useAudioThumbnail,
+} from "@/lib/media-thumbnails";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 
 function StatPill({
@@ -114,6 +118,53 @@ function StatPill({
       )}
       <span className="mt-1 text-center text-xs text-gray-500">{label}</span>
     </div>
+  );
+}
+
+function MixPlayer({
+  mix,
+}: {
+  mix: {
+    title: string;
+    audioUrl: string;
+    platform: string;
+    duration: string;
+    plays: string;
+  };
+}) {
+  const thumb = useAudioThumbnail(mix.audioUrl);
+
+  return (
+    <MediaAudioPlayer
+      audioUrl={mix.audioUrl}
+      title={mix.title}
+      thumbnailUrl={thumb || undefined}
+    >
+      <Card className="bg-h_blackLight/30 flex cursor-pointer flex-row items-center gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
+        <div className="from-h_red/30 to-h_redDark/10 mr-4 flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/8 bg-linear-to-br">
+          {thumb ? (
+            <Image
+              src={thumb}
+              alt={mix.title}
+              width={48}
+              height={48}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Music className="text-h_red h-4 w-4" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-white">{mix.title}</p>
+          <p className="mt-0.5 text-xs text-gray-500">
+            {mix.platform} · {mix.duration} · {mix.plays} plays
+          </p>
+        </div>
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white">
+          <Play className="ml-0.5 h-3 w-3" />
+        </div>
+      </Card>
+    </MediaAudioPlayer>
   );
 }
 
@@ -187,6 +238,13 @@ export default function DjProfilePremium({
     ? getCalendarMonthLabel(djData)
     : "September 2025";
   const SPOTLIGHT = djData ? djData.spotlight : PREMIUM_DEFAULT_SPOTLIGHT;
+  const featuredVideoUrl = SPOTLIGHT.featuredVideo.videoUrl;
+  const featuredVideoThumb =
+    SPOTLIGHT.featuredVideo.thumbnail ||
+    getVideoThumbnailUrl(featuredVideoUrl) ||
+    "/gallery-2.png";
+  const featuredMixAudioUrl = SPOTLIGHT.featuredMix.audioUrl;
+  const featuredMixThumb = useAudioThumbnail(featuredMixAudioUrl);
   const location = `${DJ.city}, ${DJ.country}`;
 
   const bookingContext: BookingViewerContext = viewerContext ?? {
@@ -246,9 +304,18 @@ export default function DjProfilePremium({
                 <MediaAudioPlayer
                   audioUrl={SPOTLIGHT.featuredMix.audioUrl}
                   title={SPOTLIGHT.featuredMix.title}
+                  thumbnailUrl={featuredMixThumb || undefined}
                 >
                   <Card className="bg-h_blackLight/30 group cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
                     <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
+                      {featuredMixThumb ? (
+                        <Image
+                          src={featuredMixThumb}
+                          alt={SPOTLIGHT.featuredMix.title}
+                          fill
+                          className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                        />
+                      ) : null}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
                           <Play className="ml-0.5 h-5 w-5 text-white" />
@@ -274,13 +341,13 @@ export default function DjProfilePremium({
                 </MediaAudioPlayer>
                 <MediaVideoModal
                   videoUrl={SPOTLIGHT.featuredVideo.videoUrl}
-                  thumbnail={SPOTLIGHT.featuredVideo.thumbnail}
+                  thumbnail={featuredVideoThumb}
                   title={SPOTLIGHT.featuredVideo.title}
                 >
                   <Card className="bg-h_blackLight/30 group cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
                     <div className="relative h-44 overflow-hidden">
                       <Image
-                        src={SPOTLIGHT.featuredVideo.thumbnail}
+                        src={featuredVideoThumb}
                         alt="video"
                         fill
                         className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
@@ -554,12 +621,14 @@ export default function DjProfilePremium({
                     <MediaVideoModal
                       key={m.id}
                       videoUrl={m.videoUrl ?? ""}
-                      thumbnail={m.url}
+                      thumbnail={
+                        getVideoThumbnailUrl(m.videoUrl ?? "") || m.url
+                      }
                       title={m.title ?? "Video"}
                     >
                       <div className="hover:ring-h_red/40 group relative aspect-video cursor-pointer overflow-hidden rounded-lg ring-1 ring-white/5 transition-all">
                         <Image
-                          src={m.url}
+                          src={getVideoThumbnailUrl(m.videoUrl ?? "") || m.url}
                           alt="video"
                           fill
                           className="object-cover opacity-60 transition-transform duration-300 group-hover:scale-105"
@@ -577,28 +646,7 @@ export default function DjProfilePremium({
               {mediaTab === "mixes" && (
                 <div className="flex flex-col gap-3">
                   {MIXES.map((mix) => (
-                    <MediaAudioPlayer
-                      key={mix.title}
-                      audioUrl={mix.audioUrl}
-                      title={mix.title}
-                    >
-                      <Card className="bg-h_blackLight/30 flex cursor-pointer flex-row items-center gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
-                        <div className="from-h_red/30 to-h_redDark/10 mr-4 flex size-12 shrink-0 items-center justify-center rounded-lg border border-white/8 bg-linear-to-br">
-                          <Music className="text-h_red h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-white">
-                            {mix.title}
-                          </p>
-                          <p className="mt-0.5 text-xs text-gray-500">
-                            {mix.platform} · {mix.duration} · {mix.plays} plays
-                          </p>
-                        </div>
-                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white">
-                          <Play className="ml-0.5 h-3 w-3" />
-                        </div>
-                      </Card>
-                    </MediaAudioPlayer>
+                    <MixPlayer key={mix.title} mix={mix} />
                   ))}
                 </div>
               )}
