@@ -728,7 +728,7 @@ export default function BecomeDjForm({
             label="Video Links"
             icon={<Video className="h-4 w-4" />}
             placeholder="https://youtube.com/watch?v=..."
-            hint="YouTube, Vimeo, Facebook..."
+            hint="YouTube, Vimeo, TikTok, Instagram, Facebook"
             links={videoLinks}
             onChange={setVideoLinks}
           />

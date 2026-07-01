@@ -6,25 +6,122 @@ import { X } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
-function getYouTubeId(url: string): string | null {
-  try {
-    const u = new URL(url);
-    const host = u.hostname.replace(/^www\./, "");
+type VideoProvider =
+  | "youtube"
+  | "vimeo"
+  | "tiktok"
+  | "instagram"
+  | "facebook"
+  | "unknown";
 
+type VideoEmbedInfo = {
+  provider: VideoProvider;
+  embedUrl: string | null;
+  iframeAllow?: string;
+};
+
+const PROVIDER_LABELS: Record<VideoProvider, string> = {
+  youtube: "YouTube",
+  vimeo: "Vimeo",
+  tiktok: "TikTok",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  unknown: "the original site",
+};
+
+function getVideoEmbedInfo(url: string): VideoEmbedInfo {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    const segments = parsed.pathname.split("/").filter(Boolean);
+
+    // YouTube (full + short links)
     if (host === "youtu.be") {
-      return u.pathname.split("/").filter(Boolean)[0] ?? null;
+      const videoId = segments[0];
+      if (videoId) {
+        return {
+          provider: "youtube",
+          embedUrl: `https://www.youtube.com/embed/${videoId}`,
+          iframeAllow: "autoplay; encrypted-media; fullscreen",
+        };
+      }
     }
     if (host.endsWith("youtube.com")) {
-      if (u.pathname === "/watch") return u.searchParams.get("v");
-      if (u.pathname.startsWith("/embed/"))
-        return u.pathname.split("/")[2] ?? null;
-      if (u.pathname.startsWith("/shorts/"))
-        return u.pathname.split("/")[2] ?? null;
+      let videoId: string | null = null;
+      if (parsed.pathname === "/watch") {
+        videoId = parsed.searchParams.get("v");
+      } else if (parsed.pathname.startsWith("/embed/")) {
+        videoId = segments[1] ?? null;
+      } else if (parsed.pathname.startsWith("/shorts/")) {
+        videoId = segments[1] ?? null;
+      }
+      if (videoId) {
+        return {
+          provider: "youtube",
+          embedUrl: `https://www.youtube.com/embed/${videoId}`,
+          iframeAllow: "autoplay; encrypted-media; fullscreen",
+        };
+      }
+    }
+
+    // Vimeo
+    if (host.includes("vimeo.com")) {
+      const numericSegment = segments.find((segment) =>
+        /^(\d+)$/.test(segment),
+      );
+      if (numericSegment) {
+        return {
+          provider: "vimeo",
+          embedUrl: `https://player.vimeo.com/video/${numericSegment}`,
+          iframeAllow: "autoplay; fullscreen; picture-in-picture",
+        };
+      }
+    }
+
+    // TikTok (@user/video/1234567890)
+    if (host.includes("tiktok.com")) {
+      const videoId = segments.find((segment) => /^(\d+)$/.test(segment));
+      if (videoId) {
+        return {
+          provider: "tiktok",
+          embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
+          iframeAllow:
+            "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+        };
+      }
+    }
+
+    // Instagram (p/{code}, reel/{code}, tv/{code})
+    if (host.includes("instagram.com") || host === "instagr.am") {
+      if (segments.length >= 2 && ["p", "reel", "tv"].includes(segments[0])) {
+        const mediaType = segments[0];
+        const code = segments[1];
+        if (code) {
+          return {
+            provider: "instagram",
+            embedUrl: `https://www.instagram.com/${mediaType}/${code}/embed/`,
+            iframeAllow:
+              "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          };
+        }
+      }
+    }
+
+    // Facebook (facebook.com/... or fb.watch short links)
+    if (host.includes("facebook.com") || host === "fb.watch") {
+      const canonicalUrl = encodeURIComponent(url);
+      return {
+        provider: "facebook",
+        embedUrl: `https://www.facebook.com/plugins/video.php?href=${canonicalUrl}&show_text=0&autoplay=1`,
+        iframeAllow:
+          "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+      };
     }
   } catch {
-    return null;
+    return { provider: "unknown", embedUrl: null };
   }
-  return null;
+
+  return { provider: "unknown", embedUrl: null };
 }
 
 type Props = {
@@ -41,7 +138,8 @@ export default function MediaVideoModal({
   children,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const youtubeId = getYouTubeId(videoUrl);
+  const embedInfo = getVideoEmbedInfo(videoUrl);
+  const providerLabel = PROVIDER_LABELS[embedInfo.provider];
 
   return (
     <>
@@ -55,38 +153,46 @@ export default function MediaVideoModal({
             setOpen(true);
           }
         }}
-        className="cursor-pointer h-full"
+        className="h-full cursor-pointer"
       >
         {children}
       </div>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/92"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4"
           onClick={() => setOpen(false)}
         >
           <button
             onClick={() => setOpen(false)}
-            className="absolute top-4 right-4 size-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
+            className="absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
 
           <div
             className="w-full max-w-4xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-white font-semibold mb-3 text-sm truncate px-1">
+            <p className="mb-3 truncate px-1 text-sm font-semibold text-white">
               {title}
             </p>
-            <div className="relative aspect-video rounded-xl overflow-hidden bg-black">
-              {youtubeId ? (
+            <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
+              {embedInfo.embedUrl ? (
                 <iframe
-                  src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`}
+                  src={
+                    embedInfo.provider === "youtube" ||
+                    embedInfo.provider === "vimeo"
+                      ? `${embedInfo.embedUrl}?autoplay=1`
+                      : embedInfo.embedUrl
+                  }
                   title={title}
-                  allow="autoplay; encrypted-media; fullscreen"
+                  allow={
+                    embedInfo.iframeAllow ??
+                    "autoplay; encrypted-media; fullscreen"
+                  }
                   allowFullScreen
-                  className="absolute inset-0 w-full h-full"
+                  className="absolute inset-0 h-full w-full"
                 />
               ) : (
                 <>
@@ -96,13 +202,13 @@ export default function MediaVideoModal({
                     fill
                     className="object-cover opacity-40"
                   />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
+                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
                     <FontAwesomeIcon
                       icon={faPlay}
                       className="h-10 w-10 text-white/40"
                     />
-                    <p className="text-gray-400 text-sm">
-                      Cannot embed this video
+                    <p className="text-sm text-gray-400">
+                      Cannot embed this video automatically
                     </p>
                     <a
                       href={videoUrl}
@@ -110,7 +216,7 @@ export default function MediaVideoModal({
                       rel="noopener noreferrer"
                       className="text-h_red text-sm underline"
                     >
-                      Watch on YouTube →
+                      Open on {providerLabel}
                     </a>
                   </div>
                 </>
