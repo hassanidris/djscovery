@@ -121,7 +121,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
           "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
       };
     }
-  } catch {
+  } catch (_error) {
     return { provider: "unknown", embedUrl: null };
   }
 
