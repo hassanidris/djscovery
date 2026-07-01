@@ -4,14 +4,18 @@ import { useEffect, useState } from "react";
 
 type MediaProvider = "youtube" | "vimeo" | "soundcloud" | "unknown";
 
+function isHostOrSubdomain(host: string, domain: string): boolean {
+  return host === domain || host.endsWith(`.${domain}`);
+}
+
 export function getMediaProvider(url: string): MediaProvider {
   try {
     const parsed = new URL(url);
     const host = parsed.hostname.replace(/^www\./, "");
 
-    if (host === "youtu.be" || host.endsWith("youtube.com")) return "youtube";
-    if (host.endsWith("vimeo.com")) return "vimeo";
-    if (host.includes("soundcloud.com")) return "soundcloud";
+    if (host === "youtu.be" || isHostOrSubdomain(host, "youtube.com")) return "youtube";
+    if (isHostOrSubdomain(host, "vimeo.com")) return "vimeo";
+    if (isHostOrSubdomain(host, "soundcloud.com")) return "soundcloud";
   } catch {
     return "unknown";
   }
@@ -25,7 +29,7 @@ export function getYouTubeVideoId(url: string): string | null {
     const segments = parsed.pathname.split("/").filter(Boolean);
 
     if (host === "youtu.be") return segments[0] ?? null;
-    if (host.endsWith("youtube.com")) {
+    if (isHostOrSubdomain(host, "youtube.com")) {
       if (parsed.pathname === "/watch") return parsed.searchParams.get("v");
       if (parsed.pathname.startsWith("/embed/") || parsed.pathname.startsWith("/shorts/")) {
         return segments[1] ?? null;
