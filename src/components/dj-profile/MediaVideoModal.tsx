@@ -79,7 +79,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
           embedUrl: `https://player.vimeo.com/video/${numericSegment}`,
           iframeAllow: "autoplay; fullscreen; picture-in-picture",
         };
-    if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
+      }
     }
 
     // TikTok (@user/video/1234567890)
@@ -96,7 +96,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
     }
 
     // Instagram (p/{code}, reel/{code}, tv/{code})
-    if (host.includes("instagram.com") || host === "instagr.am") {
+    if (isHostMatch(host, "instagram.com") || host === "instagr.am") {
       if (segments.length >= 2 && ["p", "reel", "tv"].includes(segments[0])) {
         const mediaType = segments[0];
         const code = segments[1];
@@ -112,7 +112,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
     }
 
     // Facebook (facebook.com/... or fb.watch short links)
-    if (host.includes("facebook.com") || host === "fb.watch") {
+    if (isHostMatch(host, "facebook.com") || host === "fb.watch") {
       const canonicalUrl = encodeURIComponent(url);
       return {
         provider: "facebook",
