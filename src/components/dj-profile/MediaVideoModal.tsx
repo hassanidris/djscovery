@@ -79,7 +79,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
           embedUrl: `https://player.vimeo.com/video/${numericSegment}`,
           iframeAllow: "autoplay; fullscreen; picture-in-picture",
         };
-      }
+    if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
     }
 
     // TikTok (@user/video/1234567890)
