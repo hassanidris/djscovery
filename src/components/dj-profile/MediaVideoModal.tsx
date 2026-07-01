@@ -29,6 +29,10 @@ const PROVIDER_LABELS: Record<VideoProvider, string> = {
   unknown: "the original site",
 };
 
+function isHostMatch(host: string, domain: string): boolean {
+  return host === domain || host.endsWith(`.${domain}`);
+}
+
 function getVideoEmbedInfo(url: string): VideoEmbedInfo {
   try {
     const parsed = new URL(url);
@@ -46,7 +50,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
         };
       }
     }
-    if (host.endsWith("youtube.com")) {
+    if (isHostMatch(host, "youtube.com")) {
       let videoId: string | null = null;
       if (parsed.pathname === "/watch") {
         videoId = parsed.searchParams.get("v");
@@ -65,7 +69,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
     }
 
     // Vimeo
-    if (host.includes("vimeo.com")) {
+    if (isHostMatch(host, "vimeo.com")) {
       const numericSegment = segments.find((segment) =>
         /^(\d+)$/.test(segment),
       );
@@ -79,7 +83,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
     }
 
     // TikTok (@user/video/1234567890)
-    if (host.includes("tiktok.com")) {
+    if (isHostMatch(host, "tiktok.com")) {
       const videoId = segments.find((segment) => /^(\d+)$/.test(segment));
       if (videoId) {
         return {
