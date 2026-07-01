@@ -12,7 +12,17 @@ type Props = {
 export default function MediaAudioPlayer({ audioUrl, title, children }: Props) {
   const [open, setOpen] = useState(false);
 
-  const isSoundCloud = audioUrl.includes("soundcloud.com");
+  let isSoundCloud = false;
+  try {
+    const { hostname } = new URL(audioUrl);
+    const normalizedHost = hostname.toLowerCase();
+    isSoundCloud =
+      normalizedHost === "soundcloud.com" ||
+      normalizedHost.endsWith(".soundcloud.com");
+  } catch {
+    isSoundCloud = false;
+  }
+
   const embedUrl = isSoundCloud
     ? `https://w.soundcloud.com/player/?url=${encodeURIComponent(audioUrl)}&auto_play=true&color=%23ff2200&buying=false&sharing=false&show_artwork=true&show_user=false`
     : null;
