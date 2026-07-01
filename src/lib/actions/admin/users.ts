@@ -113,6 +113,15 @@ export type AdminUser = {
   roles: { role: string }[];
 };
 
+export type DashboardUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  roles: string[];
+  status: string;
+  createdAt: Date;
+};
+
 export async function getAdminUsers({
   cursor,
   take = 20,
@@ -136,9 +145,11 @@ export async function getAdminUsers({
       ...(status
         ? { status: status as "ACTIVE" | "SUSPENDED" | "PENDING" | "REJECTED" }
         : {}),
-      ...(role
-        ? { roles: { some: { role: role as "ADMIN" | "DJ" | "ORGANIZER" } } }
-        : {}),
+      ...(role === "FAN"
+        ? { roles: { none: {} } }
+        : role
+          ? { roles: { some: { role: role as "ADMIN" | "DJ" | "ORGANIZER" } } }
+          : {}),
       ...(search
         ? {
             OR: [
@@ -171,4 +182,35 @@ export async function getAdminUsers({
     users,
     nextCursor: hasNextPage ? (users[users.length - 1]?.id ?? null) : null,
   };
+}
+
+export async function getRecentUsers({
+  limit = 5,
+}: {
+  limit?: number;
+} = {}): Promise<DashboardUser[]> {
+  await requireAdmin();
+
+  const users = await prisma.user.findMany({
+    where: { deletedAt: null },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      createdAt: true,
+      status: true,
+      roles: { select: { role: true } },
+    },
+  });
+
+  return users.map((user) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt,
+    status: user.status,
+    roles: user.roles.map((r) => r.role),
+  }));
 }

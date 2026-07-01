@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminTopBar from "@/components/admin/AdminTopBar";
 import prisma from "@/lib/client";
+import { getNavUser } from "@/lib/auth/getNavUser";
 
 export const metadata: Metadata = {
   title: {
@@ -26,14 +28,22 @@ export default async function AdminLayout({
   await requireAdmin();
 
   const openReportCount = await getOpenReportCount();
+  const navUser = await getNavUser();
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
-        <div className="flex flex-col gap-0 lg:flex-row lg:gap-6">
-          <AdminSidebar openReportCount={openReportCount} />
-          <div className="min-w-0 flex-1">{children}</div>
-        </div>
+      <AdminSidebar
+        openReportCount={openReportCount}
+        admin={{
+          displayName: navUser.displayName,
+          email: navUser.username,
+          avatarSrc: navUser.avatarSrc,
+          initials: navUser.initials,
+        }}
+      />
+      <div className="ml-16 lg:ml-64">
+        <AdminTopBar />
+        <main className="px-4 py-6 md:px-8">{children}</main>
       </div>
     </div>
   );

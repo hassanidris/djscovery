@@ -12,7 +12,7 @@ import AdminPagination from "@/components/admin/AdminPagination";
 import AdminFilters from "@/components/admin/AdminFilters";
 import { formatDistanceToNow } from "date-fns";
 
-export const metadata: Metadata = { title: "Users" };
+export const metadata: Metadata = { title: "Fans" };
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: "border-green-500/30 bg-green-500/10 text-green-400",
@@ -25,6 +25,7 @@ const ROLE_COLORS: Record<string, string> = {
   ADMIN: "border-purple-500/30 bg-purple-500/10 text-purple-400",
   DJ: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   ORGANIZER: "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",
+  FAN: "border-gray-500/30 bg-gray-500/10 text-gray-400",
 };
 
 export default async function AdminUsersPage({
@@ -34,7 +35,7 @@ export default async function AdminUsersPage({
 }) {
   const params = await searchParams;
   const cursor = params.cursor;
-  const role = params.role;
+  const role = params.role || "FAN";
   const status = params.status;
   const search = params.search;
 
@@ -48,9 +49,9 @@ export default async function AdminUsersPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Users</h1>
+        <h1 className="text-2xl font-bold text-white">Fans</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Manage all platform users.
+          Manage fan accounts and all platform users.
         </p>
       </div>
 
@@ -73,6 +74,7 @@ export default async function AdminUsersPage({
             key: "role",
             placeholder: "All Roles",
             options: [
+              { value: "FAN", label: "Fan" },
               { value: "ADMIN", label: "Admin" },
               { value: "DJ", label: "DJ" },
               { value: "ORGANIZER", label: "Organizer" },
