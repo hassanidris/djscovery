@@ -117,6 +117,8 @@ const DJ_TYPE_LABELS: Record<string, string> = {
   CULTURAL_EVENT: "Cultural Event",
 };
 
+type AvailabilityDay = { day: number; status: string };
+
 interface ProfileData {
   stageName: string;
   bio: string;
@@ -135,6 +137,28 @@ interface ProfileData {
   feeMax: number | null;
   feeCurrency: string;
   slug: string;
+  plan: "FREE" | "PREMIUM";
+  // Team
+  managerName: string;
+  managerEmail: string;
+  managerPhone: string;
+  agentName: string;
+  agentAgency: string;
+  agentEmail: string;
+  // Spotlight
+  featuredMixTitle: string;
+  featuredMixAudioUrl: string;
+  featuredMixDuration: string;
+  featuredMixPlays: number;
+  featuredVideoTitle: string;
+  featuredVideoUrl: string;
+  featuredVideoThumbnail: string;
+  featuredVideoDuration: string;
+  featuredVideoViews: number;
+  // Availability
+  availabilityTimezone: string;
+  availabilityMonth: string;
+  availabilityDays: AvailabilityDay[];
 }
 
 interface Props {
@@ -211,6 +235,55 @@ export default function EditDjProfileForm({
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
   const [gallery, setGallery] = useState<GalleryImage[]>(galleryImages);
+
+  // Team
+  const [managerName, setManagerName] = useState(profile.managerName);
+  const [managerEmail, setManagerEmail] = useState(profile.managerEmail);
+  const [managerPhone, setManagerPhone] = useState(profile.managerPhone);
+  const [agentName, setAgentName] = useState(profile.agentName);
+  const [agentAgency, setAgentAgency] = useState(profile.agentAgency);
+  const [agentEmail, setAgentEmail] = useState(profile.agentEmail);
+
+  // Spotlight
+  const [featuredMixTitle, setFeaturedMixTitle] = useState(
+    profile.featuredMixTitle,
+  );
+  const [featuredMixAudioUrl, setFeaturedMixAudioUrl] = useState(
+    profile.featuredMixAudioUrl,
+  );
+  const [featuredMixDuration, setFeaturedMixDuration] = useState(
+    profile.featuredMixDuration,
+  );
+  const [featuredMixPlays, setFeaturedMixPlays] = useState(
+    String(profile.featuredMixPlays),
+  );
+  const [featuredVideoTitle, setFeaturedVideoTitle] = useState(
+    profile.featuredVideoTitle,
+  );
+  const [featuredVideoUrl, setFeaturedVideoUrl] = useState(
+    profile.featuredVideoUrl,
+  );
+  const [featuredVideoThumbnail, setFeaturedVideoThumbnail] = useState(
+    profile.featuredVideoThumbnail,
+  );
+  const [featuredVideoDuration, setFeaturedVideoDuration] = useState(
+    profile.featuredVideoDuration,
+  );
+  const [featuredVideoViews, setFeaturedVideoViews] = useState(
+    String(profile.featuredVideoViews),
+  );
+
+  // Availability
+  const [availabilityTimezone, setAvailabilityTimezone] = useState(
+    profile.availabilityTimezone,
+  );
+  const [availabilityMonth, setAvailabilityMonth] = useState(
+    profile.availabilityMonth,
+  );
+  const [availabilityDays, setAvailabilityDays] = useState<AvailabilityDay[]>(
+    profile.availabilityDays,
+  );
+
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -231,7 +304,26 @@ export default function EditDjProfileForm({
       JSON.stringify([...profile.genres].sort()) ||
     JSON.stringify([...djTypes].sort()) !==
       JSON.stringify([...profile.djTypes].sort()) ||
-    JSON.stringify(socialLinks) !== JSON.stringify(profile.socialLinks);
+    JSON.stringify(socialLinks) !== JSON.stringify(profile.socialLinks) ||
+    managerName !== profile.managerName ||
+    managerEmail !== profile.managerEmail ||
+    managerPhone !== profile.managerPhone ||
+    agentName !== profile.agentName ||
+    agentAgency !== profile.agentAgency ||
+    agentEmail !== profile.agentEmail ||
+    featuredMixTitle !== profile.featuredMixTitle ||
+    featuredMixAudioUrl !== profile.featuredMixAudioUrl ||
+    featuredMixDuration !== profile.featuredMixDuration ||
+    featuredMixPlays !== String(profile.featuredMixPlays) ||
+    featuredVideoTitle !== profile.featuredVideoTitle ||
+    featuredVideoUrl !== profile.featuredVideoUrl ||
+    featuredVideoThumbnail !== profile.featuredVideoThumbnail ||
+    featuredVideoDuration !== profile.featuredVideoDuration ||
+    featuredVideoViews !== String(profile.featuredVideoViews) ||
+    availabilityTimezone !== profile.availabilityTimezone ||
+    availabilityMonth !== profile.availabilityMonth ||
+    JSON.stringify(availabilityDays) !==
+      JSON.stringify(profile.availabilityDays);
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
@@ -375,6 +467,39 @@ export default function EditDjProfileForm({
     toast.success("Photo removed", { id: toastId });
   }
 
+  function daysInMonth(monthStr: string): number {
+    if (!monthStr || !monthStr.includes("-")) return 30;
+    const [y, m] = monthStr.split("-").map(Number);
+    if (!y || !m) return 30;
+    return new Date(y, m, 0).getDate();
+  }
+
+  function firstDayOffset(monthStr: string): number {
+    if (!monthStr || !monthStr.includes("-")) return 0;
+    const [y, m] = monthStr.split("-").map(Number);
+    if (!y || !m) return 0;
+    const dow = new Date(y, m - 1, 1).getDay(); // 0=Sun, 1=Mon
+    return dow === 0 ? 6 : dow - 1; // shift so Mon=0
+  }
+
+  function getDayStatus(day: number): string {
+    const found = availabilityDays.find((d) => d.day === day);
+    return found?.status ?? "free";
+  }
+
+  function cycleDayStatus(day: number) {
+    const order = ["free", "available", "booked", "tentative"];
+    const current = getDayStatus(day);
+    const next = order[(order.indexOf(current) + 1) % order.length];
+    setAvailabilityDays((prev) => {
+      const filtered = prev.filter((d) => d.day !== day);
+      if (next === "free") return filtered;
+      return [...filtered, { day, status: next }];
+    });
+  }
+
+  const isPremium = profile.plan === "PREMIUM";
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
@@ -408,6 +533,30 @@ export default function EditDjProfileForm({
         feeMin: feeMin ? parseInt(feeMin, 10) : null,
         feeMax: feeMax ? parseInt(feeMax, 10) : null,
         feeCurrency: feeCurrency || null,
+        // Team
+        managerName: managerName.trim() || null,
+        managerEmail: managerEmail.trim() || null,
+        managerPhone: managerPhone.trim() || null,
+        agentName: agentName.trim() || null,
+        agentAgency: agentAgency.trim() || null,
+        agentEmail: agentEmail.trim() || null,
+        // Spotlight
+        featuredMixTitle: featuredMixTitle.trim() || null,
+        featuredMixAudioUrl: featuredMixAudioUrl.trim() || null,
+        featuredMixDuration: featuredMixDuration.trim() || null,
+        featuredMixPlays: featuredMixPlays ? parseInt(featuredMixPlays, 10) : 0,
+        featuredVideoTitle: featuredVideoTitle.trim() || null,
+        featuredVideoUrl: featuredVideoUrl.trim() || null,
+        featuredVideoThumbnail: featuredVideoThumbnail.trim() || null,
+        featuredVideoDuration: featuredVideoDuration.trim() || null,
+        featuredVideoViews: featuredVideoViews
+          ? parseInt(featuredVideoViews, 10)
+          : 0,
+        // Availability
+        availabilityTimezone: availabilityTimezone.trim() || null,
+        availabilityMonth: availabilityMonth.trim() || null,
+        availabilityDays:
+          availabilityDays.length > 0 ? availabilityDays : undefined,
       });
 
       if ("error" in result) {
@@ -980,6 +1129,317 @@ export default function EditDjProfileForm({
             <p className="text-[11px] text-gray-600">
               {gallery.length}/12 photos
             </p>
+          </div>
+        </SectionCard>
+
+        {/* Team Contacts */}
+        <SectionCard
+          title="Professional Team"
+          subtitle="Manager and booking agent details"
+        >
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                Manager
+              </p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Name
+                  </Label>
+                  <Input
+                    value={managerName}
+                    onChange={(e) => setManagerName(e.target.value)}
+                    placeholder="Marcus Osei"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Email
+                  </Label>
+                  <Input
+                    type="email"
+                    value={managerEmail}
+                    onChange={(e) => setManagerEmail(e.target.value)}
+                    placeholder="manager@email.com"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Phone
+                  </Label>
+                  <Input
+                    type="tel"
+                    value={managerPhone}
+                    onChange={(e) => setManagerPhone(e.target.value)}
+                    placeholder="+44 7700 900123"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+            <Separator className="bg-white/8" />
+            <div>
+              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                Booking Agent
+              </p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Name
+                  </Label>
+                  <Input
+                    value={agentName}
+                    onChange={(e) => setAgentName(e.target.value)}
+                    placeholder="Sophie Laurent"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Agency
+                  </Label>
+                  <Input
+                    value={agentAgency}
+                    onChange={(e) => setAgentAgency(e.target.value)}
+                    placeholder="Rhythm Agency"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Email
+                  </Label>
+                  <Input
+                    type="email"
+                    value={agentEmail}
+                    onChange={(e) => setAgentEmail(e.target.value)}
+                    placeholder="agent@email.com"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* Spotlight */}
+        <SectionCard
+          title="Spotlight"
+          subtitle="Featured mix and video at the top of your profile"
+        >
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                Featured Mix
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Title
+                  </Label>
+                  <Input
+                    value={featuredMixTitle}
+                    onChange={(e) => setFeaturedMixTitle(e.target.value)}
+                    placeholder="Afrobeats & Amapiano Fusion Vol.3"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Audio URL
+                  </Label>
+                  <Input
+                    value={featuredMixAudioUrl}
+                    onChange={(e) => setFeaturedMixAudioUrl(e.target.value)}
+                    placeholder="https://soundcloud.com/..."
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Duration
+                  </Label>
+                  <Input
+                    value={featuredMixDuration}
+                    onChange={(e) => setFeaturedMixDuration(e.target.value)}
+                    placeholder="1h 24m"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Plays
+                  </Label>
+                  <Input
+                    type="number"
+                    value={featuredMixPlays}
+                    onChange={(e) => setFeaturedMixPlays(e.target.value)}
+                    placeholder="82400"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+            <Separator className="bg-white/8" />
+            <div>
+              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                Featured Video
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Title
+                  </Label>
+                  <Input
+                    value={featuredVideoTitle}
+                    onChange={(e) => setFeaturedVideoTitle(e.target.value)}
+                    placeholder="Summer Closing Set — Full Recording"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Video URL
+                  </Label>
+                  <Input
+                    value={featuredVideoUrl}
+                    onChange={(e) => setFeaturedVideoUrl(e.target.value)}
+                    placeholder="https://youtube.com/..."
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Thumbnail URL
+                  </Label>
+                  <Input
+                    value={featuredVideoThumbnail}
+                    onChange={(e) => setFeaturedVideoThumbnail(e.target.value)}
+                    placeholder="https://..."
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Duration
+                  </Label>
+                  <Input
+                    value={featuredVideoDuration}
+                    onChange={(e) => setFeaturedVideoDuration(e.target.value)}
+                    placeholder="45 min"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Views
+                  </Label>
+                  <Input
+                    type="number"
+                    value={featuredVideoViews}
+                    onChange={(e) => setFeaturedVideoViews(e.target.value)}
+                    placeholder="211000"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* Availability Calendar */}
+        <SectionCard
+          title="Availability Calendar"
+          subtitle="Click days to set your schedule"
+        >
+          <div className="flex flex-col gap-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label className="mb-1.5 block text-xs text-gray-300">
+                  Month (YYYY-MM)
+                </Label>
+                <Input
+                  value={availabilityMonth}
+                  onChange={(e) => setAvailabilityMonth(e.target.value)}
+                  placeholder="2025-09"
+                  maxLength={7}
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                />
+              </div>
+              <div>
+                <Label className="mb-1.5 block text-xs text-gray-300">
+                  Timezone
+                </Label>
+                <Input
+                  value={availabilityTimezone}
+                  onChange={(e) => setAvailabilityTimezone(e.target.value)}
+                  placeholder="Europe/London"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                />
+              </div>
+            </div>
+
+            {availabilityMonth && (
+              <div>
+                <div className="mb-2 flex items-center gap-4">
+                  {[
+                    { color: "bg-emerald-500", label: "Available" },
+                    { color: "bg-h_red", label: "Booked" },
+                    { color: "bg-amber-500", label: "Tentative" },
+                    { color: "bg-white/10", label: "Free" },
+                  ].map((l) => (
+                    <div key={l.label} className="flex items-center gap-1.5">
+                      <div className={`size-2.5 rounded-full ${l.color}`} />
+                      <span className="text-xs text-gray-400">{l.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-1">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                    (d) => (
+                      <div
+                        key={d}
+                        className="pb-1 text-center text-[11px] font-semibold text-gray-600"
+                      >
+                        {d}
+                      </div>
+                    ),
+                  )}
+                  {Array.from({
+                    length: firstDayOffset(availabilityMonth),
+                  }).map((_, i) => (
+                    <div key={`e${i}`} />
+                  ))}
+                  {Array.from({
+                    length: daysInMonth(availabilityMonth),
+                  }).map((_, i) => {
+                    const day = i + 1;
+                    const status = getDayStatus(day);
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => cycleDayStatus(day)}
+                        className={`flex h-9 items-center justify-center rounded-md text-xs font-medium transition-all ${
+                          status === "booked"
+                            ? "bg-h_red/20 text-h_red border-h_red/30 border"
+                            : status === "tentative"
+                              ? "border border-amber-500/30 bg-amber-500/20 text-amber-400"
+                              : status === "available"
+                                ? "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
+                                : "text-gray-600 hover:bg-white/5"
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </SectionCard>
 

@@ -4,7 +4,7 @@ import prisma from "@/lib/client";
 
 export async function getCountries() {
   return prisma.country.findMany({
-    select: { id: true, name: true },
+    select: { id: true, name: true, code: true },
     orderBy: { name: "asc" },
   });
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Image from "next/image";
 import {
   ArrowLeft,
   Loader2,
@@ -15,6 +16,10 @@ import {
   Ticket,
   FileText,
   Link2,
+  Camera,
+  Trash2,
+  ImageIcon,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,16 +33,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCitiesForCountry } from "@/lib/actions/locations";
+import { createEvent, updateEvent } from "@/lib/actions/event";
 import {
-  createEvent,
-  updateEvent,
+  uploadEventPoster,
+  uploadEventGalleryImage,
+  deleteEventGalleryImage,
+} from "@/lib/actions/event-upload";
+import { createGenre } from "@/lib/actions/genre";
+import {
   VALID_EVENT_CATEGORIES,
-} from "@/lib/actions/event";
-import type { EventCategory } from "@/lib/actions/event";
+  type EventCategory,
+} from "@/lib/event-categories";
+import { getTimezoneByCountryCode } from "@/lib/timezones";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export type CountryOption = { id: number; name: string };
+export type CountryOption = { id: number; name: string; code?: string };
 export type CityOption = { id: number; name: string };
 
 type EventFormData = {
@@ -56,13 +67,17 @@ type EventFormData = {
   genres: string[];
   recap: string;
   audioLink: string;
+  timezone: string;
 };
+
+type GalleryImage = { id: number; url: string };
 
 type EventFormProps =
   | {
       mode: "create";
       countries: CountryOption[];
       djDefaults?: { countryId?: string; cityId?: string };
+      allGenres: string[];
     }
   | {
       mode: "edit";
@@ -71,6 +86,9 @@ type EventFormProps =
       initialData: Partial<EventFormData>;
       countries: CountryOption[];
       initialCities?: CityOption[];
+      posterUrl?: string | null;
+      galleryImages?: GalleryImage[];
+      allGenres: string[];
     };
 
 // ── Labels ────────────────────────────────────────────────────────────────────
@@ -108,6 +126,7 @@ const FORM_DEFAULTS: EventFormData = {
   genres: [],
   recap: "",
   audioLink: "",
+  timezone: "",
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -129,13 +148,29 @@ export function EventForm(props: EventFormProps) {
   const [errors, setErrors] = useState<
     Partial<Record<keyof EventFormData, string>>
   >({});
-  const [genreInput, setGenreInput] = useState("");
   const [cities, setCities] = useState<CityOption[]>(
     props.mode === "edit" ? (props.initialCities ?? []) : [],
   );
 
   const isCompleted =
     props.mode === "edit" && props.eventStatus === "COMPLETED";
+
+  const [posterUrl, setPosterUrl] = useState<string | null>(
+    props.mode === "edit" ? (props.posterUrl ?? null) : null,
+  );
+  const [isUploadingPoster, setIsUploadingPoster] = useState(false);
+
+  const [gallery, setGallery] = useState<GalleryImage[]>(
+    props.mode === "edit" ? (props.galleryImages ?? []) : [],
+  );
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+
+  // Auto-fetch cities when country is preselected (e.g. from DJ profile defaults)
+  useEffect(() => {
+    if (data.countryId && cities.length === 0) {
+      getCitiesForCountry(Number(data.countryId)).then(setCities);
+    }
+  }, []);
 
   function set(field: keyof EventFormData, value: unknown) {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -149,23 +184,138 @@ export function EventForm(props: EventFormProps) {
     if (countryId) {
       const fetched = await getCitiesForCountry(Number(countryId));
       setCities(fetched);
+      const country = props.countries.find((c) => String(c.id) === countryId);
+      if (country?.code) {
+        const tz = getTimezoneByCountryCode(country.code);
+        if (tz) set("timezone", tz);
+      }
+    } else {
+      set("timezone", "");
     }
   }
 
-  function addGenre() {
-    const trimmed = genreInput.trim();
+  async function handlePosterUpload(file: File | undefined) {
+    if (!file || props.mode !== "edit") return;
+    setIsUploadingPoster(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("eventId", String(props.eventId));
+    const res = await uploadEventPoster(fd);
+    setIsUploadingPoster(false);
+    if ("error" in res) {
+      toast.error(res.error);
+    } else {
+      setPosterUrl(res.url);
+      toast.success("Poster uploaded");
+    }
+  }
+
+  async function handleGalleryUpload(file: File | undefined) {
+    if (!file || props.mode !== "edit") return;
+    setIsUploadingGallery(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("eventId", String(props.eventId));
+    const res = await uploadEventGalleryImage(fd);
+    setIsUploadingGallery(false);
+    if ("error" in res) {
+      toast.error(res.error);
+    } else {
+      setGallery((prev) => [...prev, { id: res.id, url: res.url }]);
+      toast.success("Photo added to gallery");
+    }
+  }
+
+  async function handleGalleryDelete(id: number) {
+    const res = await deleteEventGalleryImage(id);
+    if ("error" in res) {
+      toast.error(res.error);
+    } else {
+      setGallery((prev) => prev.filter((g) => g.id !== id));
+      toast.success("Photo removed");
+    }
+  }
+
+  const [availableGenres, setAvailableGenres] = useState<string[]>(
+    props.allGenres,
+  );
+  const [customGenreInput, setCustomGenreInput] = useState("");
+  const [genreSuggestion, setGenreSuggestion] = useState<string | null>(null);
+
+  function normalizeGenre(s: string): string {
+    return s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+
+  function findGenreByNormalized(name: string): string | undefined {
+    const norm = normalizeGenre(name);
+    return availableGenres.find((g) => normalizeGenre(g) === norm);
+  }
+
+  function findSimilarGenre(name: string): string | undefined {
+    const norm = normalizeGenre(name);
+    // Simple misspelling check: allow 1-2 character differences for short words
+    for (const g of availableGenres) {
+      const gNorm = normalizeGenre(g);
+      if (gNorm.length > 3 && norm.length > 3) {
+        // If lengths are close and one contains the other, likely a misspelling
+        if (Math.abs(gNorm.length - norm.length) <= 2) {
+          if (gNorm.includes(norm) || norm.includes(gNorm)) return g;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  function toggleGenre(genre: string) {
+    if (data.genres.includes(genre)) {
+      set(
+        "genres",
+        data.genres.filter((g) => g !== genre),
+      );
+    } else if (data.genres.length < 8) {
+      set("genres", [...data.genres, genre]);
+    }
+  }
+
+  async function handleAddCustomGenre() {
+    const trimmed = customGenreInput.trim();
     if (!trimmed || data.genres.length >= 8) return;
-    if (!data.genres.includes(trimmed)) {
-      set("genres", [...data.genres, trimmed]);
-    }
-    setGenreInput("");
-  }
 
-  function removeGenre(genre: string) {
-    set(
-      "genres",
-      data.genres.filter((g) => g !== genre),
+    // 1. Exact normalized match?
+    const exact = findGenreByNormalized(trimmed);
+    if (exact) {
+      if (!data.genres.includes(exact)) {
+        toggleGenre(exact);
+      }
+      setCustomGenreInput("");
+      setGenreSuggestion(null);
+      return;
+    }
+
+    // 2. Similar (possible misspelling)?
+    const similar = findSimilarGenre(trimmed);
+    if (similar && !data.genres.includes(similar)) {
+      // Show suggestion instead of creating
+      setGenreSuggestion(similar);
+      return;
+    }
+
+    // 3. Create new genre
+    const toastId = toast.loading("Adding genre...");
+    const res = await createGenre(trimmed);
+    if ("error" in res) {
+      toast.error(res.error, { id: toastId });
+      return;
+    }
+    setAvailableGenres((prev) =>
+      prev.includes(res.name) ? prev : [...prev, res.name],
     );
+    if (!data.genres.includes(res.name) && data.genres.length < 8) {
+      set("genres", [...data.genres, res.name]);
+    }
+    toast.success(`"${res.name}" added`, { id: toastId });
+    setCustomGenreInput("");
+    setGenreSuggestion(null);
   }
 
   function validate(): boolean {
@@ -203,6 +353,7 @@ export function EventForm(props: EventFormProps) {
         endDate: data.endDate ? new Date(data.endDate) : null,
         startTime: data.startTime || null,
         endTime: data.endTime || null,
+        timezone: data.timezone || null,
         countryId: Number(data.countryId),
         cityId: data.cityId ? Number(data.cityId) : null,
         venue: data.venue.trim() || null,
@@ -225,7 +376,7 @@ export function EventForm(props: EventFormProps) {
           return;
         }
         toast.success("Event created! It's saved as a draft.");
-        router.push("/dashboard/dj/events");
+        router.push(`/dashboard/dj/events/${result.id}/edit`);
         router.refresh();
       } else {
         const result = await updateEvent(props.eventId, payload);
@@ -324,6 +475,48 @@ export function EventForm(props: EventFormProps) {
             <p className="text-xs text-red-400">{errors.category}</p>
           )}
         </div>
+
+        {/* Poster */}
+        {props.mode === "edit" && (
+          <div className="space-y-1.5">
+            <Label className="text-zinc-300">Event Poster</Label>
+            {posterUrl && (
+              <div className="relative mb-2 h-40 w-full overflow-hidden rounded-lg bg-zinc-900">
+                <Image
+                  src={posterUrl}
+                  alt="Event poster"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              id="poster-upload"
+              onChange={(e) => {
+                handlePosterUpload(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isUploadingPoster}
+              onClick={() => document.getElementById("poster-upload")?.click()}
+              className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            >
+              {isUploadingPoster ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Camera className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              {posterUrl ? "Change Poster" : "Upload Poster"}
+            </Button>
+          </div>
+        )}
       </section>
 
       <hr className="border-zinc-800" />
@@ -404,6 +597,28 @@ export function EventForm(props: EventFormProps) {
             )}
           </div>
         </div>
+
+        {/* Timezone */}
+        <div className="space-y-1.5">
+          <Label
+            htmlFor="timezone"
+            className="flex items-center gap-1 text-zinc-300"
+          >
+            <Globe className="h-3.5 w-3.5" /> Timezone
+          </Label>
+          <Input
+            id="timezone"
+            value={data.timezone}
+            onChange={(e) => set("timezone", e.target.value)}
+            placeholder="Europe/Stockholm"
+            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+          />
+          <p className="text-xs text-zinc-500">
+            {data.timezone
+              ? `Times are entered in ${data.timezone} (event local time)`
+              : "Auto-detected from country. Adjust if needed."}
+          </p>
+        </div>
       </section>
 
       <hr className="border-zinc-800" />
@@ -429,7 +644,7 @@ export function EventForm(props: EventFormProps) {
             >
               <SelectTrigger
                 id="countryId"
-                className="border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500"
+                className="w-full border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500"
               >
                 <SelectValue placeholder="Select country…" />
               </SelectTrigger>
@@ -461,7 +676,7 @@ export function EventForm(props: EventFormProps) {
             >
               <SelectTrigger
                 id="cityId"
-                className="border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500 disabled:opacity-40"
+                className="w-full border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500 disabled:opacity-40"
               >
                 <SelectValue
                   placeholder={
@@ -527,53 +742,93 @@ export function EventForm(props: EventFormProps) {
         </div>
 
         {/* Genres */}
-        <div className="space-y-1.5">
-          <Label className="flex items-center gap-1 text-zinc-300">
-            <Music className="h-3.5 w-3.5" /> Genres
-            <span className="ml-1 text-xs text-zinc-500">(max 8)</span>
-          </Label>
-          <div className="flex gap-2">
-            <Input
-              value={genreInput}
-              onChange={(e) => setGenreInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addGenre();
-                }
-              }}
-              placeholder="e.g. Afro House, Melodic Techno"
-              disabled={data.genres.length >= 8}
-              className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={addGenre}
-              disabled={!genreInput.trim() || data.genres.length >= 8}
-              className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-            >
-              Add
-            </Button>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label className="flex items-center gap-1 text-zinc-300">
+              <Music className="h-3.5 w-3.5" /> Genres
+            </Label>
+            <span className="text-xs text-zinc-500">
+              {data.genres.length}/8 selected
+            </span>
           </div>
-          {data.genres.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {data.genres.map((genre) => (
-                <span
+          <div className="flex flex-wrap gap-2">
+            {availableGenres.map((genre) => {
+              const selected = data.genres.includes(genre);
+              return (
+                <button
                   key={genre}
-                  className="flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-800 px-3 py-1 text-xs text-zinc-300"
+                  type="button"
+                  onClick={() => toggleGenre(genre)}
+                  disabled={!selected && data.genres.length >= 8}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                    selected
+                      ? "border-h_red bg-h_red/15 text-h_red"
+                      : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-500 hover:text-white"
+                  } disabled:cursor-not-allowed disabled:opacity-40`}
                 >
                   {genre}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Custom genre input */}
+          {data.genres.length < 8 && (
+            <div className="flex flex-col gap-2 pt-1">
+              {genreSuggestion && (
+                <div className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
+                  <span className="text-xs text-amber-300">
+                    Did you mean{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        toggleGenre(genreSuggestion);
+                        setGenreSuggestion(null);
+                        setCustomGenreInput("");
+                      }}
+                      className="font-semibold text-amber-200 underline hover:text-white"
+                    >
+                      {genreSuggestion}
+                    </button>
+                    ?
+                  </span>
                   <button
                     type="button"
-                    onClick={() => removeGenre(genre)}
-                    className="text-zinc-500 hover:text-red-400"
-                    aria-label={`Remove ${genre}`}
+                    onClick={() => setGenreSuggestion(null)}
+                    className="ml-auto text-[10px] text-amber-400/70 hover:text-amber-300"
                   >
-                    ×
+                    No, add new
                   </button>
-                </span>
-              ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <Input
+                  value={customGenreInput}
+                  onChange={(e) => {
+                    setCustomGenreInput(e.target.value);
+                    if (genreSuggestion) setGenreSuggestion(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCustomGenre();
+                    }
+                  }}
+                  placeholder="Add a custom genre…"
+                  className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddCustomGenre}
+                  disabled={!customGenreInput.trim() || data.genres.length >= 8}
+                  className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  <Plus className="mr-1 h-3.5 w-3.5" />
+                  Add
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -650,6 +905,65 @@ export function EventForm(props: EventFormProps) {
               {errors.audioLink && (
                 <p className="text-xs text-red-400">{errors.audioLink}</p>
               )}
+            </div>
+
+            {/* Gallery */}
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5 text-zinc-300">
+                <ImageIcon className="h-3.5 w-3.5" /> Event Photos
+              </Label>
+              {gallery.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {gallery.map((img) => (
+                    <div
+                      key={img.id}
+                      className="relative aspect-square overflow-hidden rounded-lg bg-zinc-900"
+                    >
+                      <Image
+                        src={img.url}
+                        alt="Gallery"
+                        fill
+                        className="object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleGalleryDelete(img.id)}
+                        className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-red-900/80 hover:text-red-400"
+                        aria-label="Delete photo"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="gallery-upload"
+                onChange={(e) => {
+                  handleGalleryUpload(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isUploadingGallery}
+                onClick={() =>
+                  document.getElementById("gallery-upload")?.click()
+                }
+                className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              >
+                {isUploadingGallery ? (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Camera className="mr-1.5 h-3.5 w-3.5" />
+                )}
+                Add Photo
+              </Button>
             </div>
           </section>
         </>
