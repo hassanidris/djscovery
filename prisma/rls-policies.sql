@@ -71,3 +71,31 @@ CREATE POLICY "Involved users can read hire" ON "Hire" FOR SELECT TO public USIN
       AND (op."userId" = (auth.uid())::text OR dj."userId" = (auth.uid())::text)
   )
 );
+
+-- BookingInquiry: organizer and invited DJ can read
+ALTER TABLE "BookingInquiry" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Participants can read booking inquiry" ON "BookingInquiry";
+CREATE POLICY "Participants can read booking inquiry" ON "BookingInquiry" FOR SELECT TO public USING (
+  (auth.uid())::text = "organizerId"
+  OR EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "BookingInquiry"."djProfileId"
+      AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- BookingInquiryMessage: sharers only
+ALTER TABLE "BookingInquiryMessage" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Participants can read booking inquiry messages" ON "BookingInquiryMessage";
+CREATE POLICY "Participants can read booking inquiry messages" ON "BookingInquiryMessage" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1
+    FROM "BookingInquiry" bi
+    JOIN "DjProfile" dj ON dj.id = bi."djProfileId"
+    WHERE bi.id = "BookingInquiryMessage"."inquiryId"
+      AND (
+        bi."organizerId" = (auth.uid())::text
+        OR dj."userId" = (auth.uid())::text
+      )
+  )
+);
