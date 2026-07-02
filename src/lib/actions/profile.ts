@@ -104,8 +104,8 @@ const DjProfileInputSchema = z.object({
   coverImageUrl: z.string().url().optional(),
   countryId: z.number().int().positive({ message: "Country is required" }),
   cityId: z.number().int().positive(),
-  genreIds: z
-    .array(z.number().int().positive())
+  genreNames: z
+    .array(z.string().min(1).max(50))
     .min(1, "Select at least one genre")
     .max(5, "Select up to 5 genres"),
   socialLinks: z
@@ -241,7 +241,7 @@ export async function createDjProfile(
     coverImageUrl,
     countryId,
     cityId,
-    genreIds,
+    genreNames,
     socialLinks,
     djTypes,
     media,
@@ -311,9 +311,15 @@ export async function createDjProfile(
       });
     }
 
-    if (genreIds.length > 0) {
+    if (genreNames.length > 0) {
+      const genres = await Promise.all(
+        genreNames.map((name) => getOrCreateGenre(name, tx)),
+      );
       await tx.djGenre.createMany({
-        data: genreIds.map((genreId) => ({ djProfileId: profile.id, genreId })),
+        data: genres.map((genre) => ({
+          djProfileId: profile.id,
+          genreId: genre.id,
+        })),
         skipDuplicates: true,
       });
     }

@@ -104,6 +104,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   const [fieldErrors, setFieldErrors] = useState<{
     djTypes?: string;
     country?: string;
+    city?: string;
     genres?: string;
     social?: string;
   }>({});
@@ -143,7 +144,11 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
   async function handleCountryChange(id: number) {
     setCountryId(id || null);
-    setFieldErrors((prev) => ({ ...prev, country: undefined }));
+    setFieldErrors((prev) => ({
+      ...prev,
+      country: undefined,
+      city: undefined,
+    }));
     setCityId(null);
     setCities([]);
     if (!id) return;
@@ -245,11 +250,13 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     const fe: {
       djTypes?: string;
       country?: string;
+      city?: string;
       genres?: string;
       social?: string;
     } = {};
     if (selectedDjTypes.size === 0) fe.djTypes = "Select at least one DJ type.";
     if (!countryId) fe.country = "Country is required.";
+    if (!cityId) fe.city = "City is required.";
     if (selectedGenreNames.size === 0) fe.genres = "Select at least one genre.";
     if (socialLinks.filter((l) => l.url.trim()).length === 0)
       fe.social = "Add at least one social media link.";
@@ -323,7 +330,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           avatarUrl,
           countryId: countryId ?? undefined,
           cityId: cityId ?? undefined,
-          genreIds: Array.from(selectedGenreNames),
+          genreNames: Array.from(selectedGenreNames),
           djTypes: Array.from(selectedDjTypes),
           socialLinks: socialLinks.filter((l) => l.url.trim()),
           media,
@@ -503,7 +510,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
       {/* ── Location ── */}
       <div
-        className={`${sectionCls} ${fieldErrors.country ? "border-red-500/40" : ""}`}
+        className={`${sectionCls} ${fieldErrors.country || fieldErrors.city ? "border-red-500/40" : ""}`}
       >
         <h2 className={sectionTitleCls}>Location</h2>
 
@@ -535,7 +542,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         {countryId && (
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>
-              City <span className="font-normal text-gray-500">(optional)</span>
+              City <span className="text-h_red">*</span>
             </label>
             {loadingCities ? (
               <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
@@ -544,10 +551,12 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             ) : (
               <select
                 value={cityId ?? ""}
-                onChange={(e) =>
-                  setCityId(e.target.value ? Number(e.target.value) : null)
-                }
-                className={`${inputCls} cursor-pointer appearance-none`}
+                onChange={(e) => {
+                  const value = e.target.value ? Number(e.target.value) : null;
+                  setCityId(value);
+                  setFieldErrors((prev) => ({ ...prev, city: undefined }));
+                }}
+                className={`${inputCls} cursor-pointer appearance-none ${fieldErrors.city ? "ring-red-500/50" : ""}`}
               >
                 <option value="">Select a city...</option>
                 {cities.map((c) => (
@@ -560,6 +569,9 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                   </option>
                 ))}
               </select>
+            )}
+            {fieldErrors.city && (
+              <p className="mt-1 text-xs text-red-400">{fieldErrors.city}</p>
             )}
           </div>
         )}
