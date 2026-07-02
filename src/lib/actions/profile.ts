@@ -226,185 +226,196 @@ export async function createDjProfile(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  const parsed = DjProfileInputSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      error:
-        "Invalid data: " + parsed.error.issues.map((i) => i.message).join(", "),
-    };
-  }
+  try {
+    const parsed = DjProfileInputSchema.safeParse(input);
+    if (!parsed.success) {
+      return {
+        error:
+          "Invalid data: " +
+          parsed.error.issues.map((i) => i.message).join(", "),
+      };
+    }
 
-  const {
-    stageName,
-    bio,
-    avatarUrl,
-    coverImageUrl,
-    countryId,
-    cityId,
-    genreNames,
-    socialLinks,
-    djTypes,
-    media,
-    bookingEmail,
-    bookingPhone,
-    feeMin,
-    feeMax,
-    feeCurrency,
-  } = parsed.data;
-
-  const city = await prisma.city.findFirst({
-    where: { id: cityId, countryId },
-    select: { id: true },
-  });
-  if (!city) {
-    return {
-      error: "The selected city does not belong to the selected country.",
-    };
-  }
-
-  const slug = await makeUniqueSlug(stageName, user.id);
-
-  let isNewProfile = false;
-  let adminEmailsForNotify: string[] = [];
-
-  await prisma.$transaction(async (tx) => {
-    const effectiveBookingEmail = bookingEmail ?? user.email;
-
-    const profileData = {
+    const {
       stageName,
-      bio: bio ?? null,
-      avatar: avatarUrl ?? null,
-      coverImage: coverImageUrl ?? null,
-      countryId: countryId,
-      cityId: cityId,
-      bookingEmail: effectiveBookingEmail,
-      bookingPhone: bookingPhone ?? null,
-      feeMin: feeMin ?? null,
-      feeMax: feeMax ?? null,
-      feeCurrency: feeCurrency ?? null,
-    };
-    let profile;
-    try {
-      profile = await tx.djProfile.create({
-        data: { userId: user.id, slug, ...profileData },
-      });
-      isNewProfile = true;
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      ) {
-        // Unique constraint on userId — profile already exists, update instead.
-        profile = await tx.djProfile.update({
-          where: { userId: user.id },
-          data: profileData,
+      bio,
+      avatarUrl,
+      coverImageUrl,
+      countryId,
+      cityId,
+      genreNames,
+      socialLinks,
+      djTypes,
+      media,
+      bookingEmail,
+      bookingPhone,
+      feeMin,
+      feeMax,
+      feeCurrency,
+    } = parsed.data;
+
+    const city = await prisma.city.findFirst({
+      where: { id: cityId, countryId },
+      select: { id: true },
+    });
+    if (!city) {
+      return {
+        error: "The selected city does not belong to the selected country.",
+      };
+    }
+
+    const slug = await makeUniqueSlug(stageName, user.id);
+
+    let isNewProfile = false;
+    let adminEmailsForNotify: string[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const effectiveBookingEmail = bookingEmail ?? user.email;
+
+      const profileData = {
+        stageName,
+        bio: bio ?? null,
+        avatar: avatarUrl ?? null,
+        coverImage: coverImageUrl ?? null,
+        countryId: countryId,
+        cityId: cityId,
+        bookingEmail: effectiveBookingEmail,
+        bookingPhone: bookingPhone ?? null,
+        feeMin: feeMin ?? null,
+        feeMax: feeMax ?? null,
+        feeCurrency: feeCurrency ?? null,
+      };
+      let profile;
+      try {
+        profile = await tx.djProfile.create({
+          data: { userId: user.id, slug, ...profileData },
         });
-      } else {
-        throw error;
+        isNewProfile = true;
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002"
+        ) {
+          // Unique constraint on userId — profile already exists, update instead.
+          profile = await tx.djProfile.update({
+            where: { userId: user.id },
+            data: profileData,
+          });
+        } else {
+          throw error;
+        }
       }
-    }
 
-    if (djTypes.length > 0) {
-      await tx.djProfileType.createMany({
-        data: djTypes.map((type) => ({ djProfileId: profile.id, type })),
-        skipDuplicates: true,
-      });
-    }
+      if (djTypes.length > 0) {
+        await tx.djProfileType.createMany({
+          data: djTypes.map((type) => ({ djProfileId: profile.id, type })),
+          skipDuplicates: true,
+        });
+      }
 
-    if (genreNames.length > 0) {
-      const genres = await Promise.all(
-        genreNames.map((name) => getOrCreateGenre(name, tx)),
-      );
-      await tx.djGenre.createMany({
-        data: genres.map((genre) => ({
-          djProfileId: profile.id,
-          genreId: genre.id,
-        })),
-        skipDuplicates: true,
-      });
-    }
-
-    if (socialLinks.length > 0) {
-      await tx.socialLink.createMany({
-        data: socialLinks.map((link) => ({
-          djProfileId: profile.id,
-          platform: link.platform,
-          url: link.url,
-        })),
-        skipDuplicates: true,
-      });
-    }
-
-    if (media.length > 0) {
-      await tx.media.createMany({
-        data: media.map((m) => ({
-          type: m.type as "IMAGE" | "VIDEO" | "AUDIO",
-          url: m.url,
-          bucket: m.bucket,
-          path: m.path,
-          djProfileId: profile.id,
-        })),
-      });
-    }
-
-    // Grant DJ role only now — after the profile is fully saved.
-
-    await tx.userRole.upsert({
-      where: { userId_role: { userId: user.id, role: "DJ" } },
-      update: {},
-      create: { userId: user.id, role: "DJ" },
-    });
-
-    await tx.user.update({
-      where: { id: user.id },
-      data: { onboardingComplete: true },
-    });
-
-    if (isNewProfile) {
-      const admins = await tx.userRole.findMany({
-        where: { role: "ADMIN" },
-        select: { userId: true, user: { select: { email: true } } },
-      });
-      adminEmailsForNotify = admins
-        .map((a) => a.user.email)
-        .filter((email): email is string => Boolean(email));
-      if (admins.length > 0) {
-        await tx.notification.createMany({
-          data: admins.map((a) => ({
-            type: "DJ_REGISTRATION" as const,
-            recipientId: a.userId,
-            senderId: user.id,
-            data: { djProfileId: profile.id, stageName },
+      if (genreNames.length > 0) {
+        const genres = await Promise.all(
+          genreNames.map((name) => getOrCreateGenre(name, tx)),
+        );
+        await tx.djGenre.createMany({
+          data: genres.map((genre) => ({
+            djProfileId: profile.id,
+            genreId: genre.id,
           })),
           skipDuplicates: true,
         });
       }
+
+      if (socialLinks.length > 0) {
+        await tx.socialLink.createMany({
+          data: socialLinks.map((link) => ({
+            djProfileId: profile.id,
+            platform: link.platform,
+            url: link.url,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      if (media.length > 0) {
+        await tx.media.createMany({
+          data: media.map((m) => ({
+            type: m.type as "IMAGE" | "VIDEO" | "AUDIO",
+            url: m.url,
+            bucket: m.bucket,
+            path: m.path,
+            djProfileId: profile.id,
+          })),
+        });
+      }
+
+      // Grant DJ role only now — after the profile is fully saved.
+
+      await tx.userRole.upsert({
+        where: { userId_role: { userId: user.id, role: "DJ" } },
+        update: {},
+        create: { userId: user.id, role: "DJ" },
+      });
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: { onboardingComplete: true },
+      });
+
+      if (isNewProfile) {
+        const admins = await tx.userRole.findMany({
+          where: { role: "ADMIN" },
+          select: { userId: true, user: { select: { email: true } } },
+        });
+        adminEmailsForNotify = admins
+          .map((a) => a.user.email)
+          .filter((email): email is string => Boolean(email));
+        if (admins.length > 0) {
+          await tx.notification.createMany({
+            data: admins.map((a) => ({
+              type: "DJ_REGISTRATION" as const,
+              recipientId: a.userId,
+              senderId: user.id,
+              data: { djProfileId: profile.id, stageName },
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+    });
+
+    if (isNewProfile && adminEmailsForNotify.length > 0) {
+      const adminUrl = `${
+        process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com"
+      }/admin/djs`;
+      const uniqueEmails = Array.from(new Set(adminEmailsForNotify));
+      await Promise.all(
+        uniqueEmails.map((email) =>
+          sendEmail({
+            to: email,
+            emailType: "ADMIN_DJ_REGISTRATION",
+            subject: adminDjRegistrationSubject,
+            html: adminDjRegistrationHtml({ stageName, adminUrl }),
+          }),
+        ),
+      );
     }
-  });
 
-  if (isNewProfile && adminEmailsForNotify.length > 0) {
-    const adminUrl = `${
-      process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com"
-    }/admin/djs`;
-    const uniqueEmails = Array.from(new Set(adminEmailsForNotify));
-    await Promise.all(
-      uniqueEmails.map((email) =>
-        sendEmail({
-          to: email,
-          emailType: "ADMIN_DJ_REGISTRATION",
-          subject: adminDjRegistrationSubject,
-          html: adminDjRegistrationHtml({ stageName, adminUrl }),
-        }),
-      ),
-    );
+    if (isNewProfile) {
+      revalidatePath("/admin/djs");
+      revalidatePath("/admin");
+    }
+
+    return { success: true as const };
+  } catch (error) {
+    console.error("createDjProfile failed", error);
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred. Please try again.",
+    };
   }
-
-  if (isNewProfile) {
-    revalidatePath("/admin/djs");
-    revalidatePath("/admin");
-  }
-
-  return { success: true as const };
 }
 
 export async function updateDjProfile(
