@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import Footer from "@/components/Footer";
 import BecomeDjForm from "@/components/BecomeDjForm";
 
@@ -14,8 +15,8 @@ export default async function BecomeDjPage() {
 
   const existing = await prisma.djProfile.findUnique({
     where: { userId: user.id },
+    select: { slug: true, status: true },
   });
-  if (existing) redirect("/");
 
   const countries = await prisma.country.findMany({
     orderBy: { name: "asc" },
@@ -39,7 +40,35 @@ export default async function BecomeDjPage() {
             </p>
           </div>
 
-          <BecomeDjForm countries={countries} userId={user.id} />
+          {existing ? (
+            <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+              <p className="font-medium text-white">
+                You already have a DJ profile.
+              </p>
+              <p className="mt-1 text-sm text-gray-400">
+                Status:{" "}
+                <span className="capitalize">
+                  {existing.status.toLowerCase()}
+                </span>
+              </p>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center">
+                <Link
+                  href={`/djs/${existing.slug}`}
+                  className="bg-h_red hover:bg-h_redDark inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
+                >
+                  View profile
+                </Link>
+                <Link
+                  href="/settings/dj"
+                  className="inline-flex items-center justify-center rounded-lg border border-white/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/5"
+                >
+                  Edit profile
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <BecomeDjForm countries={countries} userId={user.id} />
+          )}
         </div>
       </div>
       <Footer />
