@@ -686,7 +686,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         <div className="flex flex-col gap-3">
           {socialLinks.map((link, i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div key={i} className="flex min-w-0 items-center gap-2">
               <select
                 value={link.platform}
                 onChange={(e) =>
@@ -709,7 +709,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                 value={link.url}
                 onChange={(e) => updateSocialLink(i, "url", e.target.value)}
                 placeholder="https://..."
-                className="focus:ring-h_red flex-1 rounded-lg bg-white/10 px-4 py-3 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
+                className="focus:ring-h_red min-w-0 flex-1 rounded-lg bg-white/10 px-4 py-3 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
               />
               <button
                 type="button"
