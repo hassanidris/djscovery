@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
-import { X, Plus, Loader2, Camera, ArrowLeft } from "lucide-react";
+import { X, Plus, Loader2, Camera, ArrowLeft, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -1184,315 +1184,362 @@ export default function EditDjProfileForm({
         </SectionCard>
 
         {/* Team Contacts */}
-        <SectionCard
-          title="Professional Team"
-          subtitle="Manager and booking agent details"
-        >
-          <div className="flex flex-col gap-5">
-            <div>
-              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                Manager
-              </p>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Name
-                  </Label>
-                  <Input
-                    value={managerName}
-                    onChange={(e) => setManagerName(e.target.value)}
-                    placeholder="Marcus Osei"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
+        {isPremium ? (
+          <SectionCard
+            title="Professional Team"
+            subtitle="Manager and booking agent details"
+          >
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                  Manager
+                </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Name
+                    </Label>
+                    <Input
+                      value={managerName}
+                      onChange={(e) => setManagerName(e.target.value)}
+                      placeholder="Marcus Osei"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Email
+                    </Label>
+                    <Input
+                      type="email"
+                      value={managerEmail}
+                      onChange={(e) => setManagerEmail(e.target.value)}
+                      placeholder="manager@email.com"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Phone
+                    </Label>
+                    <Input
+                      type="tel"
+                      value={managerPhone}
+                      onChange={(e) => setManagerPhone(e.target.value)}
+                      placeholder="+44 7700 900123"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Email
-                  </Label>
-                  <Input
-                    type="email"
-                    value={managerEmail}
-                    onChange={(e) => setManagerEmail(e.target.value)}
-                    placeholder="manager@email.com"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Phone
-                  </Label>
-                  <Input
-                    type="tel"
-                    value={managerPhone}
-                    onChange={(e) => setManagerPhone(e.target.value)}
-                    placeholder="+44 7700 900123"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
+              </div>
+              <Separator className="bg-white/8" />
+              <div>
+                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                  Booking Agent
+                </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Name
+                    </Label>
+                    <Input
+                      value={agentName}
+                      onChange={(e) => setAgentName(e.target.value)}
+                      placeholder="Sophie Laurent"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Agency
+                    </Label>
+                    <Input
+                      value={agentAgency}
+                      onChange={(e) => setAgentAgency(e.target.value)}
+                      placeholder="Rhythm Agency"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Email
+                    </Label>
+                    <Input
+                      type="email"
+                      value={agentEmail}
+                      onChange={(e) => setAgentEmail(e.target.value)}
+                      placeholder="agent@email.com"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-            <Separator className="bg-white/8" />
-            <div>
-              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                Booking Agent
+          </SectionCard>
+        ) : (
+          <SectionCard
+            title="Professional Team"
+            subtitle="Manager and booking agent details — Premium only"
+          >
+            <div className="flex flex-col items-center gap-3 py-6 text-center">
+              <Crown className="h-6 w-6 text-amber-500" />
+              <p className="text-sm text-gray-400">
+                Upgrade to Premium to add your manager and booking agent
+                details.
               </p>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Name
-                  </Label>
-                  <Input
-                    value={agentName}
-                    onChange={(e) => setAgentName(e.target.value)}
-                    placeholder="Sophie Laurent"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Agency
-                  </Label>
-                  <Input
-                    value={agentAgency}
-                    onChange={(e) => setAgentAgency(e.target.value)}
-                    placeholder="Rhythm Agency"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Email
-                  </Label>
-                  <Input
-                    type="email"
-                    value={agentEmail}
-                    onChange={(e) => setAgentEmail(e.target.value)}
-                    placeholder="agent@email.com"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-              </div>
             </div>
-          </div>
-        </SectionCard>
+          </SectionCard>
+        )}
 
         {/* Spotlight */}
-        <SectionCard
-          title="Spotlight"
-          subtitle="Featured mix and video at the top of your profile"
-        >
-          <div className="flex flex-col gap-5">
-            <div>
-              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                Featured Mix
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Title
-                  </Label>
-                  <Input
-                    value={featuredMixTitle}
-                    onChange={(e) => setFeaturedMixTitle(e.target.value)}
-                    placeholder="Afrobeats & Amapiano Fusion Vol.3"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
+        {isPremium ? (
+          <SectionCard
+            title="Spotlight"
+            subtitle="Featured mix and video at the top of your profile"
+          >
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                  Featured Mix
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Title
+                    </Label>
+                    <Input
+                      value={featuredMixTitle}
+                      onChange={(e) => setFeaturedMixTitle(e.target.value)}
+                      placeholder="Afrobeats & Amapiano Fusion Vol.3"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Audio URL
+                    </Label>
+                    <Input
+                      value={featuredMixAudioUrl}
+                      onChange={(e) => setFeaturedMixAudioUrl(e.target.value)}
+                      placeholder="https://soundcloud.com/..."
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Duration
+                    </Label>
+                    <Input
+                      value={featuredMixDuration}
+                      onChange={(e) => setFeaturedMixDuration(e.target.value)}
+                      placeholder="1h 24m"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Plays
+                    </Label>
+                    <Input
+                      type="number"
+                      value={featuredMixPlays}
+                      onChange={(e) => setFeaturedMixPlays(e.target.value)}
+                      placeholder="82400"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Audio URL
-                  </Label>
-                  <Input
-                    value={featuredMixAudioUrl}
-                    onChange={(e) => setFeaturedMixAudioUrl(e.target.value)}
-                    placeholder="https://soundcloud.com/..."
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Duration
-                  </Label>
-                  <Input
-                    value={featuredMixDuration}
-                    onChange={(e) => setFeaturedMixDuration(e.target.value)}
-                    placeholder="1h 24m"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Plays
-                  </Label>
-                  <Input
-                    type="number"
-                    value={featuredMixPlays}
-                    onChange={(e) => setFeaturedMixPlays(e.target.value)}
-                    placeholder="82400"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
+              </div>
+              <Separator className="bg-white/8" />
+              <div>
+                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                  Featured Video
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Title
+                    </Label>
+                    <Input
+                      value={featuredVideoTitle}
+                      onChange={(e) => setFeaturedVideoTitle(e.target.value)}
+                      placeholder="Summer Closing Set — Full Recording"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Video URL
+                    </Label>
+                    <Input
+                      value={featuredVideoUrl}
+                      onChange={(e) => setFeaturedVideoUrl(e.target.value)}
+                      placeholder="https://youtube.com/..."
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Thumbnail URL
+                    </Label>
+                    <Input
+                      value={featuredVideoThumbnail}
+                      onChange={(e) =>
+                        setFeaturedVideoThumbnail(e.target.value)
+                      }
+                      placeholder="https://..."
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Duration
+                    </Label>
+                    <Input
+                      value={featuredVideoDuration}
+                      onChange={(e) => setFeaturedVideoDuration(e.target.value)}
+                      placeholder="45 min"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block text-xs text-gray-300">
+                      Views
+                    </Label>
+                    <Input
+                      type="number"
+                      value={featuredVideoViews}
+                      onChange={(e) => setFeaturedVideoViews(e.target.value)}
+                      placeholder="211000"
+                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-            <Separator className="bg-white/8" />
-            <div>
-              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                Featured Video
+          </SectionCard>
+        ) : (
+          <SectionCard
+            title="Spotlight"
+            subtitle="Featured mix and video — Premium only"
+          >
+            <div className="flex flex-col items-center gap-3 py-6 text-center">
+              <Crown className="h-6 w-6 text-amber-500" />
+              <p className="text-sm text-gray-400">
+                Upgrade to Premium to feature a mix and video at the top of your
+                profile.
               </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Title
-                  </Label>
-                  <Input
-                    value={featuredVideoTitle}
-                    onChange={(e) => setFeaturedVideoTitle(e.target.value)}
-                    placeholder="Summer Closing Set — Full Recording"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Video URL
-                  </Label>
-                  <Input
-                    value={featuredVideoUrl}
-                    onChange={(e) => setFeaturedVideoUrl(e.target.value)}
-                    placeholder="https://youtube.com/..."
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Thumbnail URL
-                  </Label>
-                  <Input
-                    value={featuredVideoThumbnail}
-                    onChange={(e) => setFeaturedVideoThumbnail(e.target.value)}
-                    placeholder="https://..."
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Duration
-                  </Label>
-                  <Input
-                    value={featuredVideoDuration}
-                    onChange={(e) => setFeaturedVideoDuration(e.target.value)}
-                    placeholder="45 min"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Views
-                  </Label>
-                  <Input
-                    type="number"
-                    value={featuredVideoViews}
-                    onChange={(e) => setFeaturedVideoViews(e.target.value)}
-                    placeholder="211000"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-              </div>
             </div>
-          </div>
-        </SectionCard>
+          </SectionCard>
+        )}
 
         {/* Availability Calendar */}
-        <SectionCard
-          title="Availability Calendar"
-          subtitle="Click days to set your schedule"
-        >
-          <div className="flex flex-col gap-4">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <Label className="mb-1.5 block text-xs text-gray-300">
-                  Month (YYYY-MM)
-                </Label>
-                <Input
-                  value={availabilityMonth}
-                  onChange={(e) => setAvailabilityMonth(e.target.value)}
-                  placeholder="2025-09"
-                  maxLength={7}
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                />
+        {isPremium ? (
+          <SectionCard
+            title="Availability Calendar"
+            subtitle="Click days to set your schedule"
+          >
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Month (YYYY-MM)
+                  </Label>
+                  <Input
+                    value={availabilityMonth}
+                    onChange={(e) => setAvailabilityMonth(e.target.value)}
+                    placeholder="2025-09"
+                    maxLength={7}
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs text-gray-300">
+                    Timezone
+                  </Label>
+                  <Input
+                    value={availabilityTimezone}
+                    onChange={(e) => setAvailabilityTimezone(e.target.value)}
+                    placeholder="Europe/London"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  />
+                </div>
               </div>
-              <div>
-                <Label className="mb-1.5 block text-xs text-gray-300">
-                  Timezone
-                </Label>
-                <Input
-                  value={availabilityTimezone}
-                  onChange={(e) => setAvailabilityTimezone(e.target.value)}
-                  placeholder="Europe/London"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                />
-              </div>
-            </div>
 
-            {availabilityMonth && isValidMonthFormat(availabilityMonth) && (
-              <div>
-                <div className="mb-2 flex items-center gap-4">
-                  {[
-                    { color: "bg-emerald-500", label: "Available" },
-                    { color: "bg-h_red", label: "Booked" },
-                    { color: "bg-amber-500", label: "Tentative" },
-                    { color: "bg-white/10", label: "Free" },
-                  ].map((l) => (
-                    <div key={l.label} className="flex items-center gap-1.5">
-                      <div className={`size-2.5 rounded-full ${l.color}`} />
-                      <span className="text-xs text-gray-400">{l.label}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (d) => (
-                      <div
-                        key={d}
-                        className="pb-1 text-center text-[11px] font-semibold text-gray-600"
-                      >
-                        {d}
+              {availabilityMonth && isValidMonthFormat(availabilityMonth) && (
+                <div>
+                  <div className="mb-2 flex items-center gap-4">
+                    {[
+                      { color: "bg-emerald-500", label: "Available" },
+                      { color: "bg-h_red", label: "Booked" },
+                      { color: "bg-amber-500", label: "Tentative" },
+                      { color: "bg-white/10", label: "Free" },
+                    ].map((l) => (
+                      <div key={l.label} className="flex items-center gap-1.5">
+                        <div className={`size-2.5 rounded-full ${l.color}`} />
+                        <span className="text-xs text-gray-400">{l.label}</span>
                       </div>
-                    ),
-                  )}
-                  {Array.from({
-                    length: firstDayOffset(availabilityMonth) ?? 0,
-                  }).map((_, i) => (
-                    <div key={`e${i}`} />
-                  ))}
-                  {Array.from({
-                    length: daysInMonth(availabilityMonth) ?? 0,
-                  }).map((_, i) => {
-                    const day = i + 1;
-                    const status = getDayStatus(day);
-                    return (
-                      <button
-                        key={day}
-                        type="button"
-                        onClick={() => cycleDayStatus(day)}
-                        className={`flex h-9 items-center justify-center rounded-md text-xs font-medium transition-all ${
-                          status === "booked"
-                            ? "bg-h_red/20 text-h_red border-h_red/30 border"
-                            : status === "tentative"
-                              ? "border border-amber-500/30 bg-amber-500/20 text-amber-400"
-                              : status === "available"
-                                ? "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
-                                : "text-gray-600 hover:bg-white/5"
-                        }`}
-                      >
-                        {day}
-                      </button>
-                    );
-                  })}
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                      (d) => (
+                        <div
+                          key={d}
+                          className="pb-1 text-center text-[11px] font-semibold text-gray-600"
+                        >
+                          {d}
+                        </div>
+                      ),
+                    )}
+                    {Array.from({
+                      length: firstDayOffset(availabilityMonth) ?? 0,
+                    }).map((_, i) => (
+                      <div key={`e${i}`} />
+                    ))}
+                    {Array.from({
+                      length: daysInMonth(availabilityMonth) ?? 0,
+                    }).map((_, i) => {
+                      const day = i + 1;
+                      const status = getDayStatus(day);
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => cycleDayStatus(day)}
+                          className={`flex h-9 items-center justify-center rounded-md text-xs font-medium transition-all ${
+                            status === "booked"
+                              ? "bg-h_red/20 text-h_red border-h_red/30 border"
+                              : status === "tentative"
+                                ? "border border-amber-500/30 bg-amber-500/20 text-amber-400"
+                                : status === "available"
+                                  ? "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
+                                  : "text-gray-600 hover:bg-white/5"
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </SectionCard>
+              )}
+            </div>
+          </SectionCard>
+        ) : (
+          <SectionCard
+            title="Availability Calendar"
+            subtitle="Click days to set your schedule — Premium only"
+          >
+            <div className="flex flex-col items-center gap-3 py-6 text-center">
+              <Crown className="h-6 w-6 text-amber-500" />
+              <p className="text-sm text-gray-400">
+                Upgrade to Premium to set your availability calendar and let
+                organizers know when you are free.
+              </p>
+            </div>
+          </SectionCard>
+        )}
 
         {/* Submit */}
         <div className="flex items-center justify-between pt-2">
