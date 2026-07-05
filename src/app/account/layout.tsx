@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { getNavUser } from "@/lib/auth/getNavUser";
-import AccountTabs from "@/components/account/AccountTabs";
 
 export const metadata: Metadata = {
   title: "My Account",
@@ -89,8 +88,6 @@ export default async function AccountLayout({
             </p>
           </div>
         </div>
-
-        <AccountTabs />
 
         <div className="mt-8">{children}</div>
       </div>

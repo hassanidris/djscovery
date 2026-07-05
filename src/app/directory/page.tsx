@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import prisma from "@/lib/client";
 import { DjType } from "@prisma/client";
 import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
-import { getFollowedDjIds } from "@/lib/actions/saves";
+import { getFollowedDjIds } from "@/lib/actions/follows";
 import FilterPanel from "@/components/directory/FilterPanel";
 import FilterBottomSheet from "@/components/directory/FilterBottomSheet";
 import DjGrid from "@/components/directory/DjGrid";

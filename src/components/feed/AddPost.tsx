@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import AddPostBtn from "./AddPostBtn";
-import { addPost } from "@/lib/actions";
+import { addPost } from "@/lib/actions/feed";
 import { AddPostSkeleton } from "@/components/ui/skeletons";
 
 interface AddPostProps {
@@ -43,13 +43,13 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
 
   if (!user) {
     return (
-      <div className="p-4 bg-h_blackLight/50 rounded-xl border border-gray-800/70 shadow-md flex items-center justify-between gap-4">
-        <p className="text-gray-400 text-sm">
+      <div className="bg-h_blackLight/50 flex items-center justify-between gap-4 rounded-xl border border-gray-800/70 p-4 shadow-md">
+        <p className="text-sm text-gray-400">
           Join the community to share posts and connect with DJs
         </p>
         <Link
           href="/sign-up"
-          className="shrink-0 bg-h_red hover:bg-h_redDark text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+          className="bg-h_red hover:bg-h_redDark shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
         >
           Sign Up
         </Link>
@@ -70,7 +70,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
   };
 
   return (
-    <div className="bg-h_blackLight/50 rounded-xl border border-gray-800/70 border-t-2 border-t-h_red shadow-lg overflow-hidden">
+    <div className="bg-h_blackLight/50 border-t-h_red overflow-hidden rounded-xl border border-t-2 border-gray-800/70 shadow-lg">
       <form
         action={async (formData) => {
           const content = (formData.get("content") as string | null) ?? "";
@@ -98,19 +98,19 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
 
         {/* ── Compose area ── */}
         <div className="flex gap-3 px-4 pt-4 pb-3">
-          <Avatar className="w-10 h-10 shrink-0 ring-1 ring-white/20 mt-0.5">
+          <Avatar className="mt-0.5 h-10 w-10 shrink-0 ring-1 ring-white/20">
             <AvatarImage src={avatarUrl ?? ""} alt={displayName ?? ""} />
-            <AvatarFallback className="bg-white/10 text-white text-sm font-semibold">
+            <AvatarFallback className="bg-white/10 text-sm font-semibold text-white">
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 rounded-xl border border-white/15 px-3 py-2 focus-within:border-white/30 transition-colors">
+          <div className="flex-1 rounded-xl border border-white/15 px-3 py-2 transition-colors focus-within:border-white/30">
             <textarea
               ref={textareaRef}
               name="content"
               placeholder="Share something with the community…"
               rows={3}
-              className="w-full bg-transparent text-h_white placeholder:text-white/30 resize-none focus:outline-none text-sm"
+              className="text-h_white w-full resize-none bg-transparent text-sm placeholder:text-white/30 focus:outline-none"
             />
           </div>
         </div>
@@ -118,12 +118,12 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
         {/* ── Video URL input (toggled) ── */}
         {activeMedia === "video" && (
           <div className="px-4 pb-3">
-            <div className="flex items-center gap-2 bg-black/20 ring-1 ring-white/10 focus-within:ring-h_red/40 rounded-lg px-3 py-2 transition-all">
-              <Video className="w-4 h-4 text-white/50 shrink-0" />
+            <div className="focus-within:ring-h_red/40 flex items-center gap-2 rounded-lg bg-black/20 px-3 py-2 ring-1 ring-white/10 transition-all">
+              <Video className="h-4 w-4 shrink-0 text-white/50" />
               <input
                 type="url"
                 placeholder="Paste video link (YouTube, Vimeo…)"
-                className="flex-1 bg-transparent text-sm text-h_white placeholder:text-white/30 focus:outline-none"
+                className="text-h_white flex-1 bg-transparent text-sm placeholder:text-white/30 focus:outline-none"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
               />
@@ -131,9 +131,9 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
                 <button
                   type="button"
                   onClick={() => setVideoUrl("")}
-                  className="text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+                  className="cursor-pointer text-white/30 transition-colors hover:text-white/60"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
@@ -143,12 +143,12 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
         {/* ── Mix / Sound URL input (toggled) ── */}
         {activeMedia === "mix" && (
           <div className="px-4 pb-3">
-            <div className="flex items-center gap-2 bg-black/20 ring-1 ring-white/10 focus-within:ring-h_red/40 rounded-lg px-3 py-2 transition-all">
-              <Music2 className="w-4 h-4 text-h_red/80 shrink-0" />
+            <div className="focus-within:ring-h_red/40 flex items-center gap-2 rounded-lg bg-black/20 px-3 py-2 ring-1 ring-white/10 transition-all">
+              <Music2 className="text-h_red/80 h-4 w-4 shrink-0" />
               <input
                 type="url"
                 placeholder="Paste mix link (SoundCloud, Mixcloud…)"
-                className="flex-1 bg-transparent text-sm text-h_white placeholder:text-white/30 focus:outline-none"
+                className="text-h_white flex-1 bg-transparent text-sm placeholder:text-white/30 focus:outline-none"
                 value={mixUrl}
                 onChange={(e) => setMixUrl(e.target.value)}
               />
@@ -156,9 +156,9 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
                 <button
                   type="button"
                   onClick={() => setMixUrl("")}
-                  className="text-white/30 hover:text-white/60 transition-colors"
+                  className="text-white/30 transition-colors hover:text-white/60"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
@@ -167,25 +167,25 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
 
         {/* ── Photo preview ── */}
         {img && (
-          <div className="px-4 pb-3 relative">
+          <div className="relative px-4 pb-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={img.secure_url}
               alt="preview"
-              className="w-full max-h-48 object-cover rounded-lg"
+              className="max-h-48 w-full rounded-lg object-cover"
             />
             <button
               type="button"
               onClick={() => setImg(null)}
-              className="absolute top-1 right-5 bg-black/60 hover:bg-black/80 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors"
+              className="absolute top-1 right-5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80"
             >
-              <X className="w-3 h-3" />
+              <X className="h-3 w-3" />
             </button>
           </div>
         )}
 
         {/* ── Footer: attach buttons + submit ── */}
-        <div className="border-t border-white/10 px-4 py-2.5 flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 border-t border-white/10 px-4 py-2.5">
           <div className="flex items-center gap-1">
             {/* Photo */}
             <CldUploadWidget
@@ -209,13 +209,13 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
                       open();
                     }
                   }}
-                  className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                     activeMedia === "photo"
-                      ? "text-h_red bg-h_red/10 border border-h_red/20"
-                      : "text-white/40 hover:text-white hover:bg-white/5"
+                      ? "text-h_red bg-h_red/10 border-h_red/20 border"
+                      : "text-white/40 hover:bg-white/5 hover:text-white"
                   }`}
                 >
-                  <ImageIcon className="w-3.5 h-3.5" />
+                  <ImageIcon className="h-3.5 w-3.5" />
                   Photo
                 </button>
               )}
@@ -225,13 +225,13 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
             <button
               type="button"
               onClick={() => switchMedia("video")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer text-xs transition-all ${
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                 activeMedia === "video"
-                  ? "text-h_red bg-h_red/10 border border-h_red/20"
-                  : "text-white/40 hover:text-white hover:bg-white/5"
+                  ? "text-h_red bg-h_red/10 border-h_red/20 border"
+                  : "text-white/40 hover:bg-white/5 hover:text-white"
               }`}
             >
-              <Video className="w-3.5 h-3.5" />
+              <Video className="h-3.5 w-3.5" />
               Video
             </button>
 
@@ -239,13 +239,13 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
             <button
               type="button"
               onClick={() => switchMedia("mix")}
-              className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                 activeMedia === "mix"
-                  ? "text-h_red bg-h_red/10 border border-h_red/20"
-                  : "text-white/40 hover:text-white hover:bg-white/5"
+                  ? "text-h_red bg-h_red/10 border-h_red/20 border"
+                  : "text-white/40 hover:bg-white/5 hover:text-white"
               }`}
             >
-              <Music2 className="w-3.5 h-3.5" />
+              <Music2 className="h-3.5 w-3.5" />
               Mix
             </button>
           </div>

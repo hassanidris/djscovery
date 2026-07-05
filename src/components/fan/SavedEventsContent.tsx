@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CalendarHeart } from "lucide-react";
-import { getSavedEvents } from "@/lib/actions/saves";
+import { getSavedEvents } from "@/lib/actions/follows";
 import SavedEventListItem from "./SavedEventListItem";
 
 export default async function SavedEventsContent() {

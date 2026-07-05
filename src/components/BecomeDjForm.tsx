@@ -434,7 +434,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             <p className="mt-0.5 text-xs text-gray-500">
               Profile URL:{" "}
               <span className="text-gray-400">
-                djscovery.com/djs/{slugPreview}
+                DJcovery.com/djs/{slugPreview}
               </span>
             </p>
           )}

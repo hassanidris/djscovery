@@ -9,39 +9,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { formatNumber } from "@/lib/utils/currency";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { toast } from "sonner";
 import {
-  MapPin,
-  Star,
-  Users,
-  CalendarDays,
-  UserPlus,
-  Share2,
   Play,
   Music,
   Video,
-  Image as ImageIcon,
   CircleCheck,
   ChartLine,
-  Crown,
-  Mail,
-  Phone,
-  Globe,
-  Trophy,
-  Flame,
   Headphones,
-  TrendingUp,
   Landmark,
-  Newspaper,
-  MicVocal,
   BriefcaseBusiness,
-  Rocket,
-  Zap,
-  Eye,
-  CalendarCheck2,
-  Handshake,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -62,8 +38,6 @@ import {
   SectionHeading,
   formatPlays,
 } from "@/components/dj-profile/dj-profile-shared";
-import SaveDjButton from "@/components/dj-profile/SaveDjButton";
-import FollowDjButton from "@/components/dj-profile/FollowDjButton";
 import {
   PREMIUM_DEFAULT_DJ,
   PREMIUM_DEFAULT_EVENTS,
@@ -174,8 +148,6 @@ export default function DjProfilePremium({
   djData,
   viewMode = "fan",
   isFollowed = false,
-  djUserId,
-  isFollowing = false,
   reputationScore,
   reputationDetail,
   status,
@@ -185,8 +157,6 @@ export default function DjProfilePremium({
   djData?: DjDemoData;
   viewMode?: ViewMode;
   isFollowed?: boolean;
-  djUserId?: string;
-  isFollowing?: boolean;
   reputationScore?: number;
   reputationDetail?: {
     totalScore: number;
@@ -261,8 +231,6 @@ export default function DjProfilePremium({
         djData={djData as DjDemoData}
         viewMode={viewMode}
         isFollowed={isFollowed}
-        djUserId={djUserId}
-        isFollowing={isFollowing}
         reputationScore={reputationScore}
         reputationDetail={reputationDetail}
         status={status}

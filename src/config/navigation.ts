@@ -54,7 +54,7 @@ const djAnalytics: NavItem = {
 const orgGigs: NavItem = {
   id: "gigs",
   label: "My Gigs",
-  href: "/dashboard/organizer/gigs",
+  href: "/organizer/gigs",
   icon: Briefcase,
 };
 
@@ -137,7 +137,7 @@ export function getFooterProfessionalLinks(opts: {
       { label: "Analytics", href: "/dashboard/dj/analytics" },
       { label: "My Events", href: "/dashboard/dj/events" },
       { label: "Applications", href: "/dashboard/dj/applications" },
-      { label: "Settings", href: "/settings/account" },
+      { label: "Settings", href: "/account/settings" },
       ...(!isOrganizer
         ? [{ label: "Become an Organizer", href: "/become-organizer" }]
         : [{ label: "Organizer Dashboard", href: "/organizer/dashboard" }]),
@@ -156,8 +156,8 @@ export function getFooterProfessionalLinks(opts: {
         : []),
       { label: "Organizer Dashboard", href: "/organizer/dashboard" },
       { label: "Bookings", href: "/organizer/bookings" },
-      { label: "Post a Gig", href: "/dashboard/organizer/gigs/new" },
-      { label: "My Gigs", href: "/dashboard/organizer/gigs" },
+      { label: "Post a Gig", href: "/organizer/gigs/new" },
+      { label: "My Gigs", href: "/organizer/gigs" },
       { label: "Become a DJ", href: "/become-dj" },
     ];
   }
