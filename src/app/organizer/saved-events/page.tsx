@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { CalendarHeart, MapPin, CalendarDays } from "lucide-react";
-import { getSavedEvents } from "@/lib/actions/saves";
+import { getSavedEvents } from "@/lib/actions/follows";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = { title: "Saved Events" };

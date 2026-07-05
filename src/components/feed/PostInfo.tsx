@@ -1,6 +1,6 @@
 "use client";
 
-import { deletePost } from "@/lib/actions";
+import { deletePost } from "@/lib/actions/feed";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useTransition } from "react";
@@ -36,22 +36,22 @@ const PostInfo = ({ postId }: { postId: number }) => {
     <div className="relative">
       <FontAwesomeIcon
         icon={faEllipsis}
-        className=" text-gray-200 w-4 h-4 cursor-pointer"
+        className="h-4 w-4 cursor-pointer text-gray-200"
         onClick={() => setOpen((prev) => !prev)}
       />
       {open && (
-        <div className="absolute top-6 right-0 bg-h_blackLight border border-gray-700/80 p-1.5 w-36 rounded-xl flex flex-col gap-0.5 shadow-xl z-30">
-          <span className="cursor-pointer text-gray-400 hover:text-h_white hover:bg-gray-700/50 rounded-lg px-3 py-2 text-xs transition-colors">
+        <div className="bg-h_blackLight absolute top-6 right-0 z-30 flex w-36 flex-col gap-0.5 rounded-xl border border-gray-700/80 p-1.5 shadow-xl">
+          <span className="hover:text-h_white cursor-pointer rounded-lg px-3 py-2 text-xs text-gray-400 transition-colors hover:bg-gray-700/50">
             View
           </span>
-          <span className="cursor-pointer text-gray-400 hover:text-h_white hover:bg-gray-700/50 rounded-lg px-3 py-2 text-xs transition-colors">
+          <span className="hover:text-h_white cursor-pointer rounded-lg px-3 py-2 text-xs text-gray-400 transition-colors hover:bg-gray-700/50">
             Re-post
           </span>
-          <div className="border-t border-gray-700/60 my-0.5" />
+          <div className="my-0.5 border-t border-gray-700/60" />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button
-                className="w-full text-left text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-3 py-2 text-xs transition-colors"
+                className="w-full rounded-lg px-3 py-2 text-left text-xs text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
                 onClick={() => setOpen(false)}
               >
                 Delete
@@ -68,11 +68,11 @@ const PostInfo = ({ postId }: { postId: number }) => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="bg-white/5 border-white/20 text-gray-300 hover:bg-white/10">
+                <AlertDialogCancel className="border-white/20 bg-white/5 text-gray-300 hover:bg-white/10">
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-red-600 text-white hover:bg-red-700"
                   onClick={handleDelete}
                   disabled={isPending}
                 >

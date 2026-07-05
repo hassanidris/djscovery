@@ -1,6 +1,6 @@
 "use client";
 
-import { switchLike } from "@/lib/actions";
+import { switchLike } from "@/lib/actions/feed";
 import { toast } from "sonner";
 import { Heart, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -57,23 +57,23 @@ const PostInteraction = ({
       <form action={likeAction}>
         <button
           title={!currentUserId ? "Sign in to like" : ""}
-          className="flex items-center gap-1.5 group cursor-pointer"
+          className="group flex cursor-pointer items-center gap-1.5"
         >
           <Heart
-            className={`w-4 h-4 transition-colors ${
+            className={`h-4 w-4 transition-colors ${
               optimisticLike.isLiked
                 ? "fill-h_red text-h_red"
-                : "text-gray-500 group-hover:text-h_red"
+                : "group-hover:text-h_red text-gray-500"
             }`}
           />
-          <span className="text-gray-500 group-hover:text-gray-300 transition-colors text-xs">
+          <span className="text-xs text-gray-500 transition-colors group-hover:text-gray-300">
             {optimisticLike.likeCount}
             <span className="hidden sm:inline"> Likes</span>
           </span>
         </button>
       </form>
       <div className="flex items-center gap-1.5 text-gray-500">
-        <MessageCircle className="w-4 h-4" />
+        <MessageCircle className="h-4 w-4" />
         <span className="text-xs">
           {commentNumber}
           <span className="hidden sm:inline"> Comments</span>

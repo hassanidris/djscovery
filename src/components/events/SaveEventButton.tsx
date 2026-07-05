@@ -4,7 +4,7 @@ import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toggleSaveEvent } from "@/lib/actions/saves";
+import { toggleSaveEvent } from "@/lib/actions/follows";
 
 export default function SaveEventButton({
   eventId,
@@ -55,9 +55,7 @@ export default function SaveEventButton({
         optimisticSaved ? "text-white" : "text-gray-400 hover:text-white",
       )}
     >
-      <Bookmark
-        className={cn("h-4 w-4", optimisticSaved && "fill-current")}
-      />
+      <Bookmark className={cn("h-4 w-4", optimisticSaved && "fill-current")} />
     </button>
   );
 }

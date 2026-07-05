@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { CircleCheck } from "lucide-react";
 import { DjUser } from "@/lib/data";
-import SaveDjButton from "@/components/dj-profile/SaveDjButton";
+import SaveDjButton from "@/components/dj-profile/FollowDjButton";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { formatNumber } from "@/lib/utils/currency";
 

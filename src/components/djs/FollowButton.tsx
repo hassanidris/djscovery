@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { UserPlus, UserMinus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toggleFollowDj } from "@/lib/actions/saves";
+import { toggleFollowDj } from "@/lib/actions/follows";
 
 interface Props {
   djProfileId: number;

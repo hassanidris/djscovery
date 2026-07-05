@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Star } from "lucide-react";
-import { getMyReviews } from "@/lib/actions/saves";
+import { getMyReviews } from "@/lib/actions/follows";
 import ReviewListItem from "./ReviewListItem";
 
 export default async function MyReviewsContent() {
