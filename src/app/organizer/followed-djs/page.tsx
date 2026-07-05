@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Users, CircleCheck, MapPin } from "lucide-react";
-import { getFollowedDjs } from "@/lib/actions/saves";
+import { getFollowedDjs } from "@/lib/actions/follows";
 import UnfollowDjButton from "@/components/account/RemoveSavedDjButton";
 
 export const metadata: Metadata = { title: "Followed DJs" };

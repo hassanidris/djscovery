@@ -1,6 +1,6 @@
 "use client";
 
-import { addPostComment } from "@/lib/actions";
+import { addPostComment } from "@/lib/actions/feed";
 import { useUser } from "@/lib/supabase/useUser";
 import { toast } from "sonner";
 import { PostComment, User } from "@prisma/client";

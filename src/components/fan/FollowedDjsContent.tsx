@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Users } from "lucide-react";
-import { getFollowedDjs } from "@/lib/actions/saves";
+import { getFollowedDjs } from "@/lib/actions/follows";
 import FollowedDjListItem from "./FollowedDjListItem";
 
 export default async function FollowedDjsContent() {

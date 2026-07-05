@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { X } from "lucide-react";
-import { unfollowDj } from "@/lib/actions/saves";
+import { unfollowDj } from "@/lib/actions/follows";
 
 export default function UnfollowDjButton({
   djProfileId,

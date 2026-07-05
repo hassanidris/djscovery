@@ -8,22 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { formatNumber } from "@/lib/utils/currency";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { toast } from "sonner";
 import {
-  MapPin,
-  Users,
   CalendarDays,
-  UserPlus,
-  Share2,
   Play,
   Music,
   Video,
   Headphones,
-  CalendarCheck2,
-  Mail,
   Star,
   Crown,
   Lock,
@@ -42,8 +32,6 @@ import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
-import SaveDjButton from "@/components/dj-profile/SaveDjButton";
-import FollowDjButton from "@/components/dj-profile/FollowDjButton";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import ProfileVenues from "@/components/dj-profile/ProfileVenues";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
@@ -111,8 +99,6 @@ export default function DjProfileFree({
   djData,
   viewMode = "fan",
   isFollowed = false,
-  djUserId,
-  isFollowing = false,
   reputationScore,
   reputationDetail,
   viewerContext,
@@ -121,8 +107,6 @@ export default function DjProfileFree({
   djData?: DjDemoData;
   viewMode?: ViewMode;
   isFollowed?: boolean;
-  djUserId?: string;
-  isFollowing?: boolean;
   reputationScore?: number;
   reputationDetail?: {
     totalScore: number;
@@ -190,8 +174,6 @@ export default function DjProfileFree({
         djData={djData}
         viewMode={viewMode}
         isFollowed={isFollowed}
-        djUserId={djUserId}
-        isFollowing={isFollowing}
         reputationScore={reputationScore}
         reputationDetail={reputationDetail}
         variant="free"

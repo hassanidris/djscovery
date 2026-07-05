@@ -1,5 +1,5 @@
 import type { DemoEvent, DemoEventWithDate } from "@/types/event-demo";
-import raw from "./djscovery_events_seed.json";
+import raw from "./djcovery_events_seed.json";
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 

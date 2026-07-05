@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
 import { ProfileViewTracker } from "@/components/dj-profile/ProfileViewTracker";
-import { isFollowingDj } from "@/lib/actions/saves";
-import { isFollowing } from "@/lib/actions";
+import { isFollowingDj } from "@/lib/actions/follows";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
@@ -142,10 +141,7 @@ export default async function DjProfilePage({
   const avgRating = ratingAgg._avg.rating ?? 0;
 
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
-  const [isFollowedDj, followingDj] =
-    viewMode === "fan"
-      ? await Promise.all([isFollowingDj(dj.id), isFollowing(dj.userId)])
-      : [false, false];
+  const isFollowedDj = viewMode === "fan" ? await isFollowingDj(dj.id) : false;
 
   let viewerContext: BookingViewerContext = {
     role: "guest",
@@ -398,8 +394,6 @@ export default async function DjProfilePage({
           djData={djDemoData}
           viewMode={viewMode}
           isFollowed={isFollowedDj}
-          djUserId={dj.userId}
-          isFollowing={followingDj}
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
           status={dj.status}
@@ -411,8 +405,6 @@ export default async function DjProfilePage({
           djData={djDemoData}
           viewMode={viewMode}
           isFollowed={isFollowedDj}
-          djUserId={dj.userId}
-          isFollowing={followingDj}
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
           viewerContext={viewerContext}

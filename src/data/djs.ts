@@ -1,6 +1,6 @@
 import type { DjDemoData } from "@/types/dj-demo";
-import seed1 from "./djscovery_seed_1.json";
-import seed2 from "./djscovery_seed_2.json";
+import seed1 from "./djcovery_seed_1.json";
+import seed2 from "./djcovery_seed_2.json";
 
 // ── Premium-plan overrides ─────────────────────────────────────────────────────
 // Only these 6 slugs render the Premium profile. Every other DJ shows Free tier.

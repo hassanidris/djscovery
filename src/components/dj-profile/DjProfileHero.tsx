@@ -22,7 +22,7 @@ import {
 import { SOCIAL_ICONS } from "./dj-profile-shared";
 import { ReputationBadge } from "./ReputationBadge";
 import { ScoreBreakdown } from "./ScoreBreakdown";
-import SaveDjButton from "./SaveDjButton";
+import SaveDjButton from "./FollowDjButton";
 import { ShareButton } from "./ShareButton";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 
