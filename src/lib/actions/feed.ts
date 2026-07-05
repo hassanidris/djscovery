@@ -18,18 +18,25 @@ export const switchLike = async (postId: number) => {
   const userId = await getCurrentUserId();
 
   try {
-    const existingLike = await prisma.postLike.findUnique({
-      where: { userId_postId: { userId, postId } },
-    });
-
-    if (existingLike) {
-      await prisma.postLike.delete({
-        where: { userId_postId: { userId, postId } },
+    await prisma.$transaction(async (tx) => {
+      const { count } = await tx.postLike.deleteMany({
+        where: { userId, postId },
       });
-    } else {
-      await prisma.postLike.create({ data: { postId, userId } });
-    }
+
+      if (count === 0) {
+        await tx.postLike.create({ data: { postId, userId } });
+      }
+    });
   } catch (err) {
+    if (err instanceof Error && err.message.includes("P2002")) {
+      // Another request created the like between deleteMany and create;
+      // treat as a successful toggle by deleting it now.
+      await prisma.postLike.deleteMany({
+        where: { userId, postId },
+      });
+      return;
+    }
+
     console.log(err);
     throw new Error("Something went wrong");
   }
@@ -91,56 +98,64 @@ export const addPost = async (formData: FormData, imageUrl?: string) => {
   const audioUrl = rawAudioUrl && isSafeUrl(rawAudioUrl) ? rawAudioUrl : "";
 
   const validated = z.string().min(0).max(1000).safeParse(content);
-  if (!validated.success) return;
+  if (!validated.success) {
+    throw new Error("Post text must be 1000 characters or fewer.");
+  }
   const hasMedia = !!(imageUrl || videoUrl || audioUrl);
-  if (!validated.data && !hasMedia) return;
+  if (!validated.data && !hasMedia) {
+    throw new Error("Post must include text or media.");
+  }
 
   const userId = await getCurrentUserId();
 
   try {
-    const post = await prisma.post.create({
-      data: {
-        content: validated.data,
-        type: imageUrl ? "IMAGE" : "TEXT",
-        userId,
-      },
+    const post = await prisma.$transaction(async (tx) => {
+      const created = await tx.post.create({
+        data: {
+          content: validated.data,
+          type: imageUrl ? "IMAGE" : "TEXT",
+          userId,
+        },
+      });
+
+      if (imageUrl) {
+        await tx.media.create({
+          data: {
+            url: imageUrl,
+            bucket: "djscovery-media",
+            path: imageUrl,
+            type: "IMAGE",
+            postId: created.id,
+          },
+        });
+      }
+
+      if (videoUrl) {
+        await tx.media.create({
+          data: {
+            url: videoUrl,
+            bucket: "external",
+            path: videoUrl,
+            type: "VIDEO",
+            postId: created.id,
+          },
+        });
+      }
+
+      if (audioUrl) {
+        await tx.media.create({
+          data: {
+            url: audioUrl,
+            bucket: "external",
+            path: audioUrl,
+            type: "AUDIO",
+            postId: created.id,
+          },
+        });
+      }
+
+      return created;
     });
-
-    if (imageUrl) {
-      await prisma.media.create({
-        data: {
-          url: imageUrl,
-          bucket: "djscovery-media",
-          path: imageUrl,
-          type: "IMAGE",
-          postId: post.id,
-        },
-      });
-    }
-
-    if (videoUrl) {
-      await prisma.media.create({
-        data: {
-          url: videoUrl,
-          bucket: "external",
-          path: videoUrl,
-          type: "VIDEO",
-          postId: post.id,
-        },
-      });
-    }
-
-    if (audioUrl) {
-      await prisma.media.create({
-        data: {
-          url: audioUrl,
-          bucket: "external",
-          path: audioUrl,
-          type: "AUDIO",
-          postId: post.id,
-        },
-      });
-    }
 
     revalidatePath("/");
   } catch (err) {
