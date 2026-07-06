@@ -389,7 +389,6 @@ export default async function AdminDjReviewPage({
                   fields={{ djProfileId: String(dj.id) }}
                   action={approveDjProfile}
                   successMessage="DJ profile approved"
-                  variant="default"
                   className="w-full bg-green-600 text-white hover:bg-green-700"
                 />
                 <AdminActionButton
