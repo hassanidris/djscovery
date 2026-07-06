@@ -378,6 +378,7 @@ export default function EditDjProfileForm({
     !stageNameError && !genresError && !djTypesError && !countryError;
 
   const [prevCountryId, setPrevCountryId] = useState(countryId);
+  const cityRequestId = useRef(0);
 
   if (prevCountryId !== countryId) {
     setPrevCountryId(countryId);
@@ -390,11 +391,14 @@ export default function EditDjProfileForm({
   useEffect(() => {
     if (!countryId) return;
     const selectedCountry = countries.find((c) => c.id === countryId);
+    const requestId = ++cityRequestId.current;
     getCitiesByCountry(countryId).then((result) => {
-      setCities(result ?? []);
-      if (selectedCountry && currencyAutoSet) {
-        const mapped = COUNTRY_CURRENCIES[selectedCountry.name];
-        if (mapped) setFeeCurrency(mapped);
+      if (requestId === cityRequestId.current) {
+        setCities(result ?? []);
+        if (selectedCountry && currencyAutoSet) {
+          const mapped = COUNTRY_CURRENCIES[selectedCountry.name];
+          if (mapped) setFeeCurrency(mapped);
+        }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

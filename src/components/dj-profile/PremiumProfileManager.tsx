@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useTransition } from "react";
+import { useState, useCallback, useTransition, useEffect } from "react";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Loader2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -117,12 +117,14 @@ function PackageForm({
   const [duration, setDuration] = useState(item?.duration ?? "");
   const [features, setFeatures] = useState(item?.features?.join("\n") ?? "");
   const [popular, setPopular] = useState(item?.popular ?? false);
+  const [saving, setSaving] = useState(false);
 
   async function save() {
+    setSaving(true);
     const fd = new FormData();
     fd.append("name", name);
     fd.append("priceFrom", priceFrom);
-    if (priceTo) fd.append("priceTo", priceTo);
+    fd.append("priceTo", priceTo);
     fd.append("currency", currency);
     if (duration) fd.append("duration", duration);
     fd.append("features", features);
@@ -134,6 +136,7 @@ function PackageForm({
           "Updating package...",
         )
       : await wrapAction(() => createDjPackage(fd), "Creating package...");
+    setSaving(false);
     if (success) onCancel();
   }
 
@@ -208,11 +211,11 @@ function PackageForm({
         <Button
           type="button"
           size="sm"
-          disabled={isPending || !name.trim() || !priceFrom}
+          disabled={saving || !name.trim() || !priceFrom}
           onClick={save}
           className="bg-h_red hover:bg-h_redDark text-white"
         >
-          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+          {saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
         </Button>
         <Button
           type="button"
@@ -243,8 +246,10 @@ function HighlightForm({
   const [year, setYear] = useState(item?.year ?? "");
   const [title, setTitle] = useState(item?.title ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
+  const [saving, setSaving] = useState(false);
 
   async function save() {
+    setSaving(true);
     const fd = new FormData();
     fd.append("year", year);
     fd.append("title", title);
@@ -255,6 +260,7 @@ function HighlightForm({
           "Updating highlight...",
         )
       : await wrapAction(() => createDjHighlight(fd), "Creating highlight...");
+    setSaving(false);
     if (success) onCancel();
   }
 
@@ -290,11 +296,11 @@ function HighlightForm({
         <Button
           type="button"
           size="sm"
-          disabled={isPending || !year.trim() || !title.trim()}
+          disabled={saving || !year.trim() || !title.trim()}
           onClick={save}
           className="bg-h_red hover:bg-h_redDark text-white"
         >
-          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+          {saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
         </Button>
         <Button
           type="button"
@@ -327,8 +333,10 @@ function EndorsementForm({
   const [company, setCompany] = useState(item?.company ?? "");
   const [quote, setQuote] = useState(item?.quote ?? "");
   const [avatar, setAvatar] = useState(item?.avatar ?? "");
+  const [saving, setSaving] = useState(false);
 
   async function save() {
+    setSaving(true);
     const fd = new FormData();
     fd.append("name", name);
     fd.append("role", role);
@@ -344,6 +352,7 @@ function EndorsementForm({
           () => createDjEndorsement(fd),
           "Creating endorsement...",
         );
+    setSaving(false);
     if (success) onCancel();
   }
 
@@ -395,11 +404,11 @@ function EndorsementForm({
         <Button
           type="button"
           size="sm"
-          disabled={isPending || !name.trim() || !role.trim() || !quote.trim()}
+          disabled={saving || !name.trim() || !role.trim() || !quote.trim()}
           onClick={save}
           className="bg-h_red hover:bg-h_redDark text-white"
         >
-          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+          {saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
         </Button>
         <Button
           type="button"
@@ -432,8 +441,10 @@ function PressForm({
   const [title, setTitle] = useState(item?.title ?? "");
   const [date, setDate] = useState(item?.date ?? "");
   const [url, setUrl] = useState(item?.url ?? "");
+  const [saving, setSaving] = useState(false);
 
   async function save() {
+    setSaving(true);
     const fd = new FormData();
     fd.append("source", source);
     fd.append("type", type);
@@ -446,6 +457,7 @@ function PressForm({
           "Updating press...",
         )
       : await wrapAction(() => createDjPressItem(fd), "Creating press item...");
+    setSaving(false);
     if (success) onCancel();
   }
 
@@ -502,13 +514,11 @@ function PressForm({
         <Button
           type="button"
           size="sm"
-          disabled={
-            isPending || !source.trim() || !type.trim() || !title.trim()
-          }
+          disabled={saving || !source.trim() || !type.trim() || !title.trim()}
           onClick={save}
           className="bg-h_red hover:bg-h_redDark text-white"
         >
-          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+          {saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
         </Button>
         <Button
           type="button"
@@ -544,25 +554,28 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
   const [addPress, setAddPress] = useState(false);
 
   const loadAll = useCallback(async () => {
-    const [p, h, e, pr] = await Promise.all([
-      getDjPackages(djProfileId),
-      getDjHighlights(djProfileId),
-      getDjEndorsements(djProfileId),
-      getDjPressItems(djProfileId),
-    ]);
-    setPackages(p);
-    setHighlights(h);
-    setEndorsements(e);
-    setPressItems(pr);
-    setLoaded(true);
+    try {
+      const [p, h, e, pr] = await Promise.all([
+        getDjPackages(djProfileId),
+        getDjHighlights(djProfileId),
+        getDjEndorsements(djProfileId),
+        getDjPressItems(djProfileId),
+      ]);
+      setPackages(p);
+      setHighlights(h);
+      setEndorsements(e);
+      setPressItems(pr);
+      setLoaded(true);
+    } catch (err) {
+      console.error("[PremiumProfileManager] Failed to load data:", err);
+    }
   }, [djProfileId]);
 
-  const [hasLoaded, setHasLoaded] = useState(false);
-
-  if (!hasLoaded) {
-    setHasLoaded(true);
-    loadAll();
-  }
+  useEffect(() => {
+    startTransition(() => {
+      loadAll();
+    });
+  }, [loadAll]);
 
   async function wrapAction<T extends { error?: string; success?: boolean }>(
     action: () => Promise<T>,
