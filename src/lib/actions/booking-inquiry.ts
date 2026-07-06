@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { sendEmail } from "@/lib/email/sendEmail";
+import { rateLimit, rateLimitMessage } from "@/lib/rate-limit";
 import {
   bookingInquiryReceivedHtml,
   bookingInquiryReceivedSubject,
@@ -230,6 +231,18 @@ export async function submitBookingInquiry(
     };
   }
 
+  const inquiryRateLimit = await rateLimit(
+    `booking-inquiry:organizer:${user.id}`,
+    10,
+    60 * 60,
+  );
+  if (!inquiryRateLimit.success) {
+    return {
+      success: false,
+      error: rateLimitMessage("booking inquiry", inquiryRateLimit.resetAt),
+    };
+  }
+
   let payload: SubmitBookingInquiryInput;
   try {
     payload = submitBookingInquirySchema.parse(input);
@@ -335,95 +348,108 @@ export async function submitBookingInquiry(
 
   let createdInquiry: any;
 
-  await prisma.$transaction(async (tx) => {
-    const txUnsafe = tx as Record<string, any>;
-    await tx.$executeRaw`
-      SELECT pg_advisory_xact_lock(hashtext(${`${user.id}:${payload.djProfileId}`}))
-    `;
+  try {
+    await prisma.$transaction(async (tx) => {
+      const txUnsafe = tx as Record<string, any>;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(hashtext(${`${user.id}:${payload.djProfileId}`}))
+      `;
 
-    const recentInquiry = await txUnsafe.bookingInquiry.findFirst({
-      where: {
-        organizerId: user.id,
-        djProfileId: payload.djProfileId,
-        createdAt: { gte: windowStart },
-      },
-      select: { id: true },
-    });
-    if (recentInquiry) {
-      throw new Error("RATE_LIMITED_BOOKING_INQUIRY");
-    }
-
-    const baseCreateData = {
-      djProfileId: payload.djProfileId,
-      organizerId: user.id,
-      eventName: payload.eventName,
-      eventDate: eventDateValue,
-      venue: payload.venue,
-      crowdSize: payload.crowdSize,
-      budgetType: payload.budgetType,
-      budgetMin,
-      budgetMax,
-      budgetCurrency: budgetCurrency.toUpperCase(),
-      message: payload.message,
-    } satisfies Record<string, unknown>;
-
-    const locationCreateData = {
-      countryId: normalizedCountryId,
-      countryName: countryRecord.name,
-      cityId: cityRecord.id,
-      cityName: cityRecord.name,
-    } satisfies Record<string, unknown>;
-
-    try {
-      createdInquiry = await txUnsafe.bookingInquiry.create({
-        data: {
-          ...baseCreateData,
-          ...locationCreateData,
+      const recentInquiry = await txUnsafe.bookingInquiry.findFirst({
+        where: {
+          organizerId: user.id,
+          djProfileId: payload.djProfileId,
+          createdAt: { gte: windowStart },
         },
+        select: { id: true },
       });
-    } catch (error) {
-      if (!isUnknownLocationArgumentError(error)) {
-        throw error;
+      if (recentInquiry) {
+        throw new Error("RATE_LIMITED_BOOKING_INQUIRY");
       }
 
-      console.warn(
-        "Prisma schema for BookingInquiry appears out of date. Falling back to legacy location fields. Please run `npx prisma db push && npx prisma generate`.",
-      );
+      const baseCreateData = {
+        djProfileId: payload.djProfileId,
+        organizerId: user.id,
+        eventName: payload.eventName,
+        eventDate: eventDateValue,
+        venue: payload.venue,
+        crowdSize: payload.crowdSize,
+        budgetType: payload.budgetType,
+        budgetMin,
+        budgetMax,
+        budgetCurrency: budgetCurrency.toUpperCase(),
+        message: payload.message,
+      } satisfies Record<string, unknown>;
 
-      createdInquiry = await txUnsafe.bookingInquiry.create({
-        data: {
-          ...baseCreateData,
-          country: countryRecord.name,
-          city: cityRecord.name,
-        },
-      });
-    }
+      const locationCreateData = {
+        countryId: normalizedCountryId,
+        countryName: countryRecord.name,
+        cityId: cityRecord.id,
+        cityName: cityRecord.name,
+      } satisfies Record<string, unknown>;
 
-    await txUnsafe.bookingInquiryMessage.create({
-      data: {
-        inquiryId: createdInquiry.id,
-        senderId: user.id,
-        senderRole: "ORGANIZER",
-        body: payload.message,
-      },
-    });
+      try {
+        createdInquiry = await txUnsafe.bookingInquiry.create({
+          data: {
+            ...baseCreateData,
+            ...locationCreateData,
+          },
+        });
+      } catch (error) {
+        if (!isUnknownLocationArgumentError(error)) {
+          throw error;
+        }
 
-    await tx.notification.create({
-      data: {
-        type: "BOOKING_INQUIRY" as any,
-        recipientId: djProfile.userId,
-        senderId: user.id,
+        console.warn(
+          "Prisma schema for BookingInquiry appears out of date. Falling back to legacy location fields. Please run `npx prisma db push && npx prisma generate`.",
+        );
+
+        createdInquiry = await txUnsafe.bookingInquiry.create({
+          data: {
+            ...baseCreateData,
+            country: countryRecord.name,
+            city: cityRecord.name,
+          },
+        });
+      }
+
+      await txUnsafe.bookingInquiryMessage.create({
         data: {
           inquiryId: createdInquiry.id,
-          eventName: payload.eventName,
-          cityName: cityRecord.name,
-          countryName: countryRecord.name,
-          organizerName: organizerProfile.displayName,
-          stageName: djProfile.stageName,
+          senderId: user.id,
+          senderRole: "ORGANIZER",
+          body: payload.message,
         },
-      },
+      });
+
+      await tx.notification.create({
+        data: {
+          type: "BOOKING_INQUIRY" as any,
+          recipientId: djProfile.userId,
+          senderId: user.id,
+          data: {
+            inquiryId: createdInquiry.id,
+            eventName: payload.eventName,
+            cityName: cityRecord.name,
+            countryName: countryRecord.name,
+            organizerName: organizerProfile.displayName,
+            stageName: djProfile.stageName,
+          },
+        },
+      });
     });
-  });
+  } catch (err) {
+    if (
+      err instanceof Error &&
+      err.message === "RATE_LIMITED_BOOKING_INQUIRY"
+    ) {
+      return {
+        success: false,
+        error: "You already contacted this DJ in the last 24 hours.",
+      };
+    }
+    throw err;
+  }
 
   const organizerName = getDisplayName({
     profileName: organizerProfile.displayName,

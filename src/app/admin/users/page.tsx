@@ -136,7 +136,8 @@ export default async function AdminUsersPage({
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
-                          {user.roles.length === 0 ? (
+                          {user.roles.length === 0 ||
+                          user.roles.some((r) => r.role === "FAN") ? (
                             <Badge className="border border-gray-500/30 bg-gray-500/10 text-xs text-gray-400">
                               Fan
                             </Badge>

@@ -406,7 +406,7 @@ export default async function AdminDashboardPage({
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex flex-wrap gap-1">
-                      {user.roles.length === 0 ? (
+                      {user.roles.length === 0 || user.roles.includes("FAN") ? (
                         <Badge className="border border-white/10 bg-white/5 text-xs text-gray-300">
                           Fan
                         </Badge>

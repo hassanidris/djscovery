@@ -227,7 +227,6 @@ export async function createDjProfile(
   if (!user) return { error: "Not authenticated" };
 
   try {
-    console.log("createDjProfile invoked", { input });
     const parsed = DjProfileInputSchema.safeParse(input);
     if (!parsed.success) {
       return {
@@ -935,6 +934,11 @@ export async function setupFanProfile(
       await tx.user.update({
         where: { id: user.id },
         data: { name, countryId, cityId, onboardingComplete: true },
+      });
+      await tx.userRole.upsert({
+        where: { userId_role: { userId: user.id, role: "FAN" } },
+        update: {},
+        create: { userId: user.id, role: "FAN" },
       });
     });
     return { success: true, error: null };

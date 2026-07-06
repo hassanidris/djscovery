@@ -4,6 +4,7 @@ import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { ActionResult, actionError, actionSuccess } from "./action-result";
 
 async function getCurrentUserId(): Promise<string> {
   const supabase = await createClient();
@@ -14,8 +15,13 @@ async function getCurrentUserId(): Promise<string> {
   return user.id;
 }
 
-export const switchLike = async (postId: number) => {
-  const userId = await getCurrentUserId();
+export const switchLike = async (postId: number): Promise<ActionResult> => {
+  let userId: string;
+  try {
+    userId = await getCurrentUserId();
+  } catch {
+    return actionError("User is not authenticated!");
+  }
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -27,6 +33,7 @@ export const switchLike = async (postId: number) => {
         await tx.postLike.create({ data: { postId, userId } });
       }
     });
+    return actionSuccess();
   } catch (err) {
     if (err instanceof Error && err.message.includes("P2002")) {
       // Another request created the like between deleteMany and create;
@@ -34,11 +41,10 @@ export const switchLike = async (postId: number) => {
       await prisma.postLike.deleteMany({
         where: { userId, postId },
       });
-      return;
+      return actionSuccess();
     }
 
-    console.log(err);
-    throw new Error("Something went wrong");
+    return actionError("Something went wrong");
   }
 };
 
@@ -46,23 +52,34 @@ export const addPostComment = async (
   postId: number,
   content: string,
   parentId?: number,
-) => {
-  const userId = await getCurrentUserId();
+): Promise<ActionResult<any>> => {
+  let userId: string;
+  try {
+    userId = await getCurrentUserId();
+  } catch {
+    return actionError("User is not authenticated!");
+  }
 
   try {
     const comment = await prisma.postComment.create({
       data: { content, userId, postId, parentId },
       include: { user: true },
     });
-    return comment;
+    return actionSuccess(comment);
   } catch (err) {
-    console.log(err);
-    throw new Error("Something went wrong!");
+    return actionError("Something went wrong!");
   }
 };
 
-export const deletePostComment = async (commentId: number) => {
-  const userId = await getCurrentUserId();
+export const deletePostComment = async (
+  commentId: number,
+): Promise<ActionResult> => {
+  let userId: string;
+  try {
+    userId = await getCurrentUserId();
+  } catch {
+    return actionError("User is not authenticated!");
+  }
 
   try {
     await prisma.postComment.update({
@@ -70,9 +87,9 @@ export const deletePostComment = async (commentId: number) => {
       data: { deletedAt: new Date() },
     });
     revalidatePath("/");
+    return actionSuccess();
   } catch (err) {
-    console.log(err);
-    throw new Error("Something went wrong!");
+    return actionError("Something went wrong!");
   }
 };
 
@@ -85,7 +102,10 @@ function isSafeUrl(raw: string): boolean {
   }
 }
 
-export const addPost = async (formData: FormData, imageUrl?: string) => {
+export const addPost = async (
+  formData: FormData,
+  imageUrl?: string,
+): Promise<ActionResult<any>> => {
   const content = ((formData.get("content") as string | null) ?? "").trim();
   const rawVideoUrl = (
     (formData.get("videoUrl") as string | null) ?? ""
@@ -99,14 +119,19 @@ export const addPost = async (formData: FormData, imageUrl?: string) => {
 
   const validated = z.string().min(0).max(1000).safeParse(content);
   if (!validated.success) {
-    throw new Error("Post text must be 1000 characters or fewer.");
+    return actionError("Post text must be 1000 characters or fewer.");
   }
   const hasMedia = !!(imageUrl || videoUrl || audioUrl);
   if (!validated.data && !hasMedia) {
-    throw new Error("Post must include text or media.");
+    return actionError("Post must include text or media.");
   }
 
-  const userId = await getCurrentUserId();
+  let userId: string;
+  try {
+    userId = await getCurrentUserId();
+  } catch {
+    return actionError("User is not authenticated!");
+  }
 
   try {
     const post = await prisma.$transaction(async (tx) => {
@@ -158,14 +183,19 @@ export const addPost = async (formData: FormData, imageUrl?: string) => {
     });
 
     revalidatePath("/");
+    return actionSuccess(post);
   } catch (err) {
-    console.log(err);
-    throw new Error(`addPost failed: ${err}`);
+    return actionError("Failed to create post");
   }
 };
 
-export const deletePost = async (postId: number) => {
-  const userId = await getCurrentUserId();
+export const deletePost = async (postId: number): Promise<ActionResult> => {
+  let userId: string;
+  try {
+    userId = await getCurrentUserId();
+  } catch {
+    return actionError("User is not authenticated!");
+  }
 
   try {
     await prisma.post.update({
@@ -173,8 +203,8 @@ export const deletePost = async (postId: number) => {
       data: { deletedAt: new Date() },
     });
     revalidatePath("/");
+    return actionSuccess();
   } catch (err) {
-    console.log(err);
-    throw new Error(`deletePost failed: ${err}`);
+    return actionError("Failed to delete post");
   }
 };

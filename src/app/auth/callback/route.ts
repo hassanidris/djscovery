@@ -98,14 +98,6 @@ export async function GET(request: Request) {
       : "";
     const role = urlRole || cookieRole || metaRole;
 
-    console.log("[auth/callback] role resolution:", {
-      urlRole,
-      cookieRole,
-      metaRole,
-      resolved: role,
-      uid: userId.slice(0, 8),
-    });
-
     if (rawCookieRole) cookieStore.delete("pending_role");
 
     let dbRoles: string[] = [];
@@ -149,6 +141,7 @@ export async function GET(request: Request) {
         // must not be silently converted to fans
         if (isNewUser && (role === "" || role === "fan")) {
           await tx.fanProfile.create({ data: { userId, name } });
+          await tx.userRole.create({ data: { userId, role: "FAN" } });
         }
 
         const roleRecords = await tx.userRole.findMany({
