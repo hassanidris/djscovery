@@ -185,11 +185,7 @@ export default async function AdminDjsPage({
                               action={toggleDjFeatured}
                               successMessage={`DJ ${dj.featured ? "unfeatured" : "featured"}`}
                               requireConfirm={false}
-                              className={
-                                dj.featured
-                                  ? "border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-                                  : "border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-                              }
+                              className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
                             />
                           )}
                           {dj.status === "PENDING_APPROVAL" && (
