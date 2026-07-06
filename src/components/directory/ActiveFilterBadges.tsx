@@ -4,9 +4,12 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { DJ_TYPES } from "./FilterBottomSheet";
 
 const SORT_LABELS: Record<string, string> = {
+  new: "Just Joined",
+  "top-rated": "Top Rated",
+  trending: "Trending",
+  "most-followed": "Most Followed",
   "a-z": "A – Z",
   "z-a": "Z – A",
-  "most-followed": "Most Followed",
 };
 
 const DJ_TYPE_LABEL: Record<string, string> = Object.fromEntries(
