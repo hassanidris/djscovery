@@ -24,7 +24,7 @@ export default async function HomeTrendingDJs() {
               Trending This Month
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-gray-400">
-              Hot DJs everyone's viewing
+              Hot DJs everyone&apos;s viewing
               <span className="text-gray-500"> · Sorted by monthly views</span>
             </p>
           </div>
