@@ -1,22 +1,28 @@
 "use client";
 
-import { useState, useLayoutEffect } from "react";
+import { useSyncExternalStore } from "react";
+
+const QUERY = "(min-width: 768px)";
+
+function subscribe(callback: () => void) {
+  const mq = window.matchMedia(QUERY);
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getSnapshot(): boolean {
+  return window.matchMedia(QUERY).matches;
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
 
 /**
  * Returns true when the viewport is at the Tailwind `md` breakpoint (≥768px).
- * Uses useLayoutEffect so the state is set synchronously before any useEffect
- * runs — preventing a component that's about to unmount from firing side-effects.
+ * Uses useSyncExternalStore so the value is read synchronously during render
+ * and stays subscribed to viewport changes.
  */
 export function useIsDesktop(): boolean {
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useLayoutEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  return isDesktop;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

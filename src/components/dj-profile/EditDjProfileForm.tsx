@@ -377,20 +377,30 @@ export default function EditDjProfileForm({
   const canSave =
     !stageNameError && !genresError && !djTypesError && !countryError;
 
-  useEffect(() => {
+  const [prevCountryId, setPrevCountryId] = useState(countryId);
+  const cityRequestId = useRef(0);
+
+  if (prevCountryId !== countryId) {
+    setPrevCountryId(countryId);
     if (!countryId) {
       setCities([]);
       setCityId(null);
-      return;
     }
-    getCitiesByCountry(countryId).then((result) => {
-      setCities(result ?? []);
-    });
+  }
+
+  useEffect(() => {
+    if (!countryId) return;
     const selectedCountry = countries.find((c) => c.id === countryId);
-    if (selectedCountry && currencyAutoSet) {
-      const mapped = COUNTRY_CURRENCIES[selectedCountry.name];
-      if (mapped) setFeeCurrency(mapped);
-    }
+    const requestId = ++cityRequestId.current;
+    getCitiesByCountry(countryId).then((result) => {
+      if (requestId === cityRequestId.current) {
+        setCities(result ?? []);
+        if (selectedCountry && currencyAutoSet) {
+          const mapped = COUNTRY_CURRENCIES[selectedCountry.name];
+          if (mapped) setFeeCurrency(mapped);
+        }
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryId]);
 

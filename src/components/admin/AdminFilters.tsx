@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useRef, useCallback, useEffect, useState } from "react";
+import { useRef, useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -39,10 +39,12 @@ export default function AdminFilters({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [searchValue, setSearchValue] = useState(currentSearch);
+  const [prevSearch, setPrevSearch] = useState(currentSearch);
 
-  useEffect(() => {
+  if (prevSearch !== currentSearch) {
+    setPrevSearch(currentSearch);
     setSearchValue(currentSearch);
-  }, [currentSearch]);
+  }
 
   const buildUrl = useCallback(
     (updates: Record<string, string>) => {

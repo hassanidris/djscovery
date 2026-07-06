@@ -4,7 +4,7 @@ import { updateDjProfile } from "@/lib/actions";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@prisma/client";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import UpdateBtn from "./UpdateBtn";
@@ -12,31 +12,29 @@ import UpdateBtn from "./UpdateBtn";
 const UpdateUser = ({ user }: { user: User }) => {
   const [open, setOpen] = useState(false);
 
-  const [state, formAction] = useActionState(updateDjProfile, {
-    success: false,
-    error: false,
-  });
-
   const router = useRouter();
-  const isFirstRender = useRef(true);
+
+  const [, formAction] = useActionState(
+    async (
+      prev: { success: boolean; error: boolean },
+      payload: { formData: FormData },
+    ) => {
+      const result = await updateDjProfile(prev, payload);
+      if (result.success) {
+        toast.success("Profile updated");
+        setOpen(false);
+        router.refresh();
+      } else if (result.error) {
+        toast.error("Update failed. Please try again.");
+      }
+      return result;
+    },
+    { success: false, error: false },
+  );
 
   const handleClose = () => {
     setOpen(false);
   };
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (state.success) {
-      toast.success("Profile updated");
-      setOpen(false);
-      router.refresh();
-    } else if (state.error) {
-      toast.error("Update failed. Please try again.");
-    }
-  }, [state, router]);
 
   useEffect(() => {
     if (open) {
