@@ -44,7 +44,6 @@ export const switchLike = async (postId: number): Promise<ActionResult> => {
       return actionSuccess();
     }
 
-    console.log(err);
     return actionError("Something went wrong");
   }
 };
@@ -68,7 +67,6 @@ export const addPostComment = async (
     });
     return actionSuccess(comment);
   } catch (err) {
-    console.log(err);
     return actionError("Something went wrong!");
   }
 };
@@ -91,7 +89,6 @@ export const deletePostComment = async (
     revalidatePath("/");
     return actionSuccess();
   } catch (err) {
-    console.log(err);
     return actionError("Something went wrong!");
   }
 };
@@ -188,7 +185,6 @@ export const addPost = async (
     revalidatePath("/");
     return actionSuccess(post);
   } catch (err) {
-    console.log(err);
     return actionError("Failed to create post");
   }
 };
@@ -209,7 +205,6 @@ export const deletePost = async (postId: number): Promise<ActionResult> => {
     revalidatePath("/");
     return actionSuccess();
   } catch (err) {
-    console.log(err);
     return actionError("Failed to delete post");
   }
 };

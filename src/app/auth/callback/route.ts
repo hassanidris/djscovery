@@ -98,14 +98,6 @@ export async function GET(request: Request) {
       : "";
     const role = urlRole || cookieRole || metaRole;
 
-    console.log("[auth/callback] role resolution:", {
-      urlRole,
-      cookieRole,
-      metaRole,
-      resolved: role,
-      uid: userId.slice(0, 8),
-    });
-
     if (rawCookieRole) cookieStore.delete("pending_role");
 
     let dbRoles: string[] = [];

@@ -227,7 +227,6 @@ export async function createDjProfile(
   if (!user) return { error: "Not authenticated" };
 
   try {
-    console.log("createDjProfile invoked", { input });
     const parsed = DjProfileInputSchema.safeParse(input);
     if (!parsed.success) {
       return {

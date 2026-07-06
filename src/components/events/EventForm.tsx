@@ -176,7 +176,8 @@ export function EventForm(props: EventFormProps) {
         if (tz && !data.timezone) set("timezone", tz);
       }
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.countryId, data.timezone, cities.length, props.countries]);
 
   function set(field: keyof EventFormData, value: unknown) {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -794,7 +795,7 @@ export function EventForm(props: EventFormProps) {
             {data.genres.map((genre) => (
               <span
                 key={genre}
-                className="inline-flex items-center gap-1 rounded-full border border-h_red bg-h_red/15 px-3 py-1 text-xs font-medium text-h_red"
+                className="border-h_red bg-h_red/15 text-h_red inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
               >
                 {genre}
                 <button

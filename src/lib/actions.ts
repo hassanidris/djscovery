@@ -39,7 +39,6 @@ export const updateDjProfile = async (
 
   const validated = DjProfileSchema.safeParse(fields);
   if (!validated.success) {
-    console.log(validated.error.flatten().fieldErrors);
     return { success: false, error: true };
   }
 
@@ -57,7 +56,6 @@ export const updateDjProfile = async (
     revalidatePath("/profile");
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
     return { success: false, error: true };
   }
 };
