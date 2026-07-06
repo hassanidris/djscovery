@@ -46,7 +46,14 @@ export const CreateDjProfileSchema = z.object({
     .array(
       z.object({
         platform: z.enum(SOCIAL_PLATFORMS),
-        url: z.string().url("Invalid URL").min(1, "URL is required"),
+        url: z
+          .string()
+          .url("Invalid URL")
+          .min(1, "URL is required")
+          .refine(
+            (url) => url.startsWith("http://") || url.startsWith("https://"),
+            "URL must start with http:// or https://",
+          ),
       }),
     )
     .min(1, "Add at least one social media link")

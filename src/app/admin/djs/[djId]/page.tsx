@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/client";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,22 +27,18 @@ export default async function AdminDjReviewPage({
   params: Promise<{ djId: string }>;
 }) {
   const { djId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
 
-  // Verify admin access
-  if (!authUser) return notFound();
-  const userRoles = await prisma.userRole.findMany({
-    where: { userId: authUser.id },
-    select: { role: true },
-  });
-  const isAdmin = userRoles.some((r) => r.role === "ADMIN");
-  if (!isAdmin) return notFound();
+  // Validate djId is a valid number
+  const djProfileId = Number(djId);
+  if (isNaN(djProfileId) || djProfileId <= 0) {
+    return notFound();
+  }
+
+  // Verify admin access (checks auth, role, user status, and deletedAt)
+  const { userId } = await requireAdmin();
 
   const dj = await prisma.djProfile.findUnique({
-    where: { id: Number(djId) },
+    where: { id: djProfileId },
     include: {
       user: {
         select: {
@@ -86,10 +82,22 @@ export default async function AdminDjReviewPage({
 
   if (!dj) return notFound();
 
-  const ratingAgg = await prisma.djRating.aggregate({
-    where: { djProfileId: dj.id },
-    _avg: { rating: true },
-  });
+  const [ratingAgg, mediaCount, publicEventsCount] = await Promise.all([
+    prisma.djRating.aggregate({
+      where: { djProfileId: dj.id },
+      _avg: { rating: true },
+    }),
+    prisma.media.count({
+      where: { djProfileId: dj.id },
+    }),
+    prisma.event.count({
+      where: {
+        ownerDjId: dj.id,
+        status: { in: ["PUBLISHED", "COMPLETED"] },
+        deletedAt: null,
+      },
+    }),
+  ]);
   const avgRating = ratingAgg._avg.rating ?? 0;
 
   const STATUS_COLORS: Record<string, string> = {
@@ -243,18 +251,24 @@ export default async function AdminDjReviewPage({
                 Social Links
               </h2>
               <div className="grid gap-2">
-                {dj.socialLinks.map((link) => (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-gray-300 hover:text-white"
-                  >
-                    <Globe className="h-4 w-4" />
-                    {link.platform}
-                  </a>
-                ))}
+                {dj.socialLinks
+                  .filter(
+                    (link) =>
+                      link.url.startsWith("http://") ||
+                      link.url.startsWith("https://"),
+                  )
+                  .map((link) => (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-gray-300 hover:text-white"
+                    >
+                      <Globe className="h-4 w-4" />
+                      {link.platform}
+                    </a>
+                  ))}
               </div>
             </div>
           )}
@@ -263,7 +277,7 @@ export default async function AdminDjReviewPage({
           {dj.media.length > 0 && (
             <div className="rounded-xl border border-white/8 bg-white/3 p-6">
               <h2 className="mb-4 text-lg font-semibold text-white">
-                Media ({dj.media.length})
+                Media ({mediaCount})
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {dj.media.slice(0, 6).map((media) => (
@@ -349,7 +363,7 @@ export default async function AdminDjReviewPage({
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Events</span>
-                <span className="text-white">{dj.eventsOwned.length}</span>
+                <span className="text-white">{publicEventsCount}</span>
               </div>
             </div>
           </div>
