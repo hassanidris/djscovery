@@ -34,8 +34,8 @@ export async function getFeaturedDJs(): Promise<FeaturedDj[]> {
           b.stats.followers - a.stats.followers,
       )
       .slice(0, 3)
-      .map((dj) => ({
-        id: 0, // Demo data has no real ID
+      .map((dj, index) => ({
+        id: index + 1, // Use unique IDs for demo data
         slug: dj.slug,
         stageName: dj.stageName,
         avatar: dj.avatar.url,
@@ -116,8 +116,8 @@ export async function getTrendingDJs(): Promise<TrendingDj[]> {
     const demoDJs = [...PREMIUM_DEMO_DJS]
       .sort((a, b) => b.stats.followers - a.stats.followers)
       .slice(0, 8)
-      .map((dj) => ({
-        id: 0,
+      .map((dj, index) => ({
+        id: index + 100, // Use unique IDs for demo data (offset to avoid collision)
         slug: dj.slug,
         stageName: dj.stageName,
         avatar: dj.avatar.url,
