@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getNavUser } from "@/lib/auth/getNavUser";
 import Hero from "@/components/Hero";
 import HomeFeaturedDJs from "@/components/home/HomeFeaturedDJs";
+import HomeTrendingDJs from "@/components/home/HomeTrendingDJs";
 import HomeDJsTabsAsync from "@/components/home/HomeDJsTabsAsync";
 import HomeEventsSection from "@/components/home/HomeEventsSection";
 import HomeOpenGigsSection from "@/components/home/HomeOpenGigsSection";
@@ -25,6 +26,9 @@ const Homepage = async () => {
 
       {/* Featured DJs */}
       <HomeFeaturedDJs />
+
+      {/* Trending DJs */}
+      <HomeTrendingDJs />
 
       {/* DJ rows with tabs — streams independently */}
       <Suspense fallback={<HomeDJsTabsSkeleton />}>
