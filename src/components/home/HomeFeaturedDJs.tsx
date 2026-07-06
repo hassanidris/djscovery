@@ -24,7 +24,11 @@ export default async function HomeFeaturedDJs() {
               Featured DJs
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-gray-400">
-              Handpicked talent making waves globally
+              Curated talent you should know
+              <span className="text-gray-500">
+                {" "}
+                · Admin-picked + high reputation
+              </span>
             </p>
           </div>
           <Button
