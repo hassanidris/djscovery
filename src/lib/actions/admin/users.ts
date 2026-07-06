@@ -146,9 +146,15 @@ export async function getAdminUsers({
         ? { status: status as "ACTIVE" | "SUSPENDED" | "PENDING" | "REJECTED" }
         : {}),
       ...(role === "FAN"
-        ? { roles: { none: {} } }
+        ? {
+            OR: [{ roles: { none: {} } }, { roles: { some: { role: "FAN" } } }],
+          }
         : role
-          ? { roles: { some: { role: role as "ADMIN" | "DJ" | "ORGANIZER" } } }
+          ? {
+              roles: {
+                some: { role: role as "ADMIN" | "DJ" | "ORGANIZER" | "FAN" },
+              },
+            }
           : {}),
       ...(search
         ? {

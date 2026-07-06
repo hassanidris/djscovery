@@ -334,6 +334,8 @@ function Cell({ val }: { val: boolean | string }) {
 
 const CATEGORIES = Array.from(new Set(ROWS.map((r) => r.category)));
 
+const showDemo = process.env.NEXT_PUBLIC_APP_ENV !== "production";
+
 export default function DjProfileComparePage() {
   return (
     <div className="min-h-screen bg-black">
@@ -351,22 +353,27 @@ export default function DjProfileComparePage() {
             Everything DJs need to get booked, build credibility, and grow their
             community.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/djs/demo-free">
-              <Button
-                variant="outline"
-                className="border-white/20 text-gray-300 hover:bg-white/5"
-              >
-                View Free Profile
-              </Button>
-            </Link>
-            <Link href="/djs/demo-premium">
-              <Button className="bg-amber-500 font-bold text-black hover:bg-amber-400">
-                <FontAwesomeIcon icon={faCrown} className="mr-2 h-3.5 w-3.5" />
-                View Premium Profile
-              </Button>
-            </Link>
-          </div>
+          {showDemo && (
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/djs/demo-free">
+                <Button
+                  variant="outline"
+                  className="border-white/20 text-gray-300 hover:bg-white/5"
+                >
+                  View Free Profile
+                </Button>
+              </Link>
+              <Link href="/djs/demo-premium">
+                <Button className="bg-amber-500 font-bold text-black hover:bg-amber-400">
+                  <FontAwesomeIcon
+                    icon={faCrown}
+                    className="mr-2 h-3.5 w-3.5"
+                  />
+                  View Premium Profile
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Comparison Table */}
@@ -491,22 +498,27 @@ export default function DjProfileComparePage() {
             Every DJ on DJcovery starts with a professional free profile.
             Premium unlocks the tools that turn visibility into bookings.
           </p>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/djs/demo-free">
-              <Button
-                variant="outline"
-                className="border-white/20 text-gray-300 hover:bg-white/5"
-              >
-                See Free Profile
-              </Button>
-            </Link>
-            <Link href="/djs/demo-premium">
-              <Button className="bg-amber-500 px-8 font-bold text-black hover:bg-amber-400">
-                <FontAwesomeIcon icon={faCrown} className="mr-2 h-3.5 w-3.5" />
-                See Premium Profile
-              </Button>
-            </Link>
-          </div>
+          {showDemo && (
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/djs/demo-free">
+                <Button
+                  variant="outline"
+                  className="border-white/20 text-gray-300 hover:bg-white/5"
+                >
+                  See Free Profile
+                </Button>
+              </Link>
+              <Link href="/djs/demo-premium">
+                <Button className="bg-amber-500 px-8 font-bold text-black hover:bg-amber-400">
+                  <FontAwesomeIcon
+                    icon={faCrown}
+                    className="mr-2 h-3.5 w-3.5"
+                  />
+                  See Premium Profile
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

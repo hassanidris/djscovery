@@ -36,7 +36,7 @@ const UpdateUser = ({ user }: { user: User }) => {
     } else if (state.error) {
       toast.error("Update failed. Please try again.");
     }
-  }, [state]);
+  }, [state, router]);
 
   useEffect(() => {
     if (open) {
@@ -52,38 +52,38 @@ const UpdateUser = ({ user }: { user: User }) => {
   return (
     <div>
       <span
-        className="text-blue-500 text-xs cursor-pointer"
+        className="cursor-pointer text-xs text-blue-500"
         onClick={() => setOpen(true)}
       >
         Update
       </span>
       {open && (
-        <div className="absolute w-screen h-screen top-0 left-0 bg-black bg-opacity-65 flex items-center justify-center z-50">
+        <div className="bg-opacity-65 absolute top-0 left-0 z-50 flex h-screen w-screen items-center justify-center bg-black">
           <form
             action={(formData) => formAction({ formData })}
-            className="p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3 relative overflow-y-scroll"
+            className="relative flex w-full flex-col gap-2 overflow-y-scroll rounded-lg bg-white p-12 shadow-md md:w-1/2 xl:w-1/3"
           >
             <h1 className="text-2xl font-semibold">Update DJ Profile</h1>
             <div className="mt-4 text-sm text-gray-500">
               Update your DJ stage name and bio.
             </div>
 
-            <div className="flex justify-start flex-wrap gap-2 xl:gap-3">
-              <div className="flex flex-col gap-1 w-full">
+            <div className="flex flex-wrap justify-start gap-2 xl:gap-3">
+              <div className="flex w-full flex-col gap-1">
                 <label className="text-xs text-gray-500">DJ Stage Name</label>
                 <input
                   type="text"
                   placeholder="Dj. Echo"
-                  className="w-full ring-1 ring-gray-300 p-3.25 rounded-md text-sm"
+                  className="w-full rounded-md p-3.25 text-sm ring-1 ring-gray-300"
                   name="stageName"
                 />
               </div>
 
-              <div className="flex flex-col gap-1 w-full">
+              <div className="flex w-full flex-col gap-1">
                 <label className="text-xs text-gray-500">Bio</label>
                 <textarea
                   placeholder="Tell your fans about yourself..."
-                  className="w-full ring-1 ring-gray-300 p-3.25 rounded-md text-sm resize-none"
+                  className="w-full resize-none rounded-md p-3.25 text-sm ring-1 ring-gray-300"
                   name="bio"
                   rows={3}
                 />
@@ -92,7 +92,7 @@ const UpdateUser = ({ user }: { user: User }) => {
 
             <UpdateBtn />
             <div
-              className="absolute text-xl right-3 top-3 cursor-pointer"
+              className="absolute top-3 right-3 cursor-pointer text-xl"
               onClick={handleClose}
             >
               <FontAwesomeIcon icon={faClose} />

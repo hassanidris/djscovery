@@ -22,7 +22,7 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
   const [activeTab, setActiveTab] = useState<"new" | "trending">("new");
 
   const viewAllHref =
-    activeTab === "new" ? "/directory?sort=new" : "/directory?sort=trending";
+    activeTab === "new" ? "/directory?sort=new" : "/directory?sort=top-rated";
 
   return (
     <section className="border-t border-white/5 px-4 py-12 md:px-8">
@@ -50,7 +50,7 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
                   value="trending"
                   className="data-[state=active]:bg-h_red data-[state=active]:text-white"
                 >
-                  Trending
+                  Top Rated
                   <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
                     {trendingDJs.length}
                   </span>

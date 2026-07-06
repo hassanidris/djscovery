@@ -16,10 +16,13 @@ const GENRES = [
 ];
 
 const SORT_OPTIONS = [
-  { value: "", label: "Newest" },
+  { value: "", label: "Recommended" },
+  { value: "new", label: "Just Joined" },
+  { value: "top-rated", label: "Top Rated" },
+  { value: "trending", label: "Trending" },
+  { value: "most-followed", label: "Most Followed" },
   { value: "a-z", label: "A – Z" },
   { value: "z-a", label: "Z – A" },
-  { value: "most-followed", label: "Most Followed" },
 ];
 
 type FilterPanelProps = {

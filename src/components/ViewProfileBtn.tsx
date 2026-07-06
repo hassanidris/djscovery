@@ -21,8 +21,6 @@
 //     },
 //   });
 
-//   console.log("user", user);
-
 //   if (!user) return null;
 //   return (
 //     <Link

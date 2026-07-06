@@ -88,7 +88,11 @@ const DirectoryPage = async ({
           ? { stageName: "asc" }
           : sort === "z-a"
             ? { stageName: "desc" }
-            : [{ searchScore: "desc" }, { reputationScore: "desc" }],
+            : sort === "new"
+              ? { createdAt: "desc" }
+              : sort === "trending"
+                ? { monthlyViews: "desc" }
+                : [{ searchScore: "desc" }, { reputationScore: "desc" }],
       include: {
         user: true,
         country: { select: { name: true } },
@@ -170,6 +174,37 @@ const DirectoryPage = async ({
       return [...list].sort(
         (a, b) => (b._count?.followers ?? 0) - (a._count?.followers ?? 0),
       );
+    if (sort === "new")
+      return [...list].sort((a, b) => {
+        // For demo data, use a stable order since they don't have createdAt
+        if (!a.djProfileId) return 1;
+        if (!b.djProfileId) return -1;
+        return b.djProfileId - a.djProfileId;
+      });
+    if (sort === "trending")
+      return [...list].sort((a, b) => {
+        // For demo data, use followers as proxy for monthlyViews
+        return (b._count?.followers ?? 0) - (a._count?.followers ?? 0);
+      });
+    if (sort === "top-rated")
+      return [...list].sort((a, b) => {
+        // Calculate average rating from ratings array
+        const avgRatingA =
+          a.ratings && a.ratings.length > 0
+            ? a.ratings.reduce(
+                (sum: number, r: any) => sum + (r.rating || 0),
+                0,
+              ) / a.ratings.length
+            : 0;
+        const avgRatingB =
+          b.ratings && b.ratings.length > 0
+            ? b.ratings.reduce(
+                (sum: number, r: any) => sum + (r.rating || 0),
+                0,
+              ) / b.ratings.length
+            : 0;
+        return avgRatingB - avgRatingA;
+      });
     return list;
   };
 

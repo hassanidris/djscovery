@@ -99,3 +99,273 @@ CREATE POLICY "Participants can read booking inquiry messages" ON "BookingInquir
       )
   )
 );
+
+-- ============================================================
+-- RLS POLICIES FOR PUBLIC/LISTING TABLES (added in cleanup)
+-- ============================================================
+
+-- User: private table; server-side writes preferred. User can read/update own row.
+ALTER TABLE "User" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can read own row" ON "User";
+CREATE POLICY "User can read own row" ON "User" FOR SELECT TO public USING (id = (auth.uid())::text);
+DROP POLICY IF EXISTS "User can update own row" ON "User";
+CREATE POLICY "User can update own row" ON "User" FOR UPDATE TO public USING (id = (auth.uid())::text);
+
+-- DjProfile: public read for approved, non-hidden, active profiles; owner can manage own.
+ALTER TABLE "DjProfile" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read approved DJ profiles" ON "DjProfile";
+CREATE POLICY "Public read approved DJ profiles" ON "DjProfile" FOR SELECT TO public USING (
+  status = 'APPROVED' AND hidden = false AND "deletedAt" IS NULL
+);
+DROP POLICY IF EXISTS "Owner can read own DJ profile" ON "DjProfile";
+CREATE POLICY "Owner can read own DJ profile" ON "DjProfile" FOR SELECT TO public USING ("userId" = (auth.uid())::text);
+DROP POLICY IF EXISTS "Owner can update own DJ profile" ON "DjProfile";
+CREATE POLICY "Owner can update own DJ profile" ON "DjProfile" FOR UPDATE TO public
+  USING ("userId" = (auth.uid())::text)
+  WITH CHECK ("userId" = (auth.uid())::text AND status = (SELECT status FROM "DjProfile" WHERE id = "DjProfile".id) AND hidden = (SELECT hidden FROM "DjProfile" WHERE id = "DjProfile".id));
+
+-- OrganizerProfile: public read for active, non-hidden, active organizers; owner can manage own.
+ALTER TABLE "OrganizerProfile" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read active organizer profiles" ON "OrganizerProfile";
+CREATE POLICY "Public read active organizer profiles" ON "OrganizerProfile" FOR SELECT TO public USING (
+  status = 'ACTIVE' AND hidden = false AND "deletedAt" IS NULL
+);
+DROP POLICY IF EXISTS "Owner can read own organizer profile" ON "OrganizerProfile";
+CREATE POLICY "Owner can read own organizer profile" ON "OrganizerProfile" FOR SELECT TO public USING ("userId" = (auth.uid())::text);
+DROP POLICY IF EXISTS "Owner can update own organizer profile" ON "OrganizerProfile";
+CREATE POLICY "Owner can update own organizer profile" ON "OrganizerProfile" FOR UPDATE TO public
+  USING ("userId" = (auth.uid())::text)
+  WITH CHECK ("userId" = (auth.uid())::text AND status = (SELECT status FROM "OrganizerProfile" WHERE id = "OrganizerProfile".id) AND hidden = (SELECT hidden FROM "OrganizerProfile" WHERE id = "OrganizerProfile".id));
+
+-- FanProfile: owner only
+ALTER TABLE "FanProfile" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Owner can read own fan profile" ON "FanProfile";
+CREATE POLICY "Owner can read own fan profile" ON "FanProfile" FOR SELECT TO public USING ("userId" = (auth.uid())::text);
+DROP POLICY IF EXISTS "Owner can update own fan profile" ON "FanProfile";
+CREATE POLICY "Owner can update own fan profile" ON "FanProfile" FOR UPDATE TO public USING ("userId" = (auth.uid())::text);
+
+-- Gig: public read for published, non-hidden, active gigs; organizer owner can manage; applied DJs can read.
+ALTER TABLE "Gig" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read published gigs" ON "Gig";
+CREATE POLICY "Public read published gigs" ON "Gig" FOR SELECT TO public USING (
+  status = 'PUBLISHED' AND hidden = false AND "deletedAt" IS NULL
+);
+DROP POLICY IF EXISTS "Organizer can read own gigs" ON "Gig";
+CREATE POLICY "Organizer can read own gigs" ON "Gig" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "OrganizerProfile" op
+    WHERE op.id = "Gig"."organizerProfileId" AND op."userId" = (auth.uid())::text
+  )
+);
+DROP POLICY IF EXISTS "Applied DJ can read gig" ON "Gig";
+CREATE POLICY "Applied DJ can read gig" ON "Gig" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "GigApplication" ga
+    JOIN "DjProfile" dj ON dj.id = ga."djProfileId"
+    WHERE ga."gigId" = "Gig".id AND dj."userId" = (auth.uid())::text
+  )
+);
+DROP POLICY IF EXISTS "Organizer can update own gigs" ON "Gig";
+CREATE POLICY "Organizer can update own gigs" ON "Gig" FOR UPDATE TO public USING (
+  EXISTS (
+    SELECT 1 FROM "OrganizerProfile" op
+    WHERE op.id = "Gig"."organizerProfileId" AND op."userId" = (auth.uid())::text
+  )
+);
+
+-- Event: public read for published, non-hidden, active events; owner DJ can manage.
+ALTER TABLE "Event" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read published events" ON "Event";
+CREATE POLICY "Public read published events" ON "Event" FOR SELECT TO public USING (
+  status = 'PUBLISHED' AND "deletedAt" IS NULL
+);
+DROP POLICY IF EXISTS "Owner DJ can read own events" ON "Event";
+CREATE POLICY "Owner DJ can read own events" ON "Event" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "Event"."ownerDjId" AND dj."userId" = (auth.uid())::text
+  )
+);
+DROP POLICY IF EXISTS "Owner DJ can update own events" ON "Event";
+CREATE POLICY "Owner DJ can update own events" ON "Event" FOR UPDATE TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "Event"."ownerDjId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- Post: public read for non-deleted posts; owner can manage own.
+ALTER TABLE "Post" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read non-deleted posts" ON "Post";
+CREATE POLICY "Public read non-deleted posts" ON "Post" FOR SELECT TO public USING ("deletedAt" IS NULL);
+DROP POLICY IF EXISTS "Owner can read own posts" ON "Post";
+CREATE POLICY "Owner can read own posts" ON "Post" FOR SELECT TO public USING ("userId" = (auth.uid())::text);
+DROP POLICY IF EXISTS "Owner can update own posts" ON "Post";
+CREATE POLICY "Owner can update own posts" ON "Post" FOR UPDATE TO public USING ("userId" = (auth.uid())::text);
+DROP POLICY IF EXISTS "Owner can delete own posts" ON "Post";
+CREATE POLICY "Owner can delete own posts" ON "Post" FOR DELETE TO public USING ("userId" = (auth.uid())::text);
+
+-- Media: public read for media linked to public posts or public DJ profiles; owner can manage own.
+ALTER TABLE "Media" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read media for public posts" ON "Media";
+CREATE POLICY "Public read media for public posts" ON "Media" FOR SELECT TO public USING (
+  "postId" IS NOT NULL AND EXISTS (
+    SELECT 1 FROM "Post" p WHERE p.id = "Media"."postId" AND p."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Public read media for public DJ profiles" ON "Media";
+CREATE POLICY "Public read media for public DJ profiles" ON "Media" FOR SELECT TO public USING (
+  "djProfileId" IS NOT NULL AND EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "Media"."djProfileId"
+      AND dj.status = 'APPROVED' AND dj.hidden = false AND dj."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage media via profile" ON "Media";
+CREATE POLICY "Owner can manage media via profile" ON "Media" FOR ALL TO public USING (
+  ("djProfileId" IS NOT NULL AND EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "Media"."djProfileId" AND dj."userId" = (auth.uid())::text
+  ))
+  OR
+  ("postId" IS NOT NULL AND EXISTS (
+    SELECT 1 FROM "Post" p WHERE p.id = "Media"."postId" AND p."userId" = (auth.uid())::text
+  ))
+);
+
+-- Notification: recipient only
+ALTER TABLE "Notification" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Recipient can read own notifications" ON "Notification";
+CREATE POLICY "Recipient can read own notifications" ON "Notification" FOR SELECT TO public USING ("recipientId" = (auth.uid())::text);
+DROP POLICY IF EXISTS "Recipient can update own notifications" ON "Notification";
+CREATE POLICY "Recipient can update own notifications" ON "Notification" FOR UPDATE TO public USING ("recipientId" = (auth.uid())::text);
+
+-- DjRating: public read; owner can manage own rating
+ALTER TABLE "DjRating" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read DJ ratings" ON "DjRating";
+CREATE POLICY "Public read DJ ratings" ON "DjRating" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "User can manage own DJ rating" ON "DjRating";
+CREATE POLICY "User can manage own DJ rating" ON "DjRating" FOR ALL TO public USING ("userId" = (auth.uid())::text);
+
+-- GigApplication: applicant DJ or gig organizer can read; applicant can create/update.
+ALTER TABLE "GigApplication" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Applicant DJ or organizer can read application" ON "GigApplication";
+CREATE POLICY "Applicant DJ or organizer can read application" ON "GigApplication" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "GigApplication"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+  OR
+  EXISTS (
+    SELECT 1 FROM "Gig" g
+    JOIN "OrganizerProfile" op ON op.id = g."organizerProfileId"
+    WHERE g.id = "GigApplication"."gigId" AND op."userId" = (auth.uid())::text
+  )
+);
+DROP POLICY IF EXISTS "Applicant DJ can create application" ON "GigApplication";
+CREATE POLICY "Applicant DJ can create application" ON "GigApplication" FOR INSERT TO public WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "GigApplication"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+);
+DROP POLICY IF EXISTS "Applicant DJ or organizer can update application" ON "GigApplication";
+CREATE POLICY "Applicant DJ or organizer can update application" ON "GigApplication" FOR UPDATE TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "GigApplication"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+  OR
+  EXISTS (
+    SELECT 1 FROM "Gig" g
+    JOIN "OrganizerProfile" op ON op.id = g."organizerProfileId"
+    WHERE g.id = "GigApplication"."gigId" AND op."userId" = (auth.uid())::text
+  )
+);
+
+-- EventAttendance: user can manage own attendance
+ALTER TABLE "EventAttendance" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can manage own event attendance" ON "EventAttendance";
+CREATE POLICY "User can manage own event attendance" ON "EventAttendance" FOR ALL TO public USING ("userId" = (auth.uid())::text);
+
+-- PostComment: public read non-deleted; owner can manage own
+ALTER TABLE "PostComment" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read non-deleted comments" ON "PostComment";
+CREATE POLICY "Public read non-deleted comments" ON "PostComment" FOR SELECT TO public USING ("deletedAt" IS NULL);
+DROP POLICY IF EXISTS "Owner can manage own post comments" ON "PostComment";
+CREATE POLICY "Owner can manage own post comments" ON "PostComment" FOR ALL TO public USING ("userId" = (auth.uid())::text);
+
+-- PostLike: public read; owner can manage own
+ALTER TABLE "PostLike" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read post likes" ON "PostLike";
+CREATE POLICY "Public read post likes" ON "PostLike" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "User can manage own post likes" ON "PostLike";
+CREATE POLICY "User can manage own post likes" ON "PostLike" FOR ALL TO public USING ("userId" = (auth.uid())::text);
+
+-- DjComment: public read non-deleted; owner can manage own
+ALTER TABLE "DjComment" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read non-deleted DJ comments" ON "DjComment";
+CREATE POLICY "Public read non-deleted DJ comments" ON "DjComment" FOR SELECT TO public USING ("deletedAt" IS NULL);
+DROP POLICY IF EXISTS "Owner can manage own DJ comments" ON "DjComment";
+CREATE POLICY "Owner can manage own DJ comments" ON "DjComment" FOR ALL TO public USING ("userId" = (auth.uid())::text);
+
+-- DjCommentLike: public read; owner can manage own
+ALTER TABLE "DjCommentLike" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read DJ comment likes" ON "DjCommentLike";
+CREATE POLICY "Public read DJ comment likes" ON "DjCommentLike" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "User can manage own DJ comment likes" ON "DjCommentLike";
+CREATE POLICY "User can manage own DJ comment likes" ON "DjCommentLike" FOR ALL TO public USING ("userId" = (auth.uid())::text);
+
+-- SavedEvent: owner only
+ALTER TABLE "SavedEvent" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can manage own saved events" ON "SavedEvent";
+CREATE POLICY "User can manage own saved events" ON "SavedEvent" FOR ALL TO public USING ("userId" = (auth.uid())::text);
+
+-- EventDj: public read only; writes via server
+ALTER TABLE "EventDj" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read event DJs" ON "EventDj";
+CREATE POLICY "Public read event DJs" ON "EventDj" FOR SELECT TO public USING (true);
+
+-- EventMedia: public read; owner DJ of event can manage
+ALTER TABLE "EventMedia" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read event media" ON "EventMedia";
+CREATE POLICY "Public read event media" ON "EventMedia" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "Owner DJ can manage event media" ON "EventMedia";
+CREATE POLICY "Owner DJ can manage event media" ON "EventMedia" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "Event" e
+    JOIN "DjProfile" dj ON dj.id = e."ownerDjId"
+    WHERE e.id = "EventMedia"."eventId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- SocialLink: public read for public profiles; owner can manage
+ALTER TABLE "SocialLink" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read social links for public DJ profiles" ON "SocialLink";
+CREATE POLICY "Public read social links for public DJ profiles" ON "SocialLink" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "SocialLink"."djProfileId"
+      AND dj.status = 'APPROVED' AND dj.hidden = false AND dj."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage own social links" ON "SocialLink";
+CREATE POLICY "Owner can manage own social links" ON "SocialLink" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "SocialLink"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- OrganizerSocialLink: public read for public profiles; owner can manage
+ALTER TABLE "OrganizerSocialLink" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read social links for public organizer profiles" ON "OrganizerSocialLink";
+CREATE POLICY "Public read social links for public organizer profiles" ON "OrganizerSocialLink" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "OrganizerProfile" op
+    WHERE op.id = "OrganizerSocialLink"."organizerProfileId"
+      AND op.status = 'ACTIVE' AND op.hidden = false AND op."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage own organizer social links" ON "OrganizerSocialLink";
+CREATE POLICY "Owner can manage own organizer social links" ON "OrganizerSocialLink" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "OrganizerProfile" op
+    WHERE op.id = "OrganizerSocialLink"."organizerProfileId" AND op."userId" = (auth.uid())::text
+  )
+);

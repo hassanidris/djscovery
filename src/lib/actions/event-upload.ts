@@ -9,6 +9,7 @@ import {
   buildEventPosterPath,
   buildEventGalleryPath,
 } from "@/lib/storage";
+import { requireEventOwner } from "@/lib/auth/require-owner";
 
 const MAX_POSTER_BYTES_FREE = 5 * 1024 * 1024; // 5 MB
 const MAX_POSTER_BYTES_PREMIUM = 10 * 1024 * 1024; // 10 MB
@@ -17,34 +18,6 @@ const MAX_GALLERY_BYTES_PREMIUM = 10 * 1024 * 1024; // 10 MB
 const GALLERY_LIMIT_FREE = 12;
 const GALLERY_LIMIT_PREMIUM = 40;
 
-// ── Shared: auth + ownership check ───────────────────────────────────────────
-
-type PosterOwnershipError = { error: string };
-type PosterOwnershipSuccess = {
-  djProfile: { id: number; plan: string };
-  event: { id: number; ownerDjId: number; posterPath: string | null };
-};
-
-async function getEventWithOwnership(
-  eventId: number,
-  userId: string,
-): Promise<PosterOwnershipError | PosterOwnershipSuccess> {
-  const djProfile = await prisma.djProfile.findUnique({
-    where: { userId },
-    select: { id: true, plan: true },
-  });
-  if (!djProfile) return { error: "DJ profile not found." };
-
-  const event = await prisma.event.findFirst({
-    where: { id: eventId, deletedAt: null },
-    select: { id: true, ownerDjId: true, posterPath: true },
-  });
-  if (!event) return { error: "Event not found." };
-  if (event.ownerDjId !== djProfile.id) return { error: "Forbidden." };
-
-  return { djProfile, event };
-}
-
 // ── uploadEventPoster ─────────────────────────────────────────────────────────
 // Validates, uploads to events/{eventId}/poster/, updates Event.posterUrl
 // + Event.posterPath, and deletes the previous poster from storage.
@@ -52,12 +25,6 @@ async function getEventWithOwnership(
 export async function uploadEventPoster(
   formData: FormData,
 ): Promise<{ url: string; path: string } | { error: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
-
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
 
@@ -65,9 +32,19 @@ export async function uploadEventPoster(
   const eventId = Number(eventIdRaw);
   if (!eventId || isNaN(eventId)) return { error: "Invalid event ID." };
 
-  const ownership = await getEventWithOwnership(eventId, user.id);
-  if ("error" in ownership) return ownership;
-  const { djProfile, event } = ownership;
+  const { djProfileId } = await requireEventOwner(eventId);
+
+  const djProfile = await prisma.djProfile.findUnique({
+    where: { id: djProfileId },
+    select: { plan: true },
+  });
+  if (!djProfile) return { error: "DJ profile not found." };
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId, deletedAt: null },
+    select: { posterPath: true },
+  });
+  if (!event) return { error: "Event not found." };
 
   const maxBytes =
     djProfile.plan === "PREMIUM"
@@ -79,6 +56,7 @@ export async function uploadEventPoster(
 
   const path = buildEventPosterPath(String(eventId), file);
 
+  const supabase = await createClient();
   const { data, error: uploadError } = await supabase.storage
     .from(BUCKET)
     .upload(path, file, { upsert: false, contentType: file.type });
@@ -115,12 +93,6 @@ export async function uploadEventPoster(
 export async function uploadEventGalleryImage(
   formData: FormData,
 ): Promise<{ id: number; url: string; path: string } | { error: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
-
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
 
@@ -128,18 +100,19 @@ export async function uploadEventGalleryImage(
   const eventId = Number(eventIdRaw);
   if (!eventId || isNaN(eventId)) return { error: "Invalid event ID." };
 
+  const { djProfileId } = await requireEventOwner(eventId);
+
   const djProfile = await prisma.djProfile.findUnique({
-    where: { userId: user.id },
-    select: { id: true, plan: true },
+    where: { id: djProfileId },
+    select: { plan: true },
   });
   if (!djProfile) return { error: "DJ profile not found." };
 
-  const event = await prisma.event.findFirst({
+  const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
-    select: { id: true, ownerDjId: true, status: true },
+    select: { status: true },
   });
   if (!event) return { error: "Event not found." };
-  if (event.ownerDjId !== djProfile.id) return { error: "Forbidden." };
   if (event.status !== "COMPLETED") {
     return {
       error: "Gallery uploads are only allowed after the event is completed.",
@@ -164,6 +137,7 @@ export async function uploadEventGalleryImage(
 
   const path = buildEventGalleryPath(String(eventId), file);
 
+  const supabase = await createClient();
   const { data, error: uploadError } = await supabase.storage
     .from(BUCKET)
     .upload(path, file, { upsert: false, contentType: file.type });
@@ -197,26 +171,16 @@ export async function uploadEventGalleryImage(
 export async function deleteEventGalleryImage(
   mediaId: number,
 ): Promise<{ success: true } | { error: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
-
   const media = await prisma.eventMedia.findUnique({
     where: { id: mediaId },
-    include: {
-      event: {
-        select: {
-          ownerDj: { select: { userId: true } },
-        },
-      },
-    },
+    select: { eventId: true, path: true },
   });
 
   if (!media) return { error: "Gallery image not found." };
-  if (media.event.ownerDj.userId !== user.id) return { error: "Forbidden." };
 
+  await requireEventOwner(media.eventId);
+
+  const supabase = await createClient();
   await supabase.storage
     .from(BUCKET)
     .remove([media.path])

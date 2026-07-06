@@ -67,9 +67,13 @@ const CommentsList = ({
       },
     });
     try {
-      const created = await addPostComment(postId, text);
-      setCommentState((prev) => [created, ...prev]);
-      setText("");
+      const result = await addPostComment(postId, text);
+      if (result.success && result.data) {
+        setCommentState((prev) => [result.data, ...prev]);
+        setText("");
+      } else if (!result.success) {
+        toast.error(result.error || "Comment failed. Please try again.");
+      }
     } catch {
       toast.error("Comment failed. Please try again.");
     }
