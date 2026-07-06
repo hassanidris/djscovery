@@ -33,9 +33,22 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
         >
           <div className="mb-6 flex items-center justify-between">
             <div className="flex flex-wrap items-center gap-4">
-              <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
-                Discover DJs
-              </h2>
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+                  Discover DJs
+                </h2>
+                <p className="mt-1 text-sm leading-relaxed text-gray-400">
+                  {activeTab === "new"
+                    ? "Fresh talent just joined"
+                    : "Top performers"}
+                  <span className="text-gray-500">
+                    {" · "}
+                    {activeTab === "new"
+                      ? "Newest profiles first"
+                      : "Sorted by rating"}
+                  </span>
+                </p>
+              </div>
               <TabsList className="bg-h_blackLight/80 border border-white/10">
                 <TabsTrigger
                   value="new"
