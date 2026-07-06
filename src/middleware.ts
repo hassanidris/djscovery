@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { indexingEnabled } from "./lib/seo/indexing";
 
-export const runtime = "edge";
+export const runtime = "experimental-edge";
 
 const PRE_LAUNCH_MODE = process.env.PRE_LAUNCH_MODE === "true";
 
