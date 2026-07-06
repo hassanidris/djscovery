@@ -146,7 +146,9 @@ export async function getAdminUsers({
         ? { status: status as "ACTIVE" | "SUSPENDED" | "PENDING" | "REJECTED" }
         : {}),
       ...(role === "FAN"
-        ? { roles: { some: { role: "FAN" } } }
+        ? {
+            OR: [{ roles: { none: {} } }, { roles: { some: { role: "FAN" } } }],
+          }
         : role
           ? {
               roles: {

@@ -120,7 +120,9 @@ CREATE POLICY "Public read approved DJ profiles" ON "DjProfile" FOR SELECT TO pu
 DROP POLICY IF EXISTS "Owner can read own DJ profile" ON "DjProfile";
 CREATE POLICY "Owner can read own DJ profile" ON "DjProfile" FOR SELECT TO public USING ("userId" = (auth.uid())::text);
 DROP POLICY IF EXISTS "Owner can update own DJ profile" ON "DjProfile";
-CREATE POLICY "Owner can update own DJ profile" ON "DjProfile" FOR UPDATE TO public USING ("userId" = (auth.uid())::text);
+CREATE POLICY "Owner can update own DJ profile" ON "DjProfile" FOR UPDATE TO public
+  USING ("userId" = (auth.uid())::text)
+  WITH CHECK ("userId" = (auth.uid())::text AND status = (SELECT status FROM "DjProfile" WHERE id = "DjProfile".id) AND hidden = (SELECT hidden FROM "DjProfile" WHERE id = "DjProfile".id));
 
 -- OrganizerProfile: public read for active, non-hidden, active organizers; owner can manage own.
 ALTER TABLE "OrganizerProfile" ENABLE ROW LEVEL SECURITY;
@@ -131,7 +133,9 @@ CREATE POLICY "Public read active organizer profiles" ON "OrganizerProfile" FOR 
 DROP POLICY IF EXISTS "Owner can read own organizer profile" ON "OrganizerProfile";
 CREATE POLICY "Owner can read own organizer profile" ON "OrganizerProfile" FOR SELECT TO public USING ("userId" = (auth.uid())::text);
 DROP POLICY IF EXISTS "Owner can update own organizer profile" ON "OrganizerProfile";
-CREATE POLICY "Owner can update own organizer profile" ON "OrganizerProfile" FOR UPDATE TO public USING ("userId" = (auth.uid())::text);
+CREATE POLICY "Owner can update own organizer profile" ON "OrganizerProfile" FOR UPDATE TO public
+  USING ("userId" = (auth.uid())::text)
+  WITH CHECK ("userId" = (auth.uid())::text AND status = (SELECT status FROM "OrganizerProfile" WHERE id = "OrganizerProfile".id) AND hidden = (SELECT hidden FROM "OrganizerProfile" WHERE id = "OrganizerProfile".id));
 
 -- FanProfile: owner only
 ALTER TABLE "FanProfile" ENABLE ROW LEVEL SECURITY;

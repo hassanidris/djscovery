@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { ActionResult, actionError, actionSuccess } from "./action-result";
+import { Prisma } from "@prisma/client";
 
 async function getCurrentUserId(): Promise<string> {
   const supabase = await createClient();
@@ -35,13 +36,20 @@ export const switchLike = async (postId: number): Promise<ActionResult> => {
     });
     return actionSuccess();
   } catch (err) {
-    if (err instanceof Error && err.message.includes("P2002")) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002"
+    ) {
       // Another request created the like between deleteMany and create;
       // treat as a successful toggle by deleting it now.
-      await prisma.postLike.deleteMany({
-        where: { userId, postId },
-      });
-      return actionSuccess();
+      try {
+        await prisma.postLike.deleteMany({
+          where: { userId, postId },
+        });
+        return actionSuccess();
+      } catch {
+        return actionError("Something went wrong");
+      }
     }
 
     return actionError("Something went wrong");

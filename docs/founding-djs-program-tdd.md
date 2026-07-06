@@ -29,15 +29,17 @@ The Founding DJs Program enables DJs to apply during pre-launch, undergo vetting
 ### 1.4 Current Architecture Context
 
 DJcovery uses:
+
 - Next.js 15 App Router with React 19
 - Supabase Auth (email, Google, magic links)
 - Prisma v7 with PostgreSQL
 - Resend for email
-- Existing `PRE_LAUNCH_MODE` middleware flag
 - RLS policies for data security
 - Admin dashboard with DJ approval workflow
 
 The Founding Program will extend—not replace—this architecture.
+
+**Note:** The existing `PRE_LAUNCH_MODE` middleware flag will be replaced by `SITE_MODE` as part of this implementation.
 
 ---
 
@@ -84,69 +86,83 @@ Official Launch (rewards activated)
 ### 2.2 Stage Explanations
 
 **Visitor → Landing Page**
+
 - Public landing page explaining Founding Program benefits
 - No authentication required
 - Clear CTA to apply
 
 **Landing Page → Application Form**
+
 - Multi-step form collecting contact, experience, location, social media, portfolio
 - Email validation for uniqueness
 - Existing user detection
 
 **Application Form → Confirmation Page**
+
 - Success message with application ID
 - Expected timeline communication
 - Email verification request
 
 **Confirmation → Email Verification**
+
 - Verification email sent to applicant
 - Token-based verification (24-hour expiry)
 - Updates application status to EMAIL_VERIFIED
 
 **Email Verification → Application Review**
+
 - Admin dashboard displays pending applications
 - Admin can view all data and add notes
 
 **Application Review → Approval Decision**
+
 - Admin approves or rejects application
 - Approval triggers invitation generation
 
 **Approval → Invitation Email Sent**
+
 - Secure invitation token generated
 - Email contains unique signup link
 - Token expires in 7 days
 
 **Invitation → Authentication**
+
 - User clicks invitation link
 - Sign-up or sign-in flow
 - Token validated and consumed
 
 **Authentication → Account Linking**
+
 - If invitation email differs from account email, display mismatch warning
 - Require email verification of new address
 - Prevents duplicate accounts
 
 **Authentication → DJ Onboarding**
+
 - Onboarding form prefilled with application data
 - User can edit all fields
 - Additional onboarding fields (avatar, cover image, detailed bio)
 
 **Onboarding → Profile Submission**
+
 - User submits complete profile
 - Profile status: PENDING_APPROVAL
 - Admin notification sent
 
 **Profile Submission → Admin Profile Review**
+
 - Admin reviews profile in existing approval workflow
 - Uses existing DjProfileStatus enum
 
 **Admin Review → Profile Approved**
+
 - Profile becomes publicly visible
 - Founding badge assigned
 - Founding number assigned
 - User receives approval email
 
 **Profile Approved → Official Launch**
+
 - Founding rewards activated (premium months, priority ranking, homepage feature)
 - Founding badge becomes permanent
 
@@ -157,6 +173,7 @@ Official Launch (rewards activated)
 ### 3.1 Architectural Overview
 
 Layered architecture with clear separation:
+
 - Presentation Layer (Next.js App Router, React Components)
 - Application Layer (Server Actions, Route Handlers)
 - Domain Layer (Business Logic, Services)
@@ -165,27 +182,35 @@ Layered architecture with clear separation:
 ### 3.2 Key Architectural Decisions
 
 **Decision 1: Separate FoundingApplication Model**
+
 - New model stores application data
 - Decoupled from User model (applications can exist without accounts)
 - Enables anonymous applications during pre-launch
 
 **Decision 2: Invitation Token Table**
+
 - New InvitationToken model for secure token management
 - Tokens stored in database for revocation, expiry tracking, audit trail
 - Prevents replay attacks
 
 **Decision 3: Site Mode Configuration**
+
 - Single environment variable: SITE_MODE (founding | public | maintenance)
+- SITE_MODE replaces the existing PRE_LAUNCH_MODE boolean flag
 - Middleware enforces mode-based access control
 - No code changes required for mode switching
 
+**Migration Note:** When implementing this design, remove PRE_LAUNCH_MODE from middleware.ts and environment configuration. SITE_MODE provides the same pre-launch gating via the "founding" mode, plus additional modes for public launch and maintenance.
+
 **Decision 4: Prefill Strategy**
+
 - Application data stored separately from profile
 - Onboarding reads from application when creating profile
 - User can edit all fields
 - Application retained for audit trail
 
 **Decision 5: Founding Rewards as Data**
+
 - Rewards stored in database, not hardcoded
 - FoundingMember model tracks founding status
 - Enables future reward modifications without code changes
@@ -199,14 +224,15 @@ Layered architecture with clear separation:
 **Purpose:** Full platform access for testing and debugging
 
 **Configuration:**
+
 ```env
 NEXT_PUBLIC_APP_ENV=development
 SITE_MODE=public
 DATABASE_URL=local PostgreSQL
-PRE_LAUNCH_MODE=false
 ```
 
 **Behavior:**
+
 - All routes accessible
 - Test data seeding enabled
 - Debug logging enabled
@@ -217,14 +243,15 @@ PRE_LAUNCH_MODE=false
 **Purpose:** Internal QA and feature testing
 
 **Configuration:**
+
 ```env
 NEXT_PUBLIC_APP_ENV=staging
 SITE_MODE=founding
 DATABASE_URL=staging Supabase
-PRE_LAUNCH_MODE=false
 ```
 
 **Behavior:**
+
 - Founding mode (matches production)
 - All routes accessible for internal testing
 - Real email sending to internal team
@@ -235,23 +262,26 @@ PRE_LAUNCH_MODE=false
 **Purpose:** Public access limited to founding program only
 
 **Configuration:**
+
 ```env
 NEXT_PUBLIC_APP_ENV=production
 SITE_MODE=founding
 DATABASE_URL=production Supabase
-PRE_LAUNCH_MODE=false
 ```
 
 **Public Access:**
+
 - Founding landing page, application, confirmation, legal pages
 - Authentication routes
-- API routes
+- Founding API endpoints (/api/founding/\*) for application submission and email verification only
 
 **Internal Access (Authenticated):**
+
 - Admin dashboard
 - All routes for admin users
 
 **Blocked Routes:**
+
 - DJ directory, profiles, organizer pages, events, gigs, community, dashboards
 
 ### 4.4 Production (Public Launch)
@@ -259,14 +289,15 @@ PRE_LAUNCH_MODE=false
 **Purpose:** Full platform access after launch
 
 **Configuration:**
+
 ```env
 NEXT_PUBLIC_APP_ENV=production
 SITE_MODE=public
 DATABASE_URL=production Supabase
-PRE_LAUNCH_MODE=false
 ```
 
 **Behavior:**
+
 - All routes accessible
 - Founding program redirects or shows "closed" message
 - Normal registration enabled
@@ -277,12 +308,14 @@ PRE_LAUNCH_MODE=false
 **Purpose:** Platform-wide maintenance
 
 **Configuration:**
+
 ```env
 NEXT_PUBLIC_APP_ENV=production
 SITE_MODE=maintenance
 ```
 
 **Behavior:**
+
 - Single maintenance page
 - Admin can bypass with authentication
 
@@ -296,13 +329,14 @@ SITE_MODE=maintenance
 enum SiteMode {
   FOUNDING = "founding",
   PUBLIC = "public",
-  MAINTENANCE = "maintenance"
+  MAINTENANCE = "maintenance",
 }
 ```
 
 ### 5.2 Mode Responsibilities
 
 **FOUNDING Mode**
+
 - Restrict public routes to founding program only
 - Allow authenticated admin access to all routes
 - Enable application submission
@@ -311,22 +345,26 @@ enum SiteMode {
 - Block dashboards and discovery features
 
 **PUBLIC Mode**
+
 - Full platform access
 - Normal registration enabled
 - Founding program redirects or shows "closed" message
 
 **MAINTENANCE Mode**
+
 - Single maintenance page
 - Admin bypass available
 
 ### 5.3 Switching Strategy
 
 **Configuration-Based Switching**
+
 - Single environment variable: SITE_MODE
 - Read by middleware on every request
 - No code deployment required for mode changes
 
 **Deployment Process**
+
 ```bash
 # Update environment variable
 SITE_MODE=public
@@ -335,6 +373,7 @@ vercel --prod
 ```
 
 **Rollback Process**
+
 - Revert environment variable
 - Deploy (no code changes)
 - Instant rollback
@@ -421,26 +460,32 @@ src/app/
 ### 7.1 Middleware Responsibilities
 
 **1. Site Mode Enforcement**
+
 - Read SITE_MODE from environment
 - Block routes based on mode
 - Redirect to appropriate landing page
 
 **2. Authentication**
+
 - Verify Supabase session
 - Redirect unauthenticated users
 - Refresh session
 
 **3. Role-Based Access**
+
 - Check user roles for protected routes
 - Redirect unauthorized users
 
 **4. Admin Protection**
+
 - Verify admin role for admin routes
 
 **5. SEO Headers**
+
 - Add X-Robots-Tag based on mode
 
 **6. Security Headers**
+
 - CSP, X-Frame-Options
 
 ### 7.2 What Middleware Does NOT Handle
@@ -463,6 +508,7 @@ src/app/
 **Purpose:** Store DJ applications during founding program
 
 **Fields:**
+
 - `id` (Int, @id, autoincrement)
 - `applicationNumber` (String, unique) - Sequential: FDJ-0001
 - `status` (FoundingApplicationStatus, default: PENDING)
@@ -492,6 +538,7 @@ src/app/
 - `reviewedBy` (String?)
 
 **Indexes:**
+
 - status, email, countryId, cityId, createdAt, applicationNumber
 
 #### InvitationToken
@@ -499,6 +546,7 @@ src/app/
 **Purpose:** Secure invitation tokens for account creation
 
 **Fields:**
+
 - `id` (Int, @id, autoincrement)
 - `token` (String, unique)
 - `type` (InvitationType)
@@ -514,6 +562,7 @@ src/app/
 - `revocationReason` (String?)
 
 **Indexes:**
+
 - token, email, status, expiresAt, foundingApplicationId
 
 #### FoundingMember
@@ -521,6 +570,7 @@ src/app/
 **Purpose:** Track founding members and their rewards
 
 **Fields:**
+
 - `id` (Int, @id, autoincrement)
 - `userId` (String, unique)
 - `djProfileId` (Int, unique)
@@ -540,11 +590,13 @@ src/app/
 - `updatedAt` (DateTime)
 
 **Indexes:**
+
 - userId, djProfileId, foundingNumber, status, referralCode
 
 ### 8.2 New Enums
 
 #### FoundingApplicationStatus
+
 ```typescript
 enum FoundingApplicationStatus {
   PENDING = "PENDING",
@@ -559,6 +611,7 @@ enum FoundingApplicationStatus {
 ```
 
 #### InvitationType
+
 ```typescript
 enum InvitationType {
   FOUNDING_DJ = "FOUNDING_DJ",
@@ -567,6 +620,7 @@ enum InvitationType {
 ```
 
 #### InvitationStatus
+
 ```typescript
 enum InvitationStatus {
   ACTIVE = "ACTIVE",
@@ -577,6 +631,7 @@ enum InvitationStatus {
 ```
 
 #### FoundingMemberStatus
+
 ```typescript
 enum FoundingMemberStatus {
   ACTIVE = "ACTIVE",
@@ -615,25 +670,30 @@ REJECTED      REJECTED       REJECTED    EXPIRED
 ### 9.2 Status Change Triggers
 
 **PENDING → EMAIL_VERIFIED**
+
 - Who: System (automatic)
 - Trigger: User clicks email verification link
 - Validation: Token valid, not expired
 
 **EMAIL_VERIFIED → UNDER_REVIEW**
+
 - Who: Admin
 - Trigger: Admin opens application for review
 
 **UNDER_REVIEW → APPROVED**
+
 - Who: Admin
 - Trigger: Admin clicks "Approve"
 - Notification: Invitation email sent
 
 **UNDER_REVIEW → REJECTED**
+
 - Who: Admin
 - Trigger: Admin clicks "Reject"
 - Notification: Rejection email sent
 
 **APPROVED → COMPLETED**
+
 - Who: System (automatic)
 - Trigger: DJ completes onboarding, profile approved
 - Notification: Welcome email, founding badge assigned
@@ -859,6 +919,7 @@ Additional onboarding fields: stage name, avatar, cover image, detailed bio, DJ 
 ### 15.3 Activation
 
 On launch (SITE_MODE=public):
+
 - Set DjProfile.plan to PREMIUM
 - Set DjProfile.priorityBoost to 2.0
 - Set DjProfile.homepageFeatured to true
@@ -882,6 +943,7 @@ Rationale: Founding program MVP is already complex. Referral system adds signifi
 **Referral Code:** Each founding member gets unique 8-character code
 
 **Referral Model:**
+
 ```typescript
 model Referral {
   id: Int @id @default(autoincrement())
@@ -938,6 +1000,7 @@ model Referral {
 ### 18.1 Founding Mode (Production)
 
 **Index:**
+
 - /founding-djs (landing page)
 - /about
 - /contact
@@ -946,9 +1009,11 @@ model Referral {
 - /privacy
 
 **Noindex:**
+
 - Everything else (application form, confirmation pages, admin, api)
 
 **Implementation:**
+
 - Middleware adds X-Robots-Tag based on route
 - Founding landing page: normal indexing
 - Application form: noindex (temporary content)
@@ -957,27 +1022,32 @@ model Referral {
 ### 18.2 Public Mode (Production)
 
 **Index:**
+
 - All public pages (djs, organizers, events, gigs, community)
 - Founding landing page (redirects to /djs or shows "closed")
 
 **Noindex:**
+
 - Admin, API, protected routes
 
 ### 18.3 Staging
 
 **Noindex:**
+
 - Everything (SITE_MODE=founding or public)
 - X-Robots-Tag: noindex, nofollow on all routes
 
 ### 18.4 Metadata
 
 **Founding Landing Page:**
+
 - Title: "DJcovery Founding DJs Program - Join the Community"
 - Description: "Apply to become a founding DJ on DJcovery. Exclusive rewards, early access, and permanent recognition."
 - Canonical: https://djcovery.com/founding-djs
 - Open Graph: Program branding, benefits overview
 
 **Application Form:**
+
 - Title: "Apply - DJcovery Founding Program"
 - Noindex: true
 - No canonical (temporary)
@@ -985,16 +1055,19 @@ model Referral {
 ### 18.5 Sitemap
 
 **Founding Mode:**
+
 - Include: /, /about, /contact, /faq, /terms, /privacy, /founding-djs
 - Exclude: Everything else
 
 **Public Mode:**
+
 - Include: All public pages
 - Exclude: Admin, API, protected routes
 
 ### 18.6 Robots.txt
 
 **Founding Mode:**
+
 ```
 User-agent: *
 Allow: /$
@@ -1017,6 +1090,7 @@ Disallow: /community
 ```
 
 **Public Mode:**
+
 ```
 User-agent: *
 Disallow: /admin
@@ -1029,6 +1103,7 @@ Disallow: /dashboard
 ### 18.7 Structured Data
 
 **Founding Landing Page:**
+
 - Organization schema (DJcovery)
 - Program schema (Founding DJs Program)
 - FAQ schema (if FAQ section included)
@@ -1036,12 +1111,14 @@ Disallow: /dashboard
 ### 18.8 Social Metadata
 
 **Founding Landing Page:**
+
 - Open Graph: Program image, title, description
 - Twitter Card: Summary card with large image
 
 ### 18.9 Future Launch Strategy
 
 **Transition:**
+
 - Update sitemap to include all public pages
 - Update robots.txt to allow discovery routes
 - Remove noindex from public pages
@@ -1127,15 +1204,18 @@ Disallow: /dashboard
 ### 19.11 Supabase RLS
 
 **FoundingApplication:**
+
 - Admin: full access
 - Applicant: read own only (after account creation)
 - Public: no access
 
 **InvitationToken:**
+
 - Admin: full access
 - Public: no access
 
 **FoundingMember:**
+
 - Admin: full access
 - Member: read own only
 - Public: read founding number, badge status only
@@ -1158,6 +1238,7 @@ Disallow: /dashboard
 ### 19.14 Future Auditing
 
 **AdminActionLog Model (Future):**
+
 ```typescript
 model AdminActionLog {
   id: Int @id @default(autoincrement())
@@ -1173,6 +1254,7 @@ model AdminActionLog {
 ```
 
 **Actions to Log:**
+
 - Application approval/rejection
 - Invitation generation/revocation
 - Founding member suspension/revocation
@@ -1272,17 +1354,20 @@ src/
 ### 21.1 Existing Components to Reuse
 
 **Forms:**
+
 - BecomeDjForm (adapt for founding onboarding)
 - BecomeFanForm (country/city dropdowns)
 - Existing form validation patterns
 
 **UI Components:**
+
 - shadcn/ui components (Button, Input, Select, Textarea, Card, Dialog)
 - Existing layout components
 - Navigation components
 - Loading states
 
 **Admin Components:**
+
 - Existing admin table components
 - Existing admin filters
 - Existing admin detail views
@@ -1290,6 +1375,7 @@ src/
 ### 21.2 New Components to Create
 
 **Founding-Specific:**
+
 - ApplicationForm (multi-step form)
 - ApplicationSuccess (confirmation page)
 - EmailVerification (verification UI)
@@ -1297,6 +1383,7 @@ src/
 - FoundingBadge (profile badge)
 
 **Admin-Specific:**
+
 - ApplicationList (table with filters)
 - ApplicationDetail (full application view)
 - InvitationList (invitation management)
@@ -1317,12 +1404,14 @@ src/
 ### 22.1 Founding Mode Deployment
 
 **Configuration:**
+
 ```env
 SITE_MODE=founding
 NEXT_PUBLIC_APP_ENV=production
 ```
 
 **Process:**
+
 1. Set SITE_MODE=founding in environment
 2. Deploy to production
 3. Verify middleware blocking non-founding routes
@@ -1330,6 +1419,7 @@ NEXT_PUBLIC_APP_ENV=production
 5. Test admin access
 
 **Rollback:**
+
 - Set SITE_MODE=public (or maintenance)
 - Deploy
 - Instant rollback
@@ -1337,12 +1427,14 @@ NEXT_PUBLIC_APP_ENV=production
 ### 22.2 Private Beta Deployment
 
 **Configuration:**
+
 ```env
 SITE_MODE=founding
 NEXT_PUBLIC_APP_ENV=production
 ```
 
 **Process:**
+
 - Same as founding mode
 - Additional: Enable beta access for founding members
 - Send beta access emails
@@ -1351,12 +1443,14 @@ NEXT_PUBLIC_APP_ENV=production
 ### 22.3 Public Launch Deployment
 
 **Configuration:**
+
 ```env
 SITE_MODE=public
 NEXT_PUBLIC_APP_ENV=production
 ```
 
 **Process:**
+
 1. Set SITE_MODE=public in environment
 2. Deploy to production
 3. Verify all routes accessible
@@ -1366,6 +1460,7 @@ NEXT_PUBLIC_APP_ENV=production
 7. Submit to Google Search Console
 
 **Rollback:**
+
 - Set SITE_MODE=founding
 - Deploy
 - Deactivate founding rewards (if needed)
@@ -1373,25 +1468,30 @@ NEXT_PUBLIC_APP_ENV=production
 ### 22.4 Configuration Changes
 
 **Environment Variables:**
+
 - SITE_MODE: founding | public | maintenance
 - No other configuration changes required
 
 **Database:**
+
 - No schema changes required for mode switching
 - Data migrations not required
 
 **Code:**
+
 - No code changes required for mode switching
 - Middleware reads SITE_MODE from environment
 
 ### 22.5 Rollback Strategy
 
 **Instant Rollback:**
+
 - Change SITE_MODE environment variable
 - Deploy (no code changes)
 - Effect: immediate (next request)
 
 **Data Rollback:**
+
 - Database backups before major changes
 - Point-in-time recovery if needed
 - Revert migrations if schema changes
@@ -1403,6 +1503,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 23.1 Founding Mode → Private Beta
 
 **Process:**
+
 1. All founding applications processed
 2. All invitations sent or expired
 3. All invited DJs completed onboarding
@@ -1411,16 +1512,19 @@ NEXT_PUBLIC_APP_ENV=production
 6. Monitor beta usage
 
 **Data Changes:**
+
 - None required
 - FoundingMember records already created
 
 **Configuration:**
+
 - SITE_MODE remains founding
 - Beta access controlled via FoundingMember status
 
 ### 23.2 Private Beta → Public Launch
 
 **Process:**
+
 1. Set SITE_MODE=public
 2. Deploy
 3. Activate founding rewards
@@ -1429,44 +1533,52 @@ NEXT_PUBLIC_APP_ENV=production
 6. Submit to search engines
 
 **Data Changes:**
+
 - Update DjProfile.plan to PREMIUM for founding members
 - Update DjProfile.priorityBoost
 - Update DjProfile.homepageFeatured
 - Set FoundingMember.launchedAt
 
 **Configuration:**
+
 - SITE_MODE=public
 
 ### 23.3 Public Launch → Normal Registration
 
 **Process:**
+
 1. Founding program redirects to /djs or shows "closed"
 2. Normal registration enabled
 3. New users cannot apply to founding program
 4. Existing founding members retain status
 
 **Data Changes:**
+
 - None required
 - FoundingMember records remain
 
 **Configuration:**
+
 - SITE_MODE=public (unchanged)
 
 ### 23.4 Migration Without Breaking Users
 
 **Principles:**
+
 - Never delete data
 - Never break existing user flows
 - Additive changes only
 - Backward compatibility
 
 **Specific Migrations:**
+
 - FoundingApplication: Retain permanently
 - InvitationToken: Archive after 1 year
 - FoundingMember: Retain permanently
 - DjProfile: Add founding fields (non-breaking)
 
 **Testing:**
+
 - Test with real founding member accounts
 - Test with new user accounts
 - Test admin workflows
@@ -1479,12 +1591,14 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.1 Organizers
 
 **Founding Program for Organizers:**
+
 - New FoundingApplication for organizers
 - New InvitationType: ORGANIZER_FOUNDING
 - New FoundingMember for organizers
 - Similar workflow to DJs
 
 **Implementation:**
+
 - Reuse existing models (add type field)
 - Reuse existing components (adapt for organizer fields)
 - Reuse existing admin workflows
@@ -1492,11 +1606,13 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.2 Fans
 
 **Founding Program for Fans:**
+
 - Simplified application (no portfolio)
 - Early access to community features
 - Different rewards (exclusive content, early event access)
 
 **Implementation:**
+
 - New FoundingApplication type
 - Simplified onboarding
 - Different reward structure
@@ -1504,6 +1620,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.3 Venues
 
 **Venue Partner Program:**
+
 - Similar to founding program
 - Focus on venue partnerships
 - Different onboarding (venue details, equipment)
@@ -1511,6 +1628,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.4 Agencies
 
 **Agency Partner Program:**
+
 - Multi-DJ applications
 - Agency onboarding
 - Different reward structure
@@ -1518,11 +1636,13 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.5 Premium
 
 **Premium Tiers:**
+
 - Founding members get 3 months free
 - Upgrade to paid premium after expiry
 - Tiered pricing (Basic, Pro, Enterprise)
 
 **Implementation:**
+
 - Extend DjProfile.plan enum
 - Add subscription management
 - Add payment integration (Stripe)
@@ -1530,11 +1650,13 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.6 Subscriptions
 
 **Recurring Billing:**
+
 - Monthly/yearly subscriptions
 - Automatic renewal
 - Payment failure handling
 
 **Implementation:**
+
 - Stripe integration
 - Subscription model
 - Webhook handling
@@ -1542,6 +1664,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.7 Reputation System
 
 **Enhanced Reputation:**
+
 - Build on existing ReputationScore model
 - Add founding member boost
 - Add activity-based reputation
@@ -1550,11 +1673,13 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.8 Messaging
 
 **Direct Messaging:**
+
 - Founding members get early access
 - Messaging between DJs and organizers
 - Group messaging for events
 
 **Implementation:**
+
 - New Message model
 - Real-time via Supabase Realtime
 - Message history
@@ -1562,6 +1687,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.9 Notifications
 
 **Enhanced Notifications:**
+
 - Build on existing Notification model
 - Add founding-specific notifications
 - Add notification preferences
@@ -1570,16 +1696,19 @@ NEXT_PUBLIC_APP_ENV=production
 ### 24.10 AI Features
 
 **AI-Powered Matching:**
+
 - Match DJs with gigs based on profile
 - Recommend events to fans
 - Smart search
 
 **Implementation:**
+
 - Vector embeddings for profiles
 - Similarity search
 - Recommendation engine
 
 **Architectural Considerations:**
+
 - Add AI service layer
 - Add vector database (pgvector)
 - Add ML pipeline
@@ -1592,6 +1721,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 25.1 In Scope (MVP)
 
 **Core Features:**
+
 - Founding landing page
 - Application form (multi-step)
 - Email verification
@@ -1615,6 +1745,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Security (authentication, authorization, RLS)
 
 **Email Templates:**
+
 - Application received
 - Email verification
 - Invitation
@@ -1624,6 +1755,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Founding welcome
 
 **Admin Features:**
+
 - Application list, filters, search
 - Application detail view
 - Approve/reject workflow
@@ -1634,27 +1766,33 @@ NEXT_PUBLIC_APP_ENV=production
 ### 25.2 Out of Scope (Post-MVP)
 
 **Referral System**
+
 - Postpone to post-launch
 - Can be added without architectural changes
 
 **Advanced Analytics**
+
 - Basic analytics in MVP
 - Advanced analytics (funnel analysis, cohort analysis) post-MVP
 
 **Gamification**
+
 - Leaderboards, badges beyond founding badge
 - Post-MVP
 
 **Community Features**
+
 - Founding member community
 - Forums, discussions
 - Post-MVP
 
 **Mobile App**
+
 - Web-only in MVP
 - Mobile app post-MVP
 
 **AI Features**
+
 - No AI in MVP
 - Post-MVP
 
@@ -1665,23 +1803,27 @@ NEXT_PUBLIC_APP_ENV=production
 ### 26.1 Phase 2 (Post-Launch)
 
 **Referral System:**
+
 - Referral code generation
 - Referral tracking
 - Reward calculation
 - Referral dashboard
 
 **Enhanced Analytics:**
+
 - Funnel analysis
 - Cohort analysis
 - Traffic source tracking
 - Referral performance
 
 **Community Features:**
+
 - Founding member community
 - Forums, discussions
 - Member spotlights
 
 **Gamification:**
+
 - Leaderboards
 - Achievement badges
 - Progress tracking
@@ -1689,16 +1831,19 @@ NEXT_PUBLIC_APP_ENV=production
 ### 26.2 Phase 3
 
 **Organizer Founding Program:**
+
 - Similar workflow to DJs
 - Organizer-specific rewards
 - Organizer onboarding
 
 **Fan Founding Program:**
+
 - Simplified application
 - Fan-specific rewards
 - Early access to community
 
 **Advanced Rewards:**
+
 - Tiered rewards
 - Customizable rewards
 - Reward marketplace
@@ -1706,16 +1851,19 @@ NEXT_PUBLIC_APP_ENV=production
 ### 26.3 Phase 4
 
 **AI Features:**
+
 - Profile matching
 - Gig recommendations
 - Smart search
 
 **Mobile App:**
+
 - iOS and Android apps
 - Push notifications
 - Offline support
 
 **Premium Tiers:**
+
 - Multiple premium tiers
 - Subscription management
 - Payment integration
@@ -1727,6 +1875,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 27.1 Phase 1: Foundation (Week 1-2)
 
 **Tasks:**
+
 - Database schema design
 - Prisma schema implementation
 - Database migration
@@ -1735,6 +1884,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Route structure setup
 
 **Deliverables:**
+
 - Database schema
 - Working site mode switching
 - Route structure
@@ -1742,6 +1892,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 27.2 Phase 2: Application Flow (Week 3-4)
 
 **Tasks:**
+
 - Application form component
 - Application server actions
 - Email verification flow
@@ -1749,6 +1900,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Email templates (application received, email verification)
 
 **Deliverables:**
+
 - Working application form
 - Email verification
 - Confirmation pages
@@ -1756,6 +1908,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 27.3 Phase 3: Admin Application Management (Week 5-6)
 
 **Tasks:**
+
 - Admin application list
 - Application detail view
 - Approve/reject workflow
@@ -1764,6 +1917,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Analytics dashboard (basic)
 
 **Deliverables:**
+
 - Admin application management
 - Invitation generation
 - Basic analytics
@@ -1771,6 +1925,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 27.4 Phase 4: Invitation System (Week 7)
 
 **Tasks:**
+
 - Invitation token generation
 - Invitation validation
 - Invitation landing page
@@ -1778,12 +1933,14 @@ NEXT_PUBLIC_APP_ENV=production
 - Email templates (invitation reminder, invitation expired)
 
 **Deliverables:**
+
 - Working invitation system
 - Account linking
 
 ### 27.5 Phase 5: Onboarding Integration (Week 8)
 
 **Tasks:**
+
 - Onboarding prefill from application
 - Onboarding completion flow
 - FoundingMember creation
@@ -1791,12 +1948,14 @@ NEXT_PUBLIC_APP_ENV=production
 - Email template (founding welcome)
 
 **Deliverables:**
+
 - Onboarding integration
 - Founding member creation
 
 ### 27.6 Phase 6: Rewards System (Week 9)
 
 **Tasks:**
+
 - Founding badge implementation
 - Founding number assignment
 - Premium months tracking
@@ -1805,12 +1964,14 @@ NEXT_PUBLIC_APP_ENV=production
 - Reward activation on launch
 
 **Deliverables:**
+
 - Working rewards system
 - Reward activation
 
 ### 27.7 Phase 7: Admin Member Management (Week 10)
 
 **Tasks:**
+
 - Admin member list
 - Member detail view
 - Reward editing
@@ -1818,12 +1979,14 @@ NEXT_PUBLIC_APP_ENV=production
 - CSV export
 
 **Deliverables:**
+
 - Admin member management
 - CSV export
 
 ### 27.8 Phase 8: SEO & Polish (Week 11)
 
 **Tasks:**
+
 - SEO metadata
 - Sitemap generation
 - Robots.txt
@@ -1833,6 +1996,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Testing
 
 **Deliverables:**
+
 - SEO optimization
 - Polished UI
 - Complete email suite
@@ -1840,6 +2004,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 27.9 Phase 9: Testing & Launch (Week 12)
 
 **Tasks:**
+
 - End-to-end testing
 - Security testing
 - Performance testing
@@ -1848,6 +2013,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Launch preparation
 
 **Deliverables:**
+
 - Tested application
 - Documentation
 - Launch readiness
@@ -1859,6 +2025,7 @@ NEXT_PUBLIC_APP_ENV=production
 **Total Duration:** 12 weeks (3 months)
 
 **Breakdown:**
+
 - Phase 1 (Foundation): 2 weeks
 - Phase 2 (Application Flow): 2 weeks
 - Phase 3 (Admin Application Management): 2 weeks
@@ -1872,6 +2039,7 @@ NEXT_PUBLIC_APP_ENV=production
 **Buffer:** 2 weeks included in timeline for unexpected issues
 
 **Milestone Dates:**
+
 - Week 2: Foundation complete
 - Week 4: Application flow complete
 - Week 6: Admin application management complete
@@ -1889,28 +2057,33 @@ NEXT_PUBLIC_APP_ENV=production
 ### 29.1 Technical Risks
 
 **Risk: Database schema changes break existing functionality**
+
 - **Mitigation:** Thorough testing in development/staging
 - **Mitigation:** Database backups before migrations
 - **Mitigation:** Rollback plan for each migration
 
 **Risk: Middleware complexity leads to bugs**
+
 - **Mitigation:** Keep middleware simple (mode checks only)
 - **Mitigation:** Comprehensive testing of all routes
 - **Mitigation:** Log middleware decisions for debugging
 
 **Risk: Invitation token security vulnerability**
+
 - **Mitigation:** Use cryptographically secure random generator
 - **Mitigation:** Short expiry (7 days)
 - **Mitigation:** Single-use tokens
 - **Mitigation:** Security audit before launch
 
 **Risk: Email delivery failures**
+
 - **Mitigation:** Use reliable email service (Resend)
 - **Mitigation:** Retry logic for failed sends
 - **Mitigation:** Admin notification of persistent failures
 - **Mitigation:** Email status tracking in database
 
 **Risk: Account linking complexity**
+
 - **Mitigation:** Simple UI with clear options
 - **Mitigation:** Email verification for mismatch
 - **Mitigation:** Comprehensive testing of scenarios
@@ -1919,24 +2092,28 @@ NEXT_PUBLIC_APP_ENV=production
 ### 29.2 Business Risks
 
 **Risk: Low application volume**
+
 - **Mitigation:** Marketing campaign for founding program
 - **Mitigation:** Leverage existing DJ networks
 - **Mitigation:** Incentivize referrals (post-MVP)
 - **Mitigation:** Extend application period if needed
 
 **Risk: Low conversion rate (application → onboarding)**
+
 - **Mitigation:** Streamlined onboarding (prefilled data)
 - **Mitigation:** Clear communication of benefits
 - **Mitigation:** Reminder emails for pending invitations
 - **Mitigation:** Admin outreach for stuck applications
 
 **Risk: High rejection rate**
+
 - **Mitigation:** Clear application criteria
 - **Mitigation:** Helpful rejection feedback
 - **Mitigation:** Encourage reapplication
 - **Mitigation:** Adjust criteria if too strict
 
 **Risk: Launch delay**
+
 - **Mitigation:** Realistic timeline (12 weeks)
 - **Mitigation:** Buffer time included
 - **Mitigation:** MVP scope management
@@ -1945,18 +2122,21 @@ NEXT_PUBLIC_APP_ENV=production
 ### 29.3 Operational Risks
 
 **Risk: Admin overwhelmed by applications**
+
 - **Mitigation:** Efficient admin dashboard
 - **Mitigation:** Bulk actions
 - **Mitigation:** Clear prioritization criteria
 - **Mitigation:** Additional admin support if needed
 
 **Risk: Support requests increase**
+
 - **Mitigation:** Clear documentation
 - **Mitigation:** FAQ page
 - **Mitigation:** Automated email responses
 - **Mitigation:** Support ticket system
 
 **Risk: Database performance issues**
+
 - **Mitigation:** Proper indexing
 - **Mitigation:** Query optimization
 - **Mitigation:** Monitoring and alerts
@@ -1965,18 +2145,21 @@ NEXT_PUBLIC_APP_ENV=production
 ### 29.4 Security Risks
 
 **Risk: Invitation token brute force**
+
 - **Mitigation:** Long tokens (32 bytes)
 - **Mitigation:** Rate limiting
 - **Mitigation:** Account lockout after failures
 - **Mitigation:** Monitoring for suspicious activity
 
 **Risk: Data breach**
+
 - **Mitigation:** RLS policies on all tables
 - **Mitigation:** Encryption at rest (Supabase)
 - **Mitigation:** Regular security audits
 - **Mitigation:** Incident response plan
 
 **Risk: Admin account compromise**
+
 - **Mitigation:** Strong password requirements
 - **Mitigation:** 2FA for admin accounts
 - **Mitigation:** Limited admin accounts
@@ -1989,6 +2172,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 30.1 Recommended Architecture
 
 **Overall Approach:**
+
 - Configuration-driven mode switching (SITE_MODE)
 - Clean separation of founding program logic
 - Reuse existing patterns where possible
@@ -1996,6 +2180,7 @@ NEXT_PUBLIC_APP_ENV=production
 - Scalable for future expansion
 
 **Key Decisions:**
+
 1. **Site Mode Configuration:** Single environment variable controls platform mode
 2. **Separate Models:** FoundingApplication, InvitationToken, FoundingMember
 3. **Invitation System:** Database-backed tokens with expiry and revocation
@@ -2006,24 +2191,28 @@ NEXT_PUBLIC_APP_ENV=production
 ### 30.2 Architecture Strengths
 
 **Simplicity:**
+
 - Mode switching via environment variable
 - No code changes for mode transitions
 - Clear separation of concerns
 - Solo-founder maintainable
 
 **Scalability:**
+
 - Database design supports future expansion
 - Invitation system extensible to other programs
 - Reward system supports new reward types
 - Route structure supports new features
 
 **Security:**
+
 - Secure invitation tokens
 - Proper authorization at all layers
 - RLS policies on database
 - Audit logging for sensitive operations
 
 **Maintainability:**
+
 - Clear folder organization
 - Reusable components
 - Consistent patterns
@@ -2032,21 +2221,25 @@ NEXT_PUBLIC_APP_ENV=production
 ### 30.3 Trade-offs
 
 **Trade-off 1: Plaintext vs Hashed Tokens**
-- Decision: Plaintext tokens
-- Reason: Simpler for solo founder, database already protected by RLS
-- Future: Can add hashing if security requirements increase
+
+- Decision: Hashed tokens at rest
+- Reason: Invitation tokens are bearer credentials and must be stored only as a digest for lookup and revocation; raw token shown only once at creation
+- Future: Maintain hashing as security best practice for credential storage
 
 **Trade-off 2: Referral System in MVP**
+
 - Decision: Postpone to post-MVP
 - Reason: MVP already complex, can add later without architectural changes
 - Future: Add in Phase 2 post-launch
 
 **Trade-off 3: Advanced Analytics in MVP**
+
 - Decision: Basic analytics only
 - Reason: Focus on core functionality first
 - Future: Add advanced analytics post-MVP
 
 **Trade-off 4: AI Features**
+
 - Decision: No AI in MVP
 - Reason: Adds significant complexity, not required for founding program
 - Future: Add AI for matching and recommendations post-MVP
@@ -2054,6 +2247,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 30.4 Implementation Priority
 
 **Priority 1 (Critical):**
+
 - Database schema
 - Site mode configuration
 - Application form
@@ -2063,12 +2257,14 @@ NEXT_PUBLIC_APP_ENV=production
 - Onboarding integration
 
 **Priority 2 (Important):**
+
 - Rewards system
 - Admin member management
 - SEO optimization
 - Email templates
 
 **Priority 3 (Nice to Have):**
+
 - Advanced analytics
 - CSV export
 - Bulk actions
@@ -2077,6 +2273,7 @@ NEXT_PUBLIC_APP_ENV=production
 ### 30.5 Success Criteria
 
 **Technical Success:**
+
 - All founding program features working
 - Mode switching functional
 - No breaking changes to existing features
@@ -2084,12 +2281,14 @@ NEXT_PUBLIC_APP_ENV=production
 - Performance acceptable
 
 **Business Success:**
+
 - 50+ founding applications
 - 30+ founding members complete onboarding
 - Positive feedback from founding members
 - Smooth transition to public launch
 
 **Operational Success:**
+
 - Admin can manage applications efficiently
 - Support requests manageable
 - No critical bugs in production
