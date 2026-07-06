@@ -5,28 +5,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
-import { PREMIUM_DEMO_DJS } from "@/data/djs";
+import { getFeaturedDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
 
-const FEATURED_DJS = [...PREMIUM_DEMO_DJS]
-  .sort(
-    (a, b) =>
-      b.stats.rating - a.stats.rating || b.stats.followers - a.stats.followers,
-  )
-  .slice(0, 3)
-  .map((dj) => ({
-    slug: dj.slug,
-    stageName: dj.stageName,
-    avatar: dj.avatar.url,
-    bio: dj.bio,
-    genres: dj.genres,
-    city: dj.location.city,
-    country: dj.location.country,
-    rating: dj.stats.rating,
-    followers: dj.stats.followers,
-  }));
+export default async function HomeFeaturedDJs() {
+  const featuredDJs = await getFeaturedDJs();
 
-export default function HomeFeaturedDJs() {
+  if (featuredDJs.length === 0) {
+    return null;
+  }
+
   return (
     <section className="border-t border-white/5 px-4 py-12 md:px-8">
       <div className="mx-auto max-w-7xl">
@@ -50,14 +38,17 @@ export default function HomeFeaturedDJs() {
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {FEATURED_DJS.map((dj) => (
-            <Link key={dj.slug} href={`/djs/${dj.slug}`} className="h-full">
+          {featuredDJs.map((dj) => (
+            <Link key={dj.id} href={`/djs/${dj.slug}`} className="h-full">
               <Card className="bg-h_blackLight/50 hover:ring-h_red flex h-full flex-col gap-0 overflow-hidden p-0 ring-white/5 transition-all">
                 <div className="from-h_cyanDark relative h-24 bg-linear-to-r to-black">
                   <div className="absolute -bottom-8 left-4">
                     <div className="relative">
                       <Avatar className="size-16 ring-2 ring-amber-400 ring-offset-2 ring-offset-black">
-                        <AvatarImage src={dj.avatar} alt={dj.stageName} />
+                        <AvatarImage
+                          src={dj.avatar ?? undefined}
+                          alt={dj.stageName}
+                        />
                         <AvatarFallback className="bg-h_redDark text-lg text-white">
                           {dj.stageName[0]}
                         </AvatarFallback>
@@ -81,7 +72,7 @@ export default function HomeFeaturedDJs() {
                       Dj. {dj.stageName}
                     </p>
                     <p className="mt-0.5 text-xs text-gray-500">
-                      📍 {dj.city}, {dj.country}
+                      📍 {dj.city?.name}, {dj.country?.name}
                     </p>
                   </div>
 
@@ -92,17 +83,19 @@ export default function HomeFeaturedDJs() {
                   <div className="flex flex-wrap gap-1">
                     {dj.genres.map((g) => (
                       <Badge
-                        key={g}
+                        key={g.genre.name}
                         className="bg-h_redDark/60 border-0 text-red-300"
                       >
-                        {g}
+                        {g.genre.name}
                       </Badge>
                     ))}
                   </div>
 
                   <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3 text-xs text-gray-400">
-                    <span>⭐ {dj.rating} rating</span>
-                    <span>{formatNumber(dj.followers)} followers</span>
+                    <span>
+                      ⭐ {dj._avg?.rating?.toFixed(1) || "N/A"} rating
+                    </span>
+                    <span>{formatNumber(dj._count.followers)} followers</span>
                   </div>
                 </div>
               </Card>

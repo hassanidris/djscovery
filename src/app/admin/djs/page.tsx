@@ -8,13 +8,14 @@ import {
   hideDjProfile,
   unhideDjProfile,
   suspendDjAccount,
+  toggleDjFeatured,
 } from "@/lib/actions/admin/djs";
 import AdminActionButton from "@/components/admin/AdminActionButton";
 import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import AdminPagination from "@/components/admin/AdminPagination";
 import AdminFilters from "@/components/admin/AdminFilters";
 import { formatDistanceToNow } from "date-fns";
-import { EyeOff, Star } from "lucide-react";
+import { EyeOff, Star, Crown } from "lucide-react";
 
 export const metadata: Metadata = { title: "DJs" };
 
@@ -105,6 +106,9 @@ export default async function AdminDjsPage({
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
+                          {dj.featured && (
+                            <Crown className="h-3.5 w-3.5 shrink-0 text-amber-400" />
+                          )}
                           {dj.hidden && (
                             <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-500" />
                           )}
@@ -172,6 +176,22 @@ export default async function AdminDjsPage({
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap items-center justify-end gap-1">
+                          {dj.status === "APPROVED" && (
+                            <AdminActionButton
+                              label={dj.featured ? "Unfeature" : "Feature"}
+                              description={`${dj.featured ? "Remove" : "Add"} ${dj.stageName} to homepage featured section?`}
+                              confirmLabel={dj.featured ? "Remove" : "Add"}
+                              fields={{ djProfileId: String(dj.id) }}
+                              action={toggleDjFeatured}
+                              successMessage={`DJ ${dj.featured ? "unfeatured" : "featured"}`}
+                              requireConfirm={false}
+                              className={
+                                dj.featured
+                                  ? "border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                                  : "border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                              }
+                            />
+                          )}
                           {dj.status === "PENDING_APPROVAL" && (
                             <>
                               <AdminActionButton

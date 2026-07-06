@@ -23,6 +23,7 @@ import {
   accountSuspendedSubject,
   accountSuspendedHtml,
 } from "@/lib/email/templates/accountSuspended";
+import { z } from "zod";
 
 type ActionResult = { success: true } | { error: string };
 
@@ -313,6 +314,54 @@ export async function suspendDjAccount(
   }
 }
 
+const ToggleFeaturedSchema = z.object({
+  djProfileId: z.coerce.number(),
+});
+
+export async function toggleDjFeatured(
+  formData: FormData,
+): Promise<ActionResult> {
+  const { userId: adminId } = await requireAdmin();
+
+  const parsed = ToggleFeaturedSchema.safeParse({
+    djProfileId: formData.get("djProfileId"),
+  });
+  if (!parsed.success)
+    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+
+  const { djProfileId } = parsed.data;
+
+  try {
+    const profile = await prisma.djProfile.findUnique({
+      where: { id: djProfileId },
+      select: { featured: true, slug: true },
+    });
+    if (!profile) return { error: "DJ profile not found" };
+
+    await prisma.$transaction([
+      prisma.djProfile.update({
+        where: { id: djProfileId },
+        data: { featured: !profile.featured },
+      }),
+      prisma.adminActionLog.create({
+        data: {
+          adminId,
+          action: profile.featured ? "UNFEATURE_DJ" : "FEATURE_DJ",
+          targetType: "DjProfile",
+          targetId: String(djProfileId),
+        },
+      }),
+    ]);
+
+    revalidatePath("/admin/djs");
+    revalidatePath("/");
+    revalidatePath(`/djs/${profile.slug}`);
+    return { success: true };
+  } catch {
+    return { error: "Failed to toggle featured status" };
+  }
+}
+
 export type AdminDj = {
   id: number;
   stageName: string;
@@ -320,6 +369,7 @@ export type AdminDj = {
   avatar: string | null;
   status: string;
   hidden: boolean;
+  featured: boolean;
   createdAt: Date;
   country: { name: string } | null;
   city: { name: string } | null;
@@ -374,6 +424,7 @@ export async function getAdminDjs({
       avatar: true,
       status: true,
       hidden: true,
+      featured: true,
       createdAt: true,
       country: { select: { name: true } },
       city: { select: { name: true } },
