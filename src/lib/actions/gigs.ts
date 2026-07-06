@@ -28,6 +28,7 @@ import {
   gigApplicationRejectedSubject,
   gigApplicationRejectedHtml,
 } from "@/lib/email/templates/gigApplicationRejected";
+import { requireGigOwner } from "@/lib/auth/require-owner";
 
 // ============================================================
 // RESULT TYPE
@@ -192,14 +193,12 @@ export async function updateGig(
   gigId: number,
   input: unknown,
 ): Promise<ActionResult<{ slug: string }>> {
-  const user = await getAuthUser();
-  if (!user) return { success: false, error: "You must be signed in." };
+  const { organizerProfileId } = await requireGigOwner(gigId);
 
-  const roles = await getRoles(user.id);
-  if (!roles.includes("ORGANIZER"))
-    return { success: false, error: "Only organizers can edit gigs." };
-
-  const orgProfile = await getActiveOrganizerProfile(user.id);
+  const orgProfile = await prisma.organizerProfile.findUnique({
+    where: { id: organizerProfileId },
+    select: { status: true, deletedAt: true },
+  });
   if (
     !orgProfile ||
     orgProfile.status !== "ACTIVE" ||
@@ -209,10 +208,9 @@ export async function updateGig(
 
   const gig = await prisma.gig.findUnique({
     where: { id: gigId, deletedAt: null },
-    select: { organizerProfileId: true, status: true, title: true, slug: true },
+    select: { status: true, title: true, slug: true },
   });
-  if (!gig || gig.organizerProfileId !== orgProfile.id)
-    return { success: false, error: "Gig not found." };
+  if (!gig) return { success: false, error: "Gig not found." };
 
   if (gig.status === "CANCELLED" || gig.status === "EXPIRED")
     return {
@@ -307,14 +305,12 @@ const publishSelectShape = {
 } as const;
 
 export async function publishGig(gigId: number): Promise<ActionResult> {
-  const user = await getAuthUser();
-  if (!user) return { success: false, error: "You must be signed in." };
+  const { organizerProfileId } = await requireGigOwner(gigId);
 
-  const roles = await getRoles(user.id);
-  if (!roles.includes("ORGANIZER"))
-    return { success: false, error: "Only organizers can publish gigs." };
-
-  const orgProfile = await getActiveOrganizerProfile(user.id);
+  const orgProfile = await prisma.organizerProfile.findUnique({
+    where: { id: organizerProfileId },
+    select: { status: true, deletedAt: true },
+  });
   if (
     !orgProfile ||
     orgProfile.status !== "ACTIVE" ||
@@ -324,10 +320,9 @@ export async function publishGig(gigId: number): Promise<ActionResult> {
 
   const gig = await prisma.gig.findUnique({
     where: { id: gigId, deletedAt: null },
-    select: { organizerProfileId: true, status: true, ...publishSelectShape },
+    select: { status: true, ...publishSelectShape },
   });
-  if (!gig || gig.organizerProfileId !== orgProfile.id)
-    return { success: false, error: "Gig not found." };
+  if (!gig) return { success: false, error: "Gig not found." };
 
   if (gig.status !== "DRAFT" && gig.status !== "UNDER_REVIEW")
     return { success: false, error: "Only draft gigs can be published." };
@@ -359,14 +354,12 @@ export async function publishGig(gigId: number): Promise<ActionResult> {
 // ============================================================
 
 export async function closeGig(gigId: number): Promise<ActionResult> {
-  const user = await getAuthUser();
-  if (!user) return { success: false, error: "You must be signed in." };
+  const { organizerProfileId } = await requireGigOwner(gigId);
 
-  const roles = await getRoles(user.id);
-  if (!roles.includes("ORGANIZER"))
-    return { success: false, error: "Only organizers can close gigs." };
-
-  const orgProfile = await getActiveOrganizerProfile(user.id);
+  const orgProfile = await prisma.organizerProfile.findUnique({
+    where: { id: organizerProfileId },
+    select: { status: true, deletedAt: true },
+  });
   if (
     !orgProfile ||
     orgProfile.status !== "ACTIVE" ||
@@ -376,10 +369,9 @@ export async function closeGig(gigId: number): Promise<ActionResult> {
 
   const gig = await prisma.gig.findUnique({
     where: { id: gigId, deletedAt: null },
-    select: { organizerProfileId: true, status: true },
+    select: { status: true },
   });
-  if (!gig || gig.organizerProfileId !== orgProfile.id)
-    return { success: false, error: "Gig not found." };
+  if (!gig) return { success: false, error: "Gig not found." };
 
   if (gig.status !== "PUBLISHED" && gig.status !== "UNDER_REVIEW")
     return { success: false, error: "Only published gigs can be closed." };
@@ -398,14 +390,12 @@ export async function closeGig(gigId: number): Promise<ActionResult> {
 // ============================================================
 
 export async function cancelGig(gigId: number): Promise<ActionResult> {
-  const user = await getAuthUser();
-  if (!user) return { success: false, error: "You must be signed in." };
+  const { organizerProfileId } = await requireGigOwner(gigId);
 
-  const roles = await getRoles(user.id);
-  if (!roles.includes("ORGANIZER"))
-    return { success: false, error: "Only organizers can cancel gigs." };
-
-  const orgProfile = await getActiveOrganizerProfile(user.id);
+  const orgProfile = await prisma.organizerProfile.findUnique({
+    where: { id: organizerProfileId },
+    select: { status: true, deletedAt: true },
+  });
   if (
     !orgProfile ||
     orgProfile.status !== "ACTIVE" ||
@@ -415,10 +405,9 @@ export async function cancelGig(gigId: number): Promise<ActionResult> {
 
   const gig = await prisma.gig.findUnique({
     where: { id: gigId, deletedAt: null },
-    select: { organizerProfileId: true, status: true },
+    select: { status: true },
   });
-  if (!gig || gig.organizerProfileId !== orgProfile.id)
-    return { success: false, error: "Gig not found." };
+  if (!gig) return { success: false, error: "Gig not found." };
 
   if (gig.status === "CANCELLED" || gig.status === "EXPIRED")
     return { success: false, error: "Gig is already cancelled or expired." };

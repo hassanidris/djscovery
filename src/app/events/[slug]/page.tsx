@@ -16,6 +16,7 @@ import { getDemoEventBySlug } from "@/data/events-demo";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
 import { EventReviewSection } from "@/components/reputation/EventReviewSection";
+import JsonLd from "@/components/seo/JsonLd";
 
 export const revalidate = 60;
 
@@ -151,6 +152,7 @@ export default async function EventDetailPage({
 
     return (
       <EventDetailView
+        slug={dbEvent.slug}
         title={dbEvent.title}
         eventType={dbEvent.eventType}
         category={dbEvent.category}
@@ -216,6 +218,7 @@ type DjMini = {
 type GalleryItem = { id: number; url: string; caption: string | null };
 
 function EventDetailView(props: {
+  slug: string;
   title: string;
   eventType: string;
   category: string;
@@ -245,6 +248,7 @@ function EventDetailView(props: {
   reviewedDjIds: number[];
 }) {
   const {
+    slug,
     title,
     eventType,
     category,
@@ -279,8 +283,42 @@ function EventDetailView(props: {
     ...participants.filter((p) => p.slug !== ownerDj.slug),
   ];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: title,
+    description:
+      description || `${CATEGORY_LABELS[category] || "Event"} in ${location}`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL}/events/${slug}`,
+    image: posterUrl,
+    startDate: startDate.toISOString(),
+    endDate: endDate?.toISOString(),
+    location: {
+      "@type": "Place",
+      name: venue || location,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: location,
+      },
+    },
+    performer: allPerformers.map((p) => ({
+      "@type": "Person",
+      name: p.stageName,
+      image: p.avatar,
+    })),
+    organizer: {
+      "@type": "Person",
+      name: ownerDj.stageName,
+    },
+    eventStatus:
+      status === "COMPLETED"
+        ? "https://schema.org/EventMovedOnline"
+        : "https://schema.org/EventScheduled",
+  };
+
   return (
     <div className="min-h-screen bg-black pb-20">
+      <JsonLd data={jsonLd} />
       {/* Top nav bar */}
       <div className="sticky top-0 z-10 border-b border-zinc-800/60 bg-black/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
@@ -563,6 +601,7 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
 
   return (
     <EventDetailView
+      slug={event.slug}
       title={event.title}
       eventType={event.eventType}
       category={event.category}

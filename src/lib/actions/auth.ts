@@ -12,6 +12,7 @@ import {
 } from "@/lib/validations/auth";
 import { cookies } from "next/headers";
 import { sendEmail } from "@/lib/email/sendEmail";
+import { rateLimit, rateLimitMessage } from "@/lib/rate-limit";
 import {
   welcomeEmailSubject,
   welcomeEmailHtml,
@@ -32,6 +33,18 @@ export async function signIn(formData: FormData) {
   if (!parsed.success) {
     const message = parsed.error.errors[0]?.message ?? "Invalid input";
     redirect(`/sign-in?error=${encodeURIComponent(message)}`);
+  }
+
+  const { email } = parsed.data;
+  const rateLimitResult = await rateLimit(
+    `auth:sign-in:${email.toLowerCase()}`,
+    5,
+    15 * 60,
+  );
+  if (!rateLimitResult.success) {
+    redirect(
+      `/sign-in?error=${encodeURIComponent(rateLimitMessage("sign-in", rateLimitResult.resetAt))}`,
+    );
   }
 
   const supabase = await createClient();
@@ -113,6 +126,17 @@ export async function signUp(formData: FormData) {
   }
 
   const { email, password, role, displayName } = parsed.data;
+  const signUpRateLimit = await rateLimit(
+    `auth:sign-up:${email.toLowerCase()}`,
+    3,
+    60 * 60,
+  );
+  if (!signUpRateLimit.success) {
+    redirect(
+      `/sign-up?error=${encodeURIComponent(rateLimitMessage("sign-up", signUpRateLimit.resetAt))}`,
+    );
+  }
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signUp({
@@ -154,6 +178,11 @@ export async function signUp(formData: FormData) {
           if (!existing) {
             await tx.fanProfile.create({ data: { userId, name } });
           }
+          await tx.userRole.upsert({
+            where: { userId_role: { userId, role: "FAN" } },
+            update: {},
+            create: { userId, role: "FAN" },
+          });
         }
       });
 
@@ -190,6 +219,18 @@ export async function requestPasswordReset(formData: FormData) {
   if (!parsed.success) {
     const message = parsed.error.errors[0]?.message ?? "Invalid email";
     redirect(`/forgot-password?error=${encodeURIComponent(message)}`);
+  }
+
+  const { email } = parsed.data;
+  const resetRateLimit = await rateLimit(
+    `auth:password-reset:${email.toLowerCase()}`,
+    3,
+    15 * 60,
+  );
+  if (!resetRateLimit.success) {
+    redirect(
+      `/forgot-password?error=${encodeURIComponent(rateLimitMessage("password reset", resetRateLimit.resetAt))}`,
+    );
   }
 
   const supabase = await createClient();

@@ -3,6 +3,8 @@
 import { useState, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createDjProfile,
   getCitiesByCountry,
@@ -22,6 +24,10 @@ import {
   Mic,
 } from "lucide-react";
 import { DJ_TYPES } from "@/config/dj-types";
+import {
+  CreateDjProfileSchema,
+  CreateDjProfileInput,
+} from "@/lib/validations/dj-profile";
 
 type Genre = { id: number; name: string };
 type Country = { id: number; name: string; code: string };
@@ -52,28 +58,50 @@ const sectionTitleCls =
 
 export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  // Basic info
-  const [stageName, setStageName] = useState("");
-  const [bio, setBio] = useState("");
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<CreateDjProfileInput>({
+    resolver: zodResolver(CreateDjProfileSchema),
+    defaultValues: {
+      stageName: "",
+      bio: "",
+      countryId: 0,
+      cityId: 0,
+      djTypes: [],
+      genreNames: [],
+      socialLinks: [{ platform: "instagram", url: "" }],
+      media: [],
+    },
+  });
 
-  // Avatar
+  // Watch values for derived state
+  const stageName = watch("stageName");
+  const countryId = watch("countryId");
+  const cityId = watch("cityId");
+  const djTypes = watch("djTypes");
+  const genreNames = watch("genreNames");
+  const socialLinks = watch("socialLinks");
+
+  // Avatar (file upload - not in form schema)
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
-  // Location
-  const [countryId, setCountryId] = useState<number | null>(null);
-  const [cityId, setCityId] = useState<number | null>(null);
+  // Location cities
   const [cities, setCities] = useState<City[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
   const cityRequestId = useRef(0);
 
   // Genres
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
-  const [selectedGenreNames, setSelectedGenreNames] = useState<Set<string>>(
-    new Set(),
-  );
   const [newGenreInput, setNewGenreInput] = useState("");
   const [addingGenre, setAddingGenre] = useState(false);
   const [showGenreDropdown, setShowGenreDropdown] = useState(false);
@@ -83,31 +111,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     getGenres().then(setAvailableGenres);
   }, []);
 
-  // Social links
-  const [socialLinks, setSocialLinks] = useState<
-    { platform: string; url: string }[]
-  >([]);
-
-  // DJ Types
-  const [selectedDjTypes, setSelectedDjTypes] = useState<Set<string>>(
-    new Set(),
-  );
-
-  // Optional media
+  // Optional media (not in form schema)
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [videoLinks, setVideoLinks] = useState<string[]>([]);
   const [audioLinks, setAudioLinks] = useState<string[]>([]);
-
-  // Form state
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{
-    djTypes?: string;
-    country?: string;
-    city?: string;
-    genres?: string;
-    social?: string;
-  }>({});
 
   const slugPreview =
     stageName.length > 0
@@ -124,32 +131,26 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     if (!file) return;
     const allowed = ["image/jpeg", "image/png", "image/webp"];
     if (!allowed.includes(file.type)) {
-      setError("Avatar must be a JPG, PNG, or WEBP file.");
+      toast.error("Avatar must be a JPG, PNG, or WEBP file.");
       setAvatarFile(null);
       setAvatarPreview(null);
       e.target.value = "";
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setError("Avatar must be 5 MB or smaller.");
+      toast.error("Avatar must be 5 MB or smaller.");
       setAvatarFile(null);
       setAvatarPreview(null);
       e.target.value = "";
       return;
     }
-    setError(null);
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   }
 
   async function handleCountryChange(id: number) {
-    setCountryId(id || null);
-    setFieldErrors((prev) => ({
-      ...prev,
-      country: undefined,
-      city: undefined,
-    }));
-    setCityId(null);
+    setValue("countryId", id || 0);
+    setValue("cityId", 0);
     setCities([]);
     if (!id) return;
     const requestId = ++cityRequestId.current;
@@ -177,17 +178,19 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         g.toLowerCase().includes(newGenreInput.toLowerCase())
       );
     })
-    .filter((g) => !selectedGenreNames.has(g))
+    .filter((g) => !genreNames.includes(g))
     .slice(0, 10);
 
   function toggleGenre(name: string) {
-    setFieldErrors((prev) => ({ ...prev, genres: undefined }));
-    setSelectedGenreNames((prev) => {
-      const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
-      else if (next.size < 5) next.add(name);
-      return next;
-    });
+    const current = genreNames;
+    if (current.includes(name)) {
+      setValue(
+        "genreNames",
+        current.filter((g) => g !== name),
+      );
+    } else if (current.length < 5) {
+      setValue("genreNames", [...current, name]);
+    }
   }
 
   async function handleAddGenre() {
@@ -201,9 +204,9 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           ? prev
           : [...prev, genre.name].sort((a, b) => a.localeCompare(b)),
       );
-      setSelectedGenreNames((prev) =>
-        prev.size >= 5 ? prev : new Set([...prev, genre.name]),
-      );
+      if (genreNames.length < 5 && !genreNames.includes(genre.name)) {
+        setValue("genreNames", [...genreNames, genre.name]);
+      }
       setNewGenreInput("");
     } catch {
       // silently ignore — genre may already exist
@@ -212,17 +215,25 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   }
 
   function addSocialLink() {
-    setSocialLinks((prev) => [...prev, { platform: "instagram", url: "" }]);
-    setFieldErrors((prev) => ({ ...prev, social: undefined }));
+    setValue("socialLinks", [
+      ...socialLinks,
+      { platform: "instagram", url: "" },
+    ]);
   }
 
   function removeSocialLink(i: number) {
-    setSocialLinks((prev) => prev.filter((_, idx) => idx !== i));
+    setValue(
+      "socialLinks",
+      socialLinks.filter((_, idx) => idx !== i),
+    );
   }
 
   function updateSocialLink(i: number, key: "platform" | "url", value: string) {
-    setSocialLinks((prev) =>
-      prev.map((link, idx) => (idx === i ? { ...link, [key]: value } : link)),
+    setValue(
+      "socialLinks",
+      socialLinks.map((link, idx) =>
+        idx === i ? { ...link, [key]: value } : link,
+      ),
     );
   }
 
@@ -237,35 +248,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     return result;
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setFieldErrors({});
-
-    if (!stageName.trim()) {
-      setError("Stage name is required.");
-      return;
-    }
-
-    const fe: {
-      djTypes?: string;
-      country?: string;
-      city?: string;
-      genres?: string;
-      social?: string;
-    } = {};
-    if (selectedDjTypes.size === 0) fe.djTypes = "Select at least one DJ type.";
-    if (!countryId) fe.country = "Country is required.";
-    if (!cityId) fe.city = "City is required.";
-    if (selectedGenreNames.size === 0) fe.genres = "Select at least one genre.";
-    if (socialLinks.filter((l) => l.url.trim()).length === 0)
-      fe.social = "Add at least one social media link.";
-    if (Object.keys(fe).length > 0) {
-      setFieldErrors(fe);
-      setError("Please fill in all required fields.");
-      return;
-    }
-
+  async function onSubmit(data: CreateDjProfileInput) {
     startTransition(async () => {
       const toastId = toast.loading("Preparing your profile...");
       const uploadedPaths: { path: string; bucket: string }[] = [];
@@ -325,14 +308,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         toast.loading("Saving your profile...", { id: toastId });
 
         const result = await createDjProfile({
-          stageName: stageName.trim(),
-          bio: bio.trim() || undefined,
+          stageName: data.stageName.trim(),
+          bio: data.bio?.trim() || undefined,
           avatarUrl,
-          countryId: countryId ?? undefined,
-          cityId: cityId ?? undefined,
-          genreNames: Array.from(selectedGenreNames),
-          djTypes: Array.from(selectedDjTypes),
-          socialLinks: socialLinks.filter((l) => l.url.trim()),
+          countryId: data.countryId,
+          cityId: data.cityId,
+          genreNames: data.genreNames,
+          djTypes: data.djTypes,
+          socialLinks: data.socialLinks.filter((l) => l.url.trim()),
           media,
         });
 
@@ -362,7 +345,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="flex w-full flex-col gap-6 overflow-hidden"
     >
       {/* ── Avatar ── */}
@@ -421,15 +404,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             DJ Stage Name <span className="text-h_red">*</span>
           </label>
           <input
+            {...register("stageName")}
             type="text"
-            value={stageName}
-            onChange={(e) => setStageName(e.target.value)}
             placeholder="e.g. DJ Echo"
-            required
-            minLength={2}
-            maxLength={60}
             className={inputCls}
           />
+          {errors.stageName && (
+            <p className="text-xs text-red-400">{errors.stageName.message}</p>
+          )}
           {slugPreview && (
             <p className="mt-0.5 text-xs text-gray-500">
               Profile URL:{" "}
@@ -441,24 +423,22 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className={labelCls}>
-            Bio <span className="text-h_red">*</span>
-          </label>
+          <label className={labelCls}>Bio</label>
           <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            {...register("bio")}
             placeholder="Tell fans about yourself, your style, your influences..."
             rows={4}
-            maxLength={500}
             className={`${inputCls} resize-none`}
           />
-          <p className="text-right text-xs text-gray-600">{bio.length}/500</p>
+          <p className="text-right text-xs text-gray-600">
+            {watch("bio")?.length || 0}/500
+          </p>
         </div>
       </div>
 
       {/* ── DJ Type ── */}
       <div
-        className={`${sectionCls} ${fieldErrors.djTypes ? "border-red-500/40" : ""}`}
+        className={`${sectionCls} ${errors.djTypes ? "border-red-500/40" : ""}`}
       >
         <h2 className={sectionTitleCls}>
           DJ Type <span className="text-h_red">*</span>
@@ -469,19 +449,21 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {DJ_TYPES.map((t) => {
-            const checked = selectedDjTypes.has(t.value);
+            const checked = djTypes.includes(t.value);
             return (
               <button
                 key={t.value}
                 type="button"
                 onClick={() => {
-                  setFieldErrors((prev) => ({ ...prev, djTypes: undefined }));
-                  setSelectedDjTypes((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(t.value)) next.delete(t.value);
-                    else next.add(t.value);
-                    return next;
-                  });
+                  const current = djTypes;
+                  if (current.includes(t.value)) {
+                    setValue(
+                      "djTypes",
+                      current.filter((type) => type !== t.value),
+                    );
+                  } else {
+                    setValue("djTypes", [...current, t.value]);
+                  }
                 }}
                 className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
                   checked
@@ -503,14 +485,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           })}
         </div>
 
-        {fieldErrors.djTypes && (
-          <p className="-mt-1 text-xs text-red-400">{fieldErrors.djTypes}</p>
+        {errors.djTypes && (
+          <p className="-mt-1 text-xs text-red-400">{errors.djTypes.message}</p>
         )}
       </div>
 
       {/* ── Location ── */}
       <div
-        className={`${sectionCls} ${fieldErrors.country || fieldErrors.city ? "border-red-500/40" : ""}`}
+        className={`${sectionCls} ${errors.countryId || errors.cityId ? "border-red-500/40" : ""}`}
       >
         <h2 className={sectionTitleCls}>Location</h2>
 
@@ -519,11 +501,11 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             Country <span className="text-h_red">*</span>
           </label>
           <select
-            value={countryId ?? ""}
+            {...register("countryId", { valueAsNumber: true })}
             onChange={(e) => handleCountryChange(Number(e.target.value))}
             className={`${inputCls} cursor-pointer appearance-none`}
           >
-            <option value="">Select a country...</option>
+            <option value="0">Select a country...</option>
             {countries.map((c) => (
               <option
                 key={c.id}
@@ -534,12 +516,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
               </option>
             ))}
           </select>
-          {fieldErrors.country && (
-            <p className="mt-1 text-xs text-red-400">{fieldErrors.country}</p>
+          {errors.countryId && (
+            <p className="mt-1 text-xs text-red-400">
+              {errors.countryId.message}
+            </p>
           )}
         </div>
 
-        {countryId && (
+        {countryId > 0 && (
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>
               City <span className="text-h_red">*</span>
@@ -550,15 +534,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
               </div>
             ) : (
               <select
-                value={cityId ?? ""}
-                onChange={(e) => {
-                  const value = e.target.value ? Number(e.target.value) : null;
-                  setCityId(value);
-                  setFieldErrors((prev) => ({ ...prev, city: undefined }));
-                }}
-                className={`${inputCls} cursor-pointer appearance-none ${fieldErrors.city ? "ring-red-500/50" : ""}`}
+                {...register("cityId", { valueAsNumber: true })}
+                className={`${inputCls} cursor-pointer appearance-none ${errors.cityId ? "ring-red-500/50" : ""}`}
               >
-                <option value="">Select a city...</option>
+                <option value="0">Select a city...</option>
                 {cities.map((c) => (
                   <option
                     key={c.id}
@@ -570,8 +549,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                 ))}
               </select>
             )}
-            {fieldErrors.city && (
-              <p className="mt-1 text-xs text-red-400">{fieldErrors.city}</p>
+            {errors.cityId && (
+              <p className="mt-1 text-xs text-red-400">
+                {errors.cityId.message}
+              </p>
             )}
           </div>
         )}
@@ -579,16 +560,16 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
       {/* ── Genres ── */}
       <div
-        className={`${sectionCls} ${fieldErrors.genres ? "border-red-500/40" : ""}`}
+        className={`${sectionCls} ${errors.genreNames ? "border-red-500/40" : ""}`}
       >
         <div className="mb-1 flex items-center justify-between border-b border-white/10 pb-3">
           <h2 className="text-base font-semibold text-white">
             Genres <span className="text-h_red">*</span>
           </h2>
           <span
-            className={`text-xs font-medium ${selectedGenreNames.size >= 5 ? "text-amber-400" : "text-gray-500"}`}
+            className={`text-xs font-medium ${genreNames.length >= 5 ? "text-amber-400" : "text-gray-500"}`}
           >
-            {selectedGenreNames.size}/5
+            {genreNames.length}/5
           </span>
         </div>
         <p className="-mt-2 text-xs text-gray-400">
@@ -597,7 +578,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         {/* Selected genres */}
         <div className="flex flex-wrap gap-2">
-          {Array.from(selectedGenreNames).map((genre) => (
+          {genreNames.map((genre) => (
             <span
               key={genre}
               className="border-h_red bg-h_red/20 inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-medium text-white"
@@ -615,8 +596,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           ))}
         </div>
 
-        {fieldErrors.genres && (
-          <p className="-mt-2 text-xs text-red-400">{fieldErrors.genres}</p>
+        {errors.genreNames && (
+          <p className="-mt-2 text-xs text-red-400">
+            {errors.genreNames.message}
+          </p>
         )}
 
         <div className="relative">
@@ -636,12 +619,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
               }
             }}
             placeholder={
-              selectedGenreNames.size >= 5
-                ? "Max 5 genres reached"
-                : "Add a genre..."
+              genreNames.length >= 5 ? "Max 5 genres reached" : "Add a genre..."
             }
             maxLength={50}
-            disabled={selectedGenreNames.size >= 5}
+            disabled={genreNames.length >= 5}
             className="focus:ring-h_red w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none disabled:opacity-40"
           />
           {showGenreDropdown && filteredGenres.length > 0 && (
@@ -670,7 +651,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
       {/* ── Social Media ── */}
       <div
-        className={`${sectionCls} ${fieldErrors.social ? "border-red-500/40" : ""}`}
+        className={`${sectionCls} ${errors.socialLinks ? "border-red-500/40" : ""}`}
       >
         <div className="flex items-center justify-between">
           <h2 className={sectionTitleCls}>
@@ -722,8 +703,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           ))}
         </div>
 
-        {fieldErrors.social && (
-          <p className="-mt-2 text-xs text-red-400">{fieldErrors.social}</p>
+        {errors.socialLinks && (
+          <p className="-mt-2 text-xs text-red-400">
+            {errors.socialLinks.message}
+          </p>
         )}
 
         <button
@@ -788,13 +771,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           it appears publicly. You can still update your profile while waiting.
         </p>
       </div>
-
-      {/* ── Error ── */}
-      {error && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
-          <p className="text-sm text-red-400">{error}</p>
-        </div>
-      )}
 
       {/* ── Submit ── */}
       <button

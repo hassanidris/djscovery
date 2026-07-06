@@ -8,7 +8,6 @@ export interface DjDemoData {
   slug: string;
   type: DjType;
   plan: DjPlan;
-  verified: boolean;
   featured: boolean;
   name: string;
   stageName: string;

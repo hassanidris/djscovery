@@ -10,6 +10,7 @@ import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
+import JsonLd from "@/components/seo/JsonLd";
 
 export default async function DjProfilePage({
   params,
@@ -18,7 +19,10 @@ export default async function DjProfilePage({
 }) {
   const { slug } = await params;
 
+  const showDemo = process.env.NEXT_PUBLIC_APP_ENV !== "production";
+
   if (slug === "demo-free") {
+    if (!showDemo) return notFound();
     return (
       <div>
         <div className="bg-h_blackLight/60 flex items-center justify-center gap-4 border-b border-white/8 px-4 py-2 text-center text-xs font-medium tracking-wide text-gray-300">
@@ -37,6 +41,7 @@ export default async function DjProfilePage({
   }
 
   if (slug === "demo-premium") {
+    if (!showDemo) return notFound();
     const demoDj = getDemodjBySlug("amara-pulse");
     if (!demoDj) return notFound();
     return (
@@ -56,15 +61,17 @@ export default async function DjProfilePage({
     );
   }
 
-  // ── JSON demo data lookup (dev/staging) ─────────────────────────────────
-  const demoDj = getDemodjBySlug(slug);
-  if (demoDj) {
-    if (demoDj.plan === "free") {
-      return <DjProfileFree djData={demoDj} viewMode="fan" />;
+  // ── JSON demo data lookup (dev/staging only) ─────────────────────────────
+  if (showDemo) {
+    const demoDj = getDemodjBySlug(slug);
+    if (demoDj) {
+      if (demoDj.plan === "free") {
+        return <DjProfileFree djData={demoDj} viewMode="fan" />;
+      }
+      return (
+        <DjProfilePremium djData={demoDj} viewMode="fan" status="APPROVED" />
+      );
     }
-    return (
-      <DjProfilePremium djData={demoDj} viewMode="fan" status="APPROVED" />
-    );
   }
 
   // ── Prisma DB lookup (production) ─────────────────────────────────────────
@@ -218,7 +225,6 @@ export default async function DjProfilePage({
     slug: dj.slug,
     type: "fictional_demo",
     plan: djPlan === "PREMIUM" ? "premium" : "free",
-    verified: djVerified,
     featured: djFeatured,
     name: dj.stageName,
     stageName: dj.stageName,
@@ -377,8 +383,36 @@ export default async function DjProfilePage({
 
   const isPremium = djPlan === "PREMIUM";
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: dj.stageName,
+    description:
+      dj.bio ||
+      `Professional DJ based in ${dj.city?.name || ""}, ${dj.country?.name || ""}`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL}/djs/${dj.slug}`,
+    image: dj.avatar,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: dj.city?.name,
+      addressCountry: dj.country?.name,
+    },
+    knowsAbout: dj.genres.map((g) => g.genre.name),
+    aggregateRating:
+      avgRating > 0
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: avgRating,
+            reviewCount: dj._count.ratings,
+            bestRating: 5,
+            worstRating: 1,
+          }
+        : undefined,
+  };
+
   return (
     <div>
+      <JsonLd data={jsonLd} />
       <ProfileViewTracker
         djProfileId={dj.id}
         status={dj.status}

@@ -1,6 +1,6 @@
 "use client";
 
-import { switchFollow } from "@/lib/actions";
+import { switchFollow } from "@/lib/actions/user-follows";
 import { toast } from "sonner";
 import { useOptimistic, useState, useTransition } from "react";
 import { UserCheck, UserPlus } from "lucide-react";
@@ -37,16 +37,16 @@ const UserInfoCardInteraction = ({
     <form action={follow}>
       <button
         disabled={isPending}
-        className={`w-full flex items-center justify-center gap-2 text-sm font-medium rounded-lg p-2 transition-all disabled:opacity-60 disabled:cursor-wait cursor-pointer ${
+        className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg p-2 text-sm font-medium transition-all disabled:cursor-wait disabled:opacity-60 ${
           optimisticFollowing
-            ? "bg-gray-700 hover:bg-gray-600 text-gray-200"
+            ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
             : "bg-h_red hover:bg-h_redDark text-white"
         }`}
       >
         {optimisticFollowing ? (
-          <UserCheck className="w-4 h-4" />
+          <UserCheck className="h-4 w-4" />
         ) : (
-          <UserPlus className="w-4 h-4" />
+          <UserPlus className="h-4 w-4" />
         )}
         {optimisticFollowing ? "Following" : "Follow"}
       </button>

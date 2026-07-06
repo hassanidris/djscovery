@@ -5,38 +5,45 @@ import { createClient } from "@/lib/supabase/server";
 import { updateReputationScore } from "@/lib/reputation/update";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { ActionResult, actionError, actionSuccess } from "./action-result";
 
-async function checkVelocityLimits(organizerId: string, djProfileId: number) {
+async function checkVelocityLimits(
+  organizerId: string,
+  djProfileId: number,
+): Promise<ActionResult> {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const recentByOrganizer = await prisma.gigReview.count({
     where: { organizerId, createdAt: { gte: sevenDaysAgo } },
   });
   if (recentByOrganizer >= 1)
-    throw new Error("You can only review one gig per week");
+    return actionError("You can only review one gig per week");
 
   const recentToDj = await prisma.gigReview.count({
     where: { djProfileId, createdAt: { gte: sevenDaysAgo } },
   });
   if (recentToDj >= 3)
-    throw new Error("This DJ has received too many reviews recently");
+    return actionError("This DJ has received too many reviews recently");
+
+  return actionSuccess();
 }
 
 export async function createGigReview(
   gigId: number,
   djProfileId: number,
   data: { rating: number; review?: string },
-) {
+): Promise<ActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) return actionError("Unauthorized");
 
-  await checkVelocityLimits(user.id, djProfileId);
+  const velocityCheck = await checkVelocityLimits(user.id, djProfileId);
+  if (!velocityCheck.success) return velocityCheck;
 
   if (data.rating < 1 || data.rating > 5) {
-    throw new Error("Rating must be between 1 and 5");
+    return actionError("Rating must be between 1 and 5");
   }
 
   const gig = await prisma.gig.findUnique({
@@ -54,15 +61,15 @@ export async function createGigReview(
   });
 
   if (!gig || gig.organizerProfile.userId !== user.id) {
-    throw new Error("Only the gig organizer can review");
+    return actionError("Only the gig organizer can review");
   }
 
   if (gig.gigReviews.length > 0) {
-    throw new Error("You have already reviewed this DJ for this gig");
+    return actionError("You have already reviewed this DJ for this gig");
   }
 
   if (gig.applications.length === 0) {
-    throw new Error("No accepted application found");
+    return actionError("No accepted application found");
   }
 
   const application = gig.applications[0];
@@ -71,18 +78,18 @@ export async function createGigReview(
   });
 
   if (!hire || hire.status !== "COMPLETED") {
-    throw new Error("Gig must be completed before reviewing");
+    return actionError("Gig must be completed before reviewing");
   }
 
   const completedAt = hire.completedAt || gig.eventDate;
   const daysSinceCompletion =
     (Date.now() - new Date(completedAt).getTime()) / (1000 * 60 * 60 * 24);
   if (daysSinceCompletion > 30) {
-    throw new Error("Review window expired (30 days)");
+    return actionError("Review window expired (30 days)");
   }
 
   if (!data.review || data.review.length < 30) {
-    throw new Error("Review must be at least 30 characters");
+    return actionError("Review must be at least 30 characters");
   }
 
   const h = await headers();
@@ -119,5 +126,5 @@ export async function createGigReview(
   revalidatePath("/organizer/dashboard");
   revalidatePath(`/dashboard/organizer/gigs/${gigId}`);
 
-  return review;
+  return actionSuccess();
 }

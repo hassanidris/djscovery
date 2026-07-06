@@ -74,6 +74,7 @@ enum Role {
   ADMIN
   DJ
   ORGANIZER
+  FAN
 }
 
 enum UserStatus {
@@ -437,7 +438,6 @@ model DjProfile {
   city      City    @relation(fields: [cityId], references: [id])
 
   plan         DjPlan  @default(FREE)
-  verified     Boolean @default(false) // DEPRECATED: use status === APPROVED instead
   featured     Boolean @default(false)
   hidden       Boolean @default(false) // Admin can hide without changing approval status
   searchScore  Float   @default(0)

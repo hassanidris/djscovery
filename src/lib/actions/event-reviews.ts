@@ -4,27 +4,28 @@ import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import { updateReputationScore } from "@/lib/reputation/update";
 import { revalidatePath } from "next/cache";
+import { ActionResult, actionError, actionSuccess } from "./action-result";
 
 export async function createEventReview(
   eventId: number,
   djProfileId: number,
   data: { rating: number; review: string },
-) {
+): Promise<ActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) return actionError("Unauthorized");
 
   if (data.rating < 1 || data.rating > 5) {
-    throw new Error("Rating must be between 1 and 5");
+    return actionError("Rating must be between 1 and 5");
   }
 
   const attendance = await prisma.eventAttendance.findUnique({
     where: { eventId_userId: { eventId, userId: user.id } },
   });
   if (!attendance || attendance.status !== "ATTENDED") {
-    throw new Error("You must have attended this event to review");
+    return actionError("You must have attended this event to review");
   }
 
   const event = await prisma.event.findUnique({
@@ -37,16 +38,16 @@ export async function createEventReview(
       ownerDjId: true,
     },
   });
-  if (!event) throw new Error("Event not found");
+  if (!event) return actionError("Event not found");
   if (event.status !== "COMPLETED") {
-    throw new Error("Event must be completed before reviewing");
+    return actionError("Event must be completed before reviewing");
   }
 
   const participant = await prisma.eventDj.findUnique({
     where: { eventId_djProfileId: { eventId, djProfileId } },
   });
   const canReviewDj = event.ownerDjId === djProfileId || Boolean(participant);
-  if (!canReviewDj) throw new Error("DJ did not perform at this event");
+  if (!canReviewDj) return actionError("DJ did not perform at this event");
 
   const existingReview = await prisma.eventReview.findUnique({
     where: {
@@ -58,14 +59,14 @@ export async function createEventReview(
     },
   });
   if (existingReview)
-    throw new Error("You have already reviewed this DJ for this event");
+    return actionError("You have already reviewed this DJ for this event");
 
   const daysSince =
     (Date.now() - new Date(event.startDate).getTime()) / (1000 * 60 * 60 * 24);
-  if (daysSince > 30) throw new Error("Review window expired (30 days)");
+  if (daysSince > 30) return actionError("Review window expired (30 days)");
 
   if (!data.review || data.review.length < 30) {
-    throw new Error("Review must be at least 30 characters");
+    return actionError("Review must be at least 30 characters");
   }
 
   const createdReview = await prisma.eventReview.create({
@@ -103,5 +104,5 @@ export async function createEventReview(
   revalidatePath(`/events/${event.slug}`);
   revalidatePath("/fan/profile");
 
-  return createdReview;
+  return actionSuccess();
 }

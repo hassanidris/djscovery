@@ -5,6 +5,7 @@ import prisma from "@/lib/client";
 import { z } from "zod";
 import { VALID_EVENT_CATEGORIES } from "@/lib/event-categories";
 import { isValidTimezone } from "@/lib/timezones";
+import { requireEventOwner } from "@/lib/auth/require-owner";
 
 // ── Slug helpers ──────────────────────────────────────────────────────────────
 
@@ -39,19 +40,18 @@ async function makeUniqueEventSlug(
 
 // ── Auth + ownership helpers ──────────────────────────────────────────────────
 
-type AuthError = { error: string };
-type AuthSuccess = {
-  user: { id: string };
-  djProfile: {
-    id: number;
-    slug: string;
-    plan: string;
-    userId: string;
-    stageName: string;
-  };
-};
-
-async function getAuthUserAndDjProfile(): Promise<AuthError | AuthSuccess> {
+async function getAuthUserAndDjProfile(): Promise<
+  | { error: string }
+  | {
+      djProfile: {
+        id: number;
+        slug: string;
+        plan: string;
+        userId: string;
+        stageName: string;
+      };
+    }
+> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -64,37 +64,7 @@ async function getAuthUserAndDjProfile(): Promise<AuthError | AuthSuccess> {
   });
   if (!djProfile) return { error: "DJ profile not found" };
 
-  return { user, djProfile };
-}
-
-type OwnershipError = { error: string };
-type OwnershipSuccess = {
-  event: {
-    id: number;
-    ownerDjId: number;
-    status: string;
-    startDate: Date;
-    featured: boolean;
-  };
-};
-
-async function verifyEventOwnership(
-  eventId: number,
-  djProfileId: number,
-): Promise<OwnershipError | OwnershipSuccess> {
-  const event = await prisma.event.findFirst({
-    where: { id: eventId, deletedAt: null },
-    select: {
-      id: true,
-      ownerDjId: true,
-      status: true,
-      startDate: true,
-      featured: true,
-    },
-  });
-  if (!event) return { error: "Event not found" };
-  if (event.ownerDjId !== djProfileId) return { error: "Forbidden" };
-  return { event };
+  return { djProfile };
 }
 
 // ── Zod schemas ───────────────────────────────────────────────────────────────
@@ -248,9 +218,13 @@ export async function updateEvent(
   if ("error" in auth) return auth;
   const { djProfile } = auth;
 
-  const ownership = await verifyEventOwnership(eventId, djProfile.id);
-  if ("error" in ownership) return ownership;
-  const { event } = ownership;
+  const { djProfileId } = await requireEventOwner(eventId);
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId, deletedAt: null },
+    select: { status: true, startDate: true, featured: true },
+  });
+  if (!event) return { error: "Event not found" };
 
   const parsed = UpdateEventSchema.safeParse(input);
   if (!parsed.success) {
@@ -281,7 +255,7 @@ export async function updateEvent(
   if (parsed.data.featured === true && !event.featured) {
     const featuredCount = await prisma.event.count({
       where: {
-        ownerDjId: djProfile.id,
+        ownerDjId: djProfileId,
         featured: true,
         deletedAt: null,
         status: { in: ["PUBLISHED", "COMPLETED"] },
@@ -333,9 +307,13 @@ export async function publishEvent(
   if ("error" in auth) return auth;
   const { djProfile } = auth;
 
-  const ownership = await verifyEventOwnership(eventId, djProfile.id);
-  if ("error" in ownership) return ownership;
-  const { event } = ownership;
+  const { djProfileId } = await requireEventOwner(eventId);
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId, deletedAt: null },
+    select: { status: true },
+  });
+  if (!event) return { error: "Event not found" };
 
   if (event.status === "PUBLISHED")
     return { error: "Event is already published." };
@@ -395,10 +373,8 @@ export async function unpublishEvent(
 ): Promise<{ error: string } | { success: true }> {
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
-  const { djProfile } = auth;
 
-  const ownership = await verifyEventOwnership(eventId, djProfile.id);
-  if ("error" in ownership) return ownership;
+  await requireEventOwner(eventId);
 
   await prisma.event.update({
     where: { id: eventId },
@@ -415,11 +391,14 @@ export async function cancelEvent(
 ): Promise<{ error: string } | { success: true }> {
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
-  const { djProfile } = auth;
 
-  const ownership = await verifyEventOwnership(eventId, djProfile.id);
-  if ("error" in ownership) return ownership;
-  const { event } = ownership;
+  const { djProfileId } = await requireEventOwner(eventId);
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId, deletedAt: null },
+    select: { status: true },
+  });
+  if (!event) return { error: "Event not found" };
 
   if (event.status !== "PUBLISHED") {
     return { error: "Only published events can be cancelled." };
@@ -440,11 +419,14 @@ export async function archiveEvent(
 ): Promise<{ error: string } | { success: true }> {
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
-  const { djProfile } = auth;
 
-  const ownership = await verifyEventOwnership(eventId, djProfile.id);
-  if ("error" in ownership) return ownership;
-  const { event } = ownership;
+  const { djProfileId } = await requireEventOwner(eventId);
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId, deletedAt: null },
+    select: { status: true },
+  });
+  if (!event) return { error: "Event not found" };
 
   if (event.status === "PUBLISHED") {
     return { error: "Unpublish the event before archiving." };
@@ -465,10 +447,8 @@ export async function deleteEvent(
 ): Promise<{ error: string } | { success: true }> {
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
-  const { djProfile } = auth;
 
-  const ownership = await verifyEventOwnership(eventId, djProfile.id);
-  if ("error" in ownership) return ownership;
+  await requireEventOwner(eventId);
 
   await prisma.event.update({
     where: { id: eventId },

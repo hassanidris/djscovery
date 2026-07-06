@@ -14,7 +14,7 @@
   a slow connection.
 */
 
-import { switchFollow } from "@/lib/actions";
+import { switchFollow } from "@/lib/actions/user-follows";
 import { UserCheck, UserPlus } from "lucide-react";
 import { useOptimistic, useState, useTransition } from "react";
 
@@ -49,16 +49,16 @@ const SuggestFollowBtn = ({
     <form action={follow}>
       <button
         disabled={isPending}
-        className={`flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg transition-all disabled:opacity-60 disabled:cursor-wait ${
+        className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all disabled:cursor-wait disabled:opacity-60 ${
           optimisticFollowing
-            ? "bg-gray-700 text-gray-300 hover:bg-gray-600 cursor-pointer"
-            : "bg-h_red/10 text-h_red border border-h_red/20 hover:bg-h_red/20 cursor-pointer"
+            ? "cursor-pointer bg-gray-700 text-gray-300 hover:bg-gray-600"
+            : "bg-h_red/10 text-h_red border-h_red/20 hover:bg-h_red/20 cursor-pointer border"
         }`}
       >
         {optimisticFollowing ? (
-          <UserCheck className="w-3 h-3" />
+          <UserCheck className="h-3 w-3" />
         ) : (
-          <UserPlus className="w-3 h-3" />
+          <UserPlus className="h-3 w-3" />
         )}
         {optimisticFollowing ? "Following" : "Follow"}
       </button>

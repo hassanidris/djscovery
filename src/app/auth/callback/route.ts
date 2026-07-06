@@ -149,6 +149,7 @@ export async function GET(request: Request) {
         // must not be silently converted to fans
         if (isNewUser && (role === "" || role === "fan")) {
           await tx.fanProfile.create({ data: { userId, name } });
+          await tx.userRole.create({ data: { userId, role: "FAN" } });
         }
 
         const roleRecords = await tx.userRole.findMany({
