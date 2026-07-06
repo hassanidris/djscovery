@@ -3,7 +3,7 @@
 import { useState, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createDjProfile,
@@ -65,7 +65,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     register,
     handleSubmit,
     control,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<CreateDjProfileInput>({
@@ -82,13 +81,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     },
   });
 
-  // Watch values for derived state
-  const stageName = watch("stageName");
-  const countryId = watch("countryId");
-  const cityId = watch("cityId");
-  const djTypes = watch("djTypes");
-  const genreNames = watch("genreNames");
-  const socialLinks = watch("socialLinks");
+  // Watch values for derived state (useWatch is memoizable for React Compiler)
+  const stageName = useWatch({ control, name: "stageName" });
+  const countryId = useWatch({ control, name: "countryId" });
+  const cityId = useWatch({ control, name: "cityId" });
+  const djTypes = useWatch({ control, name: "djTypes" });
+  const genreNames = useWatch({ control, name: "genreNames" });
+  const socialLinks = useWatch({ control, name: "socialLinks" });
+  const bio = useWatch({ control, name: "bio" });
 
   // Avatar (file upload - not in form schema)
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -432,7 +432,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             className={`${inputCls} resize-none`}
           />
           <p className="text-right text-xs text-gray-600">
-            {watch("bio")?.length || 0}/500
+            {bio?.length || 0}/500
           </p>
         </div>
       </div>

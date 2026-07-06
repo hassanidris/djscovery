@@ -2,8 +2,6 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { indexingEnabled } from "./lib/seo/indexing";
 
-export const runtime = "experimental-edge";
-
 const PRE_LAUNCH_MODE = process.env.PRE_LAUNCH_MODE === "true";
 
 // Paths that remain accessible during pre-launch (public landing, auth, legal, admin, api)
@@ -29,7 +27,7 @@ function isAlwaysPublic(pathname: string): boolean {
   return false;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   // ── Pre-launch gate: block all platform routes in production ─────────────

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   CookieIcon,
   Settings2Icon,
@@ -19,16 +19,33 @@ import {
 } from "@/components/ui/dialog";
 import {
   CONSENT_CATEGORIES,
+  CONSENT_COOKIE_NAME,
   type CookieConsent,
   type ConsentCategory,
   acceptAll,
   rejectNonEssential,
-  getStoredConsent,
   saveConsent,
 } from "@/lib/cookies/consent";
 
+const emptySubscribe = () => () => {};
+
+function hasConsentCookie(): boolean {
+  return document.cookie.includes(`${CONSENT_COOKIE_NAME}=`);
+}
+
+// On the server (and during hydration) assume consent exists so the banner
+// stays hidden until the client can read the cookie.
+function serverHasConsent(): boolean {
+  return true;
+}
+
 export default function CookieBanner() {
-  const [visible, setVisible] = useState(false);
+  const hasStoredConsent = useSyncExternalStore(
+    emptySubscribe,
+    hasConsentCookie,
+    serverHasConsent,
+  );
+  const [dismissed, setDismissed] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [prefs, setPrefs] = useState<Omit<CookieConsent, "updatedAt">>({
     necessary: true,
@@ -37,23 +54,11 @@ export default function CookieBanner() {
     preferences: false,
   });
 
-  useEffect(() => {
-    const stored = getStoredConsent();
-    if (!stored) {
-      setVisible(true);
-    } else {
-      setPrefs({
-        necessary: true,
-        analytics: stored.analytics,
-        marketing: stored.marketing,
-        preferences: stored.preferences,
-      });
-    }
-  }, []);
+  const visible = !hasStoredConsent && !dismissed;
 
   function handleAcceptAll() {
     acceptAll();
-    setVisible(false);
+    setDismissed(true);
     setPrefsOpen(false);
   }
 
@@ -65,13 +70,13 @@ export default function CookieBanner() {
       marketing: false,
       preferences: false,
     });
-    setVisible(false);
+    setDismissed(true);
     setPrefsOpen(false);
   }
 
   function handleSavePreferences() {
     saveConsent(prefs);
-    setVisible(false);
+    setDismissed(true);
     setPrefsOpen(false);
   }
 

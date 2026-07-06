@@ -35,7 +35,6 @@ export async function sendEmail({
 }: SendEmailParams): Promise<void> {
   const prismaEmailType = emailType as EmailType;
   if (!process.env.RESEND_API_KEY) {
-    // eslint-disable-next-line no-console
     console.log(
       `[sendEmail] RESEND_API_KEY not set — skipping: ${emailType} → ${maskEmail(to)}`,
     );

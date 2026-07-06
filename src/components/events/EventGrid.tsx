@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { EventCard, type EventCardItem } from "./EventCard";
 
 const PAGE_SIZE = 12;
@@ -14,10 +14,12 @@ export function EventGrid({
 }) {
   const savedSet = new Set(savedEventIds);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [prevEvents, setPrevEvents] = useState(events);
 
-  useEffect(() => {
+  if (prevEvents !== events) {
+    setPrevEvents(events);
     setVisibleCount(PAGE_SIZE);
-  }, [events]);
+  }
 
   const visible = events.slice(0, visibleCount);
   const hasMore = visibleCount < events.length;
