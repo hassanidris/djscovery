@@ -1,7 +1,7 @@
 # DJcovery Founding DJs Program – Technical Design Document
 
-**Version:** 1.0  
-**Date:** July 6, 2026  
+**Version:** 1.1  
+**Date:** July 7, 2026  
 **Status:** Draft  
 **Author:** Lead Software Architect
 
@@ -30,7 +30,7 @@ The Founding DJs Program enables DJs to apply during pre-launch, undergo vetting
 
 DJcovery uses:
 
-- Next.js 15 App Router with React 19
+- Next.js 16.2.10 App Router with React 19
 - Supabase Auth (email, Google, magic links)
 - Prisma v7 with PostgreSQL
 - Resend for email
@@ -39,7 +39,7 @@ DJcovery uses:
 
 The Founding Program will extend—not replace—this architecture.
 
-**Note:** The existing `PRE_LAUNCH_MODE` middleware flag will be replaced by `SITE_MODE` as part of this implementation.
+**Note:** The existing `PRE_LAUNCH_MODE` flag in `src/proxy.ts` will be replaced by `SITE_MODE` as part of this implementation.
 
 ---
 
@@ -200,7 +200,7 @@ Layered architecture with clear separation:
 - Middleware enforces mode-based access control
 - No code changes required for mode switching
 
-**Migration Note:** When implementing this design, remove PRE_LAUNCH_MODE from middleware.ts and environment configuration. SITE_MODE provides the same pre-launch gating via the "founding" mode, plus additional modes for public launch and maintenance.
+**Migration Note:** When implementing this design, remove PRE_LAUNCH_MODE from src/proxy.ts and environment configuration. SITE_MODE provides the same pre-launch gating via the "founding" mode, plus additional modes for public launch and maintenance.
 
 **Decision 4: Prefill Strategy**
 

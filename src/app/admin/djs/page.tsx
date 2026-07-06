@@ -114,9 +114,8 @@ export default async function AdminDjsPage({
                           )}
                           <div>
                             <Link
-                              href={`/djs/${dj.slug}`}
+                              href={`/admin/djs/${dj.id}`}
                               className="font-medium text-white hover:underline"
-                              target="_blank"
                             >
                               {dj.stageName}
                             </Link>
