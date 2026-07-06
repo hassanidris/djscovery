@@ -203,6 +203,7 @@ export default async function OrganizerDashboardPage() {
                           src={review.djAvatar}
                           alt={review.djName}
                           fill
+                          sizes="40px"
                           className="object-cover"
                         />
                       ) : (

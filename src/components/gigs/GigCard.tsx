@@ -25,6 +25,14 @@ function formatBudget(
   return "Budget TBA";
 }
 
+// ─── Deadline check ───────────────────────────────────────────────────────────
+
+function isDeadlineSoon(deadline: Date | string | null): boolean {
+  if (!deadline) return false;
+  const deltaMs = new Date(deadline).getTime() - Date.now();
+  return deltaMs > 0 && deltaMs < 3 * 24 * 60 * 60 * 1000; // within next 3 days
+}
+
 // ─── Date formatter ───────────────────────────────────────────────────────────
 
 function formatEventDate(date: Date): string {
@@ -126,13 +134,7 @@ export function DjGigCard({
     gig.currency,
   );
 
-  const deadlineDeltaMs = gig.applicationDeadline
-    ? new Date(gig.applicationDeadline).getTime() - Date.now()
-    : null;
-  const deadlineWarning =
-    deadlineDeltaMs != null &&
-    deadlineDeltaMs > 0 &&
-    deadlineDeltaMs < 3 * 24 * 60 * 60 * 1000; // within next 3 days
+  const deadlineWarning = isDeadlineSoon(gig.applicationDeadline);
 
   const cardClass =
     "group flex flex-col gap-4 rounded-xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-white/20 hover:bg-white/8";
@@ -221,6 +223,7 @@ export function DjGigCard({
               src={gig.organizerProfile.logoUrl}
               alt={gig.organizerProfile.displayName}
               fill
+              sizes="24px"
               className="object-cover"
             />
           </div>

@@ -31,50 +31,50 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
           defaultValue="new"
           onValueChange={(v) => setActiveTab(v as "new" | "trending")}
         >
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex flex-wrap items-center gap-4">
-              <div>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-4">
                 <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
                   Discover DJs
                 </h2>
-                <p className="mt-1 text-sm leading-relaxed text-gray-400">
-                  {activeTab === "new"
-                    ? "Fresh talent just joined"
-                    : "Top performers"}
-                  <span className="text-gray-500">
-                    {" · "}
-                    {activeTab === "new"
-                      ? "Newest profiles first"
-                      : "Sorted by rating"}
-                  </span>
-                </p>
+                <TabsList className="bg-h_blackLight/80 border border-white/10">
+                  <TabsTrigger
+                    value="new"
+                    className="data-[state=active]:bg-h_red data-[state=active]:text-white"
+                  >
+                    Just Joined
+                    <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
+                      {newDJs.length}
+                    </span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="trending"
+                    className="data-[state=active]:bg-h_red data-[state=active]:text-white"
+                  >
+                    Top Rated
+                    <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
+                      {trendingDJs.length}
+                    </span>
+                  </TabsTrigger>
+                </TabsList>
               </div>
-              <TabsList className="bg-h_blackLight/80 border border-white/10">
-                <TabsTrigger
-                  value="new"
-                  className="data-[state=active]:bg-h_red data-[state=active]:text-white"
-                >
-                  Just Joined
-                  <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
-                    {newDJs.length}
-                  </span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="trending"
-                  className="data-[state=active]:bg-h_red data-[state=active]:text-white"
-                >
-                  Top Rated
-                  <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
-                    {trendingDJs.length}
-                  </span>
-                </TabsTrigger>
-              </TabsList>
+              <p className="mt-1 text-sm leading-relaxed text-gray-400">
+                {activeTab === "new"
+                  ? "Fresh talent just joined"
+                  : "Top performers"}
+                <span className="text-gray-500">
+                  {" · "}
+                  {activeTab === "new"
+                    ? "Newest profiles first"
+                    : "Sorted by rating"}
+                </span>
+              </p>
             </div>
             <Button
               asChild
               variant="ghost"
               size="sm"
-              className="text-h_red hover:text-h_red hover:bg-white/5"
+              className="text-h_red hover:text-h_red shrink-0 hover:bg-white/5"
             >
               <Link href={viewAllHref}>View all →</Link>
             </Button>

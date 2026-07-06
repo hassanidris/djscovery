@@ -130,13 +130,22 @@ export function BookCTA({
   const latestCountryRequestIdRef = useRef(0);
   const latestCityRequestIdRef = useRef(0);
 
-  useEffect(() => {
+  const [prevReset, setPrevReset] = useState<{
+    formState: FormState;
+    options: typeof bookingOptions;
+  }>({ formState: initialFormState, options: bookingOptions });
+
+  if (
+    prevReset.formState !== initialFormState ||
+    prevReset.options !== bookingOptions
+  ) {
+    setPrevReset({ formState: initialFormState, options: bookingOptions });
     setForm(initialFormState);
     setCities(bookingOptions?.initialCities ?? []);
     setVenues(bookingOptions?.initialVenues ?? []);
     setVenueSelection("");
     setIsCustomVenue((bookingOptions?.initialVenues ?? []).length === 0);
-  }, [initialFormState, bookingOptions]);
+  }
 
   useEffect(() => {
     if (!bookingOptions) return;
