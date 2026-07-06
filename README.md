@@ -5,6 +5,7 @@ A comprehensive platform connecting DJs, organizers, and fans in the electronic 
 ## 🎯 Overview
 
 DJcovery is a multi-role platform that serves:
+
 - **DJs**: Showcase profiles, get discovered, apply for gigs, manage bookings, and track analytics
 - **Organizers**: Post gigs, find talent, manage bookings, and build their brand
 - **Fans**: Follow favorite DJs, discover events, and engage with the community
@@ -27,6 +28,7 @@ DJcovery is a multi-role platform that serves:
 ## ✨ Key Features
 
 ### For DJs
+
 - **Profile Management**: Create detailed profiles with genres, experience, social links, and media
 - **Gig Marketplace**: Browse and apply for gigs from organizers worldwide
 - **Booking System**: Receive and manage booking inquiries with masked messaging
@@ -35,6 +37,7 @@ DJcovery is a multi-role platform that serves:
 - **Premium Features**: Packages, career highlights, endorsements, press coverage, availability calendar
 
 ### For Organizers
+
 - **Gig Posting**: Create detailed gig listings with requirements, budget, and equipment specs
 - **DJ Discovery**: Search and filter DJs by genre, location, experience, and reputation
 - **Booking Management**: Send booking inquiries, review applications, and manage communications
@@ -42,12 +45,14 @@ DJcovery is a multi-role platform that serves:
 - **Application Review**: Shortlist, accept, or reject DJ applications with detailed tracking
 
 ### For Fans
+
 - **DJ Discovery**: Browse directory with advanced filters
 - **Follow System**: Follow favorite DJs and track their activity
 - **Event Discovery**: Find upcoming events and save favorites
 - **Community Engagement**: Comment on profiles, like posts, and participate in discussions
 
 ### Platform Features
+
 - **Community Feed**: Social feed with posts, comments, and likes
 - **Rating System**: 5-star ratings with reviews for DJs, gigs, and events
 - **Notifications**: Real-time notifications for all key actions
@@ -98,18 +103,21 @@ djscovery/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd djscovery
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
    Create a `.env.local` file:
+
    ```env
    # Supabase
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
@@ -132,6 +140,7 @@ djscovery/
    ```
 
 4. **Set up the database**
+
    ```bash
    # Push schema to database
    npx prisma db push
@@ -144,11 +153,13 @@ djscovery/
    ```
 
 5. **Create admin user**
+
    ```bash
    npm run create-admin
    ```
 
 6. **Run development server**
+
    ```bash
    npm run dev
    ```
@@ -191,6 +202,7 @@ See `prisma/schema.prisma` for the complete schema.
 ## 🔐 Authentication
 
 DJcovery uses Supabase Auth for authentication. The system supports:
+
 - Email/password authentication
 - Role-based access control (DJ, Organizer, Fan, Admin)
 - Protected routes with middleware
@@ -199,6 +211,7 @@ DJcovery uses Supabase Auth for authentication. The system supports:
 ## 📧 Email System
 
 Email notifications are powered by Resend. Supported email types:
+
 - Welcome emails
 - Profile approval/rejection
 - Gig application updates
@@ -224,41 +237,59 @@ npm start
 ### Cron Jobs
 
 Vercel cron jobs are configured in `vercel.json`:
+
 - Daily event completion check at 6:00 UTC
 
-## 📱 Screenshots Needed
+## 📱 Screenshots
 
-Add the following screenshots to the `public/` folder to showcase the platform:
+### Homepage
 
-### Essential Screenshots
-1. **home-screenshot.png** - Homepage hero section and main features
-2. **directory-screenshot.png** - DJ directory with filters and search
-3. **dj-profile-screenshot.png** - Complete DJ profile page with media, ratings, and booking CTA
-4. **gigs-marketplace-screenshot.png** - Gigs listing page with filters
-5. **gig-detail-screenshot.png** - Individual gig page with application form
-6. **events-screenshot.png** - Events listing page
-7. **event-detail-screenshot.png** - Event page with lineup and details
-8. **booking-modal-screenshot.png** - Booking inquiry modal
-9. **dj-dashboard-screenshot.png** - DJ dashboard with analytics
-10. **organizer-dashboard-screenshot.png** - Organizer dashboard with gigs overview
+![Homepage](public/home-screenshot.png)
 
-### Optional Screenshots
-11. **community-feed-screenshot.png** - Community feed with posts
-12. **fan-dashboard-screenshot.png** - Fan profile with followed DJs
-13. **admin-panel-screenshot.png** - Admin panel overview
-14. **mobile-nav-screenshot.png** - Mobile navigation and responsive design
-15. **booking-messages-screenshot.png** - Booking inquiry messaging thread
+### DJ Directory
 
-### Screenshot Guidelines
-- Use 1920x1080 resolution for desktop screenshots
-- Use 390x844 resolution for mobile screenshots
-- Ensure consistent branding and no sensitive data
-- Use demo/test accounts for all screenshots
-- Include realistic content (not empty states)
+![DJ Directory](public/directory-screenshot.png)
+
+### DJ Profile
+
+![DJ Profile](public/dj-profile-screenshot.png)
+
+### Gigs Marketplace
+
+![Gigs Marketplace](public/gigs-marketplace-screenshot.png)
+
+### Gig Detail
+
+![Gig Detail](public/gig-detail-screenshot.png)
+
+### Events Listing
+
+![Events Listing](public/events-screenshot.png)
+
+### Event Detail
+
+![Event Detail](public/event-detail-screenshot.png)
+
+### Booking Modal
+
+![Booking Modal](public/booking-modal-screenshot.png)
+
+### DJ Dashboard
+
+![DJ Dashboard](public/dj-dashboard-screenshot.png)
+
+### Organizer Dashboard
+
+![Organizer Dashboard](public/organizer-dashboard-screenshot.png)
+
+### Admin Panel
+
+![Admin Panel](public/admin-panel-screenshot.png)
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these guidelines:
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
