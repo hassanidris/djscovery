@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useTransition } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Loader2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -89,6 +89,441 @@ function Section({
   );
 }
 
+type WrapAction = <T extends { error?: string; success?: boolean }>(
+  action: () => Promise<T>,
+  msg: string,
+) => Promise<boolean>;
+
+/* ── Package Form ── */
+function PackageForm({
+  item,
+  onCancel,
+  wrapAction,
+  isPending,
+}: {
+  item?: Package;
+  onCancel: () => void;
+  wrapAction: WrapAction;
+  isPending: boolean;
+}) {
+  const [name, setName] = useState(item?.name ?? "");
+  const [priceFrom, setPriceFrom] = useState(
+    item?.priceFrom ? String(item.priceFrom) : "",
+  );
+  const [priceTo, setPriceTo] = useState(
+    item?.priceTo ? String(item.priceTo) : "",
+  );
+  const [currency, setCurrency] = useState(item?.currency ?? "USD");
+  const [duration, setDuration] = useState(item?.duration ?? "");
+  const [features, setFeatures] = useState(item?.features?.join("\n") ?? "");
+  const [popular, setPopular] = useState(item?.popular ?? false);
+
+  async function save() {
+    const fd = new FormData();
+    fd.append("name", name);
+    fd.append("priceFrom", priceFrom);
+    if (priceTo) fd.append("priceTo", priceTo);
+    fd.append("currency", currency);
+    if (duration) fd.append("duration", duration);
+    fd.append("features", features);
+    fd.append("popular", String(popular));
+
+    const success = item
+      ? await wrapAction(
+          () => updateDjPackage(item.id, fd),
+          "Updating package...",
+        )
+      : await wrapAction(() => createDjPackage(fd), "Creating package...");
+    if (success) onCancel();
+  }
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Name">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Club Night"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Currency">
+          <Input
+            value={currency}
+            onChange={(e) =>
+              setCurrency(e.target.value.toUpperCase().slice(0, 3))
+            }
+            placeholder="USD"
+            maxLength={3}
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Price From">
+          <Input
+            type="number"
+            value={priceFrom}
+            onChange={(e) => setPriceFrom(e.target.value)}
+            placeholder="500"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Price To" optional>
+          <Input
+            type="number"
+            value={priceTo}
+            onChange={(e) => setPriceTo(e.target.value)}
+            placeholder="5000"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Duration" optional>
+          <Input
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            placeholder="4 hours"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <div className="flex items-end">
+          <label className="flex cursor-pointer items-center gap-2">
+            <Checkbox
+              checked={popular}
+              onCheckedChange={(v) => setPopular(v === true)}
+              className="data-[state=checked]:bg-h_red data-[state=checked]:border-h_red"
+            />
+            <span className="text-xs text-gray-300">Most Popular</span>
+          </label>
+        </div>
+      </div>
+      <Field label="Features (one per line)" optional>
+        <Textarea
+          value={features}
+          onChange={(e) => setFeatures(e.target.value)}
+          placeholder={`Setup consultation\nCustom setlist\nSocial media promotion`}
+          className="min-h-20 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+        />
+      </Field>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          disabled={isPending || !name.trim() || !priceFrom}
+          onClick={save}
+          className="bg-h_red hover:bg-h_redDark text-white"
+        >
+          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={onCancel}
+          className="text-gray-400 hover:text-white"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Highlight Form ── */
+function HighlightForm({
+  item,
+  onCancel,
+  wrapAction,
+  isPending,
+}: {
+  item?: Highlight;
+  onCancel: () => void;
+  wrapAction: WrapAction;
+  isPending: boolean;
+}) {
+  const [year, setYear] = useState(item?.year ?? "");
+  const [title, setTitle] = useState(item?.title ?? "");
+  const [description, setDescription] = useState(item?.description ?? "");
+
+  async function save() {
+    const fd = new FormData();
+    fd.append("year", year);
+    fd.append("title", title);
+    fd.append("description", description);
+    const success = item
+      ? await wrapAction(
+          () => updateDjHighlight(item.id, fd),
+          "Updating highlight...",
+        )
+      : await wrapAction(() => createDjHighlight(fd), "Creating highlight...");
+    if (success) onCancel();
+  }
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Year">
+          <Input
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            placeholder="2024"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Title">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Residency at Fabric London"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+      </div>
+      <Field label="Description" optional>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="6-month weekly residency..."
+          className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+        />
+      </Field>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          disabled={isPending || !year.trim() || !title.trim()}
+          onClick={save}
+          className="bg-h_red hover:bg-h_redDark text-white"
+        >
+          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={onCancel}
+          className="text-gray-400 hover:text-white"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Endorsement Form ── */
+function EndorsementForm({
+  item,
+  onCancel,
+  wrapAction,
+  isPending,
+}: {
+  item?: Endorsement;
+  onCancel: () => void;
+  wrapAction: WrapAction;
+  isPending: boolean;
+}) {
+  const [name, setName] = useState(item?.name ?? "");
+  const [role, setRole] = useState(item?.role ?? "");
+  const [company, setCompany] = useState(item?.company ?? "");
+  const [quote, setQuote] = useState(item?.quote ?? "");
+  const [avatar, setAvatar] = useState(item?.avatar ?? "");
+
+  async function save() {
+    const fd = new FormData();
+    fd.append("name", name);
+    fd.append("role", role);
+    fd.append("quote", quote);
+    fd.append("company", company);
+    fd.append("avatar", avatar);
+    const success = item
+      ? await wrapAction(
+          () => updateDjEndorsement(item.id, fd),
+          "Updating endorsement...",
+        )
+      : await wrapAction(
+          () => createDjEndorsement(fd),
+          "Creating endorsement...",
+        );
+    if (success) onCancel();
+  }
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Name">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Marcus Osei"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Role">
+          <Input
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            placeholder="Music Director"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Company" optional>
+          <Input
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            placeholder="Elite Management"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Avatar URL" optional>
+          <Input
+            value={avatar}
+            onChange={(e) => setAvatar(e.target.value)}
+            placeholder="https://..."
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+      </div>
+      <Field label="Quote">
+        <Textarea
+          value={quote}
+          onChange={(e) => setQuote(e.target.value)}
+          placeholder="One of the most exciting DJs..."
+          className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+        />
+      </Field>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          disabled={isPending || !name.trim() || !role.trim() || !quote.trim()}
+          onClick={save}
+          className="bg-h_red hover:bg-h_redDark text-white"
+        >
+          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={onCancel}
+          className="text-gray-400 hover:text-white"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Press Form ── */
+function PressForm({
+  item,
+  onCancel,
+  wrapAction,
+  isPending,
+}: {
+  item?: PressItem;
+  onCancel: () => void;
+  wrapAction: WrapAction;
+  isPending: boolean;
+}) {
+  const [source, setSource] = useState(item?.source ?? "");
+  const [type, setType] = useState(item?.type ?? "Feature");
+  const [title, setTitle] = useState(item?.title ?? "");
+  const [date, setDate] = useState(item?.date ?? "");
+  const [url, setUrl] = useState(item?.url ?? "");
+
+  async function save() {
+    const fd = new FormData();
+    fd.append("source", source);
+    fd.append("type", type);
+    fd.append("title", title);
+    fd.append("date", date);
+    fd.append("url", url);
+    const success = item
+      ? await wrapAction(
+          () => updateDjPressItem(item.id, fd),
+          "Updating press...",
+        )
+      : await wrapAction(() => createDjPressItem(fd), "Creating press item...");
+    if (success) onCancel();
+  }
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Source">
+          <Input
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
+            placeholder="DJ Mag"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Type">
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none"
+          >
+            {["Feature", "Interview", "Podcast"].map((t) => (
+              <option key={t} value={t} className="bg-zinc-900">
+                {t}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Title">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Top 10 Afrobeats DJs"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="Date" optional>
+          <Input
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            placeholder="Sep 2024"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+        <Field label="URL" optional>
+          <Input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://..."
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          />
+        </Field>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          disabled={
+            isPending || !source.trim() || !type.trim() || !title.trim()
+          }
+          onClick={save}
+          className="bg-h_red hover:bg-h_redDark text-white"
+        >
+          {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={onCancel}
+          className="text-gray-400 hover:text-white"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function PremiumProfileManager({ djProfileId, plan }: Props) {
   const isPremium = plan === "PREMIUM";
   const [isPending, startTransition] = useTransition();
@@ -122,9 +557,12 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
     setLoaded(true);
   }, [djProfileId]);
 
-  useEffect(() => {
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  if (!hasLoaded) {
+    setHasLoaded(true);
     loadAll();
-  }, [loadAll]);
+  }
 
   async function wrapAction<T extends { error?: string; success?: boolean }>(
     action: () => Promise<T>,
@@ -191,428 +629,6 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
     );
   }
 
-  /* ── Package Form ── */
-  function PackageForm({
-    item,
-    onCancel,
-  }: {
-    item?: Package;
-    onCancel: () => void;
-  }) {
-    const [name, setName] = useState(item?.name ?? "");
-    const [priceFrom, setPriceFrom] = useState(
-      item?.priceFrom ? String(item.priceFrom) : "",
-    );
-    const [priceTo, setPriceTo] = useState(
-      item?.priceTo ? String(item.priceTo) : "",
-    );
-    const [currency, setCurrency] = useState(item?.currency ?? "USD");
-    const [duration, setDuration] = useState(item?.duration ?? "");
-    const [features, setFeatures] = useState(item?.features?.join("\n") ?? "");
-    const [popular, setPopular] = useState(item?.popular ?? false);
-
-    async function save() {
-      const fd = new FormData();
-      fd.append("name", name);
-      fd.append("priceFrom", priceFrom);
-      if (priceTo) fd.append("priceTo", priceTo);
-      fd.append("currency", currency);
-      if (duration) fd.append("duration", duration);
-      fd.append("features", features);
-      fd.append("popular", String(popular));
-
-      const success = item
-        ? await wrapAction(
-            () => updateDjPackage(item.id, fd),
-            "Updating package...",
-          )
-        : await wrapAction(() => createDjPackage(fd), "Creating package...");
-      if (success) onCancel();
-    }
-
-    return (
-      <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Name">
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Club Night"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Currency">
-            <Input
-              value={currency}
-              onChange={(e) =>
-                setCurrency(e.target.value.toUpperCase().slice(0, 3))
-              }
-              placeholder="USD"
-              maxLength={3}
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Price From">
-            <Input
-              type="number"
-              value={priceFrom}
-              onChange={(e) => setPriceFrom(e.target.value)}
-              placeholder="500"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Price To" optional>
-            <Input
-              type="number"
-              value={priceTo}
-              onChange={(e) => setPriceTo(e.target.value)}
-              placeholder="5000"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Duration" optional>
-            <Input
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              placeholder="4 hours"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <div className="flex items-end">
-            <label className="flex cursor-pointer items-center gap-2">
-              <Checkbox
-                checked={popular}
-                onCheckedChange={(v) => setPopular(v === true)}
-                className="data-[state=checked]:bg-h_red data-[state=checked]:border-h_red"
-              />
-              <span className="text-xs text-gray-300">Most Popular</span>
-            </label>
-          </div>
-        </div>
-        <Field label="Features (one per line)" optional>
-          <Textarea
-            value={features}
-            onChange={(e) => setFeatures(e.target.value)}
-            placeholder={`Setup consultation\nCustom setlist\nSocial media promotion`}
-            className="min-h-20 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            size="sm"
-            disabled={isPending || !name.trim() || !priceFrom}
-            onClick={save}
-            className="bg-h_red hover:bg-h_redDark text-white"
-          >
-            {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={onCancel}
-            className="text-gray-400 hover:text-white"
-          >
-            Cancel
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── Highlight Form ── */
-  function HighlightForm({
-    item,
-    onCancel,
-  }: {
-    item?: Highlight;
-    onCancel: () => void;
-  }) {
-    const [year, setYear] = useState(item?.year ?? "");
-    const [title, setTitle] = useState(item?.title ?? "");
-    const [description, setDescription] = useState(item?.description ?? "");
-
-    async function save() {
-      const fd = new FormData();
-      fd.append("year", year);
-      fd.append("title", title);
-      fd.append("description", description);
-      const success = item
-        ? await wrapAction(
-            () => updateDjHighlight(item.id, fd),
-            "Updating highlight...",
-          )
-        : await wrapAction(
-            () => createDjHighlight(fd),
-            "Creating highlight...",
-          );
-      if (success) onCancel();
-    }
-
-    return (
-      <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Year">
-            <Input
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              placeholder="2024"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Title">
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Residency at Fabric London"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-        </div>
-        <Field label="Description" optional>
-          <Textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="6-month weekly residency..."
-            className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            size="sm"
-            disabled={isPending || !year.trim() || !title.trim()}
-            onClick={save}
-            className="bg-h_red hover:bg-h_redDark text-white"
-          >
-            {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={onCancel}
-            className="text-gray-400 hover:text-white"
-          >
-            Cancel
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── Endorsement Form ── */
-  function EndorsementForm({
-    item,
-    onCancel,
-  }: {
-    item?: Endorsement;
-    onCancel: () => void;
-  }) {
-    const [name, setName] = useState(item?.name ?? "");
-    const [role, setRole] = useState(item?.role ?? "");
-    const [company, setCompany] = useState(item?.company ?? "");
-    const [quote, setQuote] = useState(item?.quote ?? "");
-    const [avatar, setAvatar] = useState(item?.avatar ?? "");
-
-    async function save() {
-      const fd = new FormData();
-      fd.append("name", name);
-      fd.append("role", role);
-      fd.append("quote", quote);
-      fd.append("company", company);
-      fd.append("avatar", avatar);
-      const success = item
-        ? await wrapAction(
-            () => updateDjEndorsement(item.id, fd),
-            "Updating endorsement...",
-          )
-        : await wrapAction(
-            () => createDjEndorsement(fd),
-            "Creating endorsement...",
-          );
-      if (success) onCancel();
-    }
-
-    return (
-      <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Name">
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Marcus Osei"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Role">
-            <Input
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              placeholder="Music Director"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Company" optional>
-            <Input
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              placeholder="Elite Management"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Avatar URL" optional>
-            <Input
-              value={avatar}
-              onChange={(e) => setAvatar(e.target.value)}
-              placeholder="https://..."
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-        </div>
-        <Field label="Quote">
-          <Textarea
-            value={quote}
-            onChange={(e) => setQuote(e.target.value)}
-            placeholder="One of the most exciting DJs..."
-            className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            size="sm"
-            disabled={
-              isPending || !name.trim() || !role.trim() || !quote.trim()
-            }
-            onClick={save}
-            className="bg-h_red hover:bg-h_redDark text-white"
-          >
-            {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={onCancel}
-            className="text-gray-400 hover:text-white"
-          >
-            Cancel
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── Press Form ── */
-  function PressForm({
-    item,
-    onCancel,
-  }: {
-    item?: PressItem;
-    onCancel: () => void;
-  }) {
-    const [source, setSource] = useState(item?.source ?? "");
-    const [type, setType] = useState(item?.type ?? "Feature");
-    const [title, setTitle] = useState(item?.title ?? "");
-    const [date, setDate] = useState(item?.date ?? "");
-    const [url, setUrl] = useState(item?.url ?? "");
-
-    async function save() {
-      const fd = new FormData();
-      fd.append("source", source);
-      fd.append("type", type);
-      fd.append("title", title);
-      fd.append("date", date);
-      fd.append("url", url);
-      const success = item
-        ? await wrapAction(
-            () => updateDjPressItem(item.id, fd),
-            "Updating press...",
-          )
-        : await wrapAction(
-            () => createDjPressItem(fd),
-            "Creating press item...",
-          );
-      if (success) onCancel();
-    }
-
-    return (
-      <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Source">
-            <Input
-              value={source}
-              onChange={(e) => setSource(e.target.value)}
-              placeholder="DJ Mag"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Type">
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none"
-            >
-              {["Feature", "Interview", "Podcast"].map((t) => (
-                <option key={t} value={t} className="bg-zinc-900">
-                  {t}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Title">
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Top 10 Afrobeats DJs"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="Date" optional>
-            <Input
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              placeholder="Sep 2024"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-          <Field label="URL" optional>
-            <Input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://..."
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-            />
-          </Field>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            size="sm"
-            disabled={
-              isPending || !source.trim() || !type.trim() || !title.trim()
-            }
-            onClick={save}
-            className="bg-h_red hover:bg-h_redDark text-white"
-          >
-            {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={onCancel}
-            className="text-gray-400 hover:text-white"
-          >
-            Cancel
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   /* ── Render ── */
   return (
     <div className="flex flex-col gap-6">
@@ -628,6 +644,8 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                 key={pkg.id}
                 item={pkg}
                 onCancel={() => setEditPkgId(null)}
+                wrapAction={wrapAction}
+                isPending={isPending}
               />
             ) : (
               <div
@@ -687,7 +705,13 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               </div>
             ),
           )}
-          {addPkg && <PackageForm onCancel={() => setAddPkg(false)} />}
+          {addPkg && (
+            <PackageForm
+              onCancel={() => setAddPkg(false)}
+              wrapAction={wrapAction}
+              isPending={isPending}
+            />
+          )}
           {!addPkg && (
             <Button
               type="button"
@@ -715,6 +739,8 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                 key={h.id}
                 item={h}
                 onCancel={() => setEditHlId(null)}
+                wrapAction={wrapAction}
+                isPending={isPending}
               />
             ) : (
               <div
@@ -753,7 +779,13 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               </div>
             ),
           )}
-          {addHl && <HighlightForm onCancel={() => setAddHl(false)} />}
+          {addHl && (
+            <HighlightForm
+              onCancel={() => setAddHl(false)}
+              wrapAction={wrapAction}
+              isPending={isPending}
+            />
+          )}
           {!addHl && (
             <Button
               type="button"
@@ -781,6 +813,8 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                 key={e.id}
                 item={e}
                 onCancel={() => setEditEndId(null)}
+                wrapAction={wrapAction}
+                isPending={isPending}
               />
             ) : (
               <div
@@ -820,7 +854,13 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               </div>
             ),
           )}
-          {addEnd && <EndorsementForm onCancel={() => setAddEnd(false)} />}
+          {addEnd && (
+            <EndorsementForm
+              onCancel={() => setAddEnd(false)}
+              wrapAction={wrapAction}
+              isPending={isPending}
+            />
+          )}
           {!addEnd && (
             <Button
               type="button"
@@ -848,6 +888,8 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                 key={p.id}
                 item={p}
                 onCancel={() => setEditPressId(null)}
+                wrapAction={wrapAction}
+                isPending={isPending}
               />
             ) : (
               <div
@@ -901,7 +943,13 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               </div>
             ),
           )}
-          {addPress && <PressForm onCancel={() => setAddPress(false)} />}
+          {addPress && (
+            <PressForm
+              onCancel={() => setAddPress(false)}
+              wrapAction={wrapAction}
+              isPending={isPending}
+            />
+          )}
           {!addPress && (
             <Button
               type="button"

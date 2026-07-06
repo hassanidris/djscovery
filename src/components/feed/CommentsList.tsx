@@ -7,7 +7,7 @@ import { PostComment, User } from "@prisma/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send } from "lucide-react";
 import Link from "next/link";
-import { useOptimistic, useState } from "react";
+import { useOptimistic, useRef, useState } from "react";
 
 type DjSnippet = {
   avatar: string | null;
@@ -36,12 +36,13 @@ const CommentsList = ({
   const { user } = useUser();
   const [commentState, setCommentState] = useState(comments);
   const [text, setText] = useState("");
+  const tempIdRef = useRef(-1);
 
   const add = async () => {
     if (!user || !text.trim()) return;
 
     addOptimisticComment({
-      id: Math.random(),
+      id: tempIdRef.current--,
       content: text,
       createdAt: new Date(),
       updatedAt: new Date(),

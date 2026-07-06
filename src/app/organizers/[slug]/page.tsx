@@ -189,6 +189,7 @@ export default async function OrganizerPublicProfilePage({
             src={profile.coverImageUrl}
             alt={`${profile.displayName} cover`}
             fill
+            sizes="100vw"
             className="object-cover"
             priority
           />
@@ -206,6 +207,7 @@ export default async function OrganizerPublicProfilePage({
                 src={profile.logoUrl}
                 alt={`${profile.displayName} logo`}
                 fill
+                sizes="96px"
                 className="object-cover"
               />
             ) : (

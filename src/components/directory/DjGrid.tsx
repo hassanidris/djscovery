@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DjUser } from "@/lib/data";
 import DjCard from "./DjCard";
 
@@ -14,10 +14,12 @@ type DjGridProps = {
 const DjGrid = ({ djs, followedDjIds = [] }: DjGridProps) => {
   const followedSet = new Set(followedDjIds);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [prevDjs, setPrevDjs] = useState(djs);
 
-  useEffect(() => {
+  if (prevDjs !== djs) {
+    setPrevDjs(djs);
     setVisibleCount(PAGE_SIZE);
-  }, [djs]);
+  }
 
   if (djs.length === 0) {
     return (

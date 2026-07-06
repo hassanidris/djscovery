@@ -176,7 +176,6 @@ export function EventForm(props: EventFormProps) {
         if (tz && !data.timezone) set("timezone", tz);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.countryId, data.timezone, cities.length, props.countries]);
 
   function set(field: keyof EventFormData, value: unknown) {

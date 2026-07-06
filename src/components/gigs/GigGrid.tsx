@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { DjGigListItem } from "@/lib/queries/gigs";
 import { DjGigCard } from "./GigCard";
 
@@ -10,10 +10,12 @@ type GigItem = DjGigListItem & { isDemo?: true };
 
 export function GigGrid({ gigs }: { gigs: GigItem[] }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [prevGigs, setPrevGigs] = useState(gigs);
 
-  useEffect(() => {
+  if (prevGigs !== gigs) {
+    setPrevGigs(gigs);
     setVisibleCount(PAGE_SIZE);
-  }, [gigs]);
+  }
 
   const visible = gigs.slice(0, visibleCount);
   const hasMore = visibleCount < gigs.length;
@@ -30,7 +32,7 @@ export function GigGrid({ gigs }: { gigs: GigItem[] }) {
         <div className="flex justify-center pt-2 pb-4">
           <button
             onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-            className="cursor-pointer rounded-full bg-h_blackLight/60 px-8 py-2.5 text-sm text-gray-300 ring-1 ring-gray-700 transition-all hover:text-white hover:ring-h_red"
+            className="bg-h_blackLight/60 hover:ring-h_red cursor-pointer rounded-full px-8 py-2.5 text-sm text-gray-300 ring-1 ring-gray-700 transition-all hover:text-white"
           >
             Load more ({gigs.length - visibleCount} remaining)
           </button>

@@ -32,6 +32,16 @@ export async function generateMetadata({
   return { title: gig?.title ? `${gig.title} | DJcovery` : "Gig | DJcovery" };
 }
 
+function getReviewDaysRemaining(completedAt: Date | string): number {
+  return Math.max(
+    0,
+    30 -
+      Math.floor(
+        (Date.now() - new Date(completedAt).getTime()) / (1000 * 60 * 60 * 24),
+      ),
+  );
+}
+
 export default async function GigDetailPage({
   params,
 }: {
@@ -119,14 +129,7 @@ export default async function GigDetailPage({
 
   const daysRemaining =
     canReview && accepted?.hire?.completedAt
-      ? Math.max(
-          0,
-          30 -
-            Math.floor(
-              (Date.now() - new Date(accepted.hire.completedAt).getTime()) /
-                (1000 * 60 * 60 * 24),
-            ),
-        )
+      ? getReviewDaysRemaining(accepted.hire.completedAt)
       : null;
 
   return (
@@ -220,6 +223,7 @@ export default async function GigDetailPage({
                 src={gig.organizerProfile.logoUrl}
                 alt={gig.organizerProfile.displayName ?? "Organizer"}
                 fill
+                sizes="48px"
                 className="object-cover"
               />
             ) : (

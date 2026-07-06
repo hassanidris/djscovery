@@ -41,14 +41,6 @@ const nextConfig = {
       { protocol: "https", hostname: "unrqebwfdfumpjgvavbk.supabase.co" },
     ],
   },
-  webpack: (config, { isServer }) => {
-    // @opentelemetry/api is an optional peer dep of supabase-js — ignore it
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      "@opentelemetry/api": false,
-    };
-    return config;
-  },
 };
 
 export default nextConfig;

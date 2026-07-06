@@ -13,16 +13,21 @@ export function GigFormStep1({
   countries,
 }: StepProps) {
   const [cities, setCities] = useState<CityOption[]>([]);
-  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(() => !!data.countryId);
+  const [prevCountryId, setPrevCountryId] = useState(data.countryId);
+
+  if (prevCountryId !== data.countryId) {
+    setPrevCountryId(data.countryId);
+    setCities([]);
+    setLoadingCities(!!data.countryId);
+  }
 
   useEffect(() => {
     let active = true;
     if (!data.countryId) {
-      setCities([]);
       if (data.cityId) onChange("cityId", "");
       return;
     }
-    setLoadingCities(true);
     getCitiesForCountry(parseInt(data.countryId))
       .then((c) => {
         if (!active) return;
