@@ -142,9 +142,6 @@ const DjProfileInputSchema = z.object({
   ),
   bookingEmail: z.string().email().optional(),
   bookingPhone: z.string().max(30).optional(),
-  feeMin: z.number().int().nonnegative().optional(),
-  feeMax: z.number().int().nonnegative().optional(),
-  feeCurrency: z.string().max(3).optional(),
 });
 
 const UpdateDjProfileSchema = z.object({
