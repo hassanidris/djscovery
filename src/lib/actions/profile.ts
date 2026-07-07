@@ -100,6 +100,10 @@ export async function getOrCreateGenre(
 const DjProfileInputSchema = z.object({
   stageName: z.string().min(2).max(60),
   bio: z.string().max(800).optional(),
+  experienceYears: z.number().int().min(0).max(50).optional(),
+  experienceLevel: z
+    .enum(["OPEN", "BEGINNER", "INTERMEDIATE", "PROFESSIONAL", "EXPERT"])
+    .optional(),
   avatarUrl: z.string().url().optional(),
   coverImageUrl: z.string().url().optional(),
   countryId: z.number().int().positive({ message: "Country is required" }),
@@ -147,6 +151,11 @@ const UpdateDjProfileSchema = z.object({
     .max(60)
     .optional(),
   bio: z.string().max(800).optional().nullable(),
+  experienceYears: z.number().int().min(0).max(50).optional().nullable(),
+  experienceLevel: z
+    .enum(["OPEN", "BEGINNER", "INTERMEDIATE", "PROFESSIONAL", "EXPERT"])
+    .optional()
+    .nullable(),
   avatarUrl: z.string().url().optional().nullable(),
   coverImageUrl: z.string().url().optional().nullable(),
   countryId: z.number().int().positive().optional(),
@@ -239,6 +248,8 @@ export async function createDjProfile(
     const {
       stageName,
       bio,
+      experienceYears,
+      experienceLevel,
       avatarUrl,
       coverImageUrl,
       countryId,
@@ -275,6 +286,8 @@ export async function createDjProfile(
       const profileData = {
         stageName,
         bio: bio ?? null,
+        experienceYears: experienceYears ?? null,
+        experienceLevel: experienceLevel ?? null,
         avatar: avatarUrl ?? null,
         coverImage: coverImageUrl ?? null,
         countryId: countryId,
@@ -471,6 +484,12 @@ export async function updateDjProfile(
             slug: newSlug,
           }),
           ...(data.bio !== undefined && { bio: data.bio }),
+          ...(data.experienceYears !== undefined && {
+            experienceYears: data.experienceYears,
+          }),
+          ...(data.experienceLevel !== undefined && {
+            experienceLevel: data.experienceLevel,
+          }),
           ...(data.avatarUrl !== undefined && { avatar: data.avatarUrl }),
           ...(data.coverImageUrl !== undefined && {
             coverImage: data.coverImageUrl,

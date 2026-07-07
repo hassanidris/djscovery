@@ -72,6 +72,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     defaultValues: {
       stageName: "",
       bio: "",
+      experienceYears: undefined,
+      experienceLevel: undefined,
       countryId: 0,
       cityId: 0,
       djTypes: [],
@@ -83,6 +85,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
   // Watch values for derived state (useWatch is memoizable for React Compiler)
   const stageName = useWatch({ control, name: "stageName" });
+  const experienceYears = useWatch({ control, name: "experienceYears" });
+  const experienceLevel = useWatch({ control, name: "experienceLevel" });
   const countryId = useWatch({ control, name: "countryId" });
   const cityId = useWatch({ control, name: "cityId" });
   const djTypes = useWatch({ control, name: "djTypes" });
@@ -434,6 +438,56 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           <p className="text-right text-xs text-gray-600">
             {bio?.length || 0}/500
           </p>
+        </div>
+      </div>
+
+      {/* ── Experience ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Experience{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          Help organizers understand your background and skill level.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Years of Experience</label>
+            <input
+              {...register("experienceYears", { valueAsNumber: true })}
+              type="number"
+              min="0"
+              max="50"
+              placeholder="e.g. 5"
+              className={inputCls}
+            />
+            {errors.experienceYears && (
+              <p className="text-xs text-red-400">
+                {errors.experienceYears.message}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Experience Level</label>
+            <select
+              {...register("experienceLevel")}
+              className={`${inputCls} cursor-pointer appearance-none`}
+            >
+              <option value="">Select level...</option>
+              <option value="OPEN">Open to all</option>
+              <option value="BEGINNER">Beginner (0-2 years)</option>
+              <option value="INTERMEDIATE">Intermediate (2-5 years)</option>
+              <option value="PROFESSIONAL">Professional (5-10 years)</option>
+              <option value="EXPERT">Expert (10+ years)</option>
+            </select>
+            {errors.experienceLevel && (
+              <p className="text-xs text-red-400">
+                {errors.experienceLevel.message}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

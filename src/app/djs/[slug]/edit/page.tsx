@@ -55,6 +55,8 @@ export default async function EditDjProfilePage({
   const profileData = {
     stageName: dj.stageName,
     bio: dj.bio ?? "",
+    experienceYears: dj.experienceYears ?? null,
+    experienceLevel: dj.experienceLevel ?? null,
     avatar: dj.avatar ?? "",
     coverImage: dj.coverImage ?? "",
     countryId: dj.countryId,
