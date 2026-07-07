@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -124,6 +124,7 @@ type AvailabilityDay = { day: number; status: string };
 interface ProfileData {
   stageName: string;
   bio: string;
+  experienceYears: number | null;
   avatar: string;
   coverImage: string;
   countryId: number | null;
@@ -200,13 +201,16 @@ export default function EditDjProfileForm({
   galleryImages,
 }: Props) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const plan = normalisePlan(profile.plan);
   const galleryLimit = getMediaLimit(plan, "photos");
 
   const [stageName, setStageName] = useState(profile.stageName);
   const [bio, setBio] = useState(profile.bio);
+  const [experienceYears, setExperienceYears] = useState(
+    profile.experienceYears !== null ? String(profile.experienceYears) : "",
+  );
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar);
   const [coverImageUrl, setCoverImageUrl] = useState(profile.coverImage);
   const [countryId, setCountryId] = useState<number | null>(profile.countryId);
@@ -317,6 +321,10 @@ export default function EditDjProfileForm({
   const isDirty =
     stageName !== profile.stageName ||
     bio !== profile.bio ||
+    experienceYears !==
+      (profile.experienceYears !== null
+        ? String(profile.experienceYears)
+        : "") ||
     avatarUrl !== profile.avatar ||
     coverImageUrl !== profile.coverImage ||
     countryId !== profile.countryId ||
@@ -547,12 +555,14 @@ export default function EditDjProfileForm({
     if (isUploadingAvatar || isUploadingCover || isUploadingGallery) return;
     if (!canSave) return;
     const toastId = toast.loading("Saving profile...");
+    setIsSubmitting(true);
 
-    startTransition(async () => {
+    try {
       const validLinks = socialLinks.filter((l) => l.platform && l.url.trim());
       const result = await updateDjProfile({
         stageName: stageName.trim() || undefined,
         bio: bio.trim() || null,
+        experienceYears: experienceYears ? parseInt(experienceYears, 10) : null,
         avatarUrl: avatarUrl || null,
         coverImageUrl: coverImageUrl || null,
         countryId,
@@ -604,10 +614,14 @@ export default function EditDjProfileForm({
       } else {
         toast.success("Profile updated!", { id: toastId });
         const targetSlug = result.newSlug ?? profile.slug;
+        // Clear dirty state before redirect
+        setSubmitted(false);
+        // Redirect to profile view
         router.push(`/djs/${targetSlug}`);
-        router.refresh();
       }
-    });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -801,6 +815,32 @@ export default function EditDjProfileForm({
                 )}
                 <p className="text-[11px] text-gray-600">{bio.length}/800</p>
               </div>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* Experience */}
+        <SectionCard
+          title="Experience"
+          subtitle="Your background and skill level"
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label className="mb-1.5 block text-xs text-gray-300">
+                Years of Experience
+              </Label>
+              <Input
+                type="number"
+                min="0"
+                max="50"
+                value={experienceYears}
+                onChange={(e) => setExperienceYears(e.target.value)}
+                placeholder="e.g. 5"
+                className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+              />
+              <p className="mt-1 text-[11px] text-gray-600">
+                Total years as a DJ
+              </p>
             </div>
           </div>
         </SectionCard>
@@ -1559,7 +1599,7 @@ export default function EditDjProfileForm({
           <Button
             type="submit"
             disabled={
-              isPending ||
+              isSubmitting ||
               isUploadingAvatar ||
               isUploadingCover ||
               isUploadingGallery ||
@@ -1567,7 +1607,7 @@ export default function EditDjProfileForm({
             }
             className="bg-h_red hover:bg-h_redDark min-w-32 px-8 font-semibold text-white disabled:opacity-50"
           >
-            {isPending ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                 Saving...

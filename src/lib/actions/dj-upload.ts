@@ -250,7 +250,7 @@ export async function deleteGalleryImage(
 
 export async function uploadDjMediaTemp(
   formData: FormData,
-  type: "avatar" | "gallery",
+  type: "avatar" | "gallery" | "cover",
 ): Promise<{ url: string; path: string; bucket: string } | { error: string }> {
   const supabase = await createClient();
   const {
@@ -261,14 +261,21 @@ export async function uploadDjMediaTemp(
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
 
-  const maxBytes = type === "avatar" ? MAX_AVATAR_BYTES : MAX_GALLERY_BYTES;
+  const maxBytes =
+    type === "avatar"
+      ? MAX_AVATAR_BYTES
+      : type === "cover"
+        ? MAX_COVER_BYTES
+        : MAX_GALLERY_BYTES;
   const validationError = validateImageFile(file, maxBytes);
   if (validationError) return validationError;
 
   const path =
     type === "avatar"
       ? buildDjAvatarPath(user.id, file)
-      : buildDjGalleryPath(user.id, file);
+      : type === "cover"
+        ? buildDjCoverPath(user.id, file)
+        : buildDjGalleryPath(user.id, file);
 
   const { data, error: uploadError } = await supabase.storage
     .from(BUCKET)
