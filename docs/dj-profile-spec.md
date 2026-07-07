@@ -239,16 +239,15 @@ model DjFollow {
 
 ```prisma
 model DjPackage {
-  id          Int      @id @default(autoincrement())
-  name        String
-  priceFrom   Int
-  priceTo     Int?
-  currency    String   @default("USD")
-  durationMin Int?
-  durationMax Int?
-  features    String[]
-  popular     Boolean  @default(false)
-  sortOrder   Int      @default(0)
+  id        Int      @id @default(autoincrement())
+  name      String
+  priceFrom Int
+  priceTo   Int?
+  currency  String   @default("USD")
+  duration  String?
+  features  String[]
+  popular   Boolean  @default(false)
+  sortOrder Int      @default(0)
 
   djProfileId Int
   djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
@@ -260,7 +259,7 @@ model DjPackage {
 }
 ```
 
-**Note:** Duration is stored as range using `durationMin` and `durationMax` (in hours). Display format is "X-Y hours" when both values exist, or "X hours" when only one value is provided.
+**Note:** Duration is stored as a single string field (e.g., "3-4 hours", "2 hours"). Display format preserves the input, with hyphens replaced by en-dashes for consistency.
 
 #### DjCareerHighlight
 
@@ -625,7 +624,7 @@ const SOCIAL_PLATFORMS = [
 
 #### Premium-Only Sections
 
-- **Booking Packages** - Pricing packages with duration ranges (durationMin/durationMax in hours), managed via PackageModal in profile view
+- **Booking Packages** - Pricing packages with duration strings (e.g., "3-4 hours"), managed via PackageModal in profile view
 - Career highlights
 - Endorsements
 - Press & media coverage
@@ -634,7 +633,7 @@ const SOCIAL_PLATFORMS = [
 - Availability calendar
 - Featured mix/video spotlight
 
-**Note:** Booking Packages are managed via a modal in the owner's profile view (similar to Where I've Played), not in the edit form. The modal allows DJs to add/edit/delete packages with duration ranges (e.g., "3-4 hours"), price ranges, features, and popularity flags.
+**Note:** Booking Packages are managed via a modal in the owner's profile view (similar to Where I've Played), not in the edit form. The modal allows DJs to add/edit/delete packages with duration strings (e.g., "3-4 hours"), price ranges, features, and popularity flags.
 
 ### Validation
 
@@ -788,7 +787,7 @@ Demo data defined in `src/data/djscovery_seed_1.json` and loaded via `src/data/d
 - Name (e.g., "Wedding Package", "Club Set")
 - Price range (from/to, optional)
 - Currency
-- Duration (e.g., "2 hours", "4 hours")
+- Duration string (e.g., "2 hours", "3-4 hours")
 - Features list (e.g., ["MC included", "Sound system provided"])
 - Popular badge (highlight one package)
 
@@ -1644,6 +1643,33 @@ type Props = {
 ```typescript
 type ViewMode = "dj-owner" | "fan" | "organizer" | "guest";
 ```
+
+**BookingPackages Component:**
+
+```typescript
+type Package = {
+  id: number;
+  name: string;
+  priceFrom: number;
+  priceTo?: number | null;
+  currency: string;
+  duration?: string | null;
+  features: string[];
+  popular: boolean;
+  icon?: LucideIcon;
+};
+
+type Props = {
+  packages: Package[];
+  onEnquire?: (packageName: string, priceFrom: number) => void;
+  openBookingModal?: (packageName?: string, packagePrice?: number) => void;
+};
+```
+
+**Helper Functions:**
+
+- `formatPrice(priceFrom, currency, priceTo?)` — Formats price range with currency symbol
+- `formatDuration(duration?)` — Replaces hyphens with en-dashes for consistency
 
 ---
 
