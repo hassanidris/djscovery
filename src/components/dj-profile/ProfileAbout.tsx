@@ -9,6 +9,8 @@ type Props = {
   djTypes: string[];
   bioExpanded: boolean;
   onToggleBio: () => void;
+  experienceYears?: number;
+  experienceLevel?: string;
 };
 
 export default function ProfileAbout({
@@ -16,6 +18,8 @@ export default function ProfileAbout({
   djTypes,
   bioExpanded,
   onToggleBio,
+  experienceYears,
+  experienceLevel,
 }: Props) {
   return (
     <section>
@@ -23,7 +27,7 @@ export default function ProfileAbout({
       <div>
         <p
           className={cn(
-            "text-gray-300 text-sm leading-relaxed",
+            "text-sm leading-relaxed text-gray-300",
             !bioExpanded && "line-clamp-4",
           )}
         >
@@ -31,18 +35,33 @@ export default function ProfileAbout({
         </p>
         <button
           onClick={onToggleBio}
-          className="text-h_red text-xs mt-2 hover:text-red-400 transition-colors"
+          className="text-h_red mt-2 text-xs transition-colors hover:text-red-400"
         >
           {bioExpanded ? "Show less" : "Read more"}
         </button>
       </div>
-      <div className="flex items-center gap-2 flex-wrap mt-4">
-        <span className="text-xs text-gray-500 shrink-0">Specializes in:</span>
+      {(experienceYears || experienceLevel) && (
+        <div className="mt-4 flex items-center gap-3 text-xs text-gray-400">
+          {experienceYears && (
+            <span>
+              <span className="text-gray-500">Experience:</span>{" "}
+              {experienceYears} {experienceYears === 1 ? "year" : "years"}
+            </span>
+          )}
+          {experienceLevel && (
+            <span>
+              <span className="text-gray-500">Level:</span> {experienceLevel}
+            </span>
+          )}
+        </div>
+      )}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="shrink-0 text-xs text-gray-500">Specializes in:</span>
         {djTypes.map((t) => (
           <Badge
             key={t}
             variant="outline"
-            className="border-white/15 text-gray-300 text-xs"
+            className="border-white/15 text-xs text-gray-300"
           >
             {t}
           </Badge>

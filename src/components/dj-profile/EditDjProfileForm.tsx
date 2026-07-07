@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -202,7 +202,7 @@ export default function EditDjProfileForm({
   galleryImages,
 }: Props) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const plan = normalisePlan(profile.plan);
   const galleryLimit = getMediaLimit(plan, "photos");
@@ -560,8 +560,9 @@ export default function EditDjProfileForm({
     if (isUploadingAvatar || isUploadingCover || isUploadingGallery) return;
     if (!canSave) return;
     const toastId = toast.loading("Saving profile...");
+    setIsSubmitting(true);
 
-    startTransition(async () => {
+    try {
       const validLinks = socialLinks.filter((l) => l.platform && l.url.trim());
       const result = await updateDjProfile({
         stageName: stageName.trim() || undefined,
@@ -622,7 +623,9 @@ export default function EditDjProfileForm({
         router.push(`/djs/${targetSlug}`);
         router.refresh();
       }
-    });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -1632,7 +1635,7 @@ export default function EditDjProfileForm({
           <Button
             type="submit"
             disabled={
-              isPending ||
+              isSubmitting ||
               isUploadingAvatar ||
               isUploadingCover ||
               isUploadingGallery ||
@@ -1640,7 +1643,7 @@ export default function EditDjProfileForm({
             }
             className="bg-h_red hover:bg-h_redDark min-w-32 px-8 font-semibold text-white disabled:opacity-50"
           >
-            {isPending ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                 Saving...

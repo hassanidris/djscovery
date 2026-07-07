@@ -199,6 +199,8 @@ export default function DjProfileFree({
               djTypes={DJ.djTypes}
               bioExpanded={bioExpanded}
               onToggleBio={() => setBioExpanded(!bioExpanded)}
+              experienceYears={djData?.experienceYears}
+              experienceLevel={djData?.experienceLevel}
             />
 
             <Separator className="bg-white/8" />

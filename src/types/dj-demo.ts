@@ -11,6 +11,8 @@ export interface DjDemoData {
   featured: boolean;
   name: string;
   stageName: string;
+  experienceYears?: number;
+  experienceLevel?: string;
   location: {
     city: string;
     country: string;
