@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "sonner";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -537,11 +538,12 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             className="hover:border-h_red relative flex h-32 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/30 bg-white/10 transition-all"
           >
             {coverPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={coverPreview.startsWith("blob:") ? coverPreview : ""}
                 alt="Cover preview"
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
+                unoptimized
               />
             ) : (
               <div className="flex flex-col items-center gap-2">
