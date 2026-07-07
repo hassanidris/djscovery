@@ -125,7 +125,6 @@ interface ProfileData {
   stageName: string;
   bio: string;
   experienceYears: number | null;
-  experienceLevel: string | null;
   avatar: string;
   coverImage: string;
   countryId: number | null;
