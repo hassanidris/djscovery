@@ -14,6 +14,9 @@ type Props = {
   feeMin?: number;
   feeMax?: number;
   feeCurrency?: string;
+  bookingEmail?: string;
+  bookingPhone?: string;
+  isOwner?: boolean;
 };
 
 export default function ProfileAbout({
@@ -26,6 +29,9 @@ export default function ProfileAbout({
   feeMin,
   feeMax,
   feeCurrency,
+  bookingEmail,
+  bookingPhone,
+  isOwner = false,
 }: Props) {
   const formatFee = (value?: number) => {
     if (!value) return null;
@@ -56,7 +62,7 @@ export default function ProfileAbout({
           {bioExpanded ? "Show less" : "Read more"}
         </button>
       </div>
-      {(experienceYears || experienceLevel || feeMin || feeMax) && (
+      {(experienceYears || experienceLevel || feeMin || feeMax || isOwner) && (
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-400">
           {experienceYears && experienceYears > 0 && (
             <span>
@@ -77,6 +83,46 @@ export default function ProfileAbout({
                 : feeMin
                   ? `${formatFee(feeMin)}+`
                   : `Up to ${formatFee(feeMax)}`}
+            </span>
+          )}
+          {isOwner &&
+            !experienceYears &&
+            !experienceLevel &&
+            !feeMin &&
+            !feeMax && (
+              <span className="text-gray-600 italic">
+                No experience or fee information added
+              </span>
+            )}
+        </div>
+      )}
+      {(bookingEmail || bookingPhone || isOwner) && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-400">
+          {bookingEmail && (
+            <span>
+              <span className="text-gray-500">Email:</span>{" "}
+              <a
+                href={`mailto:${bookingEmail}`}
+                className="text-gray-300 transition-colors hover:text-white"
+              >
+                {bookingEmail}
+              </a>
+            </span>
+          )}
+          {bookingPhone && (
+            <span>
+              <span className="text-gray-500">Phone:</span>{" "}
+              <a
+                href={`tel:${bookingPhone}`}
+                className="text-gray-300 transition-colors hover:text-white"
+              >
+                {bookingPhone}
+              </a>
+            </span>
+          )}
+          {isOwner && !bookingEmail && !bookingPhone && (
+            <span className="text-gray-600 italic">
+              No contact information added
             </span>
           )}
         </div>

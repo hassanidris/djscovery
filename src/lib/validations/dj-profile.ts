@@ -50,6 +50,10 @@ export const CreateDjProfileSchema = z.object({
   // Cover Image
   coverImageUrl: z.string().url().optional(),
 
+  // Contact Information
+  bookingEmail: z.string().email().optional(),
+  bookingPhone: z.string().optional(),
+
   // Location
   countryId: z.number().int().positive("Country is required"),
   cityId: z.number().int().positive("City is required"),

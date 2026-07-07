@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ import {
   Headphones,
   Landmark,
   BriefcaseBusiness,
+  MapPin,
+  Star,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -72,6 +75,38 @@ import {
   useAudioThumbnail,
 } from "@/lib/media-thumbnails";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
+
+function EmptySectionState({
+  icon: Icon,
+  title,
+  description,
+  actionLabel,
+  actionHref,
+}: {
+  icon: any;
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionHref: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/2 py-12 text-center">
+      <div className="mb-3 flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/5">
+        <Icon className="h-5 w-5 text-gray-500" />
+      </div>
+      <p className="text-sm font-medium text-white">{title}</p>
+      <p className="mt-1 max-w-xs text-xs text-gray-500">{description}</p>
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="mt-4 text-xs text-gray-400 hover:text-white"
+      >
+        <Link href={actionHref}>{actionLabel}</Link>
+      </Button>
+    </div>
+  );
+}
 
 function StatPill({
   value,
@@ -181,12 +216,8 @@ export default function DjProfilePremium({
   const EVENTS = djData
     ? mapPremiumEventsFromData(djData)
     : PREMIUM_DEFAULT_EVENTS;
-  const VENUES = djData
-    ? mapPremiumVenuesFromData(djData)
-    : PREMIUM_DEFAULT_VENUES;
-  const REVIEWS = djData
-    ? mapPremiumReviewsFromData(djData)
-    : PREMIUM_DEFAULT_REVIEWS;
+  const VENUES = djData ? mapPremiumVenuesFromData(djData) : [];
+  const REVIEWS = djData ? mapPremiumReviewsFromData(djData) : [];
   const MEDIA = djData
     ? mapPremiumMediaFromData(djData)
     : PREMIUM_DEFAULT_MEDIA;
@@ -223,6 +254,7 @@ export default function DjProfilePremium({
   };
 
   const isOwner = viewMode === "dj-owner";
+  const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
 
   return (
     <div className="min-h-screen bg-black">
@@ -264,6 +296,9 @@ export default function DjProfilePremium({
               feeMin={djData?.booking?.feeRange?.min}
               feeMax={djData?.booking?.feeRange?.max}
               feeCurrency={djData?.booking?.feeRange?.currency}
+              bookingEmail={djData?.booking?.email}
+              bookingPhone={djData?.booking?.phone}
+              isOwner={isOwner}
             />
 
             <Separator className="bg-white/8" />
@@ -740,9 +775,28 @@ export default function DjProfilePremium({
 
             <Separator className="bg-white/8" />
 
-            <ProfileVenues venues={VENUES} />
+            {(VENUES.length > 0 || isOwner) && (
+              <section>
+                <SectionHeading sub="Past performances and residencies">
+                  Venues
+                </SectionHeading>
+                {VENUES.length > 0 ? (
+                  <ProfileVenues venues={VENUES} />
+                ) : (
+                  <EmptySectionState
+                    icon={MapPin}
+                    title="No venues added yet"
+                    description="Add venues where you've performed to build credibility"
+                    actionLabel="Add Venues"
+                    actionHref={editHref}
+                  />
+                )}
+              </section>
+            )}
 
-            <Separator className="bg-white/8" />
+            {(VENUES.length > 0 || isOwner) && (
+              <Separator className="bg-white/8" />
+            )}
 
             {/* ── MOBILE EVENTS ── */}
             <div className="lg:hidden">
@@ -753,11 +807,28 @@ export default function DjProfilePremium({
               <Separator className="bg-white/8" />
             </div>
 
-            <ProfileReviews
-              avgRating={DJ.avgRating}
-              ratingCount={DJ.ratingCount}
-              reviews={REVIEWS}
-            />
+            {(REVIEWS.length > 0 || isOwner) && (
+              <section>
+                <SectionHeading sub="What people say about this DJ">
+                  Reviews
+                </SectionHeading>
+                {REVIEWS.length > 0 ? (
+                  <ProfileReviews
+                    avgRating={DJ.avgRating}
+                    ratingCount={DJ.ratingCount}
+                    reviews={REVIEWS}
+                  />
+                ) : (
+                  <EmptySectionState
+                    icon={Star}
+                    title="No reviews yet"
+                    description="Reviews build trust and help you get more bookings"
+                    actionLabel="Request Reviews"
+                    actionHref={editHref}
+                  />
+                )}
+              </section>
+            )}
           </div>
 
           {/* ── SIDEBAR ── */}

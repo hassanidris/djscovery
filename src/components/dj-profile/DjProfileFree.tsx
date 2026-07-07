@@ -23,6 +23,7 @@ import {
   BriefcaseBusiness,
   Pencil,
   ImageIcon,
+  MapPin,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -125,10 +126,8 @@ export default function DjProfileFree({
 
   const DJ = djData ? mapFreeDjToProps(djData) : FREE_DEFAULT_DJ;
   const EVENTS = djData ? mapFreeEventsFromData(djData) : FREE_DEFAULT_EVENTS;
-  const VENUES = djData ? mapFreeVenuesFromData(djData) : FREE_DEFAULT_VENUES;
-  const REVIEWS = djData
-    ? mapFreeReviewsFromData(djData)
-    : FREE_DEFAULT_REVIEWS;
+  const VENUES = djData ? mapFreeVenuesFromData(djData) : [];
+  const REVIEWS = djData ? mapFreeReviewsFromData(djData) : [];
   const MEDIA = djData ? mapFreeMediaFromData(djData) : FREE_DEFAULT_MEDIA;
   const FEATURED_MIX = djData
     ? mapFreeFeaturedMix(djData)
@@ -204,6 +203,9 @@ export default function DjProfileFree({
               feeMin={djData?.booking?.feeRange?.min}
               feeMax={djData?.booking?.feeRange?.max}
               feeCurrency={djData?.booking?.feeRange?.currency}
+              bookingEmail={djData?.booking?.email}
+              bookingPhone={djData?.booking?.phone}
+              isOwner={isOwner}
             />
 
             <Separator className="bg-white/8" />
@@ -421,9 +423,26 @@ export default function DjProfileFree({
 
             {(hasPhotos || isOwner) && <Separator className="bg-white/8" />}
 
-            {hasVenues && <ProfileVenues venues={VENUES} />}
+            {(hasVenues || isOwner) && (
+              <section>
+                <SectionHeading sub="Past performances and residencies">
+                  Venues
+                </SectionHeading>
+                {hasVenues ? (
+                  <ProfileVenues venues={VENUES} />
+                ) : (
+                  <EmptySectionState
+                    icon={MapPin}
+                    title="No venues added yet"
+                    description="Add venues where you've performed to build credibility"
+                    actionLabel="Add Venues"
+                    actionHref={editHref}
+                  />
+                )}
+              </section>
+            )}
 
-            {hasVenues && <Separator className="bg-white/8" />}
+            {(hasVenues || isOwner) && <Separator className="bg-white/8" />}
 
             {/* ── MOBILE EVENTS ── */}
             <div className="lg:hidden">
@@ -438,11 +457,28 @@ export default function DjProfileFree({
               <Separator className="bg-white/8" />
             </div>
 
-            <ProfileReviews
-              avgRating={DJ.avgRating}
-              ratingCount={DJ.ratingCount}
-              reviews={REVIEWS}
-            />
+            {(REVIEWS.length > 0 || isOwner) && (
+              <section>
+                <SectionHeading sub="What people say about this DJ">
+                  Reviews
+                </SectionHeading>
+                {REVIEWS.length > 0 ? (
+                  <ProfileReviews
+                    avgRating={DJ.avgRating}
+                    ratingCount={DJ.ratingCount}
+                    reviews={REVIEWS}
+                  />
+                ) : (
+                  <EmptySectionState
+                    icon={Star}
+                    title="No reviews yet"
+                    description="Reviews build trust and help you get more bookings"
+                    actionLabel="Request Reviews"
+                    actionHref={editHref}
+                  />
+                )}
+              </section>
+            )}
 
             {/* ── LOCKED PREMIUM TEASERS (DJ owner only) ── */}
             <OwnerOnlySection viewMode={viewMode}>

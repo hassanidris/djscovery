@@ -137,6 +137,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       feeMin: undefined,
       feeMax: undefined,
       feeCurrency: "",
+      bookingEmail: "",
+      bookingPhone: "",
       countryId: 0,
       cityId: 0,
       djTypes: [],
@@ -152,6 +154,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   const feeMin = useWatch({ control, name: "feeMin" });
   const feeMax = useWatch({ control, name: "feeMax" });
   const feeCurrency = useWatch({ control, name: "feeCurrency" });
+  const bookingEmail = useWatch({ control, name: "bookingEmail" });
+  const bookingPhone = useWatch({ control, name: "bookingPhone" });
   const countryId = useWatch({ control, name: "countryId" });
   const cityId = useWatch({ control, name: "cityId" });
   const djTypes = useWatch({ control, name: "djTypes" });
@@ -429,6 +433,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           bio: data.bio?.trim() || undefined,
           avatarUrl,
           coverImageUrl,
+          bookingEmail: data.bookingEmail?.trim() || undefined,
+          bookingPhone: data.bookingPhone?.trim() || undefined,
           countryId: data.countryId,
           cityId: data.cityId,
           genreNames: data.genreNames,
@@ -709,6 +715,49 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             {errors.feeCurrency && (
               <p className="text-xs text-red-400">
                 {errors.feeCurrency.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Contact Information ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Contact Information{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          How organizers can reach you for bookings.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Booking Email</label>
+            <input
+              {...register("bookingEmail")}
+              type="email"
+              placeholder="bookings@yourname.com"
+              className={inputCls}
+            />
+            {errors.bookingEmail && (
+              <p className="text-xs text-red-400">
+                {errors.bookingEmail.message}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Booking Phone</label>
+            <input
+              {...register("bookingPhone")}
+              type="tel"
+              placeholder="+44 7700 900123"
+              className={inputCls}
+            />
+            {errors.bookingPhone && (
+              <p className="text-xs text-red-400">
+                {errors.bookingPhone.message}
               </p>
             )}
           </div>
