@@ -100,6 +100,13 @@ export async function getOrCreateGenre(
 const DjProfileInputSchema = z.object({
   stageName: z.string().min(2).max(60),
   bio: z.string().max(800).optional(),
+  experienceYears: z.number().int().min(0).max(50).optional(),
+  experienceLevel: z
+    .enum(["OPEN", "BEGINNER", "INTERMEDIATE", "PROFESSIONAL", "EXPERT"])
+    .optional(),
+  feeMin: z.number().int().min(0).optional(),
+  feeMax: z.number().int().min(0).optional(),
+  feeCurrency: z.string().max(3).optional(),
   avatarUrl: z.string().url().optional(),
   coverImageUrl: z.string().url().optional(),
   countryId: z.number().int().positive({ message: "Country is required" }),
@@ -135,9 +142,6 @@ const DjProfileInputSchema = z.object({
   ),
   bookingEmail: z.string().email().optional(),
   bookingPhone: z.string().max(30).optional(),
-  feeMin: z.number().int().nonnegative().optional(),
-  feeMax: z.number().int().nonnegative().optional(),
-  feeCurrency: z.string().max(3).optional(),
 });
 
 const UpdateDjProfileSchema = z.object({
@@ -147,6 +151,8 @@ const UpdateDjProfileSchema = z.object({
     .max(60)
     .optional(),
   bio: z.string().max(800).optional().nullable(),
+  experienceYears: z.number().int().min(0).max(50).optional().nullable(),
+  // experienceLevel is auto-calculated from experienceYears
   avatarUrl: z.string().url().optional().nullable(),
   coverImageUrl: z.string().url().optional().nullable(),
   countryId: z.number().int().positive().optional(),
@@ -217,6 +223,18 @@ const UpdateDjProfileSchema = z.object({
 
 export type UpdateDjProfileInput = z.infer<typeof UpdateDjProfileSchema>;
 
+// Helper function to calculate experience level from years
+function calculateExperienceLevel(
+  years: number | null | undefined,
+): "OPEN" | "BEGINNER" | "INTERMEDIATE" | "PROFESSIONAL" | "EXPERT" | null {
+  if (!years || years < 0) return null;
+  if (years === 0) return "OPEN";
+  if (years <= 2) return "BEGINNER";
+  if (years <= 5) return "INTERMEDIATE";
+  if (years <= 10) return "PROFESSIONAL";
+  return "EXPERT";
+}
+
 export async function createDjProfile(
   input: unknown,
 ): Promise<{ error: string } | { success: true }> {
@@ -239,6 +257,8 @@ export async function createDjProfile(
     const {
       stageName,
       bio,
+      experienceYears,
+      experienceLevel,
       avatarUrl,
       coverImageUrl,
       countryId,
@@ -275,6 +295,8 @@ export async function createDjProfile(
       const profileData = {
         stageName,
         bio: bio ?? null,
+        experienceYears: experienceYears ?? null,
+        experienceLevel: calculateExperienceLevel(experienceYears),
         avatar: avatarUrl ?? null,
         coverImage: coverImageUrl ?? null,
         countryId: countryId,
@@ -471,6 +493,10 @@ export async function updateDjProfile(
             slug: newSlug,
           }),
           ...(data.bio !== undefined && { bio: data.bio }),
+          ...(data.experienceYears !== undefined && {
+            experienceYears: data.experienceYears,
+            experienceLevel: calculateExperienceLevel(data.experienceYears),
+          }),
           ...(data.avatarUrl !== undefined && { avatar: data.avatarUrl }),
           ...(data.coverImageUrl !== undefined && {
             coverImage: data.coverImageUrl,

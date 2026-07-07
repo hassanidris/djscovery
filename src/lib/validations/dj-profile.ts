@@ -13,6 +13,14 @@ const SOCIAL_PLATFORMS = [
   "website",
 ] as const;
 
+const EXPERIENCE_LEVELS = [
+  "OPEN",
+  "BEGINNER",
+  "INTERMEDIATE",
+  "PROFESSIONAL",
+  "EXPERT",
+] as const;
+
 export const CreateDjProfileSchema = z.object({
   // Basic info
   stageName: z
@@ -24,6 +32,27 @@ export const CreateDjProfileSchema = z.object({
       "Stage name can only contain letters, numbers, spaces, hyphens, underscores, and apostrophes",
     ),
   bio: z.string().max(500, "Bio must be 500 characters or less").optional(),
+
+  // Experience
+  experienceYears: z
+    .number()
+    .int("Years must be a whole number")
+    .min(0, "Years must be 0 or more")
+    .max(50, "Years must be 50 or less")
+    .optional(),
+  // experienceLevel is auto-calculated from experienceYears
+
+  // Fee/Pricing
+  feeMin: z.number().int().min(0).optional(),
+  feeMax: z.number().int().min(0).optional(),
+  feeCurrency: z.string().max(3).optional(),
+
+  // Cover Image
+  coverImageUrl: z.string().url().optional(),
+
+  // Contact Information
+  bookingEmail: z.string().email().optional(),
+  bookingPhone: z.string().optional(),
 
   // Location
   countryId: z.number().int().positive("Country is required"),

@@ -43,6 +43,67 @@ const SOCIAL_PLATFORMS = [
   { value: "website", label: "Website" },
 ];
 
+const COUNTRY_CURRENCIES: Record<string, string> = {
+  Sweden: "SEK",
+  "United Kingdom": "GBP",
+  "United States": "USD",
+  Germany: "EUR",
+  France: "EUR",
+  Spain: "EUR",
+  Italy: "EUR",
+  Netherlands: "EUR",
+  Belgium: "EUR",
+  Portugal: "EUR",
+  Austria: "EUR",
+  Switzerland: "CHF",
+  Norway: "NOK",
+  Denmark: "DKK",
+  Finland: "EUR",
+  Poland: "PLN",
+  "Czech Republic": "CZK",
+  Hungary: "HUF",
+  Romania: "RON",
+  Turkey: "TRY",
+  Russia: "RUB",
+  Ukraine: "UAH",
+  Australia: "AUD",
+  "New Zealand": "NZD",
+  Canada: "CAD",
+  Mexico: "MXN",
+  Brazil: "BRL",
+  Argentina: "ARS",
+  Colombia: "COP",
+  Chile: "CLP",
+  "South Africa": "ZAR",
+  Nigeria: "NGN",
+  Kenya: "KES",
+  Ghana: "GHS",
+  Egypt: "EGP",
+  Morocco: "MAD",
+  "Saudi Arabia": "SAR",
+  "United Arab Emirates": "AED",
+  Qatar: "QAR",
+  Kuwait: "KWD",
+  Bahrain: "BHD",
+  Israel: "ILS",
+  India: "INR",
+  Pakistan: "PKR",
+  Bangladesh: "BDT",
+  Japan: "JPY",
+  China: "CNY",
+  "South Korea": "KRW",
+  Singapore: "SGD",
+  Malaysia: "MYR",
+  Indonesia: "IDR",
+  Thailand: "THB",
+  Philippines: "PHP",
+  Vietnam: "VND",
+  Lebanon: "LBP",
+  Jordan: "JOD",
+  Iraq: "IQD",
+  Somalia: "SOS",
+};
+
 interface BecomeDjFormProps {
   countries: Country[];
   userId: string;
@@ -72,6 +133,12 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     defaultValues: {
       stageName: "",
       bio: "",
+      experienceYears: undefined,
+      feeMin: undefined,
+      feeMax: undefined,
+      feeCurrency: "",
+      bookingEmail: "",
+      bookingPhone: "",
       countryId: 0,
       cityId: 0,
       djTypes: [],
@@ -83,6 +150,12 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
   // Watch values for derived state (useWatch is memoizable for React Compiler)
   const stageName = useWatch({ control, name: "stageName" });
+  const experienceYears = useWatch({ control, name: "experienceYears" });
+  const feeMin = useWatch({ control, name: "feeMin" });
+  const feeMax = useWatch({ control, name: "feeMax" });
+  const feeCurrency = useWatch({ control, name: "feeCurrency" });
+  const bookingEmail = useWatch({ control, name: "bookingEmail" });
+  const bookingPhone = useWatch({ control, name: "bookingPhone" });
   const countryId = useWatch({ control, name: "countryId" });
   const cityId = useWatch({ control, name: "cityId" });
   const djTypes = useWatch({ control, name: "djTypes" });
@@ -94,6 +167,11 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Cover image (file upload - not in form schema)
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   // Location cities
   const [cities, setCities] = useState<City[]>([]);
@@ -110,6 +188,19 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   useEffect(() => {
     getGenres().then(setAvailableGenres);
   }, []);
+
+  // Auto-set currency based on country
+  useEffect(() => {
+    if (countryId && countries.length > 0) {
+      const selectedCountry = countries.find((c) => c.id === countryId);
+      if (selectedCountry) {
+        const currency = COUNTRY_CURRENCIES[selectedCountry.name];
+        if (currency && !feeCurrency) {
+          setValue("feeCurrency", currency);
+        }
+      }
+    }
+  }, [countryId, countries, feeCurrency, setValue]);
 
   // Optional media (not in form schema)
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
@@ -146,6 +237,28 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     }
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Cover image must be a JPG, PNG, or WEBP file.");
+      setCoverFile(null);
+      setCoverPreview(null);
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Cover image must be 5 MB or smaller.");
+      setCoverFile(null);
+      setCoverPreview(null);
+      e.target.value = "";
+      return;
+    }
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
   }
 
   async function handleCountryChange(id: number) {
@@ -239,7 +352,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
   async function uploadFile(
     file: File,
-    type: "avatar" | "gallery",
+    type: "avatar" | "gallery" | "cover",
   ): Promise<{ url: string; path: string; bucket: string }> {
     const fd = new FormData();
     fd.append("file", file);
@@ -280,6 +393,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           avatarUrl = uploaded.url;
         }
 
+        let coverImageUrl: string | undefined;
+        if (coverFile) {
+          toast.loading("Uploading cover image...", { id: toastId });
+          const uploaded = await uploadFile(coverFile, "cover");
+          uploadedPaths.push({ path: uploaded.path, bucket: uploaded.bucket });
+          coverImageUrl = uploaded.url;
+        }
+
         const media: {
           type: "IMAGE" | "VIDEO" | "AUDIO";
           url: string;
@@ -311,6 +432,9 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           stageName: data.stageName.trim(),
           bio: data.bio?.trim() || undefined,
           avatarUrl,
+          coverImageUrl,
+          bookingEmail: data.bookingEmail?.trim() || undefined,
+          bookingPhone: data.bookingPhone?.trim() || undefined,
           countryId: data.countryId,
           cityId: data.cityId,
           genreNames: data.genreNames,
@@ -396,6 +520,66 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         </div>
       </div>
 
+      {/* ── Cover Image ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Cover Image{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          A banner image for your profile header.
+        </p>
+
+        <div className="flex items-start gap-4">
+          <button
+            type="button"
+            onClick={() => coverInputRef.current?.click()}
+            className="hover:border-h_red relative flex h-32 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/30 bg-white/10 transition-all"
+          >
+            {coverPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverPreview.startsWith("blob:") ? coverPreview : ""}
+                alt="Cover preview"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <Camera className="h-8 w-8 text-gray-500" />
+                <span className="text-xs text-gray-500">
+                  16:9 ratio recommended
+                </span>
+              </div>
+            )}
+          </button>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleCoverChange}
+          />
+          <div>
+            <p className="text-sm text-gray-300">Upload cover image</p>
+            <p className="mt-1 text-xs text-gray-500">
+              JPG, PNG or WEBP · Max 10 MB
+            </p>
+            {coverFile && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCoverFile(null);
+                  setCoverPreview(null);
+                }}
+                className="text-h_red mt-2 flex items-center gap-1 text-xs hover:underline"
+              >
+                <X className="h-3 w-3" /> Remove
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* ── Basic Info ── */}
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>Basic Info</h2>
@@ -434,6 +618,149 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           <p className="text-right text-xs text-gray-600">
             {bio?.length || 0}/500
           </p>
+        </div>
+      </div>
+
+      {/* ── Experience ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Experience{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          Help organizers understand your background and skill level.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Years of Experience</label>
+            <input
+              {...register("experienceYears", { valueAsNumber: true })}
+              type="number"
+              min="0"
+              max="50"
+              placeholder="e.g. 5"
+              className={inputCls}
+            />
+            {errors.experienceYears && (
+              <p className="text-xs text-red-400">
+                {errors.experienceYears.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Fee/Pricing ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Fee/Pricing{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          Set your booking fee range. Currency auto-detected from your country.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Minimum Fee</label>
+            <input
+              {...register("feeMin", { valueAsNumber: true })}
+              type="number"
+              min="0"
+              placeholder="e.g. 500"
+              className={inputCls}
+            />
+            {errors.feeMin && (
+              <p className="text-xs text-red-400">{errors.feeMin.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Maximum Fee</label>
+            <input
+              {...register("feeMax", { valueAsNumber: true })}
+              type="number"
+              min="0"
+              placeholder="e.g. 2000"
+              className={inputCls}
+            />
+            {errors.feeMax && (
+              <p className="text-xs text-red-400">{errors.feeMax.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Currency</label>
+            <select
+              {...register("feeCurrency")}
+              className={`${inputCls} cursor-pointer appearance-none`}
+            >
+              <option value="">Select currency...</option>
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="SEK">SEK (kr)</option>
+              <option value="NOK">NOK (kr)</option>
+              <option value="DKK">DKK (kr)</option>
+              <option value="CHF">CHF</option>
+              <option value="CAD">CAD ($)</option>
+              <option value="AUD">AUD ($)</option>
+              <option value="JPY">JPY (¥)</option>
+              <option value="CNY">CNY (¥)</option>
+              <option value="INR">INR (₹)</option>
+              <option value="AED">AED (د.إ)</option>
+              <option value="SAR">SAR (﷼)</option>
+            </select>
+            {errors.feeCurrency && (
+              <p className="text-xs text-red-400">
+                {errors.feeCurrency.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Contact Information ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Contact Information{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          How organizers can reach you for bookings.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Booking Email</label>
+            <input
+              {...register("bookingEmail")}
+              type="email"
+              placeholder="bookings@yourname.com"
+              className={inputCls}
+            />
+            {errors.bookingEmail && (
+              <p className="text-xs text-red-400">
+                {errors.bookingEmail.message}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Booking Phone</label>
+            <input
+              {...register("bookingPhone")}
+              type="tel"
+              placeholder="+44 7700 900123"
+              className={inputCls}
+            />
+            {errors.bookingPhone && (
+              <p className="text-xs text-red-400">
+                {errors.bookingPhone.message}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

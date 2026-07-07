@@ -430,6 +430,8 @@ model DjProfile {
   coverImage     String? // Supabase Storage public URL
   coverImagePath String? // Supabase Storage path (for deletion on re-upload)
   bio            String?
+  experienceYears Int?
+  experienceLevel ExperienceLevel?
   status         DjProfileStatus @default(PENDING_APPROVAL)
 
   countryId Int

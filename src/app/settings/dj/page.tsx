@@ -53,6 +53,7 @@ export default async function DjSettingsPage() {
   const profileData = {
     stageName: dj.stageName,
     bio: dj.bio ?? "",
+    experienceYears: dj.experienceYears,
     avatar: dj.avatar ?? "",
     coverImage: dj.coverImage ?? "",
     countryId: dj.countryId,
