@@ -1,16 +1,15 @@
 # DJscovery — Events Model Specification
 
-**Status:** Planning complete. Awaiting implementation approval.
+**Status:** ✅ Implemented (Complete)
 **Created:** June 17, 2026
+**Last Updated:** July 7, 2026
 **Author:** Planning session
 
 ---
 
-## Critical Instruction
+## Implementation Status
 
-This document is for planning, architecture, UX, business logic, and technical specification only.
-
-**Do NOT implement until explicitly approved.**
+This feature has been fully implemented and is live in production. This document serves as historical reference for the design decisions made during implementation.
 
 ---
 
@@ -42,10 +41,10 @@ This document is for planning, architecture, UX, business logic, and technical s
 
 ## Important Distinction: Events vs Gigs
 
-| Concept | Owner | Represents |
-|---|---|---|
-| **Event** | DJ | A performance the DJ is doing or has done |
-| **Gig** | Organizer | A hiring opportunity posted for DJs to apply to |
+| Concept   | Owner     | Represents                                      |
+| --------- | --------- | ----------------------------------------------- |
+| **Event** | DJ        | A performance the DJ is doing or has done       |
+| **Gig**   | Organizer | A hiring opportunity posted for DJs to apply to |
 
 Examples of **Events**: Afro House Night, Summer Festival, Wedding Performance
 Examples of **Gigs**: Looking for Wedding DJ, Looking for Club DJ
@@ -58,14 +57,14 @@ Treat them as completely separate models.
 
 Events are the primary trust signal for DJs. A profile with 0 events reads as a beginner regardless of other credentials. Events transform a static profile into a living portfolio.
 
-| Purpose | Impact |
-|---|---|
-| Showcase activity | DJ appears active and in-demand |
-| Build credibility | Past events = social proof |
-| Improve discoverability | More indexed content → better search ranking |
-| Drive bookings | Organizers scroll events before deciding to contact |
-| Increase profile completeness | DJs with events score higher |
-| Enable monetization | Featured events, premium galleries, analytics |
+| Purpose                       | Impact                                              |
+| ----------------------------- | --------------------------------------------------- |
+| Showcase activity             | DJ appears active and in-demand                     |
+| Build credibility             | Past events = social proof                          |
+| Improve discoverability       | More indexed content → better search ranking        |
+| Drive bookings                | Organizers scroll events before deciding to contact |
+| Increase profile completeness | DJs with events score higher                        |
+| Enable monetization           | Featured events, premium galleries, analytics       |
 
 **Core principle:** Every event a DJ adds is free advertising. The platform benefits from richness of content, the DJ benefits from visibility.
 
@@ -79,14 +78,14 @@ The existing schema defines `EventStatus` as: `DRAFT`, `PUBLISHED`, `CANCELLED`,
 
 **Recommendation: keep this exact enum, add only `ARCHIVED`.**
 
-| Status | Meaning | Who can set |
-|---|---|---|
-| `DRAFT` | Saved, not visible to anyone except owner | DJ |
-| `PUBLISHED` | Visible, date in future → shows as Upcoming | DJ |
-| `PUBLISHED` | Visible, date passed → auto-shows as Past | System (date-based) |
-| `CANCELLED` | Visible with cancelled badge, kept in portfolio | DJ |
-| `COMPLETED` | Manually confirmed as done, unlocks post-event media | DJ |
-| `ARCHIVED` | Hidden from profile, soft-preserved in DB | DJ |
+| Status      | Meaning                                              | Who can set         |
+| ----------- | ---------------------------------------------------- | ------------------- |
+| `DRAFT`     | Saved, not visible to anyone except owner            | DJ                  |
+| `PUBLISHED` | Visible, date in future → shows as Upcoming          | DJ                  |
+| `PUBLISHED` | Visible, date passed → auto-shows as Past            | System (date-based) |
+| `CANCELLED` | Visible with cancelled badge, kept in portfolio      | DJ                  |
+| `COMPLETED` | Manually confirmed as done, unlocks post-event media | DJ                  |
+| `ARCHIVED`  | Hidden from profile, soft-preserved in DB            | DJ                  |
 
 > **Challenge on "UPCOMING" as a status:** Do not add it. Upcoming vs Past is a **computed display state** derived from `startDate` vs `now()`. Using a status enum for it creates a sync problem (cron jobs to auto-transition). Keep it as a query-time filter only.
 
@@ -114,12 +113,13 @@ ARCHIVED    → DRAFT       (manual, DJ restores — gives chance to republish)
 
 **Recommendation: keep exactly `PUBLIC` and `PRIVATE`. Do not add more.**
 
-| Type | Meaning | Ticket URL | Venue visible |
-|---|---|---|---|
-| `PUBLIC` | Open to anyone | Yes, optional | Yes |
-| `PRIVATE` | Invite-only, portfolio proof | No | Shows as "Private Venue" |
+| Type      | Meaning                      | Ticket URL    | Venue visible            |
+| --------- | ---------------------------- | ------------- | ------------------------ |
+| `PUBLIC`  | Open to anyone               | Yes, optional | Yes                      |
+| `PRIVATE` | Invite-only, portfolio proof | No            | Shows as "Private Venue" |
 
 **Why not `COMMERCIAL`, `CORPORATE`, etc.?**
+
 - That information is captured by **Category** (see §4)
 - Event type answers "who can attend," not "what kind of event it is"
 - Two clear options = zero decision fatigue for the DJ
@@ -170,6 +170,7 @@ CHARITY_EVENT
 ### Guest (not logged in)
 
 **Can see:**
+
 - Event title, category, city, country, date, poster
 - DJ name (links to DJ profile)
 - Venue name (PUBLIC events only)
@@ -177,6 +178,7 @@ CHARITY_EVENT
 - Event description
 
 **Cannot see:**
+
 - Ticket URL (replaced with "Sign up to see tickets")
 - PRIVATE event venue or location details
 - Recap text (blurred with CTA: "Log in to read the full recap")
@@ -186,12 +188,14 @@ CHARITY_EVENT
 ### Fan / Logged-in non-DJ user
 
 **Can see:**
+
 - Everything Guest can see
 - Ticket URL (PUBLIC events)
 - Recap text (full)
 - Event gallery
 
 **Cannot see:**
+
 - PRIVATE event venue details (same as guest)
 
 ---
@@ -205,6 +209,7 @@ Same as Fan. No special access to other DJs' events.
 ### DJ Owner
 
 **Can see and edit:**
+
 - All fields including DRAFT events
 - PRIVATE event details
 - Analytics (view count — future)
@@ -225,29 +230,29 @@ Same as Fan. No special access to other DJs' events.
 
 ### Required Fields (5 fields to publish)
 
-| Field | Reason |
-|---|---|
-| `title` | Event name (2–100 chars) |
-| `eventType` | PUBLIC or PRIVATE — two buttons, not a dropdown |
-| `category` | Controlled list select |
-| `startDate` | Required for timeline placement (date picker, no past dates forced) |
-| `country` + `city` | Required for location display and filtering |
+| Field              | Reason                                                              |
+| ------------------ | ------------------------------------------------------------------- |
+| `title`            | Event name (2–100 chars)                                            |
+| `eventType`        | PUBLIC or PRIVATE — two buttons, not a dropdown                     |
+| `category`         | Controlled list select                                              |
+| `startDate`        | Required for timeline placement (date picker, no past dates forced) |
+| `country` + `city` | Required for location display and filtering                         |
 
 > **Challenge:** Do NOT require a poster to publish. Many DJs won't have one. A grey gradient fallback with the DJ avatar is enough. Requiring a poster blocks entries.
 
 ### Optional Fields
 
-| Field | Why it exists |
-|---|---|
-| `venue` | Increases credibility (DC-10, Ushuaïa are social proof) |
-| `description` | SEO + storytelling |
-| `startTime` / `endTime` | Adds professionalism |
-| `ticketUrl` | PUBLIC only — drives fans to buy tickets |
-| `poster` | Primary visual — upload encouraged but not required |
-| `endDate` | For multi-day festivals |
-| `coPerformers` (djSlugs) | Tag other DJs on the platform — cross-promotion |
-| `genres[]` | Filters and search |
-| `featured` | DJ can pin as featured (max 3 — see §11) |
+| Field                    | Why it exists                                           |
+| ------------------------ | ------------------------------------------------------- |
+| `venue`                  | Increases credibility (DC-10, Ushuaïa are social proof) |
+| `description`            | SEO + storytelling                                      |
+| `startTime` / `endTime`  | Adds professionalism                                    |
+| `ticketUrl`              | PUBLIC only — drives fans to buy tickets                |
+| `poster`                 | Primary visual — upload encouraged but not required     |
+| `endDate`                | For multi-day festivals                                 |
+| `coPerformers` (djSlugs) | Tag other DJs on the platform — cross-promotion         |
+| `genres[]`               | Filters and search                                      |
+| `featured`               | DJ can pin as featured (max 3 — see §11)                |
 
 ### Fields Deliberately Excluded from MVP
 
@@ -261,21 +266,25 @@ Same as Fan. No special access to other DJs' events.
 ## 7. Dynamic Fields
 
 ### If `eventType = PUBLIC`
+
 - Show: `ticketUrl` (optional text input with URL validation)
 - Show: `venue` field with full label "Venue Name"
 - Show: Full city/country on public page
 
 ### If `eventType = PRIVATE`
+
 - Hide: `ticketUrl` (remove from form entirely)
 - Show: `venue` field with label "Venue (shown as 'Private Venue' publicly)"
 - Show: City only, no venue name on public page
 
 ### If `status = COMPLETED` or `startDate < now()`
+
 - Show: Post-event media upload section (gallery photos, recap text)
 - Lock: `startDate`, `eventType`, `country`, `city` (event already happened — do not let DJs rewrite history)
 - Allow: Editing `description`, `title`, `poster`, `ticketUrl` (corrections)
 
 ### If `startDate < now()` and `status = DRAFT`
+
 - Show warning: "This event date has passed. You can still publish it as a past event."
 
 ---
@@ -285,6 +294,7 @@ Same as Fan. No special access to other DJs' events.
 ### Event Card (Upcoming)
 
 **Visible:**
+
 - Poster (fallback: gradient + DJ initials)
 - Title
 - Category badge (e.g. "Festival", "Club Night")
@@ -293,11 +303,13 @@ Same as Fan. No special access to other DJs' events.
 - Venue name (PUBLIC only)
 
 **Hidden:**
+
 - Ticket URL (shown on detail page, not card)
 - Description (shown on detail page)
 - Time details on card
 
 **Mobile-first UX:**
+
 - Card is portrait-oriented (poster-dominant)
 - 2-column grid on mobile, 3-column on desktop
 - Tap anywhere opens detail page
@@ -310,6 +322,7 @@ Same as Fan. No special access to other DJs' events.
 ### Past Event Card
 
 **Visible:**
+
 - Original poster
 - Title with "Past Event" muted label
 - Date
@@ -318,16 +331,19 @@ Same as Fan. No special access to other DJs' events.
 - Gallery photo count badge (if any): "12 photos"
 
 **DJ can add post-event:**
+
 - Gallery photos (up to 12 on Free, 40 on Premium)
 - Recap text (short-form write-up, max 500 chars Free / 2000 chars Premium)
 - Setlist (future)
 
 **Locked after completion:**
+
 - `startDate` (immutable after event passes)
 - `eventType`
 - `country`, `city`
 
 **Editable after completion:**
+
 - Title (corrections)
 - Poster (replacement)
 - Description
@@ -340,20 +356,20 @@ Same as Fan. No special access to other DJs' events.
 
 ### Before Event
 
-| Asset | Type | Free Limit | Premium Limit |
-|---|---|---|---|
-| Poster | Image (JPG/PNG/WebP) | 1, max 5MB | 1, max 10MB |
+| Asset  | Type                 | Free Limit | Premium Limit |
+| ------ | -------------------- | ---------- | ------------- |
+| Poster | Image (JPG/PNG/WebP) | 1, max 5MB | 1, max 10MB   |
 
 > **Recommendation:** Only allow a single poster before the event. Pre-event gallery = clutter. Keep pre-event media minimal.
 
 ### After Event (status = COMPLETED)
 
-| Asset | Type | Free Limit | Premium Limit |
-|---|---|---|---|
-| Gallery photos | Image (JPG/PNG/WebP) | 12, max 5MB each | 40, max 10MB each |
-| Recap text | String | 500 chars | 2000 chars |
-| Audio link | URL (SoundCloud / Mixcloud) | 1 external link | 3 external links |
-| Video link | URL (YouTube / Vimeo) | — | 1 external link |
+| Asset          | Type                        | Free Limit       | Premium Limit     |
+| -------------- | --------------------------- | ---------------- | ----------------- |
+| Gallery photos | Image (JPG/PNG/WebP)        | 12, max 5MB each | 40, max 10MB each |
+| Recap text     | String                      | 500 chars        | 2000 chars        |
+| Audio link     | URL (SoundCloud / Mixcloud) | 1 external link  | 3 external links  |
+| Video link     | URL (YouTube / Vimeo)       | —                | 1 external link   |
 
 > **Decision: No direct audio/video uploads for events in MVP.** Use external link URLs only. Rationale: storage costs, encoding complexity, and most DJs already have SoundCloud/Mixcloud sets. Store as `String?` field.
 
@@ -377,6 +393,7 @@ events/{eventId}/gallery/gallery-{uuid}.{ext}
 **Why:** Featured Performances are the highest-value section of a DJ profile. Three pinned events represent the DJ's best work. Organizers look at this before anything else.
 
 ### Business Rules
+
 - Maximum 3 featured events per DJ at any time
 - Only `PUBLISHED` or `COMPLETED` events can be featured
 - DJ sets `featured = true` via a toggle on the event edit page
@@ -384,6 +401,7 @@ events/{eventId}/gallery/gallery-{uuid}.{ext}
 - Featured events appear in a dedicated section at the top of the DJ profile
 
 ### Display
+
 - Larger card format (landscape, not portrait)
 - Shows: poster, title, date, city, category
 - Premium plan: visible across platform (homepage, search results)
@@ -394,18 +412,21 @@ events/{eventId}/gallery/gallery-{uuid}.{ext}
 ## 12. Homepage Integration
 
 ### Featured Events Section
+
 - **Qualification:** `status = PUBLISHED`, `startDate > now()`, `featured = true`, DJ is `APPROVED` and `PREMIUM`
 - **Sorting:** Nearest date first
 - **Visibility:** All users including guests
 - **Display:** 4 cards in horizontal scroll (mobile), grid on desktop
 
 ### Upcoming Events Section
+
 - **Qualification:** `status = PUBLISHED`, `startDate > now()`, DJ is `APPROVED`
 - **Sorting:** Nearest date first
 - **Visibility:** All users (guests see cards; ticket URL behind login prompt)
 - **Display:** 6 cards, "View All Events" link to `/events`
 
 ### Environment Rules
+
 - **Staging:** Homepage shows demo events from JSON (same `isStaging` pattern as gigs)
 - **Production:** Real DB events only, never demo data
 
@@ -420,6 +441,7 @@ events/{eventId}/gallery/gallery-{uuid}.{ext}
 3. **Past Events** — date-descending, paginated (6 per load)
 
 ### Display Rules
+
 - Featured and Upcoming sections empty → hide section silently (no empty states on public profiles)
 - Past Events empty → show "No past events yet" only to DJ owner, not to visitors
 - PRIVATE events appear in DJ profile with a "Private Event" label (no venue, no ticket URL)
@@ -430,23 +452,26 @@ events/{eventId}/gallery/gallery-{uuid}.{ext}
 
 ### MVP Filters (v1)
 
-| Filter | Type |
-|---|---|
-| Country | Select (from DB Country table) |
-| City | Dependent select |
-| Category | Multi-select (controlled list) |
-| Event Type | Toggle: All / Public only |
-| Date range | From / To date pickers |
+| Filter     | Type                           |
+| ---------- | ------------------------------ |
+| Country    | Select (from DB Country table) |
+| City       | Dependent select               |
+| Category   | Multi-select (controlled list) |
+| Event Type | Toggle: All / Public only      |
+| Date range | From / To date pickers         |
 
 ### MVP Search
+
 - Full-text on `title` + `venue` + `city`
 - Debounced, URL-param driven (SSR-compatible)
 
 ### Sorting
+
 - Default: `startDate ASC` (nearest first for upcoming)
 - Option: Most recent (for past events browsing)
 
 ### Deferred to Future
+
 - Genre filter
 - Map view
 - "Near me" location-based filter
@@ -457,11 +482,13 @@ events/{eventId}/gallery/gallery-{uuid}.{ext}
 ## 15. Event Detail Page (`/events/[slug]`)
 
 ### URL Strategy
+
 Every event needs a `slug`. Format: `{dj-slug}-{event-title-kebab}-{shortid}`
 
 Example: `carl-cox-factory-93-closing-night-ab12`
 
 ### Hero Section
+
 - Full-width poster (or gradient fallback)
 - Title overlay
 - Date, time, city, country
@@ -470,35 +497,38 @@ Example: `carl-cox-factory-93-closing-night-ab12`
 - DJ avatar + name linking to DJ profile
 
 ### Event Details Section
+
 - Full description
 - Venue name (PUBLIC) or "Private Venue" (PRIVATE)
 - Co-performers (tagged DJs with avatars)
 - Genres list
 
 ### Post-Event Section (status = COMPLETED)
+
 - Recap text
 - Photo gallery (masonry grid, lightbox on click)
 - External audio/video link (rendered as styled embed link)
 
 ### Related Events Section
+
 - 3 upcoming events from the same DJ
 - 3 upcoming events in same city + category (future)
 
 ### MVP vs Future
 
-| Feature | MVP | Future |
-|---|---|---|
-| Hero, poster, details | ✅ | — |
-| Gallery with lightbox | ✅ | — |
-| Recap text | ✅ | — |
-| Co-performers | ✅ | — |
-| Related events (same DJ) | ✅ | — |
-| Related events (same city/genre) | ❌ | ✅ |
-| Comments section | ❌ | ✅ |
-| RSVP / Attendance | ❌ | ✅ |
-| Share to social | ❌ | ✅ |
-| Setlist embed | ❌ | ✅ |
-| SEO metadata (ISR 60s) | ✅ | Enhanced OG tags |
+| Feature                          | MVP | Future           |
+| -------------------------------- | --- | ---------------- |
+| Hero, poster, details            | ✅  | —                |
+| Gallery with lightbox            | ✅  | —                |
+| Recap text                       | ✅  | —                |
+| Co-performers                    | ✅  | —                |
+| Related events (same DJ)         | ✅  | —                |
+| Related events (same city/genre) | ❌  | ✅               |
+| Comments section                 | ❌  | ✅               |
+| RSVP / Attendance                | ❌  | ✅               |
+| Share to social                  | ❌  | ✅               |
+| Setlist embed                    | ❌  | ✅               |
+| SEO metadata (ISR 60s)           | ✅  | Enhanced OG tags |
 
 ---
 
@@ -512,27 +542,29 @@ The existing `Event` model is a valid skeleton but missing critical fields.
 
 **Fields to add:**
 
-| Field | Type | Notes |
-|---|---|---|
-| `slug` | String unique | URL-safe, required for `/events/[slug]` |
-| `eventType` | Enum: `PUBLIC \| PRIVATE` | New enum |
-| `category` | String | App-layer validated, not DB enum |
-| `startTime` | String? | e.g. "22:00" — avoids TZ complexity |
-| `endTime` | String? | e.g. "05:00" |
-| `posterUrl` | String? | Rename from current `image` |
-| `posterPath` | String? | For deletion on re-upload (mirrors DJ pattern) |
-| `ticketUrl` | String? | Null for PRIVATE events |
-| `recap` | String? | Post-event text |
-| `audioLink` | String? | SoundCloud / Mixcloud external URL |
-| `videoLink` | String? | YouTube / Vimeo — Premium only |
-| `featured` | Boolean | Default false |
-| `viewCount` | Int | Default 0 |
-| `genres` | String[] | Matches Gig pattern — no join table in MVP |
+| Field        | Type                      | Notes                                          |
+| ------------ | ------------------------- | ---------------------------------------------- |
+| `slug`       | String unique             | URL-safe, required for `/events/[slug]`        |
+| `eventType`  | Enum: `PUBLIC \| PRIVATE` | New enum                                       |
+| `category`   | String                    | App-layer validated, not DB enum               |
+| `startTime`  | String?                   | e.g. "22:00" — avoids TZ complexity            |
+| `endTime`    | String?                   | e.g. "05:00"                                   |
+| `posterUrl`  | String?                   | Rename from current `image`                    |
+| `posterPath` | String?                   | For deletion on re-upload (mirrors DJ pattern) |
+| `ticketUrl`  | String?                   | Null for PRIVATE events                        |
+| `recap`      | String?                   | Post-event text                                |
+| `audioLink`  | String?                   | SoundCloud / Mixcloud external URL             |
+| `videoLink`  | String?                   | YouTube / Vimeo — Premium only                 |
+| `featured`   | Boolean                   | Default false                                  |
+| `viewCount`  | Int                       | Default 0                                      |
+| `genres`     | String[]                  | Matches Gig pattern — no join table in MVP     |
 
 **Fields to rename:**
+
 - `image` → `posterUrl` (clearer intent)
 
 **Relationships to preserve (already exist ✅):**
+
 - `ownerDjId → DjProfile`
 - `participants → EventDj[]`
 - `countryId`, `cityId`
@@ -543,60 +575,65 @@ Do NOT reuse the generic `Media` model for event gallery. The existing `Media` m
 
 **Fields:**
 
-| Field | Type | Notes |
-|---|---|---|
-| `id` | Int autoincrement | PK |
-| `eventId` | Int | FK to Event |
-| `url` | String | Supabase Storage public URL |
-| `path` | String | Supabase Storage path (for deletion) |
-| `caption` | String? | Optional |
-| `sortOrder` | Int | Default 0, for gallery ordering |
-| `createdAt` | DateTime | |
+| Field       | Type              | Notes                                |
+| ----------- | ----------------- | ------------------------------------ |
+| `id`        | Int autoincrement | PK                                   |
+| `eventId`   | Int               | FK to Event                          |
+| `url`       | String            | Supabase Storage public URL          |
+| `path`      | String            | Supabase Storage path (for deletion) |
+| `caption`   | String?           | Optional                             |
+| `sortOrder` | Int               | Default 0, for gallery ordering      |
+| `createdAt` | DateTime          |                                      |
 
 ### EventDj (existing — minor additions)
 
-| Field | Addition |
-|---|---|
-| `role` | String? — "Headliner", "Support", "B2B" |
-| `setStartTime` | String? — future use |
-| `setEndTime` | String? — future use |
+| Field          | Addition                                |
+| -------------- | --------------------------------------- |
+| `role`         | String? — "Headliner", "Support", "B2B" |
+| `setStartTime` | String? — future use                    |
+| `setEndTime`   | String? — future use                    |
 
 ### Recommended Indexes
 
-| Index | Purpose |
-|---|---|
-| `Event.slug` | URL lookup |
+| Index                      | Purpose                    |
+| -------------------------- | -------------------------- |
+| `Event.slug`               | URL lookup                 |
 | `Event.status + startDate` | Homepage / listing queries |
-| `Event.ownerDjId + status` | DJ profile queries |
-| `Event.featured` | Homepage featured section |
-| `Event.cityId + status` | Location-based browsing |
-| `EventMedia.eventId` | Gallery queries |
+| `Event.ownerDjId + status` | DJ profile queries         |
+| `Event.featured`           | Homepage featured section  |
+| `Event.cityId + status`    | Location-based browsing    |
+| `EventMedia.eventId`       | Gallery queries            |
 
 ---
 
 ## 17. Security Planning
 
 ### Ownership Validation
+
 - All event mutations (create, update, delete, media upload) validate `ownerDjId` matches authenticated user's `DjProfile.id`
 - Server actions only — no client-side Supabase calls
 - Pattern: same as `uploadDjAvatar` / `updateOrganizerProfile`
 
 ### Edit Permissions
+
 - Only `ownerDj` can edit their events
 - Admin can update `status` and `featured` fields only
 - Co-performers (`EventDj`) cannot edit — read-only access
 
 ### Media Upload Permissions
+
 - `events/{eventId}/poster/...` — upload permitted only to `ownerDj`
 - `events/{eventId}/gallery/...` — same
 - Supabase RLS: check `auth.uid()` against `Event.ownerDj.userId` via policy join
 
 ### Delete Permissions
+
 - Soft delete (`deletedAt = now()`) only from UI
 - Hard delete available to Admin only
 - Deleting an event cascades to `EventMedia` records + deletes Supabase Storage files
 
 ### Public Access Rules
+
 - `DRAFT` events: owner only — never returned from public queries
 - `PUBLISHED` events: all users including guests — RLS SELECT: `status IN ('PUBLISHED', 'COMPLETED', 'CANCELLED')`
 - `CANCELLED` events: visible with badge
@@ -683,14 +720,14 @@ src/data/events-demo.ts               ← getDemoEvents() + getDemoEventsByDjSlu
 
 The current seed is nearly complete. Add these fields:
 
-| Field | Value example | Reason |
-|---|---|---|
-| `id` | `"demo-event-001"` | Deduplication (mirrors gigs pattern) |
-| `slug` | `"mira-sol-sunset-grooves-lisbon-demo"` | URL routing |
-| `djSlug` | `"mira-sol"` | Replace `djName` — must match demo DJ slugs exactly |
-| `featured` | `false` | Marks demo featured events |
-| `status` | `"PUBLISHED"` | Explicit status |
-| `genres` | `["Melodic House", "Organic House"]` | Filtering support |
+| Field      | Value example                           | Reason                                              |
+| ---------- | --------------------------------------- | --------------------------------------------------- |
+| `id`       | `"demo-event-001"`                      | Deduplication (mirrors gigs pattern)                |
+| `slug`     | `"mira-sol-sunset-grooves-lisbon-demo"` | URL routing                                         |
+| `djSlug`   | `"mira-sol"`                            | Replace `djName` — must match demo DJ slugs exactly |
+| `featured` | `false`                                 | Marks demo featured events                          |
+| `status`   | `"PUBLISHED"`                           | Explicit status                                     |
+| `genres`   | `["Melodic House", "Organic House"]`    | Filtering support                                   |
 
 ### Date Strategy
 
@@ -698,6 +735,7 @@ Use `daysFromNow(days)` helper from `gigs-demo.ts` for upcoming events.
 Add `daysAgo(days)` mirror function for past events.
 
 **Recommended split of 40 events:**
+
 - ~25 upcoming (positive `daysFromNow`)
 - ~15 past (negative offset via `daysAgo`)
 

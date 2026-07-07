@@ -67,11 +67,13 @@ export function mapVenuesFromData(
   d: DjDemoData,
   opts?: { withCountry?: boolean },
 ) {
-  return d.venuesPlayed.map((v) => ({
-    name: v.venue,
-    city: v.city,
-    country: opts?.withCountry ? "" : undefined,
-    count: v.timesPlayed,
+  return (d.venuesPlayed || []).map((v, i) => ({
+    id: v.id || i + 1,
+    venueName: v.venue,
+    eventDate: v.date || null,
+    description: v.description || null,
+    city: { name: v.city },
+    country: opts?.withCountry ? { name: v.country || "" } : { name: "" },
   }));
 }
 
@@ -213,16 +215,28 @@ export function mapPackagesFromData(d: DjDemoData) {
     Festival: "from-amber-500/20 to-transparent",
     "Private Event": "from-blue-600/20 to-transparent",
   };
-  return d.packages.map((pkg, i) => ({
-    name: pkg.name,
-    icon:
-      PACKAGE_ICON_MAP[pkg.name] ?? HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
-    price: `From ${pkg.currency}${formatNumber(pkg.priceFrom)}`,
-    duration: pkg.features[0] ?? "",
-    includes: pkg.features.slice(1),
-    color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",
-    featured: pkg.popular ?? false,
-  }));
+  return d.packages.map((pkg, i) => {
+    // Use duration string directly (e.g., "3-4 hours", "2 hours")
+    const duration = pkg.duration || "";
+
+    // Format price range
+    let price = `From ${pkg.currency}${formatNumber(pkg.priceFrom)}`;
+    if (pkg.priceTo && pkg.priceTo > pkg.priceFrom) {
+      price = `From ${pkg.currency}${formatNumber(pkg.priceFrom)} – ${pkg.currency}${formatNumber(pkg.priceTo)}`;
+    }
+
+    return {
+      name: pkg.name,
+      icon:
+        PACKAGE_ICON_MAP[pkg.name] ??
+        HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
+      price,
+      duration,
+      includes: pkg.features || [],
+      color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",
+      featured: pkg.popular ?? false,
+    };
+  });
 }
 
 export function mapMixesFromData(d: DjDemoData) {

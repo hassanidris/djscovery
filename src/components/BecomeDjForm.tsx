@@ -24,6 +24,7 @@ import {
   Mic,
 } from "lucide-react";
 import { DJ_TYPES } from "@/config/dj-types";
+import { CURRENCIES } from "@/config/currencies";
 import {
   CreateDjProfileSchema,
   CreateDjProfileInput,
@@ -103,11 +104,6 @@ const COUNTRY_CURRENCIES: Record<string, string> = {
   Iraq: "IQD",
   Somalia: "SOS",
 };
-
-// Derive all unique currencies from COUNTRY_CURRENCIES for the dropdown
-const ALL_CURRENCIES = Array.from(
-  new Set(Object.values(COUNTRY_CURRENCIES)),
-).sort();
 
 interface BecomeDjFormProps {
   countries: Country[];
@@ -711,9 +707,9 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
               className={`${inputCls} cursor-pointer appearance-none`}
             >
               <option value="">Select currency...</option>
-              {ALL_CURRENCIES.map((currency) => (
-                <option key={currency} value={currency}>
-                  {currency}
+              {CURRENCIES.map((currency) => (
+                <option key={currency.code} value={currency.code}>
+                  {currency.code} ({currency.symbol})
                 </option>
               ))}
             </select>

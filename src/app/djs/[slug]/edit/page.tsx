@@ -60,6 +60,10 @@ export default async function EditDjProfilePage({
       socialLinks: { select: { platform: true, url: true } },
       city: { select: { id: true, name: true } },
       country: { select: { id: true, name: true } },
+      venues: {
+        orderBy: { createdAt: "desc" },
+        include: { city: true, country: true },
+      },
     },
   });
 

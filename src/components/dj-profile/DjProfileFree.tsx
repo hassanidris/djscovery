@@ -34,7 +34,6 @@ import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
-import ProfileVenues from "@/components/dj-profile/ProfileVenues";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
@@ -45,7 +44,6 @@ import {
 import {
   FREE_DEFAULT_DJ,
   FREE_DEFAULT_EVENTS,
-  FREE_DEFAULT_VENUES,
   FREE_DEFAULT_REVIEWS,
   FREE_DEFAULT_MEDIA,
   FREE_DEFAULT_FEATURED_MIX,
@@ -53,7 +51,6 @@ import {
 import {
   mapFreeDjToProps,
   mapFreeEventsFromData,
-  mapFreeVenuesFromData,
   mapFreeReviewsFromData,
   mapFreeMediaFromData,
   mapFreeFeaturedMix,
@@ -126,7 +123,6 @@ export default function DjProfileFree({
 
   const DJ = djData ? mapFreeDjToProps(djData) : FREE_DEFAULT_DJ;
   const EVENTS = djData ? mapFreeEventsFromData(djData) : FREE_DEFAULT_EVENTS;
-  const VENUES = djData ? mapFreeVenuesFromData(djData) : [];
   const REVIEWS = djData ? mapFreeReviewsFromData(djData) : [];
   const MEDIA = djData ? mapFreeMediaFromData(djData) : FREE_DEFAULT_MEDIA;
   const FEATURED_MIX = djData
@@ -151,7 +147,6 @@ export default function DjProfileFree({
   const hasSpotlight = hasFeaturedMix || hasFeaturedVideo;
   const hasMixes = hasFeaturedMix;
   const hasPhotos = MEDIA.length > 0;
-  const hasVenues = VENUES.length > 0;
 
   const featuredMixAudioUrl = FEATURED_MIX.audioUrl;
   const featuredMixThumb = useAudioThumbnail(featuredMixAudioUrl);
@@ -423,27 +418,6 @@ export default function DjProfileFree({
 
             {(hasPhotos || isOwner) && <Separator className="bg-white/8" />}
 
-            {(hasVenues || isOwner) && (
-              <section>
-                <SectionHeading sub="Past performances and residencies">
-                  Venues
-                </SectionHeading>
-                {hasVenues ? (
-                  <ProfileVenues venues={VENUES} />
-                ) : (
-                  <EmptySectionState
-                    icon={MapPin}
-                    title="No venues added yet"
-                    description="Add venues where you've performed to build credibility"
-                    actionLabel="Add Venues"
-                    actionHref={editHref}
-                  />
-                )}
-              </section>
-            )}
-
-            {(hasVenues || isOwner) && <Separator className="bg-white/8" />}
-
             {/* ── MOBILE EVENTS ── */}
             <div className="lg:hidden">
               <ProfileEventsSidebar
@@ -514,11 +488,6 @@ export default function DjProfileFree({
                         title: "Availability Calendar",
                         desc: "Show your available & booked dates",
                         icon: CalendarDays,
-                      },
-                      {
-                        title: "Booking Packages",
-                        desc: "Offer tailored packages to clients",
-                        icon: BriefcaseBusiness,
                       },
                       {
                         title: "Career Highlights",

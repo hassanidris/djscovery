@@ -82,7 +82,9 @@ export interface DjDemoData {
   packages: Array<{
     name: string;
     priceFrom: number;
+    priceTo?: number;
     currency: string;
+    duration?: string;
     features: string[];
     popular?: boolean;
   }>;
@@ -106,10 +108,13 @@ export interface DjDemoData {
     title: string;
     date: string;
   }>;
-  venuesPlayed: Array<{
+  venuesPlayed?: Array<{
+    id: number;
     venue: string;
     city: string;
-    timesPlayed: number;
+    country: string;
+    date: string;
+    description: string;
   }>;
   reviewsList: Array<{
     name: string;
