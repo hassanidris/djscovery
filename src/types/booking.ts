@@ -10,6 +10,8 @@ export interface BookingViewerContext {
   isAuthenticated: boolean;
   organizerDisplayName?: string | null;
   organizerContactEmail?: string | null;
+  organizerCityId?: number | null;
+  organizerCityName?: string | null;
 }
 
 export type CountryOption = {

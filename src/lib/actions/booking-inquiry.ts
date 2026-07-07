@@ -48,6 +48,9 @@ const submitBookingInquirySchema = z
     budgetMax: z.number().int().nonnegative().max(1_000_000).nullable(),
     budgetCurrency: z.string().trim().min(2).max(10),
     message: z.string().trim().min(50).max(1500),
+    packageName: z.string().trim().max(100).optional(),
+    packagePrice: z.number().int().nonnegative().max(1_000_000).nullable(),
+    packagePriceTo: z.number().int().nonnegative().max(1_000_000).nullable(),
   })
   .superRefine((value, ctx) => {
     const eventDate = new Date(value.eventDate);
@@ -168,6 +171,20 @@ async function getOrganizerProfile(userId: string) {
       deletedAt: true,
       displayName: true,
       contactEmail: true,
+      cityId: true,
+      city: {
+        select: {
+          id: true,
+          name: true,
+          countryId: true,
+          country: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 }
@@ -183,6 +200,20 @@ async function getDjProfileForInquiry(djProfileId: number) {
       bookingEmail: true,
       userId: true,
       user: { select: { id: true, email: true, name: true } },
+      cityId: true,
+      city: {
+        select: {
+          id: true,
+          name: true,
+          countryId: true,
+          country: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 }
@@ -379,6 +410,9 @@ export async function submitBookingInquiry(
         budgetMax,
         budgetCurrency: budgetCurrency.toUpperCase(),
         message: payload.message,
+        packageName: payload.packageName,
+        packagePrice: payload.packagePrice,
+        packagePriceTo: payload.packagePriceTo,
       } satisfies Record<string, unknown>;
 
       const locationCreateData = {
@@ -473,6 +507,9 @@ export async function submitBookingInquiry(
           .filter(Boolean)
           .join(", "),
         ctaUrl: `${BASE_URL}/dashboard/dj/bookings?inquiry=${createdInquiry.id}`,
+        packageName: payload.packageName,
+        packagePrice: payload.packagePrice,
+        packagePriceTo: payload.packagePriceTo,
       }),
     });
   }

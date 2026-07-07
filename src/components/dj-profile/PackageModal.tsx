@@ -194,7 +194,7 @@ export default function PackageModal({
         <div className="flex flex-col gap-4">
           {packages.map((pkg, index) => (
             <div
-              key={pkg.id || index}
+              key={`${pkg.id || 0}-${index}`}
               className="flex flex-col gap-3 rounded-lg border border-white/10 bg-white/5 p-4"
             >
               <div className="flex items-center justify-between">

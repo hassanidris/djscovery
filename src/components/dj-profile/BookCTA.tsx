@@ -62,6 +62,9 @@ type FormState = {
   budgetMax: string;
   budgetCurrency: string;
   message: string;
+  packageName?: string;
+  packagePrice?: number;
+  packagePriceTo?: number;
 };
 
 const CUSTOM_VENUE_VALUE = "__CUSTOM__";
@@ -86,7 +89,11 @@ type Props = {
 };
 
 export interface BookCTARef {
-  openBookingModal: (packageName?: string, packagePrice?: number) => void;
+  openBookingModal: (
+    packageName?: string,
+    packagePrice?: number,
+    packagePriceTo?: number,
+  ) => void;
 }
 
 export const BookCTA = forwardRef<BookCTARef, Props>(
@@ -154,16 +161,33 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
 
     // Expose openBookingModal function via ref
     useImperativeHandle(ref, () => ({
-      openBookingModal: (newPackageName?: string, newPackagePrice?: number) => {
+      openBookingModal: (
+        newPackageName?: string,
+        newPackagePrice?: number,
+        newPackagePriceTo?: number,
+      ) => {
         // Update form with package details
         setForm((prev) => ({
           ...prev,
-          budgetType: newPackagePrice ? "FIXED" : "NEGOTIABLE",
+          budgetType: newPackagePriceTo
+            ? "RANGE"
+            : newPackagePrice
+              ? "FIXED"
+              : "NEGOTIABLE",
           budgetMin: newPackagePrice ? String(newPackagePrice) : "",
+          budgetMax: newPackagePriceTo ? String(newPackagePriceTo) : "",
           message: newPackageName
             ? `I'm interested in the ${newPackageName} package.`
             : "",
+          packageName: newPackageName,
+          packagePrice: newPackagePrice,
+          packagePriceTo: newPackagePriceTo,
         }));
+        // Force custom venue input for package enquiries
+        if (newPackageName) {
+          setIsCustomVenue(true);
+          setVenueSelection(CUSTOM_VENUE_VALUE);
+        }
         setModal("booking");
       },
     }));
@@ -471,6 +495,9 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
             form.budgetType === "RANGE" ? Number(form.budgetMax) : null,
           budgetCurrency: form.budgetCurrency || "SEK",
           message: form.message,
+          packageName: form.packageName,
+          packagePrice: form.packagePrice,
+          packagePriceTo: form.packagePriceTo,
         };
 
         const result = await submitBookingInquiry(payload);
@@ -647,6 +674,25 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                     Provide key details so {stageName} can evaluate your event
                     quickly. Contact info stays hidden until the DJ accepts.
                   </DialogDescription>
+                  {form.packageName && (
+                    <div className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/10 p-3">
+                      <p className="text-xs font-medium text-amber-400">
+                        Enquiring about: {form.packageName}
+                      </p>
+                      {form.packagePrice && (
+                        <p className="mt-1 text-xs text-gray-400">
+                          Package price: {form.budgetCurrency || "SEK"}{" "}
+                          {form.packagePrice.toLocaleString()}
+                          {form.packagePriceTo &&
+                            ` – ${form.packagePriceTo.toLocaleString()}`}
+                        </p>
+                      )}
+                      <p className="mt-2 text-[11px] text-gray-500">
+                        DJ will provide final quote based on your specific
+                        requirements
+                      </p>
+                    </div>
+                  )}
                 </DialogHeader>
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -677,6 +723,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                         }))
                       }
                       required
+                      className="[color-scheme:dark]"
                     />
                   </div>
                 </div>
@@ -684,53 +731,93 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="countryId">Country</Label>
-                    <Select
-                      value={form.countryId}
-                      onValueChange={handleCountryChange}
-                    >
-                      <SelectTrigger id="countryId">
-                        <SelectValue placeholder="Select country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {countries.map((country) => (
-                          <SelectItem
-                            key={country.id}
-                            value={String(country.id)}
-                          >
-                            {country.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {form.packageName ? (
+                      <div className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-400">
+                        {countries.find((c) => c.id === Number(form.countryId))
+                          ?.name || "Loading..."}
+                      </div>
+                    ) : (
+                      <Select
+                        value={form.countryId}
+                        onValueChange={handleCountryChange}
+                      >
+                        <SelectTrigger id="countryId">
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countries.map((country) => (
+                            <SelectItem
+                              key={country.id}
+                              value={String(country.id)}
+                            >
+                              {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="cityId">City</Label>
-                    <Select
-                      value={form.cityId}
-                      onValueChange={handleCityChange}
-                      disabled={!form.countryId || isLoadingCities}
-                    >
-                      <SelectTrigger id="cityId">
-                        <SelectValue
-                          placeholder={
-                            isLoadingCities
-                              ? "Loading…"
-                              : form.countryId
-                                ? "Select city"
-                                : "Select country first"
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city) => (
-                          <SelectItem key={city.id} value={String(city.id)}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {form.packageName ? (
+                      <div className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-400">
+                        {cities.find((c) => c.id === Number(form.cityId))
+                          ?.name || "Loading..."}
+                      </div>
+                    ) : (
+                      <Select
+                        value={form.cityId}
+                        onValueChange={handleCityChange}
+                        disabled={!form.countryId || isLoadingCities}
+                      >
+                        <SelectTrigger id="cityId">
+                          <SelectValue
+                            placeholder={
+                              isLoadingCities
+                                ? "Loading…"
+                                : form.countryId
+                                  ? "Select city"
+                                  : "Select country first"
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cities.map((city) => (
+                            <SelectItem key={city.id} value={String(city.id)}>
+                              {city.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                 </div>
+
+                {form.packageName && (
+                  <p className="text-[11px] text-gray-500">
+                    If you want the DJ to play in another city,{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm((prev) => ({
+                          ...prev,
+                          packageName: undefined,
+                          packagePrice: undefined,
+                          packagePriceTo: undefined,
+                          budgetType: "NEGOTIABLE",
+                          budgetMin: "",
+                          budgetMax: "",
+                          message: "",
+                        }));
+                        setIsCustomVenue(false);
+                        setVenueSelection("");
+                      }}
+                      className="text-h_red hover:text-h_redDark cursor-pointer underline underline-offset-2"
+                    >
+                      use the general booking form
+                    </button>
+                  </p>
+                )}
 
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="venue">Venue</Label>
@@ -806,105 +893,108 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                   />
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <Label>Budget</Label>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {BUDGET_OPTIONS.map((opt) => {
-                      const active = form.budgetType === opt.value;
-                      return (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() =>
-                            setForm((prev) => ({
-                              ...prev,
-                              budgetType: opt.value,
-                              budgetMin:
-                                opt.value === "NEGOTIABLE" ||
-                                opt.value === "TBA"
-                                  ? ""
-                                  : prev.budgetMin,
-                              budgetMax:
-                                opt.value === "RANGE" ? prev.budgetMax : "",
-                            }))
-                          }
-                          className={cn(
-                            "flex flex-col gap-0.5 rounded-lg border px-3 py-2.5 text-left transition-colors",
-                            active
-                              ? "border-white/40 bg-white/10 text-white"
-                              : "border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-200",
-                          )}
-                        >
-                          <span className="text-sm font-medium">
-                            {opt.label}
-                          </span>
-                          <span className="text-[11px] text-gray-500">
-                            {opt.hint}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                {!form.packageName && (
+                  <div className="flex flex-col gap-2">
+                    <Label>Budget</Label>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {BUDGET_OPTIONS.map((opt) => {
+                        const active = form.budgetType === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() =>
+                              setForm((prev) => ({
+                                ...prev,
+                                budgetType: opt.value,
+                                budgetMin:
+                                  opt.value === "NEGOTIABLE" ||
+                                  opt.value === "TBA"
+                                    ? ""
+                                    : prev.budgetMin,
+                                budgetMax:
+                                  opt.value === "RANGE" ? prev.budgetMax : "",
+                              }))
+                            }
+                            className={cn(
+                              "flex flex-col gap-0.5 rounded-lg border px-3 py-2.5 text-left transition-colors",
+                              active
+                                ? "border-white/40 bg-white/10 text-white"
+                                : "border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-200",
+                            )}
+                          >
+                            <span className="text-sm font-medium">
+                              {opt.label}
+                            </span>
+                            <span className="text-[11px] text-gray-500">
+                              {opt.hint}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                  {(form.budgetType === "FIXED" ||
-                    form.budgetType === "RANGE") && (
-                    <div className="mt-2 grid gap-3 sm:grid-cols-3">
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="budgetMin">
-                          {form.budgetType === "FIXED"
-                            ? "Amount"
-                            : "Min amount"}
-                        </Label>
-                        <Input
-                          id="budgetMin"
-                          type="number"
-                          min={0}
-                          value={form.budgetMin}
-                          onChange={(event) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              budgetMin: event.target.value,
-                            }))
-                          }
-                          required
-                        />
-                      </div>
-                      {form.budgetType === "RANGE" && (
+                    {(form.budgetType === "FIXED" ||
+                      form.budgetType === "RANGE") && (
+                      <div className="mt-2 grid gap-3 sm:grid-cols-3">
                         <div className="flex flex-col gap-2">
-                          <Label htmlFor="budgetMax">Max amount</Label>
+                          <Label htmlFor="budgetMin">
+                            {form.budgetType === "FIXED"
+                              ? "Amount"
+                              : "Min amount"}
+                          </Label>
                           <Input
-                            id="budgetMax"
+                            id="budgetMin"
                             type="number"
                             min={0}
-                            value={form.budgetMax}
+                            value={form.budgetMin}
                             onChange={(event) =>
                               setForm((prev) => ({
                                 ...prev,
-                                budgetMax: event.target.value,
+                                budgetMin: event.target.value,
                               }))
                             }
                             required
                           />
                         </div>
-                      )}
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="budgetCurrency">Currency</Label>
-                        <Input
-                          id="budgetCurrency"
-                          value={form.budgetCurrency}
-                          onChange={(event) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              budgetCurrency: event.target.value.toUpperCase(),
-                            }))
-                          }
-                          maxLength={10}
-                          required
-                        />
+                        {form.budgetType === "RANGE" && (
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor="budgetMax">Max amount</Label>
+                            <Input
+                              id="budgetMax"
+                              type="number"
+                              min={0}
+                              value={form.budgetMax}
+                              onChange={(event) =>
+                                setForm((prev) => ({
+                                  ...prev,
+                                  budgetMax: event.target.value,
+                                }))
+                              }
+                              required
+                            />
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-2">
+                          <Label htmlFor="budgetCurrency">Currency</Label>
+                          <Input
+                            id="budgetCurrency"
+                            value={form.budgetCurrency}
+                            onChange={(event) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                budgetCurrency:
+                                  event.target.value.toUpperCase(),
+                              }))
+                            }
+                            maxLength={10}
+                            required
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="message">Message</Label>

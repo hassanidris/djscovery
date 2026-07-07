@@ -20,6 +20,9 @@ model BookingInquiry {
   message           String
   contactReleasedAt DateTime?
   lastRespondedAt   DateTime?
+  packageName       String?
+  packagePrice      Int?
+  packagePriceTo    Int?
 
   countryId Int?
   country   Country? @relation("BookingInquiryCountry", fields: [countryId], references: [id])

@@ -38,6 +38,9 @@ export type BookingInquiryViewModel = {
   counterpartyEmail?: string | null;
   contactVisible: boolean;
   messages: BookingMessage[];
+  packageName?: string | null;
+  packagePrice?: number | null;
+  packagePriceTo?: number | null;
 };
 
 export type BookingInquiryCardProps = {
@@ -170,6 +173,20 @@ export function BookingInquiryCard({
               {statusTheme.label}
             </Badge>
           </div>
+          {inquiry.packageName && (
+            <div className="mt-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2">
+              <p className="text-xs font-medium text-amber-400">
+                Package: {inquiry.packageName}
+              </p>
+              {inquiry.packagePrice && (
+                <p className="mt-1 text-xs text-gray-400">
+                  {inquiry.packagePrice.toLocaleString()}
+                  {inquiry.packagePriceTo &&
+                    ` – ${inquiry.packagePriceTo.toLocaleString()}`}
+                </p>
+              )}
+            </div>
+          )}
           {formattedEventMeta && (
             <p className="text-sm text-gray-400">{formattedEventMeta}</p>
           )}

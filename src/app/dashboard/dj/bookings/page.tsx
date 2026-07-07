@@ -95,6 +95,9 @@ export default async function DjBookingsPage() {
       counterpartyEmail: organizerEmail,
       contactVisible,
       messages,
+      packageName: inquiry.packageName,
+      packagePrice: inquiry.packagePrice,
+      packagePriceTo: inquiry.packagePriceTo,
     };
   });
 

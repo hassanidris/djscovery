@@ -9,6 +9,9 @@ export function bookingInquiryReceivedHtml({
   eventDate,
   location,
   ctaUrl,
+  packageName,
+  packagePrice,
+  packagePriceTo,
 }: {
   djName: string;
   organizerName: string;
@@ -16,12 +19,20 @@ export function bookingInquiryReceivedHtml({
   eventDate?: string | null;
   location?: string | null;
   ctaUrl: string;
+  packageName?: string | null;
+  packagePrice?: number | null;
+  packagePriceTo?: number | null;
 }): string {
   const safeDj = escapeHtml(djName);
   const safeOrganizer = escapeHtml(organizerName);
   const safeEvent = escapeHtml(eventName);
   const safeDate = eventDate ? escapeHtml(eventDate) : null;
   const safeLocation = location ? escapeHtml(location) : null;
+  const safePackageName = packageName ? escapeHtml(packageName) : null;
+  const safePackagePrice = packagePrice ? packagePrice.toLocaleString() : null;
+  const safePackagePriceTo = packagePriceTo
+    ? packagePriceTo.toLocaleString()
+    : null;
 
   return baseLayout(`
     <h1 style="color:#ffffff;font-size:24px;font-weight:700;margin:0 0 12px;">
@@ -42,6 +53,19 @@ export function bookingInquiryReceivedHtml({
       safeLocation
         ? `<p style="color:#9ca3af;font-size:15px;line-height:1.7;margin:0 0 18px;">
             Location: <strong style="color:#d1d5db;">${safeLocation}</strong>
+          </p>`
+        : ""
+    }
+    ${
+      safePackageName
+        ? `<p style="color:#9ca3af;font-size:15px;line-height:1.7;margin:0 0 18px;">
+            Package: <strong style="color:#d1d5db;">${safePackageName}</strong>${
+              safePackagePrice
+                ? ` (${safePackagePrice}${
+                    safePackagePriceTo ? ` – ${safePackagePriceTo}` : ""
+                  })`
+                : ""
+            }
           </p>`
         : ""
     }

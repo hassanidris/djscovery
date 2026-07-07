@@ -22,6 +22,7 @@ import {
   MapPin,
   Star,
   Plus,
+  Pencil,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -275,17 +276,19 @@ export default function DjProfilePremium({
       sortOrder: number;
     }>
   >(
-    (djData?.packages || []).map((p: any) => ({
-      id: p.id || 0,
-      name: p.name || "",
-      priceFrom: p.priceFrom || 0,
-      priceTo: p.priceTo || null,
-      currency: p.currency || "USD",
-      duration: p.duration || null,
-      features: p.features || [],
-      popular: p.popular || false,
-      sortOrder: p.sortOrder || 0,
-    })),
+    (djData?.packages || [])
+      .filter((p: any) => p.id != null && p.id !== undefined)
+      .map((p: any) => ({
+        id: p.id,
+        name: p.name || "",
+        priceFrom: p.priceFrom || 0,
+        priceTo: p.priceTo || null,
+        currency: p.currency || "USD",
+        duration: p.duration || null,
+        features: p.features || [],
+        popular: p.popular || false,
+        sortOrder: p.sortOrder || 0,
+      })),
   );
 
   async function handleVenueSave(newVenues: typeof venues) {
@@ -410,6 +413,10 @@ export default function DjProfilePremium({
 
       // Update modified packages
       for (const pkg of packagesToUpdate) {
+        // Skip packages with invalid IDs
+        if (!pkg.id || pkg.id === undefined || pkg.id === null) {
+          continue;
+        }
         const formData = new FormData();
         formData.append("name", pkg.name.trim());
         formData.append("priceFrom", String(pkg.priceFrom));
@@ -1033,25 +1040,52 @@ export default function DjProfilePremium({
             {/* ── BOOKING PACKAGES ── */}
             {(packages.length > 0 || isOwner) && (
               <section>
-                <SectionHeading sub="Tailored options for every event type">
-                  Booking Packages
-                </SectionHeading>
+                <div className="mb-5 flex items-center justify-between">
+                  <SectionHeading sub="Tailored options for every event type">
+                    Booking Packages
+                  </SectionHeading>
+                  {isOwner && packages.length > 0 && (
+                    <Button
+                      onClick={() => setIsPackageModalOpen(true)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-gray-400 hover:text-white"
+                    >
+                      <Pencil className="mr-1.5 h-3 w-3" />
+                      Edit
+                    </Button>
+                  )}
+                </div>
                 {packages.length > 0 ? (
                   <BookingPackages
-                    packages={packages.map((p) => ({
-                      id: p.id,
-                      name: p.name,
-                      priceFrom: p.priceFrom,
-                      priceTo: p.priceTo,
-                      currency: p.currency,
-                      duration: p.duration,
-                      features: p.features,
-                      popular: p.popular,
-                    }))}
-                    openBookingModal={(packageName, packagePrice) =>
+                    packages={packages
+                      .sort((a, b) => {
+                        // Popular packages first
+                        if (a.popular && !b.popular) return -1;
+                        if (!a.popular && b.popular) return 1;
+                        // Then by sortOrder
+                        return a.sortOrder - b.sortOrder;
+                      })
+                      .map((p) => ({
+                        id: p.id,
+                        name: p.name,
+                        priceFrom: p.priceFrom,
+                        priceTo: p.priceTo,
+                        currency: p.currency,
+                        duration: p.duration,
+                        features: p.features,
+                        popular: p.popular,
+                      }))}
+                    viewerRole={bookingContext.role}
+                    openBookingModal={(
+                      packageName,
+                      packagePrice,
+                      packagePriceTo,
+                    ) =>
                       bookCTARef.current?.openBookingModal(
                         packageName,
                         packagePrice,
+                        packagePriceTo,
                       )
                     }
                   />
