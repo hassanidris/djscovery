@@ -318,6 +318,7 @@ model Country {
   gigs              Gig[]
   fanProfiles       FanProfile[]
   bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCountry")
+  djVenues          DjVenue[]
 
   @@index([name])
 }
@@ -334,6 +335,7 @@ model City {
   gigs              Gig[]
   fanProfiles       FanProfile[]
   bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCity")
+  djVenues          DjVenue[]
 
   @@unique([name, countryId])
   @@unique([id, countryId])
@@ -423,16 +425,16 @@ model DjProfile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  stageName      String
-  slug           String          @unique // URL-friendly: /djs/[slug]
-  avatar         String? // Supabase Storage public URL
-  avatarPath     String? // Supabase Storage path (for deletion on re-upload)
-  coverImage     String? // Supabase Storage public URL
-  coverImagePath String? // Supabase Storage path (for deletion on re-upload)
-  bio            String?
+  stageName       String
+  slug            String           @unique // URL-friendly: /djs/[slug]
+  avatar          String? // Supabase Storage public URL
+  avatarPath      String? // Supabase Storage path (for deletion on re-upload)
+  coverImage      String? // Supabase Storage public URL
+  coverImagePath  String? // Supabase Storage path (for deletion on re-upload)
+  bio             String?
   experienceYears Int?
   experienceLevel ExperienceLevel?
-  status         DjProfileStatus @default(PENDING_APPROVAL)
+  status          DjProfileStatus  @default(PENDING_APPROVAL)
 
   countryId Int
   country   Country @relation(fields: [countryId], references: [id])
@@ -501,6 +503,7 @@ model DjProfile {
   endorsements     DjEndorsement[]
   pressItems       DjPress[]
   profileViews     ProfileView[]
+  venues           DjVenue[]
 
   @@index([slug])
   @@index([status])
@@ -584,6 +587,30 @@ model DjPress {
   createdAt DateTime @default(now())
 
   @@index([djProfileId])
+}
+
+// ------ DJ PREMIUM: WHERE I'VE PLAYED (VENUES) ------
+
+model DjVenue {
+  id          Int     @id @default(autoincrement())
+  venueName   String
+  eventDate   String? // YYYY-MM format or full date
+  description String?
+
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+  cityId    Int
+  city      City    @relation(fields: [cityId, countryId], references: [id, countryId])
+
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([djProfileId])
+  @@index([countryId])
+  @@index([cityId])
 }
 
 // ------ DJ ANALYTICS: PROFILE VIEWS ------

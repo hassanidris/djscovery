@@ -34,7 +34,7 @@ import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
-import ProfileVenues from "@/components/dj-profile/ProfileVenues";
+import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
@@ -422,27 +422,6 @@ export default function DjProfileFree({
             )}
 
             {(hasPhotos || isOwner) && <Separator className="bg-white/8" />}
-
-            {(hasVenues || isOwner) && (
-              <section>
-                <SectionHeading sub="Past performances and residencies">
-                  Venues
-                </SectionHeading>
-                {hasVenues ? (
-                  <ProfileVenues venues={VENUES} />
-                ) : (
-                  <EmptySectionState
-                    icon={MapPin}
-                    title="No venues added yet"
-                    description="Add venues where you've performed to build credibility"
-                    actionLabel="Add Venues"
-                    actionHref={editHref}
-                  />
-                )}
-              </section>
-            )}
-
-            {(hasVenues || isOwner) && <Separator className="bg-white/8" />}
 
             {/* ── MOBILE EVENTS ── */}
             <div className="lg:hidden">

@@ -278,6 +278,7 @@ export default function EditDjProfileForm({
   const [featuredMixTitle, setFeaturedMixTitle] = useState(
     profile.featuredMixTitle,
   );
+
   const [featuredMixAudioUrl, setFeaturedMixAudioUrl] = useState(
     profile.featuredMixAudioUrl,
   );
