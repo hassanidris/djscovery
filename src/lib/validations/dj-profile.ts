@@ -42,6 +42,11 @@ export const CreateDjProfileSchema = z.object({
     .optional(),
   experienceLevel: z.enum(EXPERIENCE_LEVELS).optional(),
 
+  // Fee/Pricing
+  feeMin: z.number().int().min(0).optional(),
+  feeMax: z.number().int().min(0).optional(),
+  feeCurrency: z.string().max(3).optional(),
+
   // Location
   countryId: z.number().int().positive("Country is required"),
   cityId: z.number().int().positive("City is required"),

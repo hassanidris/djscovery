@@ -104,6 +104,9 @@ const DjProfileInputSchema = z.object({
   experienceLevel: z
     .enum(["OPEN", "BEGINNER", "INTERMEDIATE", "PROFESSIONAL", "EXPERT"])
     .optional(),
+  feeMin: z.number().int().min(0).optional(),
+  feeMax: z.number().int().min(0).optional(),
+  feeCurrency: z.string().max(3).optional(),
   avatarUrl: z.string().url().optional(),
   coverImageUrl: z.string().url().optional(),
   countryId: z.number().int().positive({ message: "Country is required" }),

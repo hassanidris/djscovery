@@ -201,6 +201,9 @@ export default function DjProfileFree({
               onToggleBio={() => setBioExpanded(!bioExpanded)}
               experienceYears={djData?.experienceYears}
               experienceLevel={djData?.experienceLevel}
+              feeMin={djData?.booking?.feeRange?.min}
+              feeMax={djData?.booking?.feeRange?.max}
+              feeCurrency={djData?.booking?.feeRange?.currency}
             />
 
             <Separator className="bg-white/8" />

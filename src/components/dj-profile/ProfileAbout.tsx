@@ -11,6 +11,9 @@ type Props = {
   onToggleBio: () => void;
   experienceYears?: number;
   experienceLevel?: string;
+  feeMin?: number;
+  feeMax?: number;
+  feeCurrency?: string;
 };
 
 export default function ProfileAbout({
@@ -20,7 +23,20 @@ export default function ProfileAbout({
   onToggleBio,
   experienceYears,
   experienceLevel,
+  feeMin,
+  feeMax,
+  feeCurrency,
 }: Props) {
+  const formatFee = (value?: number) => {
+    if (!value) return null;
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: feeCurrency || "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
   return (
     <section>
       <SectionHeading>About Me</SectionHeading>
@@ -40,8 +56,8 @@ export default function ProfileAbout({
           {bioExpanded ? "Show less" : "Read more"}
         </button>
       </div>
-      {(experienceYears || experienceLevel) && (
-        <div className="mt-4 flex items-center gap-3 text-xs text-gray-400">
+      {(experienceYears || experienceLevel || feeMin || feeMax) && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-400">
           {experienceYears && (
             <span>
               <span className="text-gray-500">Experience:</span>{" "}
@@ -51,6 +67,16 @@ export default function ProfileAbout({
           {experienceLevel && (
             <span>
               <span className="text-gray-500">Level:</span> {experienceLevel}
+            </span>
+          )}
+          {(feeMin || feeMax) && (
+            <span>
+              <span className="text-gray-500">Fee:</span>{" "}
+              {feeMin && feeMax
+                ? `${formatFee(feeMin)} - ${formatFee(feeMax)}`
+                : feeMin
+                  ? `${formatFee(feeMin)}+`
+                  : `Up to ${formatFee(feeMax)}`}
             </span>
           )}
         </div>

@@ -43,6 +43,67 @@ const SOCIAL_PLATFORMS = [
   { value: "website", label: "Website" },
 ];
 
+const COUNTRY_CURRENCIES: Record<string, string> = {
+  Sweden: "SEK",
+  "United Kingdom": "GBP",
+  "United States": "USD",
+  Germany: "EUR",
+  France: "EUR",
+  Spain: "EUR",
+  Italy: "EUR",
+  Netherlands: "EUR",
+  Belgium: "EUR",
+  Portugal: "EUR",
+  Austria: "EUR",
+  Switzerland: "CHF",
+  Norway: "NOK",
+  Denmark: "DKK",
+  Finland: "EUR",
+  Poland: "PLN",
+  "Czech Republic": "CZK",
+  Hungary: "HUF",
+  Romania: "RON",
+  Turkey: "TRY",
+  Russia: "RUB",
+  Ukraine: "UAH",
+  Australia: "AUD",
+  "New Zealand": "NZD",
+  Canada: "CAD",
+  Mexico: "MXN",
+  Brazil: "BRL",
+  Argentina: "ARS",
+  Colombia: "COP",
+  Chile: "CLP",
+  "South Africa": "ZAR",
+  Nigeria: "NGN",
+  Kenya: "KES",
+  Ghana: "GHS",
+  Egypt: "EGP",
+  Morocco: "MAD",
+  "Saudi Arabia": "SAR",
+  "United Arab Emirates": "AED",
+  Qatar: "QAR",
+  Kuwait: "KWD",
+  Bahrain: "BHD",
+  Israel: "ILS",
+  India: "INR",
+  Pakistan: "PKR",
+  Bangladesh: "BDT",
+  Japan: "JPY",
+  China: "CNY",
+  "South Korea": "KRW",
+  Singapore: "SGD",
+  Malaysia: "MYR",
+  Indonesia: "IDR",
+  Thailand: "THB",
+  Philippines: "PHP",
+  Vietnam: "VND",
+  Lebanon: "LBP",
+  Jordan: "JOD",
+  Iraq: "IQD",
+  Somalia: "SOS",
+};
+
 interface BecomeDjFormProps {
   countries: Country[];
   userId: string;
@@ -74,6 +135,9 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       bio: "",
       experienceYears: undefined,
       experienceLevel: undefined,
+      feeMin: undefined,
+      feeMax: undefined,
+      feeCurrency: "",
       countryId: 0,
       cityId: 0,
       djTypes: [],
@@ -87,6 +151,9 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   const stageName = useWatch({ control, name: "stageName" });
   const experienceYears = useWatch({ control, name: "experienceYears" });
   const experienceLevel = useWatch({ control, name: "experienceLevel" });
+  const feeMin = useWatch({ control, name: "feeMin" });
+  const feeMax = useWatch({ control, name: "feeMax" });
+  const feeCurrency = useWatch({ control, name: "feeCurrency" });
   const countryId = useWatch({ control, name: "countryId" });
   const cityId = useWatch({ control, name: "cityId" });
   const djTypes = useWatch({ control, name: "djTypes" });
@@ -114,6 +181,19 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   useEffect(() => {
     getGenres().then(setAvailableGenres);
   }, []);
+
+  // Auto-set currency based on country
+  useEffect(() => {
+    if (countryId && countries.length > 0) {
+      const selectedCountry = countries.find((c) => c.id === countryId);
+      if (selectedCountry) {
+        const currency = COUNTRY_CURRENCIES[selectedCountry.name];
+        if (currency && !feeCurrency) {
+          setValue("feeCurrency", currency);
+        }
+      }
+    }
+  }, [countryId, countries, feeCurrency, setValue]);
 
   // Optional media (not in form schema)
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
@@ -485,6 +565,76 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             {errors.experienceLevel && (
               <p className="text-xs text-red-400">
                 {errors.experienceLevel.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Fee/Pricing ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Fee/Pricing{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          Set your booking fee range. Currency auto-detected from your country.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Minimum Fee</label>
+            <input
+              {...register("feeMin", { valueAsNumber: true })}
+              type="number"
+              min="0"
+              placeholder="e.g. 500"
+              className={inputCls}
+            />
+            {errors.feeMin && (
+              <p className="text-xs text-red-400">{errors.feeMin.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Maximum Fee</label>
+            <input
+              {...register("feeMax", { valueAsNumber: true })}
+              type="number"
+              min="0"
+              placeholder="e.g. 2000"
+              className={inputCls}
+            />
+            {errors.feeMax && (
+              <p className="text-xs text-red-400">{errors.feeMax.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Currency</label>
+            <select
+              {...register("feeCurrency")}
+              className={`${inputCls} cursor-pointer appearance-none`}
+            >
+              <option value="">Select currency...</option>
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="SEK">SEK (kr)</option>
+              <option value="NOK">NOK (kr)</option>
+              <option value="DKK">DKK (kr)</option>
+              <option value="CHF">CHF</option>
+              <option value="CAD">CAD ($)</option>
+              <option value="AUD">AUD ($)</option>
+              <option value="JPY">JPY (¥)</option>
+              <option value="CNY">CNY (¥)</option>
+              <option value="INR">INR (₹)</option>
+              <option value="AED">AED (د.إ)</option>
+              <option value="SAR">SAR (﷼)</option>
+            </select>
+            {errors.feeCurrency && (
+              <p className="text-xs text-red-400">
+                {errors.feeCurrency.message}
               </p>
             )}
           </div>
