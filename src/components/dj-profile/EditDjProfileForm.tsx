@@ -31,6 +31,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CURRENCIES } from "@/config/currencies";
 
 type Country = { id: number; name: string };
 type City = { id: number; name: string };
@@ -1149,16 +1157,24 @@ export default function EditDjProfileForm({
                     <span className="text-[11px] text-gray-600">auto</span>
                   )}
                 </div>
-                <Input
+                <Select
                   value={feeCurrency}
-                  onChange={(e) => {
-                    setFeeCurrency(e.target.value.toUpperCase().slice(0, 3));
+                  onValueChange={(value) => {
+                    setFeeCurrency(value);
                     setCurrencyAutoSet(false);
                   }}
-                  placeholder="USD"
-                  maxLength={3}
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white uppercase placeholder:text-gray-600"
-                />
+                >
+                  <SelectTrigger className="focus:border-h_red/50 border-white/10 bg-white/5 text-white">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent className="border-white/10 bg-black text-white">
+                    {CURRENCIES.map((currency) => (
+                      <SelectItem key={currency.code} value={currency.code}>
+                        {currency.code} ({currency.symbol})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

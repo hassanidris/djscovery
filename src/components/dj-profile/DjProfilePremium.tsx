@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
-import { BookCTA } from "@/components/dj-profile/BookCTA";
+import { BookCTA, type BookCTARef } from "@/components/dj-profile/BookCTA";
 import { OwnerOnlySection } from "@/components/dj-profile/OwnerOnlySection";
 import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
@@ -34,8 +34,16 @@ import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
 import VenueModal from "@/components/dj-profile/VenueModal";
+import BookingPackages from "@/components/dj-profile/BookingPackages";
+import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
+import {
+  getDjPackages,
+  createDjPackage,
+  updateDjPackage,
+  deleteDjPackage,
+} from "@/lib/actions/dj-packages";
 import { toast } from "sonner";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
@@ -229,6 +237,8 @@ export default function DjProfilePremium({
     "photos",
   );
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
+  const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
+  const bookCTARef = useRef<BookCTARef>(null);
   const [venues, setVenues] = useState<
     Array<{
       id: number;
@@ -250,6 +260,33 @@ export default function DjProfilePremium({
       cityId: 0,
       countryName: v.country,
       cityName: v.city,
+    })),
+  );
+  const [packages, setPackages] = useState<
+    Array<{
+      id: number;
+      name: string;
+      priceFrom: number;
+      priceTo: number | null;
+      currency: string;
+      durationMin: number | null;
+      durationMax: number | null;
+      features: string[];
+      popular: boolean;
+      sortOrder: number;
+    }>
+  >(
+    (djData?.packages || []).map((p: any) => ({
+      id: p.id || 0,
+      name: p.name || "",
+      priceFrom: p.priceFrom || 0,
+      priceTo: p.priceTo || null,
+      currency: p.currency || "USD",
+      durationMin: p.durationMin || null,
+      durationMax: p.durationMax || null,
+      features: p.features || [],
+      popular: p.popular || false,
+      sortOrder: p.sortOrder || 0,
     })),
   );
 
@@ -334,6 +371,109 @@ export default function DjProfilePremium({
     }
   }
 
+  async function handlePackageSave(newPackages: typeof packages) {
+    const toastId = toast.loading("Saving packages...");
+
+    try {
+      // Find new packages (id === 0)
+      const packagesToAdd = newPackages.filter((p) => p.id === 0);
+      // Find existing packages that were modified
+      const packagesToUpdate = newPackages.filter((p) => p.id !== 0);
+      // Find packages that were removed
+      const removedPackageIds = packages
+        .filter((p) => !newPackages.find((np) => np.id === p.id))
+        .map((p) => p.id);
+
+      // Format duration for storage
+      const formatDuration = (min: number | null, max: number | null) => {
+        if (!min && !max) return null;
+        if (min && max && min !== max) return `${min}-${max} hours`;
+        return `${min || max} hours`;
+      };
+
+      // Add new packages
+      const addedPackageIds: number[] = [];
+      for (const pkg of packagesToAdd) {
+        if (!pkg.name.trim() || !pkg.priceFrom) {
+          continue;
+        }
+        const formData = new FormData();
+        formData.append("name", pkg.name.trim());
+        formData.append("priceFrom", String(pkg.priceFrom));
+        if (pkg.priceTo) formData.append("priceTo", String(pkg.priceTo));
+        formData.append("currency", pkg.currency);
+        formData.append(
+          "duration",
+          formatDuration(pkg.durationMin, pkg.durationMax) || "",
+        );
+        pkg.features.forEach((f) => formData.append("features", f));
+        formData.append("popular", String(pkg.popular));
+        formData.append("sortOrder", String(pkg.sortOrder));
+
+        const result = await createDjPackage(formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+        if ("success" in result) {
+          addedPackageIds.push(result.id);
+        }
+      }
+
+      // Update modified packages
+      for (const pkg of packagesToUpdate) {
+        const formData = new FormData();
+        formData.append("name", pkg.name.trim());
+        formData.append("priceFrom", String(pkg.priceFrom));
+        if (pkg.priceTo !== null)
+          formData.append("priceTo", String(pkg.priceTo));
+        formData.append("currency", pkg.currency);
+        formData.append(
+          "duration",
+          formatDuration(pkg.durationMin, pkg.durationMax) || "",
+        );
+        pkg.features.forEach((f) => formData.append("features", f));
+        formData.append("popular", String(pkg.popular));
+        formData.append("sortOrder", String(pkg.sortOrder));
+
+        const result = await updateDjPackage(pkg.id, formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      // Delete removed packages
+      for (const packageId of removedPackageIds) {
+        const result = await deleteDjPackage(packageId);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      toast.success("Packages saved successfully!", { id: toastId });
+
+      // Update local state with new package IDs
+      const updatedPackages = newPackages.map((p, idx) => {
+        if (p.id === 0 && addedPackageIds.length > 0) {
+          const newId = addedPackageIds.shift();
+          return { ...p, id: newId || 0 };
+        }
+        return p;
+      });
+      setPackages(updatedPackages);
+
+      // Trigger page refresh to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to save packages:", error);
+      toast.error("Failed to save packages. Please try again.", {
+        id: toastId,
+      });
+    }
+  }
+
   const DJ = djData ? mapPremiumDjToProps(djData) : PREMIUM_DEFAULT_DJ;
   const EVENTS = djData
     ? mapPremiumEventsFromData(djData)
@@ -397,6 +537,7 @@ export default function DjProfilePremium({
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
+              ref={bookCTARef}
               stageName={`Dj. ${DJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
@@ -505,64 +646,6 @@ export default function DjProfilePremium({
                     </div>
                   </Card>
                 </MediaVideoModal>
-              </div>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            {/* ── BOOKING PACKAGES ── */}
-            <section>
-              <SectionHeading sub="Tailored options for every event type">
-                Booking Packages
-              </SectionHeading>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {PACKAGES.map((pkg) => (
-                  <Card
-                    key={pkg.name}
-                    className={cn(
-                      "relative flex flex-col gap-0 overflow-hidden border-white/8 p-5",
-                      pkg.featured
-                        ? "to-h_blackLight/30 border-amber-500/30 bg-linear-to-b from-amber-500/10"
-                        : "bg-h_blackLight/30",
-                    )}
-                  >
-                    {pkg.featured && (
-                      <Badge className="absolute top-3 right-3 border-amber-500/25 bg-amber-500/15 text-[11px] text-amber-400">
-                        Most Popular
-                      </Badge>
-                    )}
-                    <div className="bg-h_red/10 border-h_red/20 mb-3 flex size-10 items-center justify-center rounded-lg border">
-                      {(() => {
-                        const PkgIcon = pkg.icon;
-                        return <PkgIcon className="text-h_red h-4 w-4" />;
-                      })()}
-                    </div>
-                    <p className="text-sm font-semibold text-white">
-                      {pkg.name}
-                    </p>
-                    <p className="text-h_red mt-1 text-lg font-bold">
-                      {pkg.price}
-                    </p>
-                    <p className="mb-3 text-xs text-gray-500">{pkg.duration}</p>
-                    <ul className="flex flex-1 flex-col gap-1.5">
-                      {pkg.includes.map((item) => (
-                        <li
-                          key={item}
-                          className="flex items-center gap-1.5 text-xs text-gray-400"
-                        >
-                          <CircleCheck className="h-3 w-3 shrink-0 text-emerald-500" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      className="bg-h_red hover:bg-h_redDark mt-4 w-full font-semibold text-white"
-                      size="sm"
-                    >
-                      Enquire
-                    </Button>
-                  </Card>
-                ))}
               </div>
             </section>
 
@@ -959,12 +1042,63 @@ export default function DjProfilePremium({
                 )}
               </section>
             )}
+
+            <Separator className="bg-white/8" />
+
+            {/* ── BOOKING PACKAGES ── */}
+            {(packages.length > 0 || isOwner) && (
+              <section>
+                <SectionHeading sub="Tailored options for every event type">
+                  Booking Packages
+                </SectionHeading>
+                {packages.length > 0 ? (
+                  <BookingPackages
+                    packages={packages.map((p) => ({
+                      id: p.id,
+                      name: p.name,
+                      priceFrom: p.priceFrom,
+                      priceTo: p.priceTo,
+                      currency: p.currency,
+                      duration:
+                        p.durationMin && p.durationMax
+                          ? `${p.durationMin}-${p.durationMax} hours`
+                          : p.durationMin
+                            ? `${p.durationMin} hours`
+                            : p.durationMax
+                              ? `${p.durationMax} hours`
+                              : null,
+                      features: p.features,
+                      popular: p.popular,
+                    }))}
+                    openBookingModal={(packageName, packagePrice) =>
+                      bookCTARef.current?.openBookingModal(
+                        packageName,
+                        packagePrice,
+                      )
+                    }
+                  />
+                ) : (
+                  <EmptySectionState
+                    icon={BriefcaseBusiness}
+                    title="No packages added yet"
+                    description="Create packages to help organizers understand your offerings"
+                    actionLabel="Add Packages"
+                    onAction={() => setIsPackageModalOpen(true)}
+                  />
+                )}
+              </section>
+            )}
+
+            {(packages.length > 0 || isOwner) && (
+              <Separator className="bg-white/8" />
+            )}
           </div>
 
           {/* ── SIDEBAR ── */}
           <aside className="sticky top-28 flex h-fit flex-col gap-5">
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
+              ref={bookCTARef}
               stageName={`Dj. ${DJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
@@ -1083,14 +1217,24 @@ export default function DjProfilePremium({
       </div>
 
       {isOwner && (
-        <VenueModal
-          isOpen={isVenueModalOpen}
-          onClose={() => setIsVenueModalOpen(false)}
-          venues={venues}
-          onSave={handleVenueSave}
-          countries={countries || []}
-          djProfileId={djProfileId}
-        />
+        <>
+          <VenueModal
+            isOpen={isVenueModalOpen}
+            onClose={() => setIsVenueModalOpen(false)}
+            venues={venues}
+            onSave={handleVenueSave}
+            countries={countries || []}
+            djProfileId={djProfileId}
+          />
+          <PackageModal
+            isOpen={isPackageModalOpen}
+            onClose={() => setIsPackageModalOpen(false)}
+            packages={packages}
+            onSave={handlePackageSave}
+            djProfileId={djProfileId}
+            defaultCurrency={djData?.booking?.feeRange?.currency || "USD"}
+          />
+        </>
       )}
     </div>
   );

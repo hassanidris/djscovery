@@ -212,16 +212,39 @@ export function mapPackagesFromData(d: DjDemoData) {
     Festival: "from-amber-500/20 to-transparent",
     "Private Event": "from-blue-600/20 to-transparent",
   };
-  return d.packages.map((pkg, i) => ({
-    name: pkg.name,
-    icon:
-      PACKAGE_ICON_MAP[pkg.name] ?? HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
-    price: `From ${pkg.currency}${formatNumber(pkg.priceFrom)}`,
-    duration: pkg.features[0] ?? "",
-    includes: pkg.features.slice(1),
-    color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",
-    featured: pkg.popular ?? false,
-  }));
+  return d.packages.map((pkg, i) => {
+    // Format duration from durationMin/durationMax
+    let duration = "";
+    if (
+      pkg.durationMin &&
+      pkg.durationMax &&
+      pkg.durationMin !== pkg.durationMax
+    ) {
+      duration = `${pkg.durationMin}-${pkg.durationMax} hours`;
+    } else if (pkg.durationMin) {
+      duration = `${pkg.durationMin} hours`;
+    } else if (pkg.durationMax) {
+      duration = `${pkg.durationMax} hours`;
+    }
+
+    // Format price range
+    let price = `From ${pkg.currency}${formatNumber(pkg.priceFrom)}`;
+    if (pkg.priceTo && pkg.priceTo > pkg.priceFrom) {
+      price = `From ${pkg.currency}${formatNumber(pkg.priceFrom)} – ${pkg.currency}${formatNumber(pkg.priceTo)}`;
+    }
+
+    return {
+      name: pkg.name,
+      icon:
+        PACKAGE_ICON_MAP[pkg.name] ??
+        HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
+      price,
+      duration,
+      includes: pkg.features || [],
+      color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",
+      featured: pkg.popular ?? false,
+    };
+  });
 }
 
 export function mapMixesFromData(d: DjDemoData) {
