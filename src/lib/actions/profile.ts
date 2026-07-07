@@ -97,129 +97,153 @@ export async function getOrCreateGenre(
   });
 }
 
-const DjProfileInputSchema = z.object({
-  stageName: z.string().min(2).max(60),
-  bio: z.string().max(800).optional(),
-  experienceYears: z.number().int().min(0).max(50).optional(),
-  experienceLevel: z
-    .enum(["OPEN", "BEGINNER", "INTERMEDIATE", "PROFESSIONAL", "EXPERT"])
-    .optional(),
-  feeMin: z.number().int().min(0).optional(),
-  feeMax: z.number().int().min(0).optional(),
-  feeCurrency: z.string().max(3).optional(),
-  avatarUrl: z.string().url().optional(),
-  coverImageUrl: z.string().url().optional(),
-  countryId: z.number().int().positive({ message: "Country is required" }),
-  cityId: z.number().int().positive(),
-  genreNames: z
-    .array(z.string().min(1).max(50))
-    .min(1, "Select at least one genre")
-    .max(5, "Select up to 5 genres"),
-  socialLinks: z
-    .array(z.object({ platform: z.string(), url: z.string().url() }))
-    .min(1, "Add at least one social media link"),
-  djTypes: z
-    .array(
-      z.enum([
-        "CLUB",
-        "WEDDING",
-        "FESTIVAL",
-        "CORPORATE",
-        "BAR_LOUNGE",
-        "PRIVATE_PARTY",
-        "BIRTHDAY",
-        "CULTURAL_EVENT",
-      ]),
-    )
-    .min(1, "Select at least one DJ type"),
-  media: z.array(
-    z.object({
-      type: z.enum(["IMAGE", "VIDEO", "AUDIO"]),
-      url: z.string().url(),
-      path: z.string(),
-      bucket: z.string(),
-    }),
-  ),
-  bookingEmail: z.string().email().optional(),
-  bookingPhone: z.string().max(30).optional(),
-});
-
-const UpdateDjProfileSchema = z.object({
-  stageName: z
-    .string()
-    .min(2, "Stage name must be at least 2 characters")
-    .max(60)
-    .optional(),
-  bio: z.string().max(800).optional().nullable(),
-  experienceYears: z.number().int().min(0).max(50).optional().nullable(),
-  // experienceLevel is auto-calculated from experienceYears
-  avatarUrl: z.string().url().optional().nullable(),
-  coverImageUrl: z.string().url().optional().nullable(),
-  countryId: z.number().int().positive().optional(),
-  cityId: z.number().int().positive().optional(),
-  genreNames: z
-    .array(z.string().min(1).max(50))
-    .max(5, "Select up to 5 genres")
-    .optional(),
-  socialLinks: z
-    .array(
+const DjProfileInputSchema = z
+  .object({
+    stageName: z.string().min(2).max(60),
+    bio: z.string().max(800).optional(),
+    experienceYears: z.number().int().min(0).max(50).optional(),
+    // experienceLevel is auto-calculated from experienceYears
+    feeMin: z.number().int().min(0).optional(),
+    feeMax: z.number().int().min(0).optional(),
+    feeCurrency: z.string().max(3).optional(),
+    avatarUrl: z.string().url().optional(),
+    coverImageUrl: z.string().url().optional(),
+    countryId: z.number().int().positive({ message: "Country is required" }),
+    cityId: z.number().int().positive(),
+    genreNames: z
+      .array(z.string().min(1).max(50))
+      .min(1, "Select at least one genre")
+      .max(5, "Select up to 5 genres"),
+    socialLinks: z
+      .array(z.object({ platform: z.string(), url: z.string().url() }))
+      .min(1, "Add at least one social media link"),
+    djTypes: z
+      .array(
+        z.enum([
+          "CLUB",
+          "WEDDING",
+          "FESTIVAL",
+          "CORPORATE",
+          "BAR_LOUNGE",
+          "PRIVATE_PARTY",
+          "BIRTHDAY",
+          "CULTURAL_EVENT",
+        ]),
+      )
+      .min(1, "Select at least one DJ type"),
+    media: z.array(
       z.object({
-        platform: z.string().min(1),
-        url: z.string().url("Invalid URL"),
+        type: z.enum(["IMAGE", "VIDEO", "AUDIO"]),
+        url: z.string().url(),
+        path: z.string(),
+        bucket: z.string(),
       }),
-    )
-    .optional(),
-  djTypes: z
-    .array(
-      z.enum([
-        "CLUB",
-        "WEDDING",
-        "FESTIVAL",
-        "CORPORATE",
-        "BAR_LOUNGE",
-        "PRIVATE_PARTY",
-        "BIRTHDAY",
-        "CULTURAL_EVENT",
-      ]),
-    )
-    .optional(),
-  bookingEmail: z.string().email("Invalid email address").optional().nullable(),
-  bookingPhone: z.string().max(30).optional().nullable(),
-  feeMin: z.number().int().nonnegative().optional().nullable(),
-  feeMax: z.number().int().nonnegative().optional().nullable(),
-  feeCurrency: z.string().max(3).optional().nullable(),
+    ),
+    bookingEmail: z.string().email().optional(),
+    bookingPhone: z.string().max(30).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.feeMin == null || data.feeMax == null) return true;
+      return data.feeMax >= data.feeMin;
+    },
+    {
+      message: "Maximum fee must be greater than or equal to minimum fee",
+      path: ["feeMax"],
+    },
+  );
 
-  // Team contacts
-  managerName: z.string().max(60).optional().nullable(),
-  managerEmail: z.string().email().optional().nullable(),
-  managerPhone: z.string().max(30).optional().nullable(),
-  agentName: z.string().max(60).optional().nullable(),
-  agentAgency: z.string().max(60).optional().nullable(),
-  agentEmail: z.string().email().optional().nullable(),
+const UpdateDjProfileSchema = z
+  .object({
+    stageName: z
+      .string()
+      .min(2, "Stage name must be at least 2 characters")
+      .max(60)
+      .optional(),
+    bio: z.string().max(800).optional().nullable(),
+    experienceYears: z.number().int().min(0).max(50).optional().nullable(),
+    // experienceLevel is auto-calculated from experienceYears
+    avatarUrl: z.string().url().optional().nullable(),
+    coverImageUrl: z.string().url().optional().nullable(),
+    countryId: z.number().int().positive().optional(),
+    cityId: z.number().int().positive().optional(),
+    genreNames: z
+      .array(z.string().min(1).max(50))
+      .max(5, "Select up to 5 genres")
+      .optional(),
+    socialLinks: z
+      .array(
+        z.object({
+          platform: z.string().min(1),
+          url: z.string().url("Invalid URL"),
+        }),
+      )
+      .optional(),
+    djTypes: z
+      .array(
+        z.enum([
+          "CLUB",
+          "WEDDING",
+          "FESTIVAL",
+          "CORPORATE",
+          "BAR_LOUNGE",
+          "PRIVATE_PARTY",
+          "BIRTHDAY",
+          "CULTURAL_EVENT",
+        ]),
+      )
+      .optional(),
+    bookingEmail: z
+      .string()
+      .email("Invalid email address")
+      .optional()
+      .nullable(),
+    bookingPhone: z.string().max(30).optional().nullable(),
+    feeMin: z.number().int().nonnegative().optional().nullable(),
+    feeMax: z.number().int().nonnegative().optional().nullable(),
+    feeCurrency: z.string().max(3).optional().nullable(),
 
-  // Availability
-  availabilityTimezone: z.string().max(50).optional().nullable(),
-  availabilityMonth: z.string().max(7).optional().nullable(),
-  availabilityDays: z
-    .array(
-      z.object({
-        day: z.number().int().min(1).max(31),
-        status: z.enum(["available", "booked", "tentative", "free"]),
-      }),
-    )
-    .optional(),
+    // Team contacts
+    managerName: z.string().max(60).optional().nullable(),
+    managerEmail: z.string().email().optional().nullable(),
+    managerPhone: z.string().max(30).optional().nullable(),
+    agentName: z.string().max(60).optional().nullable(),
+    agentAgency: z.string().max(60).optional().nullable(),
+    agentEmail: z.string().email().optional().nullable(),
 
-  // Spotlight
-  featuredMixTitle: z.string().max(120).optional().nullable(),
-  featuredMixAudioUrl: z.string().url().optional().nullable(),
-  featuredMixDuration: z.string().max(20).optional().nullable(),
-  featuredMixPlays: z.number().int().nonnegative().optional(),
-  featuredVideoTitle: z.string().max(120).optional().nullable(),
-  featuredVideoUrl: z.string().url().optional().nullable(),
-  featuredVideoThumbnail: z.string().url().optional().nullable(),
-  featuredVideoDuration: z.string().max(20).optional().nullable(),
-  featuredVideoViews: z.number().int().nonnegative().optional(),
-});
+    // Availability
+    availabilityTimezone: z.string().max(50).optional().nullable(),
+    availabilityMonth: z.string().max(7).optional().nullable(),
+    availabilityDays: z
+      .array(
+        z.object({
+          day: z.number().int().min(1).max(31),
+          status: z.enum(["available", "booked", "tentative", "free"]),
+        }),
+      )
+      .optional(),
+
+    // Spotlight
+    featuredMixTitle: z.string().max(120).optional().nullable(),
+    featuredMixAudioUrl: z.string().url().optional().nullable(),
+    featuredMixDuration: z.string().max(20).optional().nullable(),
+    featuredMixPlays: z.number().int().nonnegative().optional(),
+    featuredVideoTitle: z.string().max(120).optional().nullable(),
+    featuredVideoUrl: z.string().url().optional().nullable(),
+    featuredVideoThumbnail: z.string().url().optional().nullable(),
+    featuredVideoDuration: z.string().max(20).optional().nullable(),
+    featuredVideoViews: z.number().int().nonnegative().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.feeMin == null || data.feeMax == null) return true;
+      return data.feeMax >= data.feeMin;
+    },
+    {
+      message: "Maximum fee must be greater than or equal to minimum fee",
+      path: ["feeMax"],
+    },
+  );
 
 export type UpdateDjProfileInput = z.infer<typeof UpdateDjProfileSchema>;
 
@@ -227,7 +251,7 @@ export type UpdateDjProfileInput = z.infer<typeof UpdateDjProfileSchema>;
 function calculateExperienceLevel(
   years: number | null | undefined,
 ): "OPEN" | "BEGINNER" | "INTERMEDIATE" | "PROFESSIONAL" | "EXPERT" | null {
-  if (!years || years < 0) return null;
+  if (years == null || years < 0) return null;
   if (years === 0) return "OPEN";
   if (years <= 2) return "BEGINNER";
   if (years <= 5) return "INTERMEDIATE";
@@ -258,7 +282,6 @@ export async function createDjProfile(
       stageName,
       bio,
       experienceYears,
-      experienceLevel,
       avatarUrl,
       coverImageUrl,
       countryId,

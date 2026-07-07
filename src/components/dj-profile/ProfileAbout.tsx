@@ -35,9 +35,12 @@ export default function ProfileAbout({
 }: Props) {
   const formatFee = (value?: number) => {
     if (!value) return null;
+    // Validate currency code: must be 3 uppercase letters
+    const isValidCurrency = /^[A-Z]{3}$/.test(feeCurrency || "");
+    const currency = isValidCurrency ? feeCurrency : "USD";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: feeCurrency || "USD",
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);

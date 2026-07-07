@@ -104,6 +104,11 @@ const COUNTRY_CURRENCIES: Record<string, string> = {
   Somalia: "SOS",
 };
 
+// Derive all unique currencies from COUNTRY_CURRENCIES for the dropdown
+const ALL_CURRENCIES = Array.from(
+  new Set(Object.values(COUNTRY_CURRENCIES)),
+).sort();
+
 interface BecomeDjFormProps {
   countries: Country[];
   userId: string;
@@ -250,8 +255,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       e.target.value = "";
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Cover image must be 5 MB or smaller.");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Cover image must be 10 MB or smaller.");
       setCoverFile(null);
       setCoverPreview(null);
       e.target.value = "";
@@ -635,7 +640,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>Years of Experience</label>
             <input
-              {...register("experienceYears", { valueAsNumber: true })}
+              {...register("experienceYears", {
+                setValueAs: (v) =>
+                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
+              })}
               type="number"
               min="0"
               max="50"
@@ -665,7 +673,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>Minimum Fee</label>
             <input
-              {...register("feeMin", { valueAsNumber: true })}
+              {...register("feeMin", {
+                setValueAs: (v) =>
+                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
+              })}
               type="number"
               min="0"
               placeholder="e.g. 500"
@@ -679,7 +690,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>Maximum Fee</label>
             <input
-              {...register("feeMax", { valueAsNumber: true })}
+              {...register("feeMax", {
+                setValueAs: (v) =>
+                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
+              })}
               type="number"
               min="0"
               placeholder="e.g. 2000"
@@ -697,20 +711,11 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
               className={`${inputCls} cursor-pointer appearance-none`}
             >
               <option value="">Select currency...</option>
-              <option value="USD">USD ($)</option>
-              <option value="EUR">EUR (€)</option>
-              <option value="GBP">GBP (£)</option>
-              <option value="SEK">SEK (kr)</option>
-              <option value="NOK">NOK (kr)</option>
-              <option value="DKK">DKK (kr)</option>
-              <option value="CHF">CHF</option>
-              <option value="CAD">CAD ($)</option>
-              <option value="AUD">AUD ($)</option>
-              <option value="JPY">JPY (¥)</option>
-              <option value="CNY">CNY (¥)</option>
-              <option value="INR">INR (₹)</option>
-              <option value="AED">AED (د.إ)</option>
-              <option value="SAR">SAR (﷼)</option>
+              {ALL_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
             </select>
             {errors.feeCurrency && (
               <p className="text-xs text-red-400">
@@ -735,7 +740,9 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>Booking Email</label>
             <input
-              {...register("bookingEmail")}
+              {...register("bookingEmail", {
+                setValueAs: (v) => (v?.trim() ? v.trim() : undefined),
+              })}
               type="email"
               placeholder="bookings@yourname.com"
               className={inputCls}
