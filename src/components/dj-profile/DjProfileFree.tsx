@@ -495,11 +495,6 @@ export default function DjProfileFree({
                         icon: CalendarDays,
                       },
                       {
-                        title: "Booking Packages",
-                        desc: "Offer tailored packages to clients",
-                        icon: BriefcaseBusiness,
-                      },
-                      {
                         title: "Career Highlights",
                         desc: "Showcase your biggest achievements",
                         icon: Trophy,

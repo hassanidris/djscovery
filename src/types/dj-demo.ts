@@ -82,7 +82,9 @@ export interface DjDemoData {
   packages: Array<{
     name: string;
     priceFrom: number;
+    priceTo?: number;
     currency: string;
+    duration?: string;
     features: string[];
     popular?: boolean;
   }>;

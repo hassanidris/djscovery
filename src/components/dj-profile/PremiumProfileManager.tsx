@@ -12,12 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import {
-  getDjPackages,
-  createDjPackage,
-  updateDjPackage,
-  deleteDjPackage,
-} from "@/lib/actions/dj-packages";
-import {
   getDjHighlights,
   createDjHighlight,
   updateDjHighlight,
@@ -36,7 +30,6 @@ import {
   deleteDjPressItem,
 } from "@/lib/actions/dj-press";
 
-type Package = Awaited<ReturnType<typeof getDjPackages>>[number];
 type Highlight = Awaited<ReturnType<typeof getDjHighlights>>[number];
 type Endorsement = Awaited<ReturnType<typeof getDjEndorsements>>[number];
 type PressItem = Awaited<ReturnType<typeof getDjPressItems>>[number];
@@ -93,143 +86,6 @@ type WrapAction = <T extends { error?: string; success?: boolean }>(
   action: () => Promise<T>,
   msg: string,
 ) => Promise<boolean>;
-
-/* ── Package Form ── */
-function PackageForm({
-  item,
-  onCancel,
-  wrapAction,
-  isPending,
-}: {
-  item?: Package;
-  onCancel: () => void;
-  wrapAction: WrapAction;
-  isPending: boolean;
-}) {
-  const [name, setName] = useState(item?.name ?? "");
-  const [priceFrom, setPriceFrom] = useState(
-    item?.priceFrom ? String(item.priceFrom) : "",
-  );
-  const [priceTo, setPriceTo] = useState(
-    item?.priceTo ? String(item.priceTo) : "",
-  );
-  const [currency, setCurrency] = useState(item?.currency ?? "USD");
-  const [duration, setDuration] = useState(item?.duration ?? "");
-  const [features, setFeatures] = useState(item?.features?.join("\n") ?? "");
-  const [popular, setPopular] = useState(item?.popular ?? false);
-  const [saving, setSaving] = useState(false);
-
-  async function save() {
-    setSaving(true);
-    const fd = new FormData();
-    fd.append("name", name);
-    fd.append("priceFrom", priceFrom);
-    fd.append("priceTo", priceTo);
-    fd.append("currency", currency);
-    if (duration) fd.append("duration", duration);
-    fd.append("features", features);
-    fd.append("popular", String(popular));
-
-    const success = item
-      ? await wrapAction(
-          () => updateDjPackage(item.id, fd),
-          "Updating package...",
-        )
-      : await wrapAction(() => createDjPackage(fd), "Creating package...");
-    setSaving(false);
-    if (success) onCancel();
-  }
-
-  return (
-    <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-white/3 p-4">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Name">
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Club Night"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <Field label="Currency">
-          <Input
-            value={currency}
-            onChange={(e) =>
-              setCurrency(e.target.value.toUpperCase().slice(0, 3))
-            }
-            placeholder="USD"
-            maxLength={3}
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <Field label="Price From">
-          <Input
-            type="number"
-            value={priceFrom}
-            onChange={(e) => setPriceFrom(e.target.value)}
-            placeholder="500"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <Field label="Price To" optional>
-          <Input
-            type="number"
-            value={priceTo}
-            onChange={(e) => setPriceTo(e.target.value)}
-            placeholder="5000"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <Field label="Duration" optional>
-          <Input
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            placeholder="4 hours"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-          />
-        </Field>
-        <div className="flex items-end">
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={popular}
-              onCheckedChange={(v) => setPopular(v === true)}
-              className="data-[state=checked]:bg-h_red data-[state=checked]:border-h_red"
-            />
-            <span className="text-xs text-gray-300">Most Popular</span>
-          </label>
-        </div>
-      </div>
-      <Field label="Features (one per line)" optional>
-        <Textarea
-          value={features}
-          onChange={(e) => setFeatures(e.target.value)}
-          placeholder={`Setup consultation\nCustom setlist\nSocial media promotion`}
-          className="min-h-20 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-        />
-      </Field>
-      <div className="flex gap-2">
-        <Button
-          type="button"
-          size="sm"
-          disabled={saving || !name.trim() || !priceFrom}
-          onClick={save}
-          className="bg-h_red hover:bg-h_redDark text-white"
-        >
-          {saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          onClick={onCancel}
-          className="text-gray-400 hover:text-white"
-        >
-          Cancel
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 /* ── Highlight Form ── */
 function HighlightForm({
@@ -538,14 +394,11 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
   const isPremium = plan === "PREMIUM";
   const [isPending, startTransition] = useTransition();
 
-  const [packages, setPackages] = useState<Package[]>([]);
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [endorsements, setEndorsements] = useState<Endorsement[]>([]);
   const [pressItems, setPressItems] = useState<PressItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  const [editPkgId, setEditPkgId] = useState<number | null>(null);
-  const [addPkg, setAddPkg] = useState(false);
   const [editHlId, setEditHlId] = useState<number | null>(null);
   const [addHl, setAddHl] = useState(false);
   const [editEndId, setEditEndId] = useState<number | null>(null);
@@ -555,13 +408,11 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
 
   const loadAll = useCallback(async () => {
     try {
-      const [p, h, e, pr] = await Promise.all([
-        getDjPackages(djProfileId),
+      const [h, e, pr] = await Promise.all([
         getDjHighlights(djProfileId),
         getDjEndorsements(djProfileId),
         getDjPressItems(djProfileId),
       ]);
-      setPackages(p);
       setHighlights(h);
       setEndorsements(e);
       setPressItems(pr);
@@ -619,8 +470,8 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
         <div className="flex flex-col items-center gap-3 py-8 text-center">
           <Crown className="h-8 w-8 text-amber-500" />
           <p className="text-sm text-gray-400">
-            Upgrade to Premium to manage booking packages, career highlights,
-            endorsements, and press items.
+            Upgrade to Premium to manage career highlights, endorsements, and
+            press items.
           </p>
           <Button
             className="bg-h_red hover:bg-h_redDark mt-2 font-semibold text-white"
@@ -645,101 +496,6 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
   /* ── Render ── */
   return (
     <div className="flex flex-col gap-6">
-      {/* Packages */}
-      <Section
-        title="Booking Packages"
-        subtitle="Tailored options for every event"
-      >
-        <div className="flex flex-col gap-3">
-          {packages.map((pkg) =>
-            editPkgId === pkg.id ? (
-              <PackageForm
-                key={pkg.id}
-                item={pkg}
-                onCancel={() => setEditPkgId(null)}
-                wrapAction={wrapAction}
-                isPending={isPending}
-              />
-            ) : (
-              <div
-                key={pkg.id}
-                className="flex items-start justify-between gap-3 rounded-lg border border-white/8 bg-white/3 p-4"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-white">
-                      {pkg.name}
-                    </p>
-                    {pkg.popular && (
-                      <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">
-                        Popular
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    {pkg.currency}
-                    {pkg.priceFrom}
-                    {pkg.priceTo ? ` – ${pkg.priceTo}` : ""}
-                    {pkg.duration ? ` · ${pkg.duration}` : ""}
-                  </p>
-                  {pkg.features.length > 0 && (
-                    <ul className="mt-2 flex flex-wrap gap-1.5">
-                      {pkg.features.map((f) => (
-                        <li
-                          key={f}
-                          className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] text-gray-400"
-                        >
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setEditPkgId(pkg.id)}
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white"
-                    aria-label="Edit"
-                  >
-                    <Pencil className="h-3 w-3" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleDelete(pkg.id, "package", deleteDjPackage)
-                    }
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
-                    aria-label="Delete"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
-            ),
-          )}
-          {addPkg && (
-            <PackageForm
-              onCancel={() => setAddPkg(false)}
-              wrapAction={wrapAction}
-              isPending={isPending}
-            />
-          )}
-          {!addPkg && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setAddPkg(true)}
-              className="w-fit border-white/15 text-gray-400 hover:bg-white/5"
-            >
-              <Plus className="mr-1.5 h-3.5 w-3.5" />
-              Add Package
-            </Button>
-          )}
-        </div>
-      </Section>
-
       {/* Highlights */}
       <Section
         title="Career Highlights"
