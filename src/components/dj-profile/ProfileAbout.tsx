@@ -58,13 +58,13 @@ export default function ProfileAbout({
       </div>
       {(experienceYears || experienceLevel || feeMin || feeMax) && (
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-400">
-          {experienceYears && (
+          {experienceYears && experienceYears > 0 && (
             <span>
               <span className="text-gray-500">Experience:</span>{" "}
               {experienceYears} {experienceYears === 1 ? "year" : "years"}
             </span>
           )}
-          {experienceLevel && (
+          {experienceLevel && experienceLevel !== "0" && (
             <span>
               <span className="text-gray-500">Level:</span> {experienceLevel}
             </span>

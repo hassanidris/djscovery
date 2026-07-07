@@ -40,12 +40,15 @@ export const CreateDjProfileSchema = z.object({
     .min(0, "Years must be 0 or more")
     .max(50, "Years must be 50 or less")
     .optional(),
-  experienceLevel: z.enum(EXPERIENCE_LEVELS).optional(),
+  // experienceLevel is auto-calculated from experienceYears
 
   // Fee/Pricing
   feeMin: z.number().int().min(0).optional(),
   feeMax: z.number().int().min(0).optional(),
   feeCurrency: z.string().max(3).optional(),
+
+  // Cover Image
+  coverImageUrl: z.string().url().optional(),
 
   // Location
   countryId: z.number().int().positive("Country is required"),

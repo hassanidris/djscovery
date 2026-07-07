@@ -134,7 +134,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       stageName: "",
       bio: "",
       experienceYears: undefined,
-      experienceLevel: undefined,
       feeMin: undefined,
       feeMax: undefined,
       feeCurrency: "",
@@ -150,7 +149,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   // Watch values for derived state (useWatch is memoizable for React Compiler)
   const stageName = useWatch({ control, name: "stageName" });
   const experienceYears = useWatch({ control, name: "experienceYears" });
-  const experienceLevel = useWatch({ control, name: "experienceLevel" });
   const feeMin = useWatch({ control, name: "feeMin" });
   const feeMax = useWatch({ control, name: "feeMax" });
   const feeCurrency = useWatch({ control, name: "feeCurrency" });
@@ -165,6 +163,11 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Cover image (file upload - not in form schema)
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   // Location cities
   const [cities, setCities] = useState<City[]>([]);
@@ -230,6 +233,28 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     }
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Cover image must be a JPG, PNG, or WEBP file.");
+      setCoverFile(null);
+      setCoverPreview(null);
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Cover image must be 5 MB or smaller.");
+      setCoverFile(null);
+      setCoverPreview(null);
+      e.target.value = "";
+      return;
+    }
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
   }
 
   async function handleCountryChange(id: number) {
@@ -323,7 +348,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
   async function uploadFile(
     file: File,
-    type: "avatar" | "gallery",
+    type: "avatar" | "gallery" | "cover",
   ): Promise<{ url: string; path: string; bucket: string }> {
     const fd = new FormData();
     fd.append("file", file);
@@ -364,6 +389,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           avatarUrl = uploaded.url;
         }
 
+        let coverImageUrl: string | undefined;
+        if (coverFile) {
+          toast.loading("Uploading cover image...", { id: toastId });
+          const uploaded = await uploadFile(coverFile, "cover");
+          uploadedPaths.push({ path: uploaded.path, bucket: uploaded.bucket });
+          coverImageUrl = uploaded.url;
+        }
+
         const media: {
           type: "IMAGE" | "VIDEO" | "AUDIO";
           url: string;
@@ -395,6 +428,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           stageName: data.stageName.trim(),
           bio: data.bio?.trim() || undefined,
           avatarUrl,
+          coverImageUrl,
           countryId: data.countryId,
           cityId: data.cityId,
           genreNames: data.genreNames,
@@ -480,6 +514,66 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         </div>
       </div>
 
+      {/* ── Cover Image ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Cover Image{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          A banner image for your profile header.
+        </p>
+
+        <div className="flex items-start gap-4">
+          <button
+            type="button"
+            onClick={() => coverInputRef.current?.click()}
+            className="hover:border-h_red relative flex h-32 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/30 bg-white/10 transition-all"
+          >
+            {coverPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverPreview.startsWith("blob:") ? coverPreview : ""}
+                alt="Cover preview"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <Camera className="h-8 w-8 text-gray-500" />
+                <span className="text-xs text-gray-500">
+                  16:9 ratio recommended
+                </span>
+              </div>
+            )}
+          </button>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleCoverChange}
+          />
+          <div>
+            <p className="text-sm text-gray-300">Upload cover image</p>
+            <p className="mt-1 text-xs text-gray-500">
+              JPG, PNG or WEBP · Max 10 MB
+            </p>
+            {coverFile && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCoverFile(null);
+                  setCoverPreview(null);
+                }}
+                className="text-h_red mt-2 flex items-center gap-1 text-xs hover:underline"
+              >
+                <X className="h-3 w-3" /> Remove
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* ── Basic Info ── */}
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>Basic Info</h2>
@@ -545,26 +639,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             {errors.experienceYears && (
               <p className="text-xs text-red-400">
                 {errors.experienceYears.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Experience Level</label>
-            <select
-              {...register("experienceLevel")}
-              className={`${inputCls} cursor-pointer appearance-none`}
-            >
-              <option value="">Select level...</option>
-              <option value="OPEN">Open to all</option>
-              <option value="BEGINNER">Beginner (0-2 years)</option>
-              <option value="INTERMEDIATE">Intermediate (2-5 years)</option>
-              <option value="PROFESSIONAL">Professional (5-10 years)</option>
-              <option value="EXPERT">Expert (10+ years)</option>
-            </select>
-            {errors.experienceLevel && (
-              <p className="text-xs text-red-400">
-                {errors.experienceLevel.message}
               </p>
             )}
           </div>

@@ -212,9 +212,6 @@ export default function EditDjProfileForm({
   const [experienceYears, setExperienceYears] = useState(
     profile.experienceYears !== null ? String(profile.experienceYears) : "",
   );
-  const [experienceLevel, setExperienceLevel] = useState(
-    profile.experienceLevel || "",
-  );
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar);
   const [coverImageUrl, setCoverImageUrl] = useState(profile.coverImage);
   const [countryId, setCountryId] = useState<number | null>(profile.countryId);
@@ -329,7 +326,6 @@ export default function EditDjProfileForm({
       (profile.experienceYears !== null
         ? String(profile.experienceYears)
         : "") ||
-    experienceLevel !== (profile.experienceLevel || "") ||
     avatarUrl !== profile.avatar ||
     coverImageUrl !== profile.coverImage ||
     countryId !== profile.countryId ||
@@ -568,7 +564,6 @@ export default function EditDjProfileForm({
         stageName: stageName.trim() || undefined,
         bio: bio.trim() || null,
         experienceYears: experienceYears ? parseInt(experienceYears, 10) : null,
-        experienceLevel: experienceLevel.trim() || null,
         avatarUrl: avatarUrl || null,
         coverImageUrl: coverImageUrl || null,
         countryId,
@@ -620,8 +615,10 @@ export default function EditDjProfileForm({
       } else {
         toast.success("Profile updated!", { id: toastId });
         const targetSlug = result.newSlug ?? profile.slug;
+        // Clear dirty state before redirect
+        setSubmitted(false);
+        // Redirect to profile view
         router.push(`/djs/${targetSlug}`);
-        router.refresh();
       }
     } finally {
       setIsSubmitting(false);
@@ -844,38 +841,6 @@ export default function EditDjProfileForm({
               />
               <p className="mt-1 text-[11px] text-gray-600">
                 Total years as a DJ
-              </p>
-            </div>
-            <div>
-              <Label className="mb-1.5 block text-xs text-gray-300">
-                Experience Level
-              </Label>
-              <select
-                value={experienceLevel}
-                onChange={(e) => setExperienceLevel(e.target.value)}
-                className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none"
-              >
-                <option value="" className="bg-zinc-900">
-                  Select level...
-                </option>
-                <option value="OPEN" className="bg-zinc-900">
-                  Open to all
-                </option>
-                <option value="BEGINNER" className="bg-zinc-900">
-                  Beginner (0-2 years)
-                </option>
-                <option value="INTERMEDIATE" className="bg-zinc-900">
-                  Intermediate (2-5 years)
-                </option>
-                <option value="PROFESSIONAL" className="bg-zinc-900">
-                  Professional (5-10 years)
-                </option>
-                <option value="EXPERT" className="bg-zinc-900">
-                  Expert (10+ years)
-                </option>
-              </select>
-              <p className="mt-1 text-[11px] text-gray-600">
-                Helps organizers match with suitable DJs
               </p>
             </div>
           </div>

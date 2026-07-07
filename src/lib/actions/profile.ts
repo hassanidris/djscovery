@@ -155,10 +155,7 @@ const UpdateDjProfileSchema = z.object({
     .optional(),
   bio: z.string().max(800).optional().nullable(),
   experienceYears: z.number().int().min(0).max(50).optional().nullable(),
-  experienceLevel: z
-    .enum(["OPEN", "BEGINNER", "INTERMEDIATE", "PROFESSIONAL", "EXPERT"])
-    .optional()
-    .nullable(),
+  // experienceLevel is auto-calculated from experienceYears
   avatarUrl: z.string().url().optional().nullable(),
   coverImageUrl: z.string().url().optional().nullable(),
   countryId: z.number().int().positive().optional(),
@@ -229,6 +226,18 @@ const UpdateDjProfileSchema = z.object({
 
 export type UpdateDjProfileInput = z.infer<typeof UpdateDjProfileSchema>;
 
+// Helper function to calculate experience level from years
+function calculateExperienceLevel(
+  years: number | null | undefined,
+): "OPEN" | "BEGINNER" | "INTERMEDIATE" | "PROFESSIONAL" | "EXPERT" | null {
+  if (!years || years < 0) return null;
+  if (years === 0) return "OPEN";
+  if (years <= 2) return "BEGINNER";
+  if (years <= 5) return "INTERMEDIATE";
+  if (years <= 10) return "PROFESSIONAL";
+  return "EXPERT";
+}
+
 export async function createDjProfile(
   input: unknown,
 ): Promise<{ error: string } | { success: true }> {
@@ -290,7 +299,7 @@ export async function createDjProfile(
         stageName,
         bio: bio ?? null,
         experienceYears: experienceYears ?? null,
-        experienceLevel: experienceLevel ?? null,
+        experienceLevel: calculateExperienceLevel(experienceYears),
         avatar: avatarUrl ?? null,
         coverImage: coverImageUrl ?? null,
         countryId: countryId,
@@ -489,9 +498,7 @@ export async function updateDjProfile(
           ...(data.bio !== undefined && { bio: data.bio }),
           ...(data.experienceYears !== undefined && {
             experienceYears: data.experienceYears,
-          }),
-          ...(data.experienceLevel !== undefined && {
-            experienceLevel: data.experienceLevel,
+            experienceLevel: calculateExperienceLevel(data.experienceYears),
           }),
           ...(data.avatarUrl !== undefined && { avatar: data.avatarUrl }),
           ...(data.coverImageUrl !== undefined && {
