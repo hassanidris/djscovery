@@ -31,6 +31,7 @@ export default function WhereIvePlayed({ venues }: Props) {
         return date.toLocaleDateString("en-US", {
           month: "short",
           year: "numeric",
+          timeZone: "UTC",
         });
       } else if (parts.length === 2) {
         // Month only: YYYY-MM

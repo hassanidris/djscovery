@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -160,6 +161,17 @@ export default function PackageModal({
   }
 
   function handleSave() {
+    // Validate each package
+    for (const pkg of packages) {
+      if (!pkg.name.trim()) {
+        toast.error("Package name is required");
+        return;
+      }
+      if (pkg.priceFrom <= 0) {
+        toast.error("Price must be greater than 0");
+        return;
+      }
+    }
     onSave(packages);
     onClose();
   }

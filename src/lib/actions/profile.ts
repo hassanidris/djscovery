@@ -146,12 +146,13 @@ const DjProfileInputSchema = z
       .array(
         z.object({
           venueName: z.string().min(1).max(100),
-          eventDate: z.string().optional(),
+          eventDate: z.string().max(20).optional(),
           description: z.string().max(300).optional(),
           countryId: z.number().int().positive(),
           cityId: z.number().int().positive(),
         }),
       )
+      .max(20, "Up to 20 venues allowed")
       .optional(),
   })
   .refine(
@@ -421,8 +422,18 @@ export async function createDjProfile(
       }
 
       if (venues && venues.length > 0) {
+        const validCities = await tx.city.findMany({
+          where: {
+            OR: venues.map((v) => ({ id: v.cityId, countryId: v.countryId })),
+          },
+          select: { id: true, countryId: true },
+        });
+        const isValid = (v: (typeof venues)[number]) =>
+          validCities.some(
+            (c) => c.id === v.cityId && c.countryId === v.countryId,
+          );
         await tx.djVenue.createMany({
-          data: venues.map((v) => ({
+          data: venues.filter(isValid).map((v) => ({
             venueName: v.venueName,
             eventDate: v.eventDate,
             description: v.description,
@@ -699,16 +710,33 @@ export async function updateDjProfile(
             } => v.venueName != null && v.countryId != null && v.cityId != null,
           );
           if (validVenues.length > 0) {
-            await tx.djVenue.createMany({
-              data: validVenues.map((v) => ({
-                venueName: v.venueName,
-                eventDate: v.eventDate ?? null,
-                description: v.description ?? null,
-                countryId: v.countryId,
-                cityId: v.cityId,
-                djProfileId: existing.id,
-              })),
+            // Validate city/country consistency
+            const validCities = await tx.city.findMany({
+              where: {
+                OR: validVenues.map((v) => ({
+                  id: v.cityId,
+                  countryId: v.countryId,
+                })),
+              },
+              select: { id: true, countryId: true },
             });
+            const isValid = (v: (typeof validVenues)[number]) =>
+              validCities.some(
+                (c) => c.id === v.cityId && c.countryId === v.countryId,
+              );
+            const validatedVenues = validVenues.filter(isValid);
+            if (validatedVenues.length > 0) {
+              await tx.djVenue.createMany({
+                data: validatedVenues.map((v) => ({
+                  venueName: v.venueName,
+                  eventDate: v.eventDate ?? null,
+                  description: v.description ?? null,
+                  countryId: v.countryId,
+                  cityId: v.cityId,
+                  djProfileId: existing.id,
+                })),
+              });
+            }
           }
         }
       }
@@ -1119,6 +1147,24 @@ export async function uploadFanAvatar(
 
 // ── Venue CRUD Operations ─────────────────────────────────────────────────────
 
+const VenueInputSchema = z.object({
+  djProfileId: z.number().int().positive(),
+  venueName: z.string().min(1).max(100),
+  eventDate: z.string().max(20).nullable().optional(),
+  description: z.string().max(300).nullable().optional(),
+  countryId: z.number().int().positive(),
+  cityId: z.number().int().positive(),
+});
+
+const VenueUpdateSchema = z.object({
+  id: z.number().int().positive(),
+  venueName: z.string().min(1).max(100),
+  eventDate: z.string().max(20).nullable().optional(),
+  description: z.string().max(300).nullable().optional(),
+  countryId: z.number().int().positive(),
+  cityId: z.number().int().positive(),
+});
+
 export async function addVenue(input: {
   djProfileId: number;
   venueName: string;
@@ -1133,12 +1179,33 @@ export async function addVenue(input: {
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated." };
 
+  // Validate input
+  const parsed = VenueInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      error:
+        "Validation failed: " +
+        parsed.error.issues.map((i) => i.message).join(", "),
+    };
+  }
+
   const djProfile = await prisma.djProfile.findUnique({
     where: { id: input.djProfileId },
     select: { userId: true },
   });
   if (!djProfile || djProfile.userId !== user.id) {
     return { error: "Not authorized." };
+  }
+
+  // Validate city/country consistency
+  const city = await prisma.city.findFirst({
+    where: { id: input.cityId, countryId: input.countryId },
+    select: { id: true },
+  });
+  if (!city) {
+    return {
+      error: "The selected city does not belong to the selected country.",
+    };
   }
 
   try {
@@ -1177,12 +1244,33 @@ export async function updateVenue(input: {
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated." };
 
+  // Validate input
+  const parsed = VenueUpdateSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      error:
+        "Validation failed: " +
+        parsed.error.issues.map((i) => i.message).join(", "),
+    };
+  }
+
   const venue = await prisma.djVenue.findUnique({
     where: { id: input.id },
     select: { djProfile: { select: { userId: true } } },
   });
   if (!venue || venue.djProfile.userId !== user.id) {
     return { error: "Not authorized." };
+  }
+
+  // Validate city/country consistency
+  const city = await prisma.city.findFirst({
+    where: { id: input.cityId, countryId: input.countryId },
+    select: { id: true },
+  });
+  if (!city) {
+    return {
+      error: "The selected city does not belong to the selected country.",
+    };
   }
 
   try {

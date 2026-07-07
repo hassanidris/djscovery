@@ -34,7 +34,6 @@ import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
-import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
@@ -45,7 +44,6 @@ import {
 import {
   FREE_DEFAULT_DJ,
   FREE_DEFAULT_EVENTS,
-  FREE_DEFAULT_VENUES,
   FREE_DEFAULT_REVIEWS,
   FREE_DEFAULT_MEDIA,
   FREE_DEFAULT_FEATURED_MIX,
@@ -53,7 +51,6 @@ import {
 import {
   mapFreeDjToProps,
   mapFreeEventsFromData,
-  mapFreeVenuesFromData,
   mapFreeReviewsFromData,
   mapFreeMediaFromData,
   mapFreeFeaturedMix,
@@ -126,7 +123,6 @@ export default function DjProfileFree({
 
   const DJ = djData ? mapFreeDjToProps(djData) : FREE_DEFAULT_DJ;
   const EVENTS = djData ? mapFreeEventsFromData(djData) : FREE_DEFAULT_EVENTS;
-  const VENUES = djData ? mapFreeVenuesFromData(djData) : [];
   const REVIEWS = djData ? mapFreeReviewsFromData(djData) : [];
   const MEDIA = djData ? mapFreeMediaFromData(djData) : FREE_DEFAULT_MEDIA;
   const FEATURED_MIX = djData
@@ -151,7 +147,6 @@ export default function DjProfileFree({
   const hasSpotlight = hasFeaturedMix || hasFeaturedVideo;
   const hasMixes = hasFeaturedMix;
   const hasPhotos = MEDIA.length > 0;
-  const hasVenues = VENUES.length > 0;
 
   const featuredMixAudioUrl = FEATURED_MIX.audioUrl;
   const featuredMixThumb = useAudioThumbnail(featuredMixAudioUrl);

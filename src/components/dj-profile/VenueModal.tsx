@@ -125,7 +125,8 @@ export default function VenueModal({
   }
 
   function handleSave() {
-    onSave(venues);
+    const validVenues = venues.filter((v) => v.venueName.trim() !== "");
+    onSave(validVenues);
     onClose();
   }
 
