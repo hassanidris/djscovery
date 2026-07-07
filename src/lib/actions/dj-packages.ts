@@ -33,13 +33,10 @@ export async function createDjPackage(
   const priceTo = priceToRaw ? parseInt(priceToRaw as string, 10) : null;
   const currency = (formData.get("currency") as string)?.trim() || "USD";
   const duration = (formData.get("duration") as string)?.trim() || null;
-  const featuresRaw = (formData.get("features") as string)?.trim();
-  const features = featuresRaw
-    ? featuresRaw
-        .split("\n")
-        .map((f) => f.trim())
-        .filter(Boolean)
-    : [];
+  const features = formData
+    .getAll("features")
+    .map((f) => String(f).trim())
+    .filter(Boolean);
   const popular = formData.get("popular") === "true";
 
   if (!name || isNaN(priceFrom)) {
@@ -86,13 +83,10 @@ export async function updateDjPackage(
   const priceToRaw = formData.get("priceTo");
   const currency = (formData.get("currency") as string)?.trim() || null;
   const duration = (formData.get("duration") as string)?.trim() || null;
-  const featuresRaw = (formData.get("features") as string)?.trim();
-  const features = featuresRaw
-    ? featuresRaw
-        .split("\n")
-        .map((f) => f.trim())
-        .filter(Boolean)
-    : undefined;
+  const features = formData
+    .getAll("features")
+    .map((f) => String(f).trim())
+    .filter(Boolean);
   const popular = formData.get("popular");
 
   const data: Record<string, unknown> = {};

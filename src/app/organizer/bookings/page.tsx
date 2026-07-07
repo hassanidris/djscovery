@@ -88,6 +88,9 @@ export default async function OrganizerBookingsPage() {
       counterpartyEmail: contactVisible ? djContactEmail : undefined,
       contactVisible,
       messages,
+      packageName: inquiry.packageName,
+      packagePrice: inquiry.packagePrice,
+      packagePriceTo: inquiry.packagePriceTo,
     };
   });
 
