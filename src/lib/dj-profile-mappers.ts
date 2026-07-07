@@ -67,11 +67,10 @@ export function mapVenuesFromData(
   d: DjDemoData,
   opts?: { withCountry?: boolean },
 ) {
-  return d.venuesPlayed.map((v) => ({
+  return (d.venuesPlayed || []).map((v) => ({
     name: v.venue,
     city: v.city,
-    country: opts?.withCountry ? "" : undefined,
-    count: v.timesPlayed,
+    country: opts?.withCountry ? v.country : undefined,
   }));
 }
 
