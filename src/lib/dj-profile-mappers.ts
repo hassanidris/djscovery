@@ -213,19 +213,8 @@ export function mapPackagesFromData(d: DjDemoData) {
     "Private Event": "from-blue-600/20 to-transparent",
   };
   return d.packages.map((pkg, i) => {
-    // Format duration from durationMin/durationMax
-    let duration = "";
-    if (
-      pkg.durationMin &&
-      pkg.durationMax &&
-      pkg.durationMin !== pkg.durationMax
-    ) {
-      duration = `${pkg.durationMin}-${pkg.durationMax} hours`;
-    } else if (pkg.durationMin) {
-      duration = `${pkg.durationMin} hours`;
-    } else if (pkg.durationMax) {
-      duration = `${pkg.durationMax} hours`;
-    }
+    // Use duration string directly (e.g., "3-4 hours", "2 hours")
+    const duration = pkg.duration || "";
 
     // Format price range
     let price = `From ${pkg.currency}${formatNumber(pkg.priceFrom)}`;

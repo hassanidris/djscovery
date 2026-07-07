@@ -25,8 +25,7 @@ interface Package {
   priceFrom: number;
   priceTo: number | null;
   currency: string;
-  durationMin: number | null;
-  durationMax: number | null;
+  duration: string | null;
   features: string[];
   popular: boolean;
   sortOrder: number;
@@ -60,8 +59,7 @@ export default function PackageModal({
           priceFrom: 0,
           priceTo: null,
           currency: defaultCurrency,
-          durationMin: null,
-          durationMax: null,
+          duration: null,
           features: [],
           popular: false,
           sortOrder: 0,
@@ -81,8 +79,7 @@ export default function PackageModal({
         priceFrom: 0,
         priceTo: null,
         currency: defaultCurrency,
-        durationMin: null,
-        durationMax: null,
+        duration: null,
         features: [],
         popular: false,
         sortOrder: prev.length,
@@ -103,8 +100,7 @@ export default function PackageModal({
               priceFrom: template.priceFrom,
               priceTo: template.priceTo || null,
               currency: defaultCurrency, // Use DJ's currency instead of template's
-              durationMin: template.durationMin,
-              durationMax: template.durationMax,
+              duration: template.duration,
               features: template.features,
               popular: template.popular || false,
             }
@@ -217,8 +213,7 @@ export default function PackageModal({
                       updatePackage(index, "name", "");
                       updatePackage(index, "priceFrom", 0);
                       updatePackage(index, "priceTo", null);
-                      updatePackage(index, "durationMin", null);
-                      updatePackage(index, "durationMax", null);
+                      updatePackage(index, "duration", null);
                       updatePackage(index, "features", []);
                       updatePackage(index, "popular", false);
                     } else {
@@ -323,45 +318,19 @@ export default function PackageModal({
                 </select>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Duration Min (hours)
-                  </Label>
-                  <Input
-                    type="number"
-                    value={pkg.durationMin || ""}
-                    onChange={(e) =>
-                      updatePackage(
-                        index,
-                        "durationMin",
-                        e.target.value ? Number(e.target.value) : null,
-                      )
-                    }
-                    placeholder="3"
-                    min="1"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Duration Max (hours)
-                  </Label>
-                  <Input
-                    type="number"
-                    value={pkg.durationMax || ""}
-                    onChange={(e) =>
-                      updatePackage(
-                        index,
-                        "durationMax",
-                        e.target.value ? Number(e.target.value) : null,
-                      )
-                    }
-                    placeholder="4"
-                    min="1"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                  />
-                </div>
+              <div>
+                <Label className="mb-1.5 block text-xs text-gray-300">
+                  Duration (e.g., "3-4 hours", "2 hours")
+                </Label>
+                <Input
+                  type="text"
+                  value={pkg.duration || ""}
+                  onChange={(e) =>
+                    updatePackage(index, "duration", e.target.value || null)
+                  }
+                  placeholder="3-4 hours"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                />
               </div>
 
               <div>

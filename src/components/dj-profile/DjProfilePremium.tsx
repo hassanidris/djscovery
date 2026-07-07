@@ -269,8 +269,7 @@ export default function DjProfilePremium({
       priceFrom: number;
       priceTo: number | null;
       currency: string;
-      durationMin: number | null;
-      durationMax: number | null;
+      duration: string | null;
       features: string[];
       popular: boolean;
       sortOrder: number;
@@ -282,8 +281,7 @@ export default function DjProfilePremium({
       priceFrom: p.priceFrom || 0,
       priceTo: p.priceTo || null,
       currency: p.currency || "USD",
-      durationMin: p.durationMin || null,
-      durationMax: p.durationMax || null,
+      duration: p.duration || null,
       features: p.features || [],
       popular: p.popular || false,
       sortOrder: p.sortOrder || 0,
@@ -384,13 +382,6 @@ export default function DjProfilePremium({
         .filter((p) => !newPackages.find((np) => np.id === p.id))
         .map((p) => p.id);
 
-      // Format duration for storage
-      const formatDuration = (min: number | null, max: number | null) => {
-        if (!min && !max) return null;
-        if (min && max && min !== max) return `${min}-${max} hours`;
-        return `${min || max} hours`;
-      };
-
       // Add new packages
       const addedPackageIds: number[] = [];
       for (const pkg of packagesToAdd) {
@@ -402,10 +393,7 @@ export default function DjProfilePremium({
         formData.append("priceFrom", String(pkg.priceFrom));
         if (pkg.priceTo) formData.append("priceTo", String(pkg.priceTo));
         formData.append("currency", pkg.currency);
-        formData.append(
-          "duration",
-          formatDuration(pkg.durationMin, pkg.durationMax) || "",
-        );
+        formData.append("duration", pkg.duration || "");
         pkg.features.forEach((f) => formData.append("features", f));
         formData.append("popular", String(pkg.popular));
         formData.append("sortOrder", String(pkg.sortOrder));
@@ -428,10 +416,7 @@ export default function DjProfilePremium({
         if (pkg.priceTo !== null)
           formData.append("priceTo", String(pkg.priceTo));
         formData.append("currency", pkg.currency);
-        formData.append(
-          "duration",
-          formatDuration(pkg.durationMin, pkg.durationMax) || "",
-        );
+        formData.append("duration", pkg.duration || "");
         pkg.features.forEach((f) => formData.append("features", f));
         formData.append("popular", String(pkg.popular));
         formData.append("sortOrder", String(pkg.sortOrder));
@@ -1059,14 +1044,7 @@ export default function DjProfilePremium({
                       priceFrom: p.priceFrom,
                       priceTo: p.priceTo,
                       currency: p.currency,
-                      duration:
-                        p.durationMin && p.durationMax
-                          ? `${p.durationMin}-${p.durationMax} hours`
-                          : p.durationMin
-                            ? `${p.durationMin} hours`
-                            : p.durationMax
-                              ? `${p.durationMax} hours`
-                              : null,
+                      duration: p.duration,
                       features: p.features,
                       popular: p.popular,
                     }))}

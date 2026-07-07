@@ -83,6 +83,7 @@ export interface DjDemoData {
     name: string;
     priceFrom: number;
     currency: string;
+    duration?: string;
     features: string[];
     popular?: boolean;
   }>;

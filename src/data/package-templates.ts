@@ -3,8 +3,7 @@ export interface PackageTemplate {
   priceFrom: number;
   priceTo?: number;
   currency: string;
-  durationMin: number;
-  durationMax: number;
+  duration: string;
   features: string[];
   popular?: boolean;
 }
@@ -15,8 +14,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 2500,
     priceTo: 4000,
     currency: "GBP",
-    durationMin: 3,
-    durationMax: 4,
+    duration: "3-4 hours",
     features: [
       "Pre-event consultation",
       "Custom setlist",
@@ -29,8 +27,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 6000,
     priceTo: 10000,
     currency: "GBP",
-    durationMin: 1,
-    durationMax: 1.5,
+    duration: "1-1.5 hours",
     features: [
       "Full production rider",
       "Stage management",
@@ -44,8 +41,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 3500,
     priceTo: 5000,
     currency: "GBP",
-    durationMin: 4,
-    durationMax: 5,
+    duration: "4-5 hours",
     features: [
       "Personalized playlist",
       "Song requests welcome",
@@ -61,8 +57,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 4000,
     priceTo: 7000,
     currency: "GBP",
-    durationMin: 3,
-    durationMax: 4,
+    duration: "3-4 hours",
     features: [
       "Brand-aligned music curation",
       "Professional attire",
@@ -78,8 +73,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 2000,
     priceTo: 3500,
     currency: "GBP",
-    durationMin: 3,
-    durationMax: 4,
+    duration: "3-4 hours",
     features: [
       "Flexible music selection",
       "Song requests encouraged",
@@ -94,8 +88,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 1500,
     priceTo: 2500,
     currency: "GBP",
-    durationMin: 2,
-    durationMax: 3,
+    duration: "2-3 hours",
     features: [
       "Background music curation",
       "Volume-appropriate mixing",
@@ -109,8 +102,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 1800,
     priceTo: 3000,
     currency: "GBP",
-    durationMin: 3,
-    durationMax: 4,
+    duration: "3-4 hours",
     features: [
       "Birthday song coordination",
       "Age-appropriate music",
@@ -125,8 +117,7 @@ export const PACKAGE_TEMPLATES: Record<string, PackageTemplate> = {
     priceFrom: 1200,
     priceTo: 2000,
     currency: "GBP",
-    durationMin: 2,
-    durationMax: 3,
+    duration: "2-3 hours",
     features: [
       "Ambient music curation",
       "Dinner-appropriate volume",
