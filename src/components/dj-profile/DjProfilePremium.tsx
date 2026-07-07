@@ -21,6 +21,7 @@ import {
   BriefcaseBusiness,
   MapPin,
   Star,
+  Plus,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -31,8 +32,11 @@ import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
-import ProfileVenues from "@/components/dj-profile/ProfileVenues";
+import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
+import VenueModal from "@/components/dj-profile/VenueModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
+import { toast } from "sonner";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
@@ -44,7 +48,6 @@ import {
 import {
   PREMIUM_DEFAULT_DJ,
   PREMIUM_DEFAULT_EVENTS,
-  PREMIUM_DEFAULT_VENUES,
   PREMIUM_DEFAULT_REVIEWS,
   PREMIUM_DEFAULT_MEDIA,
   PREMIUM_DEFAULT_ENDORSEMENTS,
@@ -59,7 +62,6 @@ import {
 import {
   mapPremiumDjToProps,
   mapPremiumEventsFromData,
-  mapPremiumVenuesFromData,
   mapPremiumReviewsFromData,
   mapPremiumMediaFromData,
   mapEndorsementsFromData,
@@ -82,12 +84,14 @@ function EmptySectionState({
   description,
   actionLabel,
   actionHref,
+  onAction,
 }: {
   icon: any;
   title: string;
   description: string;
   actionLabel: string;
-  actionHref: string;
+  actionHref?: string;
+  onAction?: () => void;
 }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/2 py-12 text-center">
@@ -96,14 +100,25 @@ function EmptySectionState({
       </div>
       <p className="text-sm font-medium text-white">{title}</p>
       <p className="mt-1 max-w-xs text-xs text-gray-500">{description}</p>
-      <Button
-        asChild
-        variant="ghost"
-        size="sm"
-        className="mt-4 text-xs text-gray-400 hover:text-white"
-      >
-        <Link href={actionHref}>{actionLabel}</Link>
-      </Button>
+      {actionHref ? (
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="mt-4 text-xs text-gray-400 hover:text-white"
+        >
+          <Link href={actionHref}>{actionLabel}</Link>
+        </Button>
+      ) : onAction ? (
+        <Button
+          onClick={onAction}
+          variant="ghost"
+          size="sm"
+          className="mt-4 text-xs text-gray-400 hover:text-white"
+        >
+          {actionLabel}
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -188,6 +203,7 @@ export default function DjProfilePremium({
   status,
   viewerContext,
   bookingOptions,
+  countries,
 }: {
   djData?: DjDemoData;
   viewMode?: ViewMode;
@@ -205,18 +221,123 @@ export default function DjProfilePremium({
   status?: string;
   viewerContext?: BookingViewerContext;
   bookingOptions?: BookingFormOptions;
+  countries?: Array<{ id: number; name: string }>;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
   const [mediaTab, setMediaTab] = useState<"photos" | "videos" | "mixes">(
     "photos",
   );
+  const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
+  const [venues, setVenues] = useState<
+    Array<{
+      id: number;
+      venueName: string;
+      eventDate: string;
+      description: string;
+      countryId: number;
+      cityId: number;
+      countryName: string;
+      cityName: string;
+    }>
+  >(
+    (djData?.venuesPlayed || []).map((v) => ({
+      id: v.id || 0,
+      venueName: v.venue,
+      eventDate: v.date || "",
+      description: v.description || "",
+      countryId: 0,
+      cityId: 0,
+      countryName: v.country,
+      cityName: v.city,
+    })),
+  );
+
+  async function handleVenueSave(newVenues: typeof venues) {
+    const toastId = toast.loading("Saving venues...");
+
+    try {
+      // Find new venues (id === 0)
+      const venuesToAdd = newVenues.filter((v) => v.id === 0);
+      // Find existing venues that were modified
+      const venuesToUpdate = newVenues.filter((v) => v.id !== 0);
+      // Find venues that were removed
+      const removedVenueIds = venues
+        .filter((v) => !newVenues.find((nv) => nv.id === v.id))
+        .map((v) => v.id);
+
+      // Add new venues
+      const addedVenueIds: number[] = [];
+      for (const venue of venuesToAdd) {
+        if (!venue.venueName.trim() || !venue.countryId || !venue.cityId) {
+          continue;
+        }
+        const result = await addVenue({
+          djProfileId,
+          venueName: venue.venueName.trim(),
+          eventDate: venue.eventDate.trim() || null,
+          description: venue.description.trim() || null,
+          countryId: venue.countryId,
+          cityId: venue.cityId,
+        });
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+        if ("success" in result) {
+          addedVenueIds.push(result.venue.id);
+        }
+      }
+
+      // Update modified venues
+      for (const venue of venuesToUpdate) {
+        const result = await updateVenue({
+          id: venue.id,
+          venueName: venue.venueName.trim(),
+          eventDate: venue.eventDate.trim() || null,
+          description: venue.description.trim() || null,
+          countryId: venue.countryId,
+          cityId: venue.cityId,
+        });
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      // Delete removed venues
+      for (const venueId of removedVenueIds) {
+        const result = await deleteVenue(venueId);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      toast.success("Venues saved successfully!", { id: toastId });
+
+      // Update local state with new venue IDs
+      const updatedVenues = newVenues.map((v, idx) => {
+        if (v.id === 0 && addedVenueIds.length > 0) {
+          const newId = addedVenueIds.shift();
+          return { ...v, id: newId || 0 };
+        }
+        return v;
+      });
+      setVenues(updatedVenues);
+
+      // Trigger page refresh to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to save venues:", error);
+      toast.error("Failed to save venues. Please try again.", { id: toastId });
+    }
+  }
 
   const DJ = djData ? mapPremiumDjToProps(djData) : PREMIUM_DEFAULT_DJ;
   const EVENTS = djData
     ? mapPremiumEventsFromData(djData)
     : PREMIUM_DEFAULT_EVENTS;
-  const VENUES = djData ? mapPremiumVenuesFromData(djData) : [];
   const REVIEWS = djData ? mapPremiumReviewsFromData(djData) : [];
   const MEDIA = djData
     ? mapPremiumMediaFromData(djData)
@@ -775,28 +896,37 @@ export default function DjProfilePremium({
 
             <Separator className="bg-white/8" />
 
-            {(VENUES.length > 0 || isOwner) && (
+            {(djData?.venuesPlayed?.length ?? 0) > 0 || isOwner ? (
               <section>
                 <SectionHeading sub="Past performances and residencies">
-                  Venues
+                  Where I've Played
                 </SectionHeading>
-                {VENUES.length > 0 ? (
-                  <ProfileVenues venues={VENUES} />
+                {(djData?.venuesPlayed?.length ?? 0) > 0 ? (
+                  <WhereIvePlayed
+                    venues={(djData?.venuesPlayed || []).map((v) => ({
+                      id: 0,
+                      venueName: v.venue,
+                      eventDate: v.date || null,
+                      description: v.description || null,
+                      city: { name: v.city },
+                      country: { name: v.country },
+                    }))}
+                  />
                 ) : (
                   <EmptySectionState
                     icon={MapPin}
                     title="No venues added yet"
                     description="Add venues where you've performed to build credibility"
                     actionLabel="Add Venues"
-                    actionHref={editHref}
+                    onAction={() => setIsVenueModalOpen(true)}
                   />
                 )}
               </section>
-            )}
+            ) : null}
 
-            {(VENUES.length > 0 || isOwner) && (
+            {(djData?.venuesPlayed?.length ?? 0) > 0 || isOwner ? (
               <Separator className="bg-white/8" />
-            )}
+            ) : null}
 
             {/* ── MOBILE EVENTS ── */}
             <div className="lg:hidden">
@@ -951,6 +1081,17 @@ export default function DjProfilePremium({
           </aside>
         </div>
       </div>
+
+      {isOwner && (
+        <VenueModal
+          isOpen={isVenueModalOpen}
+          onClose={() => setIsVenueModalOpen(false)}
+          venues={venues}
+          onSave={handleVenueSave}
+          countries={countries || []}
+          djProfileId={djProfileId}
+        />
+      )}
     </div>
   );
 }

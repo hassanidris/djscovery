@@ -149,6 +149,10 @@ export default async function DjProfilePage({
         orderBy: { startDate: "asc" },
         include: { city: true, country: true },
       },
+      venues: {
+        orderBy: { createdAt: "desc" },
+        include: { city: true, country: true },
+      },
       reputationDetail: true,
       _count: {
         select: { ratings: true, followers: true },
@@ -388,10 +392,13 @@ export default async function DjProfilePage({
       title: p.title,
       date: p.date ?? "",
     })),
-    venuesPlayed: dj.eventsOwned.map((e) => ({
-      venue: e.venue ?? e.title,
-      city: e.city?.name ?? "",
-      timesPlayed: 1,
+    venuesPlayed: (dj.venues || []).map((v) => ({
+      id: v.id,
+      venue: v.venueName,
+      city: v.city?.name ?? "",
+      country: v.country?.name ?? "",
+      date: v.eventDate ?? "",
+      description: v.description ?? "",
     })),
     reviewsList: dj.ratings.map((r) => ({
       name: r.user.name ?? r.user.username,
@@ -475,6 +482,7 @@ export default async function DjProfilePage({
           status={dj.status}
           viewerContext={viewerContext}
           bookingOptions={bookingOptions}
+          countries={bookingOptions.countries}
         />
       ) : (
         <DjProfileFree

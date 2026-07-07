@@ -141,6 +141,18 @@ const DjProfileInputSchema = z
     ),
     bookingEmail: z.string().email().optional(),
     bookingPhone: z.string().max(30).optional(),
+    // Where I've Played (venues)
+    venues: z
+      .array(
+        z.object({
+          venueName: z.string().min(1).max(100),
+          eventDate: z.string().optional(),
+          description: z.string().max(300).optional(),
+          countryId: z.number().int().positive(),
+          cityId: z.number().int().positive(),
+        }),
+      )
+      .optional(),
   })
   .refine(
     (data) => {
@@ -233,6 +245,19 @@ const UpdateDjProfileSchema = z
     featuredVideoThumbnail: z.string().url().optional().nullable(),
     featuredVideoDuration: z.string().max(20).optional().nullable(),
     featuredVideoViews: z.number().int().nonnegative().optional(),
+
+    // Where I've Played (venues)
+    venues: z
+      .array(
+        z.object({
+          venueName: z.string().min(1).max(100).optional().nullable(),
+          eventDate: z.string().optional().nullable(),
+          description: z.string().max(300).optional().nullable(),
+          countryId: z.number().int().positive().optional().nullable(),
+          cityId: z.number().int().positive().optional().nullable(),
+        }),
+      )
+      .optional(),
   })
   .refine(
     (data) => {
@@ -295,6 +320,7 @@ export async function createDjProfile(
       feeMin,
       feeMax,
       feeCurrency,
+      venues,
     } = parsed.data;
 
     const city = await prisma.city.findFirst({
@@ -389,6 +415,19 @@ export async function createDjProfile(
             url: m.url,
             bucket: m.bucket,
             path: m.path,
+            djProfileId: profile.id,
+          })),
+        });
+      }
+
+      if (venues && venues.length > 0) {
+        await tx.djVenue.createMany({
+          data: venues.map((v) => ({
+            venueName: v.venueName,
+            eventDate: v.eventDate,
+            description: v.description,
+            countryId: v.countryId,
+            cityId: v.cityId,
             djProfileId: profile.id,
           })),
         });
@@ -642,6 +681,35 @@ export async function updateDjProfile(
             })),
             skipDuplicates: true,
           });
+        }
+      }
+
+      if (data.venues !== undefined) {
+        await tx.djVenue.deleteMany({ where: { djProfileId: existing.id } });
+        if (data.venues.length > 0) {
+          const validVenues = data.venues.filter(
+            (
+              v,
+            ): v is {
+              venueName: string;
+              eventDate?: string | null;
+              description?: string | null;
+              countryId: number;
+              cityId: number;
+            } => v.venueName != null && v.countryId != null && v.cityId != null,
+          );
+          if (validVenues.length > 0) {
+            await tx.djVenue.createMany({
+              data: validVenues.map((v) => ({
+                venueName: v.venueName,
+                eventDate: v.eventDate ?? null,
+                description: v.description ?? null,
+                countryId: v.countryId,
+                cityId: v.cityId,
+                djProfileId: existing.id,
+              })),
+            });
+          }
         }
       }
     });
@@ -1047,4 +1115,124 @@ export async function uploadFanAvatar(
   revalidatePath("/fan/settings");
   revalidatePath("/account");
   return { url };
+}
+
+// ── Venue CRUD Operations ─────────────────────────────────────────────────────
+
+export async function addVenue(input: {
+  djProfileId: number;
+  venueName: string;
+  eventDate: string | null;
+  description: string | null;
+  countryId: number;
+  cityId: number;
+}): Promise<{ success: true; venue: { id: number } } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  const djProfile = await prisma.djProfile.findUnique({
+    where: { id: input.djProfileId },
+    select: { userId: true },
+  });
+  if (!djProfile || djProfile.userId !== user.id) {
+    return { error: "Not authorized." };
+  }
+
+  try {
+    const venue = await prisma.djVenue.create({
+      data: {
+        djProfileId: input.djProfileId,
+        venueName: input.venueName,
+        eventDate: input.eventDate,
+        description: input.description,
+        countryId: input.countryId,
+        cityId: input.cityId,
+      },
+      select: { id: true },
+    });
+
+    revalidatePath(`/djs`);
+    revalidatePath(`/djs/[slug]`);
+    return { success: true, venue };
+  } catch (error) {
+    console.error("Failed to add venue:", error);
+    return { error: "Failed to add venue. Please try again." };
+  }
+}
+
+export async function updateVenue(input: {
+  id: number;
+  venueName: string;
+  eventDate: string | null;
+  description: string | null;
+  countryId: number;
+  cityId: number;
+}): Promise<{ success: true } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  const venue = await prisma.djVenue.findUnique({
+    where: { id: input.id },
+    select: { djProfile: { select: { userId: true } } },
+  });
+  if (!venue || venue.djProfile.userId !== user.id) {
+    return { error: "Not authorized." };
+  }
+
+  try {
+    await prisma.djVenue.update({
+      where: { id: input.id },
+      data: {
+        venueName: input.venueName,
+        eventDate: input.eventDate,
+        description: input.description,
+        countryId: input.countryId,
+        cityId: input.cityId,
+      },
+    });
+
+    revalidatePath(`/djs`);
+    revalidatePath(`/djs/[slug]`);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update venue:", error);
+    return { error: "Failed to update venue. Please try again." };
+  }
+}
+
+export async function deleteVenue(
+  venueId: number,
+): Promise<{ success: true } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  const venue = await prisma.djVenue.findUnique({
+    where: { id: venueId },
+    select: { djProfile: { select: { userId: true } } },
+  });
+  if (!venue || venue.djProfile.userId !== user.id) {
+    return { error: "Not authorized." };
+  }
+
+  try {
+    await prisma.djVenue.delete({
+      where: { id: venueId },
+    });
+
+    revalidatePath(`/djs`);
+    revalidatePath(`/djs/[slug]`);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete venue:", error);
+    return { error: "Failed to delete venue. Please try again." };
+  }
 }
