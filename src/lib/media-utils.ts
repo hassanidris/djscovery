@@ -1,8 +1,12 @@
-"use client";
+// Pure utility functions for media provider detection and thumbnail extraction
+// These can be used in both server and client code
 
-import { useEffect, useState } from "react";
-
-type MediaProvider = "youtube" | "vimeo" | "soundcloud" | "unknown";
+type MediaProvider =
+  | "youtube"
+  | "vimeo"
+  | "soundcloud"
+  | "instagram"
+  | "unknown";
 
 function isHostOrSubdomain(host: string, domain: string): boolean {
   return host === domain || host.endsWith(`.${domain}`);
@@ -17,6 +21,8 @@ export function getMediaProvider(url: string): MediaProvider {
       return "youtube";
     if (isHostOrSubdomain(host, "vimeo.com")) return "vimeo";
     if (isHostOrSubdomain(host, "soundcloud.com")) return "soundcloud";
+    if (isHostOrSubdomain(host, "instagram.com") || host === "instagr.am")
+      return "instagram";
   } catch {
     return "unknown";
   }
@@ -52,34 +58,15 @@ export function getVideoThumbnailUrl(url: string): string | null {
     if (videoId)
       return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
   }
+  if (provider === "vimeo") {
+    // Vimeo doesn't provide a simple thumbnail URL without API
+    // This would require Vimeo API, so return null
+    return null;
+  }
+  if (provider === "instagram") {
+    // Instagram doesn't provide a public thumbnail API
+    // oEmbed is the only way, but it's now restricted
+    return null;
+  }
   return null;
-}
-
-export function useAudioThumbnail(audioUrl: string | undefined): string | null {
-  const [thumbnail, setThumbnail] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!audioUrl) return;
-    const provider = getMediaProvider(audioUrl);
-
-    if (provider === "soundcloud") {
-      let cancelled = false;
-      fetch(
-        `https://soundcloud.com/oembed?url=${encodeURIComponent(audioUrl)}&format=json`,
-      )
-        .then((res) => res.json())
-        .then((data: { thumbnail_url?: string }) => {
-          if (!cancelled && data.thumbnail_url)
-            setThumbnail(data.thumbnail_url);
-        })
-        .catch(() => {
-          // Ignore fetch failures; keep null so caller can fall back.
-        });
-      return () => {
-        cancelled = true;
-      };
-    }
-  }, [audioUrl]);
-
-  return thumbnail;
 }

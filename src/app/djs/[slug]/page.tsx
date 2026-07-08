@@ -110,15 +110,6 @@ export default async function DjProfilePage({
       agentName: true,
       agentAgency: true,
       agentEmail: true,
-      featuredMixTitle: true,
-      featuredMixAudioUrl: true,
-      featuredMixDuration: true,
-      featuredMixPlays: true,
-      featuredVideoTitle: true,
-      featuredVideoUrl: true,
-      featuredVideoThumbnail: true,
-      featuredVideoDuration: true,
-      featuredVideoViews: true,
       availabilityTimezone: true,
       availabilityMonth: true,
       availabilityDays: true,
@@ -142,7 +133,19 @@ export default async function DjProfilePage({
       },
       media: {
         take: 50,
-        orderBy: { createdAt: "desc" },
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          type: true,
+          url: true,
+          title: true,
+          duration: true,
+          thumbnail: true,
+          isSpotlight: true,
+          sortOrder: true,
+          playCount: true,
+          viewCount: true,
+        },
       },
       packages: true,
       highlights: true,
@@ -328,22 +331,30 @@ export default async function DjProfilePage({
       monthlyViews: dj.monthlyViews ?? 0,
     },
     spotlight: {
-      featuredMix: {
-        title: dj.featuredMixTitle ?? "",
-        duration: dj.featuredMixDuration ?? "",
-        plays: dj.featuredMixPlays ?? 0,
-        genres: [],
-        audioUrl: dj.featuredMixAudioUrl ?? "",
-        coverImage: dj.coverImage || "/noCover.png",
-      },
-      featuredVideo: {
-        title: dj.featuredVideoTitle ?? "",
-        subtitle: "",
-        duration: dj.featuredVideoDuration ?? "",
-        views: dj.featuredVideoViews ?? 0,
-        thumbnail: dj.featuredVideoThumbnail || dj.coverImage || "/noCover.png",
-        videoUrl: dj.featuredVideoUrl ?? "",
-      },
+      featuredMix: (() => {
+        const mix = dj.media.find((m) => m.type === "AUDIO" && m.isSpotlight);
+        return {
+          id: mix?.id,
+          title: mix?.title ?? "",
+          duration: mix?.duration ?? "",
+          plays: mix?.playCount ?? 0,
+          genres: [],
+          audioUrl: mix?.url ?? "",
+          thumbnail: mix?.thumbnail ?? dj.coverImage ?? "/noCover.png",
+        };
+      })(),
+      featuredVideo: (() => {
+        const video = dj.media.find((m) => m.type === "VIDEO" && m.isSpotlight);
+        return {
+          id: video?.id,
+          title: video?.title ?? "",
+          subtitle: "",
+          duration: video?.duration ?? "",
+          views: video?.viewCount ?? 0,
+          thumbnail: video?.thumbnail ?? dj.coverImage ?? "/noCover.png",
+          videoUrl: video?.url ?? "",
+        };
+      })(),
     },
     analytics: {
       profileViews: { value: dj.monthlyViews ?? 0, growth: 0 },
@@ -402,10 +413,24 @@ export default async function DjProfilePage({
       photos: dj.media.filter((m) => m.type === "IMAGE").map((m) => m.url),
       videos: dj.media
         .filter((m) => m.type === "VIDEO")
-        .map((m) => ({ title: "", url: m.url })),
+        .map((m) => ({
+          id: m.id,
+          title: m.title ?? "",
+          url: m.url,
+          thumbnail: m.thumbnail ?? dj.coverImage ?? "/noCover.png",
+          duration: m.duration ?? "",
+          views: m.viewCount ?? 0,
+        })),
       mixes: dj.media
         .filter((m) => m.type === "AUDIO")
-        .map((m) => ({ title: "", url: m.url })),
+        .map((m) => ({
+          id: m.id,
+          title: m.title ?? "",
+          url: m.url,
+          thumbnail: m.thumbnail ?? dj.coverImage ?? "/noCover.png",
+          duration: m.duration ?? "",
+          plays: m.playCount ?? 0,
+        })),
     },
     careerHighlights: dj.highlights.map((h) => ({
       title: h.title,

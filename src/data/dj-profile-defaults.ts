@@ -114,12 +114,14 @@ export const FREE_DEFAULT_MEDIA = [
 ];
 
 export const FREE_DEFAULT_FEATURED_MIX = {
+  id: undefined as number | undefined,
   title: "Afrobeats & Amapiano Fusion Vol.3",
   duration: "1h 24m",
   plays: "38.2k",
   platform: "SoundCloud",
   genres: ["Afrobeats", "Amapiano"],
   audioUrl: "https://soundcloud.com/soundcloud-shine/soundcloud-2025",
+  thumbnail: "/gallery-1.png",
 };
 
 // ── Premium plan defaults ───────────────────────────────────────────────────────
@@ -245,6 +247,7 @@ export type PremiumMediaItem = {
   type: "photo" | "video";
   videoUrl?: string;
   title?: string;
+  views?: number;
 };
 
 export const PREMIUM_DEFAULT_MEDIA: PremiumMediaItem[] = [
@@ -397,6 +400,7 @@ export const PREMIUM_DEFAULT_CALENDAR_DAYS = Array.from(
 
 export const PREMIUM_DEFAULT_MIXES = [
   {
+    id: 1,
     title: "Afrobeats & Amapiano Vol.3",
     duration: "1h 24m",
     plays: "82.4k",
@@ -404,6 +408,7 @@ export const PREMIUM_DEFAULT_MIXES = [
     audioUrl: "",
   },
   {
+    id: 2,
     title: "Late Night Club Mix 2025",
     duration: "2h 10m",
     plays: "41.8k",
@@ -411,6 +416,7 @@ export const PREMIUM_DEFAULT_MIXES = [
     audioUrl: "",
   },
   {
+    id: 3,
     title: "Afro Nation Pre-Party Live",
     duration: "1h 45m",
     plays: "29.2k",
@@ -421,14 +427,16 @@ export const PREMIUM_DEFAULT_MIXES = [
 
 export const PREMIUM_DEFAULT_SPOTLIGHT = {
   featuredMix: {
+    id: undefined as number | undefined,
     title: "Afrobeats & Amapiano Fusion Vol.3",
     duration: "1h 24m",
     plays: 82400,
     genres: ["Afrobeats", "Amapiano"],
     audioUrl: "https://soundcloud.com/soundcloud-shine/soundcloud-2025",
-    coverImage: "/gallery-1.png",
+    thumbnail: "/gallery-1.png",
   },
   featuredVideo: {
+    id: undefined as number | undefined,
     title: "Summer Closing Set — Full Recording",
     subtitle: "Live @ Berghain 2024",
     duration: "45 min",

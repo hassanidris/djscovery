@@ -39,6 +39,12 @@ const nextConfig = {
       { protocol: "https", hostname: "assets.podomatic.net" },
       { protocol: "https", hostname: "jarmybsjvztwrmsdcnje.supabase.co" },
       { protocol: "https", hostname: "unrqebwfdfumpjgvavbk.supabase.co" },
+      { protocol: "https", hostname: "*.tiktokcdn.com" },
+      { protocol: "https", hostname: "*.tiktokcdn-eu.com" },
+      { protocol: "https", hostname: "*.tiktokcdn-us.com" },
+      { protocol: "https", hostname: "*.tiktokcdn-asia.com" },
+      { protocol: "https", hostname: "*.tiktok.com" },
+      { protocol: "https", hostname: "*.vimeocdn.com" },
     ],
   },
 };
