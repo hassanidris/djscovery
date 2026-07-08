@@ -189,9 +189,7 @@ export default async function EventDetailPage({
         isPrivate={isPrivate}
         description={dbEvent.description}
         ticketUrl={dbEvent.ticketUrl}
-        genres={dbEvent.genres.map((g) =>
-          typeof g === "string" ? g : g.genre.name,
-        )}
+        genres={dbEvent.genres}
         recap={dbEvent.recap}
         audioLink={dbEvent.audioLink}
         posterUrl={dbEvent.posterUrl}
