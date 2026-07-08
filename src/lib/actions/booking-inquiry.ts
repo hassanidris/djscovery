@@ -49,8 +49,20 @@ const submitBookingInquirySchema = z
     budgetCurrency: z.string().trim().min(2).max(10),
     message: z.string().trim().min(50).max(1500),
     packageName: z.string().trim().max(100).optional(),
-    packagePrice: z.number().int().nonnegative().max(1_000_000).nullable(),
-    packagePriceTo: z.number().int().nonnegative().max(1_000_000).nullable(),
+    packagePrice: z
+      .number()
+      .int()
+      .nonnegative()
+      .max(1_000_000)
+      .nullable()
+      .optional(),
+    packagePriceTo: z
+      .number()
+      .int()
+      .nonnegative()
+      .max(1_000_000)
+      .nullable()
+      .optional(),
   })
   .superRefine((value, ctx) => {
     const eventDate = new Date(value.eventDate);

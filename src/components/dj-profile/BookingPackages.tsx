@@ -107,8 +107,29 @@ export default function BookingPackages({
               </li>
             ))}
           </ul>
-          {viewerRole === "dj-owner" ? null : viewerRole ===
-            "guest" ? null : viewerRole === "fan" ? (
+          {viewerRole === "dj-owner" ? null : viewerRole === "guest" ? (
+            <Button
+              className="bg-h_red hover:bg-h_redDark mt-4 w-full font-semibold text-white"
+              size="sm"
+              onClick={() => {
+                toast.error("Sign in to enquire about this package", {
+                  description: (
+                    <div className="mt-2">
+                      <a
+                        href="/sign-in"
+                        className="text-white underline underline-offset-2 hover:text-gray-200"
+                      >
+                        Sign in
+                      </a>
+                    </div>
+                  ),
+                  duration: 5000,
+                });
+              }}
+            >
+              Enquire
+            </Button>
+          ) : viewerRole === "fan" ? (
             <Button
               className="bg-h_red hover:bg-h_redDark mt-4 w-full font-semibold text-white"
               size="sm"

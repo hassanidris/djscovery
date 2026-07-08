@@ -83,10 +83,6 @@ export async function updateDjPackage(
   const priceToRaw = formData.get("priceTo");
   const currency = (formData.get("currency") as string)?.trim() || null;
   const duration = (formData.get("duration") as string)?.trim() || null;
-  const features = formData
-    .getAll("features")
-    .map((f) => String(f).trim())
-    .filter(Boolean);
   const popular = formData.get("popular");
 
   const data: Record<string, unknown> = {};
@@ -99,7 +95,14 @@ export async function updateDjPackage(
   }
   if (currency !== null) data.currency = currency;
   if (duration !== undefined) data.duration = duration || null;
-  if (features !== undefined) data.features = features;
+  // Only update features if the field is present in the form
+  if (formData.has("features")) {
+    const features = formData
+      .getAll("features")
+      .map((f) => String(f).trim())
+      .filter(Boolean);
+    data.features = features;
+  }
   if (popular !== null) data.popular = popular === "true";
 
   await prisma.djPackage.update({ where: { id }, data });

@@ -262,6 +262,20 @@ export default async function DjProfilePage({
         defaultCountryId: organizerProfile.countryId,
         defaultCityId: organizerProfile.cityId,
       };
+    } else if (dj.countryId && dj.cityId) {
+      // Fallback to DJ's location if organizer has no location
+      const [initialCities, initialVenues] = await Promise.all([
+        getCitiesForCountry(dj.countryId),
+        getVenuesForCity(dj.cityId),
+      ]);
+
+      bookingOptions = {
+        ...bookingOptions,
+        initialCities,
+        initialVenues,
+        defaultCountryId: dj.countryId,
+        defaultCityId: dj.cityId,
+      };
     }
   }
 

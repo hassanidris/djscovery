@@ -169,6 +169,8 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
         // Update form with package details
         setForm((prev) => ({
           ...prev,
+          countryId: prev.countryId || defaultCountryValue,
+          cityId: prev.cityId || defaultCityValue,
           budgetType: newPackagePriceTo
             ? "RANGE"
             : newPackagePrice

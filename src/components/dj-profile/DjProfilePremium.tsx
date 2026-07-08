@@ -239,7 +239,8 @@ export default function DjProfilePremium({
   );
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
-  const bookCTARef = useRef<BookCTARef>(null);
+  const bookCTARefMobile = useRef<BookCTARef>(null);
+  const bookCTARefDesktop = useRef<BookCTARef>(null);
   const [venues, setVenues] = useState<
     Array<{
       id: number;
@@ -529,7 +530,7 @@ export default function DjProfilePremium({
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
-              ref={bookCTARef}
+              ref={bookCTARefMobile}
               stageName={`Dj. ${DJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
@@ -1058,7 +1059,7 @@ export default function DjProfilePremium({
                 </div>
                 {packages.length > 0 ? (
                   <BookingPackages
-                    packages={packages
+                    packages={[...packages]
                       .sort((a, b) => {
                         // Popular packages first
                         if (a.popular && !b.popular) return -1;
@@ -1081,13 +1082,18 @@ export default function DjProfilePremium({
                       packageName,
                       packagePrice,
                       packagePriceTo,
-                    ) =>
-                      bookCTARef.current?.openBookingModal(
+                    ) => {
+                      bookCTARefMobile.current?.openBookingModal(
                         packageName,
                         packagePrice,
                         packagePriceTo,
-                      )
-                    }
+                      );
+                      bookCTARefDesktop.current?.openBookingModal(
+                        packageName,
+                        packagePrice,
+                        packagePriceTo,
+                      );
+                    }}
                   />
                 ) : (
                   <EmptySectionState
@@ -1110,7 +1116,7 @@ export default function DjProfilePremium({
           <aside className="sticky top-28 flex h-fit flex-col gap-5">
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
-              ref={bookCTARef}
+              ref={bookCTARefDesktop}
               stageName={`Dj. ${DJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
