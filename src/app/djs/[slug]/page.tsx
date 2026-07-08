@@ -89,6 +89,12 @@ export default async function DjProfilePage({
       coverImage: true,
       countryId: true,
       cityId: true,
+      city: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       plan: true,
       status: true,
       featured: true,
@@ -123,7 +129,6 @@ export default async function DjProfilePage({
           id: true,
         },
       },
-      city: true,
       country: true,
       genres: { include: { genre: true } },
       djTypes: true,
@@ -219,6 +224,12 @@ export default async function DjProfilePage({
           contactEmail: true,
           countryId: true,
           cityId: true,
+          city: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       }),
     ]);
@@ -234,6 +245,8 @@ export default async function DjProfilePage({
       isAuthenticated: true,
       organizerDisplayName: organizerProfile?.displayName ?? undefined,
       organizerContactEmail: organizerProfile?.contactEmail ?? undefined,
+      organizerCityId: organizerProfile?.cityId ?? undefined,
+      organizerCityName: organizerProfile?.city?.name ?? undefined,
     };
 
     if (organizerProfile?.countryId && organizerProfile?.cityId) {
@@ -248,6 +261,20 @@ export default async function DjProfilePage({
         initialVenues,
         defaultCountryId: organizerProfile.countryId,
         defaultCityId: organizerProfile.cityId,
+      };
+    } else if (dj.countryId && dj.cityId) {
+      // Fallback to DJ's location if organizer has no location
+      const [initialCities, initialVenues] = await Promise.all([
+        getCitiesForCountry(dj.countryId),
+        getVenuesForCity(dj.cityId),
+      ]);
+
+      bookingOptions = {
+        ...bookingOptions,
+        initialCities,
+        initialVenues,
+        defaultCountryId: dj.countryId,
+        defaultCityId: dj.cityId,
       };
     }
   }
@@ -359,11 +386,15 @@ export default async function DjProfilePage({
           .map((d) => d.day) ?? [],
     },
     packages: dj.packages.map((p) => ({
+      id: p.id,
       name: p.name,
       priceFrom: p.priceFrom,
+      priceTo: p.priceTo ?? undefined,
       currency: p.currency,
+      duration: p.duration ?? undefined,
       features: p.features,
       popular: p.popular,
+      sortOrder: p.sortOrder,
     })),
     bio: dj.bio ?? "",
     specialties: dj.djTypes.map((t) => t.type),
