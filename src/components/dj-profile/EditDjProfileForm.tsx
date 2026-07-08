@@ -257,6 +257,7 @@ export default function EditDjProfileForm({
   const [showLeaveAlert, setShowLeaveAlert] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [mediaChanged, setMediaChanged] = useState(false);
 
   // Team
   const [managerName, setManagerName] = useState(profile.managerName);
@@ -310,7 +311,8 @@ export default function EditDjProfileForm({
     availabilityTimezone !== profile.availabilityTimezone ||
     availabilityMonth !== profile.availabilityMonth ||
     JSON.stringify(availabilityDays) !==
-      JSON.stringify(profile.availabilityDays);
+      JSON.stringify(profile.availabilityDays) ||
+    mediaChanged;
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
@@ -1093,6 +1095,7 @@ export default function EditDjProfileForm({
             profileId={profile.id}
             plan={plan}
             initialMedia={allMedia}
+            onMediaChange={setMediaChanged}
           />
         </SectionCard>
 

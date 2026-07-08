@@ -81,10 +81,8 @@ import {
   buildCalendarFromData,
   getCalendarMonthLabel,
 } from "@/lib/dj-profile-mappers";
-import {
-  getVideoThumbnailUrl,
-  useAudioThumbnail,
-} from "@/lib/media-thumbnails";
+import { getVideoThumbnailUrl } from "@/lib/media-utils";
+import { useAudioThumbnail } from "@/lib/media-thumbnails";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 
 function EmptySectionState({

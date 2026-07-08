@@ -19,6 +19,7 @@ type VideoEmbedInfo = {
   embedUrl: string | null;
   iframeAllow?: string;
   videoId?: string;
+  originalUrl?: string;
 };
 
 const PROVIDER_LABELS: Record<VideoProvider, string> = {
@@ -88,26 +89,30 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
 
     // TikTok (@user/video/1234567890)
     if (isHostMatch(host, "tiktok.com")) {
-      const videoId = segments.find((segment) => /^(\d+)$/.test(segment));
-      if (videoId) {
-        return {
-          provider: "tiktok",
-          embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
-          iframeAllow:
-            "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
-        };
+      const videoIndex = segments.indexOf("video");
+      if (videoIndex !== -1 && videoIndex + 1 < segments.length) {
+        const username = segments[videoIndex - 1]; // @username
+        const videoId = segments[videoIndex + 1]; // numeric ID
+        if (username && videoId) {
+          return {
+            provider: "tiktok",
+            embedUrl: `https://www.tiktok.com/embed/v2/${username}/video/${videoId}`,
+            iframeAllow:
+              "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+          };
+        }
       }
     }
 
     // Instagram (p/{code}, reel/{code}, tv/{code})
     if (isHostMatch(host, "instagram.com") || host === "instagr.am") {
       if (segments.length >= 2 && ["p", "reel", "tv"].includes(segments[0])) {
-        const mediaType = segments[0];
         const code = segments[1];
         if (code) {
           return {
             provider: "instagram",
-            embedUrl: `https://www.instagram.com/${mediaType}/${code}/embed/`,
+            embedUrl: `https://www.instagram.com/p/${code}/embed/captioned/`,
+            videoId: code,
             iframeAllow:
               "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
           };
@@ -151,6 +156,10 @@ function buildEmbedUrl(info: VideoEmbedInfo): string | null {
 function getVideoThumbnailUrl(info: VideoEmbedInfo): string | null {
   if (info.provider === "youtube" && info.videoId) {
     return `https://img.youtube.com/vi/${info.videoId}/maxresdefault.jpg`;
+  }
+  if (info.provider === "instagram" && info.videoId) {
+    // Instagram doesn't provide a public thumbnail API, but we can try the oembed endpoint
+    return null; // Will rely on oembed thumbnail from server
   }
   return null;
 }
@@ -223,7 +232,10 @@ export default function MediaVideoModal({
             <p className="mb-3 truncate px-1 text-sm font-semibold text-white">
               {title}
             </p>
-            <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
+            <div
+              className="relative w-full overflow-hidden rounded-xl bg-black"
+              style={{ maxHeight: "70vh" }}
+            >
               {embedInfo.embedUrl ? (
                 <iframe
                   src={buildEmbedUrl(embedInfo) ?? embedInfo.embedUrl}

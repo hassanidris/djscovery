@@ -1,7 +1,7 @@
 // oEmbed metadata fetcher for video/audio platforms
 // No API keys required - uses public oEmbed endpoints
 
-import { getVideoThumbnailUrl } from "@/lib/media-thumbnails";
+import { getVideoThumbnailUrl } from "@/lib/media-utils";
 
 export interface OEmbedData {
   title?: string;
@@ -117,6 +117,13 @@ export async function fetchOEmbed(url: string): Promise<OEmbedData | null> {
     });
 
     if (!response.ok) {
+      console.warn(`oEmbed fetch failed for ${platform}: ${response.status}`);
+      return null;
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      console.warn(`oEmbed returned non-JSON for ${platform}: ${contentType}`);
       return null;
     }
 
