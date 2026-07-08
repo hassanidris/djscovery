@@ -23,28 +23,38 @@ const OEMBED_ENDPOINTS: Record<string, string> = {
 };
 
 /**
+ * Returns true when `hostname` is exactly `domain` or a subdomain of it.
+ */
+function isHostOrSubdomain(hostname: string, domain: string): boolean {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
+/**
  * Detect platform from URL
  */
 function detectPlatform(url: string): string | null {
   try {
     const hostname = new URL(url).hostname.toLowerCase();
 
-    if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
+    if (
+      isHostOrSubdomain(hostname, "youtube.com") ||
+      isHostOrSubdomain(hostname, "youtu.be")
+    ) {
       return "youtube";
     }
-    if (hostname.includes("vimeo.com")) {
+    if (isHostOrSubdomain(hostname, "vimeo.com")) {
       return "vimeo";
     }
-    if (hostname.includes("soundcloud.com")) {
+    if (isHostOrSubdomain(hostname, "soundcloud.com")) {
       return "soundcloud";
     }
-    if (hostname.includes("mixcloud.com")) {
+    if (isHostOrSubdomain(hostname, "mixcloud.com")) {
       return "mixcloud";
     }
-    if (hostname.includes("instagram.com")) {
+    if (isHostOrSubdomain(hostname, "instagram.com")) {
       return "instagram";
     }
-    if (hostname.includes("tiktok.com")) {
+    if (isHostOrSubdomain(hostname, "tiktok.com")) {
       return "tiktok";
     }
 
