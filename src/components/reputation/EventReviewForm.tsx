@@ -14,12 +14,14 @@ export function EventReviewForm({
   djName,
   djAvatar,
   alreadyReviewed,
+  isOrganizer = false,
 }: {
   eventId: number;
   djProfileId: number;
   djName: string;
   djAvatar?: string | null;
   alreadyReviewed?: boolean;
+  isOrganizer?: boolean;
 }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -76,9 +78,14 @@ export function EventReviewForm({
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <DjAvatar djName={djName} djAvatar={djAvatar} />
-          <CardTitle className="text-sm font-semibold text-white">
-            DJ. {djName}
-          </CardTitle>
+          <div className="flex-1">
+            <CardTitle className="text-sm font-semibold text-white">
+              DJ. {djName}
+            </CardTitle>
+            <p className="text-xs text-zinc-500">
+              {isOrganizer ? "As the event organizer" : "As an attendee"}
+            </p>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -91,7 +98,7 @@ export function EventReviewForm({
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
               onClick={() => setRating(star)}
-              className="rounded p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-h_red"
+              className="focus-visible:ring-h_red rounded p-0.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
               aria-label={`Rate ${star} stars`}
             >
               <Star
@@ -111,9 +118,13 @@ export function EventReviewForm({
         <Textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
-          placeholder={`How was DJ. ${djName} at this event?`}
+          placeholder={
+            isOrganizer
+              ? `How was DJ. ${djName}'s professionalism, punctuality, and communication?`
+              : `How was DJ. ${djName}'s performance and music selection at this event?`
+          }
           disabled={isPending}
-          className="min-h-24 border-zinc-700 bg-zinc-950 text-sm text-white placeholder:text-zinc-600 focus-visible:ring-h_red"
+          className="focus-visible:ring-h_red min-h-24 border-zinc-700 bg-zinc-950 text-sm text-white placeholder:text-zinc-600"
         />
 
         {error && <p className="text-xs text-red-400">{error}</p>}

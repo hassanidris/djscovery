@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { updateReputationScore } from "@/lib/reputation/update";
 import { revalidatePath } from "next/cache";
 import { ActionResult, actionError, actionSuccess } from "./action-result";
+import { sendEmail } from "@/lib/email/send";
+import type { DjReviewData } from "@/lib/email/types";
 
 export async function createEventReview(
   eventId: number,
@@ -69,6 +71,32 @@ export async function createEventReview(
     return actionError("Review must be at least 30 characters");
   }
 
+  // Determine reviewType: check if reviewer is a gig owner for this DJ
+  const organizerProfile = await prisma.organizerProfile.findUnique({
+    where: { userId: user.id },
+  });
+
+  let reviewType: "ATTENDEE" | "GIG_OWNER" = "ATTENDEE";
+
+  if (organizerProfile) {
+    // Check if this organizer has a gig where the DJ was hired (accepted application)
+    const gigWithDj = await prisma.gig.findFirst({
+      where: {
+        organizerProfileId: organizerProfile.id,
+        applications: {
+          some: {
+            djProfileId,
+            status: "ACCEPTED",
+          },
+        },
+      },
+    });
+
+    if (gigWithDj) {
+      reviewType = "GIG_OWNER";
+    }
+  }
+
   const createdReview = await prisma.eventReview.create({
     data: {
       eventId,
@@ -76,6 +104,7 @@ export async function createEventReview(
       userId: user.id,
       rating: data.rating,
       review: data.review,
+      reviewType,
     },
   });
 
@@ -83,7 +112,7 @@ export async function createEventReview(
 
   const djProfile = await prisma.djProfile.findUnique({
     where: { id: djProfileId },
-    select: { userId: true },
+    select: { userId: true, stageName: true },
   });
 
   if (djProfile) {
@@ -99,6 +128,34 @@ export async function createEventReview(
         },
       },
     });
+
+    // Send email notification to DJ
+    try {
+      const [djUser, reviewer] = await Promise.all([
+        prisma.user.findUnique({
+          where: { id: djProfile.userId },
+          select: { email: true },
+        }),
+        prisma.user.findUnique({
+          where: { id: user.id },
+          select: { name: true },
+        }),
+      ]);
+
+      if (djUser?.email) {
+        const emailData: DjReviewData = {
+          djName: djProfile.stageName,
+          reviewerName: reviewer?.name || "Someone",
+          rating: data.rating,
+          comment: data.review,
+          eventTitle: event.title,
+          reviewUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/events/${event.slug}`,
+        };
+        await sendEmail(djUser.email, "DJ_REVIEW", emailData);
+      }
+    } catch (emailError) {
+      console.error("Failed to send review email:", emailError);
+    }
   }
 
   revalidatePath(`/events/${event.slug}`);

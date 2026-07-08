@@ -1113,9 +1113,10 @@ model GigReview {
 }
 
 model EventReview {
-  id     Int     @id @default(autoincrement())
-  rating Int // 1-5
-  review String?
+  id         Int     @id @default(autoincrement())
+  rating     Int // 1-5
+  review     String?
+  reviewType String? // "ATTENDEE" or "GIG_OWNER"
 
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1131,6 +1132,7 @@ model EventReview {
   @@index([eventId])
   @@index([djProfileId])
   @@index([userId])
+  @@index([reviewType])
 }
 
 model ReputationScore {

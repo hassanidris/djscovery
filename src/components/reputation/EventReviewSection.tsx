@@ -11,10 +11,12 @@ export function EventReviewSection({
   eventId,
   djs,
   reviewedDjIds,
+  isOrganizer = false,
 }: {
   eventId: number;
   djs: ReviewableDj[];
   reviewedDjIds: number[];
+  isOrganizer?: boolean;
 }) {
   return (
     <section className="mb-8">
@@ -30,6 +32,7 @@ export function EventReviewSection({
             djName={dj.stageName}
             djAvatar={dj.avatar}
             alreadyReviewed={reviewedDjIds.includes(dj.djProfileId)}
+            isOrganizer={isOrganizer}
           />
         ))}
       </div>
