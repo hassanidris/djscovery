@@ -236,17 +236,6 @@ const UpdateDjProfileSchema = z
       )
       .optional(),
 
-    // Spotlight
-    featuredMixTitle: z.string().max(120).optional().nullable(),
-    featuredMixAudioUrl: z.string().url().optional().nullable(),
-    featuredMixDuration: z.string().max(20).optional().nullable(),
-    featuredMixPlays: z.number().int().nonnegative().optional(),
-    featuredVideoTitle: z.string().max(120).optional().nullable(),
-    featuredVideoUrl: z.string().url().optional().nullable(),
-    featuredVideoThumbnail: z.string().url().optional().nullable(),
-    featuredVideoDuration: z.string().max(20).optional().nullable(),
-    featuredVideoViews: z.number().int().nonnegative().optional(),
-
     // Where I've Played (venues)
     venues: z
       .array(
@@ -617,35 +606,6 @@ export async function updateDjProfile(
           }),
           ...(data.availabilityDays !== undefined && {
             availabilityDays: data.availabilityDays,
-          }),
-
-          // Spotlight
-          ...(data.featuredMixTitle !== undefined && {
-            featuredMixTitle: data.featuredMixTitle,
-          }),
-          ...(data.featuredMixAudioUrl !== undefined && {
-            featuredMixAudioUrl: data.featuredMixAudioUrl,
-          }),
-          ...(data.featuredMixDuration !== undefined && {
-            featuredMixDuration: data.featuredMixDuration,
-          }),
-          ...(data.featuredMixPlays !== undefined && {
-            featuredMixPlays: data.featuredMixPlays,
-          }),
-          ...(data.featuredVideoTitle !== undefined && {
-            featuredVideoTitle: data.featuredVideoTitle,
-          }),
-          ...(data.featuredVideoUrl !== undefined && {
-            featuredVideoUrl: data.featuredVideoUrl,
-          }),
-          ...(data.featuredVideoThumbnail !== undefined && {
-            featuredVideoThumbnail: data.featuredVideoThumbnail,
-          }),
-          ...(data.featuredVideoDuration !== undefined && {
-            featuredVideoDuration: data.featuredVideoDuration,
-          }),
-          ...(data.featuredVideoViews !== undefined && {
-            featuredVideoViews: data.featuredVideoViews,
           }),
         },
       });

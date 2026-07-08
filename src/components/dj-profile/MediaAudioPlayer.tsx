@@ -8,6 +8,7 @@ type Props = {
   audioUrl: string;
   title: string;
   thumbnailUrl?: string;
+  mediaId?: number;
   children: React.ReactNode;
 };
 
@@ -15,35 +16,59 @@ export default function MediaAudioPlayer({
   audioUrl,
   title,
   thumbnailUrl,
+  mediaId,
   children,
 }: Props) {
   const [open, setOpen] = useState(false);
 
-  let isSoundCloud = false;
+  const handleOpen = () => {
+    setOpen(true);
+    if (mediaId) {
+      fetch("/api/track-media-view", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mediaId, type: "AUDIO" }),
+      }).catch(() => {});
+    }
+  };
+
+  let normalizedUrl = audioUrl;
   try {
-    const { hostname } = new URL(audioUrl);
-    const normalizedHost = hostname.toLowerCase();
-    isSoundCloud =
+    const urlObj = new URL(audioUrl);
+    const normalizedHost = urlObj.hostname.toLowerCase();
+    const isSoundCloud =
       normalizedHost === "soundcloud.com" ||
       normalizedHost.endsWith(".soundcloud.com");
-  } catch {
-    isSoundCloud = false;
-  }
 
-  const embedUrl = isSoundCloud
-    ? `https://w.soundcloud.com/player/?url=${encodeURIComponent(audioUrl)}&auto_play=true&color=%23ff2200&buying=false&sharing=false&show_artwork=true&show_user=false`
-    : null;
+    // Normalize SoundCloud URL by removing tracking parameters
+    if (isSoundCloud) {
+      const paramsToRemove = [
+        "si",
+        "in",
+        "from",
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_content",
+        "utm_term",
+      ];
+      paramsToRemove.forEach((param) => urlObj.searchParams.delete(param));
+      normalizedUrl = urlObj.toString();
+    }
+  } catch {
+    normalizedUrl = audioUrl;
+  }
 
   return (
     <>
       <div
         role="button"
         tabIndex={0}
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            setOpen(true);
+            handleOpen();
           }
         }}
         className="h-full cursor-pointer"
@@ -86,32 +111,16 @@ export default function MediaAudioPlayer({
             </div>
 
             <div className="p-4">
-              {embedUrl ? (
-                <iframe
-                  width="100%"
-                  height="120"
-                  scrolling="no"
-                  frameBorder="no"
-                  allow="autoplay"
-                  src={embedUrl}
-                  title={title}
-                  className="w-full rounded-lg"
-                />
-              ) : (
-                <div className="py-6 text-center">
-                  <p className="mb-3 text-sm text-gray-400">
-                    This track is hosted on an external platform.
-                  </p>
-                  <a
-                    href={audioUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-h_red text-sm underline"
-                  >
-                    Open in player →
-                  </a>
-                </div>
-              )}
+              <iframe
+                width="100%"
+                height="180"
+                scrolling="no"
+                frameBorder="no"
+                allow="autoplay"
+                src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(normalizedUrl)}&auto_play=true&color=%23ff2200&buying=false&sharing=false&show_artwork=true&show_user=false&hide_related=true&show_comments=false&show_playcount=false`}
+                title={title}
+                className="w-full rounded-lg"
+              />
             </div>
           </div>
         </div>

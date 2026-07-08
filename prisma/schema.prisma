@@ -469,17 +469,6 @@ model DjProfile {
   availabilityMonth    String? // e.g. "2025-09"
   availabilityDays     Json? // [{day: 1, status: "available"}, ...]
 
-  // Premium: Spotlight
-  featuredMixTitle       String?
-  featuredMixAudioUrl    String?
-  featuredMixDuration    String?
-  featuredMixPlays       Int     @default(0)
-  featuredVideoTitle     String?
-  featuredVideoUrl       String?
-  featuredVideoThumbnail String?
-  featuredVideoDuration  String?
-  featuredVideoViews     Int     @default(0)
-
   // Premium: Analytics (denormalized)
   monthlyViews Int @default(0)
 
@@ -764,14 +753,21 @@ model SocialLink {
 
 // ------ MEDIA ------
 
-// MVP: IMAGE only. Schema is ready for VIDEO and AUDIO later.
+// Supports IMAGE (file upload), VIDEO (external URL), AUDIO (external URL)
 // Supabase Storage bucket: "djscovery-media"
 model Media {
-  id     Int       @id @default(autoincrement())
-  type   MediaType @default(IMAGE)
-  url    String // Supabase Storage public URL
-  bucket String // Supabase Storage bucket name
-  path   String // Supabase Storage path within bucket
+  id          Int       @id @default(autoincrement())
+  type        MediaType @default(IMAGE)
+  url         String // Supabase Storage public URL or external URL
+  bucket      String // Supabase Storage bucket name or "external"
+  path        String // Supabase Storage path within bucket or original URL
+  sortOrder   Int       @default(0) // For reordering in gallery
+  isSpotlight Boolean   @default(false) // Marked for spotlight section (max 2)
+  title       String? // Auto-fetched from oEmbed for video/audio
+  duration    String? // Auto-fetched from oEmbed (e.g. "3:45")
+  thumbnail   String? // Auto-fetched from oEmbed for video/audio
+  playCount   Int       @default(0) // AUDIO: unique plays (deduped per viewer per day)
+  viewCount   Int       @default(0) // VIDEO: unique views (deduped per viewer per day)
 
   djProfileId Int?
   djProfile   DjProfile? @relation(fields: [djProfileId], references: [id], onDelete: SetNull)
@@ -784,6 +780,8 @@ model Media {
   @@index([djProfileId])
   @@index([postId])
   @@index([type])
+  @@index([isSpotlight])
+  @@index([sortOrder])
 }
 
 // ------ DJ RATINGS ------

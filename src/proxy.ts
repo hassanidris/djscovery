@@ -107,7 +107,7 @@ export async function proxy(request: NextRequest) {
     "img-src 'self' data: https: blob:",
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
     "media-src 'self' https: blob:",
-    "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.tiktok.com https://open.spotify.com",
+    "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com https://open.spotify.com https://w.soundcloud.com https://www.mixcloud.com https://www.instagram.com https://embed.music.apple.com https://bandcamp.com https://www.facebook.com",
   ].join("; ");
 
   supabaseResponse.headers.set("Content-Security-Policy", cspHeader);

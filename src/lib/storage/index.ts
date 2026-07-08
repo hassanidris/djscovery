@@ -6,8 +6,6 @@
 //   djs/{userId}/avatar/
 //   djs/{userId}/cover/
 //   djs/{userId}/gallery/
-//   djs/{userId}/audio/
-//   djs/{userId}/video/
 //   organizers/{userId}/logo/
 //   organizers/{userId}/cover/
 //   events/{eventId}/poster/
@@ -43,10 +41,6 @@ export const ALLOWED_IMAGE_TYPES = [
   "image/webp",
 ] as const;
 
-export const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/wav"] as const;
-
-export const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime"] as const;
-
 // ── File validation ───────────────────────────────────────────────────────────
 
 export function validateImageFile(
@@ -59,34 +53,6 @@ export function validateImageFile(
   if (file.size > maxBytes) {
     const maxMB = Math.round(maxBytes / (1024 * 1024));
     return { error: `Image must be under ${maxMB} MB.` };
-  }
-  return null;
-}
-
-export function validateAudioFile(
-  file: File,
-  maxBytes: number = 50 * 1024 * 1024,
-): { error: string } | null {
-  if (!(ALLOWED_AUDIO_TYPES as readonly string[]).includes(file.type)) {
-    return { error: "Only MP3 and WAV audio files are allowed." };
-  }
-  if (file.size > maxBytes) {
-    const maxMB = Math.round(maxBytes / (1024 * 1024));
-    return { error: `Audio must be under ${maxMB} MB.` };
-  }
-  return null;
-}
-
-export function validateVideoFile(
-  file: File,
-  maxBytes: number = 500 * 1024 * 1024,
-): { error: string } | null {
-  if (!(ALLOWED_VIDEO_TYPES as readonly string[]).includes(file.type)) {
-    return { error: "Only MP4 and MOV video files are allowed." };
-  }
-  if (file.size > maxBytes) {
-    const maxMB = Math.round(maxBytes / (1024 * 1024));
-    return { error: `Video must be under ${maxMB} MB.` };
   }
   return null;
 }
@@ -109,14 +75,6 @@ export function buildDjCoverPath(userId: string, file: File): string {
 
 export function buildDjGalleryPath(userId: string, file: File): string {
   return `djs/${userId}/gallery/gallery-${crypto.randomUUID()}.${fileExt(file)}`;
-}
-
-export function buildDjAudioPath(userId: string, file: File): string {
-  return `djs/${userId}/audio/audio-${crypto.randomUUID()}.${fileExt(file)}`;
-}
-
-export function buildDjVideoPath(userId: string, file: File): string {
-  return `djs/${userId}/video/video-${crypto.randomUUID()}.${fileExt(file)}`;
 }
 
 export function buildOrganizerLogoPath(userId: string, file: File): string {
