@@ -32,6 +32,10 @@ function isHostOrSubdomain(hostname: string, domain: string): boolean {
 /**
  * Detect platform from URL
  */
+function isHostOrSubdomain(hostname: string, domain: string): boolean {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
 function detectPlatform(url: string): string | null {
   try {
     const hostname = new URL(url).hostname.toLowerCase();
