@@ -73,7 +73,7 @@ export async function toggleFollowDj(
         }),
         prisma.user.findUnique({
           where: { id: userId },
-          select: { email: true, displayName: true },
+          select: { email: true, name: true },
         }),
       ]);
 
@@ -94,7 +94,7 @@ export async function toggleFollowDj(
         if (djUser?.email) {
           const emailData: DjFollowData = {
             djName: djProfile.stageName,
-            followerName: user.displayName || "Someone",
+            followerName: user.name || "Someone",
             followerProfileUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/account`,
           };
           await sendEmail(djUser.email, "DJ_FOLLOW", emailData);
