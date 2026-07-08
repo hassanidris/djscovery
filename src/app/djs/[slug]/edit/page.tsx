@@ -43,15 +43,6 @@ export default async function EditDjProfilePage({
       agentName: true,
       agentAgency: true,
       agentEmail: true,
-      featuredMixTitle: true,
-      featuredMixAudioUrl: true,
-      featuredMixDuration: true,
-      featuredMixPlays: true,
-      featuredVideoTitle: true,
-      featuredVideoUrl: true,
-      featuredVideoThumbnail: true,
-      featuredVideoDuration: true,
-      featuredVideoViews: true,
       availabilityTimezone: true,
       availabilityMonth: true,
       availabilityDays: true,
@@ -83,15 +74,28 @@ export default async function EditDjProfilePage({
       })
     : [];
 
-  const galleryImages = await prisma.media.findMany({
-    where: { djProfileId: dj.id, type: "IMAGE" },
-    orderBy: { createdAt: "desc" },
-    select: { id: true, url: true, path: true, bucket: true },
+  const allMedia = await prisma.media.findMany({
+    where: { djProfileId: dj.id },
+    orderBy: { sortOrder: "asc" },
+    select: {
+      id: true,
+      type: true,
+      url: true,
+      path: true,
+      bucket: true,
+      sortOrder: true,
+      isSpotlight: true,
+      title: true,
+      duration: true,
+      thumbnail: true,
+      createdAt: true,
+    },
   });
 
   const plan = (dj.plan ?? "FREE") as "FREE" | "PREMIUM";
 
   const profileData = {
+    id: dj.id,
     stageName: dj.stageName,
     bio: dj.bio ?? "",
     experienceYears: dj.experienceYears ?? null,
@@ -118,15 +122,6 @@ export default async function EditDjProfilePage({
     agentName: dj.agentName ?? "",
     agentAgency: dj.agentAgency ?? "",
     agentEmail: dj.agentEmail ?? "",
-    featuredMixTitle: dj.featuredMixTitle ?? "",
-    featuredMixAudioUrl: dj.featuredMixAudioUrl ?? "",
-    featuredMixDuration: dj.featuredMixDuration ?? "",
-    featuredMixPlays: dj.featuredMixPlays ?? 0,
-    featuredVideoTitle: dj.featuredVideoTitle ?? "",
-    featuredVideoUrl: dj.featuredVideoUrl ?? "",
-    featuredVideoThumbnail: dj.featuredVideoThumbnail ?? "",
-    featuredVideoDuration: dj.featuredVideoDuration ?? "",
-    featuredVideoViews: dj.featuredVideoViews ?? 0,
     availabilityTimezone: dj.availabilityTimezone ?? "",
     availabilityMonth: dj.availabilityMonth ?? "",
     availabilityDays:
@@ -144,7 +139,7 @@ export default async function EditDjProfilePage({
           countries={countries}
           initialCities={existingCities}
           userId={user.id}
-          galleryImages={galleryImages}
+          allMedia={allMedia}
         />
       </div>
     </div>

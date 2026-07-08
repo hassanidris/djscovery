@@ -158,6 +158,7 @@ function MixPlayer({
   mix,
 }: {
   mix: {
+    id?: number;
     title: string;
     audioUrl: string;
     platform: string;
@@ -172,6 +173,7 @@ function MixPlayer({
       audioUrl={mix.audioUrl}
       title={mix.title}
       thumbnailUrl={thumb || undefined}
+      mediaId={mix.id}
     >
       <Card className="bg-h_blackLight/30 flex cursor-pointer flex-row items-center gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
         <div className="from-h_red/30 to-h_redDark/10 mr-4 flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/8 bg-linear-to-br">
@@ -499,7 +501,9 @@ export default function DjProfilePremium({
     getVideoThumbnailUrl(featuredVideoUrl) ||
     "/gallery-2.png";
   const featuredMixAudioUrl = SPOTLIGHT.featuredMix.audioUrl;
-  const featuredMixThumb = useAudioThumbnail(featuredMixAudioUrl);
+  const autoMixThumb = useAudioThumbnail(featuredMixAudioUrl);
+  const featuredMixThumb =
+    SPOTLIGHT.featuredMix.thumbnail || autoMixThumb || "/gallery-2.png";
   const location = `${DJ.city}, ${DJ.country}`;
 
   const bookingContext: BookingViewerContext = viewerContext ?? {
@@ -559,88 +563,97 @@ export default function DjProfilePremium({
             <Separator className="bg-white/8" />
 
             {/* ── SPOTLIGHT ── */}
-            <section>
-              <SectionHeading sub="Curated featured content">
-                Spotlight
-              </SectionHeading>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <MediaAudioPlayer
-                  audioUrl={SPOTLIGHT.featuredMix.audioUrl}
-                  title={SPOTLIGHT.featuredMix.title}
-                  thumbnailUrl={featuredMixThumb || undefined}
-                >
-                  <Card className="bg-h_blackLight/30 group cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
-                    <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
-                      {featuredMixThumb ? (
-                        <Image
-                          src={featuredMixThumb}
-                          alt={SPOTLIGHT.featuredMix.title}
-                          fill
-                          className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
-                        />
-                      ) : null}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
-                          <Play className="ml-0.5 h-5 w-5 text-white" />
+            {(SPOTLIGHT.featuredMix.audioUrl ||
+              SPOTLIGHT.featuredVideo.videoUrl) && (
+              <section>
+                <SectionHeading sub="Curated featured content">
+                  Spotlight
+                </SectionHeading>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {SPOTLIGHT.featuredMix.audioUrl && (
+                    <MediaAudioPlayer
+                      audioUrl={SPOTLIGHT.featuredMix.audioUrl}
+                      title={SPOTLIGHT.featuredMix.title}
+                      thumbnailUrl={featuredMixThumb || undefined}
+                      mediaId={SPOTLIGHT.featuredMix.id}
+                    >
+                      <Card className="bg-h_blackLight/30 group h-full cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
+                        <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
+                          {featuredMixThumb ? (
+                            <Image
+                              src={featuredMixThumb}
+                              alt={SPOTLIGHT.featuredMix.title}
+                              fill
+                              className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
+                              <Play className="ml-0.5 h-5 w-5 text-white" />
+                            </div>
+                          </div>
+                          <div className="absolute bottom-3 left-3">
+                            <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                              <Headphones className="mr-1 h-2.5 w-2.5" />
+                              Featured Mix
+                            </Badge>
+                          </div>
                         </div>
-                      </div>
-                      <div className="absolute bottom-3 left-3">
-                        <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                          <Headphones className="mr-1 h-2.5 w-2.5" />
-                          Featured Mix
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-sm font-semibold text-white">
-                        {SPOTLIGHT.featuredMix.title}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {SPOTLIGHT.featuredMix.duration} ·{" "}
-                        {formatPlays(SPOTLIGHT.featuredMix.plays)} plays
-                      </p>
-                    </div>
-                  </Card>
-                </MediaAudioPlayer>
-                <MediaVideoModal
-                  videoUrl={SPOTLIGHT.featuredVideo.videoUrl}
-                  thumbnail={featuredVideoThumb}
-                  title={SPOTLIGHT.featuredVideo.title}
-                >
-                  <Card className="bg-h_blackLight/30 group cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
-                    <div className="relative h-44 overflow-hidden">
-                      <Image
-                        src={featuredVideoThumb}
-                        alt="video"
-                        fill
-                        className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
-                      />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
-                          <Play className="ml-0.5 h-5 w-5 text-white" />
+                        <div className="p-4">
+                          <p className="text-sm font-semibold text-white">
+                            {SPOTLIGHT.featuredMix.title}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {SPOTLIGHT.featuredMix.duration} ·{" "}
+                            {formatPlays(SPOTLIGHT.featuredMix.plays)} plays
+                          </p>
                         </div>
-                      </div>
-                      <div className="absolute bottom-3 left-3">
-                        <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                          <Video className="mr-1 h-2.5 w-2.5" />
-                          {SPOTLIGHT.featuredVideo.subtitle}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-sm font-semibold text-white">
-                        {SPOTLIGHT.featuredVideo.title}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {SPOTLIGHT.featuredVideo.duration} ·{" "}
-                        {formatPlays(SPOTLIGHT.featuredVideo.views)} views
-                      </p>
-                    </div>
-                  </Card>
-                </MediaVideoModal>
-              </div>
-            </section>
+                      </Card>
+                    </MediaAudioPlayer>
+                  )}
+                  {SPOTLIGHT.featuredVideo.videoUrl && (
+                    <MediaVideoModal
+                      videoUrl={SPOTLIGHT.featuredVideo.videoUrl}
+                      thumbnail={featuredVideoThumb}
+                      title={SPOTLIGHT.featuredVideo.title}
+                      mediaId={SPOTLIGHT.featuredVideo.id}
+                    >
+                      <Card className="bg-h_blackLight/30 group h-full cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
+                        <div className="relative h-44 overflow-hidden">
+                          <Image
+                            src={featuredVideoThumb}
+                            alt="video"
+                            fill
+                            className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
+                          />
+                          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                              <Play className="ml-0.5 h-5 w-5 text-white" />
+                            </div>
+                          </div>
+                          <div className="absolute bottom-3 left-3">
+                            <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                              <Video className="mr-1 h-2.5 w-2.5" />
+                              Featured Video
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <p className="text-sm font-semibold text-white">
+                            {SPOTLIGHT.featuredVideo.title}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {SPOTLIGHT.featuredVideo.duration} ·{" "}
+                            {formatPlays(SPOTLIGHT.featuredVideo.views)} views
+                          </p>
+                        </div>
+                      </Card>
+                    </MediaVideoModal>
+                  )}
+                </div>
+              </section>
+            )}
 
             <Separator className="bg-white/8" />
 
@@ -830,6 +843,7 @@ export default function DjProfilePremium({
                         getVideoThumbnailUrl(m.videoUrl ?? "") || m.url
                       }
                       title={m.title ?? "Video"}
+                      mediaId={m.id}
                     >
                       <div className="hover:ring-h_red/40 group relative aspect-video cursor-pointer overflow-hidden rounded-lg ring-1 ring-white/5 transition-all">
                         <Image
@@ -843,6 +857,9 @@ export default function DjProfilePremium({
                             <Play className="ml-0.5 h-4 w-4 text-white" />
                           </div>
                         </div>
+                        <div className="absolute right-3 bottom-3 rounded-full bg-black/60 px-2 py-1 text-xs text-gray-300">
+                          {formatPlays(m.views ?? 0)} views
+                        </div>
                       </div>
                     </MediaVideoModal>
                   ))}
@@ -850,9 +867,15 @@ export default function DjProfilePremium({
               )}
               {mediaTab === "mixes" && (
                 <div className="flex flex-col gap-3">
-                  {MIXES.map((mix) => (
-                    <MixPlayer key={mix.title} mix={mix} />
-                  ))}
+                  {MIXES.filter((m) => m.audioUrl).length > 0 ? (
+                    MIXES.filter((m) => m.audioUrl).map((mix, i) => (
+                      <MixPlayer key={mix.id || mix.title || i} mix={mix} />
+                    ))
+                  ) : (
+                    <div className="py-8 text-center text-gray-500">
+                      No mixes uploaded yet
+                    </div>
+                  )}
                 </div>
               )}
             </section>

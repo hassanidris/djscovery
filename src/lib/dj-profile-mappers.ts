@@ -97,12 +97,14 @@ export function mapMediaFromData(d: DjDemoData) {
 export function mapFeaturedMix(d: DjDemoData) {
   const fm = d.spotlight.featuredMix;
   return {
+    id: fm.id,
     title: fm.title,
     duration: fm.duration,
     plays: formatPlays(fm.plays),
     platform: getPlatformFromUrl(fm.audioUrl),
     genres: fm.genres,
     audioUrl: fm.audioUrl,
+    thumbnail: fm.thumbnail,
   };
 }
 
@@ -173,11 +175,12 @@ export function mapPremiumMediaFromData(d: DjDemoData): PremiumMediaItem[] {
   }));
   const videoThumb = d.spotlight.featuredVideo.thumbnail || "/gallery-1.png";
   const videos: PremiumMediaItem[] = d.media.videos.map((v, i) => ({
-    id: photos.length + i + 1,
-    url: videoThumb,
+    id: v.id,
+    url: v.thumbnail || videoThumb,
     videoUrl: v.url,
     title: v.title,
     type: "video" as const,
+    views: v.views ?? 0,
   }));
   return [...photos, ...videos];
 }
@@ -241,13 +244,16 @@ export function mapPackagesFromData(d: DjDemoData) {
 
 export function mapMixesFromData(d: DjDemoData) {
   const featured = mapFeaturedMix(d);
-  const rest = d.media.mixes.map((m) => ({
-    title: m.title,
-    duration: "",
-    plays: "",
-    platform: getPlatformFromUrl(m.url),
-    audioUrl: m.url,
-  }));
+  const rest = d.media.mixes
+    .filter((m) => m.id !== featured.id)
+    .map((m) => ({
+      id: m.id,
+      title: m.title,
+      duration: m.duration || "",
+      plays: formatPlays(m.plays ?? 0),
+      platform: getPlatformFromUrl(m.url),
+      audioUrl: m.url,
+    }));
   return [featured, ...rest];
 }
 

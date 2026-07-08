@@ -159,6 +159,7 @@ type Props = {
   videoUrl: string;
   thumbnail: string;
   title: string;
+  mediaId?: number;
   children: React.ReactNode;
 };
 
@@ -166,6 +167,7 @@ export default function MediaVideoModal({
   videoUrl,
   thumbnail,
   title,
+  mediaId,
   children,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -174,16 +176,27 @@ export default function MediaVideoModal({
   const autoThumbnail = getVideoThumbnailUrl(embedInfo);
   const effectiveThumbnail = thumbnail || autoThumbnail || "/noCover.png";
 
+  const handleOpen = () => {
+    setOpen(true);
+    if (mediaId) {
+      fetch("/api/track-media-view", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mediaId, type: "VIDEO" }),
+      }).catch(() => {});
+    }
+  };
+
   return (
     <>
       <div
         role="button"
         tabIndex={0}
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            setOpen(true);
+            handleOpen();
           }
         }}
         className="h-full cursor-pointer"

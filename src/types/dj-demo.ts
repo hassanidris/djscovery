@@ -47,14 +47,16 @@ export interface DjDemoData {
   };
   spotlight: {
     featuredMix: {
+      id?: number;
       title: string;
       duration: string;
       plays: number;
       genres: string[];
       audioUrl: string;
-      coverImage: string;
+      thumbnail: string;
     };
     featuredVideo: {
+      id?: number;
       title: string;
       subtitle: string;
       duration: string;
@@ -92,8 +94,22 @@ export interface DjDemoData {
   specialties: string[];
   media: {
     photos: string[];
-    videos: Array<{ title: string; url: string }>;
-    mixes: Array<{ title: string; url: string }>;
+    videos: Array<{
+      id: number;
+      title: string;
+      url: string;
+      thumbnail: string;
+      duration: string;
+      views?: number;
+    }>;
+    mixes: Array<{
+      id: number;
+      title: string;
+      url: string;
+      thumbnail: string;
+      duration: string;
+      plays?: number;
+    }>;
   };
   careerHighlights: Array<{ title: string; year: number }>;
   endorsements: Array<{

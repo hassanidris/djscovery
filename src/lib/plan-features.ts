@@ -11,8 +11,7 @@ export type DjPlanTier = (typeof DJ_PLANS)[number];
 export interface PlanFeatures {
   // Media limits (Infinity = unlimited)
   maxPhotos: number;
-  maxVideos: number;
-  maxMixes: number;
+  maxVideoAudio: number; // Combined limit for videos + audio
   // Discovery & visibility
   featuredPlacement: boolean;
   prioritySearchRanking: boolean;
@@ -31,8 +30,7 @@ export interface PlanFeatures {
 export const PLAN_FEATURES: Record<DjPlanTier, PlanFeatures> = {
   FREE: {
     maxPhotos: 6,
-    maxVideos: 1,
-    maxMixes: 1,
+    maxVideoAudio: 2, // Combined limit for videos + audio
     featuredPlacement: false,
     prioritySearchRanking: false,
     verifiedBadge: false,
@@ -45,8 +43,7 @@ export const PLAN_FEATURES: Record<DjPlanTier, PlanFeatures> = {
   },
   PREMIUM: {
     maxPhotos: Infinity,
-    maxVideos: Infinity,
-    maxMixes: Infinity,
+    maxVideoAudio: Infinity,
     featuredPlacement: true,
     prioritySearchRanking: true,
     verifiedBadge: true,
@@ -65,7 +62,7 @@ export const PLAN_FEATURES: Record<DjPlanTier, PlanFeatures> = {
  */
 export function hasFeature(
   plan: DjPlanTier,
-  feature: keyof Omit<PlanFeatures, "maxPhotos" | "maxVideos" | "maxMixes">,
+  feature: keyof Omit<PlanFeatures, "maxPhotos" | "maxVideoAudio">,
 ): boolean {
   return PLAN_FEATURES[plan][feature];
 }
@@ -77,12 +74,12 @@ export function hasFeature(
  */
 export function getMediaLimit(
   plan: DjPlanTier,
-  type: "photos" | "videos" | "mixes",
+  type: "photos" | "videos" | "audio",
 ): number {
   const key = {
     photos: "maxPhotos",
-    videos: "maxVideos",
-    mixes: "maxMixes",
+    videos: "maxVideoAudio",
+    audio: "maxVideoAudio",
   } as const;
   return PLAN_FEATURES[plan][key[type]];
 }

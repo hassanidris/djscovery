@@ -13,7 +13,8 @@ export function getMediaProvider(url: string): MediaProvider {
     const parsed = new URL(url);
     const host = parsed.hostname.replace(/^www\./, "");
 
-    if (host === "youtu.be" || isHostOrSubdomain(host, "youtube.com")) return "youtube";
+    if (host === "youtu.be" || isHostOrSubdomain(host, "youtube.com"))
+      return "youtube";
     if (isHostOrSubdomain(host, "vimeo.com")) return "vimeo";
     if (isHostOrSubdomain(host, "soundcloud.com")) return "soundcloud";
   } catch {
@@ -31,7 +32,10 @@ export function getYouTubeVideoId(url: string): string | null {
     if (host === "youtu.be") return segments[0] ?? null;
     if (isHostOrSubdomain(host, "youtube.com")) {
       if (parsed.pathname === "/watch") return parsed.searchParams.get("v");
-      if (parsed.pathname.startsWith("/embed/") || parsed.pathname.startsWith("/shorts/")) {
+      if (
+        parsed.pathname.startsWith("/embed/") ||
+        parsed.pathname.startsWith("/shorts/")
+      ) {
         return segments[1] ?? null;
       }
     }
@@ -45,19 +49,10 @@ export function getVideoThumbnailUrl(url: string): string | null {
   const provider = getMediaProvider(url);
   if (provider === "youtube") {
     const videoId = getYouTubeVideoId(url);
-    if (videoId) return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    if (videoId)
+      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
   }
   return null;
-}
-
-export function getVimeoVideoId(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    const segments = parsed.pathname.split("/").filter(Boolean);
-    return segments.find((s) => /^\d+$/.test(s)) ?? null;
-  } catch {
-    return null;
-  }
 }
 
 export function useAudioThumbnail(audioUrl: string | undefined): string | null {
@@ -74,7 +69,8 @@ export function useAudioThumbnail(audioUrl: string | undefined): string | null {
       )
         .then((res) => res.json())
         .then((data: { thumbnail_url?: string }) => {
-          if (!cancelled && data.thumbnail_url) setThumbnail(data.thumbnail_url);
+          if (!cancelled && data.thumbnail_url)
+            setThumbnail(data.thumbnail_url);
         })
         .catch(() => {
           // Ignore fetch failures; keep null so caller can fall back.

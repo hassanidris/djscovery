@@ -132,7 +132,8 @@ export async function uploadDjCover(
 export async function uploadDjGalleryImage(
   formData: FormData,
 ): Promise<
-  { id: number; url: string; path: string; bucket: string } | { error: string }
+  | { id: number; url: string; path: string; bucket: string; sortOrder: number }
+  | { error: string }
 > {
   const supabase = await createClient();
   const {
@@ -190,6 +191,13 @@ export async function uploadDjGalleryImage(
       }
     }
 
+    const maxOrder = await prisma.media.findFirst({
+      where: { djProfileId: profile.id },
+      orderBy: { sortOrder: "desc" },
+      select: { sortOrder: true },
+    });
+    const nextSortOrder = (maxOrder?.sortOrder ?? 0) + 1;
+
     const media = await prisma.media.create({
       data: {
         type: "IMAGE",
@@ -197,6 +205,7 @@ export async function uploadDjGalleryImage(
         path: data.path,
         bucket: BUCKET,
         djProfileId: profile.id,
+        sortOrder: nextSortOrder,
       },
     });
     return {
@@ -204,6 +213,7 @@ export async function uploadDjGalleryImage(
       url: media.url,
       path: media.path,
       bucket: media.bucket,
+      sortOrder: media.sortOrder,
     };
   } catch {
     await supabase.storage.from(BUCKET).remove([data.path]);

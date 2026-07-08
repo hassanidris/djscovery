@@ -31,7 +31,7 @@ export default async function DjSettingsPage() {
 
   if (!dj) redirect("/become-dj");
 
-  const [countries, existingCities, galleryImages] = await Promise.all([
+  const [countries, existingCities, allMedia] = await Promise.all([
     prisma.country.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true },
@@ -44,13 +44,26 @@ export default async function DjSettingsPage() {
         })
       : Promise.resolve([]),
     prisma.media.findMany({
-      where: { djProfileId: dj.id, type: "IMAGE" },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, url: true, path: true, bucket: true },
+      where: { djProfileId: dj.id },
+      orderBy: { sortOrder: "asc" },
+      select: {
+        id: true,
+        type: true,
+        url: true,
+        path: true,
+        bucket: true,
+        sortOrder: true,
+        isSpotlight: true,
+        title: true,
+        duration: true,
+        thumbnail: true,
+        createdAt: true,
+      },
     }),
   ]);
 
   const profileData = {
+    id: dj.id,
     stageName: dj.stageName,
     bio: dj.bio ?? "",
     experienceYears: dj.experienceYears,
@@ -77,16 +90,6 @@ export default async function DjSettingsPage() {
     agentName: dj.agentName ?? "",
     agentAgency: dj.agentAgency ?? "",
     agentEmail: dj.agentEmail ?? "",
-    // Spotlight
-    featuredMixTitle: dj.featuredMixTitle ?? "",
-    featuredMixAudioUrl: dj.featuredMixAudioUrl ?? "",
-    featuredMixDuration: dj.featuredMixDuration ?? "",
-    featuredMixPlays: dj.featuredMixPlays ?? 0,
-    featuredVideoTitle: dj.featuredVideoTitle ?? "",
-    featuredVideoUrl: dj.featuredVideoUrl ?? "",
-    featuredVideoThumbnail: dj.featuredVideoThumbnail ?? "",
-    featuredVideoDuration: dj.featuredVideoDuration ?? "",
-    featuredVideoViews: dj.featuredVideoViews ?? 0,
     // Availability
     availabilityTimezone: dj.availabilityTimezone ?? "",
     availabilityMonth: dj.availabilityMonth ?? "",
@@ -104,7 +107,7 @@ export default async function DjSettingsPage() {
         countries={countries}
         initialCities={existingCities}
         userId={user.id}
-        galleryImages={galleryImages}
+        allMedia={allMedia}
       />
       <PremiumProfileManager djProfileId={dj.id} plan={plan} />
     </div>

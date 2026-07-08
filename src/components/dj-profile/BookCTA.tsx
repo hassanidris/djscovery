@@ -725,7 +725,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                         }))
                       }
                       required
-                      className="[color-scheme:dark]"
+                      className="scheme-dark"
                     />
                   </div>
                 </div>

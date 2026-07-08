@@ -14,13 +14,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { updateDjProfile, getCitiesByCountry } from "@/lib/actions/profile";
 import { getGenres } from "@/lib/actions/genre";
-import {
-  uploadDjAvatar,
-  uploadDjCover,
-  uploadDjGalleryImage,
-  deleteGalleryImage,
-} from "@/lib/actions/dj-upload";
+import { uploadDjAvatar, uploadDjCover } from "@/lib/actions/dj-upload";
 import { getMediaLimit, normalisePlan } from "@/lib/plan-features";
+import MediaLibrary from "@/components/dj-profile/MediaLibrary";
+import type { MediaItem } from "@/lib/actions/dj-media";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,7 +39,6 @@ import { CURRENCIES } from "@/config/currencies";
 
 type Country = { id: number; name: string };
 type City = { id: number; name: string };
-type GalleryImage = { id: number; url: string; path: string; bucket: string };
 
 const COUNTRY_CURRENCIES: Record<string, string> = {
   Sweden: "SEK",
@@ -130,6 +126,7 @@ const DJ_TYPE_LABELS: Record<string, string> = {
 type AvailabilityDay = { day: number; status: string };
 
 interface ProfileData {
+  id: number;
   stageName: string;
   bio: string;
   experienceYears: number | null;
@@ -156,16 +153,6 @@ interface ProfileData {
   agentName: string;
   agentAgency: string;
   agentEmail: string;
-  // Spotlight
-  featuredMixTitle: string;
-  featuredMixAudioUrl: string;
-  featuredMixDuration: string;
-  featuredMixPlays: number;
-  featuredVideoTitle: string;
-  featuredVideoUrl: string;
-  featuredVideoThumbnail: string;
-  featuredVideoDuration: string;
-  featuredVideoViews: number;
   // Availability
   availabilityTimezone: string;
   availabilityMonth: string;
@@ -177,7 +164,7 @@ interface Props {
   countries: Country[];
   initialCities: City[];
   userId: string;
-  galleryImages: GalleryImage[];
+  allMedia: MediaItem[];
 }
 
 function SectionCard({
@@ -206,13 +193,12 @@ export default function EditDjProfileForm({
   countries,
   initialCities,
   userId,
-  galleryImages,
+  allMedia,
 }: Props) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const plan = normalisePlan(profile.plan);
-  const galleryLimit = getMediaLimit(plan, "photos");
 
   const [stageName, setStageName] = useState(profile.stageName);
   const [bio, setBio] = useState(profile.bio);
@@ -271,8 +257,6 @@ export default function EditDjProfileForm({
   const [showLeaveAlert, setShowLeaveAlert] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
-  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
-  const [gallery, setGallery] = useState<GalleryImage[]>(galleryImages);
 
   // Team
   const [managerName, setManagerName] = useState(profile.managerName);
@@ -281,36 +265,6 @@ export default function EditDjProfileForm({
   const [agentName, setAgentName] = useState(profile.agentName);
   const [agentAgency, setAgentAgency] = useState(profile.agentAgency);
   const [agentEmail, setAgentEmail] = useState(profile.agentEmail);
-
-  // Spotlight
-  const [featuredMixTitle, setFeaturedMixTitle] = useState(
-    profile.featuredMixTitle,
-  );
-
-  const [featuredMixAudioUrl, setFeaturedMixAudioUrl] = useState(
-    profile.featuredMixAudioUrl,
-  );
-  const [featuredMixDuration, setFeaturedMixDuration] = useState(
-    profile.featuredMixDuration,
-  );
-  const [featuredMixPlays, setFeaturedMixPlays] = useState(
-    String(profile.featuredMixPlays),
-  );
-  const [featuredVideoTitle, setFeaturedVideoTitle] = useState(
-    profile.featuredVideoTitle,
-  );
-  const [featuredVideoUrl, setFeaturedVideoUrl] = useState(
-    profile.featuredVideoUrl,
-  );
-  const [featuredVideoThumbnail, setFeaturedVideoThumbnail] = useState(
-    profile.featuredVideoThumbnail,
-  );
-  const [featuredVideoDuration, setFeaturedVideoDuration] = useState(
-    profile.featuredVideoDuration,
-  );
-  const [featuredVideoViews, setFeaturedVideoViews] = useState(
-    String(profile.featuredVideoViews),
-  );
 
   // Availability
   const [availabilityTimezone, setAvailabilityTimezone] = useState(
@@ -325,7 +279,6 @@ export default function EditDjProfileForm({
 
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
-  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const isDirty =
     stageName !== profile.stageName ||
@@ -354,15 +307,6 @@ export default function EditDjProfileForm({
     agentName !== profile.agentName ||
     agentAgency !== profile.agentAgency ||
     agentEmail !== profile.agentEmail ||
-    featuredMixTitle !== profile.featuredMixTitle ||
-    featuredMixAudioUrl !== profile.featuredMixAudioUrl ||
-    featuredMixDuration !== profile.featuredMixDuration ||
-    featuredMixPlays !== String(profile.featuredMixPlays) ||
-    featuredVideoTitle !== profile.featuredVideoTitle ||
-    featuredVideoUrl !== profile.featuredVideoUrl ||
-    featuredVideoThumbnail !== profile.featuredVideoThumbnail ||
-    featuredVideoDuration !== profile.featuredVideoDuration ||
-    featuredVideoViews !== String(profile.featuredVideoViews) ||
     availabilityTimezone !== profile.availabilityTimezone ||
     availabilityMonth !== profile.availabilityMonth ||
     JSON.stringify(availabilityDays) !==
@@ -492,34 +436,6 @@ export default function EditDjProfileForm({
     }
   }
 
-  async function handleGalleryUpload(file: File | undefined) {
-    if (!file) return;
-    setIsUploadingGallery(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const result = await uploadDjGalleryImage(fd);
-      if ("error" in result) throw new Error(result.error);
-      setGallery((prev) => [result, ...prev]);
-      toast.success("Photo added");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setIsUploadingGallery(false);
-    }
-  }
-
-  async function handleGalleryDelete(item: GalleryImage) {
-    const toastId = toast.loading("Removing photo...");
-    const result = await deleteGalleryImage(item.id);
-    if ("error" in result) {
-      toast.error(result.error, { id: toastId });
-      return;
-    }
-    setGallery((prev) => prev.filter((g) => g.id !== item.id));
-    toast.success("Photo removed", { id: toastId });
-  }
-
   function isValidMonthFormat(monthStr: string): boolean {
     if (!monthStr || !monthStr.includes("-")) return false;
     const [y, m] = monthStr.split("-").map(Number);
@@ -561,7 +477,7 @@ export default function EditDjProfileForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
-    if (isUploadingAvatar || isUploadingCover || isUploadingGallery) return;
+    if (isUploadingAvatar || isUploadingCover) return;
     if (!canSave) return;
     const toastId = toast.loading("Saving profile...");
     setIsSubmitting(true);
@@ -600,18 +516,6 @@ export default function EditDjProfileForm({
         agentName: agentName.trim() || null,
         agentAgency: agentAgency.trim() || null,
         agentEmail: agentEmail.trim() || null,
-        // Spotlight
-        featuredMixTitle: featuredMixTitle.trim() || null,
-        featuredMixAudioUrl: featuredMixAudioUrl.trim() || null,
-        featuredMixDuration: featuredMixDuration.trim() || null,
-        featuredMixPlays: featuredMixPlays ? parseInt(featuredMixPlays, 10) : 0,
-        featuredVideoTitle: featuredVideoTitle.trim() || null,
-        featuredVideoUrl: featuredVideoUrl.trim() || null,
-        featuredVideoThumbnail: featuredVideoThumbnail.trim() || null,
-        featuredVideoDuration: featuredVideoDuration.trim() || null,
-        featuredVideoViews: featuredVideoViews
-          ? parseInt(featuredVideoViews, 10)
-          : 0,
         // Availability
         availabilityTimezone: availabilityTimezone.trim() || null,
         availabilityMonth: availabilityMonth.trim() || null,
@@ -1180,74 +1084,16 @@ export default function EditDjProfileForm({
           </div>
         </SectionCard>
 
-        {/* Photo Gallery */}
+        {/* Media Library */}
         <SectionCard
-          title="Photo Gallery"
-          subtitle={
-            galleryLimit === Infinity
-              ? "Showcase your work — unlimited photos"
-              : `Showcase your work — up to ${galleryLimit} photos`
-          }
+          title="Media Library"
+          subtitle="Manage your photos, videos, and audio"
         >
-          <div>
-            <div className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
-              {gallery.map((img) => (
-                <div
-                  key={img.id}
-                  className="group relative aspect-square overflow-hidden rounded-lg bg-white/5"
-                >
-                  <Image
-                    src={img.url}
-                    alt="Gallery photo"
-                    fill
-                    className="object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleGalleryDelete(img)}
-                    className="absolute top-1 right-1 rounded-full bg-black/60 p-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-900/80"
-                    aria-label="Remove photo"
-                  >
-                    <X className="h-3 w-3 text-white" />
-                  </button>
-                </div>
-              ))}
-              {gallery.length < galleryLimit && (
-                <button
-                  type="button"
-                  onClick={() => galleryInputRef.current?.click()}
-                  disabled={isUploadingGallery}
-                  className="flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-white/15 bg-white/3 transition-colors hover:border-white/30 hover:bg-white/5 disabled:opacity-50"
-                >
-                  {isUploadingGallery ? (
-                    <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
-                  ) : (
-                    <>
-                      <Plus className="h-5 w-5 text-gray-500" />
-                      <span className="text-[10px] text-gray-600">
-                        Add Photo
-                      </span>
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-            <input
-              ref={galleryInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                handleGalleryUpload(e.target.files?.[0]);
-                e.target.value = "";
-              }}
-            />
-            <p className="text-[11px] text-gray-600">
-              {galleryLimit === Infinity
-                ? `${gallery.length} photos`
-                : `${gallery.length}/${galleryLimit} photos`}
-            </p>
-          </div>
+          <MediaLibrary
+            profileId={profile.id}
+            plan={plan}
+            initialMedia={allMedia}
+          />
         </SectionCard>
 
         {/* Team Contacts */}
@@ -1353,148 +1199,6 @@ export default function EditDjProfileForm({
               <p className="text-sm text-gray-400">
                 Upgrade to Premium to add your manager and booking agent
                 details.
-              </p>
-            </div>
-          </SectionCard>
-        )}
-
-        {/* Spotlight */}
-        {isPremium ? (
-          <SectionCard
-            title="Spotlight"
-            subtitle="Featured mix and video at the top of your profile"
-          >
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                  Featured Mix
-                </p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Title
-                    </Label>
-                    <Input
-                      value={featuredMixTitle}
-                      onChange={(e) => setFeaturedMixTitle(e.target.value)}
-                      placeholder="Afrobeats & Amapiano Fusion Vol.3"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Audio URL
-                    </Label>
-                    <Input
-                      value={featuredMixAudioUrl}
-                      onChange={(e) => setFeaturedMixAudioUrl(e.target.value)}
-                      placeholder="https://soundcloud.com/..."
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Duration
-                    </Label>
-                    <Input
-                      value={featuredMixDuration}
-                      onChange={(e) => setFeaturedMixDuration(e.target.value)}
-                      placeholder="1h 24m"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Plays
-                    </Label>
-                    <Input
-                      type="number"
-                      value={featuredMixPlays}
-                      onChange={(e) => setFeaturedMixPlays(e.target.value)}
-                      placeholder="82400"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                </div>
-              </div>
-              <Separator className="bg-white/8" />
-              <div>
-                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                  Featured Video
-                </p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Title
-                    </Label>
-                    <Input
-                      value={featuredVideoTitle}
-                      onChange={(e) => setFeaturedVideoTitle(e.target.value)}
-                      placeholder="Summer Closing Set — Full Recording"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Video URL
-                    </Label>
-                    <Input
-                      value={featuredVideoUrl}
-                      onChange={(e) => setFeaturedVideoUrl(e.target.value)}
-                      placeholder="https://youtube.com/..."
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Thumbnail URL
-                    </Label>
-                    <Input
-                      value={featuredVideoThumbnail}
-                      onChange={(e) =>
-                        setFeaturedVideoThumbnail(e.target.value)
-                      }
-                      placeholder="https://..."
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Duration
-                    </Label>
-                    <Input
-                      value={featuredVideoDuration}
-                      onChange={(e) => setFeaturedVideoDuration(e.target.value)}
-                      placeholder="45 min"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Views
-                    </Label>
-                    <Input
-                      type="number"
-                      value={featuredVideoViews}
-                      onChange={(e) => setFeaturedVideoViews(e.target.value)}
-                      placeholder="211000"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </SectionCard>
-        ) : (
-          <SectionCard
-            title="Spotlight"
-            subtitle="Featured mix and video — Premium only"
-          >
-            <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <Crown className="h-6 w-6 text-amber-500" />
-              <p className="text-sm text-gray-400">
-                Upgrade to Premium to feature a mix and video at the top of your
-                profile.
               </p>
             </div>
           </SectionCard>
@@ -1619,7 +1323,6 @@ export default function EditDjProfileForm({
               isSubmitting ||
               isUploadingAvatar ||
               isUploadingCover ||
-              isUploadingGallery ||
               (submitted && !canSave)
             }
             className="bg-h_red hover:bg-h_redDark min-w-32 px-8 font-semibold text-white disabled:opacity-50"
