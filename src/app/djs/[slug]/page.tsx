@@ -5,7 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
 import { ProfileViewTracker } from "@/components/dj-profile/ProfileViewTracker";
-import { isFollowingDj } from "@/lib/actions/follows";
+import { DjEventsSection } from "@/components/dj-profile/DjEventsSection";
+import { isFollowingDj, getSavedEventIds } from "@/lib/actions/follows";
+import { getDjEvents } from "@/lib/queries/events";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
@@ -201,6 +203,12 @@ export default async function DjProfilePage({
 
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
   const isFollowedDj = viewMode === "fan" ? await isFollowingDj(dj.id) : false;
+
+  // Fetch DJ events and saved event IDs
+  const [djEvents, savedEventIds] = await Promise.all([
+    getDjEvents(dj.id, 12),
+    authUser ? getSavedEventIds() : [],
+  ]);
 
   let viewerContext: BookingViewerContext = {
     role: "guest",
@@ -550,6 +558,12 @@ export default async function DjProfilePage({
           viewerContext={viewerContext}
           bookingOptions={bookingOptions}
         />
+      )}
+      {/* DJ Events Section - only show if DJ has more than 3 events */}
+      {djEvents.length > 3 && (
+        <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
+          <DjEventsSection events={djEvents} savedEventIds={savedEventIds} />
+        </div>
       )}
     </div>
   );

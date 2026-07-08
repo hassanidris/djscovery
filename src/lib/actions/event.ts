@@ -6,6 +6,8 @@ import { z } from "zod";
 import { VALID_EVENT_CATEGORIES } from "@/lib/event-categories";
 import { isValidTimezone } from "@/lib/timezones";
 import { requireEventOwner } from "@/lib/auth/require-owner";
+import { sendEmail } from "@/lib/email/send";
+import type { NewEventData } from "@/lib/email/types";
 
 // ── Slug helpers ──────────────────────────────────────────────────────────────
 
@@ -357,6 +359,37 @@ export async function publishEvent(
           },
         })),
         skipDuplicates: true,
+      });
+
+      // Send email notifications to followers (non-blocking)
+      const followersWithEmails = await prisma.user.findMany({
+        where: { id: { in: followers.map((f) => f.followerId) } },
+        select: { id: true, email: true, name: true },
+      });
+
+      const eventDate = full.startDate.toLocaleDateString("en-GB", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+
+      // Send emails in parallel but don't await to avoid blocking
+      followersWithEmails.forEach(async (follower) => {
+        if (follower.email) {
+          try {
+            const emailData: NewEventData = {
+              djName: djProfile.stageName,
+              eventTitle: full.title,
+              eventDate,
+              eventCategory: full.category,
+              eventUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/events/${updated.slug}`,
+            };
+            await sendEmail(follower.email, "NEW_EVENT", emailData);
+          } catch (emailError) {
+            console.error("Failed to send new event email:", emailError);
+          }
+        }
       });
     }
   } catch {
