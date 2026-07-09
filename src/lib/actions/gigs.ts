@@ -193,7 +193,9 @@ export async function updateGig(
   gigId: number,
   input: unknown,
 ): Promise<ActionResult<{ slug: string }>> {
-  const { organizerProfileId } = await requireGigOwner(gigId);
+  const ownership = await requireGigOwner(gigId);
+  if ("error" in ownership) return { success: false, error: ownership.error };
+  const { organizerProfileId } = ownership;
 
   const orgProfile = await prisma.organizerProfile.findUnique({
     where: { id: organizerProfileId },
@@ -305,7 +307,9 @@ const publishSelectShape = {
 } as const;
 
 export async function publishGig(gigId: number): Promise<ActionResult> {
-  const { organizerProfileId } = await requireGigOwner(gigId);
+  const ownership = await requireGigOwner(gigId);
+  if ("error" in ownership) return { success: false, error: ownership.error };
+  const { organizerProfileId } = ownership;
 
   const orgProfile = await prisma.organizerProfile.findUnique({
     where: { id: organizerProfileId },
@@ -354,7 +358,9 @@ export async function publishGig(gigId: number): Promise<ActionResult> {
 // ============================================================
 
 export async function closeGig(gigId: number): Promise<ActionResult> {
-  const { organizerProfileId } = await requireGigOwner(gigId);
+  const ownership = await requireGigOwner(gigId);
+  if ("error" in ownership) return { success: false, error: ownership.error };
+  const { organizerProfileId } = ownership;
 
   const orgProfile = await prisma.organizerProfile.findUnique({
     where: { id: organizerProfileId },
@@ -390,7 +396,9 @@ export async function closeGig(gigId: number): Promise<ActionResult> {
 // ============================================================
 
 export async function cancelGig(gigId: number): Promise<ActionResult> {
-  const { organizerProfileId } = await requireGigOwner(gigId);
+  const ownership = await requireGigOwner(gigId);
+  if ("error" in ownership) return { success: false, error: ownership.error };
+  const { organizerProfileId } = ownership;
 
   const orgProfile = await prisma.organizerProfile.findUnique({
     where: { id: organizerProfileId },

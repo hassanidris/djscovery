@@ -220,7 +220,9 @@ export async function updateEvent(
   if ("error" in auth) return auth;
   const { djProfile } = auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -309,7 +311,9 @@ export async function publishEvent(
   if ("error" in auth) return auth;
   const { djProfile } = auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -407,7 +411,8 @@ export async function unpublishEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
 
   await prisma.event.update({
     where: { id: eventId },
@@ -425,7 +430,9 @@ export async function cancelEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -453,7 +460,9 @@ export async function archiveEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -481,7 +490,8 @@ export async function deleteEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
 
   await prisma.event.update({
     where: { id: eventId },
