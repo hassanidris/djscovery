@@ -258,7 +258,7 @@ export async function getDjEvents(djProfileId: number, limit = 12) {
 
   const events = await prisma.event.findMany({
     where: {
-      status: "PUBLISHED",
+      status: { in: ["PUBLISHED", "COMPLETED"] },
       deletedAt: null,
       OR: [
         { ownerDjId: djProfileId },

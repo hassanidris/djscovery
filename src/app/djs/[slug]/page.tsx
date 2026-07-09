@@ -559,8 +559,8 @@ export default async function DjProfilePage({
           bookingOptions={bookingOptions}
         />
       )}
-      {/* DJ Events Section - only show if DJ has more than 3 events */}
-      {djEvents.length > 3 && (
+      {/* DJ Events Section - only show if DJ has events */}
+      {djEvents.length > 0 && (
         <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
           <DjEventsSection events={djEvents} savedEventIds={savedEventIds} />
         </div>
