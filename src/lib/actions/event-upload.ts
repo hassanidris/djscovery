@@ -32,7 +32,9 @@ export async function uploadEventPoster(
   const eventId = Number(eventIdRaw);
   if (!eventId || isNaN(eventId)) return { error: "Invalid event ID." };
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const djProfile = await prisma.djProfile.findUnique({
     where: { id: djProfileId },
@@ -100,7 +102,9 @@ export async function uploadEventGalleryImage(
   const eventId = Number(eventIdRaw);
   if (!eventId || isNaN(eventId)) return { error: "Invalid event ID." };
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const djProfile = await prisma.djProfile.findUnique({
     where: { id: djProfileId },
@@ -178,7 +182,8 @@ export async function deleteEventGalleryImage(
 
   if (!media) return { error: "Gallery image not found." };
 
-  await requireEventOwner(media.eventId);
+  const ownership = await requireEventOwner(media.eventId);
+  if ("error" in ownership) return ownership;
 
   const supabase = await createClient();
   await supabase.storage

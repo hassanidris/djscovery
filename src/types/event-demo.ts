@@ -19,6 +19,7 @@ export interface DemoEvent {
   slug: string;
   posterUrl: string | null;
   djSlug: string;
+  djName?: string;
   title: string;
   eventType: EventDemoType;
   daysOffset: number; // positive = upcoming, negative = past

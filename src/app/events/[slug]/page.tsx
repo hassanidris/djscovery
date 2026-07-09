@@ -17,6 +17,10 @@ import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
 import { EventReviewSection } from "@/components/reputation/EventReviewSection";
 import JsonLd from "@/components/seo/JsonLd";
+import AttendanceButton from "@/components/events/AttendanceButton";
+import { EventViewTracker } from "@/components/events/EventViewTracker";
+import { EventAnalytics } from "@/components/events/EventAnalytics";
+import { getEventAttendance } from "@/lib/actions/event-attendance";
 
 export const revalidate = 60;
 
@@ -96,6 +100,7 @@ export default async function EventDetailPage({
       audioLink: true,
       posterUrl: true,
       status: true,
+      viewCount: true,
       ownerDjId: true,
       ownerDj: {
         select: {
@@ -136,7 +141,24 @@ export default async function EventDetailPage({
         })
       : null;
     const hasAttended = attendance?.status === "ATTENDED";
+    const attendanceStatus = user
+      ? await getEventAttendance(dbEvent.id, user.id)
+      : { status: null };
     const reviewedDjIds = dbEvent.eventReviews.map((r) => r.djProfileId);
+    const organizerProfile = user
+      ? await prisma.organizerProfile.findUnique({ where: { userId: user.id } })
+      : null;
+    const isOrganizer = Boolean(organizerProfile);
+
+    // Fetch attendance analytics
+    const [goingCount, interestedCount] = await Promise.all([
+      prisma.eventAttendance.count({
+        where: { eventId: dbEvent.id, status: "GOING" },
+      }),
+      prisma.eventAttendance.count({
+        where: { eventId: dbEvent.id, status: "INTERESTED" },
+      }),
+    ]);
 
     if (dbEvent.status === "DRAFT" || dbEvent.status === "ARCHIVED") {
       if (isOwner) redirect(`/dashboard/dj/events/${dbEvent.id}/edit`);
@@ -158,19 +180,19 @@ export default async function EventDetailPage({
         category={dbEvent.category}
         status={dbEvent.status}
         startDate={dbEvent.startDate}
-        endDate={dbEvent.endDate ?? null}
-        startTime={dbEvent.startTime ?? null}
-        endTime={dbEvent.endTime ?? null}
-        timezone={dbEvent.timezone ?? null}
+        endDate={dbEvent.endDate}
+        startTime={dbEvent.startTime}
+        endTime={dbEvent.endTime}
+        timezone={dbEvent.timezone}
         location={location}
-        venue={showVenue ? (dbEvent.venue ?? null) : null}
+        venue={showVenue ? dbEvent.venue : null}
         isPrivate={isPrivate}
-        description={dbEvent.description ?? null}
-        ticketUrl={dbEvent.ticketUrl ?? null}
+        description={dbEvent.description}
+        ticketUrl={dbEvent.ticketUrl}
         genres={dbEvent.genres}
-        recap={dbEvent.recap ?? null}
-        audioLink={dbEvent.audioLink ?? null}
-        posterUrl={dbEvent.posterUrl ?? null}
+        recap={dbEvent.recap}
+        audioLink={dbEvent.audioLink}
+        posterUrl={dbEvent.posterUrl}
         isUpcoming={isUpcoming}
         ownerDj={{
           djProfileId: dbEvent.ownerDj.id,
@@ -191,6 +213,12 @@ export default async function EventDetailPage({
         eventId={dbEvent.id}
         hasAttended={hasAttended}
         reviewedDjIds={reviewedDjIds}
+        attendanceStatus={attendanceStatus.status}
+        user={user}
+        isOrganizer={isOrganizer}
+        viewCount={dbEvent.viewCount ?? 0}
+        goingCount={goingCount}
+        interestedCount={interestedCount}
       />
     );
   }
@@ -246,6 +274,12 @@ function EventDetailView(props: {
   eventId: number;
   hasAttended: boolean;
   reviewedDjIds: number[];
+  attendanceStatus: "GOING" | "INTERESTED" | null;
+  user: any;
+  isOrganizer: boolean;
+  viewCount: number;
+  goingCount: number;
+  interestedCount: number;
 }) {
   const {
     slug,
@@ -276,6 +310,12 @@ function EventDetailView(props: {
     eventId,
     hasAttended,
     reviewedDjIds,
+    attendanceStatus,
+    user,
+    isOrganizer,
+    viewCount,
+    goingCount,
+    interestedCount,
   } = props;
 
   const allPerformers = [
@@ -319,6 +359,7 @@ function EventDetailView(props: {
   return (
     <div className="min-h-screen bg-black pb-20">
       <JsonLd data={jsonLd} />
+      <EventViewTracker eventId={eventId} />
       {/* Top nav bar */}
       <div className="sticky top-0 z-10 border-b border-zinc-800/60 bg-black/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
@@ -359,6 +400,15 @@ function EventDetailView(props: {
                 </div>
               )}
             </div>
+
+            {/* Attendance Button — only for authenticated users */}
+            {user && (
+              <AttendanceButton
+                eventId={eventId}
+                currentStatus={attendanceStatus}
+                isUpcoming={isUpcoming}
+              />
+            )}
 
             {/* Ticket CTA — below poster on all screen sizes */}
             {ticketUrl && isUpcoming && (
@@ -404,6 +454,13 @@ function EventDetailView(props: {
             <h1 className="mb-6 text-3xl font-bold text-white md:text-4xl">
               {title}
             </h1>
+
+            {/* Analytics */}
+            <EventAnalytics
+              viewCount={viewCount}
+              goingCount={goingCount}
+              interestedCount={interestedCount}
+            />
 
             {/* Meta */}
             <div className="mb-8 space-y-3">
@@ -535,6 +592,7 @@ function EventDetailView(props: {
                   avatar: dj.avatar,
                 }))}
                 reviewedDjIds={reviewedDjIds}
+                isOrganizer={isOrganizer}
               />
             )}
 
@@ -625,7 +683,10 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
         djProfileId: 0,
         slug: event.djSlug,
         stageName: demoDj?.stageName ?? slugToName(event.djSlug),
-        avatar: demoDj?.avatar.url ?? null,
+        avatar:
+          typeof demoDj?.avatar === "string"
+            ? demoDj.avatar
+            : (demoDj?.avatar?.url ?? null),
       }}
       participants={[]}
       gallery={[]}
@@ -634,6 +695,12 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       eventId={0}
       hasAttended={false}
       reviewedDjIds={[]}
+      attendanceStatus={null}
+      user={null}
+      isOrganizer={false}
+      viewCount={0}
+      goingCount={0}
+      interestedCount={0}
     />
   );
 }

@@ -16,7 +16,11 @@
     "startTime": "18:00",
     "endTime": "23:30",
     "featured": true,
-    "genres": ["Organic House", "Melodic House"]
+    "genres": [
+      "Organic House",
+      "Melodic House"
+    ],
+    "djName": "Mira Sol"
   },
   {
     "id": "demo-event-002",
@@ -35,7 +39,11 @@
     "startTime": "22:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Deep House", "Melodic House"]
+    "genres": [
+      "Deep House",
+      "Melodic House"
+    ],
+    "djName": "Mira Sol"
   },
   {
     "id": "demo-event-003",
@@ -54,7 +62,10 @@
     "startTime": "21:00",
     "endTime": "04:00",
     "featured": true,
-    "genres": ["Melodic Techno"]
+    "genres": [
+      "Melodic Techno"
+    ],
+    "djName": "Kai Frequency"
   },
   {
     "id": "demo-event-004",
@@ -73,7 +84,10 @@
     "startTime": "22:00",
     "endTime": "06:00",
     "featured": false,
-    "genres": ["Melodic Techno"]
+    "genres": [
+      "Melodic Techno"
+    ],
+    "djName": "Kai Frequency"
   },
   {
     "id": "demo-event-005",
@@ -92,7 +106,11 @@
     "startTime": "19:00",
     "endTime": "02:00",
     "featured": true,
-    "genres": ["Afro House", "Afrobeat"]
+    "genres": [
+      "Afro House",
+      "Afrobeat"
+    ],
+    "djName": "Sahara Beats"
   },
   {
     "id": "demo-event-006",
@@ -111,7 +129,10 @@
     "startTime": "17:00",
     "endTime": "00:00",
     "featured": false,
-    "genres": ["Afro House"]
+    "genres": [
+      "Afro House"
+    ],
+    "djName": "Sahara Beats"
   },
   {
     "id": "demo-event-007",
@@ -130,7 +151,11 @@
     "startTime": "16:00",
     "endTime": "02:00",
     "featured": true,
-    "genres": ["Brazilian Bass", "Baile Funk"]
+    "genres": [
+      "Brazilian Bass",
+      "Baile Funk"
+    ],
+    "djName": "Rio Noir"
   },
   {
     "id": "demo-event-008",
@@ -149,7 +174,11 @@
     "startTime": "22:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Latin House", "Tech House"]
+    "genres": [
+      "Latin House",
+      "Tech House"
+    ],
+    "djName": "Rio Noir"
   },
   {
     "id": "demo-event-009",
@@ -168,7 +197,11 @@
     "startTime": "20:00",
     "endTime": "03:00",
     "featured": true,
-    "genres": ["Commercial", "Open Format"]
+    "genres": [
+      "Commercial",
+      "Open Format"
+    ],
+    "djName": "Zara Luxe"
   },
   {
     "id": "demo-event-010",
@@ -187,7 +220,11 @@
     "startTime": "19:00",
     "endTime": "01:00",
     "featured": false,
-    "genres": ["Deep House", "Chill House"]
+    "genres": [
+      "Deep House",
+      "Chill House"
+    ],
+    "djName": "Zara Luxe"
   },
   {
     "id": "demo-event-011",
@@ -206,7 +243,10 @@
     "startTime": "18:00",
     "endTime": "02:00",
     "featured": true,
-    "genres": ["Trance"]
+    "genres": [
+      "Trance"
+    ],
+    "djName": "Armin van Buuren"
   },
   {
     "id": "demo-event-012",
@@ -225,7 +265,10 @@
     "startTime": "19:00",
     "endTime": "03:00",
     "featured": false,
-    "genres": ["Progressive Trance"]
+    "genres": [
+      "Progressive Trance"
+    ],
+    "djName": "Armin van Buuren"
   },
   {
     "id": "demo-event-013",
@@ -244,7 +287,10 @@
     "startTime": "18:00",
     "endTime": "01:00",
     "featured": true,
-    "genres": ["EDM"]
+    "genres": [
+      "EDM"
+    ],
+    "djName": "Tiësto"
   },
   {
     "id": "demo-event-014",
@@ -263,7 +309,10 @@
     "startTime": "19:00",
     "endTime": "03:00",
     "featured": false,
-    "genres": ["EDM"]
+    "genres": [
+      "EDM"
+    ],
+    "djName": "Tiësto"
   },
   {
     "id": "demo-event-015",
@@ -282,7 +331,11 @@
     "startTime": "23:00",
     "endTime": "06:00",
     "featured": true,
-    "genres": ["Commercial", "EDM"]
+    "genres": [
+      "Commercial",
+      "EDM"
+    ],
+    "djName": "David Guetta"
   },
   {
     "id": "demo-event-016",
@@ -301,7 +354,10 @@
     "startTime": "18:00",
     "endTime": "02:00",
     "featured": false,
-    "genres": ["Commercial EDM"]
+    "genres": [
+      "Commercial EDM"
+    ],
+    "djName": "David Guetta"
   },
   {
     "id": "demo-event-017",
@@ -320,7 +376,11 @@
     "startTime": "17:00",
     "endTime": "01:00",
     "featured": true,
-    "genres": ["Brazilian Bass", "EDM"]
+    "genres": [
+      "Brazilian Bass",
+      "EDM"
+    ],
+    "djName": "Alok"
   },
   {
     "id": "demo-event-018",
@@ -339,7 +399,11 @@
     "startTime": "18:00",
     "endTime": "02:00",
     "featured": false,
-    "genres": ["Brazilian Bass", "Electronic"]
+    "genres": [
+      "Brazilian Bass",
+      "Electronic"
+    ],
+    "djName": "Alok"
   },
   {
     "id": "demo-event-019",
@@ -358,7 +422,10 @@
     "startTime": "21:00",
     "endTime": "04:00",
     "featured": true,
-    "genres": ["Future House"]
+    "genres": [
+      "Future House"
+    ],
+    "djName": "Don Diablo"
   },
   {
     "id": "demo-event-020",
@@ -377,7 +444,10 @@
     "startTime": "20:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Future House"]
+    "genres": [
+      "Future House"
+    ],
+    "djName": "Don Diablo"
   },
   {
     "id": "demo-event-021",
@@ -396,7 +466,11 @@
     "startTime": "22:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Melodic Techno", "Electronic"]
+    "genres": [
+      "Melodic Techno",
+      "Electronic"
+    ],
+    "djName": "Kai Frequency"
   },
   {
     "id": "demo-event-022",
@@ -415,7 +489,10 @@
     "startTime": "21:00",
     "endTime": "04:00",
     "featured": false,
-    "genres": ["Melodic Techno"]
+    "genres": [
+      "Melodic Techno"
+    ],
+    "djName": "Kai Frequency"
   },
   {
     "id": "demo-event-023",
@@ -434,7 +511,11 @@
     "startTime": "17:00",
     "endTime": "01:00",
     "featured": false,
-    "genres": ["Afro House", "Afrobeat"]
+    "genres": [
+      "Afro House",
+      "Afrobeat"
+    ],
+    "djName": "Sahara Beats"
   },
   {
     "id": "demo-event-024",
@@ -453,7 +534,11 @@
     "startTime": "19:00",
     "endTime": "02:00",
     "featured": false,
-    "genres": ["Organic House", "Arabic Electronic"]
+    "genres": [
+      "Organic House",
+      "Arabic Electronic"
+    ],
+    "djName": "Sahara Beats"
   },
   {
     "id": "demo-event-025",
@@ -472,7 +557,11 @@
     "startTime": "18:00",
     "endTime": "02:00",
     "featured": false,
-    "genres": ["Latin House", "Baile Funk"]
+    "genres": [
+      "Latin House",
+      "Baile Funk"
+    ],
+    "djName": "Rio Noir"
   },
   {
     "id": "demo-event-026",
@@ -491,7 +580,11 @@
     "startTime": "22:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Tech House", "Brazilian Bass"]
+    "genres": [
+      "Tech House",
+      "Brazilian Bass"
+    ],
+    "djName": "Rio Noir"
   },
   {
     "id": "demo-event-027",
@@ -510,7 +603,11 @@
     "startTime": "21:00",
     "endTime": "03:00",
     "featured": false,
-    "genres": ["Commercial", "Afro House"]
+    "genres": [
+      "Commercial",
+      "Afro House"
+    ],
+    "djName": "Zara Luxe"
   },
   {
     "id": "demo-event-028",
@@ -529,7 +626,10 @@
     "startTime": "17:00",
     "endTime": "00:00",
     "featured": false,
-    "genres": ["Open Format"]
+    "genres": [
+      "Open Format"
+    ],
+    "djName": "Zara Luxe"
   },
   {
     "id": "demo-event-029",
@@ -548,7 +648,11 @@
     "startTime": "18:00",
     "endTime": "04:00",
     "featured": false,
-    "genres": ["Trance", "Progressive Trance"]
+    "genres": [
+      "Trance",
+      "Progressive Trance"
+    ],
+    "djName": "Armin van Buuren"
   },
   {
     "id": "demo-event-030",
@@ -567,7 +671,10 @@
     "startTime": "19:00",
     "endTime": "03:00",
     "featured": false,
-    "genres": ["EDM"]
+    "genres": [
+      "EDM"
+    ],
+    "djName": "Tiësto"
   },
   {
     "id": "demo-event-031",
@@ -586,7 +693,11 @@
     "startTime": "18:00",
     "endTime": "03:00",
     "featured": false,
-    "genres": ["Commercial", "EDM"]
+    "genres": [
+      "Commercial",
+      "EDM"
+    ],
+    "djName": "David Guetta"
   },
   {
     "id": "demo-event-032",
@@ -605,7 +716,10 @@
     "startTime": "17:00",
     "endTime": "01:00",
     "featured": false,
-    "genres": ["Brazilian Bass"]
+    "genres": [
+      "Brazilian Bass"
+    ],
+    "djName": "Alok"
   },
   {
     "id": "demo-event-033",
@@ -624,7 +738,10 @@
     "startTime": "20:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Future House"]
+    "genres": [
+      "Future House"
+    ],
+    "djName": "Don Diablo"
   },
   {
     "id": "demo-event-034",
@@ -643,7 +760,11 @@
     "startTime": "21:00",
     "endTime": "04:00",
     "featured": false,
-    "genres": ["Deep House", "Organic House"]
+    "genres": [
+      "Deep House",
+      "Organic House"
+    ],
+    "djName": "Luna Vega"
   },
   {
     "id": "demo-event-035",
@@ -662,7 +783,10 @@
     "startTime": "20:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Drum and Bass"]
+    "genres": [
+      "Drum and Bass"
+    ],
+    "djName": "Marcus Blaze"
   },
   {
     "id": "demo-event-036",
@@ -681,7 +805,11 @@
     "startTime": "22:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Progressive House", "Melodic Techno"]
+    "genres": [
+      "Progressive House",
+      "Melodic Techno"
+    ],
+    "djName": "Elena Pulse"
   },
   {
     "id": "demo-event-037",
@@ -700,7 +828,11 @@
     "startTime": "18:00",
     "endTime": "02:00",
     "featured": false,
-    "genres": ["Progressive House", "EDM"]
+    "genres": [
+      "Progressive House",
+      "EDM"
+    ],
+    "djName": "DJ Nova"
   },
   {
     "id": "demo-event-038",
@@ -719,7 +851,11 @@
     "startTime": "17:00",
     "endTime": "00:00",
     "featured": false,
-    "genres": ["Afro House", "Afrobeat"]
+    "genres": [
+      "Afro House",
+      "Afrobeat"
+    ],
+    "djName": "Sofia Rhythm"
   },
   {
     "id": "demo-event-039",
@@ -738,7 +874,11 @@
     "startTime": "23:00",
     "endTime": "06:00",
     "featured": false,
-    "genres": ["Deep House", "Melodic House"]
+    "genres": [
+      "Deep House",
+      "Melodic House"
+    ],
+    "djName": "Ethan Groove"
   },
   {
     "id": "demo-event-040",
@@ -757,7 +897,11 @@
     "startTime": "04:00",
     "endTime": "10:00",
     "featured": false,
-    "genres": ["Organic House", "Melodic House"]
+    "genres": [
+      "Organic House",
+      "Melodic House"
+    ],
+    "djName": "Maya Beats"
   },
   {
     "id": "demo-event-041",
@@ -776,7 +920,10 @@
     "startTime": "22:00",
     "endTime": "05:00",
     "featured": false,
-    "genres": ["Tech House"]
+    "genres": [
+      "Tech House"
+    ],
+    "djName": "Victor Vibe"
   },
   {
     "id": "demo-event-042",
@@ -795,7 +942,11 @@
     "startTime": "20:00",
     "endTime": "03:00",
     "featured": false,
-    "genres": ["Deep House", "Chill House"]
+    "genres": [
+      "Deep House",
+      "Chill House"
+    ],
+    "djName": "Ava Noir"
   },
   {
     "id": "demo-event-043",
@@ -814,6 +965,10 @@
     "startTime": "16:00",
     "endTime": "02:00",
     "featured": false,
-    "genres": ["House", "EDM"]
+    "genres": [
+      "House",
+      "EDM"
+    ],
+    "djName": "Leo Sound"
   }
 ]

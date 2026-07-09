@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Music2, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import prisma from "@/lib/client";
 import { getDemoEvents } from "@/data/events-demo";
 import { getSavedEventIds } from "@/lib/actions/follows";
+import { VALID_EVENT_CATEGORIES } from "@/lib/event-categories";
 import type { EventCardItem } from "@/components/events/EventCard";
 import { EventGrid } from "@/components/events/EventGrid";
+import { EventFilters } from "@/components/events/EventFilters";
 
 export const metadata = { title: "Events — DJcovery" };
 export const revalidate = 60;
@@ -30,6 +33,13 @@ export default async function EventsPage({
 }) {
   const sp = await searchParams;
   const activeTab: Tab = sp.tab === "past" ? "past" : "upcoming";
+  const categoryFilter = sp.category || "all";
+  const isValidCategory =
+    categoryFilter === "all" ||
+    VALID_EVENT_CATEGORIES.includes(categoryFilter as any);
+  if (!isValidCategory) {
+    // fall back to "all" or return notFound()
+  }
   const now = new Date();
 
   // ── DB events ──────────────────────────────────────────────────────────────
@@ -40,6 +50,7 @@ export default async function EventsPage({
       ...(activeTab === "upcoming"
         ? { startDate: { gte: now } }
         : { startDate: { lt: now } }),
+      ...(categoryFilter !== "all" ? { category: categoryFilter } : {}),
     },
     orderBy: { startDate: activeTab === "upcoming" ? "asc" : "desc" },
     take: 60,
@@ -82,6 +93,8 @@ export default async function EventsPage({
         if (dbSlugs.has(e.slug)) return false;
         if (activeTab === "upcoming" && e.daysOffset <= 0) return false;
         if (activeTab === "past" && e.daysOffset > 0) return false;
+        if (categoryFilter !== "all" && e.category !== categoryFilter)
+          return false;
         return true;
       })
       .map(
@@ -136,21 +149,34 @@ export default async function EventsPage({
       </section>
 
       <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        {/* Tabs */}
-        <div className="mb-8 flex gap-1 border-b border-zinc-800">
-          {(["upcoming", "past"] as const).map((tab) => (
-            <Link
-              key={tab}
-              href={tab === "upcoming" ? "/events" : "/events?tab=past"}
-              className={`border-b-2 px-4 py-2.5 text-sm font-medium capitalize transition-colors ${
-                activeTab === tab
-                  ? "border-white text-white"
-                  : "border-transparent text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              {tab}
-            </Link>
-          ))}
+        {/* Tabs and Filters */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-1 border-b border-zinc-800">
+            {(["upcoming", "past"] as const).map((tab) => (
+              <Link
+                key={tab}
+                href={
+                  tab === "upcoming"
+                    ? `/events${categoryFilter !== "all" ? `?category=${categoryFilter}` : ""}`
+                    : `/events?tab=past${categoryFilter !== "all" ? `&category=${categoryFilter}` : ""}`
+                }
+                className={`border-b-2 px-4 py-2.5 text-sm font-medium capitalize transition-colors ${
+                  activeTab === tab
+                    ? "border-white text-white"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                {tab}
+              </Link>
+            ))}
+          </div>
+          <Suspense
+            fallback={
+              <div className="h-10 w-32 animate-pulse rounded bg-zinc-800" />
+            }
+          >
+            <EventFilters />
+          </Suspense>
         </div>
 
         {/* Empty state */}

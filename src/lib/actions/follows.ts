@@ -3,7 +3,10 @@
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { sendEmail } from "@/lib/email/send";
+import type { DjFollowData } from "@/lib/email/types";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 const FOLLOWS_LIMIT = 200;
 const SAVES_LIMIT = 50;
 
@@ -61,6 +64,47 @@ export async function toggleFollowDj(
     revalidatePath("/organizer/followed-djs");
     revalidatePath("/account/followed-djs");
     revalidatePath("/fan/followed-djs");
+
+    // Send email notification to DJ
+    try {
+      const [djProfile, user] = await Promise.all([
+        prisma.djProfile.findUnique({
+          where: { id: djProfileId },
+          select: { stageName: true, slug: true },
+        }),
+        prisma.user.findUnique({
+          where: { id: userId },
+          select: { email: true, name: true },
+        }),
+      ]);
+
+      if (djProfile && user?.email) {
+        const djUser = await prisma.user.findUnique({
+          where: {
+            id:
+              (
+                await prisma.djProfile.findUnique({
+                  where: { id: djProfileId },
+                  select: { userId: true },
+                })
+              )?.userId || "",
+          },
+          select: { email: true },
+        });
+
+        if (djUser?.email) {
+          const emailData: DjFollowData = {
+            djName: djProfile.stageName,
+            followerName: user.name || "Someone",
+            followerProfileUrl: `${SITE_URL}/account`,
+          };
+          await sendEmail(djUser.email, "DJ_FOLLOW", emailData);
+        }
+      }
+    } catch (emailError) {
+      console.error("Failed to send follow email:", emailError);
+    }
+
     return { following: true };
   } catch {
     return {
@@ -185,6 +229,7 @@ export async function toggleSaveEvent(
       await prisma.savedEvent.delete({
         where: { userId_eventId: { userId, eventId } },
       });
+      revalidatePath("/events");
       revalidatePath("/account");
       revalidatePath("/organizer/saved-events");
       revalidatePath("/fan/saved-events");
@@ -200,6 +245,7 @@ export async function toggleSaveEvent(
     }
 
     await prisma.savedEvent.create({ data: { userId, eventId } });
+    revalidatePath("/events");
     revalidatePath("/account");
     revalidatePath("/organizer/saved-events");
     revalidatePath("/fan/saved-events");

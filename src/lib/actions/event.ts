@@ -6,6 +6,10 @@ import { z } from "zod";
 import { VALID_EVENT_CATEGORIES } from "@/lib/event-categories";
 import { isValidTimezone } from "@/lib/timezones";
 import { requireEventOwner } from "@/lib/auth/require-owner";
+import { sendEmail } from "@/lib/email/send";
+import type { NewEventData } from "@/lib/email/types";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 
 // ── Slug helpers ──────────────────────────────────────────────────────────────
 
@@ -218,7 +222,9 @@ export async function updateEvent(
   if ("error" in auth) return auth;
   const { djProfile } = auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -307,7 +313,9 @@ export async function publishEvent(
   if ("error" in auth) return auth;
   const { djProfile } = auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -358,6 +366,39 @@ export async function publishEvent(
         })),
         skipDuplicates: true,
       });
+
+      // Send email notifications to followers (non-blocking)
+      const followersWithEmails = await prisma.user.findMany({
+        where: { id: { in: followers.map((f) => f.followerId) } },
+        select: { id: true, email: true, name: true },
+      });
+
+      const eventDate = full.startDate.toLocaleDateString("en-GB", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+
+      // Send emails in parallel (failures don't block publish)
+      await Promise.allSettled(
+        followersWithEmails.map(async (follower) => {
+          if (follower.email) {
+            try {
+              const emailData: NewEventData = {
+                djName: djProfile.stageName,
+                eventTitle: full.title,
+                eventDate,
+                eventCategory: full.category,
+                eventUrl: `${SITE_URL}/events/${updated.slug}`,
+              };
+              await sendEmail(follower.email, "NEW_EVENT", emailData);
+            } catch (emailError) {
+              console.error("Failed to send new event email:", emailError);
+            }
+          }
+        }),
+      );
     }
   } catch {
     // Notification failures must never block publish
@@ -374,7 +415,8 @@ export async function unpublishEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
 
   await prisma.event.update({
     where: { id: eventId },
@@ -392,7 +434,9 @@ export async function cancelEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -420,7 +464,9 @@ export async function archiveEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  const { djProfileId } = await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+  const { djProfileId } = ownership;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId, deletedAt: null },
@@ -448,7 +494,8 @@ export async function deleteEvent(
   const auth = await getAuthUserAndDjProfile();
   if ("error" in auth) return auth;
 
-  await requireEventOwner(eventId);
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
 
   await prisma.event.update({
     where: { id: eventId },

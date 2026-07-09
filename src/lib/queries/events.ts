@@ -92,3 +92,224 @@ export async function getAttendedEventsWithPendingReviews(userId: string) {
 export type AttendedEventWithPendingReview = Awaited<
   ReturnType<typeof getAttendedEventsWithPendingReviews>
 >[number];
+
+// ============================================================
+// HOMEPAGE — TRENDING EVENTS
+// Upcoming events sorted by popularity (views + attendance)
+// ============================================================
+
+export async function getTrendingEvents(limit = 6) {
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  if (isStaging) {
+    // Use demo data for staging
+    const { getDemoEvents } = await import("@/data/events-demo");
+    const demoEvents = getDemoEvents();
+    return demoEvents
+      .filter((e) => e.daysOffset > 0) // Only upcoming
+      .slice(0, limit)
+      .map((e) => ({
+        id: 0,
+        slug: e.slug,
+        title: e.title,
+        eventType: e.eventType,
+        category: e.category,
+        startDate: e.eventDate,
+        posterUrl: e.posterUrl ?? null,
+        location: [e.city, e.country].filter(Boolean).join(", "),
+        djName:
+          e.djName ||
+          e.djSlug
+            .split("-")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" "),
+        djSlug: e.djSlug,
+        isDemo: true,
+      }));
+  }
+
+  const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const events = await prisma.event.findMany({
+    where: {
+      status: "PUBLISHED",
+      startDate: { gt: new Date(), lte: thirtyDaysFromNow },
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      eventType: true,
+      category: true,
+      startDate: true,
+      posterUrl: true,
+      viewCount: true,
+      city: { select: { name: true } },
+      country: { select: { name: true } },
+      ownerDj: {
+        select: { slug: true, stageName: true },
+      },
+      _count: {
+        select: {
+          participants: true,
+        },
+      },
+    },
+    orderBy: [{ viewCount: "desc" }, { startDate: "asc" }],
+    take: limit,
+  });
+
+  return events.map((e) => ({
+    id: e.id,
+    slug: e.slug,
+    title: e.title,
+    eventType: e.eventType,
+    category: e.category,
+    startDate: e.startDate,
+    posterUrl: e.posterUrl,
+    location: [e.city?.name, e.country?.name].filter(Boolean).join(", "),
+    djName: e.ownerDj.stageName,
+    djSlug: e.ownerDj.slug,
+    isDemo: false,
+  }));
+}
+
+export type TrendingEvent = Awaited<
+  ReturnType<typeof getTrendingEvents>
+>[number];
+
+// ============================================================
+// HOMEPAGE — NEW EVENTS
+// Recently published upcoming events
+// ============================================================
+
+export async function getNewEvents(limit = 6) {
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
+  if (isStaging) {
+    // Use demo data for staging
+    const { getDemoEvents } = await import("@/data/events-demo");
+    const demoEvents = getDemoEvents();
+    return demoEvents
+      .filter((e) => e.daysOffset > 0) // Only upcoming
+      .slice(0, limit)
+      .map((e) => ({
+        id: 0,
+        slug: e.slug,
+        title: e.title,
+        eventType: e.eventType,
+        category: e.category,
+        startDate: e.eventDate,
+        posterUrl: e.posterUrl ?? null,
+        location: [e.city, e.country].filter(Boolean).join(", "),
+        djName:
+          e.djName ||
+          e.djSlug
+            .split("-")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" "),
+        djSlug: e.djSlug,
+        isDemo: true,
+      }));
+  }
+
+  const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const events = await prisma.event.findMany({
+    where: {
+      status: "PUBLISHED",
+      startDate: { gt: new Date(), lte: thirtyDaysFromNow },
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      eventType: true,
+      category: true,
+      startDate: true,
+      posterUrl: true,
+      createdAt: true,
+      city: { select: { name: true } },
+      country: { select: { name: true } },
+      ownerDj: {
+        select: { slug: true, stageName: true },
+      },
+    },
+    orderBy: [{ createdAt: "desc" }],
+    take: limit,
+  });
+
+  return events.map((e) => ({
+    id: e.id,
+    slug: e.slug,
+    title: e.title,
+    eventType: e.eventType,
+    category: e.category,
+    startDate: e.startDate,
+    posterUrl: e.posterUrl,
+    location: [e.city?.name, e.country?.name].filter(Boolean).join(", "),
+    djName: e.ownerDj.stageName,
+    djSlug: e.ownerDj.slug,
+    isDemo: false,
+  }));
+}
+
+export type NewEvent = Awaited<ReturnType<typeof getNewEvents>>[number];
+
+// ============================================================
+// DJ PROFILE — DJ'S EVENTS
+// Events where the DJ is owner or participant
+// ============================================================
+
+export async function getDjEvents(djProfileId: number, limit = 12) {
+  const now = new Date();
+
+  const events = await prisma.event.findMany({
+    where: {
+      status: { in: ["PUBLISHED", "COMPLETED"] },
+      deletedAt: null,
+      OR: [
+        { ownerDjId: djProfileId },
+        {
+          participants: {
+            some: { djProfileId },
+          },
+        },
+      ],
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      eventType: true,
+      category: true,
+      startDate: true,
+      posterUrl: true,
+      city: { select: { name: true } },
+      country: { select: { name: true } },
+      ownerDj: {
+        select: { slug: true, stageName: true },
+      },
+    },
+    orderBy: [{ startDate: "desc" }],
+    take: limit,
+  });
+
+  return events.map((e) => ({
+    id: e.id,
+    slug: e.slug,
+    title: e.title,
+    eventType: e.eventType,
+    category: e.category,
+    startDate: e.startDate,
+    posterUrl: e.posterUrl,
+    location: [e.city?.name, e.country?.name].filter(Boolean).join(", "),
+    djName: e.ownerDj.stageName,
+    djSlug: e.ownerDj.slug,
+    isDemo: false,
+  }));
+}
+
+export type DjEvent = Awaited<ReturnType<typeof getDjEvents>>[number];
