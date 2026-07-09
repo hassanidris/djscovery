@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache";
 import { sendEmail } from "@/lib/email/send";
 import type { EventAttendanceData } from "@/lib/email/types";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
+
 export async function toggleEventAttendance(
   eventId: number,
   status: "GOING" | "INTERESTED",
@@ -62,12 +64,14 @@ export async function toggleEventAttendance(
   });
 
   // Toggle logic
+  let wasRemoved = false;
   if (existing) {
     if (existing.status === status) {
       // Remove record if same status (toggle off)
       await prisma.eventAttendance.delete({
         where: { eventId_userId: { eventId, userId: user.id } },
       });
+      wasRemoved = true;
     } else {
       // Update to new status
       await prisma.eventAttendance.update({
@@ -86,7 +90,8 @@ export async function toggleEventAttendance(
     });
   }
 
-  revalidatePath(`/events/${eventId}`);
+  revalidatePath(`/events/${event.slug}`);
+  if (wasRemoved) return actionSuccess();
 
   // Send email notification to user
   try {
@@ -107,7 +112,7 @@ export async function toggleEventAttendance(
         userName: userData.name || "There",
         eventTitle: event.title,
         eventDate,
-        eventUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/events/${event.slug}`,
+        eventUrl: `${SITE_URL}/events/${event.slug}`,
         status,
       };
       await sendEmail(userData.email, "EVENT_ATTENDANCE", emailData);

@@ -10,6 +10,15 @@ import type {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function baseTemplate(htmlContent: string): string {
   return `
 <!DOCTYPE html>
@@ -57,14 +66,14 @@ export function eventAttendanceTemplate(data: EventAttendanceData): {
   const statusText = data.status === "GOING" ? "going to" : "interested in";
   const html = `
     <h2>You're ${statusText} an event!</h2>
-    <p>Hi ${data.userName},</p>
-    <p>You've marked yourself as <strong>${data.status}</strong> for:</p>
-    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${data.eventTitle}</p>
-    <p><strong>Date:</strong> ${data.eventDate}</p>
-    <a href="${data.eventUrl}" class="button">View Event</a>
+    <p>Hi ${escapeHtml(data.userName)},</p>
+    <p>You've marked yourself as <strong>${escapeHtml(data.status)}</strong> for:</p>
+    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${escapeHtml(data.eventTitle)}</p>
+    <p><strong>Date:</strong> ${escapeHtml(data.eventDate)}</p>
+    <a href="${escapeHtml(data.eventUrl)}" class="button">View Event</a>
   `;
   return {
-    subject: `You're ${statusText} ${data.eventTitle}`,
+    subject: `You're ${statusText} ${escapeHtml(data.eventTitle)}`,
     html: baseTemplate(html),
   };
 }
@@ -75,16 +84,16 @@ export function eventReminderTemplate(data: EventReminderData): {
 } {
   const html = `
     <h2>Event Reminder</h2>
-    <p>Hi ${data.userName},</p>
+    <p>Hi ${escapeHtml(data.userName)},</p>
     <p>This is a friendly reminder that you're going to:</p>
-    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${data.eventTitle}</p>
-    <p><strong>Date:</strong> ${data.eventDate}</p>
-    <p><strong>Time:</strong> ${data.eventTime}</p>
-    <p><strong>Location:</strong> ${data.eventLocation}</p>
-    <a href="${data.eventUrl}" class="button">View Event Details</a>
+    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${escapeHtml(data.eventTitle)}</p>
+    <p><strong>Date:</strong> ${escapeHtml(data.eventDate)}</p>
+    <p><strong>Time:</strong> ${escapeHtml(data.eventTime)}</p>
+    <p><strong>Location:</strong> ${escapeHtml(data.eventLocation)}</p>
+    <a href="${escapeHtml(data.eventUrl)}" class="button">View Event Details</a>
   `;
   return {
-    subject: `Reminder: ${data.eventTitle} is tomorrow!`,
+    subject: `Reminder: ${escapeHtml(data.eventTitle)} is tomorrow!`,
     html: baseTemplate(html),
   };
 }
@@ -95,15 +104,15 @@ export function djReviewTemplate(data: DjReviewData): {
 } {
   const html = `
     <h2>New Review Received</h2>
-    <p>Hi ${data.djName},</p>
-    <p>You've received a new review from <strong>${data.reviewerName}</strong>:</p>
-    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${data.eventTitle}</p>
+    <p>Hi ${escapeHtml(data.djName)},</p>
+    <p>You've received a new review from <strong>${escapeHtml(data.reviewerName)}</strong>:</p>
+    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${escapeHtml(data.eventTitle)}</p>
     <p><strong>Rating:</strong> ${"★".repeat(data.rating)}${"☆".repeat(5 - data.rating)}</p>
-    <p><strong>Comment:</strong> ${data.comment}</p>
-    <a href="${data.reviewUrl}" class="button">View Review</a>
+    <p><strong>Comment:</strong> ${escapeHtml(data.comment)}</p>
+    <a href="${escapeHtml(data.reviewUrl)}" class="button">View Review</a>
   `;
   return {
-    subject: `New review from ${data.reviewerName}`,
+    subject: `New review from ${escapeHtml(data.reviewerName)}`,
     html: baseTemplate(html),
   };
 }
@@ -114,12 +123,12 @@ export function djFollowTemplate(data: DjFollowData): {
 } {
   const html = `
     <h2>New Follower</h2>
-    <p>Hi ${data.djName},</p>
-    <p><strong>${data.followerName}</strong> is now following you!</p>
-    <a href="${data.followerProfileUrl}" class="button">View Profile</a>
+    <p>Hi ${escapeHtml(data.djName)},</p>
+    <p><strong>${escapeHtml(data.followerName)}</strong> is now following you!</p>
+    <a href="${escapeHtml(data.followerProfileUrl)}" class="button">View Profile</a>
   `;
   return {
-    subject: `${data.followerName} is now following you`,
+    subject: `${escapeHtml(data.followerName)} is now following you`,
     html: baseTemplate(html),
   };
 }
@@ -130,14 +139,14 @@ export function gigApplicationTemplate(data: GigApplicationData): {
 } {
   const html = `
     <h2>New Gig Application</h2>
-    <p>Hi ${data.organizerName},</p>
-    <p><strong>${data.djName}</strong> has applied to your gig:</p>
-    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${data.gigTitle}</p>
-    <p><strong>Date:</strong> ${data.gigDate}</p>
-    <a href="${data.applicationUrl}" class="button">Review Application</a>
+    <p>Hi ${escapeHtml(data.organizerName)},</p>
+    <p><strong>${escapeHtml(data.djName)}</strong> has applied to your gig:</p>
+    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${escapeHtml(data.gigTitle)}</p>
+    <p><strong>Date:</strong> ${escapeHtml(data.gigDate)}</p>
+    <a href="${escapeHtml(data.applicationUrl)}" class="button">Review Application</a>
   `;
   return {
-    subject: `New application for ${data.gigTitle}`,
+    subject: `New application for ${escapeHtml(data.gigTitle)}`,
     html: baseTemplate(html),
   };
 }
@@ -146,17 +155,22 @@ export function gigApplicationUpdateTemplate(data: GigApplicationUpdateData): {
   subject: string;
   html: string;
 } {
-  const statusColor = data.status === "ACCEPTED" ? "#10b981" : data.status === "REJECTED" ? "#ef4444" : "#f59e0b";
+  const statusColor =
+    data.status === "ACCEPTED"
+      ? "#10b981"
+      : data.status === "REJECTED"
+        ? "#ef4444"
+        : "#f59e0b";
   const html = `
     <h2>Application Status Update</h2>
-    <p>Hi ${data.djName},</p>
-    <p>Your application for <strong>${data.gigTitle}</strong> has been updated:</p>
-    <p style="color: ${statusColor}; font-size: 18px; font-weight: 600;">${data.status}</p>
-    <p><strong>Gig Date:</strong> ${data.gigDate}</p>
-    <a href="${data.gigUrl}" class="button">View Gig Details</a>
+    <p>Hi ${escapeHtml(data.djName)},</p>
+    <p>Your application for <strong>${escapeHtml(data.gigTitle)}</strong> has been updated:</p>
+    <p style="color: ${statusColor}; font-size: 18px; font-weight: 600;">${escapeHtml(data.status)}</p>
+    <p><strong>Gig Date:</strong> ${escapeHtml(data.gigDate)}</p>
+    <a href="${escapeHtml(data.gigUrl)}" class="button">View Gig Details</a>
   `;
   return {
-    subject: `Application ${data.status}: ${data.gigTitle}`,
+    subject: `Application ${escapeHtml(data.status)}: ${escapeHtml(data.gigTitle)}`,
     html: baseTemplate(html),
   };
 }
@@ -166,16 +180,16 @@ export function newEventTemplate(data: NewEventData): {
   html: string;
 } {
   const html = `
-    <h2>New Event from ${data.djName}</h2>
+    <h2>New Event from ${escapeHtml(data.djName)}</h2>
     <p>Hi there,</p>
-    <p><strong>${data.djName}</strong> just announced a new event:</p>
-    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${data.eventTitle}</p>
-    <p><strong>Category:</strong> ${data.eventCategory}</p>
-    <p><strong>Date:</strong> ${data.eventDate}</p>
-    <a href="${data.eventUrl}" class="button">View Event</a>
+    <p><strong>${escapeHtml(data.djName)}</strong> just announced a new event:</p>
+    <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${escapeHtml(data.eventTitle)}</p>
+    <p><strong>Category:</strong> ${escapeHtml(data.eventCategory)}</p>
+    <p><strong>Date:</strong> ${escapeHtml(data.eventDate)}</p>
+    <a href="${escapeHtml(data.eventUrl)}" class="button">View Event</a>
   `;
   return {
-    subject: `New event: ${data.eventTitle}`,
+    subject: `New event: ${escapeHtml(data.eventTitle)}`,
     html: baseTemplate(html),
   };
 }

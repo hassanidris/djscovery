@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { sendEmail } from "@/lib/email/send";
 import type { DjFollowData } from "@/lib/email/types";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 const FOLLOWS_LIMIT = 200;
 const SAVES_LIMIT = 50;
 
@@ -95,7 +96,7 @@ export async function toggleFollowDj(
           const emailData: DjFollowData = {
             djName: djProfile.stageName,
             followerName: user.name || "Someone",
-            followerProfileUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/account`,
+            followerProfileUrl: `${SITE_URL}/account`,
           };
           await sendEmail(djUser.email, "DJ_FOLLOW", emailData);
         }

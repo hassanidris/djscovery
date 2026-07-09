@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Music2, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import prisma from "@/lib/client";
@@ -33,6 +34,12 @@ export default async function EventsPage({
   const sp = await searchParams;
   const activeTab: Tab = sp.tab === "past" ? "past" : "upcoming";
   const categoryFilter = sp.category || "all";
+  const isValidCategory =
+    categoryFilter === "all" ||
+    VALID_EVENT_CATEGORIES.includes(categoryFilter as any);
+  if (!isValidCategory) {
+    // fall back to "all" or return notFound()
+  }
   const now = new Date();
 
   // ── DB events ──────────────────────────────────────────────────────────────
@@ -163,7 +170,13 @@ export default async function EventsPage({
               </Link>
             ))}
           </div>
-          <EventFilters />
+          <Suspense
+            fallback={
+              <div className="h-10 w-32 animate-pulse rounded bg-zinc-800" />
+            }
+          >
+            <EventFilters />
+          </Suspense>
         </div>
 
         {/* Empty state */}

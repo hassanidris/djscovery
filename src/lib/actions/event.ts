@@ -9,6 +9,8 @@ import { requireEventOwner } from "@/lib/auth/require-owner";
 import { sendEmail } from "@/lib/email/send";
 import type { NewEventData } from "@/lib/email/types";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
+
 // ── Slug helpers ──────────────────────────────────────────────────────────────
 
 function slugifyTitle(title: string): string {
@@ -378,23 +380,25 @@ export async function publishEvent(
         year: "numeric",
       });
 
-      // Send emails in parallel but don't await to avoid blocking
-      followersWithEmails.forEach(async (follower) => {
-        if (follower.email) {
-          try {
-            const emailData: NewEventData = {
-              djName: djProfile.stageName,
-              eventTitle: full.title,
-              eventDate,
-              eventCategory: full.category,
-              eventUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/events/${updated.slug}`,
-            };
-            await sendEmail(follower.email, "NEW_EVENT", emailData);
-          } catch (emailError) {
-            console.error("Failed to send new event email:", emailError);
+      // Send emails in parallel (failures don't block publish)
+      await Promise.allSettled(
+        followersWithEmails.map(async (follower) => {
+          if (follower.email) {
+            try {
+              const emailData: NewEventData = {
+                djName: djProfile.stageName,
+                eventTitle: full.title,
+                eventDate,
+                eventCategory: full.category,
+                eventUrl: `${SITE_URL}/events/${updated.slug}`,
+              };
+              await sendEmail(follower.email, "NEW_EVENT", emailData);
+            } catch (emailError) {
+              console.error("Failed to send new event email:", emailError);
+            }
           }
-        }
-      });
+        }),
+      );
     }
   } catch {
     // Notification failures must never block publish

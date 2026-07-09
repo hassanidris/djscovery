@@ -8,6 +8,8 @@ import { ActionResult, actionError, actionSuccess } from "./action-result";
 import { sendEmail } from "@/lib/email/send";
 import type { DjReviewData } from "@/lib/email/types";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
+
 export async function createEventReview(
   eventId: number,
   djProfileId: number,
@@ -149,7 +151,7 @@ export async function createEventReview(
           rating: data.rating,
           comment: data.review,
           eventTitle: event.title,
-          reviewUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/events/${event.slug}`,
+          reviewUrl: `${SITE_URL}/events/${event.slug}`,
         };
         await sendEmail(djUser.email, "DJ_REVIEW", emailData);
       }

@@ -117,7 +117,12 @@ export async function getTrendingEvents(limit = 6) {
         startDate: e.eventDate,
         posterUrl: e.posterUrl ?? null,
         location: [e.city, e.country].filter(Boolean).join(", "),
-        djName: e.djSlug,
+        djName:
+          e.djName ||
+          e.djSlug
+            .split("-")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" "),
         djSlug: e.djSlug,
         isDemo: true,
       }));
@@ -198,7 +203,12 @@ export async function getNewEvents(limit = 6) {
         startDate: e.eventDate,
         posterUrl: e.posterUrl ?? null,
         location: [e.city, e.country].filter(Boolean).join(", "),
-        djName: e.djSlug,
+        djName:
+          e.djName ||
+          e.djSlug
+            .split("-")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" "),
         djSlug: e.djSlug,
         isDemo: true,
       }));
