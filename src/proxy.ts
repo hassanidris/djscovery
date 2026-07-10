@@ -38,7 +38,7 @@ export async function proxy(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/coming-soon";
-    return NextResponse.redirect(url);
+    return NextResponse.rewrite(url);
   }
 
   const supabase = createServerClient(
