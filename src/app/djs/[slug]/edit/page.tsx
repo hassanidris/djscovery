@@ -46,6 +46,8 @@ export default async function EditDjProfilePage({
       availabilityTimezone: true,
       availabilityMonth: true,
       availabilityDays: true,
+      featuredPerformanceUrl: true,
+      featuredPerformanceContext: true,
       genres: { include: { genre: { select: { id: true, name: true } } } },
       djTypes: { select: { type: true } },
       socialLinks: { select: { platform: true, url: true } },
@@ -129,6 +131,8 @@ export default async function EditDjProfilePage({
         day: number;
         status: string;
       }> | null) ?? [],
+    featuredPerformanceUrl: dj.featuredPerformanceUrl ?? "",
+    featuredPerformanceContext: dj.featuredPerformanceContext ?? "",
   };
 
   return (

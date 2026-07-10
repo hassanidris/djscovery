@@ -81,6 +81,9 @@ export interface DjDemoData {
     bookedDays: number[];
     tentativeDays: number[];
   };
+  featuredPerformanceUrl?: string;
+  featuredPerformanceContext?: string;
+  featuredPerformanceThumbnailUrl?: string;
   packages: Array<{
     name: string;
     priceFrom: number;

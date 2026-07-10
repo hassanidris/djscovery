@@ -34,10 +34,13 @@ import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
+import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
+import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import VenueModal from "@/components/dj-profile/VenueModal";
 import BookingPackages from "@/components/dj-profile/BookingPackages";
 import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+import DjEventsModule from "@/components/dj-profile/DjEventsModule";
 import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
 import {
   getDjPackages,
@@ -530,6 +533,10 @@ export default function DjProfilePremium({
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* ── MAIN COLUMN ── */}
           <div className="flex flex-col gap-12 lg:col-span-2">
+            {/* ── STICKY SUB-NAVIGATION ── */}
+            <div className="bg-h_blackLight/30 sticky top-28 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
+              <DjProfileSubNav />
+            </div>
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
               ref={bookCTARefMobile}
@@ -543,171 +550,53 @@ export default function DjProfilePremium({
               bookingOptions={bookingOptions}
             />
 
-            <ProfileAbout
-              bio={DJ.bio}
-              djTypes={DJ.djTypes}
-              bioExpanded={bioExpanded}
-              onToggleBio={() => setBioExpanded(!bioExpanded)}
-              experienceYears={djData?.experienceYears}
-              experienceLevel={djData?.experienceLevel}
-              feeMin={djData?.booking?.feeRange?.min}
-              feeMax={djData?.booking?.feeRange?.max}
-              feeCurrency={djData?.booking?.feeRange?.currency}
-              bookingEmail={djData?.booking?.email}
-              bookingPhone={djData?.booking?.phone}
-              isOwner={isOwner}
-            />
+            <div id="about">
+              <ProfileAbout
+                bio={DJ.bio}
+                djTypes={DJ.djTypes}
+                bioExpanded={bioExpanded}
+                onToggleBio={() => setBioExpanded(!bioExpanded)}
+                experienceYears={djData?.experienceYears}
+                experienceLevel={djData?.experienceLevel}
+                feeMin={djData?.booking?.feeRange?.min}
+                feeMax={djData?.booking?.feeRange?.max}
+                feeCurrency={djData?.booking?.feeRange?.currency}
+                bookingEmail={djData?.booking?.email}
+                bookingPhone={djData?.booking?.phone}
+                isOwner={isOwner}
+              />
+            </div>
 
             <Separator className="bg-white/8" />
 
-            {/* ── SPOTLIGHT ── */}
-            {(SPOTLIGHT.featuredMix.audioUrl ||
-              SPOTLIGHT.featuredVideo.videoUrl) && (
-              <section>
-                <SectionHeading sub="Curated featured content">
-                  Spotlight
-                </SectionHeading>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {SPOTLIGHT.featuredMix.audioUrl && (
-                    <MediaAudioPlayer
-                      audioUrl={SPOTLIGHT.featuredMix.audioUrl}
-                      title={SPOTLIGHT.featuredMix.title}
-                      thumbnailUrl={featuredMixThumb || undefined}
-                      mediaId={SPOTLIGHT.featuredMix.id}
-                    >
-                      <Card className="bg-h_blackLight/30 group h-full cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
-                        <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
-                          {featuredMixThumb ? (
-                            <Image
-                              src={featuredMixThumb}
-                              alt={SPOTLIGHT.featuredMix.title}
-                              fill
-                              className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
-                            />
-                          ) : null}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
-                              <Play className="ml-0.5 h-5 w-5 text-white" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-3 left-3">
-                            <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                              <Headphones className="mr-1 h-2.5 w-2.5" />
-                              Featured Mix
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-sm font-semibold text-white">
-                            {SPOTLIGHT.featuredMix.title}
-                          </p>
-                          <p className="mt-1 text-xs text-gray-500">
-                            {SPOTLIGHT.featuredMix.duration} ·{" "}
-                            {formatPlays(SPOTLIGHT.featuredMix.plays)} plays
-                          </p>
-                        </div>
-                      </Card>
-                    </MediaAudioPlayer>
-                  )}
-                  {SPOTLIGHT.featuredVideo.videoUrl && (
-                    <MediaVideoModal
-                      videoUrl={SPOTLIGHT.featuredVideo.videoUrl}
-                      thumbnail={featuredVideoThumb}
-                      title={SPOTLIGHT.featuredVideo.title}
-                      mediaId={SPOTLIGHT.featuredVideo.id}
-                    >
-                      <Card className="bg-h_blackLight/30 group h-full cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30">
-                        <div className="relative h-44 overflow-hidden">
-                          <Image
-                            src={featuredVideoThumb}
-                            alt="video"
-                            fill
-                            className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
-                          />
-                          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
-                              <Play className="ml-0.5 h-5 w-5 text-white" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-3 left-3">
-                            <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                              <Video className="mr-1 h-2.5 w-2.5" />
-                              Featured Video
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-sm font-semibold text-white">
-                            {SPOTLIGHT.featuredVideo.title}
-                          </p>
-                          <p className="mt-1 text-xs text-gray-500">
-                            {SPOTLIGHT.featuredVideo.duration} ·{" "}
-                            {formatPlays(SPOTLIGHT.featuredVideo.views)} views
-                          </p>
-                        </div>
-                      </Card>
-                    </MediaVideoModal>
-                  )}
-                </div>
-              </section>
-            )}
-
-            <Separator className="bg-white/8" />
-
-            {/* ── AVAILABILITY CALENDAR ── */}
-            <section>
-              <SectionHeading sub={`${calendarLabel} availability`}>
-                Availability Calendar
-              </SectionHeading>
-              <div className="mb-4 flex items-center gap-4">
-                {[
-                  { color: "bg-emerald-500", label: "Available" },
-                  { color: "bg-h_red", label: "Booked" },
-                  { color: "bg-amber-500", label: "Tentative" },
-                ].map((l) => (
-                  <div key={l.label} className="flex items-center gap-1.5">
-                    <div className={cn("size-2.5 rounded-full", l.color)} />
-                    <span className="text-xs text-gray-400">{l.label}</span>
-                  </div>
-                ))}
-              </div>
-              <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
-                <div className="grid grid-cols-7 gap-1.5">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (d) => (
-                      <div
-                        key={d}
-                        className="pb-1 text-center text-[11px] font-semibold text-gray-600"
-                      >
-                        {d}
-                      </div>
-                    ),
-                  )}
-                  {/* Empty cells for day alignment */}
-                  {Array.from({ length: 0 }).map((_, i) => (
-                    <div key={`e${i}`} />
-                  ))}
-                  {CALENDAR_DAYS.map(({ day, status }) => (
-                    <div
-                      key={day}
-                      className={cn(
-                        "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
-                        status === "booked" &&
-                          "bg-h_red/20 text-h_red border-h_red/30 border",
-                        status === "tentative" &&
-                          "border border-amber-500/30 bg-amber-500/20 text-amber-400",
-                        status === "available" &&
-                          "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
-                        status === "free" && "text-gray-600 hover:bg-white/5",
-                      )}
-                    >
-                      {day}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </section>
+            {/* ── EVENTS MODULE ── */}
+            <div id="events">
+              <DjEventsModule
+                events={EVENTS}
+                venues={(djData?.venuesPlayed || []).map((v) => ({
+                  id: v.id || 0,
+                  venueName: v.venue,
+                  eventDate: v.date || null,
+                  description: v.description || null,
+                  city: { name: v.city },
+                  country: { name: v.country },
+                }))}
+                calendarDays={
+                  CALENDAR_DAYS as Array<{
+                    day: number;
+                    status: "available" | "booked" | "tentative" | "free";
+                  }>
+                }
+                calendarLabel={calendarLabel}
+                isOwner={isOwner}
+                djName={DJ.stageName}
+                featuredPerformanceUrl={djData?.featuredPerformanceUrl}
+                featuredPerformanceContext={djData?.featuredPerformanceContext}
+                featuredPerformanceThumbnailUrl={
+                  djData?.featuredPerformanceThumbnailUrl
+                }
+              />
+            </div>
 
             <Separator className="bg-white/8" />
 
@@ -806,10 +695,104 @@ export default function DjProfilePremium({
             <Separator className="bg-white/8" />
 
             {/* ── EXTENDED MEDIA LIBRARY ── */}
-            <section>
+            <section id="media">
               <SectionHeading sub="Full media library · Unlimited with Premium">
-                Media Library
+                Media
               </SectionHeading>
+
+              {/* ── SPOTLIGHT (nested inside Media) ── */}
+              {(SPOTLIGHT.featuredMix.audioUrl ||
+                SPOTLIGHT.featuredVideo.videoUrl) && (
+                <>
+                  <h3 className="mb-4 text-sm font-semibold text-gray-400">
+                    Spotlight
+                  </h3>
+                  <div className="mb-8 flex flex-nowrap gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid">
+                    {SPOTLIGHT.featuredMix.audioUrl && (
+                      <MediaAudioPlayer
+                        audioUrl={SPOTLIGHT.featuredMix.audioUrl}
+                        title={SPOTLIGHT.featuredMix.title}
+                        thumbnailUrl={featuredMixThumb || undefined}
+                        mediaId={SPOTLIGHT.featuredMix.id}
+                      >
+                        <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
+                          <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
+                            {featuredMixThumb ? (
+                              <Image
+                                src={featuredMixThumb}
+                                alt={SPOTLIGHT.featuredMix.title}
+                                fill
+                                className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                              />
+                            ) : null}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
+                                <Play className="ml-0.5 h-5 w-5 text-white" />
+                              </div>
+                            </div>
+                            <div className="absolute bottom-3 left-3">
+                              <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                                <Headphones className="mr-1 h-2.5 w-2.5" />
+                                Featured Mix
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <p className="text-sm font-semibold text-white">
+                              {SPOTLIGHT.featuredMix.title}
+                            </p>
+                            <p className="mt-1 text-xs text-gray-500">
+                              {SPOTLIGHT.featuredMix.duration} ·{" "}
+                              {formatPlays(SPOTLIGHT.featuredMix.plays)} plays
+                            </p>
+                          </div>
+                        </Card>
+                      </MediaAudioPlayer>
+                    )}
+                    {SPOTLIGHT.featuredVideo.videoUrl && (
+                      <MediaVideoModal
+                        videoUrl={SPOTLIGHT.featuredVideo.videoUrl}
+                        thumbnail={featuredVideoThumb}
+                        title={SPOTLIGHT.featuredVideo.title}
+                        mediaId={SPOTLIGHT.featuredVideo.id}
+                      >
+                        <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
+                          <div className="relative h-44 overflow-hidden">
+                            <Image
+                              src={featuredVideoThumb}
+                              alt="video"
+                              fill
+                              className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
+                            />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                                <Play className="ml-0.5 h-5 w-5 text-white" />
+                              </div>
+                            </div>
+                            <div className="absolute bottom-3 left-3">
+                              <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                                <Video className="mr-1 h-2.5 w-2.5" />
+                                Featured Video
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <p className="text-sm font-semibold text-white">
+                              {SPOTLIGHT.featuredVideo.title}
+                            </p>
+                            <p className="mt-1 text-xs text-gray-500">
+                              {SPOTLIGHT.featuredVideo.duration} ·{" "}
+                              {formatPlays(SPOTLIGHT.featuredVideo.views)} views
+                            </p>
+                          </div>
+                        </Card>
+                      </MediaVideoModal>
+                    )}
+                  </div>
+                </>
+              )}
+
               <div className="mb-4 flex gap-2">
                 {(["photos", "videos", "mixes"] as const).map((tab) => (
                   <button
@@ -878,263 +861,240 @@ export default function DjProfilePremium({
               )}
             </section>
 
-            <Separator className="bg-white/8" />
+            {HIGHLIGHTS.length > 0 && (
+              <>
+                <Separator className="bg-white/8" />
 
-            {/* ── CAREER HIGHLIGHTS ── */}
-            <section>
-              <SectionHeading sub="Key milestones and achievements">
-                Career Highlights
-              </SectionHeading>
-              <div className="relative flex flex-col gap-0">
-                {HIGHLIGHTS.map((h, i) => {
-                  const HIcon = h.icon;
-                  return (
-                    <div key={i} className="flex gap-4 pb-6 last:pb-0">
-                      <div className="flex flex-col items-center">
-                        <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-full border">
-                          <HIcon className="text-h_red h-3.5 w-3.5" />
-                        </div>
-                        {i < HIGHLIGHTS.length - 1 && (
-                          <div className="mt-2 w-px flex-1 bg-white/8" />
-                        )}
-                      </div>
-                      <div className="pt-1.5 pb-1">
-                        <p className="text-sm font-semibold text-white">
-                          {h.title}
-                        </p>
-                        <p className="mt-0.5 text-xs text-gray-500">{h.year}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            {/* ── INDUSTRY ENDORSEMENTS ── */}
-            <section>
-              <SectionHeading sub="What industry professionals say">
-                Industry Endorsements
-              </SectionHeading>
-              <div className="flex flex-col gap-4">
-                {ENDORSEMENTS.map((e) => (
-                  <Card
-                    key={e.name}
-                    className="bg-h_blackLight/30 gap-0 border-white/8 p-5"
-                  >
-                    <div className="flex items-start gap-3">
-                      <Avatar className="size-11 shrink-0 ring-1 ring-white/10">
-                        <AvatarImage src={e.avatar} />
-                        <AvatarFallback className="bg-h_blackLight text-xs text-white">
-                          {e.name.slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-2 flex items-center gap-2">
-                          <span className="text-sm font-semibold text-white">
-                            {e.name}
-                          </span>
-                          <Badge className="border-blue-500/20 bg-blue-500/10 text-[11px] text-blue-400">
-                            <Landmark className="mr-1 h-2 w-2" />
-                            Venue
-                          </Badge>
-                        </div>
-                        <p className="mb-2 text-xs text-gray-500">{e.role}</p>
-                        <p className="text-sm leading-relaxed text-gray-300 italic">
-                          &ldquo;{e.quote}&rdquo;
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            {/* ── PRESS & MEDIA ── */}
-            <section>
-              <SectionHeading sub="Interviews, features, and podcasts">
-                Press &amp; Media
-              </SectionHeading>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {PRESS.map((p) => {
-                  const PressIcon = p.icon;
-                  return (
-                    <Card
-                      key={p.title}
-                      className="bg-h_blackLight/30 group cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-white/8 bg-white/5">
-                          <PressIcon className="h-3.5 w-3.5 text-gray-400 transition-colors group-hover:text-white" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-0.5 flex items-center gap-2">
-                            <span className="text-h_red text-xs font-bold">
-                              {p.outlet}
-                            </span>
-                            <Badge className="border-white/8 bg-white/5 text-[11px] text-gray-500">
-                              {p.type}
-                            </Badge>
+                {/* ── CAREER HIGHLIGHTS ── */}
+                <section>
+                  <SectionHeading sub="Key milestones and achievements">
+                    Career Highlights
+                  </SectionHeading>
+                  <div className="relative flex flex-col gap-0">
+                    {HIGHLIGHTS.map((h, i) => {
+                      const HIcon = h.icon;
+                      return (
+                        <div key={i} className="flex gap-4 pb-6 last:pb-0">
+                          <div className="flex flex-col items-center">
+                            <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-full border">
+                              <HIcon className="text-h_red h-3.5 w-3.5" />
+                            </div>
+                            {i < HIGHLIGHTS.length - 1 && (
+                              <div className="mt-2 w-px flex-1 bg-white/8" />
+                            )}
                           </div>
-                          <p className="line-clamp-2 text-sm font-medium text-white">
-                            {p.title}
-                          </p>
-                          <p className="mt-1 text-xs text-gray-600">{p.date}</p>
+                          <div className="pt-1.5 pb-1">
+                            <p className="text-sm font-semibold text-white">
+                              {h.title}
+                            </p>
+                            <p className="mt-0.5 text-xs text-gray-500">
+                              {h.year}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            </section>
-
-            <Separator className="bg-white/8" />
-
-            {(djData?.venuesPlayed?.length ?? 0) > 0 || isOwner ? (
-              <section>
-                <SectionHeading sub="Past performances and residencies">
-                  Where I've Played
-                </SectionHeading>
-                {(djData?.venuesPlayed?.length ?? 0) > 0 ? (
-                  <WhereIvePlayed
-                    venues={(djData?.venuesPlayed || []).map((v) => ({
-                      id: 0,
-                      venueName: v.venue,
-                      eventDate: v.date || null,
-                      description: v.description || null,
-                      city: { name: v.city },
-                      country: { name: v.country },
-                    }))}
-                  />
-                ) : (
-                  <EmptySectionState
-                    icon={MapPin}
-                    title="No venues added yet"
-                    description="Add venues where you've performed to build credibility"
-                    actionLabel="Add Venues"
-                    onAction={() => setIsVenueModalOpen(true)}
-                  />
-                )}
-              </section>
-            ) : null}
-
-            {(djData?.venuesPlayed?.length ?? 0) > 0 || isOwner ? (
-              <Separator className="bg-white/8" />
-            ) : null}
-
-            {/* ── MOBILE EVENTS ── */}
-            <div className="lg:hidden">
-              <ProfileEventsSidebar events={EVENTS} djName={DJ.stageName} />
-            </div>
-
-            <div className="lg:hidden">
-              <Separator className="bg-white/8" />
-            </div>
-
-            {(REVIEWS.length > 0 || isOwner) && (
-              <section>
-                <SectionHeading sub="What people say about this DJ">
-                  Reviews
-                </SectionHeading>
-                {REVIEWS.length > 0 ? (
-                  <ProfileReviews
-                    avgRating={DJ.avgRating}
-                    ratingCount={DJ.ratingCount}
-                    reviews={REVIEWS}
-                  />
-                ) : (
-                  <EmptySectionState
-                    icon={Star}
-                    title="No reviews yet"
-                    description="Reviews build trust and help you get more bookings"
-                    actionLabel="Request Reviews"
-                    actionHref={editHref}
-                  />
-                )}
-              </section>
+                      );
+                    })}
+                  </div>
+                </section>
+              </>
             )}
 
-            <Separator className="bg-white/8" />
+            {ENDORSEMENTS.length > 0 && (
+              <>
+                <Separator className="bg-white/8" />
+
+                {/* ── INDUSTRY ENDORSEMENTS ── */}
+                <section>
+                  <SectionHeading sub="What industry professionals say">
+                    Industry Endorsements
+                  </SectionHeading>
+                  <div className="flex flex-col gap-4">
+                    {ENDORSEMENTS.map((e) => (
+                      <Card
+                        key={e.name}
+                        className="bg-h_blackLight/30 gap-0 border-white/8 p-5"
+                      >
+                        <div className="flex items-start gap-3">
+                          <Avatar className="size-11 shrink-0 ring-1 ring-white/10">
+                            <AvatarImage src={e.avatar} />
+                            <AvatarFallback className="bg-h_blackLight text-xs text-white">
+                              {e.name.slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-2 flex items-center gap-2">
+                              <span className="text-sm font-semibold text-white">
+                                {e.name}
+                              </span>
+                              <Badge className="border-blue-500/20 bg-blue-500/10 text-[11px] text-blue-400">
+                                <Landmark className="mr-1 h-2 w-2" />
+                                Venue
+                              </Badge>
+                            </div>
+                            <p className="mb-2 text-xs text-gray-500">
+                              {e.role}
+                            </p>
+                            <p className="text-sm leading-relaxed text-gray-300 italic">
+                              &ldquo;{e.quote}&rdquo;
+                            </p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
+
+            {PRESS.length > 0 && (
+              <>
+                <Separator className="bg-white/8" />
+
+                {/* ── PRESS & MEDIA ── */}
+                <section>
+                  <SectionHeading sub="Interviews, features, and podcasts">
+                    Press &amp; Media
+                  </SectionHeading>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {PRESS.map((p) => {
+                      const PressIcon = p.icon;
+                      return (
+                        <Card
+                          key={p.title}
+                          className="bg-h_blackLight/30 group cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-white/8 bg-white/5">
+                              <PressIcon className="h-3.5 w-3.5 text-gray-400 transition-colors group-hover:text-white" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-0.5 flex items-center gap-2">
+                                <span className="text-h_red text-xs font-bold">
+                                  {p.outlet}
+                                </span>
+                                <Badge className="border-white/8 bg-white/5 text-[11px] text-gray-500">
+                                  {p.type}
+                                </Badge>
+                              </div>
+                              <p className="line-clamp-2 text-sm font-medium text-white">
+                                {p.title}
+                              </p>
+                              <p className="mt-1 text-xs text-gray-600">
+                                {p.date}
+                              </p>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </section>
+              </>
+            )}
+
+            {(REVIEWS.length > 0 || isOwner) && (
+              <>
+                <Separator className="bg-white/8" />
+
+                <section>
+                  <SectionHeading sub="What people say about this DJ">
+                    Reviews
+                  </SectionHeading>
+                  {REVIEWS.length > 0 ? (
+                    <ProfileReviews
+                      avgRating={DJ.avgRating}
+                      ratingCount={DJ.ratingCount}
+                      reviews={REVIEWS}
+                    />
+                  ) : (
+                    <EmptySectionState
+                      icon={Star}
+                      title="No reviews yet"
+                      description="Reviews build trust and help you get more bookings"
+                      actionLabel="Request Reviews"
+                      actionHref={editHref}
+                    />
+                  )}
+                </section>
+              </>
+            )}
 
             {/* ── BOOKING PACKAGES ── */}
             {(packages.length > 0 || isOwner) && (
-              <section>
-                <div className="mb-5 flex items-center justify-between">
-                  <SectionHeading sub="Tailored options for every event type">
-                    Booking Packages
-                  </SectionHeading>
-                  {isOwner && packages.length > 0 && (
-                    <Button
-                      onClick={() => setIsPackageModalOpen(true)}
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs text-gray-400 hover:text-white"
-                    >
-                      <Pencil className="mr-1.5 h-3 w-3" />
-                      Edit
-                    </Button>
+              <>
+                <Separator className="bg-white/8" />
+                <section id="packages">
+                  <div className="mb-5 flex items-center justify-between">
+                    <SectionHeading sub="Tailored options for every event type">
+                      Booking Packages
+                    </SectionHeading>
+                    {isOwner && packages.length > 0 && (
+                      <Button
+                        onClick={() => setIsPackageModalOpen(true)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-gray-400 hover:text-white"
+                      >
+                        <Pencil className="mr-1.5 h-3 w-3" />
+                        Edit
+                      </Button>
+                    )}
+                  </div>
+                  {packages.length > 0 ? (
+                    <BookingPackages
+                      packages={[...packages]
+                        .sort((a, b) => {
+                          // Popular packages first
+                          if (a.popular && !b.popular) return -1;
+                          if (!a.popular && b.popular) return 1;
+                          // Then by sortOrder
+                          return a.sortOrder - b.sortOrder;
+                        })
+                        .map((p) => ({
+                          id: p.id,
+                          name: p.name,
+                          priceFrom: p.priceFrom,
+                          priceTo: p.priceTo,
+                          currency: p.currency,
+                          duration: p.duration,
+                          features: p.features,
+                          popular: p.popular,
+                        }))}
+                      viewerRole={bookingContext.role}
+                      openBookingModal={(
+                        packageName,
+                        packagePrice,
+                        packagePriceTo,
+                      ) => {
+                        bookCTARefMobile.current?.openBookingModal(
+                          packageName,
+                          packagePrice,
+                          packagePriceTo,
+                        );
+                        bookCTARefDesktop.current?.openBookingModal(
+                          packageName,
+                          packagePrice,
+                          packagePriceTo,
+                        );
+                      }}
+                    />
+                  ) : (
+                    <EmptySectionState
+                      icon={BriefcaseBusiness}
+                      title="No packages added yet"
+                      description="Create packages to help organizers understand your offerings"
+                      actionLabel="Add Packages"
+                      onAction={() => setIsPackageModalOpen(true)}
+                    />
                   )}
-                </div>
-                {packages.length > 0 ? (
-                  <BookingPackages
-                    packages={[...packages]
-                      .sort((a, b) => {
-                        // Popular packages first
-                        if (a.popular && !b.popular) return -1;
-                        if (!a.popular && b.popular) return 1;
-                        // Then by sortOrder
-                        return a.sortOrder - b.sortOrder;
-                      })
-                      .map((p) => ({
-                        id: p.id,
-                        name: p.name,
-                        priceFrom: p.priceFrom,
-                        priceTo: p.priceTo,
-                        currency: p.currency,
-                        duration: p.duration,
-                        features: p.features,
-                        popular: p.popular,
-                      }))}
-                    viewerRole={bookingContext.role}
-                    openBookingModal={(
-                      packageName,
-                      packagePrice,
-                      packagePriceTo,
-                    ) => {
-                      bookCTARefMobile.current?.openBookingModal(
-                        packageName,
-                        packagePrice,
-                        packagePriceTo,
-                      );
-                      bookCTARefDesktop.current?.openBookingModal(
-                        packageName,
-                        packagePrice,
-                        packagePriceTo,
-                      );
-                    }}
-                  />
-                ) : (
-                  <EmptySectionState
-                    icon={BriefcaseBusiness}
-                    title="No packages added yet"
-                    description="Create packages to help organizers understand your offerings"
-                    actionLabel="Add Packages"
-                    onAction={() => setIsPackageModalOpen(true)}
-                  />
-                )}
-              </section>
-            )}
-
-            {(packages.length > 0 || isOwner) && (
-              <Separator className="bg-white/8" />
+                </section>
+                <Separator className="bg-white/8" />
+              </>
             )}
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="sticky top-28 flex h-fit flex-col gap-5">
+          <aside className="sticky top-28 hidden h-fit flex-col gap-5 lg:flex">
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
               ref={bookCTARefDesktop}
@@ -1149,15 +1109,14 @@ export default function DjProfilePremium({
             />
 
             {/* Events — desktop only; mobile version is inline above */}
-            <div className="hidden lg:block">
+            {/* <div className="hidden lg:block">
               <ProfileEventsSidebar
                 events={EVENTS}
                 isOwner={isOwner}
                 djName={DJ.stageName}
               />
             </div>
-
-            <Separator className="bg-white/8" />
+            <Separator className="bg-white/8" /> */}
 
             {/* Professional Contacts */}
             <div>
@@ -1275,6 +1234,15 @@ export default function DjProfilePremium({
           />
         </>
       )}
+
+      {/* ── MOBILE BOTTOM BAR ── */}
+      <DjProfileMobileBottomBar
+        feeMin={djData?.booking?.feeRange?.min}
+        feeMax={djData?.booking?.feeRange?.max}
+        feeCurrency={djData?.booking?.feeRange?.currency}
+        onBookClick={() => bookCTARefMobile.current?.openBookingModal()}
+        isOwner={isOwner}
+      />
     </div>
   );
 }
