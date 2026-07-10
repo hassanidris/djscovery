@@ -4,15 +4,15 @@ import { indexingEnabled } from "./lib/seo/indexing";
 
 const PRE_LAUNCH_MODE = process.env.PRE_LAUNCH_MODE === "true";
 
-// Paths that remain accessible during pre-launch (public landing, auth, legal, admin, api)
+const isProduction =
+  process.env.VERCEL_ENV === "production" ||
+  process.env.NEXT_PUBLIC_APP_ENV === "production";
+
+// Paths that remain accessible when the production site is masked behind the
+// coming-soon placeholder. Auth paths and /admin stay reachable so the team can
+// still sign in; everything else redirects to /coming-soon.
 const ALWAYS_PUBLIC_PATHS = [
-  "/",
-  "/about",
-  "/contact",
-  "/faq",
-  "/terms",
-  "/privacy",
-  "/founding-djs",
+  "/coming-soon",
   "/sign-in",
   "/sign-up",
   "/forgot-password",
@@ -30,11 +30,15 @@ function isAlwaysPublic(pathname: string): boolean {
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
-  // ── Pre-launch gate: block all platform routes in production ─────────────
-  if (PRE_LAUNCH_MODE && !isAlwaysPublic(request.nextUrl.pathname)) {
+  // ── Pre-launch gate: mask the platform in production ──────────────────
+  if (
+    PRE_LAUNCH_MODE &&
+    isProduction &&
+    !isAlwaysPublic(request.nextUrl.pathname)
+  ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
+    url.pathname = "/coming-soon";
+    return NextResponse.rewrite(url);
   }
 
   const supabase = createServerClient(
@@ -97,6 +101,11 @@ export async function proxy(request: NextRequest) {
     );
   }
   // noindexing code end here
+
+  // Mark the placeholder page so the root layout hides the public shell.
+  if (request.nextUrl.pathname === "/coming-soon") {
+    supabaseResponse.headers.set("x-is-coming-soon", "true");
+  }
 
   // Content Security Policy
   const cspHeader = [
