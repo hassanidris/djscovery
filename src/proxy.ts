@@ -12,6 +12,7 @@ const isProduction =
 // coming-soon placeholder. Auth paths and /admin stay reachable so the team can
 // still sign in; everything else redirects to /coming-soon.
 const ALWAYS_PUBLIC_PATHS = [
+  "/",
   "/coming-soon",
   "/sign-in",
   "/sign-up",
@@ -38,7 +39,9 @@ export async function proxy(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/coming-soon";
-    return NextResponse.rewrite(url);
+    const response = NextResponse.rewrite(url);
+    response.headers.set("x-is-coming-soon", "true");
+    return response;
   }
 
   const supabase = createServerClient(
