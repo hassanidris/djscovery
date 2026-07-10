@@ -10,6 +10,7 @@ import PublicShell from "@/components/PublicShell";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNavServer from "@/components/MobileBottomNavServer";
+import { isComingSoonRoute } from "@/lib/coming-soon";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -64,33 +65,41 @@ export const metadata: Metadata = {
       },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isComingSoon = await isComingSoonRoute();
+
   return (
     <html
       lang="en"
       className={cn(inter.variable, sora.variable, "font-sans", "dark")}
     >
       <body className={inter.className}>
-        <NavigationProgress />
-        <PublicShell
-          navbar={<Navbar />}
-          footer={<Footer />}
-          mobileNav={<MobileBottomNavServer />}
-        >
-          {children}
-        </PublicShell>
-        <Toaster
-          position="bottom-right"
-          theme="dark"
-          richColors
-          closeButton
-          offset={{ bottom: 80 }}
-        />
-        <CookieBanner />
+        {isComingSoon ? (
+          children
+        ) : (
+          <>
+            <NavigationProgress />
+            <PublicShell
+              navbar={<Navbar />}
+              footer={<Footer />}
+              mobileNav={<MobileBottomNavServer />}
+            >
+              {children}
+            </PublicShell>
+            <Toaster
+              position="bottom-right"
+              theme="dark"
+              richColors
+              closeButton
+              offset={{ bottom: 80 }}
+            />
+            <CookieBanner />
+          </>
+        )}
       </body>
     </html>
   );
