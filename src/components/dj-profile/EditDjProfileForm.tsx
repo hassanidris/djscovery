@@ -157,6 +157,9 @@ interface ProfileData {
   availabilityTimezone: string;
   availabilityMonth: string;
   availabilityDays: AvailabilityDay[];
+  // Featured performance
+  featuredPerformanceUrl: string;
+  featuredPerformanceContext: string;
 }
 
 interface Props {
@@ -278,6 +281,14 @@ export default function EditDjProfileForm({
     profile.availabilityDays,
   );
 
+  // Featured performance
+  const [featuredPerformanceUrl, setFeaturedPerformanceUrl] = useState(
+    profile.featuredPerformanceUrl,
+  );
+  const [featuredPerformanceContext, setFeaturedPerformanceContext] = useState(
+    profile.featuredPerformanceContext,
+  );
+
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -312,6 +323,8 @@ export default function EditDjProfileForm({
     availabilityMonth !== profile.availabilityMonth ||
     JSON.stringify(availabilityDays) !==
       JSON.stringify(profile.availabilityDays) ||
+    featuredPerformanceUrl !== (profile.featuredPerformanceUrl || "") ||
+    featuredPerformanceContext !== (profile.featuredPerformanceContext || "") ||
     mediaChanged;
 
   useEffect(() => {
@@ -522,6 +535,9 @@ export default function EditDjProfileForm({
         availabilityTimezone: availabilityTimezone.trim() || null,
         availabilityMonth: availabilityMonth.trim() || null,
         availabilityDays: availabilityDays,
+        // Featured performance
+        featuredPerformanceUrl: featuredPerformanceUrl.trim() || null,
+        featuredPerformanceContext: featuredPerformanceContext.trim() || null,
       });
 
       if ("error" in result) {
@@ -1097,6 +1113,42 @@ export default function EditDjProfileForm({
             initialMedia={allMedia}
             onMediaChange={setMediaChanged}
           />
+        </SectionCard>
+
+        {/* Featured Performance */}
+        <SectionCard
+          title="Featured Performance"
+          subtitle="Highlight one video that shows you at your best"
+        >
+          <div className="grid gap-4">
+            <div className="grid gap-1.5">
+              <Label className="text-xs text-gray-300">
+                YouTube / Vimeo URL
+              </Label>
+              <Input
+                type="url"
+                value={featuredPerformanceUrl}
+                onChange={(e) => setFeaturedPerformanceUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+              />
+              <p className="text-[11px] text-gray-500">
+                Paste a link to a performance video. Leave empty to hide the
+                section on your profile.
+              </p>
+            </div>
+            <div className="grid gap-1.5">
+              <Label className="text-xs text-gray-300">Context</Label>
+              <Input
+                type="text"
+                value={featuredPerformanceContext}
+                onChange={(e) => setFeaturedPerformanceContext(e.target.value)}
+                placeholder="e.g. Live at Afro Nation 2025"
+                maxLength={200}
+                className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+              />
+            </div>
+          </div>
         </SectionCard>
 
         {/* Team Contacts */}

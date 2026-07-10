@@ -35,6 +35,9 @@ import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
+import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
+import DjEventsModule from "@/components/dj-profile/DjEventsModule";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
@@ -178,6 +181,10 @@ export default function DjProfileFree({
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* Main Column */}
           <div className="flex flex-col gap-12 lg:col-span-2">
+            {/* ── STICKY SUB-NAVIGATION ── */}
+            <div className="bg-h_blackLight/30 sticky top-28 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
+              <DjProfileSubNav />
+            </div>
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
               stageName={`Dj. ${DJ.stageName}`}
@@ -188,137 +195,24 @@ export default function DjProfileFree({
               bookingOptions={bookingOptions}
             />
 
-            <ProfileAbout
-              bio={DJ.bio}
-              djTypes={DJ.djTypes}
-              bioExpanded={bioExpanded}
-              onToggleBio={() => setBioExpanded(!bioExpanded)}
-              experienceYears={djData?.experienceYears}
-              experienceLevel={djData?.experienceLevel}
-              feeMin={djData?.booking?.feeRange?.min}
-              feeMax={djData?.booking?.feeRange?.max}
-              feeCurrency={djData?.booking?.feeRange?.currency}
-              bookingEmail={djData?.booking?.email}
-              bookingPhone={djData?.booking?.phone}
-              isOwner={isOwner}
-            />
+            <div id="about">
+              <ProfileAbout
+                bio={DJ.bio}
+                djTypes={DJ.djTypes}
+                bioExpanded={bioExpanded}
+                onToggleBio={() => setBioExpanded(!bioExpanded)}
+                experienceYears={djData?.experienceYears}
+                experienceLevel={djData?.experienceLevel}
+                feeMin={djData?.booking?.feeRange?.min}
+                feeMax={djData?.booking?.feeRange?.max}
+                feeCurrency={djData?.booking?.feeRange?.currency}
+                bookingEmail={djData?.booking?.email}
+                bookingPhone={djData?.booking?.phone}
+                isOwner={isOwner}
+              />
+            </div>
 
             <Separator className="bg-white/8" />
-
-            {/* ── SPOTLIGHT ── */}
-            {hasSpotlight && (
-              <section>
-                <SectionHeading sub="Featured content curated by this DJ">
-                  Spotlight
-                </SectionHeading>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {/* Featured Mix */}
-                  {hasFeaturedMix && (
-                    <MediaAudioPlayer
-                      audioUrl={FEATURED_MIX.audioUrl}
-                      title={FEATURED_MIX.title}
-                      thumbnailUrl={featuredMixThumb || undefined}
-                      mediaId={FEATURED_MIX.id}
-                    >
-                      <Card className="bg-h_blackLight/30 group hover:border-h_red/30 flex h-full cursor-pointer flex-col gap-0 overflow-hidden border-white/8 transition-all">
-                        <div className="from-h_red/20 relative h-40 shrink-0 bg-linear-to-br to-black">
-                          {featuredMixThumb ? (
-                            <Image
-                              src={featuredMixThumb}
-                              alt={FEATURED_MIX.title}
-                              fill
-                              className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
-                            />
-                          ) : null}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
-                              <Play className="ml-0.5 h-5 w-5 text-white" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-3 left-3">
-                            <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                              <Headphones className="mr-1 h-2.5 w-2.5" />
-                              Featured Mix
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-sm font-semibold text-white">
-                            {FEATURED_MIX.title}
-                          </p>
-                          <p className="mt-1 text-xs text-gray-500">
-                            {FEATURED_MIX.duration} · {FEATURED_MIX.plays} plays
-                          </p>
-                          <div className="mt-2 flex items-center gap-1">
-                            {FEATURED_MIX.genres.map((t) => (
-                              <Badge
-                                key={t}
-                                className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400"
-                              >
-                                {t}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </Card>
-                    </MediaAudioPlayer>
-                  )}
-
-                  {/* Featured Video */}
-                  {hasFeaturedVideo && (
-                    <MediaVideoModal
-                      videoUrl={djData?.spotlight.featuredVideo.videoUrl ?? ""}
-                      thumbnail={videoThumb}
-                      title={
-                        djData?.spotlight.featuredVideo.title ??
-                        "Live @ Berghain — Summer Closing 2024"
-                      }
-                      mediaId={djData?.spotlight.featuredVideo.id}
-                    >
-                      <Card className="bg-h_blackLight/30 group hover:border-h_red/30 flex h-full cursor-pointer flex-col gap-0 overflow-hidden border-white/8 transition-all">
-                        <div className="relative h-40 shrink-0 bg-linear-to-br from-slate-900 via-gray-900 to-black">
-                          <Image
-                            src={videoThumb}
-                            alt="video thumbnail"
-                            fill
-                            className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
-                              <Play className="ml-0.5 h-5 w-5 text-white" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-3 left-3">
-                            <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                              <Video className="mr-1 h-2.5 w-2.5" />
-                              Featured Video
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-sm font-semibold text-white">
-                            {djData?.spotlight.featuredVideo.title ??
-                              "Live @ Berghain — Summer Closing 2024"}
-                          </p>
-                          <p className="mt-1 text-xs text-gray-500">
-                            {djData?.spotlight.featuredVideo.duration ??
-                              "45 min"}{" "}
-                            · {djData?.spotlight.featuredVideo.views ?? 0} views
-                          </p>
-                          <div className="mt-2">
-                            <Badge className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400">
-                              Live Performance
-                            </Badge>
-                          </div>
-                        </div>
-                      </Card>
-                    </MediaVideoModal>
-                  )}
-                </div>
-              </section>
-            )}
-
-            {hasSpotlight && <Separator className="bg-white/8" />}
 
             {/* ── MY SOUND ── */}
             {(hasMixes || isOwner) && (
@@ -384,11 +278,129 @@ export default function DjProfileFree({
             {(hasMixes || isOwner) && <Separator className="bg-white/8" />}
 
             {/* ── MEDIA ── */}
-            {(hasPhotos || isOwner) && (
-              <section>
+            {(hasPhotos || hasSpotlight || isOwner) && (
+              <section id="media">
                 <SectionHeading sub="Upgrade to unlock video uploads">
                   Media
                 </SectionHeading>
+
+                {/* ── SPOTLIGHT (nested inside Media) ── */}
+                {hasSpotlight && (
+                  <>
+                    <h3 className="mb-4 text-sm font-semibold text-gray-400">
+                      Spotlight
+                    </h3>
+                    <div className="mb-8 grid gap-4 sm:grid-cols-2">
+                      {/* Featured Mix */}
+                      {hasFeaturedMix && (
+                        <MediaAudioPlayer
+                          audioUrl={FEATURED_MIX.audioUrl}
+                          title={FEATURED_MIX.title}
+                          thumbnailUrl={featuredMixThumb || undefined}
+                          mediaId={FEATURED_MIX.id}
+                        >
+                          <Card className="bg-h_blackLight/30 group hover:border-h_red/30 flex h-full cursor-pointer flex-col gap-0 overflow-hidden border-white/8 transition-all">
+                            <div className="from-h_red/20 relative h-40 shrink-0 bg-linear-to-br to-black">
+                              {featuredMixThumb ? (
+                                <Image
+                                  src={featuredMixThumb}
+                                  alt={FEATURED_MIX.title}
+                                  fill
+                                  className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                                />
+                              ) : null}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
+                                  <Play className="ml-0.5 h-5 w-5 text-white" />
+                                </div>
+                              </div>
+                              <div className="absolute bottom-3 left-3">
+                                <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                                  <Headphones className="mr-1 h-2.5 w-2.5" />
+                                  Featured Mix
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="p-4">
+                              <p className="text-sm font-semibold text-white">
+                                {FEATURED_MIX.title}
+                              </p>
+                              <p className="mt-1 text-xs text-gray-500">
+                                {FEATURED_MIX.duration} · {FEATURED_MIX.plays}{" "}
+                                plays
+                              </p>
+                              <div className="mt-2 flex items-center gap-1">
+                                {FEATURED_MIX.genres.map((t) => (
+                                  <Badge
+                                    key={t}
+                                    className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400"
+                                  >
+                                    {t}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </Card>
+                        </MediaAudioPlayer>
+                      )}
+
+                      {/* Featured Video */}
+                      {hasFeaturedVideo && (
+                        <MediaVideoModal
+                          videoUrl={
+                            djData?.spotlight.featuredVideo.videoUrl ?? ""
+                          }
+                          thumbnail={videoThumb}
+                          title={
+                            djData?.spotlight.featuredVideo.title ??
+                            "Live @ Berghain — Summer Closing 2024"
+                          }
+                          mediaId={djData?.spotlight.featuredVideo.id}
+                        >
+                          <Card className="bg-h_blackLight/30 group hover:border-h_red/30 flex h-full cursor-pointer flex-col gap-0 overflow-hidden border-white/8 transition-all">
+                            <div className="relative h-40 shrink-0 bg-linear-to-br from-slate-900 via-gray-900 to-black">
+                              <Image
+                                src={videoThumb}
+                                alt="video thumbnail"
+                                fill
+                                className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                                  <Play className="ml-0.5 h-5 w-5 text-white" />
+                                </div>
+                              </div>
+                              <div className="absolute bottom-3 left-3">
+                                <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                                  <Video className="mr-1 h-2.5 w-2.5" />
+                                  Featured Video
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="p-4">
+                              <p className="text-sm font-semibold text-white">
+                                {djData?.spotlight.featuredVideo.title ??
+                                  "Live @ Berghain — Summer Closing 2024"}
+                              </p>
+                              <p className="mt-1 text-xs text-gray-500">
+                                {djData?.spotlight.featuredVideo.duration ??
+                                  "45 min"}{" "}
+                                · {djData?.spotlight.featuredVideo.views ?? 0}{" "}
+                                views
+                              </p>
+                              <div className="mt-2">
+                                <Badge className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400">
+                                  Live Performance
+                                </Badge>
+                              </div>
+                            </div>
+                          </Card>
+                        </MediaVideoModal>
+                      )}
+                    </div>
+                  </>
+                )}
+
                 {hasPhotos ? (
                   <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
                 ) : (
@@ -405,18 +417,24 @@ export default function DjProfileFree({
 
             {(hasPhotos || isOwner) && <Separator className="bg-white/8" />}
 
-            {/* ── MOBILE EVENTS ── */}
-            <div className="lg:hidden">
-              <ProfileEventsSidebar
+            {/* ── EVENTS MODULE ── */}
+            <div id="events">
+              <DjEventsModule
                 events={EVENTS}
+                venues={[]}
+                calendarDays={[]}
+                calendarLabel="Calendar"
                 isOwner={isOwner}
                 djName={DJ.stageName}
+                featuredPerformanceUrl={djData?.featuredPerformanceUrl}
+                featuredPerformanceContext={djData?.featuredPerformanceContext}
+                featuredPerformanceThumbnailUrl={
+                  djData?.featuredPerformanceThumbnailUrl
+                }
               />
             </div>
 
-            <div className="lg:hidden">
-              <Separator className="bg-white/8" />
-            </div>
+            <Separator className="bg-white/8" />
 
             {(REVIEWS.length > 0 || isOwner) && (
               <section>
@@ -518,7 +536,16 @@ export default function DjProfileFree({
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="sticky top-28 flex h-fit flex-col gap-5">
+          <aside className="sticky top-28 hidden h-fit flex-col gap-5 lg:flex">
+            {/* Events — desktop only; mobile version is inline above */}
+            <div className="hidden lg:block">
+              <ProfileEventsSidebar
+                events={EVENTS}
+                isOwner={isOwner}
+                djName={DJ.stageName}
+              />
+            </div>
+
             {/* Book CTA — desktop only; mobile version is inline above */}
             <BookCTA
               stageName={`Dj. ${DJ.stageName}`}
@@ -528,15 +555,6 @@ export default function DjProfileFree({
               layout="desktop"
               bookingOptions={bookingOptions}
             />
-
-            {/* Events — desktop only; mobile version is inline above */}
-            <div className="hidden lg:block">
-              <ProfileEventsSidebar
-                events={EVENTS}
-                isOwner={isOwner}
-                djName={DJ.stageName}
-              />
-            </div>
 
             {isOwner && (
               <>
@@ -566,6 +584,15 @@ export default function DjProfileFree({
           </aside>
         </div>
       </div>
+
+      {/* ── MOBILE BOTTOM BAR ── */}
+      <DjProfileMobileBottomBar
+        feeMin={djData?.booking?.feeRange?.min}
+        feeMax={djData?.booking?.feeRange?.max}
+        feeCurrency={djData?.booking?.feeRange?.currency}
+        onBookClick={() => {}}
+        isOwner={isOwner}
+      />
     </div>
   );
 }

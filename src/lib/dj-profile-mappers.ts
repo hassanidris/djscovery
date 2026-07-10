@@ -59,6 +59,8 @@ export function mapEventsFromData(
     country: e.country,
     slug: e.slug,
     isPast: e.daysOffset <= 0,
+    eventType: (e as any).eventType,
+    category: (e as any).category,
     ...(opts?.withStatus ? { status: "confirmed" as const } : {}),
   }));
 }

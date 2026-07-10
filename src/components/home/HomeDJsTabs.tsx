@@ -5,8 +5,8 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ScrollableCarousel from "@/components/ScrollableCarousel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatNumber } from "@/lib/utils/currency";
@@ -84,28 +84,28 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
             value="new"
             className="data-[state=active]:animate-in data-[state=active]:fade-in data-[state=active]:duration-200"
           >
-            <ScrollArea className="w-full">
-              <div className="flex items-stretch gap-4 px-1 pt-1 pb-4">
-                {newDJs.map((dj) => (
-                  <DJCard key={dj.id} dj={dj} showNew />
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            <ScrollableCarousel
+              contentClassName="items-stretch px-1 pt-1 pb-4"
+              peek={24}
+            >
+              {newDJs.map((dj) => (
+                <DJCard key={dj.id} dj={dj} showNew />
+              ))}
+            </ScrollableCarousel>
           </TabsContent>
 
           <TabsContent
             value="trending"
             className="data-[state=active]:animate-in data-[state=active]:fade-in data-[state=active]:duration-200"
           >
-            <ScrollArea className="w-full">
-              <div className="flex items-stretch gap-4 px-1 pt-1 pb-4">
-                {trendingDJs.map((dj, index) => (
-                  <DJCard key={dj.id} dj={dj} rank={index + 1} />
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            <ScrollableCarousel
+              contentClassName="items-stretch px-1 pt-1 pb-4"
+              peek={24}
+            >
+              {trendingDJs.map((dj, index) => (
+                <DJCard key={dj.id} dj={dj} rank={index + 1} />
+              ))}
+            </ScrollableCarousel>
           </TabsContent>
         </Tabs>
       </div>

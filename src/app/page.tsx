@@ -50,19 +50,10 @@ const Homepage = async () => {
         <HomeDJsTabsAsync />
       </Suspense>
 
-      {/* Trending Events */}
+      {/* Events — one tabbed rail */}
       <EventsSection
-        title="Trending Events"
-        events={trendingEvents}
-        viewAllHref="/events"
-        savedEventIds={savedEventIds}
-      />
-
-      {/* New Events */}
-      <EventsSection
-        title="New Events"
-        events={newEvents}
-        viewAllHref="/events"
+        trendingEvents={trendingEvents}
+        newEvents={newEvents}
         savedEventIds={savedEventIds}
       />
 

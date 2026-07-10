@@ -101,6 +101,8 @@ function DjProfileHero({
           className="object-cover"
           priority
         />
+        {/* Scrim gradient at top */}
+        <div className="absolute inset-x-0 top-0 h-16 bg-linear-to-b from-black/60 to-transparent" />
         <div
           className={cn(
             "absolute inset-0 bg-linear-to-t",
