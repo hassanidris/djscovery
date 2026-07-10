@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp } from "lucide-react";
 import { getTrendingDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import ScrollableCarousel from "@/components/ScrollableCarousel";
 
 export default async function HomeTrendingDJs() {
   const trendingDJs = await getTrendingDJs();
@@ -38,73 +38,69 @@ export default async function HomeTrendingDJs() {
           </Button>
         </div>
 
-        <ScrollArea className="w-full">
-          <div className="flex items-stretch gap-4 px-1 pt-1 pb-4">
-            {trendingDJs.map((dj, index) => (
-              <Link
-                key={dj.id}
-                href={`/djs/${dj.slug}`}
-                className="block h-full"
-              >
-                <Card className="bg-h_blackLight/50 hover:ring-h_red relative flex h-full w-64 shrink-0 cursor-pointer flex-col gap-0 overflow-hidden p-0 ring-white/5 transition-all">
-                  <div className="from-h_cyanDark/20 relative bg-linear-to-br to-black p-5">
-                    <div className="flex items-start justify-between">
-                      <Avatar className="size-14 ring-2 ring-white/10 ring-offset-2 ring-offset-black">
-                        <AvatarImage
-                          src={dj.avatar ?? undefined}
-                          alt={dj.stageName}
-                        />
-                        <AvatarFallback className="bg-h_redDark text-lg text-white">
-                          {dj.stageName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex items-center gap-1 text-sm text-amber-400">
-                        <TrendingUp className="h-4 w-4" />
-                        <span>#{index + 1}</span>
-                      </div>
+        <ScrollableCarousel
+          contentClassName="items-stretch px-1 pt-1 pb-4"
+          peek={24}
+        >
+          {trendingDJs.map((dj, index) => (
+            <Link key={dj.id} href={`/djs/${dj.slug}`} className="block h-full">
+              <Card className="bg-h_blackLight/50 hover:ring-h_red relative flex h-full w-64 shrink-0 cursor-pointer flex-col gap-0 overflow-hidden p-0 ring-white/5 transition-all">
+                <div className="from-h_cyanDark/20 relative bg-linear-to-br to-black p-5">
+                  <div className="flex items-start justify-between">
+                    <Avatar className="size-14 ring-2 ring-white/10 ring-offset-2 ring-offset-black">
+                      <AvatarImage
+                        src={dj.avatar ?? undefined}
+                        alt={dj.stageName}
+                      />
+                      <AvatarFallback className="bg-h_redDark text-lg text-white">
+                        {dj.stageName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex items-center gap-1 text-sm text-amber-400">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>#{index + 1}</span>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex flex-1 flex-col gap-3 px-5 py-4">
-                    <div>
-                      <p className="truncate text-base font-bold text-white">
-                        Dj. {dj.stageName}
-                      </p>
-                      <p className="mt-1 truncate text-sm text-gray-500">
-                        📍 {dj.city?.name}, {dj.country?.name}
-                      </p>
-                    </div>
+                <div className="flex flex-1 flex-col gap-3 px-5 py-4">
+                  <div>
+                    <p className="truncate text-base font-bold text-white">
+                      Dj. {dj.stageName}
+                    </p>
+                    <p className="mt-1 truncate text-sm text-gray-500">
+                      📍 {dj.city?.name}, {dj.country?.name}
+                    </p>
+                  </div>
 
-                    <div className="flex flex-wrap gap-1.5">
-                      {dj.genres.slice(0, 2).map((g) => (
-                        <Badge
-                          key={g.genre.name}
-                          className="bg-h_redDark/60 border-0 text-sm text-red-300"
-                        >
-                          {g.genre.name}
-                        </Badge>
-                      ))}
-                      {dj.genres.length > 2 && (
-                        <span className="text-muted-foreground text-sm">
-                          +{dj.genres.length - 2}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="mt-auto flex w-full items-center justify-between border-t border-white/5 pt-3 text-sm text-gray-400">
-                      <span className="flex items-center gap-1.5">
-                        <TrendingUp className="h-4 w-4 text-amber-400" />
-                        {formatNumber(dj.monthlyViews)} views
+                  <div className="flex flex-wrap gap-1.5">
+                    {dj.genres.slice(0, 2).map((g) => (
+                      <Badge
+                        key={g.genre.name}
+                        className="bg-h_redDark/60 border-0 text-sm text-red-300"
+                      >
+                        {g.genre.name}
+                      </Badge>
+                    ))}
+                    {dj.genres.length > 2 && (
+                      <span className="text-muted-foreground text-sm">
+                        +{dj.genres.length - 2}
                       </span>
-                      <span>{formatNumber(dj._count.followers)} followers</span>
-                    </div>
+                    )}
                   </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+
+                  <div className="mt-auto flex w-full items-center justify-between border-t border-white/5 pt-3 text-sm text-gray-400">
+                    <span className="flex items-center gap-1.5">
+                      <TrendingUp className="h-4 w-4 text-amber-400" />
+                      {formatNumber(dj.monthlyViews)} views
+                    </span>
+                    <span>{formatNumber(dj._count.followers)} followers</span>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </ScrollableCarousel>
       </div>
     </section>
   );

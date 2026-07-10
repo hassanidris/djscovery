@@ -233,7 +233,7 @@ export default function MediaVideoModal({
               {title}
             </p>
             <div
-              className="relative w-full overflow-hidden rounded-xl bg-black"
+              className="relative aspect-video w-full overflow-hidden rounded-xl bg-black"
               style={{ maxHeight: "70vh" }}
             >
               {embedInfo.embedUrl ? (

@@ -469,6 +469,10 @@ model DjProfile {
   availabilityMonth    String? // e.g. "2025-09"
   availabilityDays     Json? // [{day: 1, status: "available"}, ...]
 
+  // Premium: Featured performance (YouTube only)
+  featuredPerformanceUrl     String?
+  featuredPerformanceContext String?
+
   // Premium: Analytics (denormalized)
   monthlyViews Int @default(0)
 

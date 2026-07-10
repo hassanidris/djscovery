@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { getCurrencyByCode } from "@/config/currencies";
 import { toast } from "sonner";
+import ScrollableCarousel from "@/components/ScrollableCarousel";
 
 type Package = {
   id: number;
@@ -43,6 +44,11 @@ export default function BookingPackages({
     return null;
   }
 
+  // Deduplicate packages by name
+  const uniquePackages = packages.filter(
+    (pkg, index, self) => index === self.findIndex((p) => p.name === pkg.name),
+  );
+
   const formatPrice = (
     priceFrom: number,
     currency: string,
@@ -66,12 +72,12 @@ export default function BookingPackages({
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
-      {packages.map((pkg, idx) => (
+    <ScrollableCarousel contentClassName="items-stretch pb-2" peek={24}>
+      {uniquePackages.map((pkg, idx) => (
         <Card
           key={`${pkg.id}-${idx}`}
           className={cn(
-            "relative flex flex-col gap-0 overflow-hidden border-white/8 p-5",
+            "relative flex min-w-70 shrink-0 flex-col gap-0 overflow-hidden border-white/8 p-5",
             pkg.popular
               ? "to-h_blackLight/30 border-amber-500/30 bg-linear-to-b from-amber-500/10"
               : "bg-h_blackLight/30",
@@ -171,6 +177,6 @@ export default function BookingPackages({
           )}
         </Card>
       ))}
-    </div>
+    </ScrollableCarousel>
   );
 }

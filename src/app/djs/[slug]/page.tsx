@@ -5,13 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
 import { ProfileViewTracker } from "@/components/dj-profile/ProfileViewTracker";
-import { DjEventsSection } from "@/components/dj-profile/DjEventsSection";
-import { isFollowingDj, getSavedEventIds } from "@/lib/actions/follows";
-import { getDjEvents } from "@/lib/queries/events";
+import { isFollowingDj } from "@/lib/actions/follows";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
+import { fetchYouTubeOEmbed } from "@/lib/actions/media";
 import JsonLd from "@/components/seo/JsonLd";
 
 export default async function DjProfilePage({
@@ -115,6 +114,8 @@ export default async function DjProfilePage({
       availabilityTimezone: true,
       availabilityMonth: true,
       availabilityDays: true,
+      featuredPerformanceUrl: true,
+      featuredPerformanceContext: true,
       monthlyViews: true,
       reputationScore: true,
       user: {
@@ -201,14 +202,20 @@ export default async function DjProfilePage({
   ]);
   const avgRating = ratingAgg._avg.rating ?? 0;
 
+  // Fetch YouTube oEmbed thumbnail server-side for Featured Performance
+  let featuredPerformanceThumbnailUrl: string | undefined;
+  if (
+    dj.featuredPerformanceUrl &&
+    process.env.NEXT_PUBLIC_APP_ENV === "production"
+  ) {
+    const oEmbed = await fetchYouTubeOEmbed(dj.featuredPerformanceUrl);
+    if ("thumbnailUrl" in oEmbed && oEmbed.thumbnailUrl) {
+      featuredPerformanceThumbnailUrl = oEmbed.thumbnailUrl;
+    }
+  }
+
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
   const isFollowedDj = viewMode === "fan" ? await isFollowingDj(dj.id) : false;
-
-  // Fetch DJ events and saved event IDs
-  const [djEvents, savedEventIds] = await Promise.all([
-    getDjEvents(dj.id, 12),
-    authUser ? getSavedEventIds() : [],
-  ]);
 
   let viewerContext: BookingViewerContext = {
     role: "guest",
@@ -373,6 +380,9 @@ export default async function DjProfilePage({
       audienceAge: [],
       trafficSources: [],
     },
+    featuredPerformanceUrl: dj.featuredPerformanceUrl ?? undefined,
+    featuredPerformanceContext: dj.featuredPerformanceContext ?? undefined,
+    featuredPerformanceThumbnailUrl,
     availability: {
       timezone: dj.availabilityTimezone ?? "",
       month: dj.availabilityMonth ?? "",
@@ -484,14 +494,21 @@ export default async function DjProfilePage({
       website: websiteLink,
       feeRange: { min: djFeeMin, max: djFeeMax, currency: djFeeCurrency },
     },
-    upcomingEvents: dj.eventsOwned.map((e) => ({
-      title: e.title,
-      venue: e.venue ?? "",
-      city: e.city?.name ?? "",
-      date: e.startDate.toISOString().split("T")[0],
-      slug: e.slug,
-      isPast: e.status === "COMPLETED",
-    })),
+    upcomingEvents: dj.eventsOwned.map((e) => {
+      const eventDate = new Date(e.startDate);
+      const isPast = eventDate < new Date() || e.status === "COMPLETED";
+      return {
+        title: e.title,
+        venue: e.venue ?? "",
+        city: e.city?.name ?? "",
+        country: e.country?.name ?? "",
+        date: e.startDate.toISOString().split("T")[0],
+        slug: e.slug,
+        eventType: e.eventType,
+        category: e.category,
+        isPast,
+      };
+    }),
   };
 
   const isPremium = djPlan === "PREMIUM";
@@ -558,12 +575,6 @@ export default async function DjProfilePage({
           viewerContext={viewerContext}
           bookingOptions={bookingOptions}
         />
-      )}
-      {/* DJ Events Section - only show if DJ has events */}
-      {djEvents.length > 0 && (
-        <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
-          <DjEventsSection events={djEvents} savedEventIds={savedEventIds} />
-        </div>
       )}
     </div>
   );

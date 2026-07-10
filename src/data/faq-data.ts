@@ -185,6 +185,11 @@ export const HOMEPAGE_FAQ: FaqItem[] = [
       "Yes. DJs, organizers, and fans can create accounts and use the core features for free.",
   },
   {
+    question: "Does DJcovery charge commission on bookings?",
+    answer:
+      "Currently, DJcovery does not charge commission on bookings. Future premium features may be introduced.",
+  },
+  {
     question: "How do DJs get discovered?",
     answer:
       "DJs can be discovered through public profiles, search, directory listings, genres, location, events, and future featured placements.",
@@ -195,23 +200,8 @@ export const HOMEPAGE_FAQ: FaqItem[] = [
       "Organizers can browse DJ profiles, compare talent, and contact DJs directly or through booking features available on the platform.",
   },
   {
-    question: "Do I need an account to browse DJs?",
+    question: "Can I post gigs?",
     answer:
-      "No. Anyone can browse public DJ profiles and discover talent without creating an account.",
-  },
-  {
-    question: "Can DJs apply for gigs?",
-    answer:
-      "Yes. DJs can browse available gigs and submit applications directly through the platform.",
-  },
-  {
-    question: "Why isn't my DJ profile visible yet?",
-    answer:
-      "New DJ profiles may require approval before appearing publicly to maintain quality, trust, and safety on the platform.",
-  },
-  {
-    question: "What makes DJcovery different?",
-    answer:
-      "DJcovery is purpose-built for DJs and music professionals — not a general freelance marketplace. It offers professional profiles, event-driven reputation, location and genre-based discovery, and tools designed specifically for the DJ booking industry.",
+      "Yes. Organizers can create gig listings and receive applications from DJs.",
   },
 ];

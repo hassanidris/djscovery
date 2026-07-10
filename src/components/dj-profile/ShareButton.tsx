@@ -33,7 +33,7 @@ export function ShareButton() {
     <Button
       variant="ghost"
       size="icon"
-      className="text-gray-400 hover:text-white"
+      className="text-gray-400 shadow-lg hover:text-white"
       aria-label="Share"
       onClick={handleShare}
     >

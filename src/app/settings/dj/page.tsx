@@ -98,6 +98,9 @@ export default async function DjSettingsPage() {
         day: number;
         status: string;
       }> | null) ?? [],
+    // Featured performance
+    featuredPerformanceUrl: dj.featuredPerformanceUrl ?? "",
+    featuredPerformanceContext: dj.featuredPerformanceContext ?? "",
   };
 
   return (

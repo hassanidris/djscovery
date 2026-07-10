@@ -227,6 +227,10 @@ const UpdateDjProfileSchema = z
     // Availability
     availabilityTimezone: z.string().max(50).optional().nullable(),
     availabilityMonth: z.string().max(7).optional().nullable(),
+
+    // Featured performance
+    featuredPerformanceUrl: z.string().url().max(500).optional().nullable(),
+    featuredPerformanceContext: z.string().max(200).optional().nullable(),
     availabilityDays: z
       .array(
         z.object({
@@ -606,6 +610,14 @@ export async function updateDjProfile(
           }),
           ...(data.availabilityDays !== undefined && {
             availabilityDays: data.availabilityDays,
+          }),
+
+          // Featured performance
+          ...(data.featuredPerformanceUrl !== undefined && {
+            featuredPerformanceUrl: data.featuredPerformanceUrl,
+          }),
+          ...(data.featuredPerformanceContext !== undefined && {
+            featuredPerformanceContext: data.featuredPerformanceContext,
           }),
         },
       });

@@ -40,6 +40,8 @@ export type EventItem = {
   country?: string;
   slug?: string;
   isPast?: boolean;
+  eventType?: string;
+  category?: string;
 };
 
 export type HeroStat = {
