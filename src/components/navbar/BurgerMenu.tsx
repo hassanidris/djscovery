@@ -26,6 +26,7 @@ import {
   UserPlus,
   Briefcase,
   CalendarDays,
+  LayoutDashboard,
 } from "lucide-react";
 import { desktopNavByRole } from "@/config/navigation";
 import { signOut } from "@/lib/actions/auth";
@@ -231,6 +232,36 @@ export default function BurgerMenu({
                         </SheetClose>
                       );
                     })()}
+
+                  {(navRole === "dj" || navRole === "admin") && (
+                    <SheetClose asChild>
+                      <Link
+                        href="/dj/overview"
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                          pathname.startsWith("/dj/overview")
+                            ? "bg-white/5 text-white"
+                            : "text-gray-400 hover:bg-white/5 hover:text-white",
+                        )}
+                        aria-current={
+                          pathname.startsWith("/dj/overview")
+                            ? "page"
+                            : undefined
+                        }
+                      >
+                        <LayoutDashboard
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            pathname.startsWith("/dj/overview")
+                              ? "text-h_red"
+                              : "",
+                          )}
+                          aria-hidden
+                        />
+                        <span>DJ Dashboard</span>
+                      </Link>
+                    </SheetClose>
+                  )}
 
                   {(navRole === "dj" || navRole === "admin") && (
                     <SheetClose asChild>
