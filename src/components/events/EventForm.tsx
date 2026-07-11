@@ -52,7 +52,7 @@ import { getTimezoneByCountryCode } from "@/lib/timezones";
 export type CountryOption = { id: number; name: string; code?: string };
 export type CityOption = { id: number; name: string };
 
-type EventFormData = {
+export type EventFormData = {
   title: string;
   eventType: "PUBLIC" | "PRIVATE";
   category: EventCategory | "";
