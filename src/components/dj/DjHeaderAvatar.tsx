@@ -12,28 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/lib/actions/auth";
 import { toast } from "sonner";
-import type { NavRole } from "@/config/navigation";
 
 type Props = {
   avatarSrc: string | null;
   displayName: string;
   initials: string;
-  username: string | null;
-  navRole: NavRole;
   djSlug: string | null;
-  organizerSlug: string | null;
-  isOrganizer: boolean;
 };
 
-export default function NavbarAvatar({
+export default function DjHeaderAvatar({
   avatarSrc,
   displayName,
   initials,
-  username,
-  navRole,
   djSlug,
-  organizerSlug,
-  isOrganizer,
 }: Props) {
   const signOutFormRef = useRef<HTMLFormElement>(null);
 
@@ -43,12 +34,12 @@ export default function NavbarAvatar({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="focus-visible:ring-h_red rounded-full outline-none focus-visible:ring-2">
-            <Avatar className="ring-h_red hover:ring-h_redDark size-8 cursor-pointer ring-2 transition-all">
+            <Avatar className="ring-h_red hover:ring-h_redDark size-14 cursor-pointer ring-2 transition-all">
               <AvatarImage
                 src={avatarSrc ?? "/noAvatar.png"}
                 alt={displayName}
               />
-              <AvatarFallback className="bg-h_redDark text-sm font-semibold text-white">
+              <AvatarFallback className="bg-h_redDark text-lg font-semibold text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -60,58 +51,36 @@ export default function NavbarAvatar({
           sideOffset={8}
           className="bg-h_blackLight w-52 border border-white/10 text-white"
         >
-          {navRole !== "guest" && (
+          <DropdownMenuItem
+            asChild
+            className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
+          >
+            <Link href="/dj/overview">DJ Dashboard</Link>
+          </DropdownMenuItem>
+
+          {djSlug && (
             <DropdownMenuItem
               asChild
               className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
             >
-              <Link
-                href={
-                  navRole === "dj" && djSlug
-                    ? `/djs/${djSlug}`
-                    : navRole === "dj"
-                      ? "/become-dj"
-                      : isOrganizer && organizerSlug
-                        ? `/organizers/${organizerSlug}`
-                        : "/account"
-                }
-              >
-                My Profile
-              </Link>
+              <Link href={`/djs/${djSlug}`}>View Public Profile</Link>
             </DropdownMenuItem>
           )}
 
-          {navRole === "dj" && (
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
-            >
-              <Link href="/dj/overview">DJ Dashboard</Link>
-            </DropdownMenuItem>
-          )}
-
-          {isOrganizer && (
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
-            >
-              <Link href="/organizer/dashboard">Organizer Dashboard</Link>
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuSeparator className="bg-white/10" />
 
           <DropdownMenuItem
             asChild
             className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
           >
-            <Link
-              href={
-                navRole === "dj" || navRole === "admin"
-                  ? "/settings/account"
-                  : "/account/settings"
-              }
-            >
-              Settings
-            </Link>
+            <Link href="/dj/settings">Profile Settings</Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            asChild
+            className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
+          >
+            <Link href="/dj/account">Account Settings</Link>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="bg-white/10" />
