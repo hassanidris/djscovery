@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import prisma from "@/lib/client";
 import { revalidatePath } from "next/cache";
 import {
@@ -19,12 +20,22 @@ export async function updatePassword(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated." };
 
+  const currentPassword = formData.get("currentPassword") as string;
   const password = formData.get("password") as string;
   const confirm = formData.get("confirm") as string;
-  if (!password) return { error: "Password is required." };
+
+  if (!currentPassword) return { error: "Current password is required." };
+  if (!password) return { error: "New password is required." };
   if (password.length < 8)
     return { error: "Password must be at least 8 characters." };
   if (password !== confirm) return { error: "Passwords do not match." };
+
+  // Verify current password
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email ?? "",
+    password: currentPassword,
+  });
+  if (signInError) return { error: "Current password is incorrect." };
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };
@@ -136,4 +147,134 @@ export async function updateUserProfile(input: {
   revalidatePath("/account");
   revalidatePath("/account/settings");
   return { success: true };
+}
+
+export async function updateEmail(
+  formData: FormData,
+): Promise<{ success?: true; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  const newEmail = formData.get("email") as string;
+  if (!newEmail || !newEmail.includes("@")) {
+    return { error: "A valid email address is required." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ email: newEmail });
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function deleteAccount(
+  formData: FormData,
+): Promise<{ success?: true; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  const confirmation = (formData.get("confirmation") as string)?.trim();
+  if (confirmation !== "DELETE") {
+    return { error: 'Please type "DELETE" to confirm account deletion.' };
+  }
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return {
+      error:
+        "Account deletion is not available right now. Please contact support.",
+    };
+  }
+
+  // Delete all user data. Prisma relations with onDelete: Cascade handle profiles,
+  // followers, saved events, comments, ratings, etc.
+  try {
+    await prisma.user.delete({ where: { id: user.id } });
+  } catch (err) {
+    console.error("[deleteAccount] prisma error:", err);
+    return { error: "Failed to delete profile data. Please contact support." };
+  }
+
+  // Delete auth user with service role
+  try {
+    const admin = createAdminClient();
+    const { error } = await admin.auth.admin.deleteUser(user.id);
+    if (error) {
+      console.error("[deleteAccount] supabase admin error:", error);
+      return {
+        error:
+          "Profile data was removed but auth deletion failed. Please contact support.",
+      };
+    }
+  } catch (err) {
+    console.error("[deleteAccount] admin client error:", err);
+    return {
+      error:
+        "Profile data was removed but auth deletion failed. Please contact support.",
+    };
+  }
+
+  await supabase.auth.signOut();
+  return { success: true };
+}
+
+export async function updateDjEmailPreferences(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const bookingEmails = formData.get("bookingEmails") === "on";
+  const gigEmails = formData.get("gigEmails") === "on";
+  const applicationEmails = formData.get("applicationEmails") === "on";
+  const platformUpdates = formData.get("platformUpdates") === "on";
+  const marketingEmails = formData.get("marketingEmails") === "on";
+
+  await prisma.emailPreference.upsert({
+    where: { userId: user.id },
+    update: {
+      bookingEmails,
+      gigEmails,
+      applicationEmails,
+      platformUpdates,
+      marketingEmails,
+    },
+    create: {
+      userId: user.id,
+      bookingEmails,
+      gigEmails,
+      applicationEmails,
+      platformUpdates,
+      marketingEmails,
+    },
+  });
+
+  return { success: true };
+}
+
+export async function getAccountInfo(): Promise<
+  | {
+      email: string;
+      identities: { provider: string; identity_id?: string }[];
+    }
+  | { error: string }
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated." };
+
+  return {
+    email: user.email ?? "",
+    identities:
+      user.identities?.map((i) => ({
+        provider: i.provider,
+        identity_id: i.identity_id,
+      })) ?? [],
+  };
 }
