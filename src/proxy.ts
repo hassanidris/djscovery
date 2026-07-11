@@ -12,7 +12,6 @@ const isProduction =
 // coming-soon placeholder. Auth paths and /admin stay reachable so the team can
 // still sign in; everything else redirects to /coming-soon.
 const ALWAYS_PUBLIC_PATHS = [
-  "/",
   "/coming-soon",
   "/sign-in",
   "/sign-up",
