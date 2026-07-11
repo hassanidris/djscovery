@@ -56,8 +56,6 @@ export default async function DjEventsPage() {
     },
   });
 
-  const now = new Date();
-
   const eventItems = events.map((event) => {
     const isOwner = event.ownerDj.id === djProfile.id;
     const participant = event.participants.find(
@@ -89,21 +87,6 @@ export default async function DjEventsPage() {
       isOwner,
     };
   });
-
-  const upcoming = eventItems.filter(
-    (e) =>
-      e.status === "PUBLISHED" &&
-      new Date(e.startDate).getTime() >= now.getTime(),
-  );
-  const past = eventItems.filter(
-    (e) =>
-      e.status === "COMPLETED" ||
-      e.status === "CANCELLED" ||
-      e.status === "ARCHIVED" ||
-      (e.status === "PUBLISHED" &&
-        new Date(e.startDate).getTime() < now.getTime()),
-  );
-  const drafts = eventItems.filter((e) => e.status === "DRAFT");
 
   const emptyState = eventItems.length === 0;
 

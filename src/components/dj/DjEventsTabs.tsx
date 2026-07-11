@@ -170,6 +170,7 @@ function EventCard({ event, djSlug }: { event: DjEventItem; djSlug: string }) {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   });
 
   return (
