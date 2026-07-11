@@ -61,7 +61,7 @@ function DjProfileHero({
 }: Props) {
   const isPremium = variant === "premium";
   const isOwner = viewMode === "dj-owner";
-  const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
+  const editHref = "/dj/settings";
 
   const DJ = {
     stageName: djData.stageName,

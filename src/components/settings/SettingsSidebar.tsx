@@ -13,7 +13,7 @@ const ALL_ITEMS = [
     icon: Bell,
     role: "all",
   },
-  { href: "/settings/dj", label: "DJ Profile", icon: Disc3, role: "dj" },
+  { href: "/dj/settings", label: "DJ Profile", icon: Disc3, role: "dj" },
   {
     href: "/organizer/settings",
     label: "Organizer",

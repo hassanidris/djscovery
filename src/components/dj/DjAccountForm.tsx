@@ -100,7 +100,11 @@ function EmailSection({ currentEmail }: { currentEmail: string }) {
         </p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
+        <Label htmlFor="newEmail" className="sr-only">
+          New Email Address
+        </Label>
         <Input
+          id="newEmail"
           type="email"
           placeholder="new.email@example.com"
           value={newEmail}

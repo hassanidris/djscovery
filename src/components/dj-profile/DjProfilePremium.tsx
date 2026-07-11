@@ -513,7 +513,7 @@ export default function DjProfilePremium({
   };
 
   const isOwner = viewMode === "dj-owner";
-  const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
+  const editHref = "/dj/settings";
 
   return (
     <div className="min-h-screen bg-black">

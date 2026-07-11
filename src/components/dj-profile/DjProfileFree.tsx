@@ -137,7 +137,7 @@ export default function DjProfileFree({
   const location = `${DJ.city}, ${DJ.country}`;
 
   const isOwner = viewMode === "dj-owner";
-  const editHref = djData?.slug ? `/djs/${djData.slug}/edit` : "#";
+  const editHref = "/dj/settings";
   const bookingContext: BookingViewerContext = viewerContext ?? {
     role: "guest",
     isAuthenticated: false,

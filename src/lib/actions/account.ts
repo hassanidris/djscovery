@@ -182,6 +182,13 @@ export async function deleteAccount(
     return { error: 'Please type "DELETE" to confirm account deletion.' };
   }
 
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return {
+      error:
+        "Account deletion is not available right now. Please contact support.",
+    };
+  }
+
   // Delete all user data. Prisma relations with onDelete: Cascade handle profiles,
   // followers, saved events, comments, ratings, etc.
   try {
@@ -192,24 +199,22 @@ export async function deleteAccount(
   }
 
   // Delete auth user with service role
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    try {
-      const admin = createAdminClient();
-      const { error } = await admin.auth.admin.deleteUser(user.id);
-      if (error) {
-        console.error("[deleteAccount] supabase admin error:", error);
-        return {
-          error:
-            "Profile data was removed but auth deletion failed. Please contact support.",
-        };
-      }
-    } catch (err) {
-      console.error("[deleteAccount] admin client error:", err);
+  try {
+    const admin = createAdminClient();
+    const { error } = await admin.auth.admin.deleteUser(user.id);
+    if (error) {
+      console.error("[deleteAccount] supabase admin error:", error);
       return {
         error:
           "Profile data was removed but auth deletion failed. Please contact support.",
       };
     }
+  } catch (err) {
+    console.error("[deleteAccount] admin client error:", err);
+    return {
+      error:
+        "Profile data was removed but auth deletion failed. Please contact support.",
+    };
   }
 
   await supabase.auth.signOut();
