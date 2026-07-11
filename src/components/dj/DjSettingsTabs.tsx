@@ -1,0 +1,751 @@
+"use client";
+
+import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { toast } from "sonner";
+import {
+  Loader2,
+  Camera,
+  Trash2,
+  Plus,
+  User,
+  Music,
+  Banknote,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { updateDjProfile, getCitiesByCountry } from "@/lib/actions/profile";
+import { uploadDjAvatar, uploadDjCover } from "@/lib/actions/dj-upload";
+import { CURRENCIES } from "@/config/currencies";
+
+type SocialLink = { platform: string; url: string };
+
+type ProfileData = {
+  id: number;
+  stageName: string;
+  bio: string;
+  avatar: string;
+  coverImage: string;
+  countryId: number | null;
+  cityId: number | null;
+  countryName: string;
+  cityName: string;
+  genres: string[];
+  djTypes: string[];
+  socialLinks: SocialLink[];
+  bookingEmail: string;
+  bookingPhone: string;
+  feeMin: number | null;
+  feeMax: number | null;
+  feeCurrency: string;
+  slug: string;
+};
+
+type Country = { id: number; name: string };
+type City = { id: number; name: string };
+
+const TABS = [
+  { value: "profile", label: "Profile", icon: User },
+  { value: "music", label: "Music & Social", icon: Music },
+  { value: "pricing", label: "Pricing", icon: Banknote },
+] as const;
+
+const DJ_TYPES = [
+  { value: "CLUB", label: "Club Night" },
+  { value: "WEDDING", label: "Wedding" },
+  { value: "FESTIVAL", label: "Festival" },
+  { value: "CORPORATE", label: "Corporate Event" },
+  { value: "BAR_LOUNGE", label: "Bar / Lounge" },
+  { value: "PRIVATE_PARTY", label: "Private Party" },
+  { value: "BIRTHDAY", label: "Birthday" },
+  { value: "CULTURAL_EVENT", label: "Cultural Event" },
+] as const;
+
+const SOCIAL_PLATFORMS = [
+  { value: "instagram", label: "Instagram" },
+  { value: "tiktok", label: "TikTok" },
+  { value: "youtube", label: "YouTube" },
+  { value: "spotify", label: "Spotify" },
+  { value: "soundcloud", label: "SoundCloud" },
+  { value: "mixcloud", label: "Mixcloud" },
+  { value: "website", label: "Website" },
+] as const;
+
+export default function DjSettingsTabs({
+  profile,
+  countries,
+  initialCities,
+  allGenres,
+}: {
+  profile: ProfileData;
+  countries: Country[];
+  initialCities: City[];
+  allGenres: string[];
+}) {
+  return (
+    <Tabs defaultValue="profile" className="w-full">
+      <TabsList className="mb-6 w-full flex-wrap justify-start gap-1 bg-white/5 sm:w-fit">
+        {TABS.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <TabsTrigger
+              key={tab.value}
+              value={tab.value}
+              className="data-active:bg-h_redDark flex-1 gap-1 px-3 py-1.5 data-active:text-white sm:flex-initial"
+            >
+              <Icon className="h-4 w-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
+            </TabsTrigger>
+          );
+        })}
+      </TabsList>
+
+      <TabsContent value="profile">
+        <ProfileTab
+          profile={profile}
+          countries={countries}
+          initialCities={initialCities}
+        />
+      </TabsContent>
+      <TabsContent value="music">
+        <MusicTab profile={profile} allGenres={allGenres} />
+      </TabsContent>
+      <TabsContent value="pricing">
+        <PricingTab profile={profile} />
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+// ─── Profile Tab ─────────────────────────────────────────────────────────────
+
+function ProfileTab({
+  profile,
+  countries,
+  initialCities,
+}: {
+  profile: ProfileData;
+  countries: Country[];
+  initialCities: City[];
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const [stageName, setStageName] = useState(profile.stageName);
+  const [bio, setBio] = useState(profile.bio);
+  const [avatarPreview, setAvatarPreview] = useState(profile.avatar);
+  const [coverPreview, setCoverPreview] = useState(profile.coverImage);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  const [countryId, setCountryId] = useState<number | null>(profile.countryId);
+  const [cityId, setCityId] = useState<number | null>(profile.cityId);
+  const [cities, setCities] = useState<City[]>(initialCities);
+  const [loadingCities, setLoadingCities] = useState(false);
+
+  const [email, setEmail] = useState(profile.bookingEmail);
+  const [phone, setPhone] = useState(profile.bookingPhone);
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarPreview(URL.createObjectURL(file));
+    setUploadingAvatar(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    const result = await uploadDjAvatar(fd);
+    if ("error" in result) {
+      toast.error(result.error);
+      setAvatarPreview(profile.avatar);
+    } else {
+      setAvatarPreview(result.url);
+      toast.success("Avatar updated.");
+    }
+    setUploadingAvatar(false);
+  }
+
+  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverPreview(URL.createObjectURL(file));
+    setUploadingCover(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    const result = await uploadDjCover(fd);
+    if ("error" in result) {
+      toast.error(result.error);
+      setCoverPreview(profile.coverImage);
+    } else {
+      setCoverPreview(result.url);
+      toast.success("Cover image updated.");
+    }
+    setUploadingCover(false);
+  }
+
+  async function handleCountryChange(value: string) {
+    const id = value ? Number(value) : null;
+    setCountryId(id);
+    setCityId(null);
+    setCities([]);
+    if (!id) return;
+    setLoadingCities(true);
+    try {
+      const result = await getCitiesByCountry(id);
+      setCities(result);
+    } finally {
+      setLoadingCities(false);
+    }
+  }
+
+  function handleSave() {
+    startTransition(async () => {
+      const result = await updateDjProfile({
+        stageName: stageName.trim(),
+        bio: bio.trim() || null,
+        countryId: countryId ?? undefined,
+        cityId: cityId ?? undefined,
+        bookingEmail: email.trim() || null,
+        bookingPhone: phone.trim() || null,
+      });
+      if ("error" in result) toast.error(result.error);
+      else {
+        toast.success("Profile updated.");
+        if (result.newSlug) router.push("/dj/settings");
+      }
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-10">
+      {/* Basic Info */}
+      <section className="flex flex-col gap-6">
+        <div>
+          <h3 className="text-sm font-semibold text-white">Basic Info</h3>
+          <p className="text-xs text-gray-500">Your public DJ identity.</p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label>Cover Image</Label>
+          <div className="relative h-40 w-full overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10">
+            {coverPreview ? (
+              <Image
+                src={coverPreview}
+                alt="Cover"
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-gray-500">
+                No cover image
+              </div>
+            )}
+            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => coverInputRef.current?.click()}
+                disabled={uploadingCover}
+              >
+                {uploadingCover ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
+                {coverPreview ? "Change" : "Upload"}
+              </Button>
+            </div>
+          </div>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleCoverChange}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label>Avatar</Label>
+          <div className="flex items-center gap-4">
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white/5 ring-2 ring-white/10">
+              {avatarPreview ? (
+                <Image
+                  src={avatarPreview}
+                  alt="Avatar"
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-gray-500">
+                  <Camera className="h-6 w-6" />
+                </div>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={uploadingAvatar}
+            >
+              {uploadingAvatar ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Camera className="h-4 w-4" />
+              )}
+              {avatarPreview ? "Change Avatar" : "Upload Avatar"}
+            </Button>
+          </div>
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="stageName">
+            Stage Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="stageName"
+            value={stageName}
+            onChange={(e) => setStageName(e.target.value)}
+            placeholder="Your DJ name"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="bio">Bio</Label>
+          <Textarea
+            id="bio"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={4}
+            maxLength={800}
+            placeholder="Tell fans and organizers about your style..."
+            className="resize-none"
+          />
+          <p className="text-right text-xs text-gray-500">{bio.length}/800</p>
+        </div>
+      </section>
+
+      {/* Location */}
+      <section className="flex flex-col gap-6">
+        <div>
+          <h3 className="text-sm font-semibold text-white">Location</h3>
+          <p className="text-xs text-gray-500">Where you&apos;re based.</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <Label>Country</Label>
+            <Select
+              value={countryId ? String(countryId) : ""}
+              onValueChange={handleCountryChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select country..." />
+              </SelectTrigger>
+              <SelectContent>
+                {countries.map((c) => (
+                  <SelectItem key={c.id} value={String(c.id)}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>City</Label>
+            {loadingCities ? (
+              <div className="flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-sm text-gray-500">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading cities...
+              </div>
+            ) : (
+              <Select
+                value={cityId ? String(cityId) : ""}
+                onValueChange={(v) => setCityId(v ? Number(v) : null)}
+                disabled={!countryId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select city..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section className="flex flex-col gap-6">
+        <div>
+          <h3 className="text-sm font-semibold text-white">Contact</h3>
+          <p className="text-xs text-gray-500">How organizers can reach you.</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="bookingEmail">Booking Email</Label>
+            <Input
+              id="bookingEmail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="bookings@example.com"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="bookingPhone">Booking Phone</Label>
+            <Input
+              id="bookingPhone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+46 70 000 0000"
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className="flex justify-end">
+        <Button onClick={handleSave} disabled={isPending || !stageName.trim()}>
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isPending ? "Saving..." : "Save Profile"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Music & Social Tab ──────────────────────────────────────────────────────
+
+function MusicTab({
+  profile,
+  allGenres,
+}: {
+  profile: ProfileData;
+  allGenres: string[];
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  const [selectedGenres, setSelectedGenres] = useState<string[]>(
+    profile.genres,
+  );
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(profile.djTypes);
+  const [customGenre, setCustomGenre] = useState("");
+
+  const [links, setLinks] = useState<SocialLink[]>(
+    profile.socialLinks.length > 0
+      ? profile.socialLinks
+      : [{ platform: "instagram", url: "" }],
+  );
+
+  function toggleGenre(genre: string) {
+    setSelectedGenres((prev) =>
+      prev.includes(genre)
+        ? prev.filter((g) => g !== genre)
+        : [...prev, genre].slice(0, 5),
+    );
+  }
+
+  function toggleType(type: string) {
+    setSelectedTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
+    );
+  }
+
+  async function handleAddCustomGenre() {
+    const trimmed = customGenre.trim();
+    if (!trimmed) return;
+    if (selectedGenres.includes(trimmed)) {
+      setCustomGenre("");
+      return;
+    }
+    const { createGenre } = await import("@/lib/actions/genre");
+    const result = await createGenre(trimmed);
+    if ("error" in result) toast.error(result.error);
+    else {
+      setSelectedGenres((prev) => [...prev, result.name].slice(0, 5));
+      setCustomGenre("");
+    }
+  }
+
+  function addLink() {
+    if (links.length >= 7) return;
+    const used = new Set(links.map((l) => l.platform));
+    const next = SOCIAL_PLATFORMS.find((p) => !used.has(p.value));
+    setLinks((prev) => [
+      ...prev,
+      { platform: next?.value ?? "website", url: "" },
+    ]);
+  }
+
+  function removeLink(index: number) {
+    setLinks((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateLink(index: number, field: "platform" | "url", value: string) {
+    setLinks((prev) =>
+      prev.map((link, i) => (i === index ? { ...link, [field]: value } : link)),
+    );
+  }
+
+  function handleSave() {
+    const valid = links.filter((l) => l.url.trim());
+    startTransition(async () => {
+      const result = await updateDjProfile({
+        genreNames: selectedGenres,
+        djTypes: selectedTypes as any,
+        socialLinks: valid as any,
+      });
+      if ("error" in result) toast.error(result.error);
+      else toast.success("Music & social links updated.");
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-10">
+      {/* Genres */}
+      <section className="flex flex-col gap-6">
+        <div>
+          <h3 className="text-sm font-semibold text-white">Genres</h3>
+          <p className="text-xs text-gray-500">
+            Select up to 5 genres that describe your sound.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {allGenres.map((genre) => (
+            <label
+              key={genre}
+              className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                selectedGenres.includes(genre)
+                  ? "border-h_red bg-h_redDark text-white"
+                  : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={selectedGenres.includes(genre)}
+                onChange={() => toggleGenre(genre)}
+              />
+              {genre}
+            </label>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Input
+            value={customGenre}
+            onChange={(e) => setCustomGenre(e.target.value)}
+            placeholder="Add a custom genre"
+            className="max-w-xs"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAddCustomGenre}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+      </section>
+
+      {/* DJ Types */}
+      <section className="flex flex-col gap-6">
+        <div>
+          <h3 className="text-sm font-semibold text-white">DJ Types</h3>
+          <p className="text-xs text-gray-500">
+            What kind of events do you play?
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {DJ_TYPES.map((type) => (
+            <label
+              key={type.value}
+              className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                selectedTypes.includes(type.value)
+                  ? "border-h_red bg-h_redDark text-white"
+                  : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={selectedTypes.includes(type.value)}
+                onChange={() => toggleType(type.value)}
+              />
+              {type.label}
+            </label>
+          ))}
+        </div>
+      </section>
+
+      {/* Social Links */}
+      <section className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-white">Social Links</h3>
+            <p className="text-xs text-gray-500">
+              Links shown on your public profile.
+            </p>
+          </div>
+          {links.length < 7 && (
+            <Button type="button" variant="outline" size="sm" onClick={addLink}>
+              <Plus className="h-4 w-4" /> Add Link
+            </Button>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {links.map((link, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <Select
+                value={link.platform}
+                onValueChange={(v) => updateLink(i, "platform", v)}
+              >
+                <SelectTrigger className="w-36 shrink-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SOCIAL_PLATFORMS.map((p) => (
+                    <SelectItem key={p.value} value={p.value}>
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="url"
+                value={link.url}
+                onChange={(e) => updateLink(i, "url", e.target.value)}
+                placeholder="https://..."
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeLink(i)}
+                className="text-gray-500 hover:text-red-500"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={
+            isPending ||
+            selectedGenres.length === 0 ||
+            selectedTypes.length === 0
+          }
+        >
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isPending ? "Saving..." : "Save Music & Social"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Pricing Tab ─────────────────────────────────────────────────────────────
+
+function PricingTab({ profile }: { profile: ProfileData }) {
+  const [isPending, startTransition] = useTransition();
+  const [feeMin, setFeeMin] = useState(profile.feeMin?.toString() ?? "");
+  const [feeMax, setFeeMax] = useState(profile.feeMax?.toString() ?? "");
+  const [currency, setCurrency] = useState(profile.feeCurrency || "USD");
+
+  function handleSave() {
+    startTransition(async () => {
+      const minNum = feeMin ? Number(feeMin) : null;
+      const maxNum = feeMax ? Number(feeMax) : null;
+      const result = await updateDjProfile({
+        feeMin: minNum,
+        feeMax: maxNum,
+        feeCurrency: currency,
+      });
+      if ("error" in result) toast.error(result.error);
+      else toast.success("Pricing updated.");
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="feeMin">Minimum Fee</Label>
+          <Input
+            id="feeMin"
+            type="number"
+            min={0}
+            value={feeMin}
+            onChange={(e) => setFeeMin(e.target.value)}
+            placeholder="0"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="feeMax">Maximum Fee</Label>
+          <Input
+            id="feeMax"
+            type="number"
+            min={0}
+            value={feeMax}
+            onChange={(e) => setFeeMax(e.target.value)}
+            placeholder="0"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label>Currency</Label>
+          <Select value={currency} onValueChange={setCurrency}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCIES.map((c) => (
+                <SelectItem key={c.code} value={c.code}>
+                  {c.code} — {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Button onClick={handleSave} disabled={isPending}>
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isPending ? "Saving..." : "Save Pricing"}
+        </Button>
+      </div>
+    </div>
+  );
+}
