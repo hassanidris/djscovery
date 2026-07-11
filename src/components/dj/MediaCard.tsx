@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -62,6 +63,7 @@ export default function MediaCard({
   const Icon = meta.icon;
   const stat = (media[meta.statKey] ?? 0) as number;
 
+  const [imageError, setImageError] = useState(false);
   const thumbnailUrl =
     media.type === "IMAGE" ? media.url : media.thumbnail || null;
   const displayTitle =
@@ -71,12 +73,13 @@ export default function MediaCard({
   return (
     <Card className="group flex flex-col overflow-hidden border-white/10 bg-white/5 transition-colors hover:border-white/20">
       <div className="relative aspect-video overflow-hidden bg-black">
-        {thumbnailUrl ? (
+        {thumbnailUrl && !imageError ? (
           <Image
             src={thumbnailUrl}
             alt={media.title || "Media thumbnail"}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="from-h_redDark/30 flex h-full w-full items-center justify-center bg-linear-to-br to-black">
