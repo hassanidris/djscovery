@@ -9,7 +9,13 @@ import {
   formatDuration,
   generateFallbackMetadata,
 } from "@/lib/oembed";
-import { BUCKET } from "@/lib/storage";
+import {
+  BUCKET,
+  getPublicMediaUrl,
+  validateImageFile,
+  buildDjGalleryPath,
+} from "@/lib/storage";
+import { uploadDjGalleryImage } from "@/lib/actions/dj-upload";
 
 const MAX_SPOTLIGHT_ITEMS = 2;
 
@@ -141,6 +147,8 @@ export type MediaItem = {
   title: string | null;
   duration: string | null;
   thumbnail: string | null;
+  playCount?: number;
+  viewCount?: number;
   createdAt: Date;
 };
 
@@ -251,6 +259,238 @@ export async function toggleSpotlight(
   });
 
   return { success: true };
+}
+
+// ── createDjMedia ───────────────────────────────────────────────────────────
+// Unified create for IMAGE, VIDEO, and AUDIO. For IMAGE, expects a "file" field.
+// For VIDEO/AUDIO, expects a "url" field. Auto-fetches oEmbed metadata.
+
+export async function createDjMedia(
+  formData: FormData,
+): Promise<{ success: true; media: MediaItem } | { error: string }> {
+  const session = await getCurrentUserDjProfile();
+  if (!session) return { error: "Not authenticated or DJ profile not found" };
+
+  const type = formData.get("type")?.toString();
+  const title = formData.get("title")?.toString().trim();
+  const isSpotlight = formData.get("isSpotlight") === "true";
+
+  if (!type || !isMediaType(type)) return { error: "Invalid media type" };
+  if (!title) return { error: "Title is required" };
+
+  const plan = normalisePlan(session.profile.plan);
+
+  // IMAGE: upload file via existing helper
+  if (type === "IMAGE") {
+    const result = await uploadDjGalleryImage(formData);
+    if ("error" in result) return { error: result.error };
+
+    const media = await prisma.media.update({
+      where: { id: result.id },
+      data: { title, isSpotlight },
+    });
+
+    return { success: true, media };
+  }
+
+  // VIDEO/AUDIO: validate external URL and plan limits
+  const url = formData.get("url")?.toString();
+  if (!url) return { error: "URL is required" };
+
+  const parse = AddMediaUrlSchema.safeParse({ url, type });
+  if (!parse.success) return { error: "Invalid URL or type" };
+
+  const limit = getMediaLimit(plan, type.toLowerCase() as "videos" | "audio");
+  if (limit !== Infinity) {
+    const currentCount = await prisma.media.count({
+      where: {
+        djProfileId: session.profile.id,
+        type: { in: ["VIDEO", "AUDIO"] },
+      },
+    });
+    if (currentCount >= limit) {
+      return {
+        error: `Your ${plan} plan allows up to ${limit} video/audio items. Upgrade to Premium for unlimited.`,
+      };
+    }
+  }
+
+  let finalIsSpotlight = isSpotlight;
+  if (isSpotlight) {
+    const currentSpotlightCount = await prisma.media.count({
+      where: {
+        djProfileId: session.profile.id,
+        isSpotlight: true,
+        type: { in: ["VIDEO", "AUDIO"] },
+      },
+    });
+    if (plan === "FREE") {
+      // Free plan: auto-spotlight if under limit, otherwise silently disable
+      finalIsSpotlight = currentSpotlightCount < MAX_SPOTLIGHT_ITEMS;
+    } else if (currentSpotlightCount >= MAX_SPOTLIGHT_ITEMS) {
+      return {
+        error: `You can only spotlight up to ${MAX_SPOTLIGHT_ITEMS} items`,
+      };
+    }
+  }
+
+  const oembed = await fetchOEmbed(url);
+  const fallback = generateFallbackMetadata(url, type);
+
+  const maxOrder = await prisma.media.findFirst({
+    where: { djProfileId: session.profile.id },
+    orderBy: { sortOrder: "desc" },
+    select: { sortOrder: true },
+  });
+  const nextSortOrder = (maxOrder?.sortOrder ?? 0) + 1;
+
+  const media = await prisma.media.create({
+    data: {
+      type,
+      url,
+      path: url,
+      bucket: "external",
+      title,
+      thumbnail: oembed?.thumbnail_url || fallback.thumbnail || null,
+      duration: formatDuration(oembed?.duration) || fallback.duration,
+      djProfileId: session.profile.id,
+      isSpotlight: finalIsSpotlight,
+      sortOrder: nextSortOrder,
+    },
+  });
+
+  return { success: true, media };
+}
+
+// ── updateDjMediaItem ───────────────────────────────────────────────────────
+// Updates title, spotlight, URL (video/audio), and file (image) for a media item.
+
+export async function updateDjMediaItem(
+  mediaId: number,
+  formData: FormData,
+): Promise<{ success: true; media: MediaItem } | { error: string }> {
+  const session = await getCurrentUserDjProfile();
+  if (!session) return { error: "Not authenticated or DJ profile not found" };
+
+  const media = await prisma.media.findUnique({
+    where: { id: mediaId },
+    include: { djProfile: { select: { userId: true, plan: true } } },
+  });
+  if (!media) return { error: "Media not found" };
+  if (media.djProfile?.userId !== session.user.id)
+    return { error: "Unauthorized" };
+
+  const title = formData.get("title")?.toString().trim();
+  const isSpotlight = formData.get("isSpotlight") === "true";
+
+  if (!title) return { error: "Title is required" };
+
+  const updateData: {
+    title: string;
+    url?: string;
+    path?: string;
+    bucket?: string;
+    thumbnail?: string | null;
+    duration?: string | null;
+    isSpotlight?: boolean;
+  } = { title };
+
+  // Spotlight toggle (only for video/audio in current schema)
+  if (isSpotlight !== media.isSpotlight && media.type !== "IMAGE") {
+    const plan = normalisePlan(media.djProfile?.plan);
+    if (plan === "FREE") {
+      return { error: "Spotlight selection is available on Premium plan only" };
+    }
+    if (isSpotlight) {
+      const currentSpotlightCount = await prisma.media.count({
+        where: {
+          djProfileId: session.profile.id,
+          isSpotlight: true,
+          type: { in: ["VIDEO", "AUDIO"] },
+        },
+      });
+      if (currentSpotlightCount >= MAX_SPOTLIGHT_ITEMS) {
+        return {
+          error: `You can only spotlight up to ${MAX_SPOTLIGHT_ITEMS} items`,
+        };
+      }
+    }
+    updateData.isSpotlight = isSpotlight;
+  }
+
+  // URL update for video/audio
+  if (media.type === "VIDEO" || media.type === "AUDIO") {
+    const url = formData.get("url")?.toString();
+    if (url && url !== media.url) {
+      const parse = AddMediaUrlSchema.safeParse({ url, type: media.type });
+      if (!parse.success) return { error: "Invalid URL" };
+
+      const oembed = await fetchOEmbed(url);
+      const fallback = generateFallbackMetadata(url, media.type);
+
+      updateData.url = url;
+      updateData.path = url;
+      updateData.thumbnail =
+        oembed?.thumbnail_url || fallback.thumbnail || null;
+      updateData.duration =
+        formatDuration(oembed?.duration) || fallback.duration;
+    }
+  }
+
+  // File replacement for image
+  if (media.type === "IMAGE") {
+    const file = formData.get("file");
+    if (file instanceof File && file.size > 0) {
+      const validationError = validateImageFile(file, 10 * 1024 * 1024);
+      if (validationError) return validationError;
+
+      const supabase = await createClient();
+      const path = buildDjGalleryPath(session.user.id, file);
+
+      const { data, error: uploadError } = await supabase.storage
+        .from(BUCKET)
+        .upload(path, file, { upsert: false, contentType: file.type });
+
+      if (uploadError)
+        return { error: `Upload failed: ${uploadError.message}` };
+
+      updateData.url = getPublicMediaUrl(data.path);
+      updateData.path = data.path;
+      updateData.bucket = BUCKET;
+
+      if (media.bucket !== "external" && media.path) {
+        await supabase.storage
+          .from(media.bucket)
+          .remove([media.path])
+          .catch(() => {});
+      }
+    }
+  }
+
+  const updatedMedia = await prisma.media.update({
+    where: { id: mediaId },
+    data: updateData,
+  });
+
+  return { success: true, media: updatedMedia };
+}
+
+// ── getCurrentDjSlug ──────────────────────────────────────────────────────────
+// Returns the current user's DJ profile slug.
+
+export async function getCurrentDjSlug(): Promise<
+  { slug: string } | { error: string }
+> {
+  const session = await getCurrentUserDjProfile();
+  if (!session) return { error: "Not authenticated or DJ profile not found" };
+
+  const profile = await prisma.djProfile.findUnique({
+    where: { id: session.profile.id },
+    select: { slug: true },
+  });
+
+  if (!profile?.slug) return { error: "DJ profile not found" };
+  return { slug: profile.slug };
 }
 
 // ── getDjMedia ──────────────────────────────────────────────────────────────
