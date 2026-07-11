@@ -1,5 +1,0 @@
-import { EventListingPageSkeleton } from "@/components/ui/skeletons";
-
-export default function Loading() {
-  return <EventListingPageSkeleton />;
-}
