@@ -52,7 +52,7 @@ async function DjLayoutHeader() {
       <div>
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-bold text-white">
-            {djProfile?.stageName || displayName}
+            Dj. {djProfile?.stageName || displayName}
           </h1>
           {isPremium && (
             <Badge
