@@ -185,7 +185,7 @@ export default async function DjOverviewPage() {
           <CardContent className="flex items-center gap-2 py-4">
             <CheckCircle2 className="h-5 w-5 text-green-400" />
             <span className="text-sm font-medium text-green-300">
-              Your profile is 100% complete — you're ready to get booked!
+              Your profile is 100% complete — you&apos;re ready to get booked!
             </span>
           </CardContent>
         </Card>
