@@ -6,11 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Pencil, Trash2, Globe, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  publishEvent,
-  unpublishEvent,
-  deleteEvent,
-} from "@/lib/actions/event";
+import { publishEvent, unpublishEvent, deleteEvent } from "@/lib/actions/event";
 
 type Props = {
   eventId: number;
@@ -60,9 +56,7 @@ export function EventActions({ eventId, status }: Props) {
 
   return (
     <div className="flex items-center gap-1.5">
-      {isPending && (
-        <Loader2 className="h-4 w-4 animate-spin text-zinc-500" />
-      )}
+      {isPending && <Loader2 className="h-4 w-4 animate-spin text-zinc-500" />}
 
       <Button
         asChild
@@ -71,7 +65,7 @@ export function EventActions({ eventId, status }: Props) {
         className="h-8 px-2 text-zinc-400 hover:text-white"
         disabled={isPending}
       >
-        <Link href={`/dashboard/dj/events/${eventId}/edit`}>
+        <Link href={`/dj/events/${eventId}/edit`}>
           <Pencil className="h-3.5 w-3.5" />
           <span className="sr-only">Edit</span>
         </Link>

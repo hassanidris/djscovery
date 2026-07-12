@@ -138,7 +138,7 @@ export default async function GigDetailPage({
         {/* Back link */}
         <div className="mb-6">
           <Link
-            href={isOrganizer ? "/organizer/gigs" : "/dashboard/dj/gigs"}
+            href={isOrganizer ? "/organizer/gigs" : "/gigs"}
             className="flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -417,7 +417,7 @@ export default async function GigDetailPage({
               <span className="text-sm text-white">View Applicants</span>
             </div>
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/dashboard/organizer/gigs/${gig.id}/applications`}>
+              <Link href={`/organizer/gigs/${gig.id}/applications`}>
                 {gig._count.applications}
               </Link>
             </Button>

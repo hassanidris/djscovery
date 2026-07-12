@@ -81,7 +81,7 @@ export default function ProfileEventsSidebar({
               asChild
               className="h-6 gap-1 border-white/15 px-2 text-[11px] text-gray-400 hover:bg-white/5 hover:text-white"
             >
-              <Link href="/dashboard/dj/events/new">
+              <Link href="/dj/events/new">
                 <Plus className="h-2.5 w-2.5" />
                 Add Event
               </Link>

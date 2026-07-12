@@ -414,7 +414,7 @@ export function EventForm(props: EventFormProps) {
           return;
         }
         toast.success("Event created! It's saved as a draft.");
-        router.push(`/dashboard/dj/events/${result.id}/edit`);
+        router.push(`/dj/events/${result.id}/edit`);
         router.refresh();
       } else {
         const result = await updateEvent(props.eventId, payload);
@@ -423,7 +423,7 @@ export function EventForm(props: EventFormProps) {
           return;
         }
         toast.success("Event updated.");
-        router.push("/dashboard/dj/events");
+        router.push("/dj/events");
         router.refresh();
       }
     });

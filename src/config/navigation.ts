@@ -33,21 +33,21 @@ const directory: NavItem = {
 const djGigs: NavItem = {
   id: "gigs",
   label: "Gigs",
-  href: "/dashboard/dj/gigs",
+  href: "/gigs",
   icon: Briefcase,
 };
 
 const djBookings: NavItem = {
   id: "bookings",
   label: "Bookings",
-  href: "/dashboard/dj/bookings",
+  href: "/dj/bookings",
   icon: Handshake,
 };
 
 const djAnalytics: NavItem = {
   id: "analytics",
   label: "Analytics",
-  href: "/dashboard/dj/analytics",
+  href: "/dj/analytics",
   icon: BarChart3,
 };
 
@@ -132,11 +132,11 @@ export function getFooterProfessionalLinks(opts: {
   if (navRole === "dj" || navRole === "admin") {
     return [
       ...(djSlug ? [{ label: "My DJ Profile", href: `/djs/${djSlug}` }] : []),
-      { label: "Bookings", href: "/dashboard/dj/bookings" },
-      { label: "My Gigs", href: "/dashboard/dj/gigs" },
-      { label: "Analytics", href: "/dashboard/dj/analytics" },
-      { label: "My Events", href: "/dashboard/dj/events" },
-      { label: "Applications", href: "/dashboard/dj/applications" },
+      { label: "Bookings", href: "/dj/bookings" },
+      { label: "My Gigs", href: "/gigs" },
+      { label: "Analytics", href: "/dj/analytics" },
+      { label: "My Events", href: "/dj/events" },
+      { label: "Applications", href: "/dj/applications" },
       { label: "Settings", href: "/account/settings" },
       ...(!isOrganizer
         ? [{ label: "Become an Organizer", href: "/become-organizer" }]

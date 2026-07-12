@@ -1,5 +1,34 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/dashboard/organizer/gigs",
+        destination: "/organizer/gigs",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/organizer/gigs/new",
+        destination: "/organizer/gigs/new",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/organizer/gigs/:gigId/edit",
+        destination: "/organizer/gigs/:gigId/edit",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/organizer/gigs/:gigId/applications",
+        destination: "/organizer/gigs/:gigId/applications",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/organizer/gigs/:gigId",
+        destination: "/organizer/gigs/:gigId",
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "11mb",

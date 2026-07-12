@@ -748,7 +748,7 @@ export async function updateApplicationStatus(
     });
   }
 
-  revalidatePath("/dashboard/organizer/gigs", "layout");
+  revalidatePath("/organizer/gigs", "layout");
   return { success: true, data: undefined };
 }
 

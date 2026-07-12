@@ -152,7 +152,7 @@ export default async function HomeOpenGigsSection({
             </p>
           </div>
           <Link
-            href="/dashboard/dj/gigs"
+            href="/gigs"
             className="text-h_red hover:text-h_red/80 text-sm font-medium transition-colors"
           >
             View all →
@@ -167,9 +167,7 @@ export default async function HomeOpenGigsSection({
               gig.budgetMax,
               gig.currency,
             );
-            const applyHref = gig.dbId
-              ? `/dashboard/dj/gigs/${gig.dbId}`
-              : "/dashboard/dj/gigs";
+            const applyHref = `/gigs/${gig.slug}`;
 
             return (
               <Link

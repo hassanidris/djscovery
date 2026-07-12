@@ -77,6 +77,7 @@ export async function proxy(request: NextRequest) {
     "/become-organizer",
     "/become-fan",
     "/fan",
+    "/dj",
     "/organizer",
     "/settings",
     "/profile/edit",
@@ -84,8 +85,10 @@ export async function proxy(request: NextRequest) {
     "/notifications",
     "/admin",
   ];
-  const isProtected = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path),
+  const isProtected = protectedPaths.some(
+    (path) =>
+      request.nextUrl.pathname === path ||
+      request.nextUrl.pathname.startsWith(`${path}/`),
   );
 
   if (isProtected && !user) {
