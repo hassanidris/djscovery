@@ -358,7 +358,7 @@ function ProfileTab({
               value={countryId ? String(countryId) : ""}
               onValueChange={handleCountryChange}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select country..." />
               </SelectTrigger>
               <SelectContent>
@@ -383,7 +383,7 @@ function ProfileTab({
                 onValueChange={(v) => setCityId(v ? Number(v) : null)}
                 disabled={!countryId}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select city..." />
                 </SelectTrigger>
                 <SelectContent>
