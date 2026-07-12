@@ -232,7 +232,7 @@ async function getDjProfileForInquiry(djProfileId: number) {
 
 async function revalidateInquirySurfaces() {
   revalidatePath("/notifications");
-  revalidatePath("/dashboard/dj/bookings");
+  revalidatePath("/dj/bookings");
   revalidatePath("/organizer/bookings");
 }
 
@@ -518,7 +518,7 @@ export async function submitBookingInquiry(
         location: [cityRecord.name, countryRecord.name]
           .filter(Boolean)
           .join(", "),
-        ctaUrl: `${BASE_URL}/dashboard/dj/bookings?inquiry=${createdInquiry.id}`,
+        ctaUrl: `${BASE_URL}/dj/bookings?inquiry=${createdInquiry.id}`,
         packageName: payload.packageName,
         packagePrice: payload.packagePrice,
         packagePriceTo: payload.packagePriceTo,
@@ -809,7 +809,7 @@ export async function sendBookingInquiryMessage(
         messagePreview: truncatePreview(payload.message),
         ctaUrl: `${
           isOrganizer
-            ? `${BASE_URL}/dashboard/dj/bookings`
+            ? `${BASE_URL}/dj/bookings`
             : `${BASE_URL}/organizer/bookings`
         }?inquiry=${inquiry.id}`,
       }),

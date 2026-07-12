@@ -51,7 +51,7 @@ export default async function GigApplicantsPage({
       <div className="mx-auto max-w-4xl px-4 py-10 md:px-8">
         <div className="mb-6">
           <Link
-            href={`/dashboard/organizer/gigs/${gigId}`}
+            href={`/organizer/gigs/${gigId}`}
             className="mb-4 flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />

@@ -517,7 +517,7 @@ export function BecomeDjSkeleton() {
 export function GigListingPageSkeleton() {
   return (
     <div className="min-h-screen bg-black">
-      {/* Hero Banner — flat icon style, mirrors /dashboard/dj/gigs page */}
+      {/* Hero Banner — flat icon style, mirrors /gigs page */}
       <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
         <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           <div className="flex items-center gap-4">

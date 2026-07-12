@@ -124,7 +124,7 @@ export async function createGigReview(
   revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath(`/gigs/${gig.slug}/review`);
   revalidatePath("/organizer/dashboard");
-  revalidatePath(`/dashboard/organizer/gigs/${gigId}`);
+  revalidatePath(`/organizer/gigs/${gigId}`);
 
   return actionSuccess();
 }

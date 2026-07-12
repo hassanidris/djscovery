@@ -46,7 +46,7 @@ function formatEventDate(date: Date): string {
 
 // ============================================================
 // ORGANIZER GIG CARD
-// Used in /dashboard/organizer/gigs list.
+// Used in the /organizer/gigs list.
 // ============================================================
 
 export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
@@ -60,7 +60,7 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <Link
-            href={`/dashboard/organizer/gigs/${gig.id}`}
+            href={`/organizer/gigs/${gig.id}`}
             className="truncate font-semibold text-white transition-colors group-hover:text-white/90"
           >
             {gig.title}
@@ -94,13 +94,13 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
 
         <div className="flex items-center gap-1.5">
           <Link
-            href={`/dashboard/organizer/gigs/${gig.id}/applications`}
+            href={`/organizer/gigs/${gig.id}/applications`}
             className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-gray-400 transition-colors hover:border-white/25 hover:text-white"
           >
             Applicants
           </Link>
           <Link
-            href={`/dashboard/organizer/gigs/${gig.id}/edit`}
+            href={`/organizer/gigs/${gig.id}/edit`}
             className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-gray-400 transition-colors hover:border-white/25 hover:text-white"
           >
             Edit
@@ -113,7 +113,7 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
 
 // ============================================================
 // DJ GIG CARD
-// Used in /dashboard/dj/gigs marketplace.
+// Used in the /gigs marketplace.
 // ============================================================
 
 export function DjGigCard({
@@ -244,7 +244,7 @@ export function DjGigCard({
   }
 
   return (
-    <Link href={`/dashboard/dj/gigs/${gig.id}`} className={cardClass}>
+    <Link href={`/gigs/${gig.slug}`} className={cardClass}>
       {inner}
     </Link>
   );

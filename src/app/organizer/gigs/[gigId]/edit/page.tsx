@@ -90,7 +90,7 @@ export default async function GigEditPage({
   if (!gig) return notFound();
 
   if (gig.status === "CANCELLED" || gig.status === "EXPIRED") {
-    redirect(`/dashboard/organizer/gigs/${gigId}`);
+    redirect(`/organizer/gigs/${gigId}`);
   }
 
   const initialData = gigDetailToFormData(gig);
@@ -100,7 +100,7 @@ export default async function GigEditPage({
       <div className="mx-auto max-w-3xl px-4 py-10 md:px-8">
         <div className="mb-6 flex items-center justify-between">
           <Link
-            href={`/dashboard/organizer/gigs/${gigId}`}
+            href={`/organizer/gigs/${gigId}`}
             className="flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />

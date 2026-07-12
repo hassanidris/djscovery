@@ -266,23 +266,21 @@ export default function BurgerMenu({
                   {(navRole === "dj" || navRole === "admin") && (
                     <SheetClose asChild>
                       <Link
-                        href="/dashboard/dj/events"
+                        href="/dj/events"
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                          pathname.startsWith("/dashboard/dj/events")
+                          pathname.startsWith("/dj/events")
                             ? "bg-white/5 text-white"
                             : "text-gray-400 hover:bg-white/5 hover:text-white",
                         )}
                         aria-current={
-                          pathname.startsWith("/dashboard/dj/events")
-                            ? "page"
-                            : undefined
+                          pathname.startsWith("/dj/events") ? "page" : undefined
                         }
                       >
                         <CalendarDays
                           className={cn(
                             "h-4 w-4 shrink-0",
-                            pathname.startsWith("/dashboard/dj/events")
+                            pathname.startsWith("/dj/events")
                               ? "text-h_red"
                               : "",
                           )}

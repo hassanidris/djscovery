@@ -311,7 +311,7 @@ export function GigForm(props: GigFormProps) {
       toast.success(
         props.mode === "create" ? "Gig saved as draft!" : "Gig updated!",
       );
-      router.push(`/dashboard/organizer/gigs/${gigId}`);
+      router.push(`/organizer/gigs/${gigId}`);
     });
   }
 
