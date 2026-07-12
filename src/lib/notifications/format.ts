@@ -37,9 +37,7 @@ export function formatNotification(
       return {
         icon: "📆",
         message: `${organizerName} wants to book you for "${eventName}".`,
-        link: inquiryId
-          ? `/dashboard/dj/bookings?inquiry=${inquiryId}`
-          : "/dashboard/dj/bookings",
+        link: inquiryId ? `/dj/bookings?inquiry=${inquiryId}` : "/dj/bookings",
       };
     }
     case "BOOKING_INQUIRY_RESPONSE": {
@@ -83,7 +81,7 @@ export function formatNotification(
           : "Someone";
       const senderRole = d.senderRole === "DJ" ? "DJ" : "organizer";
       const linkBase =
-        senderRole === "DJ" ? "/organizer/bookings" : "/dashboard/dj/bookings";
+        senderRole === "DJ" ? "/organizer/bookings" : "/dj/bookings";
       return {
         icon: "💬",
         message: `${senderName} replied in the "${eventName}" booking.`,
@@ -107,7 +105,7 @@ export function formatNotification(
       return {
         icon: "⭐",
         message: `${source} for "${title}".`,
-        link: "/dashboard/dj",
+        link: "/dj/overview",
       };
     }
     case "DJ_REGISTRATION":
@@ -117,11 +115,10 @@ export function formatNotification(
         link: "/admin/djs",
       };
     case "GIG_PUBLISHED": {
-      const gigId = typeof d.gigId === "number" ? d.gigId : null;
       return {
         icon: "📢",
         message: "A new gig matching your profile was posted",
-        link: gigId ? `/dashboard/dj/gigs/${gigId}` : "/dashboard/dj/gigs",
+        link: "/gigs",
       };
     }
     case "GIG_APPLICATION_RECEIVED": {
@@ -129,37 +126,33 @@ export function formatNotification(
       return {
         icon: "📩",
         message: "Someone applied to your gig",
-        link: gigId
-          ? `/dashboard/organizer/gigs/${gigId}`
-          : "/dashboard/organizer/gigs",
+        link: gigId ? `/organizer/gigs/${gigId}` : "/organizer/gigs",
       };
     }
     case "GIG_APPLICATION_SHORTLISTED":
       return {
         icon: "🔖",
         message: "Your application has been shortlisted",
-        link: "/dashboard/dj/applications",
+        link: "/dj/applications",
       };
     case "GIG_APPLICATION_ACCEPTED":
       return {
         icon: "✅",
         message: "Your application was accepted!",
-        link: "/dashboard/dj/applications",
+        link: "/dj/applications",
       };
     case "GIG_APPLICATION_REJECTED":
       return {
         icon: "❌",
         message: "Your application was not selected",
-        link: "/dashboard/dj/applications",
+        link: "/dj/applications",
       };
     case "GIG_APPLICATION_WITHDRAWN": {
       const gigId = typeof d.gigId === "number" ? d.gigId : null;
       return {
         icon: "↩️",
         message: "An applicant withdrew their application",
-        link: gigId
-          ? `/dashboard/organizer/gigs/${gigId}`
-          : "/dashboard/organizer/gigs",
+        link: gigId ? `/organizer/gigs/${gigId}` : "/organizer/gigs",
       };
     }
     case "DJ_NEW_EVENT": {
@@ -180,20 +173,19 @@ export function formatNotification(
       return {
         icon: "✅",
         message: "Your profile has been approved",
-        link: "/dashboard/dj",
+        link: "/dj/overview",
       };
     case "PROFILE_REJECTED":
       return {
         icon: "🔎",
         message: "Your profile needs some adjustments",
-        link: "/dashboard/dj",
+        link: "/dj/overview",
       };
     case "GIG_NEW_MATCH": {
-      const gigId = typeof d.gigId === "number" ? d.gigId : null;
       return {
         icon: "🎯",
         message: "A new gig matches your profile",
-        link: gigId ? `/dashboard/dj/gigs/${gigId}` : "/dashboard/dj/gigs",
+        link: "/gigs",
       };
     }
     case "ACCOUNT_SUSPENDED":

@@ -78,14 +78,14 @@ export default async function OrganizerGigDetailPage({
         {/* Back + edit link */}
         <div className="mb-6 flex items-center justify-between">
           <Link
-            href="/dashboard/organizer/gigs"
+            href="/organizer/gigs"
             className="flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             My Gigs
           </Link>
           <Link
-            href={`/dashboard/organizer/gigs/${gig.id}/edit`}
+            href={`/organizer/gigs/${gig.id}/edit`}
             className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-gray-400 transition-colors hover:border-white/25 hover:text-white"
           >
             Edit
@@ -296,7 +296,7 @@ export default async function OrganizerGigDetailPage({
 
         {/* Applicants link */}
         <Link
-          href={`/dashboard/organizer/gigs/${gig.id}/applications`}
+          href={`/organizer/gigs/${gig.id}/applications`}
           className="flex items-center justify-between rounded-xl border border-white/10 px-5 py-4 transition-colors hover:border-white/20"
         >
           <div className="flex items-center gap-2">

@@ -77,6 +77,7 @@ export async function proxy(request: NextRequest) {
     "/become-organizer",
     "/become-fan",
     "/fan",
+    "/dj",
     "/organizer",
     "/settings",
     "/profile/edit",

@@ -172,7 +172,7 @@ export default function DjEventsModule({
             asChild
             className="h-7 gap-1.5 border-white/15 px-3 text-xs text-gray-400 hover:bg-white/5 hover:text-white"
           >
-            <Link href="/dashboard/dj/events/new">
+            <Link href="/dj/events/new">
               <Plus className="h-3 w-3" />
               Add Event
             </Link>
@@ -282,7 +282,7 @@ export default function DjEventsModule({
                   variant="outline"
                   className="mt-4 h-8 border-white/15 px-4 text-xs text-gray-400 hover:bg-white/5 hover:text-white"
                 >
-                  <Link href="/dashboard/dj/events/new">
+                  <Link href="/dj/events/new">
                     <Plus className="mr-1.5 h-3 w-3" />
                     Add Event
                   </Link>

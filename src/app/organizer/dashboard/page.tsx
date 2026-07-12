@@ -327,7 +327,7 @@ export default async function OrganizerDashboardPage() {
               </p>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/organizer/gigs/new">Go →</Link>
+              <Link href="/organizer/gigs/new">Go →</Link>
             </Button>
           </CardContent>
         </Card>

@@ -161,7 +161,7 @@ export default async function EventDetailPage({
     ]);
 
     if (dbEvent.status === "DRAFT" || dbEvent.status === "ARCHIVED") {
-      if (isOwner) redirect(`/dashboard/dj/events/${dbEvent.id}/edit`);
+      if (isOwner) redirect(`/dj/events/${dbEvent.id}/edit`);
       notFound();
     }
 
@@ -209,7 +209,7 @@ export default async function EventDetailPage({
         }))}
         gallery={dbEvent.gallery}
         isOwner={isOwner}
-        editHref={isOwner ? `/dashboard/dj/events/${dbEvent.id}/edit` : null}
+        editHref={isOwner ? `/dj/events/${dbEvent.id}/edit` : null}
         eventId={dbEvent.id}
         hasAttended={hasAttended}
         reviewedDjIds={reviewedDjIds}
