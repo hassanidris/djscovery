@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "seed": "tsx prisma/seed.ts",
-    "create-admin": "tsx prisma/create-admin.ts"
+    "create-admin": "tsx prisma/create-admin.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -48,6 +49,7 @@
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.81.0",
+    "recharts": "^3.9.2",
     "resend": "^4.8.0",
     "shadcn": "^4.9.0",
     "sonner": "^2.0.7",
