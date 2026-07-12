@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   updatePassword,
-  updateEmail,
   deleteAccount,
   updateDjEmailPreferences,
 } from "@/lib/actions/account";
@@ -72,22 +71,6 @@ export default function DjAccountForm({
 // ─── Email Section ───────────────────────────────────────────────────────────
 
 function EmailSection({ currentEmail }: { currentEmail: string }) {
-  const [newEmail, setNewEmail] = useState("");
-  const [isPending, startTransition] = useTransition();
-
-  function handleSave() {
-    startTransition(async () => {
-      const fd = new FormData();
-      fd.append("email", newEmail);
-      const result = await updateEmail(fd);
-      if (result.error) toast.error(result.error);
-      else {
-        toast.success("Confirmation email sent. Check your inbox to verify.");
-        setNewEmail("");
-      }
-    });
-  }
-
   return (
     <section className="flex flex-col gap-4">
       <div>
@@ -95,26 +78,13 @@ function EmailSection({ currentEmail }: { currentEmail: string }) {
           <Mail className="h-4 w-4" />
           Email Address
         </h2>
-        <p className="text-muted-foreground mt-0.5 text-xs">
-          Current email: <span className="text-gray-300">{currentEmail}</span>
+        <p className="mt-0.5 text-xs text-gray-500">
+          Your login email cannot be changed.
         </p>
       </div>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Label htmlFor="newEmail" className="sr-only">
-          New Email Address
-        </Label>
-        <Input
-          id="newEmail"
-          type="email"
-          placeholder="new.email@example.com"
-          value={newEmail}
-          onChange={(e) => setNewEmail(e.target.value)}
-          className="flex-1"
-        />
-        <Button onClick={handleSave} disabled={isPending || !newEmail}>
-          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-          Update Email
-        </Button>
+      <div className="flex items-center gap-2 rounded-lg border border-white/8 bg-white/3 px-3 py-2.5">
+        <Mail className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+        <span className="text-sm text-gray-300">{currentEmail}</span>
       </div>
     </section>
   );

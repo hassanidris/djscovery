@@ -149,25 +149,6 @@ export async function updateUserProfile(input: {
   return { success: true };
 }
 
-export async function updateEmail(
-  formData: FormData,
-): Promise<{ success?: true; error?: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated." };
-
-  const newEmail = formData.get("email") as string;
-  if (!newEmail || !newEmail.includes("@")) {
-    return { error: "A valid email address is required." };
-  }
-
-  const { error } = await supabase.auth.updateUser({ email: newEmail });
-  if (error) return { error: error.message };
-  return { success: true };
-}
-
 export async function deleteAccount(
   formData: FormData,
 ): Promise<{ success?: true; error?: string }> {
