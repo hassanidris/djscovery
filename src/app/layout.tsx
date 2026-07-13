@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import { cn } from "@/lib/utils";
 import CookieBanner from "@/components/CookieBanner";
+import { Analytics } from "@vercel/analytics/next";
 import { indexingEnabled } from "@/lib/seo/indexing";
 import PublicShell from "@/components/PublicShell";
 import Navbar from "@/components/Navbar";
@@ -100,6 +101,7 @@ export default async function RootLayout({
             <CookieBanner />
           </>
         )}
+        <Analytics />
       </body>
     </html>
   );
