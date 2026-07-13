@@ -38,38 +38,39 @@ export default function VenueModal({
   countries,
   djProfileId,
 }: VenueModalProps) {
-  const [venues, setVenues] = useState<Venue[]>(initialVenues);
+  const [venues, setVenues] = useState<Venue[]>(() =>
+    initialVenues.length === 0
+      ? [
+          {
+            id: 0,
+            venueName: "",
+            eventDate: "",
+            description: "",
+            countryId: 0,
+            cityId: 0,
+            countryName: "",
+            cityName: "",
+          },
+        ]
+      : initialVenues,
+  );
   const [venueCities, setVenueCities] = useState<Record<number, City[]>>({});
   const [loadingVenueCities, setLoadingVenueCities] = useState<
     Record<number, boolean>
   >({});
   const venueCityRequestId = useRef<Record<number, number>>({});
+  const loadedCountryIds = useRef<Set<number>>(new Set());
 
   useEffect(() => {
-    if (initialVenues.length === 0) {
-      setVenues([
-        {
-          id: 0,
-          venueName: "",
-          eventDate: "",
-          description: "",
-          countryId: 0,
-          cityId: 0,
-          countryName: "",
-          cityName: "",
-        },
-      ]);
-    } else {
-      setVenues(initialVenues);
-      // Pre-load cities for venues that already have a country selected
-      initialVenues.forEach((venue) => {
-        if (venue.countryId && !venueCities[venue.countryId]) {
-          getCitiesByCountry(venue.countryId).then((result) => {
-            setVenueCities((prev) => ({ ...prev, [venue.countryId]: result }));
-          });
-        }
-      });
-    }
+    // Pre-load cities for venues that already have a country selected
+    initialVenues.forEach((venue) => {
+      if (venue.countryId && !loadedCountryIds.current.has(venue.countryId)) {
+        loadedCountryIds.current.add(venue.countryId);
+        getCitiesByCountry(venue.countryId).then((result) => {
+          setVenueCities((prev) => ({ ...prev, [venue.countryId]: result }));
+        });
+      }
+    });
   }, [initialVenues]);
 
   async function handleVenueCountryChange(

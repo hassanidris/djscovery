@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -49,27 +49,23 @@ export default function PackageModal({
   djProfileId,
   defaultCurrency = "USD",
 }: PackageModalProps) {
-  const [packages, setPackages] = useState<Package[]>(initialPackages);
-
-  useEffect(() => {
-    if (initialPackages.length === 0) {
-      setPackages([
-        {
-          id: 0,
-          name: "",
-          priceFrom: 0,
-          priceTo: null,
-          currency: defaultCurrency,
-          duration: null,
-          features: [],
-          popular: false,
-          sortOrder: 0,
-        },
-      ]);
-    } else {
-      setPackages(initialPackages);
-    }
-  }, [initialPackages, defaultCurrency]);
+  const [packages, setPackages] = useState<Package[]>(() =>
+    initialPackages.length === 0
+      ? [
+          {
+            id: 0,
+            name: "",
+            priceFrom: 0,
+            priceTo: null,
+            currency: defaultCurrency,
+            duration: null,
+            features: [],
+            popular: false,
+            sortOrder: 0,
+          },
+        ]
+      : initialPackages,
+  );
 
   function addPackage() {
     setPackages((prev) => [
@@ -332,7 +328,7 @@ export default function PackageModal({
 
               <div>
                 <Label className="mb-1.5 block text-xs text-gray-300">
-                  Duration (e.g., "3-4 hours", "2 hours")
+                  Duration (e.g., &quot;3-4 hours&quot;, &quot;2 hours&quot;)
                 </Label>
                 <Input
                   type="text"

@@ -47,7 +47,7 @@ export default function WhereIvePlayed({ venues }: Props) {
 
   return (
     <section>
-      <SectionHeading>Where I've Played</SectionHeading>
+      <SectionHeading>Where I&apos;ve Played</SectionHeading>
       <div className="grid gap-4 sm:grid-cols-2">
         {venues.map((venue) => (
           <div
