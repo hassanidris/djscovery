@@ -66,3 +66,8 @@ jobs:
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
           INDEXING_ENABLED: false
           PRE_LAUNCH_MODE: false
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: noreply@djcovery.com
+          RESEND_CONTACT_TO: support@djcovery.com
+          SUPABASE_WEBHOOK_SECRET: ${{ secrets.SUPABASE_WEBHOOK_SECRET }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
