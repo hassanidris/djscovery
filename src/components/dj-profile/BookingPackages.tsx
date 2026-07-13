@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { getCurrencyByCode } from "@/config/currencies";
 import { toast } from "sonner";
+import Link from "next/link";
 import ScrollableCarousel from "@/components/ScrollableCarousel";
 
 type Package = {
@@ -121,12 +122,12 @@ export default function BookingPackages({
                 toast.error("Sign in to enquire about this package", {
                   description: (
                     <div className="mt-2">
-                      <a
+                      <Link
                         href="/sign-in"
                         className="text-white underline underline-offset-2 hover:text-gray-200"
                       >
                         Sign in
-                      </a>
+                      </Link>
                     </div>
                   ),
                   duration: 5000,
@@ -145,12 +146,12 @@ export default function BookingPackages({
                   {
                     description: (
                       <div className="mt-2">
-                        <a
+                        <Link
                           href="/become-organizer"
                           className="text-white underline underline-offset-2 hover:text-gray-200"
                         >
                           Become an organizer
-                        </a>
+                        </Link>
                       </div>
                     ),
                     duration: 5000,

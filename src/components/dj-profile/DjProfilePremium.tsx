@@ -1217,6 +1217,7 @@ export default function DjProfilePremium({
       {isOwner && (
         <>
           <VenueModal
+            key={isVenueModalOpen ? "venue-modal-open" : "venue-modal-closed"}
             isOpen={isVenueModalOpen}
             onClose={() => setIsVenueModalOpen(false)}
             venues={venues}
@@ -1225,6 +1226,9 @@ export default function DjProfilePremium({
             djProfileId={djProfileId}
           />
           <PackageModal
+            key={
+              isPackageModalOpen ? "package-modal-open" : "package-modal-closed"
+            }
             isOpen={isPackageModalOpen}
             onClose={() => setIsPackageModalOpen(false)}
             packages={packages}
