@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,11 +64,12 @@ export function EventCard({
         {/* ── Header with poster / gradient + title ── */}
         <div className="relative flex h-36 items-end overflow-hidden p-4">
           {event.posterUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={event.posterUrl}
               alt={event.title}
-              className="absolute inset-0 h-full w-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
             />
           ) : (
             <div className="bg-h_redDark/20 absolute inset-0" />
