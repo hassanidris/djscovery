@@ -123,13 +123,17 @@ const DjCard = ({
 
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs text-gray-400">
-          {gigReviews.length + eventReviews.length + ratings.length === 0
-            ? "New"
-            : `${gigReviews.length + eventReviews.length + ratings.length} reviews`}
+          {(() => {
+            const total =
+              gigReviews.length + eventReviews.length + ratings.length;
+            if (total === 0) return "New";
+            return `${total} review${total === 1 ? "" : "s"}`;
+          })()}
         </span>
         {_count !== undefined && (
           <span className="text-xs text-gray-400">
-            {formatNumber(_count.followers)} followers
+            {formatNumber(_count.followers)} follower
+            {_count.followers === 1 ? "" : "s"}
           </span>
         )}
       </div>
