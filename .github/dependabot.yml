@@ -15,14 +15,13 @@ updates:
     # Group updates by dependency type
     groups:
       production-dependencies:
-        patterns:
-          - "*"
-      dev-dependencies:
-        patterns:
-          - "*"
+        dependency-type: "production"
         exclude-patterns:
           - "next"
           - "react"
+      dev-dependencies:
+        dependency-type: "development"
+        exclude-patterns:
           - "@types/*"
     # Ignore major version updates for critical packages
     ignore:

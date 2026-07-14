@@ -1,5 +1,13 @@
 # Compliance Documentation
 
+**⚠️ DRAFT STATUS** — This document is a draft and not yet finalized. The following must be implemented and linked before this can be considered final:
+
+- Privacy policy page published at `/privacy` with footer link
+- Data deletion API endpoint implemented (`DELETE /api/account/delete`)
+- User rights access process implemented (data export, rectification, erasure)
+- Data processing agreements executed with Supabase, Vercel, and Sentry
+- Data Protection Officer or privacy contact route established
+
 ## GDPR Compliance
 
 ### Data Processing Principles
@@ -7,7 +15,8 @@
 DJcovery processes personal data in accordance with GDPR Article 5:
 
 1. **Lawfulness, fairness, and transparency**
-   - User consent obtained via sign-up process
+   - Core account creation and authentication processed under contract performance (necessary to deliver the service), not consent
+   - Optional features (e.g., marketing communications) processed only with explicit user consent, separate from account sign-up
    - Clear privacy policy explaining data usage
    - Transparent data collection practices
 
@@ -40,12 +49,13 @@ DJcovery processes personal data in accordance with GDPR Article 5:
 
 ### Legal Basis for Processing
 
-- **User accounts**: Consent (Article 6(1)(a))
-- **Authentication**: Contract performance (Article 6(1)(b))
+- **User accounts / Authentication**: Contract performance (Article 6(1)(b))
 - **Analytics**: Legitimate interest (Article 6(1)(f))
 - **Marketing**: Consent (Article 6(1)(a))
 
 ### User Rights Under GDPR
+
+**Status:** PENDING — Access process not yet implemented (data export, rectification, erasure requests)
 
 Users have the right to:
 
@@ -60,14 +70,15 @@ Users have the right to:
 
 ### User Account Data
 
-| Data Type                        | Retention Period                 | Justification                        |
-| -------------------------------- | -------------------------------- | ------------------------------------ |
-| User profile (name, email, city) | 2 years after account deletion   | Legal compliance, fraud prevention   |
-| Authentication logs              | 1 year                           | Security auditing                    |
-| Session data                     | 30 days                          | Security, session management         |
-| Booking inquiries                | 3 years after completion         | Legal compliance, dispute resolution |
-| DJ profile data                  | 2 years after account deletion   | Legal compliance                     |
-| Media uploads                    | Until account deletion + 30 days | Service delivery, user control       |
+| Data Type                                      | Retention Period                 | Justification                                                                                 |
+| ---------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------- |
+| Account identifier + email (only)              | 2 years after account deletion   | Fraud prevention and defense of legal claims within the applicable limitation period (Sweden) |
+| Remaining profile data (name, city, bio, etc.) | Deleted immediately, anonymized  | No further legal basis for retention once account is deleted                                  |
+| Authentication logs                            | 1 year                           | Security auditing                                                                             |
+| Session data                                   | 30 days                          | Security, session management                                                                  |
+| Booking inquiries                              | 3 years after completion         | Legal compliance, dispute resolution                                                          |
+| DJ profile data                                | 2 years after account deletion   | Legal compliance                                                                              |
+| Media uploads                                  | Until account deletion + 30 days | Service delivery, user control                                                                |
 
 ### Analytics Data
 
@@ -90,7 +101,8 @@ Users have the right to:
 1. **Request Submission**
    - User submits deletion request via account settings
    - Confirmation email sent to user's registered email
-   - 30-day grace period for cancellation
+   - Deletion processed without undue delay (GDPR Article 17)
+   - 30-day optional cancellation window for user to reverse request
 
 2. **Data Deletion Steps**
    - Mark user account as "deleted" in database
@@ -99,6 +111,7 @@ Users have the right to:
    - Anonymize booking inquiries (retain only for legal compliance)
    - Delete authentication tokens and sessions
    - Remove user from analytics (where possible)
+   - Retain only legally required data (see "Right to be Forgotten" exceptions below)
 
 3. **Verification**
    - Confirm deletion via email
@@ -112,18 +125,19 @@ Exceptions where data may be retained:
 - Legal obligations (tax records, transaction logs)
 - Dispute resolution (booking inquiries, communications)
 - Fraud prevention (suspicious activity logs)
-- Public interest (deleted DJ profiles may show as "removed")
 
 ### Data Deletion API Endpoint
 
-**Endpoint:** `DELETE /api/account/delete`
+**Status:** PENDING — Not yet implemented
 
-**Requirements:**
+**Planned Endpoint:** `DELETE /api/account/delete`
+
+**Planned Requirements:**
 
 - User must be authenticated
 - Re-authentication required (password confirmation)
 - Email confirmation sent before deletion
-- 30-day grace period for cancellation
+- 30-day optional cancellation window for user to reverse request
 
 ## Privacy Policy
 
@@ -143,9 +157,11 @@ Exceptions where data may be retained:
    - Comply with legal obligations
 
 3. **Data Sharing**
-   - Shared with: Supabase (database hosting), Vercel (deployment), Sentry (error tracking)
-   - Not sold to third parties
-   - Shared only with user consent or legal requirement
+   - **Supabase** (data processor): Database hosting and authentication. Shared data categories: user profiles, authentication data, booking inquiries, media metadata. Legal basis: contract performance (Article 6(1)(b)) to deliver the service.
+   - **Vercel** (data processor): Application deployment and hosting. Shared data categories: deployment logs, performance metrics, error reports. Legal basis: legitimate interest (Article 6(1)(f)) for service operation and security.
+   - **Sentry** (data processor): Error tracking and performance monitoring. Shared data categories: error logs, stack traces, performance data. Legal basis: legitimate interest (Article 6(1)(f)) for service improvement and security.
+   - Data is not sold to third parties
+   - Data processing agreements: PENDING — to be executed with Supabase, Vercel, and Sentry (standard GDPR-compliant DPAs)
 
 4. **Data Security**
    - Encryption in transit and at rest
@@ -165,13 +181,15 @@ Exceptions where data may be retained:
    - User can manage cookie preferences
 
 7. **International Data Transfers**
-   - Data stored in EU (Supabase EU region)
-   - US-based services (Vercel, Sentry) with GDPR-compliant data processing agreements
+   - **Supabase** (EU): Primary database and authentication data stored in EU region (Stockholm, Sweden). No international transfer required for core user data.
+   - **Vercel** (US): Application deployment and hosting data transferred to US. Transfer mechanism: EU-US Data Privacy Framework (DPF) and Standard Contractual Clauses (SCCs). Processing regions: US (primary), EU (edge). Transfer impact assessment: Not required under DPF adequacy decision. Supplementary measures: Encryption in transit (TLS 1.3) and at rest.
+   - **Sentry** (US): Error tracking and performance monitoring data transferred to US. Transfer mechanism: Standard Contractual Clauses (SCCs). Processing regions: US. Transfer impact assessment: Conducted; low-risk data (error logs, stack traces) with minimal personal information. Supplementary measures: Encryption in transit, data minimization (no personal identifiers in error reports where possible).
 
 8. **Children's Privacy**
-   - Minimum age: 18 years (Swedish law)
+   - Minimum age: 18 years (adult-only product rule)
+   - Policy basis: DJcovery is designed for adult users in the nightlife and entertainment industry; age restriction is a business decision to avoid complexities involving minors
    - No data collection from users under 18
-   - Parental consent not applicable (adult-only service)
+   - Parental consent not applicable (service not available to minors)
 
 9. **Changes to Privacy Policy**
    - Users notified of material changes
@@ -179,25 +197,32 @@ Exceptions where data may be retained:
    - Continued use constitutes acceptance
 
 10. **Contact Information**
-    - Email: support@djcovery.com
-    - Data Protection Officer: [DPO contact if applicable]
+    - Email: support@djcovery.com (pending: verify inbox is monitored for privacy requests)
+    - Data Protection Officer: [PENDING — to be appointed or designate privacy contact]
     - Supervisory Authority: IMY (Swedish authority) or local equivalent
 
 ### Privacy Policy Location
 
-- **URL:** `/privacy` (to be created)
-- **Link:** Footer of all pages
-- **Last Updated:** [Date]
-- **Version:** 1.0
+- **URL:** `/privacy` (PENDING — page to be created and published)
+- **Link:** Footer of all pages (PENDING — to be added to footer component)
+- **Last Updated:** [PENDING — date of publication]
+- **Version:** 1.0 (draft)
 
 ## Data Breach Response
 
 ### Notification Requirements
 
-Under GDPR Article 33:
+**GDPR Article 33 (Supervisory Authority):**
 
-- Notify supervisory authority within 72 hours of discovery
-- Notify affected individuals without undue delay if high risk
+- Notify supervisory authority within 72 hours of discovery, unless the breach is unlikely to result in a risk to individuals' rights and freedoms
+- If notification is submitted after 72 hours, provide reasons for the delay
+- Notification must include: nature of breach, categories of data, approximate number of affected individuals, likely consequences, and mitigation measures
+
+**GDPR Article 34 (Affected Individuals):**
+
+- Notify affected individuals without undue delay if the breach is likely to result in a high risk to their rights and freedoms
+- Notification must include: nature of breach, categories of data concerned, likely consequences, measures taken to address the breach, and recommendations for mitigating potential harm
+- No notification required if appropriate technical and organizational protection measures were applied (e.g., encryption) or immediate action rendered the data unintelligible
 
 ### Breach Assessment Criteria
 
@@ -247,12 +272,12 @@ Under GDPR Article 33:
 
 - **Advisory:** GHSA-92pp-h63x-v22m
 - **Issue:** Middleware bypass via repeated slashes in serveStatic
-- **Current Version:** 1.19.11
-- **Dependency Chain:** prisma@7.8.0 → @prisma/dev@0.24.3 → @hono/node-server@1.19.11
+- **Current Version:** 1.19.14 (remediated via package.json override)
+- **Dependency Chain:** prisma@7.8.0 → @prisma/dev@0.24.3 → @hono/node-server@1.19.14
 - **Risk Assessment:** Low - Used only in Prisma development tooling, not in production runtime
-- **Remediation Status:** **Accepting risk** - Manual fix would require downgrading Prisma from 7.8.0 to 6.19.3 (major version downgrade, breaking change)
-- **Workaround:** Not applicable (transitive dependency)
-- **Decision:** Monitor for Prisma update that bundles fixed version; CI workflow attempts automatic fixes on each run
+- **Remediation Status:** **Remediated** - Fixed via package.json override to @hono/node-server@^1.19.13, resolving to 1.19.14
+- **Workaround:** Not applicable (override applied)
+- **Decision:** Override ensures safe version is used; monitor for Prisma update that bundles fixed version natively
 
 #### postcss < 8.5.10 (Moderate)
 
@@ -260,12 +285,12 @@ Under GDPR Article 33:
 - **Issue:** XSS via Unescaped </style> in CSS Stringify Output
 - **Current Versions:**
   - Direct: postcss@8.5.17 (safe)
-  - Via Next.js: postcss@8.4.31 (vulnerable)
-- **Dependency Chain:** next@16.2.10 bundles postcss@8.4.31
+  - Via Next.js: postcss@8.5.10 (remediated via package.json override)
+- **Dependency Chain:** next@16.2.10 → postcss@8.5.10 (via override)
 - **Risk Assessment:** Low - XSS vulnerability requires user-controlled CSS input, which is not used in application
-- **Remediation Status:** **Accepting risk** - Manual fix would require downgrading @sentry/nextjs from 10.65.0 to 6.3.5 (major version downgrade, breaking change)
-- **Workaround:** Not applicable (transitive dependency)
-- **Decision:** Monitor for Next.js update that bundles fixed postcss version; CI workflow attempts automatic fixes on each run
+- **Remediation Status:** **Remediated** - Fixed via package.json override (next.postcss: ^8.5.10), forcing safe version
+- **Workaround:** Not applicable (override applied)
+- **Decision:** Override ensures safe version is used; monitor for Next.js update that bundles fixed postcss version natively
 
 ### Risk Mitigation
 
