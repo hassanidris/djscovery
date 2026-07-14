@@ -12,8 +12,4 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
-  beforeSend(event) {
-    console.log("Sentry sending event:", event);
-    return event;
-  },
 });
