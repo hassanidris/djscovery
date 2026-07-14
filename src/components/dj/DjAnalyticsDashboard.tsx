@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   Eye,
@@ -473,12 +474,15 @@ export default function DjAnalyticsDashboard({
                 {topMedia.map((item) => (
                   <Card key={item.id} className="border-white/10 bg-white/5">
                     <CardContent className="flex items-center gap-4 py-4">
-                      <div className="bg-muted flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+                      <div className="bg-muted relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg">
                         {item.thumbnail ? (
-                          <img
+                          <Image
                             src={item.thumbnail}
                             alt=""
-                            className="h-full w-full object-cover"
+                            fill
+                            sizes="56px"
+                            unoptimized
+                            className="object-cover"
                           />
                         ) : item.type === "AUDIO" ? (
                           <Music2 className="text-muted-foreground h-6 w-6" />

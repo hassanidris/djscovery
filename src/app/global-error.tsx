@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Sora, Inter } from "next/font/google";
 import { AlertTriangle } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import "./globals.css";
@@ -49,8 +50,8 @@ export default function GlobalError({
             </h1>
 
             <p className="mb-8 max-w-sm text-sm leading-relaxed text-gray-500">
-              A critical error occurred. You can try again or head back to
-              the home page.
+              A critical error occurred. You can try again or head back to the
+              home page.
             </p>
 
             <div className="flex items-center gap-3">
@@ -60,12 +61,12 @@ export default function GlobalError({
               >
                 Try again
               </Button>
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-6 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:bg-white/5"
               >
                 Back to Home
-              </a>
+              </Link>
             </div>
           </div>
         </section>
