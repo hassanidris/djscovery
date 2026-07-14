@@ -29,6 +29,7 @@
 **Location:** Supabase Dashboard → Project Settings → Alerts
 
 Set up alerts for:
+
 - Failed authentication attempts (threshold: 10 failures/minute)
 - Database connection errors
 - API rate limit breaches
@@ -47,30 +48,37 @@ Set up alerts for:
 
 **Location:** Supabase Dashboard → Database → Backups
 
-- Enable automated daily backups
+- Free plan: Supabase does not provide backups or PITR
+- Enable automated daily backups and PITR only when upgrading to Pro/Team
 - Configure backup retention (recommended: 30 days)
 - Set up backup notifications
+
+**Upgrade trigger:** Move to a paid plan with daily backups and PITR before production launch or before storing real user data beyond the initial seed.
 
 ## Security Incident Response Plan
 
 ### Incident Severity Levels
 
 **P0 - Critical**
+
 - Data breach or confirmed unauthorized access
 - Production service unavailable due to security incident
 - Immediate action required (within 1 hour)
 
 **P1 - High**
+
 - Suspicious activity detected but not confirmed
 - Security vulnerability in production
 - Action required within 4 hours
 
 **P2 - Medium**
+
 - Security misconfiguration
 - Non-critical vulnerability
 - Action required within 24 hours
 
 **P3 - Low**
+
 - Informational security finding
 - Best practice recommendation
 - Action required within 1 week
@@ -111,6 +119,7 @@ Set up alerts for:
 ### Post-Incident Review
 
 After any P0 or P1 incident:
+
 - Conduct post-mortem within 1 week
 - Document lessons learned
 - Update security policies as needed

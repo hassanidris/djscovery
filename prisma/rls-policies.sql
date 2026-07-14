@@ -462,3 +462,98 @@ CREATE POLICY "Owner can manage own venues" ON "DjVenue" FOR ALL TO public USING
 ALTER TABLE "ProfileView" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "No user access to profile views" ON "ProfileView";
 CREATE POLICY "No user access to profile views" ON "ProfileView" FOR ALL TO public USING (false) WITH CHECK (false);
+
+-- ============================================================
+-- MISSING RLS POLICIES (added during Supabase security audit)
+-- ============================================================
+
+-- Public reference tables
+ALTER TABLE "Country" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read countries" ON "Country";
+CREATE POLICY "Public read countries" ON "Country" FOR SELECT TO public USING (true);
+
+ALTER TABLE "City" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read cities" ON "City";
+CREATE POLICY "Public read cities" ON "City" FOR SELECT TO public USING (true);
+
+ALTER TABLE "Genre" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read genres" ON "Genre";
+CREATE POLICY "Public read genres" ON "Genre" FOR SELECT TO public USING (true);
+
+-- Junction tables linked to public DJ profiles
+ALTER TABLE "DjGenre" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read DJ genres" ON "DjGenre";
+CREATE POLICY "Public read DJ genres" ON "DjGenre" FOR SELECT TO public USING (
+  "djProfileId" IN (
+    SELECT id FROM "DjProfile" WHERE status = 'APPROVED' AND hidden = false AND "deletedAt" IS NULL
+  )
+);
+
+ALTER TABLE "DjProfileType" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read DJ types" ON "DjProfileType";
+CREATE POLICY "Public read DJ types" ON "DjProfileType" FOR SELECT TO public USING (
+  "djProfileId" IN (
+    SELECT id FROM "DjProfile" WHERE status = 'APPROVED' AND hidden = false AND "deletedAt" IS NULL
+  )
+);
+
+-- User settings
+ALTER TABLE "EmailPreference" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can read own email preferences" ON "EmailPreference";
+CREATE POLICY "User can read own email preferences" ON "EmailPreference" FOR SELECT TO public USING (auth.uid()::text = "userId");
+DROP POLICY IF EXISTS "User can update own email preferences" ON "EmailPreference";
+CREATE POLICY "User can update own email preferences" ON "EmailPreference" FOR UPDATE TO public USING (auth.uid()::text = "userId");
+
+ALTER TABLE "UserRole" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can read own roles" ON "UserRole";
+CREATE POLICY "User can read own roles" ON "UserRole" FOR SELECT TO public USING (auth.uid()::text = "userId");
+
+-- Social/follow features
+ALTER TABLE "Follower" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read followers" ON "Follower";
+CREATE POLICY "Public read followers" ON "Follower" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "User can follow others" ON "Follower";
+CREATE POLICY "User can follow others" ON "Follower" FOR INSERT TO public WITH CHECK (auth.uid()::text = "followerId");
+DROP POLICY IF EXISTS "User can unfollow" ON "Follower";
+CREATE POLICY "User can unfollow" ON "Follower" FOR DELETE TO public USING (auth.uid()::text = "followerId");
+
+-- Community post comment likes
+ALTER TABLE "PostCommentLike" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read post comment likes" ON "PostCommentLike";
+CREATE POLICY "Public read post comment likes" ON "PostCommentLike" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "User can like post comments" ON "PostCommentLike";
+CREATE POLICY "User can like post comments" ON "PostCommentLike" FOR INSERT TO public WITH CHECK (auth.uid()::text = "userId");
+DROP POLICY IF EXISTS "User can unlike post comment likes" ON "PostCommentLike";
+CREATE POLICY "User can unlike post comment likes" ON "PostCommentLike" FOR DELETE TO public USING (auth.uid()::text = "userId");
+
+-- Conversations/messaging
+ALTER TABLE "Conversation" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Participant can read own conversations" ON "Conversation";
+CREATE POLICY "Participant can read own conversations" ON "Conversation" FOR SELECT TO public USING (
+  id IN (
+    SELECT "conversationId" FROM "ConversationParticipant" WHERE "userId" = auth.uid()::text
+  )
+);
+
+ALTER TABLE "ConversationParticipant" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Participant can read own conversation participants" ON "ConversationParticipant";
+CREATE POLICY "Participant can read own conversation participants" ON "ConversationParticipant" FOR SELECT TO public USING (
+  "conversationId" IN (
+    SELECT "conversationId" FROM "ConversationParticipant" WHERE "userId" = auth.uid()::text
+  )
+);
+
+ALTER TABLE "Message" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Participant can read messages" ON "Message";
+CREATE POLICY "Participant can read messages" ON "Message" FOR SELECT TO public USING (
+  "conversationId" IN (
+    SELECT "conversationId" FROM "ConversationParticipant" WHERE "userId" = auth.uid()::text
+  )
+);
+
+-- Contact submissions: public insert, no public read
+ALTER TABLE "ContactSubmission" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public can submit contact form" ON "ContactSubmission";
+CREATE POLICY "Public can submit contact form" ON "ContactSubmission" FOR INSERT TO public WITH CHECK (true);
+DROP POLICY IF EXISTS "No public read contact submissions" ON "ContactSubmission";
+CREATE POLICY "No public read contact submissions" ON "ContactSubmission" FOR SELECT TO public USING (false);
