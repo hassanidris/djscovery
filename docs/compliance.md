@@ -250,8 +250,9 @@ Under GDPR Article 33:
 - **Current Version:** 1.19.11
 - **Dependency Chain:** prisma@7.8.0 → @prisma/dev@0.24.3 → @hono/node-server@1.19.11
 - **Risk Assessment:** Low - Used only in Prisma development tooling, not in production runtime
-- **Remediation:** Waiting for Prisma update to bundle fixed @hono/node-server version
+- **Remediation Status:** **Accepting risk** - Manual fix would require downgrading Prisma from 7.8.0 to 6.19.3 (major version downgrade, breaking change)
 - **Workaround:** Not applicable (transitive dependency)
+- **Decision:** Monitor for Prisma update that bundles fixed version; CI workflow attempts automatic fixes on each run
 
 #### postcss < 8.5.10 (Moderate)
 
@@ -262,8 +263,9 @@ Under GDPR Article 33:
   - Via Next.js: postcss@8.4.31 (vulnerable)
 - **Dependency Chain:** next@16.2.10 bundles postcss@8.4.31
 - **Risk Assessment:** Low - XSS vulnerability requires user-controlled CSS input, which is not used in application
-- **Remediation:** Waiting for Next.js update to bundle fixed postcss version
+- **Remediation Status:** **Accepting risk** - Manual fix would require downgrading @sentry/nextjs from 10.65.0 to 6.3.5 (major version downgrade, breaking change)
 - **Workaround:** Not applicable (transitive dependency)
+- **Decision:** Monitor for Next.js update that bundles fixed postcss version; CI workflow attempts automatic fixes on each run
 
 ### Risk Mitigation
 
