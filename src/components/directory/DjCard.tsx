@@ -97,21 +97,13 @@ const DjCard = ({
               showScore={false}
               className="px-2 py-0.5 text-xs"
             />
-            <span className="text-xs text-gray-500">
-              {gigReviews.length + eventReviews.length + ratings.length} reviews
-            </span>
-            {_count !== undefined && (
-              <span className="text-xs text-gray-500">
-                • {formatNumber(_count.followers)} followers
-              </span>
-            )}
           </div>
         </div>
       </Link>
 
       {genreList.length > 0 && (
         <div className="mt-1 flex flex-wrap gap-1">
-          {genreList.slice(0, 3).map((genre) => (
+          {genreList.slice(0, 2).map((genre) => (
             <span
               key={genre}
               className="bg-h_redDark/60 rounded-full px-2 py-0.5 text-xs text-red-200"
@@ -119,15 +111,32 @@ const DjCard = ({
               {genre}
             </span>
           ))}
+          {genreList.length > 2 && (
+            <span className="bg-h_redDark/60 rounded-full px-2 py-0.5 text-xs text-red-200">
+              +{genreList.length - 2}
+            </span>
+          )}
         </div>
       )}
 
-      <Link
-        href={profileHref}
-        className="bg-h_red hover:bg-h_redDark focus-visible:ring-h_red mt-auto w-full cursor-pointer rounded-md px-3 py-1.5 text-center text-xs text-white transition-all outline-none focus-visible:ring-2 focus-visible:ring-offset-1 active:scale-95"
-      >
-        View Profile
-      </Link>
+      <div className="my-2 border-t border-gray-700/50" />
+
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs text-gray-400">
+          {(() => {
+            const total =
+              gigReviews.length + eventReviews.length + ratings.length;
+            if (total === 0) return "New";
+            return `${total} review${total === 1 ? "" : "s"}`;
+          })()}
+        </span>
+        {_count !== undefined && (
+          <span className="text-xs text-gray-400">
+            {formatNumber(_count.followers)} follower
+            {_count.followers === 1 ? "" : "s"}
+          </span>
+        )}
+      </div>
     </div>
   );
 };

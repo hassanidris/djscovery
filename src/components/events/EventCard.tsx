@@ -51,9 +51,11 @@ function formatDate(date: Date): string {
 export function EventCard({
   event,
   isSaved = false,
+  priority = false,
 }: {
   event: EventCardItem;
   isSaved?: boolean;
+  priority?: boolean;
 }) {
   const isPrivate = event.eventType === "PRIVATE";
   const categoryLabel = CATEGORY_LABELS[event.category] ?? event.category;
@@ -70,6 +72,7 @@ export function EventCard({
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
+              priority={priority}
             />
           ) : (
             <div className="bg-h_redDark/20 absolute inset-0" />

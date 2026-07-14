@@ -4,7 +4,7 @@ import { useState } from "react";
 import { DjUser } from "@/lib/data";
 import DjCard from "./DjCard";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 
 type DjGridProps = {
   djs: DjUser[];
