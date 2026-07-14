@@ -1,0 +1,31 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    # Allow both direct and indirect dependencies
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    # Group updates by dependency type
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        exclude-patterns:
+          - "next"
+          - "react"
+      dev-dependencies:
+        dependency-type: "development"
+        exclude-patterns:
+          - "@types/*"
+    # Ignore major version updates for critical packages
+    ignore:
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]

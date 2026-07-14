@@ -27,6 +27,39 @@ function isAlwaysPublic(pathname: string): boolean {
   return false;
 }
 
+function setSecurityHeaders(response: NextResponse): void {
+  // Content Security Policy
+  const cspHeader = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/@supabase/supabase-js https://va.vercel-scripts.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https: blob:",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io",
+    "media-src 'self' https: blob:",
+    "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com https://open.spotify.com https://w.soundcloud.com https://www.mixcloud.com https://www.instagram.com https://embed.music.apple.com https://bandcamp.com https://www.facebook.com",
+  ].join("; ");
+
+  response.headers.set("Content-Security-Policy", cspHeader);
+
+  // Additional security headers
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()",
+  );
+
+  // HSTS only in production
+  if (isProduction) {
+    response.headers.set(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload",
+    );
+  }
+}
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -40,6 +73,7 @@ export async function proxy(request: NextRequest) {
     url.pathname = "/coming-soon";
     const response = NextResponse.rewrite(url);
     response.headers.set("x-is-coming-soon", "true");
+    setSecurityHeaders(response);
     return response;
   }
 
@@ -94,7 +128,9 @@ export async function proxy(request: NextRequest) {
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url);
+    setSecurityHeaders(response);
+    return response;
   }
 
   // Add X-Robots-Tag header when indexing is disabled
@@ -112,19 +148,7 @@ export async function proxy(request: NextRequest) {
     supabaseResponse.headers.set("x-is-coming-soon", "true");
   }
 
-  // Content Security Policy
-  const cspHeader = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/@supabase/supabase-js https://va.vercel-scripts.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io",
-    "media-src 'self' https: blob:",
-    "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com https://open.spotify.com https://w.soundcloud.com https://www.mixcloud.com https://www.instagram.com https://embed.music.apple.com https://bandcamp.com https://www.facebook.com",
-  ].join("; ");
-
-  supabaseResponse.headers.set("Content-Security-Policy", cspHeader);
+  setSecurityHeaders(supabaseResponse);
 
   return supabaseResponse;
 }

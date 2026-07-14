@@ -369,3 +369,96 @@ CREATE POLICY "Owner can manage own organizer social links" ON "OrganizerSocialL
     WHERE op.id = "OrganizerSocialLink"."organizerProfileId" AND op."userId" = (auth.uid())::text
   )
 );
+
+-- DjPackage: public read for public DJ profiles; owner can manage
+ALTER TABLE "DjPackage" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read packages for public DJ profiles" ON "DjPackage";
+CREATE POLICY "Public read packages for public DJ profiles" ON "DjPackage" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "DjPackage"."djProfileId"
+      AND dj.status = 'APPROVED' AND dj.hidden = false AND dj."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage own DJ packages" ON "DjPackage";
+CREATE POLICY "Owner can manage own DJ packages" ON "DjPackage" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "DjPackage"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- DjCareerHighlight: public read for public DJ profiles; owner can manage
+ALTER TABLE "DjCareerHighlight" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read career highlights for public DJ profiles" ON "DjCareerHighlight";
+CREATE POLICY "Public read career highlights for public DJ profiles" ON "DjCareerHighlight" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "DjCareerHighlight"."djProfileId"
+      AND dj.status = 'APPROVED' AND dj.hidden = false AND dj."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage own career highlights" ON "DjCareerHighlight";
+CREATE POLICY "Owner can manage own career highlights" ON "DjCareerHighlight" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "DjCareerHighlight"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- DjEndorsement: public read for public DJ profiles; owner can manage
+ALTER TABLE "DjEndorsement" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read endorsements for public DJ profiles" ON "DjEndorsement";
+CREATE POLICY "Public read endorsements for public DJ profiles" ON "DjEndorsement" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "DjEndorsement"."djProfileId"
+      AND dj.status = 'APPROVED' AND dj.hidden = false AND dj."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage own endorsements" ON "DjEndorsement";
+CREATE POLICY "Owner can manage own endorsements" ON "DjEndorsement" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "DjEndorsement"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- DjPress: public read for public DJ profiles; owner can manage
+ALTER TABLE "DjPress" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read press for public DJ profiles" ON "DjPress";
+CREATE POLICY "Public read press for public DJ profiles" ON "DjPress" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "DjPress"."djProfileId"
+      AND dj.status = 'APPROVED' AND dj.hidden = false AND dj."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage own press" ON "DjPress";
+CREATE POLICY "Owner can manage own press" ON "DjPress" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "DjPress"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- DjVenue: public read for public DJ profiles; owner can manage
+ALTER TABLE "DjVenue" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read venues for public DJ profiles" ON "DjVenue";
+CREATE POLICY "Public read venues for public DJ profiles" ON "DjVenue" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj
+    WHERE dj.id = "DjVenue"."djProfileId"
+      AND dj.status = 'APPROVED' AND dj.hidden = false AND dj."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Owner can manage own venues" ON "DjVenue";
+CREATE POLICY "Owner can manage own venues" ON "DjVenue" FOR ALL TO public USING (
+  EXISTS (
+    SELECT 1 FROM "DjProfile" dj WHERE dj.id = "DjVenue"."djProfileId" AND dj."userId" = (auth.uid())::text
+  )
+);
+
+-- ProfileView: analytics/PII data (viewerId, viewerIp, city, country). Reads and writes
+-- happen exclusively server-side via Prisma's direct DB connection (see
+-- src/app/api/track-profile-view/route.ts and src/lib/queries/dj-stats.ts), which bypasses
+-- RLS entirely. Deny all Supabase client (anon/authenticated) access as defense-in-depth.
+ALTER TABLE "ProfileView" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "No user access to profile views" ON "ProfileView";
+CREATE POLICY "No user access to profile views" ON "ProfileView" FOR ALL TO public USING (false) WITH CHECK (false);
