@@ -35,7 +35,7 @@ export default function DirectoryLoading() {
 
           {/* DJ Grid skeleton */}
           <div className="w-full">
-            <DjGridSkeleton count={9} />
+            <DjGridSkeleton count={12} />
           </div>
         </div>
       </div>
