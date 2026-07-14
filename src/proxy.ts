@@ -126,6 +126,26 @@ export async function proxy(request: NextRequest) {
 
   supabaseResponse.headers.set("Content-Security-Policy", cspHeader);
 
+  // Additional security headers
+  supabaseResponse.headers.set("X-Frame-Options", "DENY");
+  supabaseResponse.headers.set("X-Content-Type-Options", "nosniff");
+  supabaseResponse.headers.set(
+    "Referrer-Policy",
+    "strict-origin-when-cross-origin",
+  );
+  supabaseResponse.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()",
+  );
+
+  // HSTS only in production
+  if (isProduction) {
+    supabaseResponse.headers.set(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload",
+    );
+  }
+
   return supabaseResponse;
 }
 
