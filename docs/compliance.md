@@ -48,6 +48,7 @@ DJcovery processes personal data in accordance with GDPR Article 5:
 ### User Rights Under GDPR
 
 Users have the right to:
+
 1. **Access** (Article 15) - Request copy of personal data
 2. **Rectification** (Article 16) - Correct inaccurate data
 3. **Erasure** (Article 17) - Request data deletion ("right to be forgotten")
@@ -59,22 +60,22 @@ Users have the right to:
 
 ### User Account Data
 
-| Data Type | Retention Period | Justification |
-|-----------|------------------|---------------|
-| User profile (name, email, city) | 2 years after account deletion | Legal compliance, fraud prevention |
-| Authentication logs | 1 year | Security auditing |
-| Session data | 30 days | Security, session management |
-| Booking inquiries | 3 years after completion | Legal compliance, dispute resolution |
-| DJ profile data | 2 years after account deletion | Legal compliance |
-| Media uploads | Until account deletion + 30 days | Service delivery, user control |
+| Data Type                        | Retention Period                 | Justification                        |
+| -------------------------------- | -------------------------------- | ------------------------------------ |
+| User profile (name, email, city) | 2 years after account deletion   | Legal compliance, fraud prevention   |
+| Authentication logs              | 1 year                           | Security auditing                    |
+| Session data                     | 30 days                          | Security, session management         |
+| Booking inquiries                | 3 years after completion         | Legal compliance, dispute resolution |
+| DJ profile data                  | 2 years after account deletion   | Legal compliance                     |
+| Media uploads                    | Until account deletion + 30 days | Service delivery, user control       |
 
 ### Analytics Data
 
-| Data Type | Retention Period | Justification |
-|-----------|------------------|---------------|
-| Page views | 13 months | Service improvement |
-| Error logs (Sentry) | 90 days | Security, debugging |
-| Performance metrics | 13 months | Service improvement |
+| Data Type           | Retention Period | Justification       |
+| ------------------- | ---------------- | ------------------- |
+| Page views          | 13 months        | Service improvement |
+| Error logs (Sentry) | 90 days          | Security, debugging |
+| Performance metrics | 13 months        | Service improvement |
 
 ### Automatic Deletion
 
@@ -107,6 +108,7 @@ Users have the right to:
 ### Right to be Forgotten (Article 17)
 
 Exceptions where data may be retained:
+
 - Legal obligations (tax records, transaction logs)
 - Dispute resolution (booking inquiries, communications)
 - Fraud prevention (suspicious activity logs)
@@ -117,6 +119,7 @@ Exceptions where data may be retained:
 **Endpoint:** `DELETE /api/account/delete`
 
 **Requirements:**
+
 - User must be authenticated
 - Re-authentication required (password confirmation)
 - Email confirmation sent before deletion
@@ -192,6 +195,7 @@ Exceptions where data may be retained:
 ### Notification Requirements
 
 Under GDPR Article 33:
+
 - Notify supervisory authority within 72 hours of discovery
 - Notify affected individuals without undue delay if high risk
 
@@ -235,6 +239,46 @@ Under GDPR Article 33:
    - Update security measures
    - Review compliance procedures
 
+## Security Vulnerabilities
+
+### Known Dependency Vulnerabilities (Last Audit: 2026-07-14)
+
+#### @hono/node-server < 1.19.13 (Moderate)
+
+- **Advisory:** GHSA-92pp-h63x-v22m
+- **Issue:** Middleware bypass via repeated slashes in serveStatic
+- **Current Version:** 1.19.11
+- **Dependency Chain:** prisma@7.8.0 → @prisma/dev@0.24.3 → @hono/node-server@1.19.11
+- **Risk Assessment:** Low - Used only in Prisma development tooling, not in production runtime
+- **Remediation:** Waiting for Prisma update to bundle fixed @hono/node-server version
+- **Workaround:** Not applicable (transitive dependency)
+
+#### postcss < 8.5.10 (Moderate)
+
+- **Advisory:** GHSA-qx2v-qp2m-jg93
+- **Issue:** XSS via Unescaped </style> in CSS Stringify Output
+- **Current Versions:**
+  - Direct: postcss@8.5.17 (safe)
+  - Via Next.js: postcss@8.4.31 (vulnerable)
+- **Dependency Chain:** next@16.2.10 bundles postcss@8.4.31
+- **Risk Assessment:** Low - XSS vulnerability requires user-controlled CSS input, which is not used in application
+- **Remediation:** Waiting for Next.js update to bundle fixed postcss version
+- **Workaround:** Not applicable (transitive dependency)
+
+### Risk Mitigation
+
+- **No user-controlled CSS input** - PostCSS vulnerability not exploitable
+- **@hono/node-server not in production** - Only used in Prisma dev tooling
+- **Regular dependency updates** - Monitor for security patches from upstream maintainers
+- **Security layering** - Application-level protections (CSP, input validation) reduce impact
+
+### Monitoring
+
+- Run `npm audit --audit-level=moderate` monthly
+- Subscribe to security advisories for Next.js and Prisma
+- Review Dependabot alerts in GitHub repository
+- Update dependencies when patches are available without breaking changes
+
 ## Compliance Checklist
 
 - [ ] Privacy policy created and published
@@ -247,3 +291,4 @@ Under GDPR Article 33:
 - [ ] User rights accessible from account settings
 - [ ] Contact information for data protection inquiries
 - [ ] Regular compliance reviews (annually)
+- [x] Security vulnerabilities documented and monitored
