@@ -34,7 +34,7 @@ export async function sendEmail({
   from: fromOverride,
 }: SendEmailParams): Promise<void> {
   const prismaEmailType = emailType as EmailType;
-  if (!process.env.RESEND_API_KEY) {
+  if (!resend || !process.env.RESEND_API_KEY) {
     console.log(
       `[sendEmail] RESEND_API_KEY not set — skipping: ${emailType} → ${maskEmail(to)}`,
     );
@@ -55,6 +55,7 @@ export async function sendEmail({
         emailType,
       });
     }
+    return;
   }
 
   const from =
