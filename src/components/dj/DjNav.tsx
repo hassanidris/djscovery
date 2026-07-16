@@ -11,6 +11,7 @@ import {
   BarChart3,
   SlidersHorizontal,
   KeyRound,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +56,12 @@ const NAV_ITEMS = [
     href: "/dj/settings",
     label: "Profile Settings",
     icon: SlidersHorizontal,
+    exact: false,
+  },
+  {
+    href: "/dj/notifications",
+    label: "Notifications",
+    icon: Bell,
     exact: false,
   },
   {

@@ -209,7 +209,7 @@ export default function NotificationBell() {
           {/* Footer */}
           <div className="border-t border-white/10 px-4 py-2.5">
             <Link
-              href="/notifications"
+              href="/inbox"
               onClick={() => setOpen(false)}
               className="block text-center text-xs text-gray-400 transition-colors hover:text-white"
             >
