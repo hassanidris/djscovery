@@ -9,7 +9,7 @@ import {
   faTiktok,
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { House, Mic, Mail, Info, CircleHelp } from "lucide-react";
+import { House, Mic, Mail, Info, CircleHelp, Shield } from "lucide-react";
 import { getNavUser } from "@/lib/auth/getNavUser";
 import {
   desktopNavByRole,
@@ -22,7 +22,7 @@ const companyLinks = [
   { label: "About DJcovery", href: "/about", icon: Info },
   { label: "FAQ", href: "/faq", icon: CircleHelp },
   { label: "Contact Us", href: "/contact", icon: Mail },
-  // { label: "Privacy Policy", href: "/privacy-policy" },
+  // { label: "Privacy Policy", href: "/privacy", icon: Shield },
   // { label: "Terms of Service", href: "/terms-of-service" },
   // { label: "Cookie Policy", href: "/cookie-policy" },
 ];
@@ -253,7 +253,7 @@ const Footer = async () => {
           </span>
           <div className="flex items-center gap-5">
             <Link
-              href="/privacy-policy"
+              href="/privacy"
               className="hover:text-h_red transition-colors"
             >
               Privacy
