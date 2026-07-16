@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
               <span>Last Updated:</span>
-              <span className="font-medium text-gray-400">June 2026</span>
+              <span className="font-medium text-gray-400">July 2026</span>
             </div>
           </div>
         </div>
@@ -355,13 +355,28 @@ export default function PrivacyPolicyPage() {
                       {
                         name: "Supabase",
                         role: "Authentication, database & storage",
+                        legal: "Contract performance (Article 6(1)(b))",
                       },
-                      { name: "Vercel", role: "Hosting and deployment" },
+                      {
+                        name: "Vercel",
+                        role: "Hosting and deployment",
+                        legal: "Legitimate interest (Article 6(1)(f))",
+                      },
                       {
                         name: "Resend",
                         role: "Transactional emails",
+                        legal: "Contract performance (Article 6(1)(b))",
                       },
-                      { name: "Google", role: "Authentication services" },
+                      {
+                        name: "Sentry",
+                        role: "Error tracking & monitoring",
+                        legal: "Legitimate interest (Article 6(1)(f))",
+                      },
+                      {
+                        name: "Google",
+                        role: "Authentication services",
+                        legal: "Contract performance (Article 6(1)(b))",
+                      },
                     ].map((provider) => (
                       <div
                         key={provider.name}
@@ -373,9 +388,16 @@ export default function PrivacyPolicyPage() {
                         <p className="mt-0.5 text-xs text-gray-500">
                           {provider.role}
                         </p>
+                        <p className="mt-1 text-[11px] text-gray-600">
+                          Legal basis: {provider.legal}
+                        </p>
                       </div>
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500">
+                    Data processing agreements: Pending — to be executed with
+                    Supabase, Vercel, and Sentry (standard GDPR-compliant DPAs)
+                  </p>
                   <p>We may also disclose information when required by law.</p>
                 </div>
               </section>
@@ -480,6 +502,45 @@ export default function PrivacyPolicyPage() {
                     take appropriate safeguards to protect your information in
                     accordance with applicable privacy laws.
                   </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {[
+                      {
+                        name: "Supabase",
+                        region: "EU (Stockholm, Sweden)",
+                        mechanism: "No international transfer required",
+                      },
+                      {
+                        name: "Vercel",
+                        region: "US (primary), EU (edge)",
+                        mechanism:
+                          "EU-US Data Privacy Framework (DPF) + Standard Contractual Clauses (SCCs)",
+                      },
+                      {
+                        name: "Sentry",
+                        region: "US",
+                        mechanism: "Standard Contractual Clauses (SCCs)",
+                      },
+                    ].map((provider) => (
+                      <div
+                        key={provider.name}
+                        className="rounded-xl border border-white/5 bg-white/2 px-4 py-3"
+                      >
+                        <p className="text-sm font-semibold text-white">
+                          {provider.name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-gray-500">
+                          {provider.region}
+                        </p>
+                        <p className="mt-1 text-[11px] text-gray-600">
+                          {provider.mechanism}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Supplementary measures: Encryption in transit (TLS 1.3) and
+                    at rest for all international transfers
+                  </p>
                 </div>
               </section>
 
@@ -522,6 +583,18 @@ export default function PrivacyPolicyPage() {
                     </div>
                     <ArrowRight className="text-h_red h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </Link>
+                  <div className="mt-4 rounded-xl border border-white/5 bg-white/2 px-4 py-3">
+                    <p className="text-xs font-semibold text-white">
+                      Data Protection Officer
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Pending — to be appointed or designate privacy contact
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Supervisory Authority: IMY (Swedish authority) or local
+                    equivalent
+                  </p>
                 </div>
               </section>
 
