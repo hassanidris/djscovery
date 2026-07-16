@@ -22,7 +22,7 @@ const companyLinks = [
   { label: "About DJcovery", href: "/about", icon: Info },
   { label: "FAQ", href: "/faq", icon: CircleHelp },
   { label: "Contact Us", href: "/contact", icon: Mail },
-  { label: "Privacy Policy", href: "/privacy", icon: Shield },
+  // { label: "Privacy Policy", href: "/privacy", icon: Shield },
   // { label: "Terms of Service", href: "/terms-of-service" },
   // { label: "Cookie Policy", href: "/cookie-policy" },
 ];
