@@ -172,31 +172,40 @@ export async function deleteAccount(
     };
   }
 
-  // Delete all user data. Prisma relations with onDelete: Cascade handle profiles,
-  // followers, saved events, comments, ratings, etc.
-  try {
-    await prisma.user.delete({ where: { id: user.id } });
-  } catch (err) {
-    console.error("[deleteAccount] prisma error:", err);
-    return { error: "Failed to delete profile data. Please contact support." };
-  }
-
-  // Delete auth user with service role
+  // Revoke auth access first. If this fails, no Prisma data has been touched
+  // yet, so the account is left fully intact and the user can safely retry.
   try {
     const admin = createAdminClient();
     const { error } = await admin.auth.admin.deleteUser(user.id);
     if (error) {
       console.error("[deleteAccount] supabase admin error:", error);
       return {
-        error:
-          "Profile data was removed but auth deletion failed. Please contact support.",
+        error: "Failed to delete account. Please contact support.",
       };
     }
   } catch (err) {
     console.error("[deleteAccount] admin client error:", err);
     return {
+      error: "Failed to delete account. Please contact support.",
+    };
+  }
+
+  // Auth access has been revoked (no further logins possible). Now clean up
+  // Prisma data. Relations with onDelete: Cascade handle profiles, followers,
+  // saved events, comments, ratings, etc. If this step fails, the account is
+  // already inaccessible, so we log loudly for manual/background cleanup
+  // rather than leaving orphaned data with active auth access.
+  try {
+    await prisma.user.delete({ where: { id: user.id } });
+  } catch (err) {
+    console.error(
+      "[deleteAccount] CRITICAL: auth user deleted but prisma cleanup failed — orphaned data for userId:",
+      user.id,
+      err,
+    );
+    return {
       error:
-        "Profile data was removed but auth deletion failed. Please contact support.",
+        "Your account access has been removed, but data cleanup is still in progress. Please contact support if you have concerns.",
     };
   }
 

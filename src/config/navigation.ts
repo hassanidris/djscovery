@@ -137,7 +137,9 @@ export function getFooterProfessionalLinks(opts: {
       { label: "My Analytics", href: "/dj/analytics" },
       { label: "My Events", href: "/dj/events" },
       { label: "My Applications", href: "/dj/applications" },
-      { label: "Account Settings", href: "/dj/account" },
+      ...(navRole === "dj"
+        ? [{ label: "Account Settings", href: "/dj/account" }]
+        : []),
       ...(!isOrganizer
         ? [{ label: "Become an Organizer", href: "/become-organizer" }]
         : [{ label: "Organizer Dashboard", href: "/organizer/dashboard" }]),

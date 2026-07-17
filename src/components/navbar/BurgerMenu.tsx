@@ -324,7 +324,7 @@ export default function BurgerMenu({
                     </SheetClose>
                   )}
 
-                  {navRole !== "admin" && (
+                  {navRole !== "admin" && navRole !== "guest" && (
                     <SheetClose asChild>
                       <Link
                         href={

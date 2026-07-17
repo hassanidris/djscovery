@@ -8,6 +8,10 @@
 - Data processing agreements executed with Supabase, Vercel, and Sentry
 - Data Protection Officer or privacy contact route established
 
+## Open Follow-ups (needs confirmation from legal/ops)
+
+- **DPA execution status**: `/privacy` page (`src/app/privacy/page.tsx:397-400`) states DPAs with Supabase, Vercel, and Sentry are "Pending". Note this line 8 above already claims they're "executed" — **inconsistent**. Confirm actual status and update both the privacy page copy and this doc's checklist (line ~317) to match reality before going live.
+
 ## GDPR Compliance
 
 ### Data Processing Principles

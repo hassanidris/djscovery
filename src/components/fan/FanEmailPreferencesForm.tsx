@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { toast } from "sonner";
 import { updateDjEmailPreferences } from "@/lib/actions/account";
 import { Loader2 } from "lucide-react";
 
@@ -51,8 +52,13 @@ export default function FanEmailPreferencesForm({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    startTransition(() => {
-      updateDjEmailPreferences(formData);
+    startTransition(async () => {
+      const result = await updateDjEmailPreferences(formData);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Preferences saved successfully.");
+      }
     });
   }
 

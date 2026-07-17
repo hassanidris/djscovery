@@ -294,7 +294,7 @@ export default function CookiePolicyPage() {
                   <p>
                     For more information, please review our{" "}
                     <Link
-                      href="/privacy-policy"
+                      href="/privacy"
                       className="text-h_red hover:text-h_redDark underline underline-offset-2 transition-colors"
                     >
                       Privacy Policy
