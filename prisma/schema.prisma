@@ -1247,11 +1247,12 @@ model EmailPreference {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  bookingEmails     Boolean @default(true)
-  gigEmails         Boolean @default(true)
-  applicationEmails Boolean @default(true)
-  platformUpdates   Boolean @default(true)
-  marketingEmails   Boolean @default(false)
+  bookingEmails       Boolean @default(true)
+  gigEmails           Boolean @default(true)
+  applicationEmails   Boolean @default(true)
+  profileReviewEmails Boolean @default(true)
+  platformUpdates     Boolean @default(true)
+  marketingEmails     Boolean @default(false)
   // verificationEmails, passwordReset, securityAlerts cannot be disabled (enforced app-layer)
 
   @@index([userId])

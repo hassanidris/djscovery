@@ -25,8 +25,7 @@ const RATE_LIMIT_WINDOW_HOURS = 24;
 const prismaUnsafe = prisma as Record<string, any>;
 
 export type ActionResult<T = undefined> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+  { success: true; data: T } | { success: false; error: string };
 
 type BookingInquiryStatus = "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
 type BookingInquiryParticipantRole = "DJ" | "ORGANIZER";
@@ -231,7 +230,7 @@ async function getDjProfileForInquiry(djProfileId: number) {
 }
 
 async function revalidateInquirySurfaces() {
-  revalidatePath("/notifications");
+  revalidatePath("/inbox");
   revalidatePath("/dj/bookings");
   revalidatePath("/organizer/bookings");
 }

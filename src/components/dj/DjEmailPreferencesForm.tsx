@@ -1,7 +1,8 @@
 "use client";
 
 import { useTransition } from "react";
-import { updateEmailPreferences } from "@/lib/actions/emailPreferences";
+import { toast } from "sonner";
+import { updateDjEmailPreferences } from "@/lib/actions/account";
 import { Loader2 } from "lucide-react";
 
 type Pref = {
@@ -9,20 +10,13 @@ type Pref = {
   description: string;
   name: string;
   defaultChecked: boolean;
-  required?: boolean;
 };
 
 const PREFS: Pref[] = [
   {
     label: "Booking inquiries",
-    description: "When an organizer sends you a booking inquiry.",
+    description: "New booking requests and messages from organizers.",
     name: "bookingEmails",
-    defaultChecked: true,
-  },
-  {
-    label: "Gig alerts",
-    description: "New gigs posted that match your DJ profile.",
-    name: "gigEmails",
     defaultChecked: true,
   },
   {
@@ -32,16 +26,16 @@ const PREFS: Pref[] = [
     defaultChecked: true,
   },
   {
+    label: "Profile review updates",
+    description: "When your DJ profile is approved or needs changes.",
+    name: "profileReviewEmails",
+    defaultChecked: true,
+  },
+  {
     label: "Platform updates",
     description: "New features, announcements and product news.",
     name: "platformUpdates",
     defaultChecked: true,
-  },
-  {
-    label: "Marketing emails",
-    description: "Promotions, tips and curated content from DJcovery.",
-    name: "marketingEmails",
-    defaultChecked: false,
   },
 ];
 
@@ -53,37 +47,46 @@ const REQUIRED_PREFS = [
   },
 ];
 
-export default function EmailPreferencesForm({
+export default function DjEmailPreferencesForm({
   bookingEmails,
-  gigEmails,
   applicationEmails,
+  profileReviewEmails,
   platformUpdates,
-  marketingEmails,
 }: {
   bookingEmails: boolean;
-  gigEmails: boolean;
   applicationEmails: boolean;
+  profileReviewEmails: boolean;
   platformUpdates: boolean;
-  marketingEmails: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
 
   const values: Record<string, boolean> = {
     bookingEmails,
-    gigEmails,
     applicationEmails,
+    profileReviewEmails,
     platformUpdates,
-    marketingEmails,
   };
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    startTransition(() => updateEmailPreferences(formData));
+    startTransition(async () => {
+      const result = await updateDjEmailPreferences(formData);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Preferences saved successfully.");
+      }
+    });
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <input
+        type="hidden"
+        name="_fields"
+        value={PREFS.map((p) => p.name).join(",")}
+      />
       {/* Configurable preferences */}
       <div className="flex flex-col gap-1 overflow-hidden rounded-xl border border-white/10">
         {PREFS.map((pref, i) => (

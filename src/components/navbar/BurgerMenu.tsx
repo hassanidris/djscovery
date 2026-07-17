@@ -111,7 +111,7 @@ export default function BurgerMenu({
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-white">
-                    {displayName}
+                    {navRole === "dj" ? `Dj. ${displayName}` : displayName}
                   </p>
                   {username && (
                     <p className="truncate text-xs text-gray-500">
@@ -324,37 +324,47 @@ export default function BurgerMenu({
                     </SheetClose>
                   )}
 
-                  <SheetClose asChild>
-                    <Link
-                      href={
-                        navRole === "dj" || navRole === "admin"
-                          ? "/settings/account"
-                          : "/account/settings"
-                      }
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                        pathname.startsWith("/settings") ||
-                          pathname.startsWith("/account/settings")
-                          ? "bg-white/5 text-white"
-                          : "text-gray-400 hover:bg-white/5 hover:text-white",
-                      )}
-                      aria-current={
-                        pathname.startsWith("/settings") ||
-                        pathname.startsWith("/account/settings")
-                          ? "page"
-                          : undefined
-                      }
-                    >
-                      <Settings
+                  {navRole !== "admin" && navRole !== "guest" && (
+                    <SheetClose asChild>
+                      <Link
+                        href={
+                          navRole === "dj"
+                            ? "/dj/account"
+                            : navRole === "organizer"
+                              ? "/organizer/account"
+                              : "/fan/account"
+                        }
                         className={cn(
-                          "h-4 w-4 shrink-0",
-                          pathname.startsWith("/settings") ? "text-h_red" : "",
+                          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                          pathname.startsWith("/dj/account") ||
+                            pathname.startsWith("/organizer/account") ||
+                            pathname.startsWith("/fan/account")
+                            ? "bg-white/5 text-white"
+                            : "text-gray-400 hover:bg-white/5 hover:text-white",
                         )}
-                        aria-hidden
-                      />
-                      <span>Settings</span>
-                    </Link>
-                  </SheetClose>
+                        aria-current={
+                          pathname.startsWith("/dj/account") ||
+                          pathname.startsWith("/organizer/account") ||
+                          pathname.startsWith("/fan/account")
+                            ? "page"
+                            : undefined
+                        }
+                      >
+                        <Settings
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            pathname.startsWith("/dj/account") ||
+                              pathname.startsWith("/organizer/account") ||
+                              pathname.startsWith("/fan/account")
+                              ? "text-h_red"
+                              : "",
+                          )}
+                          aria-hidden
+                        />
+                        <span>Settings</span>
+                      </Link>
+                    </SheetClose>
+                  )}
                 </div>
               </>
             )}

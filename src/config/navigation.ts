@@ -131,13 +131,15 @@ export function getFooterProfessionalLinks(opts: {
 
   if (navRole === "dj" || navRole === "admin") {
     return [
-      ...(djSlug ? [{ label: "My DJ Profile", href: `/djs/${djSlug}` }] : []),
-      { label: "Bookings", href: "/dj/bookings" },
+      ...(djSlug ? [{ label: "My Profile", href: `/djs/${djSlug}` }] : []),
+      { label: "My Bookings", href: "/dj/bookings" },
       { label: "My Gigs", href: "/gigs" },
-      { label: "Analytics", href: "/dj/analytics" },
+      { label: "My Analytics", href: "/dj/analytics" },
       { label: "My Events", href: "/dj/events" },
-      { label: "Applications", href: "/dj/applications" },
-      { label: "Settings", href: "/account/settings" },
+      { label: "My Applications", href: "/dj/applications" },
+      ...(navRole === "dj"
+        ? [{ label: "Account Settings", href: "/dj/account" }]
+        : []),
       ...(!isOrganizer
         ? [{ label: "Become an Organizer", href: "/become-organizer" }]
         : [{ label: "Organizer Dashboard", href: "/organizer/dashboard" }]),
@@ -155,17 +157,19 @@ export function getFooterProfessionalLinks(opts: {
           ]
         : []),
       { label: "Organizer Dashboard", href: "/organizer/dashboard" },
-      { label: "Bookings", href: "/organizer/bookings" },
+      { label: "My Bookings", href: "/organizer/bookings" },
       { label: "Post a Gig", href: "/organizer/gigs/new" },
       { label: "My Gigs", href: "/organizer/gigs" },
+      { label: "Account Settings", href: "/organizer/account" },
       { label: "Become a DJ", href: "/become-dj" },
     ];
   }
 
   if (navRole === "fan") {
     return [
-      { label: "Fan Dashboard", href: "/fan/profile" },
+      { label: "MY Dashboard", href: "/fan/profile" },
       { label: "Followed DJs", href: "/fan/followed-djs" },
+      { label: "Account Settings", href: "/fan/account" },
       { label: "Become a DJ", href: "/become-dj" },
       { label: "Become an Organizer", href: "/become-organizer" },
     ];

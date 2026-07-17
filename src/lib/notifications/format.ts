@@ -192,7 +192,7 @@ export function formatNotification(
       return {
         icon: "⚠️",
         message: "Your account has been suspended",
-        link: "/account/settings",
+        link: "/inbox",
       };
     case "REPORT_SUBMITTED":
       return {

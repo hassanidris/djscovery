@@ -86,8 +86,9 @@ export async function uploadUserAvatar(
     await supabase.storage.from(BUCKET).remove([existing.imagePath]);
   }
 
-  revalidatePath("/account");
-  revalidatePath("/account/settings");
+  revalidatePath("/dj/account");
+  revalidatePath("/organizer/account");
+  revalidatePath("/fan/account");
   return { url };
 }
 
@@ -144,8 +145,9 @@ export async function updateUserProfile(input: {
     },
   });
 
-  revalidatePath("/account");
-  revalidatePath("/account/settings");
+  revalidatePath("/dj/account");
+  revalidatePath("/organizer/account");
+  revalidatePath("/fan/account");
   return { success: true };
 }
 
@@ -170,37 +172,56 @@ export async function deleteAccount(
     };
   }
 
-  // Delete all user data. Prisma relations with onDelete: Cascade handle profiles,
-  // followers, saved events, comments, ratings, etc.
-  try {
-    await prisma.user.delete({ where: { id: user.id } });
-  } catch (err) {
-    console.error("[deleteAccount] prisma error:", err);
-    return { error: "Failed to delete profile data. Please contact support." };
-  }
-
-  // Delete auth user with service role
+  // Revoke auth access first. If this fails, no Prisma data has been touched
+  // yet, so the account is left fully intact and the user can safely retry.
   try {
     const admin = createAdminClient();
     const { error } = await admin.auth.admin.deleteUser(user.id);
     if (error) {
       console.error("[deleteAccount] supabase admin error:", error);
       return {
-        error:
-          "Profile data was removed but auth deletion failed. Please contact support.",
+        error: "Failed to delete account. Please contact support.",
       };
     }
   } catch (err) {
     console.error("[deleteAccount] admin client error:", err);
     return {
+      error: "Failed to delete account. Please contact support.",
+    };
+  }
+
+  // Auth access has been revoked (no further logins possible). Now clean up
+  // Prisma data. Relations with onDelete: Cascade handle profiles, followers,
+  // saved events, comments, ratings, etc. If this step fails, the account is
+  // already inaccessible, so we log loudly for manual/background cleanup
+  // rather than leaving orphaned data with active auth access.
+  try {
+    await prisma.user.delete({ where: { id: user.id } });
+  } catch (err) {
+    console.error(
+      "[deleteAccount] CRITICAL: auth user deleted but prisma cleanup failed — orphaned data for userId:",
+      user.id,
+      err,
+    );
+    return {
       error:
-        "Profile data was removed but auth deletion failed. Please contact support.",
+        "Your account access has been removed, but data cleanup is still in progress. Please contact support if you have concerns.",
     };
   }
 
   await supabase.auth.signOut();
   return { success: true };
 }
+
+const EMAIL_PREFERENCE_FIELDS = [
+  "bookingEmails",
+  "gigEmails",
+  "applicationEmails",
+  "profileReviewEmails",
+  "platformUpdates",
+  "marketingEmails",
+] as const;
+type EmailPreferenceField = (typeof EMAIL_PREFERENCE_FIELDS)[number];
 
 export async function updateDjEmailPreferences(formData: FormData) {
   const supabase = await createClient();
@@ -209,29 +230,26 @@ export async function updateDjEmailPreferences(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  const bookingEmails = formData.get("bookingEmails") === "on";
-  const gigEmails = formData.get("gigEmails") === "on";
-  const applicationEmails = formData.get("applicationEmails") === "on";
-  const platformUpdates = formData.get("platformUpdates") === "on";
-  const marketingEmails = formData.get("marketingEmails") === "on";
+  // Each form declares which fields it manages via a hidden "_fields" input
+  // (comma-separated). This avoids overwriting fields not shown in a given
+  // role's form with `false`, since unchecked checkboxes are simply absent
+  // from FormData and indistinguishable from "not managed by this form".
+  const managedFields = (formData.get("_fields") as string | null)
+    ?.split(",")
+    .map((f) => f.trim())
+    .filter((f): f is EmailPreferenceField =>
+      EMAIL_PREFERENCE_FIELDS.includes(f as EmailPreferenceField),
+    ) ?? [...EMAIL_PREFERENCE_FIELDS];
+
+  const data: Partial<Record<EmailPreferenceField, boolean>> = {};
+  for (const field of managedFields) {
+    data[field] = formData.get(field) === "on";
+  }
 
   await prisma.emailPreference.upsert({
     where: { userId: user.id },
-    update: {
-      bookingEmails,
-      gigEmails,
-      applicationEmails,
-      platformUpdates,
-      marketingEmails,
-    },
-    create: {
-      userId: user.id,
-      bookingEmails,
-      gigEmails,
-      applicationEmails,
-      platformUpdates,
-      marketingEmails,
-    },
+    update: data,
+    create: { userId: user.id, ...data },
   });
 
   return { success: true };

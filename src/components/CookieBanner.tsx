@@ -109,7 +109,7 @@ export default function CookieBanner() {
                 content, analyse traffic, and improve your experience. You can
                 accept all, reject non-essential, or manage your preferences.{" "}
                 <a
-                  href="/privacy-policy"
+                  href="/privacy"
                   className="underline underline-offset-2 transition-colors hover:text-white/80"
                 >
                   Privacy Policy
