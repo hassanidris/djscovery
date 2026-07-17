@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
-import DjAccountForm from "@/components/dj/DjAccountForm";
+import OrganizerAccountForm from "@/components/organizer/OrganizerAccountForm";
 
 export const metadata: Metadata = {
   title: "Account Settings",
 };
 
-export default async function DjAccountPage() {
+export default async function OrganizerAccountPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,7 +22,7 @@ export default async function DjAccountPage() {
           Manage your login credentials and linked accounts.
         </p>
       </div>
-      <DjAccountForm
+      <OrganizerAccountForm
         email={user.email ?? ""}
         identities={
           user.identities?.map((i) => ({

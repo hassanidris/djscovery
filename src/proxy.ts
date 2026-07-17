@@ -113,10 +113,8 @@ export async function proxy(request: NextRequest) {
     "/fan",
     "/dj",
     "/organizer",
-    "/settings",
     "/profile/edit",
-    "/account",
-    "/notifications",
+    "/inbox",
     "/admin",
   ];
   const isProtected = protectedPaths.some(

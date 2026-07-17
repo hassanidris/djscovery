@@ -28,15 +28,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { updatePassword, deleteAccount } from "@/lib/actions/account";
 
-export type DjAccountFormProps = {
+export type OrganizerAccountFormProps = {
   email: string;
   identities: { provider: string; identity_id?: string }[];
 };
 
-export default function DjAccountForm({
+export default function OrganizerAccountForm({
   email,
   identities,
-}: DjAccountFormProps) {
+}: OrganizerAccountFormProps) {
   return (
     <div className="flex flex-col gap-10">
       <EmailSection currentEmail={email} />
@@ -235,8 +235,8 @@ function DangerZoneSection() {
           <div>
             <p className="text-sm font-medium text-white">Delete Account</p>
             <p className="text-muted-foreground mt-0.5 text-xs">
-              Permanently delete your account, DJ profile, and all associated
-              data.
+              Permanently delete your account, organizer profile, and all
+              associated data.
             </p>
           </div>
           <AlertDialog>
@@ -249,7 +249,7 @@ function DangerZoneSection() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                 <AlertDialogDescription className="text-gray-400">
-                  This will permanently delete your DJcovery account, DJ
+                  This will permanently delete your DJcovery account, organizer
                   profile, and all your data. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>

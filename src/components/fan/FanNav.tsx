@@ -9,6 +9,7 @@ import {
   Star,
   SlidersHorizontal,
   KeyRound,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +42,12 @@ const NAV_ITEMS = [
     href: "/fan/settings",
     label: "Profile Settings",
     icon: SlidersHorizontal,
+    exact: false,
+  },
+  {
+    href: "/fan/notifications",
+    label: "Notifications",
+    icon: Bell,
     exact: false,
   },
   {

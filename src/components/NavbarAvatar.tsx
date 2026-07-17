@@ -99,20 +99,24 @@ export default function NavbarAvatar({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem
-            asChild
-            className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
-          >
-            <Link
-              href={
-                navRole === "dj" || navRole === "admin"
-                  ? "/settings/account"
-                  : "/account/settings"
-              }
+          {navRole !== "admin" && navRole !== "guest" && (
+            <DropdownMenuItem
+              asChild
+              className="cursor-pointer text-gray-300 focus:bg-white/5 focus:text-white"
             >
-              Settings
-            </Link>
-          </DropdownMenuItem>
+              <Link
+                href={
+                  navRole === "dj"
+                    ? "/dj/account"
+                    : navRole === "organizer"
+                      ? "/organizer/account"
+                      : "/fan/account"
+                }
+              >
+                Settings
+              </Link>
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuSeparator className="bg-white/10" />
 

@@ -86,8 +86,9 @@ export async function uploadUserAvatar(
     await supabase.storage.from(BUCKET).remove([existing.imagePath]);
   }
 
-  revalidatePath("/account");
-  revalidatePath("/account/settings");
+  revalidatePath("/dj/account");
+  revalidatePath("/organizer/account");
+  revalidatePath("/fan/account");
   return { url };
 }
 
@@ -144,8 +145,9 @@ export async function updateUserProfile(input: {
     },
   });
 
-  revalidatePath("/account");
-  revalidatePath("/account/settings");
+  revalidatePath("/dj/account");
+  revalidatePath("/organizer/account");
+  revalidatePath("/fan/account");
   return { success: true };
 }
 
@@ -202,6 +204,16 @@ export async function deleteAccount(
   return { success: true };
 }
 
+const EMAIL_PREFERENCE_FIELDS = [
+  "bookingEmails",
+  "gigEmails",
+  "applicationEmails",
+  "profileReviewEmails",
+  "platformUpdates",
+  "marketingEmails",
+] as const;
+type EmailPreferenceField = (typeof EMAIL_PREFERENCE_FIELDS)[number];
+
 export async function updateDjEmailPreferences(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -209,29 +221,26 @@ export async function updateDjEmailPreferences(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  const bookingEmails = formData.get("bookingEmails") === "on";
-  const gigEmails = formData.get("gigEmails") === "on";
-  const applicationEmails = formData.get("applicationEmails") === "on";
-  const platformUpdates = formData.get("platformUpdates") === "on";
-  const marketingEmails = formData.get("marketingEmails") === "on";
+  // Each form declares which fields it manages via a hidden "_fields" input
+  // (comma-separated). This avoids overwriting fields not shown in a given
+  // role's form with `false`, since unchecked checkboxes are simply absent
+  // from FormData and indistinguishable from "not managed by this form".
+  const managedFields = (formData.get("_fields") as string | null)
+    ?.split(",")
+    .map((f) => f.trim())
+    .filter((f): f is EmailPreferenceField =>
+      EMAIL_PREFERENCE_FIELDS.includes(f as EmailPreferenceField),
+    ) ?? [...EMAIL_PREFERENCE_FIELDS];
+
+  const data: Partial<Record<EmailPreferenceField, boolean>> = {};
+  for (const field of managedFields) {
+    data[field] = formData.get(field) === "on";
+  }
 
   await prisma.emailPreference.upsert({
     where: { userId: user.id },
-    update: {
-      bookingEmails,
-      gigEmails,
-      applicationEmails,
-      platformUpdates,
-      marketingEmails,
-    },
-    create: {
-      userId: user.id,
-      bookingEmails,
-      gigEmails,
-      applicationEmails,
-      platformUpdates,
-      marketingEmails,
-    },
+    update: data,
+    create: { userId: user.id, ...data },
   });
 
   return { success: true };

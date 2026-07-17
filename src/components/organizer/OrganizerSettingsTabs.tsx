@@ -109,7 +109,7 @@ export default function OrganizerSettingsTabs({
           This is your <strong>public organizer profile</strong> — what DJs see
           when you post a gig. For security settings (password), visit{" "}
           <a
-            href="/account/settings"
+            href="/organizer/account"
             className="underline underline-offset-2 hover:text-blue-200"
           >
             Account Settings
@@ -278,11 +278,7 @@ function ProfileTab({
       const result = await updateOrganizerProfile({
         displayName,
         organizerType: organizerType as
-          | "INDIVIDUAL"
-          | "COMPANY"
-          | "VENUE"
-          | "AGENCY"
-          | "FESTIVAL",
+          "INDIVIDUAL" | "COMPANY" | "VENUE" | "AGENCY" | "FESTIVAL",
         bio: bio || null,
         countryId,
         cityId,

@@ -74,7 +74,7 @@ export async function markNotificationRead(id: number) {
     where: { id, recipientId: user.id },
     data: { read: true },
   });
-  revalidatePath("/notifications");
+  revalidatePath("/inbox");
 }
 
 export async function markAllNotificationsRead() {
@@ -88,5 +88,5 @@ export async function markAllNotificationsRead() {
     where: { recipientId: user.id, read: false },
     data: { read: true },
   });
-  revalidatePath("/notifications");
+  revalidatePath("/inbox");
 }

@@ -9,6 +9,8 @@ import {
   Users,
   CalendarHeart,
   SlidersHorizontal,
+  KeyRound,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +49,18 @@ const NAV_ITEMS = [
     href: "/organizer/settings",
     label: "Profile Settings",
     icon: SlidersHorizontal,
+    exact: false,
+  },
+  {
+    href: "/organizer/notifications",
+    label: "Notifications",
+    icon: Bell,
+    exact: false,
+  },
+  {
+    href: "/organizer/account",
+    label: "Account Settings",
+    icon: KeyRound,
     exact: false,
   },
 ] as const;

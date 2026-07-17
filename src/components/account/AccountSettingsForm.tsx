@@ -18,16 +18,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { updatePassword } from "@/lib/actions/account";
+import { updatePassword, deleteAccount } from "@/lib/actions/account";
+import { useRouter } from "next/navigation";
 
 export default function AccountSettingsForm({
   currentEmail,
 }: {
   currentEmail: string;
 }) {
+  const router = useRouter();
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [pwPending, startPwTransition] = useTransition();
+  const [deletePending, startDeleteTransition] = useTransition();
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   return (
     <div className="flex flex-col gap-10">
@@ -59,7 +64,17 @@ export default function AccountSettingsForm({
             Change your password. Must be at least 8 characters.
           </p>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="currentPassword">Current Password</Label>
+            <Input
+              id="currentPassword"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Current password"
+            />
+          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="password">New Password</Label>
             <Input
@@ -84,10 +99,11 @@ export default function AccountSettingsForm({
         <div className="flex justify-end">
           <Button
             type="button"
-            disabled={pwPending || !password || !confirm}
+            disabled={pwPending || !currentPassword || !password || !confirm}
             onClick={() => {
               startPwTransition(async () => {
                 const fd = new FormData();
+                fd.append("currentPassword", currentPassword);
                 fd.append("password", password);
                 fd.append("confirm", confirm);
                 const result = await updatePassword(fd);
@@ -95,6 +111,7 @@ export default function AccountSettingsForm({
                   toast.error(result.error);
                 } else {
                   toast.success("Password updated.");
+                  setCurrentPassword("");
                   setPassword("");
                   setConfirm("");
                 }
@@ -120,7 +137,7 @@ export default function AccountSettingsForm({
           </p>
         </div>
         <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-medium text-white">Delete Account</p>
               <p className="mt-0.5 text-xs text-gray-500">
@@ -133,24 +150,50 @@ export default function AccountSettingsForm({
                   Delete Account
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="bg-h_black border-white/10 text-white">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-                  <AlertDialogDescription>
+                  <AlertDialogDescription className="text-gray-400">
                     This will permanently delete your DJcovery account, profile,
                     and all your data. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
+                <div className="flex flex-col gap-2 py-2">
+                  <Label htmlFor="confirm-delete">
+                    Type <strong>DELETE</strong> to confirm
+                  </Label>
+                  <Input
+                    id="confirm-delete"
+                    value={deleteConfirmation}
+                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                    placeholder="DELETE"
+                    className="border-white/10 bg-white/5"
+                  />
+                </div>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10">
+                    Cancel
+                  </AlertDialogCancel>
                   <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    onClick={() =>
-                      toast.info(
-                        "Account deletion coming soon. Please contact support.",
-                      )
-                    }
+                    onClick={() => {
+                      startDeleteTransition(async () => {
+                        const fd = new FormData();
+                        fd.append("confirmation", deleteConfirmation);
+                        const result = await deleteAccount(fd);
+                        if (result.error) {
+                          toast.error(result.error);
+                        } else {
+                          toast.success("Account deleted.");
+                          router.push("/");
+                        }
+                      });
+                    }}
+                    disabled={deletePending || deleteConfirmation !== "DELETE"}
+                    className="bg-red-600 hover:bg-red-700"
                   >
+                    {deletePending && (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    )}
                     Delete Account
                   </AlertDialogAction>
                 </AlertDialogFooter>
