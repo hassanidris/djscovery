@@ -147,7 +147,7 @@ export default function DjAnalyticsDashboard({
 
       {/* Summary stat cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        <Card size="sm">
+        <Card size="sm" className="flex flex-col justify-end">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               Total Views
@@ -160,7 +160,7 @@ export default function DjAnalyticsDashboard({
           </CardContent>
         </Card>
 
-        <Card size="sm">
+        <Card size="sm" className="flex flex-col justify-end">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               Followers
@@ -173,7 +173,7 @@ export default function DjAnalyticsDashboard({
           </CardContent>
         </Card>
 
-        <Card size="sm">
+        <Card size="sm" className="flex flex-col justify-end">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               Bookings
@@ -186,7 +186,7 @@ export default function DjAnalyticsDashboard({
           </CardContent>
         </Card>
 
-        <Card size="sm">
+        <Card size="sm" className="flex flex-col justify-end">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               Plays
@@ -199,7 +199,7 @@ export default function DjAnalyticsDashboard({
           </CardContent>
         </Card>
 
-        <Card size="sm">
+        <Card size="sm" className="flex flex-col justify-end">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               Video Views

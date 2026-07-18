@@ -17,11 +17,13 @@ import { isComingSoonRoute } from "@/lib/coming-soon";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
 });
 
 const sora = Sora({
   subsets: ["latin"],
   variable: "--font-sora",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

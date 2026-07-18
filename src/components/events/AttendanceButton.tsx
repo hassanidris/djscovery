@@ -57,7 +57,7 @@ export default function AttendanceButton({
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="mt-7 flex gap-2">
       <Button
         variant={status === "GOING" ? "default" : "outline"}
         size="sm"
