@@ -12,7 +12,11 @@ import {
   getDjBookingsByStatus,
   getDjTopMedia,
   getDjProfileViewSources,
+  getDjResponseRate,
+  getDjBookingRate,
+  getDjTopCities,
 } from "@/lib/queries/dj-stats";
+import { normalisePlan, hasFeature } from "@/lib/plan-features";
 
 export const metadata = { title: "Analytics — DJcovery" };
 
@@ -25,12 +29,14 @@ export default async function DjAnalyticsPage() {
 
   const djProfile = await prisma.djProfile.findUnique({
     where: { userId: user.id },
-    select: { id: true, slug: true },
+    select: { id: true, slug: true, plan: true },
   });
 
   if (!djProfile) redirect("/become-dj");
 
-  const days = 30;
+  const plan = normalisePlan(djProfile.plan);
+  const hasAdvancedAnalytics = hasFeature(plan, "advancedAnalyticsAccess");
+  const days = hasAdvancedAnalytics ? 30 : 7;
   const [
     followers,
     bookings,
@@ -41,6 +47,9 @@ export default async function DjAnalyticsPage() {
     bookingsByStatus,
     topMedia,
     sources,
+    responseRate,
+    bookingRate,
+    topCities,
   ] = await Promise.all([
     getDjFollowerCount(djProfile.id),
     getDjBookingCount(djProfile.id),
@@ -51,23 +60,30 @@ export default async function DjAnalyticsPage() {
     getDjBookingsByStatus(djProfile.id),
     getDjTopMedia(djProfile.id, 5),
     getDjProfileViewSources(djProfile.id),
+    getDjResponseRate(djProfile.id),
+    getDjBookingRate(djProfile.id),
+    getDjTopCities(djProfile.id, 5),
   ]);
 
   return (
     <DjAnalyticsDashboard
       slug={djProfile.slug}
+      plan={plan}
       totals={{
         followers,
         bookings,
         profileViews,
         mediaPlays: mediaStats.plays,
         mediaViews: mediaStats.views,
+        responseRate,
+        bookingRate,
       }}
       viewsOverTime={viewsOverTime}
       followersOverTime={followersOverTime}
       bookingsByStatus={bookingsByStatus}
       topMedia={topMedia}
       sources={sources}
+      topCities={topCities}
     />
   );
 }

@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
     const { djProfileId } = await req.json();
 
     if (!djProfileId || typeof djProfileId !== "number") {
-      return NextResponse.json({ error: "Invalid djProfileId" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid djProfileId" },
+        { status: 400 },
+      );
     }
 
     const supabase = await createClient();
@@ -21,8 +24,13 @@ export async function POST(req: NextRequest) {
         where: { id: djProfileId },
         select: { userId: true, status: true, hidden: true },
       });
-      if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-      if (profile.userId === user.id) return NextResponse.json({ success: true });
+      if (!profile)
+        return NextResponse.json(
+          { error: "Profile not found" },
+          { status: 404 },
+        );
+      if (profile.userId === user.id)
+        return NextResponse.json({ success: true });
       if (profile.status !== "APPROVED" || profile.hidden) {
         return NextResponse.json({ success: true });
       }
@@ -32,7 +40,11 @@ export async function POST(req: NextRequest) {
         where: { id: djProfileId },
         select: { status: true, hidden: true },
       });
-      if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+      if (!profile)
+        return NextResponse.json(
+          { error: "Profile not found" },
+          { status: 404 },
+        );
       if (profile.status !== "APPROVED" || profile.hidden) {
         return NextResponse.json({ success: true });
       }
@@ -44,11 +56,28 @@ export async function POST(req: NextRequest) {
     if (hasViewed) return NextResponse.json({ success: true });
 
     // Create profile view record
+    // Capture viewer city/country for Top Cities analytics
+    let viewerCity: string | null = null;
+    let viewerCountry: string | null = null;
+    if (user) {
+      const viewerProfile = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          city: { select: { name: true } },
+          country: { select: { name: true } },
+        },
+      });
+      viewerCity = viewerProfile?.city?.name ?? null;
+      viewerCountry = viewerProfile?.country?.name ?? null;
+    }
+
     await prisma.profileView.create({
       data: {
         djProfileId,
         viewerId: user?.id ?? null,
         source: null,
+        city: viewerCity,
+        country: viewerCountry,
       },
     });
 

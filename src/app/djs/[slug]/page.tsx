@@ -11,6 +11,11 @@ import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
 import { fetchYouTubeOEmbed } from "@/lib/actions/media";
+import {
+  getDjResponseRate,
+  getDjBookingRate,
+  getDjTopCities,
+} from "@/lib/queries/dj-stats";
 import JsonLd from "@/components/seo/JsonLd";
 
 export default async function DjProfilePage({
@@ -187,19 +192,23 @@ export default async function DjProfilePage({
 
   // Accurate aggregates: avg rating over ALL ratings (not just the fetched 20),
   // and event count limited to publicly visible events (matches the list shown).
-  const [ratingAgg, publicEventsCount] = await Promise.all([
-    prisma.djRating.aggregate({
-      where: { djProfileId: dj.id },
-      _avg: { rating: true },
-    }),
-    prisma.event.count({
-      where: {
-        ownerDjId: dj.id,
-        status: { in: ["PUBLISHED", "COMPLETED"] },
-        deletedAt: null,
-      },
-    }),
-  ]);
+  const [ratingAgg, publicEventsCount, responseRate, bookingRate, topCities] =
+    await Promise.all([
+      prisma.djRating.aggregate({
+        where: { djProfileId: dj.id },
+        _avg: { rating: true },
+      }),
+      prisma.event.count({
+        where: {
+          ownerDjId: dj.id,
+          status: { in: ["PUBLISHED", "COMPLETED"] },
+          deletedAt: null,
+        },
+      }),
+      getDjResponseRate(dj.id),
+      getDjBookingRate(dj.id),
+      getDjTopCities(dj.id, 5),
+    ]);
   const avgRating = ratingAgg._avg.rating ?? 0;
 
   // Fetch YouTube oEmbed thumbnail server-side for Featured Performance
@@ -341,8 +350,8 @@ export default async function DjProfilePage({
       rating: avgRating,
       reviews: dj._count.ratings,
       events: publicEventsCount,
-      responseRate: 0,
-      bookingRate: 0,
+      responseRate,
+      bookingRate,
       monthlyViews: dj.monthlyViews ?? 0,
     },
     spotlight: {
@@ -375,8 +384,12 @@ export default async function DjProfilePage({
       profileViews: { value: dj.monthlyViews ?? 0, growth: 0 },
       bookingRequests: { value: 0, growth: 0 },
       newFollowers: { value: 0, growth: 0 },
-      bookingRate: 0,
-      topCities: [],
+      bookingRate,
+      topCities: topCities.map((c) => ({
+        city: c.city,
+        country: c.country,
+        percentage: 0,
+      })),
       audienceAge: [],
       trafficSources: [],
     },

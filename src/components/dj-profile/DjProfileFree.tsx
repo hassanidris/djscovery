@@ -121,20 +121,47 @@ export default function DjProfileFree({
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+  const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
 
-  const DJ = djData ? mapFreeDjToProps(djData) : FREE_DEFAULT_DJ;
-  const EVENTS = djData ? mapFreeEventsFromData(djData) : FREE_DEFAULT_EVENTS;
-  const REVIEWS = djData ? mapFreeReviewsFromData(djData) : [];
-  const MEDIA = djData ? mapFreeMediaFromData(djData) : FREE_DEFAULT_MEDIA;
+  // In staging: use real data if available, supplement with demo data
+  // In production: only use real data
+  const DJ = djData
+    ? mapFreeDjToProps(djData)
+    : isStaging
+      ? FREE_DEFAULT_DJ
+      : null;
+  const EVENTS = djData
+    ? mapFreeEventsFromData(djData)
+    : isStaging
+      ? FREE_DEFAULT_EVENTS
+      : [];
+  const REVIEWS = djData
+    ? mapFreeReviewsFromData(djData)
+    : isStaging
+      ? FREE_DEFAULT_REVIEWS
+      : [];
+  const MEDIA = djData
+    ? mapFreeMediaFromData(djData)
+    : isStaging
+      ? FREE_DEFAULT_MEDIA
+      : [];
   const FEATURED_MIX = djData
     ? mapFreeFeaturedMix(djData)
-    : FREE_DEFAULT_FEATURED_MIX;
+    : isStaging
+      ? FREE_DEFAULT_FEATURED_MIX
+      : null;
   const videoUrl = djData?.spotlight.featuredVideo.videoUrl ?? "";
   const videoThumb =
     djData?.spotlight.featuredVideo.thumbnail ||
     getVideoThumbnailUrl(videoUrl) ||
     "/gallery-2.png";
-  const location = `${DJ.city}, ${DJ.country}`;
+  const location = DJ ? `${DJ.city}, ${DJ.country}` : "";
+
+  // Early return in production if no data available
+  if (!DJ && isProduction) {
+    return null;
+  }
 
   const isOwner = viewMode === "dj-owner";
   const editHref = "/dj/settings";
@@ -485,8 +512,8 @@ export default function DjProfileFree({
                   {(
                     [
                       {
-                        title: "Performance Insights",
-                        desc: "Analytics, profile views & booking stats",
+                        title: "Advanced Analytics",
+                        desc: "30-day trends, charts & demographic insights",
                         icon: ChartLine,
                       },
                       {
