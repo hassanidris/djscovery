@@ -7,12 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 type VideoProvider =
-  | "youtube"
-  | "vimeo"
-  | "tiktok"
-  | "instagram"
-  | "facebook"
-  | "unknown";
+  "youtube" | "vimeo" | "tiktok" | "instagram" | "facebook" | "unknown";
 
 type VideoEmbedInfo = {
   provider: VideoProvider;
@@ -97,6 +92,7 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
           return {
             provider: "tiktok",
             embedUrl: `https://www.tiktok.com/embed/v2/${username}/video/${videoId}`,
+            videoId,
             iframeAllow:
               "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
           };
@@ -106,13 +102,15 @@ function getVideoEmbedInfo(url: string): VideoEmbedInfo {
 
     // Instagram (p/{code}, reel/{code}, tv/{code})
     if (isHostMatch(host, "instagram.com") || host === "instagr.am") {
-      if (segments.length >= 2 && ["p", "reel", "tv"].includes(segments[0])) {
+      const postType = segments[0];
+      if (segments.length >= 2 && ["p", "reel", "tv"].includes(postType)) {
         const code = segments[1];
         if (code) {
           return {
             provider: "instagram",
-            embedUrl: `https://www.instagram.com/p/${code}/embed/captioned/`,
+            embedUrl: `https://www.instagram.com/${postType}/${code}/embed`,
             videoId: code,
+            originalUrl: `https://www.instagram.com/${postType}/${code}/`,
             iframeAllow:
               "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
           };
@@ -232,9 +230,10 @@ export default function MediaVideoModal({
             <p className="mb-3 truncate px-1 text-sm font-semibold text-white">
               {title}
             </p>
+
             <div
-              className="relative aspect-video w-full overflow-hidden rounded-xl bg-black"
-              style={{ maxHeight: "70vh" }}
+              className="relative w-full overflow-hidden rounded-xl bg-black"
+              style={{ height: "70vh" }}
             >
               {embedInfo.embedUrl ? (
                 <iframe

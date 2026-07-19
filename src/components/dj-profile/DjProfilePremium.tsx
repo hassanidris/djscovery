@@ -34,9 +34,11 @@ import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
+import CareerHighlights from "@/components/dj-profile/CareerHighlights";
 import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import VenueModal from "@/components/dj-profile/VenueModal";
+import HighlightModal from "@/components/dj-profile/HighlightModal";
 import BookingPackages from "@/components/dj-profile/BookingPackages";
 import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
@@ -49,6 +51,12 @@ import {
   updateDjPackage,
   deleteDjPackage,
 } from "@/lib/actions/dj-packages";
+import {
+  getDjHighlights,
+  createDjHighlight,
+  updateDjHighlight,
+  deleteDjHighlight,
+} from "@/lib/actions/dj-highlights";
 import { toast } from "sonner";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
@@ -243,6 +251,7 @@ export default function DjProfilePremium({
   );
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
+  const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
   const bookCTARefMobile = useRef<BookCTARef>(null);
   const bookCTARefDesktop = useRef<BookCTARef>(null);
   const [venues, setVenues] = useState<
@@ -266,6 +275,21 @@ export default function DjProfilePremium({
       cityId: 0,
       countryName: v.country,
       cityName: v.city,
+    })),
+  );
+  const [highlights, setHighlights] = useState<
+    Array<{
+      id: number;
+      year: string;
+      title: string;
+      description: string;
+    }>
+  >(
+    (djData?.careerHighlights || []).map((h: any, i: number) => ({
+      id: h.id || 0,
+      year: String(h.year),
+      title: h.title,
+      description: h.description || "",
     })),
   );
   const [packages, setPackages] = useState<
@@ -471,42 +495,179 @@ export default function DjProfilePremium({
     }
   }
 
-  const DJ = djData ? mapPremiumDjToProps(djData) : PREMIUM_DEFAULT_DJ;
+  async function handleHighlightSave(newHighlights: typeof highlights) {
+    const toastId = toast.loading("Saving highlights...");
+
+    try {
+      // Find new highlights (id === 0)
+      const highlightsToAdd = newHighlights.filter((h) => h.id === 0);
+      // Find existing highlights that were modified
+      const highlightsToUpdate = newHighlights.filter((h) => h.id !== 0);
+      // Find highlights that were removed
+      const removedHighlightIds = highlights
+        .filter((h) => !newHighlights.find((nh) => nh.id === h.id))
+        .map((h) => h.id);
+
+      // Add new highlights
+      const addedHighlightIds: number[] = [];
+      for (const highlight of highlightsToAdd) {
+        if (!highlight.year.trim() || !highlight.title.trim()) {
+          continue;
+        }
+        const formData = new FormData();
+        formData.append("year", highlight.year.trim());
+        formData.append("title", highlight.title.trim());
+        if (highlight.description.trim()) {
+          formData.append("description", highlight.description.trim());
+        }
+
+        const result = await createDjHighlight(formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+        if ("success" in result) {
+          addedHighlightIds.push(result.id);
+        }
+      }
+
+      // Update modified highlights
+      for (const highlight of highlightsToUpdate) {
+        if (
+          !highlight.id ||
+          highlight.id === undefined ||
+          highlight.id === null
+        ) {
+          continue;
+        }
+        const formData = new FormData();
+        formData.append("year", highlight.year.trim());
+        formData.append("title", highlight.title.trim());
+        formData.append("description", highlight.description.trim());
+
+        const result = await updateDjHighlight(highlight.id, formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      // Delete removed highlights
+      for (const highlightId of removedHighlightIds) {
+        const result = await deleteDjHighlight(highlightId);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      toast.success("Highlights saved successfully!", { id: toastId });
+
+      // Update local state with new highlight IDs
+      const updatedHighlights = newHighlights.map((h, idx) => {
+        if (h.id === 0 && addedHighlightIds.length > 0) {
+          const newId = addedHighlightIds.shift();
+          return { ...h, id: newId || 0 };
+        }
+        return h;
+      });
+      setHighlights(updatedHighlights);
+
+      // Trigger page refresh to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to save highlights:", error);
+      toast.error("Failed to save highlights. Please try again.", {
+        id: toastId,
+      });
+    }
+  }
+
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+  const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
+
+  // In staging: use real data if available, supplement with demo data
+  // In production: only use real data
+  const DJ = djData
+    ? mapPremiumDjToProps(djData)
+    : isStaging
+      ? PREMIUM_DEFAULT_DJ
+      : null;
   const EVENTS = djData
     ? mapPremiumEventsFromData(djData)
-    : PREMIUM_DEFAULT_EVENTS;
-  const REVIEWS = djData ? mapPremiumReviewsFromData(djData) : [];
+    : isStaging
+      ? PREMIUM_DEFAULT_EVENTS
+      : [];
+  const REVIEWS = djData
+    ? mapPremiumReviewsFromData(djData)
+    : isStaging
+      ? PREMIUM_DEFAULT_REVIEWS
+      : [];
   const MEDIA = djData
     ? mapPremiumMediaFromData(djData)
-    : PREMIUM_DEFAULT_MEDIA;
+    : isStaging
+      ? PREMIUM_DEFAULT_MEDIA
+      : [];
   const ENDORSEMENTS = djData
     ? mapEndorsementsFromData(djData)
-    : PREMIUM_DEFAULT_ENDORSEMENTS;
+    : isStaging
+      ? PREMIUM_DEFAULT_ENDORSEMENTS
+      : [];
   const HIGHLIGHTS = djData
     ? mapHighlightsFromData(djData)
-    : PREMIUM_DEFAULT_HIGHLIGHTS;
-  const PRESS = djData ? mapPressFromData(djData) : PREMIUM_DEFAULT_PRESS;
+    : isStaging
+      ? PREMIUM_DEFAULT_HIGHLIGHTS
+      : [];
+  const PRESS = djData
+    ? mapPressFromData(djData)
+    : isStaging
+      ? PREMIUM_DEFAULT_PRESS
+      : [];
   const PACKAGES = djData
     ? mapPackagesFromData(djData)
-    : PREMIUM_DEFAULT_PACKAGES;
+    : isStaging
+      ? PREMIUM_DEFAULT_PACKAGES
+      : [];
   const CALENDAR_DAYS = djData
     ? buildCalendarFromData(djData)
-    : PREMIUM_DEFAULT_CALENDAR_DAYS;
-  const MIXES = djData ? mapMixesFromData(djData) : PREMIUM_DEFAULT_MIXES;
+    : isStaging
+      ? PREMIUM_DEFAULT_CALENDAR_DAYS
+      : [];
+  const MIXES = djData
+    ? mapMixesFromData(djData)
+    : isStaging
+      ? PREMIUM_DEFAULT_MIXES
+      : [];
   const calendarLabel = djData
     ? getCalendarMonthLabel(djData)
-    : "September 2025";
-  const SPOTLIGHT = djData ? djData.spotlight : PREMIUM_DEFAULT_SPOTLIGHT;
-  const featuredVideoUrl = SPOTLIGHT.featuredVideo.videoUrl;
+    : isStaging
+      ? "September 2025"
+      : "";
+  const SPOTLIGHT = djData
+    ? djData.spotlight
+    : isStaging
+      ? PREMIUM_DEFAULT_SPOTLIGHT
+      : null;
+  const featuredVideoUrl = SPOTLIGHT?.featuredVideo.videoUrl ?? "";
   const featuredVideoThumb =
-    SPOTLIGHT.featuredVideo.thumbnail ||
+    SPOTLIGHT?.featuredVideo.thumbnail ||
     getVideoThumbnailUrl(featuredVideoUrl) ||
     "/gallery-2.png";
-  const featuredMixAudioUrl = SPOTLIGHT.featuredMix.audioUrl;
+  const featuredMixAudioUrl = SPOTLIGHT?.featuredMix.audioUrl ?? "";
   const autoMixThumb = useAudioThumbnail(featuredMixAudioUrl);
   const featuredMixThumb =
-    SPOTLIGHT.featuredMix.thumbnail || autoMixThumb || "/gallery-2.png";
-  const location = `${DJ.city}, ${DJ.country}`;
+    SPOTLIGHT?.featuredMix.thumbnail || autoMixThumb || "/gallery-2.png";
+  const location = DJ ? `${DJ.city}, ${DJ.country}` : "";
+
+  // Early return in production if no data available
+  if (!DJ && isProduction) {
+    return null;
+  }
+
+  // After this point, DJ and SPOTLIGHT are guaranteed to be non-null
+  // (either from real data or demo defaults in staging)
+  const safeDJ = DJ!;
+  const safeSPOTLIGHT = SPOTLIGHT!;
 
   const bookingContext: BookingViewerContext = viewerContext ?? {
     role: "guest",
@@ -541,20 +702,20 @@ export default function DjProfilePremium({
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
               ref={bookCTARefMobile}
-              stageName={`Dj. ${DJ.stageName}`}
+              stageName={`Dj. ${safeDJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
               variant="premium"
               layout="mobile"
-              responseRate={DJ.responseRate}
-              bookingSuccessRate={DJ.bookingSuccessRate}
+              responseRate={safeDJ.responseRate}
+              bookingSuccessRate={safeDJ.bookingSuccessRate}
               bookingOptions={bookingOptions}
             />
 
             <div id="about">
               <ProfileAbout
-                bio={DJ.bio}
-                djTypes={DJ.djTypes}
+                bio={safeDJ.bio}
+                djTypes={safeDJ.djTypes}
                 bioExpanded={bioExpanded}
                 onToggleBio={() => setBioExpanded(!bioExpanded)}
                 experienceYears={djData?.experienceYears}
@@ -590,7 +751,7 @@ export default function DjProfilePremium({
                 }
                 calendarLabel={calendarLabel}
                 isOwner={isOwner}
-                djName={DJ.stageName}
+                djName={safeDJ.stageName}
                 featuredPerformanceUrl={djData?.featuredPerformanceUrl}
                 featuredPerformanceContext={djData?.featuredPerformanceContext}
                 featuredPerformanceThumbnailUrl={
@@ -599,102 +760,6 @@ export default function DjProfilePremium({
               />
             </div>
 
-            <Separator className="bg-white/8" />
-
-            {/* ── PERFORMANCE INSIGHTS (owner-only in fan view) ── */}
-            <OwnerOnlySection viewMode={viewMode}>
-              <section>
-                <SectionHeading sub="Last 30 days · Premium analytics">
-                  Performance Insights
-                </SectionHeading>
-                <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <StatPill value="3,240" label="Profile Views" trend="+24%" />
-                  <StatPill value="47" label="Booking Requests" trend="+18%" />
-                  <StatPill value="+312" label="New Followers" trend="+9%" />
-                  <StatPill value="94%" label="Booking Rate" />
-                </div>
-                <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
-                  <h3 className="mb-4 text-sm font-semibold text-white">
-                    Top Cities (Audience)
-                  </h3>
-                  <div className="flex flex-col gap-3">
-                    {[
-                      { city: "London", pct: 28 },
-                      { city: "Lagos", pct: 22 },
-                      { city: "Berlin", pct: 17 },
-                      { city: "New York", pct: 13 },
-                      { city: "Ibiza", pct: 10 },
-                    ].map((c) => (
-                      <div key={c.city} className="flex items-center gap-3">
-                        <span className="w-20 shrink-0 text-xs text-gray-400">
-                          {c.city}
-                        </span>
-                        <Progress
-                          value={c.pct}
-                          className="h-1.5 flex-1 bg-white/8"
-                        />
-                        <span className="w-8 text-right text-xs text-gray-500">
-                          {c.pct}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
-                    <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                      Audience Age
-                    </h3>
-                    {[
-                      ["18–24", 35],
-                      ["25–34", 44],
-                      ["35–44", 16],
-                      ["45+", 5],
-                    ].map(([g, v]) => (
-                      <div key={g} className="mb-1.5 flex items-center gap-2">
-                        <span className="w-12 shrink-0 text-xs text-gray-400">
-                          {g}
-                        </span>
-                        <Progress
-                          value={Number(v)}
-                          className="h-1 flex-1 bg-white/8"
-                        />
-                        <span className="w-7 text-right text-xs text-gray-500">
-                          {v}%
-                        </span>
-                      </div>
-                    ))}
-                  </Card>
-                  <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
-                    <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                      Profile Traffic
-                    </h3>
-                    {[
-                      ["Direct", 42],
-                      ["Search", 31],
-                      ["Social", 18],
-                      ["Referral", 9],
-                    ].map(([src, v]) => (
-                      <div key={src} className="mb-1.5 flex items-center gap-2">
-                        <span className="w-14 shrink-0 text-xs text-gray-400">
-                          {src}
-                        </span>
-                        <Progress
-                          value={Number(v)}
-                          className="h-1 flex-1 bg-white/8"
-                        />
-                        <span className="w-7 text-right text-xs text-gray-500">
-                          {v}%
-                        </span>
-                      </div>
-                    ))}
-                  </Card>
-                </div>
-              </section>
-            </OwnerOnlySection>
-
-            <Separator className="bg-white/8" />
-
             {/* ── EXTENDED MEDIA LIBRARY ── */}
             <section id="media">
               <SectionHeading sub="Full media library · Unlimited with Premium">
@@ -702,97 +767,100 @@ export default function DjProfilePremium({
               </SectionHeading>
 
               {/* ── SPOTLIGHT (nested inside Media) ── */}
-              {(SPOTLIGHT.featuredMix.audioUrl ||
-                SPOTLIGHT.featuredVideo.videoUrl) && (
-                <>
-                  <h3 className="mb-4 text-sm font-semibold text-gray-400">
-                    Spotlight
-                  </h3>
-                  <div className="mb-8 flex flex-nowrap gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid">
-                    {SPOTLIGHT.featuredMix.audioUrl && (
-                      <MediaAudioPlayer
-                        audioUrl={SPOTLIGHT.featuredMix.audioUrl}
-                        title={SPOTLIGHT.featuredMix.title}
-                        thumbnailUrl={featuredMixThumb || undefined}
-                        mediaId={SPOTLIGHT.featuredMix.id}
-                      >
-                        <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
-                          <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
-                            {featuredMixThumb ? (
+              {safeSPOTLIGHT &&
+                (safeSPOTLIGHT.featuredMix.audioUrl ||
+                  safeSPOTLIGHT.featuredVideo.videoUrl) && (
+                  <>
+                    <h3 className="mb-4 text-sm font-semibold text-gray-400">
+                      Spotlight
+                    </h3>
+                    <div className="mb-8 flex flex-nowrap gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid">
+                      {safeSPOTLIGHT.featuredMix.audioUrl && (
+                        <MediaAudioPlayer
+                          audioUrl={safeSPOTLIGHT.featuredMix.audioUrl}
+                          title={safeSPOTLIGHT.featuredMix.title}
+                          thumbnailUrl={featuredMixThumb || undefined}
+                          mediaId={safeSPOTLIGHT.featuredMix.id}
+                        >
+                          <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
+                            <div className="from-h_red/20 relative h-44 bg-linear-to-br to-black">
+                              {featuredMixThumb ? (
+                                <Image
+                                  src={featuredMixThumb}
+                                  alt={safeSPOTLIGHT.featuredMix.title}
+                                  fill
+                                  className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                                />
+                              ) : null}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
+                                  <Play className="ml-0.5 h-5 w-5 text-white" />
+                                </div>
+                              </div>
+                              <div className="absolute bottom-3 left-3">
+                                <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                                  <Headphones className="mr-1 h-2.5 w-2.5" />
+                                  Featured Mix
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="p-4">
+                              <p className="text-sm font-semibold text-white">
+                                {safeSPOTLIGHT.featuredMix.title}
+                              </p>
+                              <p className="mt-1 text-xs text-gray-500">
+                                {safeSPOTLIGHT.featuredMix.duration} ·{" "}
+                                {formatPlays(safeSPOTLIGHT.featuredMix.plays)}{" "}
+                                plays
+                              </p>
+                            </div>
+                          </Card>
+                        </MediaAudioPlayer>
+                      )}
+                      {safeSPOTLIGHT.featuredVideo.videoUrl && (
+                        <MediaVideoModal
+                          videoUrl={safeSPOTLIGHT.featuredVideo.videoUrl}
+                          thumbnail={featuredVideoThumb}
+                          title={safeSPOTLIGHT.featuredVideo.title}
+                          mediaId={safeSPOTLIGHT.featuredVideo.id}
+                        >
+                          <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
+                            <div className="relative h-44 overflow-hidden">
                               <Image
-                                src={featuredMixThumb}
-                                alt={SPOTLIGHT.featuredMix.title}
+                                src={featuredVideoThumb}
+                                alt="video"
                                 fill
-                                className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
+                                className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
                               />
-                            ) : null}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="bg-h_red/20 border-h_red/30 group-hover:bg-h_red/30 flex size-14 items-center justify-center rounded-full border transition-colors">
-                                <Play className="ml-0.5 h-5 w-5 text-white" />
+                              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                                  <Play className="ml-0.5 h-5 w-5 text-white" />
+                                </div>
+                              </div>
+                              <div className="absolute bottom-3 left-3">
+                                <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
+                                  <Video className="mr-1 h-2.5 w-2.5" />
+                                  Featured Video
+                                </Badge>
                               </div>
                             </div>
-                            <div className="absolute bottom-3 left-3">
-                              <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                                <Headphones className="mr-1 h-2.5 w-2.5" />
-                                Featured Mix
-                              </Badge>
+                            <div className="p-4">
+                              <p className="text-sm font-semibold text-white">
+                                {safeSPOTLIGHT.featuredVideo.title}
+                              </p>
+                              <p className="mt-1 text-xs text-gray-500">
+                                {safeSPOTLIGHT.featuredVideo.duration} ·{" "}
+                                {formatPlays(safeSPOTLIGHT.featuredVideo.views)}{" "}
+                                views
+                              </p>
                             </div>
-                          </div>
-                          <div className="p-4">
-                            <p className="text-sm font-semibold text-white">
-                              {SPOTLIGHT.featuredMix.title}
-                            </p>
-                            <p className="mt-1 text-xs text-gray-500">
-                              {SPOTLIGHT.featuredMix.duration} ·{" "}
-                              {formatPlays(SPOTLIGHT.featuredMix.plays)} plays
-                            </p>
-                          </div>
-                        </Card>
-                      </MediaAudioPlayer>
-                    )}
-                    {SPOTLIGHT.featuredVideo.videoUrl && (
-                      <MediaVideoModal
-                        videoUrl={SPOTLIGHT.featuredVideo.videoUrl}
-                        thumbnail={featuredVideoThumb}
-                        title={SPOTLIGHT.featuredVideo.title}
-                        mediaId={SPOTLIGHT.featuredVideo.id}
-                      >
-                        <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
-                          <div className="relative h-44 overflow-hidden">
-                            <Image
-                              src={featuredVideoThumb}
-                              alt="video"
-                              fill
-                              className="object-cover opacity-60 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
-                            />
-                            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="flex size-14 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
-                                <Play className="ml-0.5 h-5 w-5 text-white" />
-                              </div>
-                            </div>
-                            <div className="absolute bottom-3 left-3">
-                              <Badge className="border-white/10 bg-black/60 text-[11px] text-gray-300">
-                                <Video className="mr-1 h-2.5 w-2.5" />
-                                Featured Video
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="p-4">
-                            <p className="text-sm font-semibold text-white">
-                              {SPOTLIGHT.featuredVideo.title}
-                            </p>
-                            <p className="mt-1 text-xs text-gray-500">
-                              {SPOTLIGHT.featuredVideo.duration} ·{" "}
-                              {formatPlays(SPOTLIGHT.featuredVideo.views)} views
-                            </p>
-                          </div>
-                        </Card>
-                      </MediaVideoModal>
-                    )}
-                  </div>
-                </>
-              )}
+                          </Card>
+                        </MediaVideoModal>
+                      )}
+                    </div>
+                  </>
+                )}
 
               <div className="mb-4 flex gap-2">
                 {(["photos", "videos", "mixes"] as const).map((tab) => (
@@ -862,43 +930,14 @@ export default function DjProfilePremium({
               )}
             </section>
 
-            {HIGHLIGHTS.length > 0 && (
-              <>
-                <Separator className="bg-white/8" />
+            <Separator className="bg-white/8" />
 
-                {/* ── CAREER HIGHLIGHTS ── */}
-                <section>
-                  <SectionHeading sub="Key milestones and achievements">
-                    Career Highlights
-                  </SectionHeading>
-                  <div className="relative flex flex-col gap-0">
-                    {HIGHLIGHTS.map((h, i) => {
-                      const HIcon = h.icon;
-                      return (
-                        <div key={i} className="flex gap-4 pb-6 last:pb-0">
-                          <div className="flex flex-col items-center">
-                            <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-full border">
-                              <HIcon className="text-h_red h-3.5 w-3.5" />
-                            </div>
-                            {i < HIGHLIGHTS.length - 1 && (
-                              <div className="mt-2 w-px flex-1 bg-white/8" />
-                            )}
-                          </div>
-                          <div className="pt-1.5 pb-1">
-                            <p className="text-sm font-semibold text-white">
-                              {h.title}
-                            </p>
-                            <p className="mt-0.5 text-xs text-gray-500">
-                              {h.year}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              </>
-            )}
+            {/* ── CAREER HIGHLIGHTS ── */}
+            <CareerHighlights
+              highlights={HIGHLIGHTS}
+              isOwner={isOwner}
+              onAddHighlight={() => setIsHighlightModalOpen(true)}
+            />
 
             {ENDORSEMENTS.length > 0 && (
               <>
@@ -1003,8 +1042,8 @@ export default function DjProfilePremium({
                   </SectionHeading>
                   {REVIEWS.length > 0 ? (
                     <ProfileReviews
-                      avgRating={DJ.avgRating}
-                      ratingCount={DJ.ratingCount}
+                      avgRating={safeDJ.avgRating}
+                      ratingCount={safeDJ.ratingCount}
                       reviews={REVIEWS}
                     />
                   ) : (
@@ -1099,13 +1138,13 @@ export default function DjProfilePremium({
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
               ref={bookCTARefDesktop}
-              stageName={`Dj. ${DJ.stageName}`}
+              stageName={`Dj. ${safeDJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
               variant="premium"
               layout="desktop"
-              responseRate={DJ.responseRate}
-              bookingSuccessRate={DJ.bookingSuccessRate}
+              responseRate={safeDJ.responseRate}
+              bookingSuccessRate={safeDJ.bookingSuccessRate}
               bookingOptions={bookingOptions}
             />
 
@@ -1114,18 +1153,18 @@ export default function DjProfilePremium({
               <ProfileEventsSidebar
                 events={EVENTS}
                 isOwner={isOwner}
-                djName={DJ.stageName}
+                djName={safeDJ.stageName}
               />
             </div>
             <Separator className="bg-white/8" /> */}
 
             {/* Professional Team */}
             <ProfessionalTeamSidebar
-              managerName={DJ.manager.name}
-              managerEmail={DJ.manager.email}
-              agentName={DJ.agent.name}
-              agentAgency={DJ.agent.agency}
-              agentEmail={DJ.agent.email}
+              managerName={safeDJ.manager.name}
+              managerEmail={safeDJ.manager.email}
+              agentName={safeDJ.agent.name}
+              agentAgency={safeDJ.agent.agency}
+              agentEmail={safeDJ.agent.email}
             />
 
             <Separator className="bg-white/8" />
@@ -1137,10 +1176,10 @@ export default function DjProfilePremium({
               </h3>
               <div className="mb-1 flex items-end gap-2">
                 <span className="text-2xl font-bold text-white">
-                  {DJ.minFee}
+                  {safeDJ.minFee}
                 </span>
                 <span className="mb-0.5 text-sm text-gray-500">
-                  – {DJ.maxFee}
+                  – {safeDJ.maxFee}
                 </span>
               </div>
               <p className="text-xs text-gray-500">
@@ -1157,11 +1196,25 @@ export default function DjProfilePremium({
                     This Month
                   </h3>
                 </div>
-                {[
-                  { label: "Profile Views", val: "3,240", trend: "+24%" },
-                  { label: "Booking Requests", val: "47", trend: "+18%" },
-                  { label: "New Followers", val: "312", trend: "+9%" },
-                ].map((m) => (
+                {(
+                  [
+                    {
+                      label: "Profile Views",
+                      val: djData?.analytics.profileViews.value ?? 0,
+                      growth: djData?.analytics.profileViews.growth ?? 0,
+                    },
+                    {
+                      label: "Booking Requests",
+                      val: djData?.analytics.bookingRequests.value ?? 0,
+                      growth: djData?.analytics.bookingRequests.growth ?? 0,
+                    },
+                    {
+                      label: "New Followers",
+                      val: djData?.analytics.newFollowers.value ?? 0,
+                      growth: djData?.analytics.newFollowers.growth ?? 0,
+                    },
+                  ] as const
+                ).map((m) => (
                   <div
                     key={m.label}
                     className="mb-2 flex items-center justify-between"
@@ -1169,10 +1222,17 @@ export default function DjProfilePremium({
                     <span className="text-xs text-gray-400">{m.label}</span>
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-semibold text-white">
-                        {m.val}
+                        {m.val.toLocaleString()}
                       </span>
-                      <span className="text-[11px] text-emerald-400">
-                        {m.trend}
+                      <span
+                        className={
+                          m.growth >= 0
+                            ? "text-[11px] text-emerald-400"
+                            : "text-[11px] text-red-400"
+                        }
+                      >
+                        {m.growth >= 0 ? "+" : ""}
+                        {m.growth}%
                       </span>
                     </div>
                   </div>
@@ -1203,7 +1263,17 @@ export default function DjProfilePremium({
             packages={packages}
             onSave={handlePackageSave}
             djProfileId={djProfileId}
-            defaultCurrency={djData?.booking?.feeRange?.currency || "USD"}
+          />
+          <HighlightModal
+            key={
+              isHighlightModalOpen
+                ? "highlight-modal-open"
+                : "highlight-modal-closed"
+            }
+            isOpen={isHighlightModalOpen}
+            onClose={() => setIsHighlightModalOpen(false)}
+            highlights={highlights}
+            onSave={handleHighlightSave}
           />
         </>
       )}

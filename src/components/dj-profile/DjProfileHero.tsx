@@ -18,6 +18,7 @@ import {
   Zap,
   Handshake,
   Eye,
+  ChartLine,
 } from "lucide-react";
 import { SOCIAL_ICONS } from "./dj-profile-shared";
 import { ReputationBadge } from "./ReputationBadge";
@@ -199,17 +200,30 @@ function DjProfileHero({
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:pb-2">
             {isOwner && djData?.slug ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-amber-500/50 text-amber-300 hover:bg-amber-500/10"
-                asChild
-              >
-                <Link href={editHref}>
-                  <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                  Edit Profile
-                </Link>
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-amber-500/50 text-amber-300 hover:bg-amber-500/10"
+                  asChild
+                >
+                  <Link href={editHref}>
+                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                    Edit Profile
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-white/20 text-gray-300 hover:bg-white/5"
+                  asChild
+                >
+                  <Link href="/dj/analytics">
+                    <ChartLine className="mr-1.5 h-3.5 w-3.5" />
+                    View Analytics
+                  </Link>
+                </Button>
+              </>
             ) : (
               <>
                 {viewMode === "fan" && !isNaN(djProfileId) ? (
@@ -312,6 +326,11 @@ function DjProfileStats({
           icon: CalendarDays,
         },
         {
+          val: formatNumber(dj.profileViews),
+          label: "Monthly Views",
+          icon: Eye,
+        },
+        {
           val: `${dj.responseRate}%`,
           label: "Response Rate",
           icon: Zap,
@@ -322,11 +341,6 @@ function DjProfileStats({
           label: "Booking Rate",
           icon: Handshake,
           green: true,
-        },
-        {
-          val: formatNumber(dj.profileViews),
-          label: "Monthly Views",
-          icon: Eye,
         },
       ]
     : [
@@ -344,6 +358,11 @@ function DjProfileStats({
           val: dj.eventsCount.toString(),
           label: "Events",
           icon: CalendarDays,
+        },
+        {
+          val: formatNumber(dj.profileViews),
+          label: "Monthly Views",
+          icon: Eye,
         },
       ];
 

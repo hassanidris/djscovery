@@ -18,9 +18,13 @@ export interface PlanFeatures {
   // Profile features
   verifiedBadge: boolean;
   advancedProfileSections: boolean; // endorsements, press, packages
-  // Analytics & stats
-  analyticsAccess: boolean;
-  responseRateStats: boolean;
+  // Public stats (hero bar - visible to all viewers)
+  publicStatsAccess: boolean;
+  responseRateStats: boolean; // Show Response/Booking rate in hero
+  monthlyViews: boolean;
+  // Owner analytics (dashboard)
+  basicAnalyticsAccess: boolean; // Summary cards, 7-day data
+  advancedAnalyticsAccess: boolean; // Charts, 30/90-day data, demographics
   // Booking
   bookingInquiries: boolean; // ALL plans — never block inquiries
   availabilityCalendar: boolean;
@@ -35,8 +39,11 @@ export const PLAN_FEATURES: Record<DjPlanTier, PlanFeatures> = {
     prioritySearchRanking: false,
     verifiedBadge: false,
     advancedProfileSections: false,
-    analyticsAccess: false,
+    publicStatsAccess: true,
     responseRateStats: false,
+    monthlyViews: true,
+    basicAnalyticsAccess: true,
+    advancedAnalyticsAccess: false,
     bookingInquiries: true,
     availabilityCalendar: false,
     advancedBookingTools: false,
@@ -48,8 +55,11 @@ export const PLAN_FEATURES: Record<DjPlanTier, PlanFeatures> = {
     prioritySearchRanking: true,
     verifiedBadge: true,
     advancedProfileSections: true,
-    analyticsAccess: true,
+    publicStatsAccess: true,
     responseRateStats: true,
+    monthlyViews: true,
+    basicAnalyticsAccess: true,
+    advancedAnalyticsAccess: true,
     bookingInquiries: true,
     availabilityCalendar: true,
     advancedBookingTools: true,

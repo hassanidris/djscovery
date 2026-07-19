@@ -76,6 +76,8 @@ const nextConfig = {
       { protocol: "https", hostname: "*.tiktokcdn-asia.com" },
       { protocol: "https", hostname: "*.tiktok.com" },
       { protocol: "https", hostname: "*.vimeocdn.com" },
+      { protocol: "https", hostname: "*.instagram.com" },
+      { protocol: "https", hostname: "*.cdninstagram.com" },
     ],
   },
 };
