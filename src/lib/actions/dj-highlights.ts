@@ -36,6 +36,18 @@ export async function createDjHighlight(
     return { error: "Year and title are required" };
   }
 
+  // Validate year format (YYYY)
+  const yearRegex = /^\d{4}$/;
+  if (!yearRegex.test(year)) {
+    return { error: "Year must be in YYYY format (e.g., 2024)" };
+  }
+
+  const yearNum = parseInt(year, 10);
+  const currentYear = new Date().getFullYear();
+  if (yearNum < 1900 || yearNum > currentYear + 10) {
+    return { error: "Year must be between 1900 and 10 years from now" };
+  }
+
   const highlight = await prisma.djCareerHighlight.create({
     data: {
       year,
@@ -71,7 +83,21 @@ export async function updateDjHighlight(
   const description = (formData.get("description") as string)?.trim();
 
   const data: Record<string, unknown> = {};
-  if (year !== undefined && year !== "") data.year = year;
+  if (year !== undefined && year !== "") {
+    // Validate year format (YYYY)
+    const yearRegex = /^\d{4}$/;
+    if (!yearRegex.test(year)) {
+      return { error: "Year must be in YYYY format (e.g., 2024)" };
+    }
+
+    const yearNum = parseInt(year, 10);
+    const currentYear = new Date().getFullYear();
+    if (yearNum < 1900 || yearNum > currentYear + 10) {
+      return { error: "Year must be between 1900 and 10 years from now" };
+    }
+
+    data.year = year;
+  }
   if (title !== undefined && title !== "") data.title = title;
   if (description !== undefined) data.description = description || null;
 
