@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   Music2,
   TrendingUp,
+  MapPin,
 } from "lucide-react";
 import {
   LineChart,
@@ -35,7 +36,9 @@ import type {
   BookingStatusCount,
   TopMediaItem,
   ProfileViewSource,
+  TopCity,
 } from "@/lib/queries/dj-stats";
+import { hasFeature, type DjPlanTier } from "@/lib/plan-features";
 
 const BRAND_RED = "#d30101";
 const BRAND_RED_DARK = "#a80000";
@@ -93,29 +96,36 @@ const ChartTooltip = ({
 
 type Props = {
   slug: string | null;
+  plan: DjPlanTier;
   totals: {
     followers: number;
     bookings: number;
     profileViews: number;
     mediaPlays: number;
     mediaViews: number;
+    responseRate: number;
+    bookingRate: number;
   };
   viewsOverTime: DailyCount[];
   followersOverTime: DailyCount[];
   bookingsByStatus: BookingStatusCount[];
   topMedia: TopMediaItem[];
   sources: ProfileViewSource[];
+  topCities: TopCity[];
 };
 
 export default function DjAnalyticsDashboard({
   slug,
+  plan,
   totals,
   viewsOverTime,
   followersOverTime,
   bookingsByStatus,
   topMedia,
   sources,
+  topCities,
 }: Props) {
+  const hasAdvancedAnalytics = hasFeature(plan, "advancedAnalyticsAccess");
   const totalViews = viewsOverTime.reduce((sum, d) => sum + d.count, 0);
   const totalFollowers = followersOverTime.reduce((sum, d) => sum + d.count, 0);
   const hasData =
@@ -132,7 +142,8 @@ export default function DjAnalyticsDashboard({
         <div>
           <h2 className="text-lg font-semibold text-white">Analytics</h2>
           <p className="text-muted-foreground mt-0.5 text-sm">
-            Track your profile and content performance over the last 30 days
+            Track your profile and content performance over the last{" "}
+            {hasAdvancedAnalytics ? "30" : "7"} days
           </p>
         </div>
         {slug && (
@@ -189,26 +200,22 @@ export default function DjAnalyticsDashboard({
         <Card size="sm" className="flex flex-col justify-end">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-              Plays
+              Response Rate
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">
-              {formatNumber(totals.mediaPlays)}
-            </p>
+            <p className="text-3xl font-bold">{totals.responseRate}%</p>
           </CardContent>
         </Card>
 
         <Card size="sm" className="flex flex-col justify-end">
           <CardHeader>
             <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-              Video Views
+              Booking Rate
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">
-              {formatNumber(totals.mediaViews)}
-            </p>
+            <p className="text-3xl font-bold">{totals.bookingRate}%</p>
           </CardContent>
         </Card>
       </div>
@@ -232,116 +239,29 @@ export default function DjAnalyticsDashboard({
         <>
           <Separator />
 
-          {/* Charts row */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {/* Profile views over time */}
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <Eye className="text-h_red h-4 w-4" />
-                  Profile Views (30 days)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={viewsOverTime}>
-                      <CartesianGrid stroke={GRID} vertical={false} />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fill: GRAY, fontSize: 11 }}
-                        tickFormatter={formatDate}
-                        axisLine={{ stroke: GRID }}
-                        tickLine={false}
-                        minTickGap={24}
-                      />
-                      <YAxis
-                        tick={{ fill: GRAY, fontSize: 11 }}
-                        axisLine={false}
-                        tickLine={false}
-                        allowDecimals={false}
-                      />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Line
-                        type="monotone"
-                        dataKey="count"
-                        stroke={BRAND_RED}
-                        strokeWidth={2}
-                        dot={{ r: 3, fill: BRAND_RED, strokeWidth: 0 }}
-                        activeDot={{ r: 5, fill: BRAND_RED }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Follower growth over time */}
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <Users className="text-h_red h-4 w-4" />
-                  New Followers (30 days)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={followersOverTime}>
-                      <CartesianGrid stroke={GRID} vertical={false} />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fill: GRAY, fontSize: 11 }}
-                        tickFormatter={formatDate}
-                        axisLine={{ stroke: GRID }}
-                        tickLine={false}
-                        minTickGap={24}
-                      />
-                      <YAxis
-                        tick={{ fill: GRAY, fontSize: 11 }}
-                        axisLine={false}
-                        tickLine={false}
-                        allowDecimals={false}
-                      />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Line
-                        type="monotone"
-                        dataKey="count"
-                        stroke={BRAND_RED_DARK}
-                        strokeWidth={2}
-                        dot={{ r: 3, fill: BRAND_RED_DARK, strokeWidth: 0 }}
-                        activeDot={{ r: 5, fill: BRAND_RED_DARK }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Booking status breakdown */}
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <Handshake className="text-h_red h-4 w-4" />
-                  Booking Requests by Status
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {bookingsByStatus.length === 0 ? (
-                  <p className="text-muted-foreground py-8 text-center text-sm">
-                    No booking requests yet
-                  </p>
-                ) : (
+          {/* Charts row - only show advanced charts for PREMIUM */}
+          {hasAdvancedAnalytics ? (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Profile views over time */}
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <Eye className="text-h_red h-4 w-4" />
+                    Profile Views (30 days)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={bookingsByStatus}>
+                      <LineChart data={viewsOverTime}>
                         <CartesianGrid stroke={GRID} vertical={false} />
                         <XAxis
-                          dataKey="status"
-                          tickFormatter={(v) => STATUS_LABELS[v] || v}
+                          dataKey="date"
                           tick={{ fill: GRAY, fontSize: 11 }}
+                          tickFormatter={formatDate}
                           axisLine={{ stroke: GRID }}
                           tickLine={false}
+                          minTickGap={24}
                         />
                         <YAxis
                           tick={{ fill: GRAY, fontSize: 11 }}
@@ -349,113 +269,280 @@ export default function DjAnalyticsDashboard({
                           tickLine={false}
                           allowDecimals={false}
                         />
-                        <Tooltip
-                          content={({ active, payload, label }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <div className="rounded-md border border-white/10 bg-black/90 px-3 py-2 text-xs text-white shadow-lg">
-                                  <p className="text-gray-400">
-                                    {STATUS_LABELS[String(label)] || label}
-                                  </p>
-                                  <p className="font-medium">
-                                    {payload[0].value}
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
+                        <Tooltip content={<ChartTooltip />} />
+                        <Line
+                          type="monotone"
+                          dataKey="count"
+                          stroke={BRAND_RED}
+                          strokeWidth={2}
+                          dot={{ r: 3, fill: BRAND_RED, strokeWidth: 0 }}
+                          activeDot={{ r: 5, fill: BRAND_RED }}
                         />
-                        <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                          {bookingsByStatus.map((_, i) => (
-                            <Cell
-                              key={`cell-${i}`}
-                              fill={CHART_COLORS[i % CHART_COLORS.length]}
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Traffic sources */}
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <TrendingUp className="text-h_red h-4 w-4" />
-                  Profile View Sources
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {sources.length === 0 ? (
-                  <p className="text-muted-foreground py-8 text-center text-sm">
-                    No source data yet
-                  </p>
-                ) : (
+              {/* Follower growth over time */}
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <Users className="text-h_red h-4 w-4" />
+                    New Followers (30 days)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={sources}
+                      <LineChart data={followersOverTime}>
+                        <CartesianGrid stroke={GRID} vertical={false} />
+                        <XAxis
+                          dataKey="date"
+                          tick={{ fill: GRAY, fontSize: 11 }}
+                          tickFormatter={formatDate}
+                          axisLine={{ stroke: GRID }}
+                          tickLine={false}
+                          minTickGap={24}
+                        />
+                        <YAxis
+                          tick={{ fill: GRAY, fontSize: 11 }}
+                          axisLine={false}
+                          tickLine={false}
+                          allowDecimals={false}
+                        />
+                        <Tooltip content={<ChartTooltip />} />
+                        <Line
+                          type="monotone"
                           dataKey="count"
-                          nameKey="source"
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={80}
-                          label={(props) => {
-                            const source = String(props.name ?? "");
-                            const count = Number(props.value ?? 0);
-                            return `${SOURCE_LABELS[source] || source}: ${count}`;
-                          }}
-                          labelLine={false}
-                        >
-                          {sources.map((_, i) => (
-                            <Cell
-                              key={`cell-${i}`}
-                              fill={CHART_COLORS[i % CHART_COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Legend
-                          verticalAlign="bottom"
-                          height={24}
-                          formatter={(value) => (
-                            <span className="text-xs text-gray-400">
-                              {SOURCE_LABELS[value] || value}
-                            </span>
-                          )}
+                          stroke={BRAND_RED_DARK}
+                          strokeWidth={2}
+                          dot={{ r: 3, fill: BRAND_RED_DARK, strokeWidth: 0 }}
+                          activeDot={{ r: 5, fill: BRAND_RED_DARK }}
                         />
-                        <Tooltip
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const p = payload[0];
-                              const source = String(p.name);
-                              return (
-                                <div className="rounded-md border border-white/10 bg-black/90 px-3 py-2 text-xs text-white shadow-lg">
-                                  <p className="text-gray-400">
-                                    {SOURCE_LABELS[source] || source}
-                                  </p>
-                                  <p className="font-medium">{p.value}</p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                      </PieChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   </div>
-                )}
+                </CardContent>
+              </Card>
+
+              {/* Booking status breakdown */}
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <Handshake className="text-h_red h-4 w-4" />
+                    Booking Requests by Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {bookingsByStatus.length === 0 ? (
+                    <p className="text-muted-foreground py-8 text-center text-sm">
+                      No booking requests yet
+                    </p>
+                  ) : (
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={bookingsByStatus}>
+                          <CartesianGrid stroke={GRID} vertical={false} />
+                          <XAxis
+                            dataKey="status"
+                            tickFormatter={(v) => STATUS_LABELS[v] || v}
+                            tick={{ fill: GRAY, fontSize: 11 }}
+                            axisLine={{ stroke: GRID }}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            tick={{ fill: GRAY, fontSize: 11 }}
+                            axisLine={false}
+                            tickLine={false}
+                            allowDecimals={false}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                return (
+                                  <div className="rounded-md border border-white/10 bg-black/90 px-3 py-2 text-xs text-white shadow-lg">
+                                    <p className="text-gray-400">
+                                      {STATUS_LABELS[String(label)] || label}
+                                    </p>
+                                    <p className="font-medium">
+                                      {payload[0].value}
+                                    </p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                            {bookingsByStatus.map((_, i) => (
+                              <Cell
+                                key={`cell-${i}`}
+                                fill={CHART_COLORS[i % CHART_COLORS.length]}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Traffic sources */}
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <TrendingUp className="text-h_red h-4 w-4" />
+                    Profile View Sources
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {sources.length === 0 ? (
+                    <p className="text-muted-foreground py-8 text-center text-sm">
+                      No source data yet
+                    </p>
+                  ) : (
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={sources}
+                            dataKey="count"
+                            nameKey="source"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            label={(props) => {
+                              const source = String(props.name ?? "");
+                              const count = Number(props.value ?? 0);
+                              return `${SOURCE_LABELS[source] || source}: ${count}`;
+                            }}
+                            labelLine={false}
+                          >
+                            {sources.map((_, i) => (
+                              <Cell
+                                key={`cell-${i}`}
+                                fill={CHART_COLORS[i % CHART_COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Legend
+                            verticalAlign="bottom"
+                            height={24}
+                            formatter={(value) => (
+                              <span className="text-xs text-gray-400">
+                                {SOURCE_LABELS[value] || value}
+                              </span>
+                            )}
+                          />
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const p = payload[0];
+                                const source = String(p.name);
+                                return (
+                                  <div className="rounded-md border border-white/10 bg-black/90 px-3 py-2 text-xs text-white shadow-lg">
+                                    <p className="text-gray-400">
+                                      {SOURCE_LABELS[source] || source}
+                                    </p>
+                                    <p className="font-medium">{p.value}</p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Top Cities — audience location from profile views */}
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <MapPin className="text-h_red h-4 w-4" />
+                    Top Cities
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {topCities.length === 0 ? (
+                    <p className="text-muted-foreground py-8 text-center text-sm">
+                      No location data yet
+                    </p>
+                  ) : (
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={topCities} layout="vertical">
+                          <CartesianGrid stroke={GRID} horizontal={false} />
+                          <XAxis
+                            type="number"
+                            tick={{ fill: GRAY, fontSize: 11 }}
+                            axisLine={false}
+                            tickLine={false}
+                            allowDecimals={false}
+                          />
+                          <YAxis
+                            type="category"
+                            dataKey="city"
+                            tick={{ fill: GRAY, fontSize: 11 }}
+                            axisLine={{ stroke: GRID }}
+                            tickLine={false}
+                            width={80}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                const item = payload[0].payload as TopCity;
+                                return (
+                                  <div className="rounded-md border border-white/10 bg-black/90 px-3 py-2 text-xs text-white shadow-lg">
+                                    <p className="text-gray-400">
+                                      {label}, {item.country}
+                                    </p>
+                                    <p className="font-medium">
+                                      {payload[0].value} views
+                                    </p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                            {topCities.map((_, i) => (
+                              <Cell
+                                key={`cell-${i}`}
+                                fill={CHART_COLORS[i % CHART_COLORS.length]}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <Card className="border-white/10 bg-white/5">
+              <CardContent className="py-12 text-center">
+                <TrendingUp className="mx-auto mb-3 h-8 w-8 text-gray-500" />
+                <h3 className="text-base font-semibold text-white">
+                  Upgrade to Premium for Advanced Analytics
+                </h3>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  Get detailed charts, 30-day trends, and demographic insights
+                </p>
               </CardContent>
             </Card>
-          </div>
+          )}
 
           <Separator />
 
-          {/* Top media */}
+          {/* Top media - available for all plans */}
           <section>
             <h3 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
               Top Performing Media

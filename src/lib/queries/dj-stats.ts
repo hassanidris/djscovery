@@ -176,3 +176,68 @@ export async function getDjProfileViewSources(
     }))
     .sort((a, b) => b.count - a.count);
 }
+
+// ── Phase 1: Response Rate & Booking Rate ────────────────────────────────────
+// These replace the hardcoded values in seed data and profile defaults.
+// Response Rate = % of booking inquiries that received a response (ACCEPTED or DECLINED)
+// Booking Rate  = % of booking inquiries that were ACCEPTED
+
+export async function getDjResponseRate(djProfileId: number): Promise<number> {
+  const [total, responded] = await Promise.all([
+    prisma.bookingInquiry.count({
+      where: { djProfileId },
+    }),
+    prisma.bookingInquiry.count({
+      where: {
+        djProfileId,
+        status: { in: ["ACCEPTED", "DECLINED"] },
+      },
+    }),
+  ]);
+
+  return total > 0 ? Math.round((responded / total) * 100) : 0;
+}
+
+export async function getDjBookingRate(djProfileId: number): Promise<number> {
+  const [total, accepted] = await Promise.all([
+    prisma.bookingInquiry.count({
+      where: { djProfileId },
+    }),
+    prisma.bookingInquiry.count({
+      where: {
+        djProfileId,
+        status: "ACCEPTED",
+      },
+    }),
+  ]);
+
+  return total > 0 ? Math.round((accepted / total) * 100) : 0;
+}
+
+// ── Phase 2: Top Cities (audience location from ProfileView) ─────────────────
+// ProfileView already has `city` and `country` as String? fields.
+// We group by city to find where the DJ's audience is located.
+
+export type TopCity = { city: string; country: string; count: number };
+
+export async function getDjTopCities(
+  djProfileId: number,
+  limit = 5,
+): Promise<TopCity[]> {
+  const results = await prisma.profileView.groupBy({
+    by: ["city", "country"],
+    where: {
+      djProfileId,
+      city: { not: null },
+    },
+    _count: { city: true },
+    orderBy: { _count: { city: "desc" } },
+    take: limit,
+  });
+
+  return results.map((r) => ({
+    city: r.city || "Unknown",
+    country: r.country || "Unknown",
+    count: r._count.city,
+  }));
+}

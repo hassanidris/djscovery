@@ -121,20 +121,58 @@ export default function DjProfileFree({
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
+  const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
+  const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
 
-  const DJ = djData ? mapFreeDjToProps(djData) : FREE_DEFAULT_DJ;
-  const EVENTS = djData ? mapFreeEventsFromData(djData) : FREE_DEFAULT_EVENTS;
-  const REVIEWS = djData ? mapFreeReviewsFromData(djData) : [];
-  const MEDIA = djData ? mapFreeMediaFromData(djData) : FREE_DEFAULT_MEDIA;
+  // In staging: use real data if available, supplement with demo data
+  // In production: only use real data
+  const DJ = djData
+    ? mapFreeDjToProps(djData)
+    : isStaging
+      ? FREE_DEFAULT_DJ
+      : null;
+  const EVENTS = djData
+    ? mapFreeEventsFromData(djData)
+    : isStaging
+      ? FREE_DEFAULT_EVENTS
+      : [];
+  const REVIEWS = djData
+    ? mapFreeReviewsFromData(djData)
+    : isStaging
+      ? FREE_DEFAULT_REVIEWS
+      : [];
+  const MEDIA = djData
+    ? mapFreeMediaFromData(djData)
+    : isStaging
+      ? FREE_DEFAULT_MEDIA
+      : [];
   const FEATURED_MIX = djData
     ? mapFreeFeaturedMix(djData)
-    : FREE_DEFAULT_FEATURED_MIX;
+    : isStaging
+      ? FREE_DEFAULT_FEATURED_MIX
+      : null;
   const videoUrl = djData?.spotlight.featuredVideo.videoUrl ?? "";
   const videoThumb =
     djData?.spotlight.featuredVideo.thumbnail ||
     getVideoThumbnailUrl(videoUrl) ||
     "/gallery-2.png";
-  const location = `${DJ.city}, ${DJ.country}`;
+  const location = DJ ? `${DJ.city}, ${DJ.country}` : "";
+
+  const featuredMixAudioUrl = FEATURED_MIX?.audioUrl ?? "";
+  // Hooks must run unconditionally before any early return (Rules of Hooks)
+  const autoMixThumb = useAudioThumbnail(featuredMixAudioUrl);
+  const featuredMixThumb =
+    FEATURED_MIX?.thumbnail || autoMixThumb || "/gallery-2.png";
+
+  // Early return in production if no data available
+  if (!DJ && isProduction) {
+    return null;
+  }
+
+  // After this point, DJ and FEATURED_MIX are guaranteed to be non-null
+  // (either from real data or demo defaults in staging)
+  const safeDJ = DJ!;
+  const safeFEATURED_MIX = FEATURED_MIX!;
 
   const isOwner = viewMode === "dj-owner";
   const editHref = "/dj/settings";
@@ -143,16 +181,11 @@ export default function DjProfileFree({
     isAuthenticated: false,
   };
 
-  const hasFeaturedMix = FEATURED_MIX.audioUrl !== "";
+  const hasFeaturedMix = safeFEATURED_MIX.audioUrl !== "";
   const hasFeaturedVideo = !!djData?.spotlight.featuredVideo.videoUrl;
   const hasSpotlight = hasFeaturedMix || hasFeaturedVideo;
   const hasMixes = hasFeaturedMix;
   const hasPhotos = MEDIA.length > 0;
-
-  const featuredMixAudioUrl = FEATURED_MIX.audioUrl;
-  const autoMixThumb = useAudioThumbnail(featuredMixAudioUrl);
-  const featuredMixThumb =
-    FEATURED_MIX.thumbnail || autoMixThumb || "/gallery-2.png";
 
   const completion = djData ? calculateProfileCompletion(djData) : null;
 
@@ -187,7 +220,7 @@ export default function DjProfileFree({
             </div>
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
-              stageName={`Dj. ${DJ.stageName}`}
+              stageName={`Dj. ${safeDJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
               variant="free"
@@ -197,8 +230,8 @@ export default function DjProfileFree({
 
             <div id="about">
               <ProfileAbout
-                bio={DJ.bio}
-                djTypes={DJ.djTypes}
+                bio={safeDJ.bio}
+                djTypes={safeDJ.djTypes}
                 bioExpanded={bioExpanded}
                 onToggleBio={() => setBioExpanded(!bioExpanded)}
                 experienceYears={djData?.experienceYears}
@@ -222,8 +255,8 @@ export default function DjProfileFree({
                 </SectionHeading>
                 {hasMixes ? (
                   <MediaAudioPlayer
-                    audioUrl={FEATURED_MIX.audioUrl}
-                    title={FEATURED_MIX.title}
+                    audioUrl={safeFEATURED_MIX.audioUrl}
+                    title={safeFEATURED_MIX.title}
                     thumbnailUrl={featuredMixThumb || undefined}
                   >
                     <Card className="bg-h_blackLight/30 cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
@@ -232,7 +265,7 @@ export default function DjProfileFree({
                           {featuredMixThumb ? (
                             <Image
                               src={featuredMixThumb}
-                              alt={FEATURED_MIX.title}
+                              alt={safeFEATURED_MIX.title}
                               fill
                               className="object-cover"
                             />
@@ -242,11 +275,12 @@ export default function DjProfileFree({
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold text-white">
-                            {FEATURED_MIX.title}
+                            {safeFEATURED_MIX.title}
                           </p>
                           <p className="mt-0.5 text-xs text-gray-500">
-                            {FEATURED_MIX.platform} · {FEATURED_MIX.duration} ·{" "}
-                            {FEATURED_MIX.plays} plays
+                            {safeFEATURED_MIX.platform} ·{" "}
+                            {safeFEATURED_MIX.duration} ·{" "}
+                            {safeFEATURED_MIX.plays} plays
                           </p>
                           <div className="mt-2 flex items-center gap-2">
                             <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
@@ -294,17 +328,17 @@ export default function DjProfileFree({
                       {/* Featured Mix */}
                       {hasFeaturedMix && (
                         <MediaAudioPlayer
-                          audioUrl={FEATURED_MIX.audioUrl}
-                          title={FEATURED_MIX.title}
+                          audioUrl={safeFEATURED_MIX.audioUrl}
+                          title={safeFEATURED_MIX.title}
                           thumbnailUrl={featuredMixThumb || undefined}
-                          mediaId={FEATURED_MIX.id}
+                          mediaId={safeFEATURED_MIX.id}
                         >
                           <Card className="bg-h_blackLight/30 group hover:border-h_red/30 flex h-full cursor-pointer flex-col gap-0 overflow-hidden border-white/8 transition-all">
                             <div className="from-h_red/20 relative h-40 shrink-0 bg-linear-to-br to-black">
                               {featuredMixThumb ? (
                                 <Image
                                   src={featuredMixThumb}
-                                  alt={FEATURED_MIX.title}
+                                  alt={safeFEATURED_MIX.title}
                                   fill
                                   className="object-cover opacity-50 transition-opacity group-hover:opacity-60"
                                 />
@@ -323,14 +357,14 @@ export default function DjProfileFree({
                             </div>
                             <div className="p-4">
                               <p className="text-sm font-semibold text-white">
-                                {FEATURED_MIX.title}
+                                {safeFEATURED_MIX.title}
                               </p>
                               <p className="mt-1 text-xs text-gray-500">
-                                {FEATURED_MIX.duration} · {FEATURED_MIX.plays}{" "}
-                                plays
+                                {safeFEATURED_MIX.duration} ·{" "}
+                                {safeFEATURED_MIX.plays} plays
                               </p>
                               <div className="mt-2 flex items-center gap-1">
-                                {FEATURED_MIX.genres.map((t) => (
+                                {safeFEATURED_MIX.genres.map((t) => (
                                   <Badge
                                     key={t}
                                     className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400"
@@ -425,7 +459,7 @@ export default function DjProfileFree({
                 calendarDays={[]}
                 calendarLabel="Calendar"
                 isOwner={isOwner}
-                djName={DJ.stageName}
+                djName={safeDJ.stageName}
                 featuredPerformanceUrl={djData?.featuredPerformanceUrl}
                 featuredPerformanceContext={djData?.featuredPerformanceContext}
                 featuredPerformanceThumbnailUrl={
@@ -443,8 +477,8 @@ export default function DjProfileFree({
                 </SectionHeading>
                 {REVIEWS.length > 0 ? (
                   <ProfileReviews
-                    avgRating={DJ.avgRating}
-                    ratingCount={DJ.ratingCount}
+                    avgRating={safeDJ.avgRating}
+                    ratingCount={safeDJ.ratingCount}
                     reviews={REVIEWS}
                   />
                 ) : (
@@ -485,8 +519,8 @@ export default function DjProfileFree({
                   {(
                     [
                       {
-                        title: "Performance Insights",
-                        desc: "Analytics, profile views & booking stats",
+                        title: "Advanced Analytics",
+                        desc: "30-day trends, charts & demographic insights",
                         icon: ChartLine,
                       },
                       {
@@ -542,13 +576,13 @@ export default function DjProfileFree({
               <ProfileEventsSidebar
                 events={EVENTS}
                 isOwner={isOwner}
-                djName={DJ.stageName}
+                djName={safeDJ.stageName}
               />
             </div>
 
             {/* Book CTA — desktop only; mobile version is inline above */}
             <BookCTA
-              stageName={`Dj. ${DJ.stageName}`}
+              stageName={`Dj. ${safeDJ.stageName}`}
               djProfileId={djProfileId}
               viewer={bookingContext}
               variant="free"

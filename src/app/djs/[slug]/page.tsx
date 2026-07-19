@@ -11,6 +11,12 @@ import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
 import { fetchYouTubeOEmbed } from "@/lib/actions/media";
+import {
+  getDjResponseRate,
+  getDjBookingRate,
+  getDjTopCities,
+} from "@/lib/queries/dj-stats";
+import { getProfileStats } from "@/lib/actions/dj-analytics";
 import JsonLd from "@/components/seo/JsonLd";
 
 export default async function DjProfilePage({
@@ -187,7 +193,14 @@ export default async function DjProfilePage({
 
   // Accurate aggregates: avg rating over ALL ratings (not just the fetched 20),
   // and event count limited to publicly visible events (matches the list shown).
-  const [ratingAgg, publicEventsCount] = await Promise.all([
+  const [
+    ratingAgg,
+    publicEventsCount,
+    responseRate,
+    bookingRate,
+    topCities,
+    ownerProfileStats,
+  ] = await Promise.all([
     prisma.djRating.aggregate({
       where: { djProfileId: dj.id },
       _avg: { rating: true },
@@ -199,6 +212,11 @@ export default async function DjProfilePage({
         deletedAt: null,
       },
     }),
+    getDjResponseRate(dj.id),
+    getDjBookingRate(dj.id),
+    getDjTopCities(dj.id, 5),
+    // Only returns data if the current viewer is the profile owner on a PREMIUM plan
+    getProfileStats(dj.id),
   ]);
   const avgRating = ratingAgg._avg.rating ?? 0;
 
@@ -341,8 +359,8 @@ export default async function DjProfilePage({
       rating: avgRating,
       reviews: dj._count.ratings,
       events: publicEventsCount,
-      responseRate: 0,
-      bookingRate: 0,
+      responseRate,
+      bookingRate,
       monthlyViews: dj.monthlyViews ?? 0,
     },
     spotlight: {
@@ -372,11 +390,24 @@ export default async function DjProfilePage({
       })(),
     },
     analytics: {
-      profileViews: { value: dj.monthlyViews ?? 0, growth: 0 },
-      bookingRequests: { value: 0, growth: 0 },
-      newFollowers: { value: 0, growth: 0 },
-      bookingRate: 0,
-      topCities: [],
+      profileViews: ownerProfileStats?.profileViews ?? {
+        value: dj.monthlyViews ?? 0,
+        growth: 0,
+      },
+      bookingRequests: ownerProfileStats?.bookingRequests ?? {
+        value: 0,
+        growth: 0,
+      },
+      newFollowers: ownerProfileStats?.newFollowers ?? {
+        value: 0,
+        growth: 0,
+      },
+      bookingRate,
+      topCities: topCities.map((c) => ({
+        city: c.city,
+        country: c.country,
+        percentage: 0,
+      })),
       audienceAge: [],
       trafficSources: [],
     },
