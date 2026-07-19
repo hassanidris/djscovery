@@ -57,41 +57,41 @@ export default function AttendanceButton({
   }
 
   return (
-    <div className="mt-7 flex gap-2">
+    <div className="mt-4 flex gap-3">
       <Button
-        variant={status === "GOING" ? "default" : "outline"}
-        size="sm"
+        variant="outline"
+        size="lg"
         disabled={isPending}
         onClick={() => handleToggle("GOING")}
-        className={
+        className={`flex-1 ${
           status === "GOING"
-            ? "bg-h_red hover:bg-h_redDark text-white"
-            : "border-white/20 text-gray-300 hover:border-white/40 hover:text-white"
-        }
+            ? "bg-h_red border-h_red hover:bg-h_redDark text-white"
+            : "border-white/30 bg-white! text-black! hover:border-white/60 hover:bg-zinc-200!"
+        }`}
       >
         {isPending && status === "GOING" ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
-          <Calendar className="h-4 w-4" />
+          <Calendar className="h-5 w-5" />
         )}
         Going
       </Button>
 
       <Button
-        variant={status === "INTERESTED" ? "default" : "outline"}
-        size="sm"
+        variant="outline"
+        size="lg"
         disabled={isPending}
         onClick={() => handleToggle("INTERESTED")}
-        className={
+        className={`flex-1 ${
           status === "INTERESTED"
-            ? "bg-h_red hover:bg-h_redDark text-white"
-            : "border-white/20 text-gray-300 hover:border-white/40 hover:text-white"
-        }
+            ? "bg-h_red border-h_red hover:bg-h_redDark text-white"
+            : "border-white/30 !bg-white !text-black hover:border-white/60 hover:!bg-zinc-200"
+        }`}
       >
         {isPending && status === "INTERESTED" ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
-          <Heart className="h-4 w-4" />
+          <Heart className="h-5 w-5" />
         )}
         Interested
       </Button>
