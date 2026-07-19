@@ -85,7 +85,7 @@ export default function AttendanceButton({
         className={`flex-1 ${
           status === "INTERESTED"
             ? "bg-h_red border-h_red hover:bg-h_redDark text-white"
-            : "border-white/30 !bg-white !text-black hover:border-white/60 hover:!bg-zinc-200"
+            : "border-white/30 bg-white! text-black! hover:border-white/60 hover:bg-zinc-200!"
         }`}
       >
         {isPending && status === "INTERESTED" ? (
