@@ -1287,6 +1287,7 @@ export default function DjProfilePremium({
             onClose={() => setIsPackageModalOpen(false)}
             packages={packages}
             onSave={handlePackageSave}
+            djProfileId={djProfileId}
           />
           <HighlightModal
             key={

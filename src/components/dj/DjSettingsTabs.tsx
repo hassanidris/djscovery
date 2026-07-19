@@ -781,7 +781,7 @@ type Highlight = {
   id: number;
   year: string;
   title: string;
-  description: string;
+  description: string | null;
 };
 
 function HighlightsTab({ profile }: { profile: ProfileData }) {
@@ -843,7 +843,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
         const formData = new FormData();
         formData.append("year", h.year.trim());
         formData.append("title", h.title.trim());
-        if (h.description.trim())
+        if (h.description?.trim())
           formData.append("description", h.description.trim());
         const result = await createDjHighlight(formData);
         if ("error" in result) {
@@ -857,7 +857,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
         const formData = new FormData();
         formData.append("year", h.year.trim());
         formData.append("title", h.title.trim());
-        formData.append("description", h.description.trim());
+        formData.append("description", h.description?.trim() ?? "");
         const result = await updateDjHighlight(h.id, formData);
         if ("error" in result) {
           toast.error(result.error);
@@ -959,7 +959,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
                   </Label>
                   <Textarea
                     id={`highlight-description-${h.id}`}
-                    value={h.description}
+                    value={h.description ?? ""}
                     onChange={(e) =>
                       updateHighlight(h.id, "description", e.target.value)
                     }
