@@ -535,7 +535,7 @@ function EventDetailView(props: {
               </div>
 
               {/* Venue Card */}
-              {(location || venue) && (
+              {(location || venue || isPrivate) && (
                 <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
                   <div className="mb-3 flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-zinc-500" />
