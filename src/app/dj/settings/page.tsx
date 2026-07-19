@@ -18,12 +18,59 @@ export default async function DjSettingsPage() {
 
   const dj = await prisma.djProfile.findUnique({
     where: { userId: user.id },
-    include: {
-      genres: { include: { genre: { select: { name: true } } } },
-      djTypes: { select: { type: true } },
-      socialLinks: { select: { platform: true, url: true } },
-      city: { select: { id: true, name: true } },
-      country: { select: { id: true, name: true } },
+    select: {
+      id: true,
+      stageName: true,
+      bio: true,
+      avatar: true,
+      coverImage: true,
+      countryId: true,
+      cityId: true,
+      bookingEmail: true,
+      bookingPhone: true,
+      feeMin: true,
+      feeMax: true,
+      feeCurrency: true,
+      slug: true,
+      plan: true,
+      managerName: true,
+      managerEmail: true,
+      managerPhone: true,
+      agentName: true,
+      agentAgency: true,
+      agentEmail: true,
+      genres: {
+        select: {
+          genre: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      djTypes: {
+        select: {
+          type: true,
+        },
+      },
+      socialLinks: {
+        select: {
+          platform: true,
+          url: true,
+        },
+      },
+      city: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      country: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 
@@ -63,6 +110,13 @@ export default async function DjSettingsPage() {
     feeMax: dj.feeMax ?? null,
     feeCurrency: dj.feeCurrency ?? "USD",
     slug: dj.slug,
+    plan: dj.plan,
+    managerName: dj.managerName ?? "",
+    managerEmail: dj.managerEmail ?? "",
+    managerPhone: dj.managerPhone ?? "",
+    agentName: dj.agentName ?? "",
+    agentAgency: dj.agentAgency ?? "",
+    agentEmail: dj.agentEmail ?? "",
   };
 
   return (

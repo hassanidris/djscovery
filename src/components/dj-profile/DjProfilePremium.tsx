@@ -41,6 +41,7 @@ import BookingPackages from "@/components/dj-profile/BookingPackages";
 import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
+import ProfessionalTeamSidebar from "@/components/dj-profile/ProfessionalTeamSidebar";
 import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
 import {
   getDjPackages,
@@ -1118,46 +1119,14 @@ export default function DjProfilePremium({
             </div>
             <Separator className="bg-white/8" /> */}
 
-            {/* Professional Contacts */}
-            <div>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
-                <BriefcaseBusiness className="text-h_red h-3 w-3" />
-                Professional Team
-              </h3>
-              <div className="flex flex-col gap-2">
-                <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-3">
-                  <p className="mb-1 text-[11px] font-semibold tracking-wider text-gray-500 uppercase">
-                    Manager
-                  </p>
-                  <p className="text-xs font-semibold text-white">
-                    {DJ.manager.name}
-                  </p>
-                  <a
-                    href={`mailto:${DJ.manager.email}`}
-                    className="hover:text-h_red mt-0.5 block truncate text-xs text-gray-400 transition-colors"
-                  >
-                    {DJ.manager.email}
-                  </a>
-                </Card>
-                <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-3">
-                  <p className="mb-1 text-[11px] font-semibold tracking-wider text-gray-500 uppercase">
-                    Booking Agent
-                  </p>
-                  <p className="text-xs font-semibold text-white">
-                    {DJ.agent.name}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-gray-500">
-                    {DJ.agent.agency}
-                  </p>
-                  <a
-                    href={`mailto:${DJ.agent.email}`}
-                    className="hover:text-h_red mt-0.5 block truncate text-xs text-gray-400 transition-colors"
-                  >
-                    {DJ.agent.email}
-                  </a>
-                </Card>
-              </div>
-            </div>
+            {/* Professional Team */}
+            <ProfessionalTeamSidebar
+              managerName={DJ.manager.name}
+              managerEmail={DJ.manager.email}
+              agentName={DJ.agent.name}
+              agentAgency={DJ.agent.agency}
+              agentEmail={DJ.agent.email}
+            />
 
             <Separator className="bg-white/8" />
 
