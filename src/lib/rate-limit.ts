@@ -80,6 +80,17 @@ export async function rateLimit(
   limit: number,
   windowSeconds: number,
 ): Promise<RateLimitResult> {
+  // Disable rate limiting in test environment
+  if (process.env.NEXT_PUBLIC_APP_ENV === "test") {
+    return {
+      success: true,
+      limit,
+      windowSeconds,
+      remaining: limit,
+      resetAt: Date.now(),
+    };
+  }
+
   if (!identifier) {
     throw new Error("rateLimit: identifier is required for rate limiting");
   }

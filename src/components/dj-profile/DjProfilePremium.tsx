@@ -34,9 +34,11 @@ import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
 import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
+import CareerHighlights from "@/components/dj-profile/CareerHighlights";
 import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import VenueModal from "@/components/dj-profile/VenueModal";
+import HighlightModal from "@/components/dj-profile/HighlightModal";
 import BookingPackages from "@/components/dj-profile/BookingPackages";
 import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
@@ -49,6 +51,12 @@ import {
   updateDjPackage,
   deleteDjPackage,
 } from "@/lib/actions/dj-packages";
+import {
+  getDjHighlights,
+  createDjHighlight,
+  updateDjHighlight,
+  deleteDjHighlight,
+} from "@/lib/actions/dj-highlights";
 import { toast } from "sonner";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
@@ -243,6 +251,7 @@ export default function DjProfilePremium({
   );
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
+  const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
   const bookCTARefMobile = useRef<BookCTARef>(null);
   const bookCTARefDesktop = useRef<BookCTARef>(null);
   const [venues, setVenues] = useState<
@@ -266,6 +275,23 @@ export default function DjProfilePremium({
       cityId: 0,
       countryName: v.country,
       cityName: v.city,
+    })),
+  );
+  const [highlights, setHighlights] = useState<
+    Array<{
+      id: number;
+      year: string;
+      title: string;
+      description: string;
+      iconName?: string;
+    }>
+  >(
+    (djData?.careerHighlights || []).map((h: any, i: number) => ({
+      id: h.id || 0,
+      year: String(h.year),
+      title: h.title,
+      description: h.description || "",
+      iconName: undefined,
     })),
   );
   const [packages, setPackages] = useState<
@@ -466,6 +492,94 @@ export default function DjProfilePremium({
     } catch (error) {
       console.error("Failed to save packages:", error);
       toast.error("Failed to save packages. Please try again.", {
+        id: toastId,
+      });
+    }
+  }
+
+  async function handleHighlightSave(newHighlights: typeof highlights) {
+    const toastId = toast.loading("Saving highlights...");
+
+    try {
+      // Find new highlights (id === 0)
+      const highlightsToAdd = newHighlights.filter((h) => h.id === 0);
+      // Find existing highlights that were modified
+      const highlightsToUpdate = newHighlights.filter((h) => h.id !== 0);
+      // Find highlights that were removed
+      const removedHighlightIds = highlights
+        .filter((h) => !newHighlights.find((nh) => nh.id === h.id))
+        .map((h) => h.id);
+
+      // Add new highlights
+      const addedHighlightIds: number[] = [];
+      for (const highlight of highlightsToAdd) {
+        if (!highlight.year.trim() || !highlight.title.trim()) {
+          continue;
+        }
+        const formData = new FormData();
+        formData.append("year", highlight.year.trim());
+        formData.append("title", highlight.title.trim());
+        if (highlight.description.trim()) {
+          formData.append("description", highlight.description.trim());
+        }
+
+        const result = await createDjHighlight(formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+        if ("success" in result) {
+          addedHighlightIds.push(result.id);
+        }
+      }
+
+      // Update modified highlights
+      for (const highlight of highlightsToUpdate) {
+        if (
+          !highlight.id ||
+          highlight.id === undefined ||
+          highlight.id === null
+        ) {
+          continue;
+        }
+        const formData = new FormData();
+        formData.append("year", highlight.year.trim());
+        formData.append("title", highlight.title.trim());
+        formData.append("description", highlight.description.trim());
+
+        const result = await updateDjHighlight(highlight.id, formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      // Delete removed highlights
+      for (const highlightId of removedHighlightIds) {
+        const result = await deleteDjHighlight(highlightId);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      toast.success("Highlights saved successfully!", { id: toastId });
+
+      // Update local state with new highlight IDs
+      const updatedHighlights = newHighlights.map((h, idx) => {
+        if (h.id === 0 && addedHighlightIds.length > 0) {
+          const newId = addedHighlightIds.shift();
+          return { ...h, id: newId || 0 };
+        }
+        return h;
+      });
+      setHighlights(updatedHighlights);
+
+      // Trigger page refresh to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to save highlights:", error);
+      toast.error("Failed to save highlights. Please try again.", {
         id: toastId,
       });
     }
@@ -862,43 +976,14 @@ export default function DjProfilePremium({
               )}
             </section>
 
-            {HIGHLIGHTS.length > 0 && (
-              <>
-                <Separator className="bg-white/8" />
+            <Separator className="bg-white/8" />
 
-                {/* ── CAREER HIGHLIGHTS ── */}
-                <section>
-                  <SectionHeading sub="Key milestones and achievements">
-                    Career Highlights
-                  </SectionHeading>
-                  <div className="relative flex flex-col gap-0">
-                    {HIGHLIGHTS.map((h, i) => {
-                      const HIcon = h.icon;
-                      return (
-                        <div key={i} className="flex gap-4 pb-6 last:pb-0">
-                          <div className="flex flex-col items-center">
-                            <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-full border">
-                              <HIcon className="text-h_red h-3.5 w-3.5" />
-                            </div>
-                            {i < HIGHLIGHTS.length - 1 && (
-                              <div className="mt-2 w-px flex-1 bg-white/8" />
-                            )}
-                          </div>
-                          <div className="pt-1.5 pb-1">
-                            <p className="text-sm font-semibold text-white">
-                              {h.title}
-                            </p>
-                            <p className="mt-0.5 text-xs text-gray-500">
-                              {h.year}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              </>
-            )}
+            {/* ── CAREER HIGHLIGHTS ── */}
+            <CareerHighlights
+              highlights={HIGHLIGHTS}
+              isOwner={isOwner}
+              onAddHighlight={() => setIsHighlightModalOpen(true)}
+            />
 
             {ENDORSEMENTS.length > 0 && (
               <>
@@ -1202,8 +1287,17 @@ export default function DjProfilePremium({
             onClose={() => setIsPackageModalOpen(false)}
             packages={packages}
             onSave={handlePackageSave}
-            djProfileId={djProfileId}
-            defaultCurrency={djData?.booking?.feeRange?.currency || "USD"}
+          />
+          <HighlightModal
+            key={
+              isHighlightModalOpen
+                ? "highlight-modal-open"
+                : "highlight-modal-closed"
+            }
+            isOpen={isHighlightModalOpen}
+            onClose={() => setIsHighlightModalOpen(false)}
+            highlights={highlights}
+            onSave={handleHighlightSave}
           />
         </>
       )}
