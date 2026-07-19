@@ -18,7 +18,7 @@ const OEMBED_ENDPOINTS: Record<string, string> = {
   vimeo: "https://vimeo.com/api/oembed.json",
   soundcloud: "https://soundcloud.com/oembed",
   mixcloud: "https://www.mixcloud.com/oembed",
-  instagram: "https://www.instagram.com/oembed",
+  instagram: "https://graph.facebook.com/v25.0/instagram_oembed",
   tiktok: "https://www.tiktok.com/oembed",
 };
 
@@ -114,6 +114,15 @@ export async function fetchOEmbed(url: string): Promise<OEmbedData | null> {
     return null;
   }
 
+  // Instagram oEmbed via Facebook Graph API requires access token for most posts
+  // Fall back to metadata without oEmbed for Instagram
+  if (platform === "instagram") {
+    console.warn("Instagram oEmbed requires access token, using fallback");
+    return null;
+  }
+
+  // TikTok oEmbed returns signed CDN URLs that expire
+  // We'll fetch it but filter out the signed thumbnail URL later
   // Normalize SoundCloud URLs
   const normalizedUrl =
     platform === "soundcloud" ? normalizeSoundCloudUrl(url) : url;
@@ -139,9 +148,17 @@ export async function fetchOEmbed(url: string): Promise<OEmbedData | null> {
 
     const data = await response.json();
 
+    // Filter out TikTok signed CDN URLs (x-expires/x-signature params cause 403 after expiration)
+    const thumbnail =
+      data.thumbnail_url &&
+      !data.thumbnail_url.includes("x-expires") &&
+      !data.thumbnail_url.includes("x-signature")
+        ? data.thumbnail_url
+        : null;
+
     return {
       title: data.title,
-      thumbnail_url: data.thumbnail_url,
+      thumbnail_url: thumbnail,
       author_name: data.author_name,
       duration: data.duration || data.video?.duration,
       html: data.html,
@@ -170,6 +187,14 @@ export function generateFallbackMetadata(
   let thumbnail: string | null = null;
   if (type === "VIDEO") {
     thumbnail = getVideoThumbnailUrl(url);
+    // Instagram fallback: use a generic placeholder since oEmbed is disabled
+    if (platform === "instagram" && !thumbnail) {
+      thumbnail = "/noCover.png";
+    }
+    // TikTok fallback: use a generic placeholder since oEmbed returns signed URLs
+    if (platform === "tiktok" && !thumbnail) {
+      thumbnail = "/noCover.png";
+    }
   }
 
   return {
