@@ -34,7 +34,7 @@ export default function FollowedDjListItem({ dj }: { dj: Dj }) {
           className="h-12 w-12 rounded-full object-cover ring-2 ring-red-500/60"
         />
         {dj.plan === "PREMIUM" && (
-          <span className="absolute -right-0.5 -bottom-0.5 flex h-4 w-4 items-center justify-center rounded-full border border-black bg-amber-400 text-[9px] font-bold text-black">
+          <span className="absolute -right-0.5 -bottom-0.5 flex h-4 w-4 items-end justify-center rounded-full border border-black bg-amber-400 text-[9px] font-bold text-black">
             ★
           </span>
         )}
@@ -72,7 +72,10 @@ export default function FollowedDjListItem({ dj }: { dj: Dj }) {
         )}
       </Link>
 
-      <UnfollowDjButton djProfileId={dj.id} onSuccess={() => setRemoved(true)} />
+      <UnfollowDjButton
+        djProfileId={dj.id}
+        onSuccess={() => setRemoved(true)}
+      />
     </div>
   );
 }

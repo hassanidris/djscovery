@@ -400,29 +400,6 @@ function EventDetailView(props: {
                 </div>
               )}
             </div>
-
-            {/* Attendance Button — only for authenticated users */}
-            {user && (
-              <AttendanceButton
-                eventId={eventId}
-                currentStatus={attendanceStatus}
-                isUpcoming={isUpcoming}
-              />
-            )}
-
-            {/* Ticket CTA — below poster on all screen sizes */}
-            {ticketUrl && isUpcoming && (
-              <a
-                href={ticketUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
-              >
-                <Ticket className="h-4 w-4" />
-                Get Tickets
-                <ExternalLink className="h-3.5 w-3.5 opacity-60" />
-              </a>
-            )}
           </div>
 
           {/* ── Right column: Details ── */}
@@ -451,86 +428,147 @@ function EventDetailView(props: {
             </div>
 
             {/* Title */}
-            <h1 className="mb-6 text-3xl font-bold text-white md:text-4xl">
+            <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl">
               {title}
             </h1>
 
-            {/* Analytics */}
-            <EventAnalytics
-              viewCount={viewCount}
-              goingCount={goingCount}
-              interestedCount={interestedCount}
-            />
-
-            {/* Meta */}
-            <div className="mb-8 space-y-3">
-              <div className="flex items-start gap-2.5 text-sm text-zinc-300">
-                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-                <div>
-                  <p>{formatDate(startDate)}</p>
-                  {endDate &&
-                    endDate.toDateString() !== startDate.toDateString() && (
-                      <p className="text-zinc-500">to {formatDate(endDate)}</p>
-                    )}
-                </div>
-              </div>
-
-              {(startTime || endTime) && (
-                <div className="flex items-center gap-2.5 text-sm text-zinc-300">
-                  <Clock className="h-4 w-4 shrink-0 text-zinc-500" />
-                  <span>
-                    {startTime}
-                    {endTime ? ` – ${endTime}` : ""}
-                    {timezone && (
-                      <span className="ml-1 text-zinc-500">({timezone})</span>
-                    )}
-                  </span>
-                </div>
-              )}
-
-              {(location || venue) && (
-                <div className="flex items-start gap-2.5 text-sm text-zinc-300">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-                  <div>
-                    {venue && <p>{venue}</p>}
-                    {location && (
-                      <p className={venue ? "text-zinc-500" : ""}>{location}</p>
-                    )}
+            {/* DJ Attribution */}
+            <Link
+              href={`/djs/${ownerDj.slug}`}
+              className="mb-6 flex items-center gap-3"
+            >
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                {ownerDj.avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={ownerDj.avatar}
+                    alt={ownerDj.stageName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
+                    {ownerDj.stageName.charAt(0).toUpperCase()}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-white">
+                  DJ. {ownerDj.stageName}
+                </p>
+                <p className="text-xs text-zinc-500">Organizer</p>
+              </div>
+            </Link>
 
-              {isPrivate && !venue && (
-                <div className="flex items-center gap-2.5 text-sm text-zinc-500">
-                  <Lock className="h-4 w-4 shrink-0" />
-                  <span>Venue hidden — private event</span>
-                </div>
-              )}
+            {/* Stats Card Grid */}
+            <div className="mb-8 grid grid-cols-3 gap-3">
+              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                  Views
+                </p>
+                <p className="mt-1 text-xl font-bold text-white">
+                  {viewCount > 0 ? viewCount.toLocaleString() : "—"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                  Going
+                </p>
+                <p className="mt-1 text-xl font-bold text-white">
+                  {goingCount > 0 ? goingCount.toLocaleString() : "—"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                  Interested
+                </p>
+                <p className="mt-1 text-xl font-bold text-white">
+                  {interestedCount > 0 ? interestedCount.toLocaleString() : "—"}
+                </p>
+              </div>
             </div>
 
-            {/* Description */}
+            {/* Attendance Button — only for authenticated users */}
+            {user && (
+              <AttendanceButton
+                eventId={eventId}
+                currentStatus={attendanceStatus}
+                isUpcoming={isUpcoming}
+              />
+            )}
+
+            {/* Description - moved before metadata */}
             {description && (
-              <div className="mb-8">
-                <h2 className="mb-2 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-                  About
-                </h2>
+              <div className="mt-10 mb-8">
+                <h2 className="mb-3 text-sm font-semibold text-white">About</h2>
                 <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
                   {description}
                 </p>
               </div>
             )}
 
-            {/* Genres */}
+            {/* Date/Time and Venue Cards - side by side */}
+            <div className="mb-8 grid gap-4 sm:grid-cols-2">
+              {/* Date/Time Card */}
+              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-zinc-500" />
+                  <h3 className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                    Date & Time
+                  </h3>
+                </div>
+                <div className="space-y-1 text-sm text-zinc-300">
+                  <p>{formatDate(startDate)}</p>
+                  {endDate &&
+                    endDate.toDateString() !== startDate.toDateString() && (
+                      <p className="text-zinc-500">to {formatDate(endDate)}</p>
+                    )}
+                  {(startTime || endTime) && (
+                    <p className="mt-2">
+                      {startTime}
+                      {endTime ? ` – ${endTime}` : ""}
+                      {timezone && (
+                        <span className="ml-1 text-zinc-500">({timezone})</span>
+                      )}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Venue Card */}
+              {(location || venue) && (
+                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-zinc-500" />
+                    <h3 className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                      Venue
+                    </h3>
+                  </div>
+                  <div className="space-y-1 text-sm text-zinc-300">
+                    {venue && <p>{venue}</p>}
+                    {location && (
+                      <p className={venue ? "text-zinc-500" : ""}>{location}</p>
+                    )}
+                    {isPrivate && !venue && (
+                      <p className="text-zinc-500">
+                        Venue hidden — private event
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Genres - clean chips */}
             {genres.length > 0 && (
               <div className="mb-8">
-                <h2 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-                  <Music className="h-3.5 w-3.5" /> Genres
+                <h2 className="mb-3 text-sm font-semibold text-white">
+                  Genres
                 </h2>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {genres.map((g) => (
                     <span
                       key={g}
-                      className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-300"
+                      className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-zinc-300"
                     >
                       {g}
                     </span>
@@ -579,6 +617,20 @@ function EventDetailView(props: {
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Ticket CTA — prominent but not sticky */}
+            {ticketUrl && isUpcoming && (
+              <a
+                href={ticketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-h_red hover:bg-h_redDark shadow-h_red/20 mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-semibold text-white shadow-lg transition-colors"
+              >
+                <Ticket className="h-4 w-4" />
+                Get Tickets
+                <ExternalLink className="h-3.5 w-3.5 opacity-60" />
+              </a>
             )}
 
             {/* Fan reviews */}
