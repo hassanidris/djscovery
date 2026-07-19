@@ -63,7 +63,7 @@ export default function AttendanceButton({
         size="lg"
         disabled={isPending}
         onClick={() => handleToggle("GOING")}
-        className={`flex-1 ${
+        className={`flex-1 cursor-pointer ${
           status === "GOING"
             ? "bg-h_red border-h_red hover:bg-h_redDark text-white"
             : "border-white/30 bg-white! text-black! hover:border-white/60 hover:bg-zinc-200!"
@@ -82,7 +82,7 @@ export default function AttendanceButton({
         size="lg"
         disabled={isPending}
         onClick={() => handleToggle("INTERESTED")}
-        className={`flex-1 ${
+        className={`flex-1 cursor-pointer ${
           status === "INTERESTED"
             ? "bg-h_red border-h_red hover:bg-h_redDark text-white"
             : "border-white/30 bg-white! text-black! hover:border-white/60 hover:bg-zinc-200!"
