@@ -7,7 +7,7 @@ test.describe("create event", () => {
     await expect(page.getByRole("heading", { name: "Sign In" })).toBeVisible();
   });
 
-  test("redirects to become-dj when authenticated but no DJ profile", async ({
+  test.fixme("redirects to become-dj when authenticated but no DJ profile", async ({
     page,
   }) => {
     // This test would require setting up authenticated state without DJ profile
@@ -98,7 +98,9 @@ test.describe("create event", () => {
     // await expect(page.locator('input[name="timezone"]')).toHaveValue(/Europe\/Stockholm/);
   });
 
-  test("disables city selection until country is selected", async ({ page }) => {
+  test("disables city selection until country is selected", async ({
+    page,
+  }) => {
     // This test would require authenticated DJ user
     // Test city select dependency
     // await page.goto("/dj/events/new");
