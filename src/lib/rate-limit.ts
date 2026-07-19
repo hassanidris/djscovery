@@ -80,8 +80,14 @@ export async function rateLimit(
   limit: number,
   windowSeconds: number,
 ): Promise<RateLimitResult> {
-  // Disable rate limiting in test environment
-  if (process.env.NEXT_PUBLIC_APP_ENV === "test") {
+  // Disable rate limiting in test environment. E2E_TESTING is set only in
+  // the CI e2e job (not APP_ENV, since staging relies on that for demo-data
+  // fallbacks elsewhere) to avoid tripping real limits across repeated
+  // sign-ins in the Playwright suite.
+  if (
+    process.env.NEXT_PUBLIC_APP_ENV === "test" ||
+    process.env.E2E_TESTING === "true"
+  ) {
     return {
       success: true,
       limit,
