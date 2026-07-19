@@ -1198,11 +1198,25 @@ export default function DjProfilePremium({
                     This Month
                   </h3>
                 </div>
-                {[
-                  { label: "Profile Views", val: "3,240", trend: "+24%" },
-                  { label: "Booking Requests", val: "47", trend: "+18%" },
-                  { label: "New Followers", val: "312", trend: "+9%" },
-                ].map((m) => (
+                {(
+                  [
+                    {
+                      label: "Profile Views",
+                      val: djData?.analytics.profileViews.value ?? 0,
+                      growth: djData?.analytics.profileViews.growth ?? 0,
+                    },
+                    {
+                      label: "Booking Requests",
+                      val: djData?.analytics.bookingRequests.value ?? 0,
+                      growth: djData?.analytics.bookingRequests.growth ?? 0,
+                    },
+                    {
+                      label: "New Followers",
+                      val: djData?.analytics.newFollowers.value ?? 0,
+                      growth: djData?.analytics.newFollowers.growth ?? 0,
+                    },
+                  ] as const
+                ).map((m) => (
                   <div
                     key={m.label}
                     className="mb-2 flex items-center justify-between"
@@ -1210,10 +1224,17 @@ export default function DjProfilePremium({
                     <span className="text-xs text-gray-400">{m.label}</span>
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-semibold text-white">
-                        {m.val}
+                        {m.val.toLocaleString()}
                       </span>
-                      <span className="text-[11px] text-emerald-400">
-                        {m.trend}
+                      <span
+                        className={
+                          m.growth >= 0
+                            ? "text-[11px] text-emerald-400"
+                            : "text-[11px] text-red-400"
+                        }
+                      >
+                        {m.growth >= 0 ? "+" : ""}
+                        {m.growth}%
                       </span>
                     </div>
                   </div>
