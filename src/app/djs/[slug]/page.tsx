@@ -403,11 +403,14 @@ export default async function DjProfilePage({
         growth: 0,
       },
       bookingRate,
-      topCities: topCities.map((c) => ({
-        city: c.city,
-        country: c.country,
-        percentage: 0,
-      })),
+      topCities: (() => {
+        const total = topCities.reduce((sum, c) => sum + c.count, 0);
+        return topCities.map((c) => ({
+          city: c.city,
+          country: c.country,
+          percentage: total > 0 ? Math.round((c.count / total) * 100) : 0,
+        }));
+      })(),
       audienceAge: [],
       trafficSources: [],
     },

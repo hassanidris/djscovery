@@ -1,30 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { X, Plus, Trash2, Trophy, TrendingUp, Flame, Zap, CircleCheck, Shield, Handshake } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const HIGHLIGHT_ICONS: { icon: LucideIcon; name: string }[] = [
-  { icon: Trophy, name: "Trophy" },
-  { icon: Flame, name: "Flame" },
-  { icon: TrendingUp, name: "Trending Up" },
-  { icon: Zap, name: "Zap" },
-  { icon: CircleCheck, name: "Check" },
-  { icon: Shield, name: "Shield" },
-  { icon: Handshake, name: "Handshake" },
-];
 
 interface Highlight {
   id: number;
   year: string;
   title: string;
   description: string;
-  iconName?: string;
 }
 
 interface HighlightModalProps {
@@ -48,7 +36,6 @@ export default function HighlightModal({
             year: "",
             title: "",
             description: "",
-            iconName: undefined,
           },
         ]
       : initialHighlights,
@@ -62,7 +49,6 @@ export default function HighlightModal({
         year: "",
         title: "",
         description: "",
-        iconName: undefined,
       },
     ]);
   }
@@ -78,7 +64,9 @@ export default function HighlightModal({
   }
 
   function handleSave() {
-    const validHighlights = highlights.filter((h) => h.year.trim() !== "" && h.title.trim() !== "");
+    const validHighlights = highlights.filter(
+      (h) => h.year.trim() !== "" && h.title.trim() !== "",
+    );
     onSave(validHighlights);
     onClose();
   }
@@ -89,7 +77,9 @@ export default function HighlightModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-white/10 bg-black p-6">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Edit Career Highlights</h2>
+          <h2 className="text-xl font-semibold text-white">
+            Edit Career Highlights
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 transition-colors hover:text-white"
@@ -131,25 +121,6 @@ export default function HighlightModal({
                     maxLength={4}
                     className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
                   />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Icon (optional)
-                  </Label>
-                  <select
-                    value={highlight.iconName || ""}
-                    onChange={(e) => updateHighlight(index, "iconName", e.target.value)}
-                    className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-600"
-                  >
-                    <option value="" className="bg-zinc-900">
-                      Auto-select icon
-                    </option>
-                    {HIGHLIGHT_ICONS.map((icon) => (
-                      <option key={icon.name} value={icon.name} className="bg-zinc-900">
-                        {icon.name}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
               <div>

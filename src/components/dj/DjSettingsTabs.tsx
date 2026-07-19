@@ -806,11 +806,12 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
   }, [profile.id, isPremium]);
 
   function addHighlight() {
+    const tempId = -Date.now();
     setHighlights((prev) => [
       ...prev,
-      { id: 0, year: "", title: "", description: "" },
+      { id: tempId, year: "", title: "", description: "" },
     ]);
-    setEditId(0);
+    setEditId(tempId);
   }
 
   async function removeHighlight(id: number) {
@@ -831,10 +832,10 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
 
   function handleSave() {
     startTransition(async () => {
-      const toAdd = highlights.filter((h) => h.id === 0);
-      const toUpdate = highlights.filter((h) => h.id !== 0);
+      const toAdd = highlights.filter((h) => h.id < 0);
+      const toUpdate = highlights.filter((h) => h.id > 0);
       const toDelete = highlights.filter(
-        (h) => h.id === 0 && h.year === "" && h.title === "",
+        (h) => h.id < 0 && h.year === "" && h.title === "",
       );
 
       // Add new highlights

@@ -283,7 +283,6 @@ export default function DjProfilePremium({
       year: string;
       title: string;
       description: string;
-      iconName?: string;
     }>
   >(
     (djData?.careerHighlights || []).map((h: any, i: number) => ({
@@ -291,7 +290,6 @@ export default function DjProfilePremium({
       year: String(h.year),
       title: h.title,
       description: h.description || "",
-      iconName: undefined,
     })),
   );
   const [packages, setPackages] = useState<
