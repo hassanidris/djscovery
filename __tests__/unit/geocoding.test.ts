@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { geocodeCity, geocodeVenue, batchGeocodeVenues } from "@/lib/actions/geocoding";
+import {
+  geocodeCity,
+  geocodeVenue,
+  batchGeocodeVenues,
+} from "@/lib/actions/geocoding";
 
 // Mock Prisma
 vi.mock("@/lib/client", () => ({
@@ -10,7 +14,21 @@ vi.mock("@/lib/client", () => ({
   },
 }));
 
-// Mock Mapbox SDK
+// Mock Mapbox SDK with controllable mock functions (hoisted for vi.mock)
+const { mockSend, mockForwardGeocode } = vi.hoisted(() => {
+  const mockSend = vi.fn(() => ({
+    body: {
+      features: [
+        {
+          center: [13.405, 52.52], // [lng, lat]
+        },
+      ],
+    },
+  }));
+  const mockForwardGeocode = vi.fn(() => ({ send: mockSend }));
+  return { mockSend, mockForwardGeocode };
+});
+
 vi.mock("@mapbox/mapbox-sdk", () => ({
   default: vi.fn(() => ({
     accessToken: "test-token",
@@ -19,17 +37,7 @@ vi.mock("@mapbox/mapbox-sdk", () => ({
 
 vi.mock("@mapbox/mapbox-sdk/services/geocoding", () => ({
   default: vi.fn(() => ({
-    forwardGeocode: vi.fn(() => ({
-      send: vi.fn(() => ({
-        body: {
-          features: [
-            {
-              center: [13.4050, 52.5200], // [lng, lat]
-            },
-          ],
-        },
-      })),
-    })),
+    forwardGeocode: mockForwardGeocode,
   })),
 }));
 
@@ -41,18 +49,11 @@ describe("geocoding", () => {
   describe("geocodeCity", () => {
     it("should return coordinates for a valid city", async () => {
       const result = await geocodeCity("Berlin", "Germany");
-      expect(result).toEqual({ lat: 52.5200, lng: 13.4050 });
+      expect(result).toEqual({ lat: 52.52, lng: 13.405 });
     });
 
     it("should return null for invalid city", async () => {
-      const { default: geocoding } = await import("@mapbox/mapbox-sdk/services/geocoding");
-      (geocoding as any).mockImplementationOnce(() => ({
-        forwardGeocode: vi.fn(() => ({
-          send: vi.fn(() => ({
-            body: { features: [] },
-          })),
-        })),
-      }));
+      mockSend.mockImplementationOnce(() => ({ body: { features: [] } }));
 
       const result = await geocodeCity("InvalidCity", "Nowhere");
       expect(result).toBeNull();
@@ -62,18 +63,11 @@ describe("geocoding", () => {
   describe("geocodeVenue", () => {
     it("should return coordinates for a valid venue", async () => {
       const result = await geocodeVenue("Berghain", "Berlin", "Germany");
-      expect(result).toEqual({ lat: 52.5200, lng: 13.4050 });
+      expect(result).toEqual({ lat: 52.52, lng: 13.405 });
     });
 
     it("should return null for invalid venue", async () => {
-      const { default: geocoding } = await import("@mapbox/mapbox-sdk/services/geocoding");
-      (geocoding as any).mockImplementationOnce(() => ({
-        forwardGeocode: vi.fn(() => ({
-          send: vi.fn(() => ({
-            body: { features: [] },
-          })),
-        })),
-      }));
+      mockSend.mockImplementationOnce(() => ({ body: { features: [] } }));
 
       const result = await geocodeVenue("InvalidVenue", "Nowhere", "Nowhere");
       expect(result).toBeNull();
@@ -88,16 +82,16 @@ describe("geocoding", () => {
           venueName: "Test Venue",
           city: { name: "Berlin" },
           country: { name: "Germany" },
-          latitude: 52.5200,
-          longitude: 13.4050,
+          latitude: 52.52,
+          longitude: 13.405,
         },
       ];
 
       const result = await batchGeocodeVenues(venues);
       expect(result[0]).toEqual({
         ...venues[0],
-        lat: 52.5200,
-        lng: 13.4050,
+        lat: 52.52,
+        lng: 13.405,
       });
     });
 
@@ -114,8 +108,8 @@ describe("geocoding", () => {
       ];
 
       const result = await batchGeocodeVenues(venues);
-      expect(result[0].lat).toBe(52.5200);
-      expect(result[0].lng).toBe(13.4050);
+      expect(result[0].lat).toBe(52.52);
+      expect(result[0].lng).toBe(13.405);
     });
   });
 });
