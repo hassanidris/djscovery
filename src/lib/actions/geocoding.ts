@@ -2,11 +2,16 @@ import prisma from "@/lib/client";
 import mapboxSdk from "@mapbox/mapbox-sdk";
 import geocoding from "@mapbox/mapbox-sdk/services/geocoding";
 
-const mapboxClient = mapboxSdk({
-  accessToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "",
-});
+let _geocoder: ReturnType<typeof geocoding> | null = null;
 
-const geocoder = geocoding(mapboxClient);
+function getGeocoder(): ReturnType<typeof geocoding> | null {
+  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  if (!token) return null;
+  if (!_geocoder) {
+    _geocoder = geocoding(mapboxSdk({ accessToken: token }));
+  }
+  return _geocoder;
+}
 
 const CACHE_TTL_DAYS = 30; // Cache coordinates for 30 days
 const CACHE_TTL_MS = CACHE_TTL_DAYS * 24 * 60 * 60 * 1000;
@@ -30,8 +35,10 @@ export async function geocodeCity(
   countryName: string,
 ): Promise<{ lat: number; lng: number } | null> {
   try {
+    const g = getGeocoder();
+    if (!g) return null;
     const query = `${cityName}, ${countryName}`;
-    const response = await geocoder
+    const response = await g
       .forwardGeocode({
         query,
         limit: 1,
@@ -59,8 +66,10 @@ export async function geocodeVenue(
   countryName: string,
 ): Promise<{ lat: number; lng: number } | null> {
   try {
+    const g = getGeocoder();
+    if (!g) return null;
     const query = `${venueName}, ${cityName}, ${countryName}`;
-    const response = await geocoder
+    const response = await g
       .forwardGeocode({
         query,
         limit: 1,

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   geocodeCity,
   geocodeVenue,
@@ -44,6 +44,11 @@ vi.mock("@mapbox/mapbox-sdk/services/geocoding", () => ({
 describe("geocoding", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN = "test-token";
+  });
+
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   });
 
   describe("geocodeCity", () => {
