@@ -12,6 +12,7 @@ const TABS: Tab[] = [
   { id: "about", label: "About" },
   { id: "events", label: "Events" },
   { id: "media", label: "Media" },
+  { id: "press", label: "Press" },
   { id: "packages", label: "Packages" },
 ];
 

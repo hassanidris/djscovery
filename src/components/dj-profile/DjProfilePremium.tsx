@@ -23,6 +23,7 @@ import {
   Star,
   Plus,
   Pencil,
+  Newspaper,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -39,6 +40,7 @@ import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import VenueModal from "@/components/dj-profile/VenueModal";
 import HighlightModal from "@/components/dj-profile/HighlightModal";
+import PressModal from "@/components/dj-profile/PressModal";
 import BookingPackages from "@/components/dj-profile/BookingPackages";
 import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
@@ -57,6 +59,11 @@ import {
   updateDjHighlight,
   deleteDjHighlight,
 } from "@/lib/actions/dj-highlights";
+import {
+  createDjPressItem,
+  updateDjPressItem,
+  deleteDjPressItem,
+} from "@/lib/actions/dj-press";
 import { toast } from "sonner";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
@@ -252,6 +259,26 @@ export default function DjProfilePremium({
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
   const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
+  const [isPressModalOpen, setIsPressModalOpen] = useState(false);
+  const [pressItems, setPressItems] = useState<
+    Array<{
+      id: number;
+      source: string;
+      type: string;
+      title: string;
+      date: string;
+      url: string;
+    }>
+  >(
+    (djData?.press || []).map((p: any) => ({
+      id: p.id || 0,
+      source: p.source || "",
+      type: p.type || "Feature",
+      title: p.title || "",
+      date: p.date || "",
+      url: p.url || "",
+    })),
+  );
   const bookCTARefMobile = useRef<BookCTARef>(null);
   const bookCTARefDesktop = useRef<BookCTARef>(null);
   const [venues, setVenues] = useState<
@@ -578,6 +605,89 @@ export default function DjProfilePremium({
     } catch (error) {
       console.error("Failed to save highlights:", error);
       toast.error("Failed to save highlights. Please try again.", {
+        id: toastId,
+      });
+    }
+  }
+
+  async function handlePressSave(newPressItems: typeof pressItems) {
+    const toastId = toast.loading("Saving press items...");
+
+    try {
+      // IDs > 1000000000000 are temporary Date.now() IDs (new items not yet saved)
+      const TEMP_ID_THRESHOLD = 1000000000000;
+      const itemsToAdd = newPressItems.filter((p) => p.id > TEMP_ID_THRESHOLD);
+      const itemsToUpdate = newPressItems.filter(
+        (p) => p.id > 0 && p.id <= TEMP_ID_THRESHOLD,
+      );
+      const removedItemIds = pressItems
+        .filter((p) => !newPressItems.find((np) => np.id === p.id))
+        .map((p) => p.id)
+        .filter((id) => id > 0 && id <= TEMP_ID_THRESHOLD); // Only delete real DB IDs
+
+      const addedItemIds: number[] = [];
+      for (const item of itemsToAdd) {
+        if (!item.source.trim() || !item.title.trim()) {
+          continue;
+        }
+        const formData = new FormData();
+        formData.append("source", item.source.trim());
+        formData.append("type", item.type.trim());
+        formData.append("title", item.title.trim());
+        if (item.date.trim()) formData.append("date", item.date.trim());
+        if (item.url.trim()) formData.append("url", item.url.trim());
+
+        const result = await createDjPressItem(formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+        if ("success" in result) {
+          addedItemIds.push(result.id);
+        }
+      }
+
+      for (const item of itemsToUpdate) {
+        if (!item.id || item.id === undefined || item.id === null) {
+          continue;
+        }
+        const formData = new FormData();
+        formData.append("source", item.source.trim());
+        formData.append("type", item.type.trim());
+        formData.append("title", item.title.trim());
+        formData.append("date", item.date.trim());
+        formData.append("url", item.url.trim());
+
+        const result = await updateDjPressItem(item.id, formData);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      for (const itemId of removedItemIds) {
+        const result = await deleteDjPressItem(itemId);
+        if ("error" in result) {
+          toast.error(result.error, { id: toastId });
+          return;
+        }
+      }
+
+      toast.success("Press items saved successfully!", { id: toastId });
+
+      const updatedItems = newPressItems.map((p) => {
+        if (p.id > TEMP_ID_THRESHOLD && addedItemIds.length > 0) {
+          const newId = addedItemIds.shift();
+          return { ...p, id: newId || 0 };
+        }
+        return p;
+      });
+      setPressItems(updatedItems);
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to save press items:", error);
+      toast.error("Failed to save press items. Please try again.", {
         id: toastId,
       });
     }
@@ -986,23 +1096,33 @@ export default function DjProfilePremium({
               </>
             )}
 
-            {PRESS.length > 0 && (
+            {(PRESS.length > 0 || isOwner) && (
               <>
                 <Separator className="bg-white/8" />
 
                 {/* ── PRESS & MEDIA ── */}
-                <section>
-                  <SectionHeading sub="Interviews, features, and podcasts">
-                    Press &amp; Media
-                  </SectionHeading>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {PRESS.map((p) => {
-                      const PressIcon = p.icon;
-                      return (
-                        <Card
-                          key={p.title}
-                          className="bg-h_blackLight/30 group cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15"
-                        >
+                <section id="press">
+                  <div className="mb-5 flex items-center justify-between">
+                    <SectionHeading sub="Interviews, features, and podcasts">
+                      Press &amp; Media
+                    </SectionHeading>
+                    {isOwner && PRESS.length > 0 && (
+                      <Button
+                        onClick={() => setIsPressModalOpen(true)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-gray-400 hover:text-white"
+                      >
+                        <Pencil className="mr-1.5 h-3 w-3" />
+                        Edit
+                      </Button>
+                    )}
+                  </div>
+                  {PRESS.length > 0 ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {PRESS.map((p) => {
+                        const PressIcon = p.icon;
+                        const cardContent = (
                           <div className="flex items-start gap-3">
                             <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-white/8 bg-white/5">
                               <PressIcon className="h-3.5 w-3.5 text-gray-400 transition-colors group-hover:text-white" />
@@ -1024,10 +1144,37 @@ export default function DjProfilePremium({
                               </p>
                             </div>
                           </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
+                        );
+                        return p.url ? (
+                          <a
+                            key={p.id}
+                            href={p.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Card className="bg-h_blackLight/30 group h-full cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
+                              {cardContent}
+                            </Card>
+                          </a>
+                        ) : (
+                          <Card
+                            key={p.id}
+                            className="bg-h_blackLight/30 group gap-0 border-white/8 p-4"
+                          >
+                            {cardContent}
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <EmptySectionState
+                      icon={Newspaper}
+                      title="No press items yet"
+                      description="Add interviews, features, and podcast appearances"
+                      actionLabel="Add Press"
+                      onAction={() => setIsPressModalOpen(true)}
+                    />
+                  )}
                 </section>
               </>
             )}
@@ -1274,6 +1421,13 @@ export default function DjProfilePremium({
             onClose={() => setIsHighlightModalOpen(false)}
             highlights={highlights}
             onSave={handleHighlightSave}
+          />
+          <PressModal
+            key={isPressModalOpen ? "press-modal-open" : "press-modal-closed"}
+            isOpen={isPressModalOpen}
+            onClose={() => setIsPressModalOpen(false)}
+            pressItems={pressItems}
+            onSave={handlePressSave}
           />
         </>
       )}
