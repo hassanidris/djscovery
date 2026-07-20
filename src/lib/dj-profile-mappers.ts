@@ -206,10 +206,12 @@ export function mapHighlightsFromData(d: DjDemoData) {
 
 export function mapPressFromData(d: DjDemoData) {
   return d.press.map((p) => ({
+    id: p.id,
     outlet: p.source,
     type: p.type,
     title: p.title,
     date: p.date,
+    url: p.url || "",
     icon: PRESS_ICON_MAP[p.type] ?? Newspaper,
   }));
 }

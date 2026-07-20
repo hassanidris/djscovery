@@ -495,10 +495,12 @@ export default async function DjProfilePage({
       quote: e.quote,
     })),
     press: dj.pressItems.map((p) => ({
+      id: p.id,
       source: p.source,
       type: p.type,
       title: p.title,
       date: p.date ?? "",
+      url: p.url ?? "",
     })),
     venuesPlayed: (dj.venues || []).map((v) => ({
       id: v.id,
