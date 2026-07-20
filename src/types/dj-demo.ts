@@ -138,6 +138,8 @@ export interface DjDemoData {
     description: string;
     countryId?: number;
     cityId?: number;
+    latitude?: number | null;
+    longitude?: number | null;
   }>;
   reviewsList: Array<{
     name: string;

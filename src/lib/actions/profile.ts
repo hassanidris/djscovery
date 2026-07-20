@@ -1147,6 +1147,8 @@ const VenueInputSchema = z.object({
   description: z.string().max(300).nullable().optional(),
   countryId: z.number().int().positive(),
   cityId: z.number().int().positive(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
 });
 
 const VenueUpdateSchema = z.object({
@@ -1156,6 +1158,8 @@ const VenueUpdateSchema = z.object({
   description: z.string().max(300).nullable().optional(),
   countryId: z.number().int().positive(),
   cityId: z.number().int().positive(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
 });
 
 export async function addVenue(input: {
@@ -1165,6 +1169,8 @@ export async function addVenue(input: {
   description: string | null;
   countryId: number;
   cityId: number;
+  latitude?: number | null;
+  longitude?: number | null;
 }): Promise<{ success: true; venue: { id: number } } | { error: string }> {
   const supabase = await createClient();
   const {
@@ -1210,6 +1216,8 @@ export async function addVenue(input: {
         description: input.description,
         countryId: input.countryId,
         cityId: input.cityId,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
       },
       select: { id: true },
     });
@@ -1230,6 +1238,8 @@ export async function updateVenue(input: {
   description: string | null;
   countryId: number;
   cityId: number;
+  latitude?: number | null;
+  longitude?: number | null;
 }): Promise<{ success: true } | { error: string }> {
   const supabase = await createClient();
   const {
@@ -1275,6 +1285,8 @@ export async function updateVenue(input: {
         description: input.description,
         countryId: input.countryId,
         cityId: input.cityId,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
       },
     });
 

@@ -20,6 +20,8 @@ interface Venue {
   cityId: number;
   countryName: string;
   cityName: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 interface VenueModalProps {
@@ -51,6 +53,8 @@ export default function VenueModal({
             cityId: 0,
             countryName: "",
             cityName: "",
+            latitude: null,
+            longitude: null,
           },
         ]
       : initialVenues,
@@ -132,6 +136,8 @@ export default function VenueModal({
           cityId: 0,
           countryName: "",
           cityName: "",
+          latitude: null,
+          longitude: null,
         },
       ];
       setExpandedIndex(next.length - 1);
@@ -202,6 +208,8 @@ export default function VenueModal({
     updateVenue(index, "venueName", suggestion.name);
     updateVenue(index, "countryId", countryId);
     updateVenue(index, "countryName", country?.name || suggestion.countryName);
+    updateVenue(index, "latitude", suggestion.latitude ?? null);
+    updateVenue(index, "longitude", suggestion.longitude ?? null);
 
     if (!countryId) {
       updateVenue(index, "cityId", 0);

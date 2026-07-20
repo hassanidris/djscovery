@@ -291,6 +291,8 @@ export default function DjProfilePremium({
       cityId: number;
       countryName: string;
       cityName: string;
+      latitude?: number | null;
+      longitude?: number | null;
     }>
   >(
     (djData?.venuesPlayed || []).map((v) => ({
@@ -302,6 +304,8 @@ export default function DjProfilePremium({
       cityId: v.cityId || 0,
       countryName: v.country,
       cityName: v.city,
+      latitude: v.latitude ?? null,
+      longitude: v.longitude ?? null,
     })),
   );
   const [highlights, setHighlights] = useState<
@@ -373,6 +377,8 @@ export default function DjProfilePremium({
           description: venue.description.trim() || null,
           countryId: venue.countryId,
           cityId: venue.cityId,
+          latitude: venue.latitude ?? null,
+          longitude: venue.longitude ?? null,
         });
         if ("error" in result) {
           toast.error(result.error, { id: toastId });
@@ -392,6 +398,8 @@ export default function DjProfilePremium({
           description: venue.description.trim() || null,
           countryId: venue.countryId,
           cityId: venue.cityId,
+          latitude: venue.latitude ?? null,
+          longitude: venue.longitude ?? null,
         });
         if ("error" in result) {
           toast.error(result.error, { id: toastId });
