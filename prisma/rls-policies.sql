@@ -480,6 +480,13 @@ ALTER TABLE "Genre" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read genres" ON "Genre";
 CREATE POLICY "Public read genres" ON "Genre" FOR SELECT TO public USING (true);
 
+-- Venue: public read for autocomplete; server-only writes via Prisma
+ALTER TABLE "Venue" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read venues" ON "Venue";
+CREATE POLICY "Public read venues" ON "Venue" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "No user write to venues" ON "Venue";
+CREATE POLICY "No user write to venues" ON "Venue" FOR ALL TO public USING (false) WITH CHECK (false);
+
 -- Junction tables linked to public DJ profiles
 ALTER TABLE "DjGenre" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read DJ genres" ON "DjGenre";

@@ -291,6 +291,8 @@ export default function DjProfilePremium({
       cityId: number;
       countryName: string;
       cityName: string;
+      latitude?: number | null;
+      longitude?: number | null;
     }>
   >(
     (djData?.venuesPlayed || []).map((v) => ({
@@ -298,10 +300,12 @@ export default function DjProfilePremium({
       venueName: v.venue,
       eventDate: v.date || "",
       description: v.description || "",
-      countryId: 0,
-      cityId: 0,
+      countryId: v.countryId || 0,
+      cityId: v.cityId || 0,
       countryName: v.country,
       cityName: v.city,
+      latitude: v.latitude ?? null,
+      longitude: v.longitude ?? null,
     })),
   );
   const [highlights, setHighlights] = useState<
@@ -373,6 +377,8 @@ export default function DjProfilePremium({
           description: venue.description.trim() || null,
           countryId: venue.countryId,
           cityId: venue.cityId,
+          latitude: venue.latitude ?? null,
+          longitude: venue.longitude ?? null,
         });
         if ("error" in result) {
           toast.error(result.error, { id: toastId });
@@ -392,6 +398,8 @@ export default function DjProfilePremium({
           description: venue.description.trim() || null,
           countryId: venue.countryId,
           cityId: venue.cityId,
+          latitude: venue.latitude ?? null,
+          longitude: venue.longitude ?? null,
         });
         if ("error" in result) {
           toast.error(result.error, { id: toastId });
@@ -1056,6 +1064,24 @@ export default function DjProfilePremium({
               highlights={HIGHLIGHTS}
               isOwner={isOwner}
               onAddHighlight={() => setIsHighlightModalOpen(true)}
+            />
+
+            <Separator className="bg-white/8" />
+
+            {/* ── WHERE I'VE PLAYED ── */}
+            <WhereIvePlayed
+              venues={(djData?.venuesPlayed || []).map((v) => ({
+                id: v.id || 0,
+                venueName: v.venue,
+                eventDate: v.date || null,
+                description: v.description || null,
+                city: { name: v.city },
+                country: { name: v.country },
+                latitude: v.latitude,
+                longitude: v.longitude,
+              }))}
+              isOwner={isOwner}
+              onAddVenue={() => setIsVenueModalOpen(true)}
             />
 
             {ENDORSEMENTS.length > 0 && (
