@@ -122,10 +122,12 @@ export interface DjDemoData {
     quote: string;
   }>;
   press: Array<{
+    id: number;
     source: string;
     type: string;
     title: string;
     date: string;
+    url?: string;
   }>;
   venuesPlayed?: Array<{
     id: number;

@@ -311,31 +311,39 @@ export const PREMIUM_DEFAULT_HIGHLIGHTS = [
 
 export const PREMIUM_DEFAULT_PRESS = [
   {
+    id: 1,
     outlet: "Mixmag",
     type: "Feature",
     title: "The Sound of Lagos Goes Global",
     date: "Mar 2025",
+    url: "",
     icon: Newspaper,
   },
   {
+    id: 2,
     outlet: "Resident Advisor",
     type: "Interview",
     title: "Amara Pulse: 'Music is My Language'",
     date: "Jan 2025",
+    url: "",
     icon: MicVocal,
   },
   {
+    id: 3,
     outlet: "BBC Music",
     type: "Podcast",
     title: "Africa Dancefloor Series Ep.12",
     date: "Nov 2024",
+    url: "",
     icon: Headphones,
   },
   {
+    id: 4,
     outlet: "Fact Magazine",
     type: "Interview",
     title: "Breaking Borders Through Afrobeats",
     date: "Sep 2024",
+    url: "",
     icon: Newspaper,
   },
 ];
