@@ -37,7 +37,7 @@ const nextConfig = {
     },
   },
   turbopack: {
-    root: process.cwd(),
+    root: import.meta.dirname,
   },
   images: {
     remotePatterns: [
