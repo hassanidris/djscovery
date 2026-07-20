@@ -112,7 +112,7 @@ export default async function AdminVenuesPage({
                         </div>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-300">
-                        {[venue.city.name, venue.country.name]
+                        {[venue.city?.name, venue.country?.name]
                           .filter(Boolean)
                           .join(", ")}
                       </td>
@@ -132,7 +132,7 @@ export default async function AdminVenuesPage({
                       <td className="px-4 py-3">
                         <Badge
                           className={`border text-xs ${
-                            SOURCE_COLORS[venue.source || ""] ?? ""
+                            SOURCE_COLORS[venue.source || "manual"] ?? ""
                           }`}
                         >
                           {venue.source || "manual"}

@@ -80,7 +80,9 @@ function WhereIvePlayed({ venues, isOwner, onAddVenue }: Props) {
   };
 
   // Filter venues with coordinates for map view
-  const venuesWithCoords = venues.filter((v) => v.latitude && v.longitude);
+  const venuesWithCoords = venues.filter(
+    (v) => v.latitude != null && v.longitude != null,
+  );
 
   return (
     <section>

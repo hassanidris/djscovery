@@ -41,6 +41,7 @@ async function suggestMapbox(
 
   const response = await fetch(
     `https://api.mapbox.com/search/searchbox/v1/suggest?${params.toString()}`,
+    { signal: AbortSignal.timeout(5000) },
   );
 
   if (!response.ok) {

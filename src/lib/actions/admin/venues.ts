@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/client";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export async function getAdminVenues({
   cursor,
@@ -12,6 +13,8 @@ export async function getAdminVenues({
   country?: string;
   source?: string;
 }) {
+  await requireAdmin();
+
   const take = 50;
   const where: any = {};
 
@@ -30,7 +33,7 @@ export async function getAdminVenues({
     take,
     skip: cursor ? 1 : 0,
     cursor: cursor ? { id: cursor } : undefined,
-    orderBy: { popularity: "desc" },
+    orderBy: [{ popularity: "desc" }, { id: "desc" }],
     include: {
       city: true,
       country: true,
@@ -46,6 +49,8 @@ export async function getAdminVenues({
 type ActionResult = { success: true } | { error: string };
 
 export async function deleteVenue(formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
   const venueId = Number(formData.get("venueId"));
 
   if (!venueId) {

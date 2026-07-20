@@ -192,6 +192,11 @@ export default async function DjProfilePage({
     })),
   );
 
+  // Lookup freshly geocoded coordinates by venue ID
+  const coordLookup = new Map(
+    venuesWithCoords.map((vc) => [vc.id, { lat: vc.lat, lng: vc.lng }]),
+  );
+
   const supabase = await createClient();
   const {
     data: { user: authUser },
@@ -515,18 +520,21 @@ export default async function DjProfilePage({
       date: p.date ?? "",
       url: p.url ?? "",
     })),
-    venuesPlayed: (dj.venues || []).map((v) => ({
-      id: v.id,
-      venue: v.venueName,
-      city: v.city?.name ?? "",
-      country: v.country?.name ?? "",
-      date: v.eventDate ?? "",
-      description: v.description ?? "",
-      latitude: v.latitude,
-      longitude: v.longitude,
-      countryId: v.countryId,
-      cityId: v.cityId,
-    })),
+    venuesPlayed: (dj.venues || []).map((v) => {
+      const coords = coordLookup.get(v.id);
+      return {
+        id: v.id,
+        venue: v.venueName,
+        city: v.city?.name ?? "",
+        country: v.country?.name ?? "",
+        date: v.eventDate ?? "",
+        description: v.description ?? "",
+        latitude: coords?.lat ?? v.latitude,
+        longitude: coords?.lng ?? v.longitude,
+        countryId: v.countryId,
+        cityId: v.cityId,
+      };
+    }),
     reviewsList: dj.ratings.map((r) => ({
       name: r.user.name ?? r.user.username,
       rating: r.rating,
