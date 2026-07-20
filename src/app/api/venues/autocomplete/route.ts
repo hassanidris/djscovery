@@ -8,6 +8,14 @@ const RATE_LIMIT_MAX_REQUESTS = 30;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+
+  // Prune expired entries to prevent unbounded Map growth
+  for (const [key, rec] of rateLimit) {
+    if (now > rec.resetTime) {
+      rateLimit.delete(key);
+    }
+  }
+
   const record = rateLimit.get(ip);
 
   if (!record || now > record.resetTime) {
@@ -25,7 +33,8 @@ function checkRateLimit(ip: string): boolean {
 
 export async function GET(request: NextRequest) {
   try {
-    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
 
     if (!checkRateLimit(ip)) {
       return NextResponse.json(

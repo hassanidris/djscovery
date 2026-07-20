@@ -47,7 +47,7 @@ export async function searchVenues(
  */
 export async function cacheExternalVenue(
   venueData: VenueSuggestion,
-): Promise<VenueSuggestion> {
+): Promise<VenueSuggestion | null> {
   try {
     // Find or create city
     let city = await prisma.city.findFirst({
@@ -67,33 +67,21 @@ export async function cacheExternalVenue(
     }
 
     if (!city) {
-      return venueData;
+      return null;
     }
 
-    // Check if venue already exists
-    const existing = await prisma.venue.findFirst({
+    // Upsert venue using [name, cityId] unique constraint
+    const venue = await prisma.venue.upsert({
       where: {
-        name: { equals: venueData.name, mode: "insensitive" },
-        cityId: city.id,
+        name_cityId: { name: venueData.name, cityId: city.id },
       },
-    });
-
-    if (existing) {
-      // Increment popularity
-      await prisma.venue.update({
-        where: { id: existing.id },
-        data: { popularity: { increment: 1 } },
-      });
-      return {
-        ...venueData,
-        id: existing.id,
-        cityId: city.id,
-      };
-    }
-
-    // Create new venue
-    const newVenue = await prisma.venue.create({
-      data: {
+      update: {
+        popularity: { increment: 1 },
+        latitude: venueData.latitude ?? undefined,
+        longitude: venueData.longitude ?? undefined,
+        externalId: venueData.externalId ?? undefined,
+      },
+      create: {
         name: venueData.name,
         address: venueData.address,
         cityId: city.id,
@@ -108,12 +96,12 @@ export async function cacheExternalVenue(
 
     return {
       ...venueData,
-      id: newVenue.id,
+      id: venue.id,
       cityId: city.id,
     };
   } catch (error) {
     console.error("Error caching venue:", error);
-    return venueData;
+    return null;
   }
 }
 

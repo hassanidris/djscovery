@@ -88,6 +88,12 @@ export async function findOrCreateCity(name: string, countryId: number) {
   });
   if (existing) return existing;
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
   try {
     return await prisma.city.create({
       data: { name: trimmed, countryId },
@@ -1147,8 +1153,8 @@ const VenueInputSchema = z.object({
   description: z.string().max(300).nullable().optional(),
   countryId: z.number().int().positive(),
   cityId: z.number().int().positive(),
-  latitude: z.number().nullable().optional(),
-  longitude: z.number().nullable().optional(),
+  latitude: z.number().min(-90).max(90).nullable().optional(),
+  longitude: z.number().min(-180).max(180).nullable().optional(),
 });
 
 const VenueUpdateSchema = z.object({
