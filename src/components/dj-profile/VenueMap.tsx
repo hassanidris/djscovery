@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, memo } from "react";
+import { useEffect, memo } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamic import to avoid SSR issues with Leaflet
@@ -36,11 +36,7 @@ interface VenueMapProps {
 }
 
 function VenueMap({ venues }: VenueMapProps) {
-  const [isClient, setIsClient] = useState(false);
-
   useEffect(() => {
-    setIsClient(true);
-
     // Fix for default marker icons in Next.js (client-side only)
     import("leaflet").then((L) => {
       delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -55,7 +51,7 @@ function VenueMap({ venues }: VenueMapProps) {
     });
   }, []);
 
-  if (!isClient || venues.length === 0) return null;
+  if (venues.length === 0) return null;
 
   // Calculate center point
   const avgLat = venues.reduce((sum, v) => sum + v.lat, 0) / venues.length;
