@@ -115,6 +115,8 @@ export default function PressModal({
           </h2>
           <button
             onClick={onClose}
+            type="button"
+            aria-label="Close"
             className="text-gray-400 transition-colors hover:text-white"
           >
             <X className="h-5 w-5" />

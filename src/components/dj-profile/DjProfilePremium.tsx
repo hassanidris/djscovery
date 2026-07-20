@@ -613,6 +613,13 @@ export default function DjProfilePremium({
   async function handlePressSave(newPressItems: typeof pressItems) {
     const toastId = toast.loading("Saving press items...");
 
+    function normalizeUrl(url: string): string {
+      const trimmed = url.trim();
+      if (!trimmed) return "";
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return `https://${trimmed}`;
+    }
+
     try {
       // IDs > 1000000000000 are temporary Date.now() IDs (new items not yet saved)
       const TEMP_ID_THRESHOLD = 1000000000000;
@@ -635,7 +642,8 @@ export default function DjProfilePremium({
         formData.append("type", item.type.trim());
         formData.append("title", item.title.trim());
         if (item.date.trim()) formData.append("date", item.date.trim());
-        if (item.url.trim()) formData.append("url", item.url.trim());
+        const normalizedUrl = normalizeUrl(item.url);
+        if (normalizedUrl) formData.append("url", normalizedUrl);
 
         const result = await createDjPressItem(formData);
         if ("error" in result) {
@@ -656,7 +664,8 @@ export default function DjProfilePremium({
         formData.append("type", item.type.trim());
         formData.append("title", item.title.trim());
         formData.append("date", item.date.trim());
-        formData.append("url", item.url.trim());
+        const normalizedUrl = normalizeUrl(item.url);
+        formData.append("url", normalizedUrl);
 
         const result = await updateDjPressItem(item.id, formData);
         if ("error" in result) {
@@ -678,9 +687,9 @@ export default function DjProfilePremium({
       const updatedItems = newPressItems.map((p) => {
         if (p.id > TEMP_ID_THRESHOLD && addedItemIds.length > 0) {
           const newId = addedItemIds.shift();
-          return { ...p, id: newId || 0 };
+          return { ...p, id: newId || 0, url: normalizeUrl(p.url) };
         }
-        return p;
+        return { ...p, url: normalizeUrl(p.url) };
       });
       setPressItems(updatedItems);
 
