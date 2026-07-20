@@ -298,8 +298,8 @@ export default function DjProfilePremium({
       venueName: v.venue,
       eventDate: v.date || "",
       description: v.description || "",
-      countryId: 0,
-      cityId: 0,
+      countryId: v.countryId || 0,
+      cityId: v.cityId || 0,
       countryName: v.country,
       cityName: v.city,
     })),
@@ -1056,6 +1056,24 @@ export default function DjProfilePremium({
               highlights={HIGHLIGHTS}
               isOwner={isOwner}
               onAddHighlight={() => setIsHighlightModalOpen(true)}
+            />
+
+            <Separator className="bg-white/8" />
+
+            {/* ── WHERE I'VE PLAYED ── */}
+            <WhereIvePlayed
+              venues={(djData?.venuesPlayed || []).map((v) => ({
+                id: v.id || 0,
+                venueName: v.venue,
+                eventDate: v.date || null,
+                description: v.description || null,
+                city: { name: v.city },
+                country: { name: v.country },
+                latitude: v.latitude,
+                longitude: v.longitude,
+              }))}
+              isOwner={isOwner}
+              onAddVenue={() => setIsVenueModalOpen(true)}
             />
 
             {ENDORSEMENTS.length > 0 && (

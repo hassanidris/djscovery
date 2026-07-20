@@ -136,6 +136,8 @@ export interface DjDemoData {
     country: string;
     date: string;
     description: string;
+    countryId?: number;
+    cityId?: number;
   }>;
   reviewsList: Array<{
     name: string;

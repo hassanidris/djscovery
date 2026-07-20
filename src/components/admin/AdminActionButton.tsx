@@ -28,6 +28,7 @@ type Props = {
   variant?: "destructive" | "ghost" | "outline";
   className?: string;
   requireConfirm?: boolean;
+  children?: React.ReactNode;
 };
 
 export default function AdminActionButton({
@@ -40,6 +41,7 @@ export default function AdminActionButton({
   variant = "ghost",
   className,
   requireConfirm = true,
+  children,
 }: Props) {
   const [isPending, startTransition] = useTransition();
 
@@ -70,7 +72,7 @@ export default function AdminActionButton({
         onClick={execute}
         className={cn("h-7 text-xs", className)}
       >
-        {isPending ? "..." : label}
+        {isPending ? "..." : children || label}
       </Button>
     );
   }
@@ -84,7 +86,7 @@ export default function AdminActionButton({
           disabled={isPending}
           className={cn("h-7 text-xs", className)}
         >
-          {isPending ? "..." : label}
+          {isPending ? "..." : children || label}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="border-white/10 bg-zinc-900">

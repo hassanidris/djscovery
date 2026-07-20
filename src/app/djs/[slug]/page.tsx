@@ -17,6 +17,7 @@ import {
   getDjTopCities,
 } from "@/lib/queries/dj-stats";
 import { getProfileStats } from "@/lib/actions/dj-analytics";
+import { batchGeocodeVenues } from "@/lib/actions/geocoding";
 import JsonLd from "@/components/seo/JsonLd";
 
 export default async function DjProfilePage({
@@ -178,6 +179,18 @@ export default async function DjProfilePage({
   });
 
   if (!dj || dj.status === "REJECTED") return notFound();
+
+  // Geocode venues for map display
+  const venuesWithCoords = await batchGeocodeVenues(
+    (dj.venues || []).map((v) => ({
+      id: v.id,
+      venueName: v.venueName,
+      city: v.city,
+      country: v.country,
+      latitude: v.latitude,
+      longitude: v.longitude,
+    })),
+  );
 
   const supabase = await createClient();
   const {
@@ -509,6 +522,10 @@ export default async function DjProfilePage({
       country: v.country?.name ?? "",
       date: v.eventDate ?? "",
       description: v.description ?? "",
+      latitude: v.latitude,
+      longitude: v.longitude,
+      countryId: v.countryId,
+      cityId: v.cityId,
     })),
     reviewsList: dj.ratings.map((r) => ({
       name: r.user.name ?? r.user.username,

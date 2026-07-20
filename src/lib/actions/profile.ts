@@ -78,6 +78,27 @@ export async function getCitiesByCountry(countryId: number) {
   return cities;
 }
 
+export async function findOrCreateCity(name: string, countryId: number) {
+  const trimmed = name.trim();
+  if (!trimmed || !countryId) return null;
+
+  const existing = await prisma.city.findFirst({
+    where: { name: { equals: trimmed, mode: "insensitive" }, countryId },
+    select: { id: true, name: true },
+  });
+  if (existing) return existing;
+
+  try {
+    return await prisma.city.create({
+      data: { name: trimmed, countryId },
+      select: { id: true, name: true },
+    });
+  } catch (error) {
+    console.error("Failed to create city:", error);
+    return null;
+  }
+}
+
 export async function getOrCreateGenre(
   name: string,
   client: Prisma.TransactionClient | typeof prisma = prisma,
