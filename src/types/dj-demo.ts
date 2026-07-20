@@ -136,6 +136,10 @@ export interface DjDemoData {
     country: string;
     date: string;
     description: string;
+    countryId?: number;
+    cityId?: number;
+    latitude?: number | null;
+    longitude?: number | null;
   }>;
   reviewsList: Array<{
     name: string;

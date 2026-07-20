@@ -322,6 +322,7 @@ model Country {
   fanProfiles       FanProfile[]
   bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCountry")
   djVenues          DjVenue[]
+  venues            Venue[]
 
   @@index([name])
 }
@@ -339,6 +340,7 @@ model City {
   fanProfiles       FanProfile[]
   bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCity")
   djVenues          DjVenue[]
+  venues            Venue[]
 
   @@unique([name, countryId])
   @@unique([id, countryId])
@@ -601,12 +603,38 @@ model DjVenue {
   djProfileId Int
   djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
 
+  latitude   Float?
+  longitude  Float?
+  geocodedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([djProfileId])
   @@index([countryId])
   @@index([cityId])
+}
+
+// ------ VENUE DATABASE (FOR AUTOCOMPLETE) ------
+
+model Venue {
+  id         Int      @id @default(autoincrement())
+  name       String
+  address    String?
+  cityId     Int
+  city       City     @relation(fields: [cityId], references: [id])
+  countryId  Int
+  country    Country  @relation(fields: [countryId], references: [id])
+  latitude   Float?
+  longitude  Float?
+  source     String? // 'manual', 'mapbox', 'osm'
+  externalId String? // Mapbox/OSM place ID
+  popularity Int      @default(0) // Track usage for ranking
+  createdAt  DateTime @default(now())
+
+  @@unique([name, cityId])
+  @@index([name])
+  @@index([countryId])
 }
 
 // ------ DJ ANALYTICS: PROFILE VIEWS ------

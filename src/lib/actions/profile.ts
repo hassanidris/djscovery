@@ -78,6 +78,27 @@ export async function getCitiesByCountry(countryId: number) {
   return cities;
 }
 
+export async function findOrCreateCity(name: string, countryId: number) {
+  const trimmed = name.trim();
+  if (!trimmed || !countryId) return null;
+
+  const existing = await prisma.city.findFirst({
+    where: { name: { equals: trimmed, mode: "insensitive" }, countryId },
+    select: { id: true, name: true },
+  });
+  if (existing) return existing;
+
+  try {
+    return await prisma.city.create({
+      data: { name: trimmed, countryId },
+      select: { id: true, name: true },
+    });
+  } catch (error) {
+    console.error("Failed to create city:", error);
+    return null;
+  }
+}
+
 export async function getOrCreateGenre(
   name: string,
   client: Prisma.TransactionClient | typeof prisma = prisma,
@@ -1126,6 +1147,8 @@ const VenueInputSchema = z.object({
   description: z.string().max(300).nullable().optional(),
   countryId: z.number().int().positive(),
   cityId: z.number().int().positive(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
 });
 
 const VenueUpdateSchema = z.object({
@@ -1135,6 +1158,8 @@ const VenueUpdateSchema = z.object({
   description: z.string().max(300).nullable().optional(),
   countryId: z.number().int().positive(),
   cityId: z.number().int().positive(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
 });
 
 export async function addVenue(input: {
@@ -1144,6 +1169,8 @@ export async function addVenue(input: {
   description: string | null;
   countryId: number;
   cityId: number;
+  latitude?: number | null;
+  longitude?: number | null;
 }): Promise<{ success: true; venue: { id: number } } | { error: string }> {
   const supabase = await createClient();
   const {
@@ -1189,6 +1216,8 @@ export async function addVenue(input: {
         description: input.description,
         countryId: input.countryId,
         cityId: input.cityId,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
       },
       select: { id: true },
     });
@@ -1209,6 +1238,8 @@ export async function updateVenue(input: {
   description: string | null;
   countryId: number;
   cityId: number;
+  latitude?: number | null;
+  longitude?: number | null;
 }): Promise<{ success: true } | { error: string }> {
   const supabase = await createClient();
   const {
@@ -1254,6 +1285,8 @@ export async function updateVenue(input: {
         description: input.description,
         countryId: input.countryId,
         cityId: input.cityId,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
       },
     });
 
