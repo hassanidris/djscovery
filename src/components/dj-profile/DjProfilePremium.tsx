@@ -862,14 +862,6 @@ export default function DjProfilePremium({
             <div id="events">
               <DjEventsModule
                 events={EVENTS}
-                venues={(djData?.venuesPlayed || []).map((v) => ({
-                  id: v.id || 0,
-                  venueName: v.venue,
-                  eventDate: v.date || null,
-                  description: v.description || null,
-                  city: { name: v.city },
-                  country: { name: v.country },
-                }))}
                 calendarDays={
                   CALENDAR_DAYS as Array<{
                     day: number;
