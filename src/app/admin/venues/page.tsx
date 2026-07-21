@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getAdminVenues, deleteVenue } from "@/lib/actions/admin/venues";
+import { getCountries } from "@/lib/actions/locations";
 import AdminActionButton from "@/components/admin/AdminActionButton";
 import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import AdminPagination from "@/components/admin/AdminPagination";
@@ -25,6 +26,13 @@ export default async function AdminVenuesPage({
     country,
   });
 
+  const countries = await getCountries();
+  const countryFilter = {
+    key: "country",
+    placeholder: "All Countries",
+    options: countries.map((c) => ({ value: c.name, label: c.name })),
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -34,7 +42,10 @@ export default async function AdminVenuesPage({
         </p>
       </div>
 
-      <AdminFilters currentValues={{ country: country ?? "" }} filters={[]} />
+      <AdminFilters
+        currentValues={{ country: country ?? "" }}
+        filters={[countryFilter]}
+      />
 
       {venues.length === 0 ? (
         <AdminEmptyState

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, memo } from "react";
+import { useEffect, memo, useState } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamic import to avoid SSR issues with Leaflet
@@ -37,8 +37,10 @@ interface VenueMapProps {
 }
 
 function VenueMap({ venues }: VenueMapProps) {
+  const [icon, setIcon] = useState<any>(null);
+
   useEffect(() => {
-    // Use a custom branded red marker icon (client-side only)
+    // Create custom branded red marker icon (client-side only)
     import("leaflet").then((L) => {
       const redIcon = L.divIcon({
         className: "djcovery-marker",
@@ -50,9 +52,7 @@ function VenueMap({ venues }: VenueMapProps) {
         iconAnchor: [12, 32],
         popupAnchor: [0, -32],
       });
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
-      L.Icon.Default.mergeOptions({ iconUrl: "" });
-      (L.Marker as any).prototype.options.icon = redIcon;
+      setIcon(redIcon);
     });
   }, []);
 
@@ -70,33 +70,38 @@ function VenueMap({ venues }: VenueMapProps) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {venues.map((venue) => (
-          <Marker key={venue.id} position={[venue.lat, venue.lng]}>
-            <Popup className="z-10000">
-              <div className="text-sm">
-                <strong>{venue.venueName}</strong>
-                <br />
-                {venue.city.name}, {venue.country.name}
-                {venue.eventDate && (
-                  <>
-                    <br />
-                    <span className="font-medium text-white">
-                      {venue.eventDate}
-                    </span>
-                  </>
-                )}
-                {venue.count && venue.count > 1 && (
-                  <>
-                    <br />
-                    <span className="text-gray-400">
-                      Played {venue.count} times
-                    </span>
-                  </>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {icon &&
+          venues.map((venue) => (
+            <Marker
+              key={venue.id}
+              position={[venue.lat, venue.lng]}
+              icon={icon}
+            >
+              <Popup className="z-10000">
+                <div className="text-sm">
+                  <strong>{venue.venueName}</strong>
+                  <br />
+                  {venue.city.name}, {venue.country.name}
+                  {venue.eventDate && (
+                    <>
+                      <br />
+                      <span className="font-medium text-white">
+                        {venue.eventDate}
+                      </span>
+                    </>
+                  )}
+                  {venue.count && venue.count > 1 && (
+                    <>
+                      <br />
+                      <span className="text-gray-400">
+                        Played {venue.count} times
+                      </span>
+                    </>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
       </MapContainer>
     </div>
   );

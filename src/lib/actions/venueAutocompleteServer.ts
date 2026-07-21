@@ -134,12 +134,11 @@ export async function searchVenuesHybrid(
     }
   }
 
-  // Cache Mapbox results fire-and-forget so future searches hit local DB first
-  for (const venue of mapboxResults) {
-    if (venue.name && venue.cityName && venue.countryId) {
-      cacheExternalVenue(venue).catch(() => {});
-    }
-  }
+  // Cache Mapbox results so future searches hit local DB first
+  const cachePromises = mapboxResults
+    .filter((venue) => venue.name && venue.cityName && venue.countryId)
+    .map((venue) => cacheExternalVenue(venue));
+  await Promise.allSettled(cachePromises);
 
   return combined.slice(0, 5);
 }

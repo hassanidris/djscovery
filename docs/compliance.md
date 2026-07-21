@@ -272,16 +272,16 @@ Exceptions where data may be retained:
 
 ### Known Dependency Vulnerabilities (Last Audit: 2026-07-14)
 
-#### @hono/node-server < 1.19.13 (Moderate)
+#### @hono/node-server < 2.0.5 (Moderate)
 
-- **Advisory:** GHSA-92pp-h63x-v22m
-- **Issue:** Middleware bypass via repeated slashes in serveStatic
-- **Current Version:** 1.19.14 (remediated via package.json override)
-- **Dependency Chain:** prisma@7.8.0 → @prisma/dev@0.24.3 → @hono/node-server@1.19.14
-- **Risk Assessment:** Low - Used only in Prisma development tooling, not in production runtime
-- **Remediation Status:** **Remediated** - Fixed via package.json override to @hono/node-server@^1.19.13, resolving to 1.19.14
+- **Advisory:** GHSA-frvp-7c67-39w9
+- **Issue:** Path traversal in serve-static on Windows via encoded backslash (%5C)
+- **Current Override:** @hono/node-server: ">=2.0.5" (resolves to 2.0.11)
+- **Dependency Chain:** prisma@7.8.0 → @prisma/dev@0.24.3 → @hono/node-server@2.0.11 (overridden)
+- **Risk Assessment:** Low - Used only in Prisma development tooling and shadcn CLI, not in production runtime; vulnerability only affects Windows (this project runs on macOS/Linux/CI)
+- **Remediation Status:** **Remediated** - Fixed via package.json override to @hono/node-server@>=2.0.5, resolving to 2.0.11
 - **Workaround:** Not applicable (override applied)
-- **Decision:** Override ensures safe version is used; monitor for Prisma update that bundles fixed version natively
+- **Decision:** Override ensures safe version is used; monitor for Prisma/shadcn updates that bundle fixed version natively
 
 #### postcss < 8.5.10 (Moderate)
 
