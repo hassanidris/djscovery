@@ -455,7 +455,6 @@ export default function DjProfileFree({
             <div id="events">
               <DjEventsModule
                 events={EVENTS}
-                venues={[]}
                 calendarDays={[]}
                 calendarLabel="Calendar"
                 isOwner={isOwner}

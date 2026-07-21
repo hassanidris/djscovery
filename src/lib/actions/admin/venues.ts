@@ -7,11 +7,9 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 export async function getAdminVenues({
   cursor,
   country,
-  source,
 }: {
   cursor?: number;
   country?: string;
-  source?: string;
 }) {
   await requireAdmin();
 
@@ -24,19 +22,22 @@ export async function getAdminVenues({
     };
   }
 
-  if (source) {
-    where.source = source;
-  }
-
-  const venues = await prisma.venue.findMany({
+  const venues = await prisma.djVenue.findMany({
     where,
     take,
     skip: cursor ? 1 : 0,
     cursor: cursor ? { id: cursor } : undefined,
-    orderBy: [{ popularity: "desc" }, { id: "desc" }],
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     include: {
       city: true,
       country: true,
+      djProfile: {
+        select: {
+          id: true,
+          stageName: true,
+          slug: true,
+        },
+      },
     },
   });
 
@@ -58,7 +59,7 @@ export async function deleteVenue(formData: FormData): Promise<ActionResult> {
   }
 
   try {
-    await prisma.venue.delete({
+    await prisma.djVenue.delete({
       where: { id: venueId },
     });
 

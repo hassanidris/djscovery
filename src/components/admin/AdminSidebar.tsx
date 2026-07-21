@@ -10,6 +10,7 @@ import {
   Building2,
   Briefcase,
   Flag,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
     exact: false,
   },
   { href: "/admin/gigs", label: "Gigs", icon: Briefcase, exact: false },
+  { href: "/admin/venues", label: "Venues", icon: MapPin, exact: false },
   { href: "/admin/reports", label: "Reports", icon: Flag, exact: false },
 ] as const;
 

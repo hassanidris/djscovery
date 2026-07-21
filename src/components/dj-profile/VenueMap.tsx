@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, memo } from "react";
+import { useEffect, memo, useState } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamic import to avoid SSR issues with Leaflet
@@ -19,6 +19,7 @@ const Marker = dynamic(
 const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
+const FitBounds = dynamic(() => import("./FitBounds"), { ssr: false });
 
 import "leaflet/dist/leaflet.css";
 
@@ -36,65 +37,71 @@ interface VenueMapProps {
 }
 
 function VenueMap({ venues }: VenueMapProps) {
+  const [icon, setIcon] = useState<any>(null);
+
   useEffect(() => {
-    // Fix for default marker icons in Next.js (client-side only)
+    // Create custom branded red marker icon (client-side only)
     import("leaflet").then((L) => {
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-        iconUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-        shadowUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+      const redIcon = L.divIcon({
+        className: "djcovery-marker",
+        html: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32">
+          <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20C24 5.4 18.6 0 12 0z" fill="#e23744"/>
+          <circle cx="12" cy="12" r="5" fill="#fff"/>
+        </svg>`,
+        iconSize: [24, 32],
+        iconAnchor: [12, 32],
+        popupAnchor: [0, -32],
       });
+      setIcon(redIcon);
     });
   }, []);
 
   if (venues.length === 0) return null;
 
-  // Calculate center point
-  const avgLat = venues.reduce((sum, v) => sum + v.lat, 0) / venues.length;
-  const avgLng = venues.reduce((sum, v) => sum + v.lng, 0) / venues.length;
-
   return (
     <div className="relative z-0 h-100 w-full overflow-hidden rounded-lg border border-white/10">
       <MapContainer
-        center={[avgLat, avgLng]}
+        center={[venues[0].lat, venues[0].lng]}
         zoom={4}
         style={{ height: "100%", width: "100%" }}
       >
+        <FitBounds venues={venues.map((v) => ({ lat: v.lat, lng: v.lng }))} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {venues.map((venue) => (
-          <Marker key={venue.id} position={[venue.lat, venue.lng]}>
-            <Popup className="z-10000">
-              <div className="text-sm">
-                <strong>{venue.venueName}</strong>
-                <br />
-                {venue.city.name}, {venue.country.name}
-                {venue.eventDate && (
-                  <>
-                    <br />
-                    <span className="font-medium text-white">
-                      {venue.eventDate}
-                    </span>
-                  </>
-                )}
-                {venue.count && venue.count > 1 && (
-                  <>
-                    <br />
-                    <span className="text-gray-400">
-                      Played {venue.count} times
-                    </span>
-                  </>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {icon &&
+          venues.map((venue) => (
+            <Marker
+              key={venue.id}
+              position={[venue.lat, venue.lng]}
+              icon={icon}
+            >
+              <Popup className="z-10000">
+                <div className="text-sm">
+                  <strong>{venue.venueName}</strong>
+                  <br />
+                  {venue.city.name}, {venue.country.name}
+                  {venue.eventDate && (
+                    <>
+                      <br />
+                      <span className="font-medium text-white">
+                        {venue.eventDate}
+                      </span>
+                    </>
+                  )}
+                  {venue.count && venue.count > 1 && (
+                    <>
+                      <br />
+                      <span className="text-gray-400">
+                        Played {venue.count} times
+                      </span>
+                    </>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
       </MapContainer>
     </div>
   );

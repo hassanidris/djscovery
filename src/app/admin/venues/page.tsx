@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Badge } from "@/components/ui/badge";
 import { getAdminVenues, deleteVenue } from "@/lib/actions/admin/venues";
+import { getCountries } from "@/lib/actions/locations";
 import AdminActionButton from "@/components/admin/AdminActionButton";
 import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import AdminPagination from "@/components/admin/AdminPagination";
@@ -9,12 +9,6 @@ import { formatDistanceToNow } from "date-fns";
 import { MapPin, Trash2 } from "lucide-react";
 
 export const metadata: Metadata = { title: "Venues" };
-
-const SOURCE_COLORS: Record<string, string> = {
-  manual: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-  mapbox: "border-purple-500/30 bg-purple-500/10 text-purple-400",
-  osm: "border-green-500/30 bg-green-500/10 text-green-400",
-};
 
 export default async function AdminVenuesPage({
   searchParams,
@@ -26,36 +20,31 @@ export default async function AdminVenuesPage({
   const cursor =
     params.cursor && Number.isInteger(cursorRaw) ? cursorRaw : undefined;
   const country = params.country;
-  const source = params.source;
 
   const { venues, nextCursor } = await getAdminVenues({
     cursor,
     country,
-    source,
   });
+
+  const countries = await getCountries();
+  const countryFilter = {
+    key: "country",
+    placeholder: "All Countries",
+    options: countries.map((c) => ({ value: c.name, label: c.name })),
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Venues</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Manage venue database for autocomplete and map features.
+          Manage venues added by DJs to their profiles.
         </p>
       </div>
 
       <AdminFilters
-        currentValues={{ country: country ?? "", source: source ?? "" }}
-        filters={[
-          {
-            key: "source",
-            placeholder: "All Sources",
-            options: [
-              { value: "manual", label: "Manual" },
-              { value: "mapbox", label: "Mapbox" },
-              { value: "osm", label: "OpenStreetMap" },
-            ],
-          },
-        ]}
+        currentValues={{ country: country ?? "" }}
+        filters={[countryFilter]}
       />
 
       {venues.length === 0 ? (
@@ -74,16 +63,16 @@ export default async function AdminVenuesPage({
                       Venue
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-gray-400">
+                      DJ
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-400">
                       Location
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-gray-400">
                       Coordinates
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Source
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Popularity
+                      Event Date
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-gray-400">
                       Added
@@ -102,14 +91,26 @@ export default async function AdminVenuesPage({
                       <td className="px-4 py-3">
                         <div>
                           <div className="font-medium text-white">
-                            {venue.name}
+                            {venue.venueName}
                           </div>
-                          {venue.address && (
-                            <p className="text-muted-foreground text-xs">
-                              {venue.address}
+                          {venue.description && (
+                            <p className="text-muted-foreground line-clamp-1 text-xs">
+                              {venue.description}
                             </p>
                           )}
                         </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-300">
+                        {venue.djProfile ? (
+                          <a
+                            href={`/djs/${venue.djProfile.slug}`}
+                            className="text-gray-300 hover:text-white"
+                          >
+                            Dj. {venue.djProfile.stageName}
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-300">
                         {[venue.city?.name, venue.country?.name]
@@ -129,17 +130,8 @@ export default async function AdminVenuesPage({
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          className={`border text-xs ${
-                            SOURCE_COLORS[venue.source || "manual"] ?? ""
-                          }`}
-                        >
-                          {venue.source || "manual"}
-                        </Badge>
-                      </td>
                       <td className="px-4 py-3 text-xs text-gray-300">
-                        {venue.popularity}
+                        {venue.eventDate || "—"}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-400">
                         {formatDistanceToNow(new Date(venue.createdAt), {
@@ -150,7 +142,7 @@ export default async function AdminVenuesPage({
                         <div className="flex items-center justify-end gap-1">
                           <AdminActionButton
                             label="Delete"
-                            description={`Delete ${venue.name} from the venue database? This cannot be undone.`}
+                            description={`Delete ${venue.venueName} from ${venue.djProfile?.stageName ?? "this DJ"}'s profile? This cannot be undone.`}
                             confirmLabel="Delete"
                             fields={{ venueId: String(venue.id) }}
                             action={deleteVenue}
