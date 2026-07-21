@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, Plus, MapPin, Play } from "lucide-react";
+import { CalendarDays, Plus, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,15 +13,6 @@ import type { EventItem } from "@/components/dj-profile/dj-profile-shared";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import { getMediaProvider, getVideoThumbnailUrl } from "@/lib/media-utils";
 
-type Venue = {
-  id: number;
-  venueName: string;
-  eventDate?: string | null;
-  description?: string | null;
-  city: { name: string };
-  country: { name: string };
-};
-
 type CalendarDay = {
   day: number;
   status: "available" | "booked" | "tentative" | "free";
@@ -29,7 +20,6 @@ type CalendarDay = {
 
 type Props = {
   events: EventItem[];
-  venues: Venue[];
   calendarDays: CalendarDay[];
   calendarLabel: string;
   isOwner?: boolean;
@@ -101,32 +91,8 @@ function PastEventRow({ e }: { e: EventItem }) {
   );
 }
 
-function VenueCard({ venue }: { venue: Venue }) {
-  return (
-    <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
-      <div className="flex items-start gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/5">
-          <MapPin className="h-4 w-4 text-gray-400" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-white">{venue.venueName}</p>
-          <p className="mt-1 text-xs text-gray-500">
-            {[venue.city.name, venue.country.name].filter(Boolean).join(" · ")}
-          </p>
-          {venue.description && (
-            <p className="mt-2 line-clamp-2 text-xs text-gray-400">
-              {venue.description}
-            </p>
-          )}
-        </div>
-      </div>
-    </Card>
-  );
-}
-
 export default function DjEventsModule({
   events,
-  venues,
   calendarDays,
   calendarLabel,
   isOwner = false,
@@ -135,9 +101,7 @@ export default function DjEventsModule({
   featuredPerformanceContext,
   featuredPerformanceThumbnailUrl,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<"upcoming" | "past" | "venues">(
-    "upcoming",
-  );
+  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
   const upcoming = events.filter((e) => !e.isPast);
   const past = events.filter((e) => e.isPast);
@@ -241,7 +205,6 @@ export default function DjEventsModule({
             count: upcoming.length,
           },
           { key: "past" as const, label: "Past", count: past.length },
-          { key: "venues" as const, label: "Venues", count: venues.length },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -338,38 +301,6 @@ export default function DjEventsModule({
               </div>
             ) : (
               filteredPast.map((e) => <PastEventRow key={e.id} e={e} />)
-            )}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "venues" && (
-        <div className="space-y-3">
-          {venues.length > 0 && (
-            <div className="rounded-lg border border-white/8 bg-white/3 px-4 py-3">
-              <p className="text-sm font-medium text-white">
-                Played {venues.length}{" "}
-                {venues.length === 1 ? "venue" : "venues"} across{" "}
-                {
-                  Array.from(
-                    new Set(venues.map((v) => v.city.name).filter(Boolean)),
-                  ).length
-                }{" "}
-                {Array.from(
-                  new Set(venues.map((v) => v.city.name).filter(Boolean)),
-                ).length === 1
-                  ? "city"
-                  : "cities"}
-              </p>
-            </div>
-          )}
-          <div className="grid gap-3 sm:grid-cols-2">
-            {venues.length === 0 ? (
-              <div className="col-span-full py-8 text-center text-sm text-gray-500">
-                No venues added yet
-              </div>
-            ) : (
-              venues.map((v) => <VenueCard key={v.id} venue={v} />)
             )}
           </div>
         </div>

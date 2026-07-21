@@ -24,7 +24,7 @@ type Props = {
 };
 
 function WhereIvePlayed({ venues, isOwner, onAddVenue }: Props) {
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "map">("map");
 
   if (!venues || venues.length === 0) {
     if (isOwner && onAddVenue) {
