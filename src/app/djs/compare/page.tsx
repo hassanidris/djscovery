@@ -1,20 +1,19 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCheckCircle,
-  faXmark,
-  faCrown,
-  faArrowRight,
-  faLock,
-  faChartLine,
-  faBolt,
-  faCalendarCheck,
-  faShield,
-  faRocket,
-  faFireFlameCurved,
-} from "@fortawesome/free-solid-svg-icons";
+  CircleCheck,
+  X,
+  Crown,
+  ArrowRight,
+  Lock,
+  TrendingUp,
+  Zap,
+  CalendarCheck,
+  Shield,
+  Rocket,
+  Flame,
+} from "lucide-react";
 
 type Row = {
   feature: string;
@@ -270,49 +269,49 @@ const ROWS: Row[] = [
 
 const UPGRADE_TRIGGERS = [
   {
-    icon: faChartLine,
+    icon: TrendingUp,
     trigger: "Profile gets 500+ views but zero analytics",
     emotion: "Curiosity gap",
     cta: "See who's looking at you",
   },
   {
-    icon: faLock,
+    icon: Lock,
     trigger: "DJ sees blurred analytics sidebar on their own profile",
     emotion: "FOMO + frustration",
     cta: "Unblock your stats",
   },
   {
-    icon: faBolt,
+    icon: Zap,
     trigger: "Competitor DJ with Premium badge ranks higher in search",
     emotion: "Competitive urgency",
     cta: "Get verified and rank first",
   },
   {
-    icon: faCalendarCheck,
+    icon: CalendarCheck,
     trigger: "Organizer can't check availability → bounces",
     emotion: "Missed opportunity pain",
     cta: "Add your calendar, close more bookings",
   },
   {
-    icon: faFireFlameCurved,
+    icon: Flame,
     trigger: "Big festival browsing the directory — Free profile looks thin",
     emotion: "Shame / professionalism gap",
     cta: "Look like a headliner, not a hobbyist",
   },
   {
-    icon: faShield,
+    icon: Shield,
     trigger: "No verified badge next to name → trust drop vs. Premium DJ",
     emotion: "Status / credibility gap",
     cta: "Get your blue tick today",
   },
   {
-    icon: faRocket,
+    icon: Rocket,
     trigger: "Booking package page missing → organizer has to email for info",
     emotion: "Friction removal",
     cta: "Let packages sell for you 24/7",
   },
   {
-    icon: faCrown,
+    icon: Crown,
     trigger: "30-day analytics email: '47 organizers visited your profile'",
     emotion: "Value demonstration",
     cta: "You're 1 click from converting them",
@@ -320,15 +319,8 @@ const UPGRADE_TRIGGERS = [
 ];
 
 function Cell({ val }: { val: boolean | string }) {
-  if (val === true)
-    return (
-      <FontAwesomeIcon
-        icon={faCheckCircle}
-        className="h-4 w-4 text-emerald-500"
-      />
-    );
-  if (val === false)
-    return <FontAwesomeIcon icon={faXmark} className="h-4 w-4 text-gray-700" />;
+  if (val === true) return <CircleCheck className="h-4 w-4 text-emerald-500" />;
+  if (val === false) return <X className="h-4 w-4 text-gray-700" />;
   return <span className="text-h_red text-xs font-semibold">{val}</span>;
 }
 
@@ -343,7 +335,7 @@ export default function DjProfileComparePage() {
       <div className="mx-auto max-w-5xl px-4 py-16 md:px-8">
         <div className="mb-14 text-center">
           <Badge className="mb-4 border-amber-500/20 bg-amber-500/10 text-amber-400">
-            <FontAwesomeIcon icon={faCrown} className="mr-1 h-2.5 w-2.5" />
+            <Crown className="mr-1 h-2.5 w-2.5" />
             Plan Comparison
           </Badge>
           <h1 className="font-heading mb-4 text-4xl text-white md:text-5xl">
@@ -365,10 +357,7 @@ export default function DjProfileComparePage() {
               </Link>
               <Link href="/djs/demo-premium">
                 <Button className="bg-amber-500 font-bold text-black hover:bg-amber-400">
-                  <FontAwesomeIcon
-                    icon={faCrown}
-                    className="mr-2 h-3.5 w-3.5"
-                  />
+                  <Crown className="mr-2 h-3.5 w-3.5" />
                   View Premium Profile
                 </Button>
               </Link>
@@ -391,10 +380,7 @@ export default function DjProfileComparePage() {
             </div>
             <div className="border-l border-amber-500/20 bg-amber-500/5 p-5 text-center">
               <div className="flex items-center justify-center gap-1.5">
-                <FontAwesomeIcon
-                  icon={faCrown}
-                  className="h-3.5 w-3.5 text-amber-400"
-                />
+                <Crown className="h-3.5 w-3.5 text-amber-400" />
                 <span className="text-sm font-bold text-amber-400">
                   Premium
                 </span>
@@ -459,10 +445,7 @@ export default function DjProfileComparePage() {
               >
                 <div className="flex items-start gap-3">
                   <div className="bg-h_red/10 border-h_red/20 mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border">
-                    <FontAwesomeIcon
-                      icon={t.icon}
-                      className="text-h_red h-3.5 w-3.5"
-                    />
+                    <t.icon className="text-h_red h-3.5 w-3.5" />
                   </div>
                   <div className="flex-1">
                     <p className="mb-1 text-sm font-semibold text-white">
@@ -472,10 +455,7 @@ export default function DjProfileComparePage() {
                       {t.emotion}
                     </Badge>
                     <p className="text-h_red flex items-center gap-1 text-xs font-medium">
-                      <FontAwesomeIcon
-                        icon={faArrowRight}
-                        className="h-2.5 w-2.5"
-                      />
+                      <ArrowRight className="h-2.5 w-2.5" />
                       {t.cta}
                     </p>
                   </div>
@@ -487,10 +467,7 @@ export default function DjProfileComparePage() {
 
         {/* Bottom CTA */}
         <div className="rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/8 via-transparent to-transparent p-8 text-center">
-          <FontAwesomeIcon
-            icon={faCrown}
-            className="mb-4 h-8 w-8 text-amber-400"
-          />
+          <Crown className="mb-4 h-8 w-8 text-amber-400" />
           <h2 className="font-heading mb-2 text-3xl text-white">
             Start Free. Upgrade When You&apos;re Ready.
           </h2>
@@ -510,10 +487,7 @@ export default function DjProfileComparePage() {
               </Link>
               <Link href="/djs/demo-premium">
                 <Button className="bg-amber-500 px-8 font-bold text-black hover:bg-amber-400">
-                  <FontAwesomeIcon
-                    icon={faCrown}
-                    className="mr-2 h-3.5 w-3.5"
-                  />
+                  <Crown className="mr-2 h-3.5 w-3.5" />
                   See Premium Profile
                 </Button>
               </Link>

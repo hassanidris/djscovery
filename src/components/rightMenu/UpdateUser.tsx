@@ -1,8 +1,7 @@
 "use client";
 
 import { updateDjProfile } from "@/lib/actions";
-import { faClose } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { X } from "lucide-react";
 import { User } from "@prisma/client";
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -93,7 +92,7 @@ const UpdateUser = ({ user }: { user: User }) => {
               className="absolute top-3 right-3 cursor-pointer text-xl"
               onClick={handleClose}
             >
-              <FontAwesomeIcon icon={faClose} />
+              <X />
             </div>
           </form>
         </div>

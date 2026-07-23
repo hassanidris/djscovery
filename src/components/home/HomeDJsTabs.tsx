@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCrown } from "@fortawesome/free-solid-svg-icons";
+import { Crown } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ScrollableCarousel from "@/components/ScrollableCarousel";
@@ -153,10 +152,7 @@ function DJCard({
             </Avatar>
             {dj.isPremium && (
               <div className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full border-2 border-black bg-amber-400">
-                <FontAwesomeIcon
-                  icon={faCrown}
-                  className="h-3 w-3 text-black"
-                />
+                <Crown className="h-3 w-3 text-black" />
               </div>
             )}
           </div>

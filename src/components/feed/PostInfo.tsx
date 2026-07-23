@@ -1,8 +1,7 @@
 "use client";
 
 import { deletePost } from "@/lib/actions/feed";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { MoreVertical } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
@@ -34,8 +33,7 @@ const PostInfo = ({ postId }: { postId: number }) => {
 
   return (
     <div className="relative">
-      <FontAwesomeIcon
-        icon={faEllipsis}
+      <MoreVertical
         className="h-4 w-4 cursor-pointer text-gray-200"
         onClick={() => setOpen((prev) => !prev)}
       />

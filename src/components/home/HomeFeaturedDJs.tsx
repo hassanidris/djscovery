@@ -3,8 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCrown } from "@fortawesome/free-solid-svg-icons";
+import { Crown } from "lucide-react";
 import { getFeaturedDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
 
@@ -58,10 +57,7 @@ export default async function HomeFeaturedDJs() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border-2 border-black bg-amber-400">
-                        <FontAwesomeIcon
-                          icon={faCrown}
-                          className="h-2.5 w-2.5 text-black"
-                        />
+                        <Crown className="h-2.5 w-2.5 text-black" />
                       </div>
                     </div>
                   </div>

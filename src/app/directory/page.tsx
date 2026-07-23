@@ -8,8 +8,6 @@ import FilterBottomSheet from "@/components/directory/FilterBottomSheet";
 import DjGrid from "@/components/directory/DjGrid";
 import ActiveFilterBadges from "@/components/directory/ActiveFilterBadges";
 import EventCalendar from "@/components/directory/EventCalendar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeadphones } from "@fortawesome/free-solid-svg-icons";
 import { AudioLines, Headphones } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 

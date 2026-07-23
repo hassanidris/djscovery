@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCrown } from "@fortawesome/free-solid-svg-icons";
+import { Crown } from "lucide-react";
 import { CircleCheck } from "lucide-react";
 import { DjUser } from "@/lib/data";
 import SaveDjButton from "@/components/dj-profile/FollowDjButton";
@@ -67,10 +66,7 @@ const DjCard = ({
           />
           {isPremium && (
             <div className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border-2 border-black bg-amber-400">
-              <FontAwesomeIcon
-                icon={faCrown}
-                className="h-2.5 w-2.5 text-black"
-              />
+              <Crown className="h-2.5 w-2.5 text-black" />
             </div>
           )}
         </div>

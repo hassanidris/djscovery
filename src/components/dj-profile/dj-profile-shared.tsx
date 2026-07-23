@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Star } from "lucide-react";
+import { Star, Globe } from "lucide-react";
 import {
   faInstagram,
   faTiktok,
