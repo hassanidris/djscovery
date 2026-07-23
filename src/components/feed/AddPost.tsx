@@ -2,6 +2,7 @@
 import { useUser } from "@/lib/supabase/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CldUploadWidget } from "next-cloudinary";
+import Image from "next/image";
 import { ImageIcon, Video, Music2, X } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -168,11 +169,13 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
         {/* ── Photo preview ── */}
         {img && (
           <div className="relative px-4 pb-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={img.secure_url}
               alt="preview"
+              width={400}
+              height={300}
               className="max-h-48 w-full rounded-lg object-cover"
+              unoptimized
             />
             <button
               type="button"

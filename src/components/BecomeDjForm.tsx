@@ -483,7 +483,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             className="hover:border-h_red relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-white/30 bg-white/10 transition-all"
           >
             {avatarPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={avatarPreview.startsWith("blob:") ? avatarPreview : ""}
                 alt="Avatar preview"
@@ -538,7 +537,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             className="hover:border-h_red relative flex h-32 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/30 bg-white/10 transition-all"
           >
             {coverPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={coverPreview.startsWith("blob:") ? coverPreview : ""}
                 alt="Cover preview"

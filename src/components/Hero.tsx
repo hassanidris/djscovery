@@ -128,12 +128,6 @@ const Hero = async () => {
                 </>
               )}
             </div>
-
-            {/* <h1 class="title text-white word txt_anim">
-                        Find the <span class="color-primary fw-bold"> Perfect DJ </span>   <br>
-                        ear You! 
-                        <img src="images/headphone.png" class="icon" alt="">
-                    </h1> */}
           </div>
         </div>
       </section>

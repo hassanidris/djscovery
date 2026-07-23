@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { bottomNavByRole, type NavRole } from "@/config/navigation";
 
@@ -83,10 +84,11 @@ export default function NavMobileBottom({
                   )}
                 >
                   {avatarSrc ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={avatarSrc}
                       alt=""
+                      width={22}
+                      height={22}
                       className="h-full w-full object-cover"
                     />
                   ) : (

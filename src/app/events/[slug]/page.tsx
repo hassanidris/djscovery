@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   CalendarDays,
   Clock,
@@ -387,10 +388,11 @@ function EventDetailView(props: {
           <div className="w-full shrink-0 md:sticky md:top-20 md:w-70 lg:w-80">
             <div className="aspect-2/3 w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl">
               {posterUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={posterUrl}
                   alt={title}
+                  width={320}
+                  height={480}
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -439,10 +441,11 @@ function EventDetailView(props: {
             >
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                 {ownerDj.avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={ownerDj.avatar}
                     alt={ownerDj.stageName}
+                    width={40}
+                    height={40}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -592,10 +595,11 @@ function EventDetailView(props: {
                     >
                       <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                         {dj.avatar ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={dj.avatar}
                             alt={dj.stageName}
+                            width={40}
+                            height={40}
                             className="h-full w-full object-cover"
                           />
                         ) : (
@@ -684,10 +688,11 @@ function EventDetailView(props: {
                       key={img.id}
                       className="aspect-square overflow-hidden rounded-lg"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={img.url}
                         alt={img.caption ?? title}
+                        width={200}
+                        height={200}
                         className="h-full w-full object-cover transition-transform hover:scale-105"
                       />
                     </div>
