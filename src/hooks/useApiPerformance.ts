@@ -92,10 +92,10 @@ export function usePageLoadMetrics() {
       "navigation",
     ) as PerformanceNavigationTiming[];
     if (navEntries.length > 0) {
-      setMetrics((prev) => ({
-        ...prev,
-        ttfb: Math.round(navEntries[0].responseStart),
-      }));
+      const ttfb = Math.round(navEntries[0].responseStart);
+      queueMicrotask(() => {
+        setMetrics((prev) => ({ ...prev, ttfb }));
+      });
     }
 
     const paintObserver = new PerformanceObserver((list) => {

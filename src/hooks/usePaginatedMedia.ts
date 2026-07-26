@@ -92,7 +92,8 @@ export function usePaginatedMedia(
   };
 
   useEffect(() => {
-    fetchMedia(1, false);
+    queueMicrotask(() => fetchMedia(1, false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, type]);
 
   return {

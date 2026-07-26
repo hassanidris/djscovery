@@ -39,19 +39,19 @@ export function usePaginatedRatings(slug: string) {
       });
 
       const response = await fetch(`/api/djs/${slug}/ratings?${queryParams}`);
-      
+
       if (!response.ok) {
         throw new Error("Failed to fetch ratings");
       }
 
       const result: PaginatedRatingsResponse = await response.json();
-      
+
       if (append) {
         setData((prev) => [...prev, ...result.ratings]);
       } else {
         setData(result.ratings);
       }
-      
+
       setTotalCount(result.totalCount);
       setHasNextPage(result.hasNextPage);
       setAvgRating(result.avgRating);
@@ -76,7 +76,8 @@ export function usePaginatedRatings(slug: string) {
   };
 
   useEffect(() => {
-    fetchRatings(1, false);
+    queueMicrotask(() => fetchRatings(1, false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   return {
