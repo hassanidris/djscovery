@@ -139,6 +139,10 @@ test.describe("Career Highlights", () => {
     });
 
     test("successfully creates highlight with valid data", async ({ page }) => {
+      // Reset here (not just in beforeAll) so retries of this test don't
+      // accumulate duplicate highlights and trip strict-mode locators below.
+      await resetDjHighlights(TEST_USERS.PREMIUM_DJ.email);
+
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
       await page.getByRole("button", { name: "Add Highlight" }).click();
@@ -151,21 +155,36 @@ test.describe("Career Highlights", () => {
         .fill("Main stage performance for 50,000 attendees");
       await page.getByRole("button", { name: "Save" }).click();
 
-      // Should show success toast
+      // Should show success toast (generous timeout: cold-compile dev server
+      // responses can take significantly longer than 5s in CI)
       await expect(page.getByText("Career highlights updated")).toBeVisible({
-        timeout: 5000,
+        timeout: 15000,
       });
 
       // Should see new highlight in list
       await expect(
-        page.getByText("Headlined Afro Nation Portugal"),
+        page.getByText("Headlined Afro Nation Portugal").first(),
       ).toBeVisible();
-      await expect(page.getByText("2024")).toBeVisible();
+      await expect(page.getByText("2024").first()).toBeVisible();
     });
 
     test("successfully edits existing highlight", async ({ page }) => {
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
+
+      // Ensure there's a highlight to edit, independent of whether the
+      // previous test's create actually persisted (avoids cascading
+      // failures if an earlier test flaked).
+      const editButton = page.locator('button[aria-label="Edit"]').first();
+      if (!(await editButton.isVisible().catch(() => false))) {
+        await page.getByRole("button", { name: "Add Highlight" }).click();
+        await page.getByLabel("Year").fill("2024");
+        await page.getByLabel("Title").fill("Seed Highlight");
+        await page.getByRole("button", { name: "Save" }).click();
+        await expect(page.getByText("Career highlights updated")).toBeVisible({
+          timeout: 15000,
+        });
+      }
 
       // Click edit button (pencil icon)
       await page.locator('button[aria-label="Edit"]').first().click();
@@ -176,7 +195,7 @@ test.describe("Career Highlights", () => {
 
       // Should show success toast
       await expect(page.getByText("Career highlights updated")).toBeVisible({
-        timeout: 5000,
+        timeout: 15000,
       });
 
       // Should see updated highlight
