@@ -21,23 +21,13 @@ export async function GET(
       id: number;
       slug: string;
       title: string;
-      description: string | null;
+      date: string;
+      venue: string;
+      city: string;
+      country: string;
+      isPast: boolean;
       eventType: string;
       category: string;
-      posterUrl: string | null;
-      venue: string | null;
-      startDate: Date;
-      endDate: Date | null;
-      startTime: string | null;
-      endTime: string | null;
-      timezone: string | null;
-      ticketUrl: string | null;
-      recap: string | null;
-      audioLink: string | null;
-      videoLink: string | null;
-      featured: boolean;
-      viewCount: number;
-      genres: string[];
       status: string;
       role: string | null;
     }>
@@ -86,33 +76,27 @@ export async function GET(
           role: true,
         },
       },
+      city: { select: { name: true } },
+      country: { select: { name: true } },
     },
     orderBy: { startDate: "desc" },
   });
   timer.end("fetch_events");
 
-  // Transform to match expected format
+  // Transform to the EventItem shape expected by DjEventsModule /
+  // ProfileEventsSidebar (date as ISO string, city/country as names, isPast).
+  const now = Date.now();
   const transformedEvents = events.map((event) => ({
     id: event.id,
     slug: event.slug,
     title: event.title,
-    description: event.description,
+    date: event.startDate.toISOString(),
+    venue: event.venue ?? "",
+    city: event.city?.name ?? "",
+    country: event.country?.name ?? "",
+    isPast: event.startDate.getTime() < now,
     eventType: event.eventType,
     category: event.category,
-    posterUrl: event.posterUrl,
-    venue: event.venue,
-    startDate: event.startDate,
-    endDate: event.endDate,
-    startTime: event.startTime,
-    endTime: event.endTime,
-    timezone: event.timezone,
-    ticketUrl: event.ticketUrl,
-    recap: event.recap,
-    audioLink: event.audioLink,
-    videoLink: event.videoLink,
-    featured: event.featured,
-    viewCount: event.viewCount,
-    genres: event.genres,
     status: event.status,
     role: event.participants[0]?.role || null,
   }));
