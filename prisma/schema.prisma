@@ -533,6 +533,8 @@ model DjPackage {
   updatedAt DateTime @updatedAt
 
   @@index([djProfileId])
+  @@index([djProfileId, sortOrder])
+  @@index([sortOrder])
 }
 
 // ------ DJ PREMIUM: CAREER HIGHLIGHTS ------
@@ -549,6 +551,7 @@ model DjCareerHighlight {
   createdAt DateTime @default(now())
 
   @@index([djProfileId])
+  @@index([djProfileId, year])
 }
 
 // ------ DJ PREMIUM: ENDORSEMENTS ------
@@ -567,6 +570,7 @@ model DjEndorsement {
   createdAt DateTime @default(now())
 
   @@index([djProfileId])
+  @@index([djProfileId, createdAt])
 }
 
 // ------ DJ PREMIUM: PRESS & MEDIA ------
@@ -585,6 +589,7 @@ model DjPress {
   createdAt DateTime @default(now())
 
   @@index([djProfileId])
+  @@index([djProfileId, createdAt])
 }
 
 // ------ DJ PREMIUM: WHERE I'VE PLAYED (VENUES) ------
@@ -611,6 +616,7 @@ model DjVenue {
   updatedAt DateTime @updatedAt
 
   @@index([djProfileId])
+  @@index([djProfileId, eventDate])
   @@index([countryId])
   @@index([cityId])
 }
@@ -810,6 +816,8 @@ model Media {
   createdAt DateTime @default(now())
 
   @@index([djProfileId])
+  @@index([djProfileId, type])
+  @@index([djProfileId, isSpotlight])
   @@index([postId])
   @@index([type])
   @@index([isSpotlight])
@@ -834,6 +842,7 @@ model DjRating {
 
   @@unique([userId, djProfileId])
   @@index([djProfileId])
+  @@index([djProfileId, createdAt])
 }
 
 // ------ DJ PROFILE COMMENTS ------
@@ -982,9 +991,9 @@ model Event {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([slug])
   @@index([ownerDjId])
   @@index([ownerDjId, status])
+  @@index([ownerDjId, status, deletedAt])
   @@index([status])
   @@index([startDate])
   @@index([featured])
@@ -1001,6 +1010,7 @@ model EventDj {
   role        String? // e.g. "Headliner", "Support", "B2B"
 
   @@id([eventId, djProfileId])
+  @@index([djProfileId])
 }
 
 // Gallery photos uploaded after event is COMPLETED

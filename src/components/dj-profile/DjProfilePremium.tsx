@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -41,12 +41,14 @@ import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBot
 import VenueModal from "@/components/dj-profile/VenueModal";
 import HighlightModal from "@/components/dj-profile/HighlightModal";
 import PressModal from "@/components/dj-profile/PressModal";
+import { HIGHLIGHT_ICONS, PRESS_ICON_MAP } from "@/data/dj-profile-defaults";
 import BookingPackages from "@/components/dj-profile/BookingPackages";
 import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
 import ProfessionalTeamSidebar from "@/components/dj-profile/ProfessionalTeamSidebar";
 import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
+import { useBookingOptions } from "@/hooks/useBookingOptions";
 import {
   getDjPackages,
   createDjPackage,
@@ -72,6 +74,7 @@ import {
   Stars,
   SectionHeading,
   formatPlays,
+  type ReviewItem,
 } from "@/components/dj-profile/dj-profile-shared";
 import {
   PREMIUM_DEFAULT_DJ,
@@ -87,6 +90,10 @@ import {
   PREMIUM_DEFAULT_SPOTLIGHT,
   type PremiumMediaItem,
 } from "@/data/dj-profile-defaults";
+import { usePaginatedMedia } from "@/hooks/usePaginatedMedia";
+import { usePaginatedRatings } from "@/hooks/usePaginatedRatings";
+import { useLazyVenues } from "@/hooks/useLazyVenues";
+import { useLazyData } from "@/hooks/useLazyData";
 import {
   mapPremiumDjToProps,
   mapPremiumEventsFromData,
@@ -97,8 +104,8 @@ import {
   mapPressFromData,
   mapPackagesFromData,
   mapMixesFromData,
-  buildCalendarFromData,
   getCalendarMonthLabel,
+  buildCalendarFromData,
 } from "@/lib/dj-profile-mappers";
 import { getVideoThumbnailUrl } from "@/lib/media-utils";
 import { useAudioThumbnail } from "@/lib/media-thumbnails";
@@ -281,6 +288,152 @@ export default function DjProfilePremium({
   );
   const bookCTARefMobile = useRef<BookCTARef>(null);
   const bookCTARefDesktop = useRef<BookCTARef>(null);
+
+  // Fetch media and ratings client-side with pagination
+  const slug = djData?.slug || "";
+  const {
+    media: fetchedMedia,
+    totalCount: mediaTotalCount,
+    hasNextPage: mediaHasNextPage,
+    isLoading: mediaIsLoading,
+    loadNextPage: loadMoreMedia,
+    typeCounts: mediaTypeCounts,
+  } = usePaginatedMedia(slug);
+
+  // Fetch booking options client-side
+  const { options: clientBookingOptions, isLoading: bookingOptionsLoading } =
+    useBookingOptions(
+      viewerContext?.organizerCountryId ?? undefined,
+      viewerContext?.organizerCityId ?? undefined,
+      (djData as any)?.countryId
+        ? parseInt((djData as any).countryId)
+        : undefined,
+      (djData as any)?.cityId ? parseInt((djData as any).cityId) : undefined,
+    );
+
+  // Use client-fetched options if available, otherwise use server options (empty array)
+  const finalBookingOptions =
+    clientBookingOptions.countries.length > 0
+      ? clientBookingOptions
+      : bookingOptions;
+
+  const {
+    ratings: fetchedRatings,
+    totalCount: ratingsTotalCount,
+    hasNextPage: ratingsHasNextPage,
+    avgRating: fetchedAvgRating,
+    isLoading: ratingsIsLoading,
+    loadNextPage: loadMoreRatings,
+  } = usePaginatedRatings(slug);
+
+  // Lazy-load venues when scrolled into view
+  const {
+    venues: lazyVenues,
+    isLoading: venuesIsLoading,
+    hasLoaded: venuesHasLoaded,
+    targetRef: venuesTargetRef,
+  } = useLazyVenues(slug);
+
+  // Lazy-load endorsements when scrolled into view
+  const {
+    data: lazyEndorsements,
+    isLoading: endorsementsIsLoading,
+    hasLoaded: endorsementsHasLoaded,
+    targetRef: endorsementsTargetRef,
+  } = useLazyData<any>(slug, "endorsements", true);
+
+  // Lazy-load press when scrolled into view
+  const {
+    data: lazyPress,
+    isLoading: pressIsLoading,
+    hasLoaded: pressHasLoaded,
+    targetRef: pressTargetRef,
+  } = useLazyData<any>(slug, "press", true);
+
+  // Lazy-load packages when scrolled into view
+  const {
+    data: lazyPackages,
+    isLoading: packagesIsLoading,
+    hasLoaded: packagesHasLoaded,
+    targetRef: packagesTargetRef,
+  } = useLazyData<any>(slug, "packages", true);
+
+  // Lazy-load events when scrolled into view
+  const {
+    data: lazyEvents,
+    isLoading: eventsIsLoading,
+    hasLoaded: eventsHasLoaded,
+  } = useLazyData<any>(slug, "events", true);
+
+  // Lazy-load highlights when scrolled into view
+  const {
+    data: lazyHighlights,
+    isLoading: highlightsIsLoading,
+    hasLoaded: highlightsHasLoaded,
+  } = useLazyData<any>(slug, "highlights", true);
+
+  // Lazy-load calendar when scrolled into view
+  const {
+    data: lazyCalendar,
+    isLoading: calendarIsLoading,
+    hasLoaded: calendarHasLoaded,
+  } = useLazyData<any>(slug, "calendar", true);
+
+  // Lazy-load mixes when scrolled into view
+  const {
+    data: lazyMixes,
+    isLoading: mixesIsLoading,
+    hasLoaded: mixesHasLoaded,
+  } = useLazyData<any>(slug, "mixes", true);
+
+  // Lazy-load spotlight when scrolled into view
+  const {
+    data: lazySpotlight,
+    isLoading: spotlightIsLoading,
+    hasLoaded: spotlightHasLoaded,
+  } = useLazyData<any>(slug, "spotlight", true);
+
+  // Transform fetched media to PremiumMediaItem format (exclude AUDIO - handled in MIXES)
+  const filteredMedia = fetchedMedia.filter((m) => m.type !== "AUDIO");
+  const totalNonAudioCount =
+    (mediaTypeCounts?.IMAGE || 0) + (mediaTypeCounts?.VIDEO || 0);
+  const transformedMedia: PremiumMediaItem[] = filteredMedia.map((m) => {
+    if (m.type === "IMAGE") {
+      return {
+        id: m.id,
+        url: m.url,
+        type: "photo" as const,
+      };
+    }
+    if (m.type === "VIDEO") {
+      return {
+        id: m.id,
+        url: m.thumbnail || "/gallery-1.png",
+        videoUrl: m.url,
+        title: m.title || "",
+        type: "video" as const,
+        views: m.viewCount ?? 0,
+      };
+    }
+    // Fallback for any other types
+    return {
+      id: m.id,
+      url: m.url || "/gallery-1.png",
+      type: "photo" as const,
+    };
+  });
+
+  // Transform fetched ratings to reviews format matching ReviewItem type
+  const transformedReviews = fetchedRatings.map((r) => ({
+    id: r.id,
+    rating: r.rating,
+    review: r.review || "",
+    date: new Date(r.createdAt).toISOString().split("T")[0],
+    user: {
+      name: r.user.name || r.user.username,
+      image: r.user.image || "",
+    },
+  }));
   const [venues, setVenues] = useState<
     Array<{
       id: number;
@@ -720,61 +873,137 @@ export default function DjProfilePremium({
     : isStaging
       ? PREMIUM_DEFAULT_DJ
       : null;
-  const EVENTS = djData
-    ? mapPremiumEventsFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_EVENTS
-      : [];
-  const REVIEWS = djData
-    ? mapPremiumReviewsFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_REVIEWS
-      : [];
+  const EVENTS =
+    eventsHasLoaded && lazyEvents
+      ? lazyEvents
+      : djData
+        ? mapPremiumEventsFromData(djData)
+        : isStaging
+          ? PREMIUM_DEFAULT_EVENTS
+          : [];
+  const REVIEWS = (
+    djData
+      ? transformedReviews.length > 0
+        ? transformedReviews
+        : mapPremiumReviewsFromData(djData)
+      : isStaging
+        ? PREMIUM_DEFAULT_REVIEWS
+        : []
+  ) as ReviewItem[];
   const MEDIA = djData
-    ? mapPremiumMediaFromData(djData)
+    ? transformedMedia.length > 0
+      ? transformedMedia
+      : mapPremiumMediaFromData(djData)
     : isStaging
       ? PREMIUM_DEFAULT_MEDIA
       : [];
-  const ENDORSEMENTS = djData
-    ? mapEndorsementsFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_ENDORSEMENTS
-      : [];
-  const HIGHLIGHTS = djData
-    ? mapHighlightsFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_HIGHLIGHTS
-      : [];
-  const PRESS = djData
-    ? mapPressFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_PRESS
-      : [];
-  const PACKAGES = djData
-    ? mapPackagesFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_PACKAGES
-      : [];
-  const CALENDAR_DAYS = djData
-    ? buildCalendarFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_CALENDAR_DAYS
-      : [];
-  const MIXES = djData
-    ? mapMixesFromData(djData)
-    : isStaging
-      ? PREMIUM_DEFAULT_MIXES
-      : [];
+  const ENDORSEMENTS =
+    endorsementsHasLoaded && lazyEndorsements
+      ? lazyEndorsements
+      : djData
+        ? mapEndorsementsFromData(djData)
+        : isStaging
+          ? PREMIUM_DEFAULT_ENDORSEMENTS
+          : [];
+  const HIGHLIGHTS =
+    highlightsHasLoaded && lazyHighlights
+      ? lazyHighlights.map((h: any, i: number) => ({
+          ...h,
+          icon: HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
+          description: h.description ?? undefined,
+        }))
+      : djData
+        ? mapHighlightsFromData(djData)
+        : isStaging
+          ? PREMIUM_DEFAULT_HIGHLIGHTS
+          : [];
+  const PRESS =
+    pressHasLoaded && lazyPress
+      ? lazyPress.map((p: any) => ({
+          ...p,
+          icon: PRESS_ICON_MAP[p.type] ?? Newspaper,
+        }))
+      : djData
+        ? mapPressFromData(djData)
+        : isStaging
+          ? PREMIUM_DEFAULT_PRESS
+          : [];
+  const PACKAGES =
+    packagesHasLoaded && lazyPackages
+      ? lazyPackages
+      : djData
+        ? mapPackagesFromData(djData)
+        : isStaging
+          ? PREMIUM_DEFAULT_PACKAGES
+          : [];
+  const CALENDAR_DAYS =
+    calendarHasLoaded && lazyCalendar
+      ? buildCalendarFromData({
+          ...(djData as any),
+          availability: {
+            month:
+              (lazyCalendar as any)?.availabilityMonth ??
+              (lazyCalendar as any)?.availability?.month ??
+              "",
+            availableDays:
+              (lazyCalendar as any)?.availabilityDays ??
+              (lazyCalendar as any)?.availability?.availableDays ??
+              [],
+            timezone:
+              (lazyCalendar as any)?.timezone ??
+              (djData as any)?.availability?.timezone ??
+              "UTC",
+          },
+        })
+      : djData
+        ? buildCalendarFromData(djData)
+        : isStaging
+          ? PREMIUM_DEFAULT_CALENDAR_DAYS
+          : [];
+  const MIXES =
+    mixesHasLoaded && lazyMixes
+      ? lazyMixes
+      : djData
+        ? mapMixesFromData(djData)
+        : isStaging
+          ? PREMIUM_DEFAULT_MIXES
+          : [];
   const calendarLabel = djData
     ? getCalendarMonthLabel(djData)
     : isStaging
       ? "September 2025"
       : "";
-  const SPOTLIGHT = djData
-    ? djData.spotlight
-    : isStaging
-      ? PREMIUM_DEFAULT_SPOTLIGHT
-      : null;
+  const SPOTLIGHT =
+    spotlightHasLoaded && lazySpotlight
+      ? lazySpotlight
+      : djData
+        ? {
+            featuredMix: djData.spotlight?.featuredMix
+              ? {
+                  ...djData.spotlight.featuredMix,
+                  audioUrl:
+                    (djData.spotlight.featuredMix as any).audioUrl ||
+                    (djData.spotlight.featuredMix as any).url,
+                  plays:
+                    (djData.spotlight.featuredMix as any).plays ||
+                    (djData.spotlight.featuredMix as any).playCount,
+                }
+              : null,
+            featuredVideo: djData.spotlight?.featuredVideo
+              ? {
+                  ...djData.spotlight.featuredVideo,
+                  videoUrl:
+                    (djData.spotlight.featuredVideo as any).videoUrl ||
+                    (djData.spotlight.featuredVideo as any).url,
+                  views:
+                    (djData.spotlight.featuredVideo as any).views ||
+                    (djData.spotlight.featuredVideo as any).viewCount,
+                }
+              : null,
+          }
+        : isStaging
+          ? PREMIUM_DEFAULT_SPOTLIGHT
+          : null;
   const featuredVideoUrl = SPOTLIGHT?.featuredVideo.videoUrl ?? "";
   const featuredVideoThumb =
     SPOTLIGHT?.featuredVideo.thumbnail ||
@@ -836,7 +1065,7 @@ export default function DjProfilePremium({
               layout="mobile"
               responseRate={safeDJ.responseRate}
               bookingSuccessRate={safeDJ.bookingSuccessRate}
-              bookingOptions={bookingOptions}
+              bookingOptions={finalBookingOptions}
             />
 
             <div id="about">
@@ -998,53 +1227,97 @@ export default function DjProfilePremium({
                 ))}
               </div>
               {mediaTab === "photos" && (
-                <MediaGalleryLightbox
-                  photos={MEDIA.filter((m) => m.type === "photo")}
-                />
+                <>
+                  {mediaIsLoading && MEDIA.length === 0 ? (
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      {[...Array(6)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="aspect-square animate-pulse rounded-lg bg-white/5"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <MediaGalleryLightbox
+                      photos={MEDIA.filter((m) => m.type === "photo")}
+                    />
+                  )}
+                </>
               )}
               {mediaTab === "videos" && (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {MEDIA.filter((m) => m.type === "video").map((m) => (
-                    <MediaVideoModal
-                      key={m.id}
-                      videoUrl={m.videoUrl ?? ""}
-                      thumbnail={
-                        getVideoThumbnailUrl(m.videoUrl ?? "") || m.url
-                      }
-                      title={m.title ?? "Video"}
-                      mediaId={m.id}
-                    >
-                      <div className="hover:ring-h_red/40 group relative aspect-video cursor-pointer overflow-hidden rounded-lg ring-1 ring-white/5 transition-all">
-                        <Image
-                          src={getVideoThumbnailUrl(m.videoUrl ?? "") || m.url}
-                          alt="video"
-                          fill
-                          className="object-cover opacity-60 transition-transform duration-300 group-hover:scale-105"
+                <>
+                  {mediaIsLoading && MEDIA.length === 0 ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {[...Array(4)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="aspect-video animate-pulse rounded-lg bg-white/5"
                         />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="flex size-12 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
-                            <Play className="ml-0.5 h-4 w-4 text-white" />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {MEDIA.filter((m) => m.type === "video").map((m) => (
+                        <MediaVideoModal
+                          key={m.id}
+                          videoUrl={m.videoUrl ?? ""}
+                          thumbnail={
+                            getVideoThumbnailUrl(m.videoUrl ?? "") || m.url
+                          }
+                          title={m.title ?? "Video"}
+                          mediaId={m.id}
+                        >
+                          <div className="hover:ring-h_red/40 group relative aspect-video cursor-pointer overflow-hidden rounded-lg ring-1 ring-white/5 transition-all">
+                            <Image
+                              src={
+                                getVideoThumbnailUrl(m.videoUrl ?? "") || m.url
+                              }
+                              alt="video"
+                              fill
+                              className="object-cover opacity-60 transition-transform duration-300 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="flex size-12 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                                <Play className="ml-0.5 h-4 w-4 text-white" />
+                              </div>
+                            </div>
+                            <div className="absolute right-3 bottom-3 rounded-full bg-black/60 px-2 py-1 text-xs text-gray-300">
+                              {formatPlays(m.views ?? 0)} views
+                            </div>
                           </div>
-                        </div>
-                        <div className="absolute right-3 bottom-3 rounded-full bg-black/60 px-2 py-1 text-xs text-gray-300">
-                          {formatPlays(m.views ?? 0)} views
-                        </div>
-                      </div>
-                    </MediaVideoModal>
-                  ))}
-                </div>
+                        </MediaVideoModal>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
               {mediaTab === "mixes" && (
                 <div className="flex flex-col gap-3">
-                  {MIXES.filter((m) => m.audioUrl).length > 0 ? (
-                    MIXES.filter((m) => m.audioUrl).map((mix, i) => (
-                      <MixPlayer key={mix.id || mix.title || i} mix={mix} />
-                    ))
+                  {MIXES.filter((m: any) => m.audioUrl).length > 0 ? (
+                    MIXES.filter((m: any) => m.audioUrl).map(
+                      (mix: any, i: number) => (
+                        <MixPlayer key={mix.id || mix.title || i} mix={mix} />
+                      ),
+                    )
                   ) : (
                     <div className="py-8 text-center text-gray-500">
                       No mixes uploaded yet
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Load More button for media */}
+              {totalNonAudioCount > 6 && mediaHasNextPage && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={loadMoreMedia}
+                    disabled={mediaIsLoading}
+                    variant="outline"
+                    className="border-white/10 bg-white/5 hover:bg-white/10"
+                  >
+                    {mediaIsLoading ? "Loading..." : "Load More Media"}
+                  </Button>
                 </div>
               )}
             </section>
@@ -1061,64 +1334,90 @@ export default function DjProfilePremium({
             <Separator className="bg-white/8" />
 
             {/* ── WHERE I'VE PLAYED ── */}
-            <WhereIvePlayed
-              venues={(djData?.venuesPlayed || []).map((v) => ({
-                id: v.id || 0,
-                venueName: v.venue,
-                eventDate: v.date || null,
-                description: v.description || null,
-                city: { name: v.city },
-                country: { name: v.country },
-                latitude: v.latitude,
-                longitude: v.longitude,
-              }))}
-              isOwner={isOwner}
-              onAddVenue={() => setIsVenueModalOpen(true)}
-            />
+            <div ref={venuesTargetRef}>
+              <WhereIvePlayed
+                venues={
+                  venuesHasLoaded && lazyVenues.length > 0
+                    ? lazyVenues.map((v) => ({
+                        id: v.id,
+                        venueName: v.venueName,
+                        eventDate: v.eventDate,
+                        description: v.description,
+                        city: { name: v.cityName },
+                        country: { name: v.countryName },
+                        latitude: v.latitude,
+                        longitude: v.longitude,
+                      }))
+                    : (djData?.venuesPlayed || []).map((v) => ({
+                        id: v.id || 0,
+                        venueName: v.venue,
+                        eventDate: v.date || null,
+                        description: v.description || null,
+                        city: { name: v.city },
+                        country: { name: v.country },
+                        latitude: v.latitude,
+                        longitude: v.longitude,
+                      }))
+                }
+                isOwner={isOwner}
+                onAddVenue={() => setIsVenueModalOpen(true)}
+              />
+            </div>
 
             {ENDORSEMENTS.length > 0 && (
               <>
                 <Separator className="bg-white/8" />
 
                 {/* ── INDUSTRY ENDORSEMENTS ── */}
-                <section>
+                <section ref={endorsementsTargetRef}>
                   <SectionHeading sub="What industry professionals say">
                     Industry Endorsements
                   </SectionHeading>
-                  <div className="flex flex-col gap-4">
-                    {ENDORSEMENTS.map((e) => (
-                      <Card
-                        key={e.name}
-                        className="bg-h_blackLight/30 gap-0 border-white/8 p-5"
-                      >
-                        <div className="flex items-start gap-3">
-                          <Avatar className="size-11 shrink-0 ring-1 ring-white/10">
-                            <AvatarImage src={e.avatar} />
-                            <AvatarFallback className="bg-h_blackLight text-xs text-white">
-                              {e.name.slice(0, 2)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <div className="mb-2 flex items-center gap-2">
-                              <span className="text-sm font-semibold text-white">
-                                {e.name}
-                              </span>
-                              <Badge className="border-blue-500/20 bg-blue-500/10 text-[11px] text-blue-400">
-                                <Landmark className="mr-1 h-2 w-2" />
-                                Venue
-                              </Badge>
+                  {endorsementsIsLoading && !endorsementsHasLoaded ? (
+                    <div className="space-y-4">
+                      {[...Array(2)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-24 animate-pulse rounded-lg bg-white/5"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      {ENDORSEMENTS.map((e: any) => (
+                        <Card
+                          key={e.name}
+                          className="bg-h_blackLight/30 gap-0 border-white/8 p-5"
+                        >
+                          <div className="flex items-start gap-3">
+                            <Avatar className="size-11 shrink-0 ring-1 ring-white/10">
+                              <AvatarImage src={e.avatar} />
+                              <AvatarFallback className="bg-h_blackLight text-xs text-white">
+                                {e.name.slice(0, 2)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-2 flex items-center gap-2">
+                                <span className="text-sm font-semibold text-white">
+                                  {e.name}
+                                </span>
+                                <Badge className="border-blue-500/20 bg-blue-500/10 text-[11px] text-blue-400">
+                                  <Landmark className="mr-1 h-2 w-2" />
+                                  Venue
+                                </Badge>
+                              </div>
+                              <p className="mb-2 text-xs text-gray-500">
+                                {e.role}
+                              </p>
+                              <p className="text-sm leading-relaxed text-gray-300 italic">
+                                &ldquo;{e.quote}&rdquo;
+                              </p>
                             </div>
-                            <p className="mb-2 text-xs text-gray-500">
-                              {e.role}
-                            </p>
-                            <p className="text-sm leading-relaxed text-gray-300 italic">
-                              &ldquo;{e.quote}&rdquo;
-                            </p>
                           </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </section>
               </>
             )}
@@ -1128,7 +1427,7 @@ export default function DjProfilePremium({
                 <Separator className="bg-white/8" />
 
                 {/* ── PRESS & MEDIA ── */}
-                <section id="press">
+                <section id="press" ref={pressTargetRef}>
                   <div className="mb-5 flex items-center justify-between">
                     <SectionHeading sub="Interviews, features, and podcasts">
                       Press &amp; Media
@@ -1145,9 +1444,18 @@ export default function DjProfilePremium({
                       </Button>
                     )}
                   </div>
-                  {PRESS.length > 0 ? (
+                  {pressIsLoading && PRESS.length === 0 ? (
                     <div className="grid gap-3 sm:grid-cols-2">
-                      {PRESS.map((p) => {
+                      {[...Array(4)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-20 animate-pulse rounded-lg bg-white/5"
+                        />
+                      ))}
+                    </div>
+                  ) : PRESS.length > 0 ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {PRESS.map((p: any) => {
                         const PressIcon = p.icon;
                         const cardContent = (
                           <div className="flex items-start gap-3">
@@ -1214,12 +1522,45 @@ export default function DjProfilePremium({
                   <SectionHeading sub="What people say about this DJ">
                     Reviews
                   </SectionHeading>
-                  {REVIEWS.length > 0 ? (
-                    <ProfileReviews
-                      avgRating={safeDJ.avgRating}
-                      ratingCount={safeDJ.ratingCount}
-                      reviews={REVIEWS}
-                    />
+                  {ratingsIsLoading ? (
+                    <div className="space-y-4">
+                      {[...Array(3)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="flex gap-4 rounded-lg bg-white/5 p-4"
+                        >
+                          <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
+                            <div className="h-3 w-full animate-pulse rounded bg-white/5" />
+                            <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : REVIEWS.length > 0 ? (
+                    <>
+                      <ProfileReviews
+                        avgRating={fetchedAvgRating || safeDJ.avgRating}
+                        ratingCount={ratingsTotalCount || safeDJ.ratingCount}
+                        reviews={REVIEWS}
+                      />
+                      {/* Load More button for reviews */}
+                      {ratingsHasNextPage && (
+                        <div className="flex justify-center pt-4">
+                          <Button
+                            onClick={loadMoreRatings}
+                            disabled={ratingsIsLoading}
+                            variant="outline"
+                            className="border-white/10 bg-white/5 hover:bg-white/10"
+                          >
+                            {ratingsIsLoading
+                              ? "Loading..."
+                              : "Load More Reviews"}
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <EmptySectionState
                       icon={Star}
@@ -1237,7 +1578,7 @@ export default function DjProfilePremium({
             {(packages.length > 0 || isOwner) && (
               <>
                 <Separator className="bg-white/8" />
-                <section id="packages">
+                <section id="packages" ref={packagesTargetRef}>
                   <div className="mb-5 flex items-center justify-between">
                     <SectionHeading sub="Tailored options for every event type">
                       Booking Packages
@@ -1254,9 +1595,18 @@ export default function DjProfilePremium({
                       </Button>
                     )}
                   </div>
-                  {packages.length > 0 ? (
+                  {packagesIsLoading && PACKAGES.length === 0 ? (
+                    <div className="space-y-4">
+                      {[...Array(2)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-32 animate-pulse rounded-lg bg-white/5"
+                        />
+                      ))}
+                    </div>
+                  ) : PACKAGES.length > 0 ? (
                     <BookingPackages
-                      packages={[...packages]
+                      packages={[...PACKAGES]
                         .sort((a, b) => {
                           // Popular packages first
                           if (a.popular && !b.popular) return -1;
@@ -1319,7 +1669,7 @@ export default function DjProfilePremium({
               layout="desktop"
               responseRate={safeDJ.responseRate}
               bookingSuccessRate={safeDJ.bookingSuccessRate}
-              bookingOptions={bookingOptions}
+              bookingOptions={finalBookingOptions}
             />
 
             {/* Events — desktop only; mobile version is inline above */}

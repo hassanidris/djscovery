@@ -10,10 +10,11 @@ import { publishEvent, unpublishEvent, deleteEvent } from "@/lib/actions/event";
 
 type Props = {
   eventId: number;
+  eventSlug?: string;
   status: string;
 };
 
-export function EventActions({ eventId, status }: Props) {
+export function EventActions({ eventId, eventSlug, status }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -65,7 +66,7 @@ export function EventActions({ eventId, status }: Props) {
         className="h-8 px-2 text-zinc-400 hover:text-white"
         disabled={isPending}
       >
-        <Link href={`/dj/events/${eventId}/edit`}>
+        <Link href={eventSlug ? `/events/${eventSlug}/edit` : `/dj/events`}>
           <Pencil className="h-3.5 w-3.5" />
           <span className="sr-only">Edit</span>
         </Link>

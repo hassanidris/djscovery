@@ -614,7 +614,7 @@ export default function EditDjProfileForm({
                   ref={avatarInputRef}
                   type="file"
                   accept="image/*"
-                  className="hidden"
+                  className="sr-only"
                   onChange={(e) => {
                     handleAvatarChange(e.target.files?.[0]);
                     e.target.value = "";
@@ -662,7 +662,7 @@ export default function EditDjProfileForm({
                 ref={coverInputRef}
                 type="file"
                 accept="image/*"
-                className="hidden"
+                className="sr-only"
                 onChange={(e) => {
                   handleCoverChange(e.target.files?.[0]);
                   e.target.value = "";

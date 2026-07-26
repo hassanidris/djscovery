@@ -190,19 +190,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     getGenres().then(setAvailableGenres);
   }, []);
 
-  // Auto-set currency based on country
-  useEffect(() => {
-    if (countryId && countries.length > 0) {
-      const selectedCountry = countries.find((c) => c.id === countryId);
-      if (selectedCountry) {
-        const currency = COUNTRY_CURRENCIES[selectedCountry.name];
-        if (currency && !feeCurrency) {
-          setValue("feeCurrency", currency);
-        }
-      }
-    }
-  }, [countryId, countries, feeCurrency, setValue]);
-
   // Optional media (not in form schema)
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [videoLinks, setVideoLinks] = useState<string[]>([]);
@@ -266,6 +253,21 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
     setValue("countryId", id || 0);
     setValue("cityId", 0);
     setCities([]);
+
+    // Auto-set currency based on selected country (with USD fallback)
+    if (id && countries.length > 0) {
+      const selectedCountry = countries.find((c) => c.id === id);
+      if (selectedCountry) {
+        const mappedCurrency = COUNTRY_CURRENCIES[selectedCountry.name];
+        const availableCodes = new Set(CURRENCIES.map((c) => c.code));
+        const currency =
+          mappedCurrency && availableCodes.has(mappedCurrency)
+            ? mappedCurrency
+            : "USD";
+        setValue("feeCurrency", currency);
+      }
+    }
+
     if (!id) return;
     const requestId = ++cityRequestId.current;
     setLoadingCities(true);
@@ -471,17 +473,13 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex w-full flex-col gap-6 overflow-hidden"
+      className="flex w-full flex-col gap-6"
     >
       {/* ── Avatar ── */}
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>Profile Photo</h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-          <button
-            type="button"
-            onClick={() => avatarInputRef.current?.click()}
-            className="hover:border-h_red relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-white/30 bg-white/10 transition-all"
-          >
+          <label className="hover:border-h_red relative flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-white/30 bg-white/10 transition-all">
             {avatarPreview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -492,14 +490,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             ) : (
               <Camera className="h-8 w-8 text-gray-500" />
             )}
-          </button>
-          <input
-            ref={avatarInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleAvatarChange}
-          />
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleAvatarChange}
+            />
+          </label>
           <div>
             <p className="text-sm text-gray-300">Upload your DJ photo</p>
             <p className="mt-1 text-xs text-gray-500">
@@ -531,12 +529,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           A banner image for your profile header.
         </p>
 
-        <div className="flex items-start gap-4">
-          <button
-            type="button"
-            onClick={() => coverInputRef.current?.click()}
-            className="hover:border-h_red relative flex h-32 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/30 bg-white/10 transition-all"
-          >
+        <div className="flex flex-col items-start gap-4">
+          <label className="hover:border-h_red relative flex h-32 w-full shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/30 bg-white/10 transition-all">
             {coverPreview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -552,14 +546,14 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                 </span>
               </div>
             )}
-          </button>
-          <input
-            ref={coverInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="hidden"
-            onChange={handleCoverChange}
-          />
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={handleCoverChange}
+            />
+          </label>
           <div>
             <p className="text-sm text-gray-300">Upload cover image</p>
             <p className="mt-1 text-xs text-gray-500">
@@ -622,151 +616,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         </div>
       </div>
 
-      {/* ── Experience ── */}
-      <div className={sectionCls}>
-        <h2 className={sectionTitleCls}>
-          Experience{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
-        </h2>
-        <p className="-mt-2 text-xs text-gray-400">
-          Help organizers understand your background and skill level.
-        </p>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Years of Experience</label>
-            <input
-              {...register("experienceYears", {
-                setValueAs: (v) =>
-                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
-              })}
-              type="number"
-              min="0"
-              max="50"
-              placeholder="e.g. 5"
-              className={inputCls}
-            />
-            {errors.experienceYears && (
-              <p className="text-xs text-red-400">
-                {errors.experienceYears.message}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Fee/Pricing ── */}
-      <div className={sectionCls}>
-        <h2 className={sectionTitleCls}>
-          Fee/Pricing{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
-        </h2>
-        <p className="-mt-2 text-xs text-gray-400">
-          Set your booking fee range. Currency auto-detected from your country.
-        </p>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Minimum Fee</label>
-            <input
-              {...register("feeMin", {
-                setValueAs: (v) =>
-                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
-              })}
-              type="number"
-              min="0"
-              placeholder="e.g. 500"
-              className={inputCls}
-            />
-            {errors.feeMin && (
-              <p className="text-xs text-red-400">{errors.feeMin.message}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Maximum Fee</label>
-            <input
-              {...register("feeMax", {
-                setValueAs: (v) =>
-                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
-              })}
-              type="number"
-              min="0"
-              placeholder="e.g. 2000"
-              className={inputCls}
-            />
-            {errors.feeMax && (
-              <p className="text-xs text-red-400">{errors.feeMax.message}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Currency</label>
-            <select
-              {...register("feeCurrency")}
-              className={`${inputCls} cursor-pointer appearance-none`}
-            >
-              <option value="">Select currency...</option>
-              {CURRENCIES.map((currency) => (
-                <option key={currency.code} value={currency.code}>
-                  {currency.code} ({currency.symbol})
-                </option>
-              ))}
-            </select>
-            {errors.feeCurrency && (
-              <p className="text-xs text-red-400">
-                {errors.feeCurrency.message}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Contact Information ── */}
-      <div className={sectionCls}>
-        <h2 className={sectionTitleCls}>
-          Contact Information{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
-        </h2>
-        <p className="-mt-2 text-xs text-gray-400">
-          How organizers can reach you for bookings.
-        </p>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Booking Email</label>
-            <input
-              {...register("bookingEmail", {
-                setValueAs: (v) => (v?.trim() ? v.trim() : undefined),
-              })}
-              type="email"
-              placeholder="bookings@yourname.com"
-              className={inputCls}
-            />
-            {errors.bookingEmail && (
-              <p className="text-xs text-red-400">
-                {errors.bookingEmail.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Booking Phone</label>
-            <input
-              {...register("bookingPhone")}
-              type="tel"
-              placeholder="+44 7700 900123"
-              className={inputCls}
-            />
-            {errors.bookingPhone && (
-              <p className="text-xs text-red-400">
-                {errors.bookingPhone.message}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* ── DJ Type ── */}
       <div
         className={`${sectionCls} ${errors.djTypes ? "border-red-500/40" : ""}`}
@@ -818,74 +667,6 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         {errors.djTypes && (
           <p className="-mt-1 text-xs text-red-400">{errors.djTypes.message}</p>
-        )}
-      </div>
-
-      {/* ── Location ── */}
-      <div
-        className={`${sectionCls} ${errors.countryId || errors.cityId ? "border-red-500/40" : ""}`}
-      >
-        <h2 className={sectionTitleCls}>Location</h2>
-
-        <div className="flex flex-col gap-1.5">
-          <label className={labelCls}>
-            Country <span className="text-h_red">*</span>
-          </label>
-          <select
-            {...register("countryId", { valueAsNumber: true })}
-            onChange={(e) => handleCountryChange(Number(e.target.value))}
-            className={`${inputCls} cursor-pointer appearance-none`}
-          >
-            <option value="0">Select a country...</option>
-            {countries.map((c) => (
-              <option
-                key={c.id}
-                value={c.id}
-                className="bg-[#1a1a1a] text-white"
-              >
-                {c.name}
-              </option>
-            ))}
-          </select>
-          {errors.countryId && (
-            <p className="mt-1 text-xs text-red-400">
-              {errors.countryId.message}
-            </p>
-          )}
-        </div>
-
-        {countryId > 0 && (
-          <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>
-              City <span className="text-h_red">*</span>
-            </label>
-            {loadingCities ? (
-              <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
-                <Loader2 className="h-4 w-4 animate-spin" /> Loading cities...
-              </div>
-            ) : (
-              <select
-                {...register("cityId", { valueAsNumber: true })}
-                className={`${inputCls} cursor-pointer appearance-none ${errors.cityId ? "ring-red-500/50" : ""}`}
-              >
-                <option value="0">Select a city...</option>
-                {cities.map((c) => (
-                  <option
-                    key={c.id}
-                    value={c.id}
-                    className="bg-[#1a1a1a] text-white"
-                  >
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            {errors.cityId && (
-              <p className="mt-1 text-xs text-red-400">
-                {errors.cityId.message}
-              </p>
-            )}
-          </div>
         )}
       </div>
 
@@ -980,6 +761,74 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         </p>
       </div>
 
+      {/* ── Location ── */}
+      <div
+        className={`${sectionCls} ${errors.countryId || errors.cityId ? "border-red-500/40" : ""}`}
+      >
+        <h2 className={sectionTitleCls}>Location</h2>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>
+            Country <span className="text-h_red">*</span>
+          </label>
+          <select
+            {...register("countryId", { valueAsNumber: true })}
+            onChange={(e) => handleCountryChange(Number(e.target.value))}
+            className={`${inputCls} cursor-pointer appearance-none`}
+          >
+            <option value="0">Select a country...</option>
+            {countries.map((c) => (
+              <option
+                key={c.id}
+                value={c.id}
+                className="bg-[#1a1a1a] text-white"
+              >
+                {c.name}
+              </option>
+            ))}
+          </select>
+          {errors.countryId && (
+            <p className="mt-1 text-xs text-red-400">
+              {errors.countryId.message}
+            </p>
+          )}
+        </div>
+
+        {countryId > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>
+              City <span className="text-h_red">*</span>
+            </label>
+            {loadingCities ? (
+              <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading cities...
+              </div>
+            ) : (
+              <select
+                {...register("cityId", { valueAsNumber: true })}
+                className={`${inputCls} cursor-pointer appearance-none ${errors.cityId ? "ring-red-500/50" : ""}`}
+              >
+                <option value="0">Select a city...</option>
+                {cities.map((c) => (
+                  <option
+                    key={c.id}
+                    value={c.id}
+                    className="bg-[#1a1a1a] text-white"
+                  >
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {errors.cityId && (
+              <p className="mt-1 text-xs text-red-400">
+                {errors.cityId.message}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* ── Social Media ── */}
       <div
         className={`${sectionCls} ${errors.socialLinks ? "border-red-500/40" : ""}`}
@@ -1048,6 +897,156 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           <Plus className="h-4 w-4" />
           Add social link
         </button>
+      </div>
+
+      {/* ── Experience ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Experience{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          Help organizers understand your background and skill level.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Years of Experience</label>
+            <input
+              {...register("experienceYears", {
+                setValueAs: (v) =>
+                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
+              })}
+              type="number"
+              min="0"
+              max="50"
+              placeholder="e.g. 5"
+              className={inputCls}
+            />
+            {errors.experienceYears && (
+              <p className="text-xs text-red-400">
+                {errors.experienceYears.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Fee/Pricing ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Fee/Pricing{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          Set your booking fee range. Currency auto-detected from your country.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Minimum Fee</label>
+            <input
+              {...register("feeMin", {
+                setValueAs: (v) =>
+                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
+              })}
+              type="number"
+              min="0"
+              placeholder="e.g. 500"
+              className={inputCls}
+            />
+            {errors.feeMin && (
+              <p className="text-xs text-red-400">{errors.feeMin.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Maximum Fee</label>
+            <input
+              {...register("feeMax", {
+                setValueAs: (v) =>
+                  v === "" || isNaN(Number(v)) ? undefined : Number(v),
+              })}
+              type="number"
+              min="0"
+              placeholder="e.g. 2000"
+              className={inputCls}
+            />
+            {errors.feeMax && (
+              <p className="text-xs text-red-400">{errors.feeMax.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Currency</label>
+            <select
+              {...register("feeCurrency")}
+              className={`${inputCls} cursor-pointer appearance-none`}
+            >
+              <option value="">Select currency...</option>
+              {CURRENCIES.map((currency) => (
+                <option
+                  key={currency.code}
+                  value={currency.code}
+                  className="bg-[#1a1a1a] text-white"
+                >
+                  {currency.code} ({currency.symbol})
+                </option>
+              ))}
+            </select>
+            {errors.feeCurrency && (
+              <p className="text-xs text-red-400">
+                {errors.feeCurrency.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Contact Information ── */}
+      <div className={sectionCls}>
+        <h2 className={sectionTitleCls}>
+          Contact Information{" "}
+          <span className="text-sm font-normal text-gray-500">(optional)</span>
+        </h2>
+        <p className="-mt-2 text-xs text-gray-400">
+          How organizers can reach you for bookings.
+        </p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Booking Email</label>
+            <input
+              {...register("bookingEmail", {
+                setValueAs: (v) => (v?.trim() ? v.trim() : undefined),
+              })}
+              type="email"
+              placeholder="bookings@yourname.com"
+              className={inputCls}
+            />
+            {errors.bookingEmail && (
+              <p className="text-xs text-red-400">
+                {errors.bookingEmail.message}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Booking Phone</label>
+            <input
+              {...register("bookingPhone")}
+              type="tel"
+
+              placeholder="+44 7700 900123"
+              className={inputCls}
+            />
+            {errors.bookingPhone && (
+              <p className="text-xs text-red-400">
+                {errors.bookingPhone.message}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ── Optional Media ── */}
@@ -1169,26 +1168,22 @@ function MediaUploadSection({
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        className="flex w-fit items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-500 transition-all hover:border-white/30 hover:text-gray-300"
-      >
+      <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-500 transition-all hover:border-white/30 hover:text-gray-300">
         <Plus className="h-3.5 w-3.5" />
         Add {label.toLowerCase()}
-      </button>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        multiple
-        className="hidden"
-        onChange={(e) => {
-          const selected = Array.from(e.target.files ?? []);
-          if (selected.length > 0) onAdd(selected);
-          e.target.value = "";
-        }}
-      />
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          multiple
+          className="sr-only"
+          onChange={(e) => {
+            const selected = Array.from(e.target.files ?? []);
+            if (selected.length > 0) onAdd(selected);
+            e.target.value = "";
+          }}
+        />
+      </label>
     </div>
   );
 }

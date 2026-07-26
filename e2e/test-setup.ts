@@ -32,6 +32,12 @@ let prisma: PrismaClient | null = null;
 
 function getPrisma(): PrismaClient {
   if (!prisma) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error(
+        "DATABASE_URL is not set. The Playwright test runner does not auto-load .env files; " +
+          "ensure playwright.config.ts loads them (e.g. via dotenv) before tests run.",
+      );
+    }
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 1,

@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { X } from "lucide-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import { X, Play } from "lucide-react";
 
 type VideoProvider =
   "youtube" | "vimeo" | "tiktok" | "instagram" | "facebook" | "unknown";
@@ -255,10 +253,7 @@ export default function MediaVideoModal({
                     className="object-cover opacity-40"
                   />
                   <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
-                    <FontAwesomeIcon
-                      icon={faPlay}
-                      className="h-10 w-10 text-white/40"
-                    />
+                    <Play className="h-10 w-10 text-white/40" />
                     <p className="text-sm text-gray-400">
                       Cannot embed this video automatically
                     </p>
