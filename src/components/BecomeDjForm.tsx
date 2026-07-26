@@ -481,6 +481,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
           <label className="hover:border-h_red relative flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-white/30 bg-white/10 transition-all">
             {avatarPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={avatarPreview.startsWith("blob:") ? avatarPreview : ""}
                 alt="Avatar preview"
@@ -531,6 +532,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         <div className="flex flex-col items-start gap-4">
           <label className="hover:border-h_red relative flex h-32 w-full shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/30 bg-white/10 transition-all">
             {coverPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={coverPreview.startsWith("blob:") ? coverPreview : ""}
                 alt="Cover preview"
