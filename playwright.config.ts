@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 // dev/build server; it does not auto-load .env files the way Next does.
 // Load them here so test-setup.ts's direct Prisma/pg connection has
 // DATABASE_URL available (mirrors .env.local overriding .env, like Next.js).
+dotenv.config({ path: ".env.local" });
 dotenv.config({ path: ".env" });
-dotenv.config({ path: ".env.local", override: true });
 
 export default defineConfig({
   testDir: "./e2e",

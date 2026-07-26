@@ -14,13 +14,16 @@ export async function GET(
   const { slug } = await params;
   const { searchParams } = new URL(request.url);
 
-  const page = parseInt(searchParams.get("page") || "1", 10);
-  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const MAX_PAGE = 1000;
+
+  const page = Number(searchParams.get("page") || "1");
+  const limit = Number(searchParams.get("limit") || "10");
 
   if (
-    !Number.isFinite(page) ||
-    !Number.isFinite(limit) ||
+    !Number.isSafeInteger(page) ||
+    !Number.isSafeInteger(limit) ||
     page < 1 ||
+    page > MAX_PAGE ||
     limit < 1 ||
     limit > 50
   ) {
