@@ -27,6 +27,7 @@ type Props = {
   featuredPerformanceUrl?: string;
   featuredPerformanceContext?: string;
   featuredPerformanceThumbnailUrl?: string;
+  showCalendar?: boolean;
 };
 
 function EventCard({ e, isOwner }: { e: EventItem; isOwner?: boolean }) {
@@ -100,6 +101,7 @@ export default function DjEventsModule({
   featuredPerformanceUrl,
   featuredPerformanceContext,
   featuredPerformanceThumbnailUrl,
+  showCalendar = true,
 }: Props) {
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
@@ -306,54 +308,56 @@ export default function DjEventsModule({
         </div>
       )}
 
-      {/* Calendar Availability */}
-      <div className="mt-8">
-        <h3 className="mb-4 text-sm font-semibold text-white">
-          Calendar Availability
-        </h3>
-        <div className="mb-4 flex items-center gap-4">
-          {[
-            { color: "bg-emerald-500", label: "Available" },
-            { color: "bg-h_red", label: "Booked" },
-            { color: "bg-amber-500", label: "Tentative" },
-          ].map((l) => (
-            <div key={l.label} className="flex items-center gap-1.5">
-              <div className={cn("size-2.5 rounded-full", l.color)} />
-              <span className="text-xs text-gray-400">{l.label}</span>
-            </div>
-          ))}
-        </div>
-        <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
-          <div className="mb-3 text-xs text-gray-500">{calendarLabel}</div>
-          <div className="grid grid-cols-7 gap-1.5">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-              <div
-                key={d}
-                className="pb-1 text-center text-[11px] font-semibold text-gray-600"
-              >
-                {d}
-              </div>
-            ))}
-            {calendarDays.map(({ day, status }) => (
-              <div
-                key={day}
-                className={cn(
-                  "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
-                  status === "booked" &&
-                    "bg-h_red/20 text-h_red border-h_red/30 border",
-                  status === "tentative" &&
-                    "border border-amber-500/30 bg-amber-500/20 text-amber-400",
-                  status === "available" &&
-                    "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
-                  status === "free" && "text-gray-600 hover:bg-white/5",
-                )}
-              >
-                {day}
+      {/* Calendar Availability — Premium only */}
+      {showCalendar && (
+        <div className="mt-8">
+          <h3 className="mb-4 text-sm font-semibold text-white">
+            Calendar Availability
+          </h3>
+          <div className="mb-4 flex items-center gap-4">
+            {[
+              { color: "bg-emerald-500", label: "Available" },
+              { color: "bg-h_red", label: "Booked" },
+              { color: "bg-amber-500", label: "Tentative" },
+            ].map((l) => (
+              <div key={l.label} className="flex items-center gap-1.5">
+                <div className={cn("size-2.5 rounded-full", l.color)} />
+                <span className="text-xs text-gray-400">{l.label}</span>
               </div>
             ))}
           </div>
-        </Card>
-      </div>
+          <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
+            <div className="mb-3 text-xs text-gray-500">{calendarLabel}</div>
+            <div className="grid grid-cols-7 gap-1.5">
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                <div
+                  key={d}
+                  className="pb-1 text-center text-[11px] font-semibold text-gray-600"
+                >
+                  {d}
+                </div>
+              ))}
+              {calendarDays.map(({ day, status }) => (
+                <div
+                  key={day}
+                  className={cn(
+                    "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
+                    status === "booked" &&
+                      "bg-h_red/20 text-h_red border-h_red/30 border",
+                    status === "tentative" &&
+                      "border border-amber-500/30 bg-amber-500/20 text-amber-400",
+                    status === "available" &&
+                      "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
+                    status === "free" && "text-gray-600 hover:bg-white/5",
+                  )}
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -45,7 +45,10 @@ import {
   VALID_EVENT_CATEGORIES,
   type EventCategory,
 } from "@/lib/event-categories";
-import { getTimezoneByCountryCode } from "@/lib/timezones";
+import {
+  getTimezoneByCountryCode,
+  getTimezoneOffsetLabel,
+} from "@/lib/timezones";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -158,25 +161,31 @@ export function EventForm(props: EventFormProps) {
     props.mode === "edit" ? (props.posterUrl ?? null) : null,
   );
   const [isUploadingPoster, setIsUploadingPoster] = useState(false);
+  const posterInputRef = useRef<HTMLInputElement>(null);
+  const pendingPosterFile = useRef<File | null>(null);
 
   const [gallery, setGallery] = useState<GalleryImage[]>(
     props.mode === "edit" ? (props.galleryImages ?? []) : [],
   );
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
 
-  // Auto-fetch cities and timezone when country is preselected (e.g. from DJ profile defaults)
+  // One-time initial load: fetch cities and set timezone for preselected country
+  const didInit = useRef(false);
   useEffect(() => {
+    if (didInit.current) return;
     if (data.countryId && cities.length === 0) {
+      didInit.current = true;
       getCitiesForCountry(Number(data.countryId)).then(setCities);
       const country = props.countries.find(
         (c) => String(c.id) === data.countryId,
       );
       if (country?.code) {
         const tz = getTimezoneByCountryCode(country.code);
-        if (tz && !data.timezone) set("timezone", tz);
+        if (tz) set("timezone", tz);
       }
     }
-  }, [data.countryId, data.timezone, cities.length, props.countries]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function set(field: keyof EventFormData, value: unknown) {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -201,7 +210,13 @@ export function EventForm(props: EventFormProps) {
   }
 
   async function handlePosterUpload(file: File | undefined) {
-    if (!file || props.mode !== "edit") return;
+    if (!file) return;
+    if (props.mode === "create") {
+      pendingPosterFile.current = file;
+      setPosterUrl(URL.createObjectURL(file));
+      toast.success("Poster selected — will upload after event is created.");
+      return;
+    }
     setIsUploadingPoster(true);
     try {
       const fd = new FormData();
@@ -383,48 +398,62 @@ export function EventForm(props: EventFormProps) {
     if (!validate()) return;
 
     startTransition(async () => {
-      const payload = {
-        title: data.title.trim(),
-        eventType: data.eventType,
-        category: data.category as EventCategory,
-        startDate: new Date(data.startDate),
-        endDate: data.endDate ? new Date(data.endDate) : null,
-        startTime: data.startTime || null,
-        endTime: data.endTime || null,
-        timezone: data.timezone || null,
-        countryId: Number(data.countryId),
-        cityId: data.cityId ? Number(data.cityId) : null,
-        venue: data.venue.trim() || null,
-        description: data.description.trim() || null,
-        ticketUrl:
-          data.eventType === "PUBLIC" && data.ticketUrl.trim()
-            ? data.ticketUrl.trim()
-            : null,
-        genres: data.genres,
-        ...(isCompleted && {
-          recap: data.recap.trim() || null,
-          audioLink: data.audioLink.trim() || null,
-        }),
-      };
+      try {
+        const payload = {
+          title: data.title.trim(),
+          eventType: data.eventType,
+          category: data.category as EventCategory,
+          startDate: new Date(data.startDate),
+          endDate: data.endDate ? new Date(data.endDate) : null,
+          startTime: data.startTime || null,
+          endTime: data.endTime || null,
+          timezone: data.timezone || null,
+          countryId: Number(data.countryId),
+          cityId: data.cityId ? Number(data.cityId) : null,
+          venue: data.venue.trim() || null,
+          description: data.description.trim() || null,
+          ticketUrl:
+            data.eventType === "PUBLIC" && data.ticketUrl.trim()
+              ? data.ticketUrl.trim()
+              : null,
+          genres: data.genres,
+          ...(isCompleted && {
+            recap: data.recap.trim() || null,
+            audioLink: data.audioLink.trim() || null,
+          }),
+        };
 
-      if (props.mode === "create") {
-        const result = await createEvent(payload);
-        if ("error" in result) {
-          toast.error(result.error);
-          return;
+        if (props.mode === "create") {
+          const result = await createEvent(payload);
+          if ("error" in result) {
+            toast.error(result.error);
+            return;
+          }
+          // Upload pending poster if user selected one during create
+          if (pendingPosterFile.current) {
+            const fd = new FormData();
+            fd.append("file", pendingPosterFile.current);
+            fd.append("eventId", String(result.id));
+            const posterRes = await uploadEventPoster(fd);
+            if ("error" in posterRes) {
+              toast.error(`Poster upload failed: ${posterRes.error}`);
+            }
+            pendingPosterFile.current = null;
+          }
+          toast.success("Event created! It's saved as a draft.");
+          router.push(`/events/${result.slug}/edit`);
+        } else {
+          const result = await updateEvent(props.eventId, payload);
+          if ("error" in result) {
+            toast.error(result.error);
+            return;
+          }
+          toast.success("Event updated.");
+          router.push("/dj/events");
         }
-        toast.success("Event created! It's saved as a draft.");
-        router.push(`/dj/events/${result.id}/edit`);
-        router.refresh();
-      } else {
-        const result = await updateEvent(props.eventId, payload);
-        if ("error" in result) {
-          toast.error(result.error);
-          return;
-        }
-        toast.success("Event updated.");
-        router.push("/dj/events");
-        router.refresh();
+      } catch (err) {
+        console.error("Event save error:", err);
+        toast.error("Something went wrong. Please try again.");
       }
     });
   }
@@ -493,7 +522,7 @@ export function EventForm(props: EventFormProps) {
           >
             <SelectTrigger
               id="category"
-              className="border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500"
+              className="w-full border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500"
             >
               <SelectValue placeholder="Select category…" />
             </SelectTrigger>
@@ -515,46 +544,143 @@ export function EventForm(props: EventFormProps) {
         </div>
 
         {/* Poster */}
-        {props.mode === "edit" && (
-          <div className="space-y-1.5">
-            <Label className="text-zinc-300">Event Poster</Label>
-            {posterUrl && (
-              <div className="relative mb-2 h-40 w-full overflow-hidden rounded-lg bg-zinc-900">
-                <Image
-                  src={posterUrl}
-                  alt="Event poster"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+        <div className="space-y-1.5">
+          <Label className="text-zinc-300">Event Poster</Label>
+          {posterUrl && (
+            <div className="relative mb-2 h-40 w-full overflow-hidden rounded-lg bg-zinc-900">
+              <Image
+                src={posterUrl}
+                alt="Event poster"
+                fill
+                className="object-cover"
+              />
+            </div>
+          )}
+          <input
+            ref={posterInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            onChange={(e) => {
+              handlePosterUpload(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isUploadingPoster}
+            onClick={() => posterInputRef.current?.click()}
+            className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+          >
+            {isUploadingPoster ? (
+              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Camera className="mr-1.5 h-3.5 w-3.5" />
             )}
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="poster-upload"
-              onChange={(e) => {
-                handlePosterUpload(e.target.files?.[0]);
-                e.target.value = "";
-              }}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isUploadingPoster}
-              onClick={() => document.getElementById("poster-upload")?.click()}
-              className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            {posterUrl ? "Change Poster" : "Upload Poster"}
+          </Button>
+          {props.mode === "create" && (
+            <p className="text-xs text-zinc-500">
+              Poster will be uploaded after the event is created.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <hr className="border-zinc-800" />
+
+      {/* ── Location ── */}
+      <section className="space-y-4">
+        <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
+          <MapPin className="h-4 w-4" /> Location
+        </h2>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="countryId"
+              className="flex items-center gap-1 text-zinc-300"
             >
-              {isUploadingPoster ? (
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Camera className="mr-1.5 h-3.5 w-3.5" />
-              )}
-              {posterUrl ? "Change Poster" : "Upload Poster"}
-            </Button>
+              <Globe className="h-3.5 w-3.5" /> Country{" "}
+              <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={data.countryId}
+              onValueChange={(v) => handleCountryChange(v)}
+            >
+              <SelectTrigger
+                id="countryId"
+                className="w-full border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500"
+              >
+                <SelectValue placeholder="Select country…" />
+              </SelectTrigger>
+              <SelectContent className="border-zinc-700 bg-zinc-900">
+                {props.countries.map((c) => (
+                  <SelectItem
+                    key={c.id}
+                    value={String(c.id)}
+                    className="text-zinc-300 focus:bg-zinc-800 focus:text-white"
+                  >
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.countryId && (
+              <p className="text-xs text-red-400">{errors.countryId}</p>
+            )}
           </div>
-        )}
+
+          <div className="space-y-1.5">
+            <Label htmlFor="cityId" className="text-zinc-300">
+              City
+            </Label>
+            <Select
+              value={data.cityId}
+              onValueChange={(v) => set("cityId", v)}
+              disabled={cities.length === 0}
+            >
+              <SelectTrigger
+                id="cityId"
+                className="w-full border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500 disabled:opacity-40"
+              >
+                <SelectValue
+                  placeholder={
+                    cities.length === 0
+                      ? "Select country first"
+                      : "Select city…"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent className="border-zinc-700 bg-zinc-900">
+                {cities.map((c) => (
+                  <SelectItem
+                    key={c.id}
+                    value={String(c.id)}
+                    className="text-zinc-300 focus:bg-zinc-800 focus:text-white"
+                  >
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="venue" className="text-zinc-300">
+            Venue Name
+          </Label>
+          <Input
+            id="venue"
+            value={data.venue}
+            onChange={(e) => set("venue", e.target.value)}
+            placeholder="e.g. DC-10, Berghain, Avicii Arena"
+            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+          />
+        </div>
       </section>
 
       <hr className="border-zinc-800" />
@@ -653,103 +779,9 @@ export function EventForm(props: EventFormProps) {
           />
           <p className="text-xs text-zinc-500">
             {data.timezone
-              ? `Times are entered in ${data.timezone} (event local time)`
+              ? `Auto-detected from country — ${data.timezone} (UTC${getTimezoneOffsetLabel(data.timezone)}). Adjust if needed.`
               : "Auto-detected from country. Adjust if needed."}
           </p>
-        </div>
-      </section>
-
-      <hr className="border-zinc-800" />
-
-      {/* ── Location ── */}
-      <section className="space-y-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
-          <MapPin className="h-4 w-4" /> Location
-        </h2>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="countryId"
-              className="flex items-center gap-1 text-zinc-300"
-            >
-              <Globe className="h-3.5 w-3.5" /> Country{" "}
-              <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={data.countryId}
-              onValueChange={(v) => handleCountryChange(v)}
-            >
-              <SelectTrigger
-                id="countryId"
-                className="w-full border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500"
-              >
-                <SelectValue placeholder="Select country…" />
-              </SelectTrigger>
-              <SelectContent className="border-zinc-700 bg-zinc-900">
-                {props.countries.map((c) => (
-                  <SelectItem
-                    key={c.id}
-                    value={String(c.id)}
-                    className="text-zinc-300 focus:bg-zinc-800 focus:text-white"
-                  >
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.countryId && (
-              <p className="text-xs text-red-400">{errors.countryId}</p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="cityId" className="text-zinc-300">
-              City
-            </Label>
-            <Select
-              value={data.cityId}
-              onValueChange={(v) => set("cityId", v)}
-              disabled={cities.length === 0}
-            >
-              <SelectTrigger
-                id="cityId"
-                className="w-full border-zinc-700 bg-zinc-900 text-white focus:border-zinc-500 disabled:opacity-40"
-              >
-                <SelectValue
-                  placeholder={
-                    cities.length === 0
-                      ? "Select country first"
-                      : "Select city…"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent className="border-zinc-700 bg-zinc-900">
-                {cities.map((c) => (
-                  <SelectItem
-                    key={c.id}
-                    value={String(c.id)}
-                    className="text-zinc-300 focus:bg-zinc-800 focus:text-white"
-                  >
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="venue" className="text-zinc-300">
-            Venue Name
-          </Label>
-          <Input
-            id="venue"
-            value={data.venue}
-            onChange={(e) => set("venue", e.target.value)}
-            placeholder="e.g. DC-10, Berghain, Avicii Arena"
-            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
-          />
         </div>
       </section>
 
@@ -1001,8 +1033,8 @@ export function EventForm(props: EventFormProps) {
               )}
               <input
                 type="file"
-                accept="image/*"
-                className="hidden"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
                 id="gallery-upload"
                 onChange={(e) => {
                   handleGalleryUpload(e.target.files?.[0]);

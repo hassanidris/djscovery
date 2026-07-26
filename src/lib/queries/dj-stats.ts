@@ -67,17 +67,29 @@ export async function getDjMediaStats(djProfileId: number): Promise<{
   plays: number;
   views: number;
 }> {
-  const media = await prisma.media.findMany({
-    where: { djProfileId },
-    select: { type: true, playCount: true, viewCount: true },
+  const [countsByType, sums] = await Promise.all([
+    prisma.media.groupBy({
+      by: ["type"],
+      where: { djProfileId },
+      _count: true,
+    }),
+    prisma.media.aggregate({
+      where: { djProfileId },
+      _sum: { playCount: true, viewCount: true },
+    }),
+  ]);
+
+  const counts = { AUDIO: 0, VIDEO: 0, IMAGE: 0 };
+  countsByType.forEach((item) => {
+    counts[item.type as keyof typeof counts] = item._count;
   });
 
-  const mixes = media.filter((m) => m.type === "AUDIO").length;
-  const videos = media.filter((m) => m.type === "VIDEO").length;
-  const plays = media.reduce((sum, m) => sum + m.playCount, 0);
-  const views = media.reduce((sum, m) => sum + m.viewCount, 0);
-
-  return { mixes, videos, plays, views };
+  return {
+    mixes: counts.AUDIO,
+    videos: counts.VIDEO,
+    plays: sums._sum.playCount ?? 0,
+    views: sums._sum.viewCount ?? 0,
+  };
 }
 
 export async function getDjProfileViews(djProfileId: number): Promise<number> {
@@ -183,33 +195,30 @@ export async function getDjProfileViewSources(
 // Booking Rate  = % of booking inquiries that were ACCEPTED
 
 export async function getDjResponseRate(djProfileId: number): Promise<number> {
-  const [total, responded] = await Promise.all([
-    prisma.bookingInquiry.count({
-      where: { djProfileId },
-    }),
-    prisma.bookingInquiry.count({
-      where: {
-        djProfileId,
-        status: { in: ["ACCEPTED", "DECLINED"] },
-      },
-    }),
-  ]);
+  const results = await prisma.bookingInquiry.groupBy({
+    by: ["status"],
+    where: { djProfileId },
+    _count: { status: true },
+  });
+
+  const total = results.reduce((sum, r) => sum + r._count.status, 0);
+  const responded = results
+    .filter((r) => r.status === "ACCEPTED" || r.status === "DECLINED")
+    .reduce((sum, r) => sum + r._count.status, 0);
 
   return total > 0 ? Math.round((responded / total) * 100) : 0;
 }
 
 export async function getDjBookingRate(djProfileId: number): Promise<number> {
-  const [total, accepted] = await Promise.all([
-    prisma.bookingInquiry.count({
-      where: { djProfileId },
-    }),
-    prisma.bookingInquiry.count({
-      where: {
-        djProfileId,
-        status: "ACCEPTED",
-      },
-    }),
-  ]);
+  const results = await prisma.bookingInquiry.groupBy({
+    by: ["status"],
+    where: { djProfileId },
+    _count: { status: true },
+  });
+
+  const total = results.reduce((sum, r) => sum + r._count.status, 0);
+  const accepted =
+    results.find((r) => r.status === "ACCEPTED")?._count.status ?? 0;
 
   return total > 0 ? Math.round((accepted / total) * 100) : 0;
 }

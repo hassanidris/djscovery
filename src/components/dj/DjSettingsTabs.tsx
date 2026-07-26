@@ -171,6 +171,8 @@ function ProfileTab({
   const [bio, setBio] = useState(profile.bio);
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar);
   const [coverPreview, setCoverPreview] = useState(profile.coverImage);
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar);
+  const [coverImageUrl, setCoverImageUrl] = useState(profile.coverImage);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -197,6 +199,7 @@ function ProfileTab({
       setAvatarPreview(profile.avatar);
     } else {
       setAvatarPreview(result.url);
+      setAvatarUrl(result.url);
       toast.success("Avatar updated.");
     }
     setUploadingAvatar(false);
@@ -215,6 +218,7 @@ function ProfileTab({
       setCoverPreview(profile.coverImage);
     } else {
       setCoverPreview(result.url);
+      setCoverImageUrl(result.url);
       toast.success("Cover image updated.");
     }
     setUploadingCover(false);
@@ -244,11 +248,14 @@ function ProfileTab({
         cityId: cityId ?? undefined,
         bookingEmail: email.trim() || null,
         bookingPhone: phone.trim() || null,
+        avatarUrl: avatarUrl || null,
+        coverImageUrl: coverImageUrl || null,
       });
       if ("error" in result) toast.error(result.error);
       else {
         toast.success("Profile updated.");
         if (result.newSlug) router.push("/dj/settings");
+        else router.refresh();
       }
     });
   }
@@ -297,7 +304,7 @@ function ProfileTab({
             ref={coverInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            className="hidden"
+            className="sr-only"
             onChange={handleCoverChange}
           />
         </div>
@@ -337,7 +344,7 @@ function ProfileTab({
             ref={avatarInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            className="hidden"
+            className="sr-only"
             onChange={handleAvatarChange}
           />
         </div>
