@@ -1,4 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+
+// The Playwright test runner is a separate Node process from the Next.js
+// dev/build server; it does not auto-load .env files the way Next does.
+// Load them here so test-setup.ts's direct Prisma/pg connection has
+// DATABASE_URL available (mirrors .env.local overriding .env, like Next.js).
+dotenv.config({ path: ".env" });
+dotenv.config({ path: ".env.local", override: true });
 
 export default defineConfig({
   testDir: "./e2e",
@@ -23,5 +31,13 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 300000,
+    // Disables the app's own auth rate limiter (see src/lib/rate-limit.ts),
+    // which otherwise locks out the shared test users after repeated
+    // sign-ins across e2e runs. CI already sets this in ci.yml; set it here
+    // too so local `npm run e2e` (which spawns its own dev server) matches.
+    env: {
+      ...process.env,
+      E2E_TESTING: "true",
+    },
   },
 });

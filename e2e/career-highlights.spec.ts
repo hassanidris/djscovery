@@ -64,10 +64,26 @@ test.describe("Career Highlights", () => {
   });
 
   test.describe("Authenticated Premium DJ tests", () => {
-    // Ensure a clean slate: previous runs leave highlights in the DB since
-    // the test user is shared/persistent across runs.
-    test.beforeAll(async () => {
+    // Sign in via the UI ONCE per file and reuse the session for every test
+    // below. Signing in before each test (7x here) hit Supabase Auth's own
+    // sign-in rate limit ("Too many sign-in attempts"), locking the shared
+    // test user out for 15 minutes on repeated runs.
+    let storageState: Awaited<
+      ReturnType<import("@playwright/test").BrowserContext["storageState"]>
+    >;
+
+    test.beforeAll(async ({ browser }) => {
       await resetDjHighlights(TEST_USERS.PREMIUM_DJ.email);
+
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await signIn(
+        page,
+        TEST_USERS.PREMIUM_DJ.email,
+        TEST_USERS.PREMIUM_DJ.password,
+      );
+      storageState = await context.storageState();
+      await context.close();
     });
 
     test.afterAll(async () => {
@@ -75,11 +91,16 @@ test.describe("Career Highlights", () => {
     });
 
     test.beforeEach(async ({ page }) => {
-      await signIn(
-        page,
-        TEST_USERS.PREMIUM_DJ.email,
-        TEST_USERS.PREMIUM_DJ.password,
-      );
+      // Restore cookies, then seed localStorage (Supabase Auth persists its
+      // session there) before any app script runs on first navigation.
+      await page.context().addCookies(storageState.cookies);
+      await page.addInitScript((origins) => {
+        for (const origin of origins) {
+          for (const { name, value } of origin.localStorage) {
+            window.localStorage.setItem(name, value);
+          }
+        }
+      }, storageState.origins);
     });
 
     test("shows empty state for DJ with no highlights", async ({ page }) => {
@@ -87,8 +108,12 @@ test.describe("Career Highlights", () => {
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
 
-      // Should see empty state
-      await expect(page.getByText("No career highlights yet")).toBeVisible();
+      // Should see empty state (generous timeout: the tab shows a loading
+      // spinner while the async highlights fetch resolves, and cold-compile
+      // dev server responses in CI can take much longer than the default)
+      await expect(page.getByText("No career highlights yet")).toBeVisible({
+        timeout: 15000,
+      });
     });
 
     test("opens highlight edit form when clicking add button", async ({
@@ -172,11 +197,21 @@ test.describe("Career Highlights", () => {
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
 
+      // Wait for the async highlights fetch to resolve: the "Add Highlight"
+      // button only renders once loading finishes, so this doubles as a
+      // reliable readiness signal before we inspect the highlight count
+      // (an instant isVisible() check would race the loading spinner).
+      await expect(
+        page.getByRole("button", { name: "Add Highlight" }),
+      ).toBeVisible({ timeout: 15000 });
+
       // Ensure there's a highlight to edit, independent of whether the
       // previous test's create actually persisted (avoids cascading
       // failures if an earlier test flaked).
-      const editButton = page.locator('button[aria-label="Edit"]').first();
-      if (!(await editButton.isVisible().catch(() => false))) {
+      const highlightCount = await page
+        .locator('button[aria-label="Edit"]')
+        .count();
+      if (highlightCount === 0) {
         await page.getByRole("button", { name: "Add Highlight" }).click();
         await page.getByLabel("Year").fill("2024");
         await page.getByLabel("Title").fill("Seed Highlight");
