@@ -47,7 +47,8 @@ export async function GET(
   timer.end("fetch_profile");
 
   if (!djProfile || djProfile.status === "REJECTED") {
-    return notFound();
+    timer.flush();
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   // Fetch venues with city and country relations

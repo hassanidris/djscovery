@@ -7,20 +7,22 @@ export const revalidate = 300; // Cache for 5 minutes
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
   // Check cache first
   const cacheKey = `dj_endorsements:${slug}`;
-  const cached = await cacheGet<Array<{
-    id: number;
-    name: string;
-    role: string;
-    company: string | null;
-    quote: string;
-    avatar: string | null;
-  }>>(cacheKey);
+  const cached = await cacheGet<
+    Array<{
+      id: number;
+      name: string;
+      role: string;
+      company: string | null;
+      quote: string;
+      avatar: string | null;
+    }>
+  >(cacheKey);
 
   if (cached) {
     return NextResponse.json(cached);
@@ -39,6 +41,14 @@ export async function GET(
   // Fetch endorsements
   const endorsements = await prisma.djEndorsement.findMany({
     where: { djProfileId: djProfile.id },
+    select: {
+      id: true,
+      name: true,
+      role: true,
+      company: true,
+      quote: true,
+      avatar: true,
+    },
     orderBy: { createdAt: "desc" },
   });
 

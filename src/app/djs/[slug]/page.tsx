@@ -84,83 +84,96 @@ export default async function DjProfilePage({
 
   // ── Prisma DB lookup (production) ─────────────────────────────────────────
   // Split into focused queries for better performance
-  const [djCore, spotlightMedia, basicCounts] = await Promise.all([
-    // Core profile data for hero section
-    prisma.djProfile.findUnique({
-      where: { slug },
-      select: {
-        id: true,
-        userId: true,
-        stageName: true,
-        slug: true,
-        bio: true,
-        experienceYears: true,
-        experienceLevel: true,
-        avatar: true,
-        coverImage: true,
-        countryId: true,
-        cityId: true,
-        city: {
-          select: {
-            id: true,
-            name: true,
+  const [djCore, spotlightMedia, basicCounts, ratingAgg, eventCount] =
+    await Promise.all([
+      // Core profile data for hero section
+      prisma.djProfile.findUnique({
+        where: { slug },
+        select: {
+          id: true,
+          userId: true,
+          stageName: true,
+          slug: true,
+          bio: true,
+          experienceYears: true,
+          experienceLevel: true,
+          avatar: true,
+          coverImage: true,
+          countryId: true,
+          cityId: true,
+          city: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          plan: true,
+          status: true,
+          featured: true,
+          hidden: true,
+          bookingEmail: true,
+          bookingPhone: true,
+          feeMin: true,
+          feeMax: true,
+          feeCurrency: true,
+          monthlyViews: true,
+          reputationScore: true,
+          user: {
+            select: {
+              id: true,
+            },
+          },
+          country: { select: { name: true } },
+          genres: { include: { genre: { select: { name: true } } } },
+          djTypes: true,
+          socialLinks: true,
+          // Non-critical fields removed (will be fetched separately):
+          // - managerName, managerEmail, managerPhone (ProfessionalTeamSidebar)
+          // - agentName, agentAgency, agentEmail (ProfessionalTeamSidebar)
+          // - availabilityTimezone, availabilityMonth, availabilityDays (availability section)
+          // - featuredPerformanceUrl, featuredPerformanceContext (featured performance section)
+          // - reputationDetail (owner-only analytics)
+        },
+      }),
+      // Spotlight media only (featured mix/video)
+      prisma.media.findMany({
+        where: { djProfile: { slug }, isSpotlight: true },
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          type: true,
+          url: true,
+          title: true,
+          duration: true,
+          thumbnail: true,
+          isSpotlight: true,
+          sortOrder: true,
+          playCount: true,
+          viewCount: true,
+        },
+      }),
+      // Basic counts for stats display
+      prisma.djProfile.findUnique({
+        where: { slug },
+        select: {
+          _count: {
+            select: { ratings: true, followers: true },
           },
         },
-        plan: true,
-        status: true,
-        featured: true,
-        hidden: true,
-        bookingEmail: true,
-        bookingPhone: true,
-        feeMin: true,
-        feeMax: true,
-        feeCurrency: true,
-        monthlyViews: true,
-        reputationScore: true,
-        user: {
-          select: {
-            id: true,
-          },
+      }),
+      // Rating aggregate for avgRating
+      prisma.djRating.aggregate({
+        where: { djProfile: { slug } },
+        _avg: { rating: true },
+      }),
+      // Public events count (where DJ is owner)
+      prisma.event.count({
+        where: {
+          ownerDj: { slug },
+          status: "PUBLISHED",
         },
-        country: { select: { name: true } },
-        genres: { include: { genre: { select: { name: true } } } },
-        djTypes: true,
-        socialLinks: true,
-        // Non-critical fields removed (will be fetched separately):
-        // - managerName, managerEmail, managerPhone (ProfessionalTeamSidebar)
-        // - agentName, agentAgency, agentEmail (ProfessionalTeamSidebar)
-        // - availabilityTimezone, availabilityMonth, availabilityDays (availability section)
-        // - featuredPerformanceUrl, featuredPerformanceContext (featured performance section)
-        // - reputationDetail (owner-only analytics)
-      },
-    }),
-    // Spotlight media only (featured mix/video)
-    prisma.media.findMany({
-      where: { djProfile: { slug }, isSpotlight: true },
-      orderBy: { sortOrder: "asc" },
-      select: {
-        id: true,
-        type: true,
-        url: true,
-        title: true,
-        duration: true,
-        thumbnail: true,
-        isSpotlight: true,
-        sortOrder: true,
-        playCount: true,
-        viewCount: true,
-      },
-    }),
-    // Basic counts for stats display
-    prisma.djProfile.findUnique({
-      where: { slug },
-      select: {
-        _count: {
-          select: { ratings: true, followers: true },
-        },
-      },
-    }),
-  ]);
+      }),
+    ]);
 
   if (!djCore || djCore.status === "REJECTED") return notFound();
 
@@ -214,8 +227,8 @@ export default async function DjProfilePage({
 
   // Analytics data is now fetched client-side via API endpoints with caching
   // See: DjProfilePremium/DjProfileFree components for client-side fetching
-  const avgRating = 0; // Will be updated client-side
-  const publicEventsCount = 0; // Will be updated client-side
+  const avgRating = ratingAgg._avg.rating ?? 0; // Server-side computed for JSON-LD
+  const publicEventsCount = eventCount; // Server-side computed for JSON-LD
   const responseRate = 0; // Will be updated client-side
   const bookingRate = 0; // Will be updated client-side
   const topCities: Array<{ city: string; country: string; count: number }> = []; // Will be updated client-side

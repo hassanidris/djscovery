@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
-import { notFound } from "next/navigation";
 import { cacheGet, cacheSet } from "@/lib/cache";
 import { getProfileStats } from "@/lib/actions/dj-analytics";
 
@@ -9,7 +8,7 @@ export const revalidate = 60; // Cache for 1 minute (more dynamic than public an
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
@@ -30,7 +29,7 @@ export async function GET(
   });
 
   if (!djProfile || djProfile.status === "REJECTED") {
-    return notFound();
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   // Verify ownership

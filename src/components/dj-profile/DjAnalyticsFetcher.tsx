@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface AnalyticsData {
   avgRating: number;
@@ -23,7 +23,10 @@ interface DjAnalyticsFetcherProps {
   slug: string;
   isOwner: boolean;
   isPremium: boolean;
-  onDataFetched: (data: AnalyticsData, ownerData: OwnerAnalyticsData | null) => void;
+  onDataFetched: (
+    data: AnalyticsData,
+    ownerData: OwnerAnalyticsData | null,
+  ) => void;
 }
 
 export function DjAnalyticsFetcher({
@@ -33,6 +36,12 @@ export function DjAnalyticsFetcher({
   onDataFetched,
 }: DjAnalyticsFetcherProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const onDataFetchedRef = useRef(onDataFetched);
+
+  // Update ref whenever callback changes
+  useEffect(() => {
+    onDataFetchedRef.current = onDataFetched;
+  }, [onDataFetched]);
 
   useEffect(() => {
     async function fetchAnalytics() {
@@ -41,7 +50,7 @@ export function DjAnalyticsFetcher({
         const analyticsRes = await fetch(`/api/djs/${slug}/analytics`);
         if (analyticsRes.ok) {
           const analyticsData: AnalyticsData = await analyticsRes.json();
-          
+
           // Fetch owner-only analytics if applicable
           let ownerData: OwnerAnalyticsData | null = null;
           if (isOwner && isPremium) {
@@ -50,8 +59,8 @@ export function DjAnalyticsFetcher({
               ownerData = await ownerRes.json();
             }
           }
-          
-          onDataFetched(analyticsData, ownerData);
+
+          onDataFetchedRef.current(analyticsData, ownerData);
         }
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
@@ -61,7 +70,7 @@ export function DjAnalyticsFetcher({
     }
 
     fetchAnalytics();
-  }, [slug, isOwner, isPremium, onDataFetched]);
+  }, [slug, isOwner, isPremium]);
 
   // This component doesn't render anything - it just fetches data
   return null;

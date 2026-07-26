@@ -17,7 +17,13 @@ export async function GET(
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-  if (page < 1 || limit < 1 || limit > 50) {
+  if (
+    !Number.isFinite(page) ||
+    !Number.isFinite(limit) ||
+    page < 1 ||
+    limit < 1 ||
+    limit > 50
+  ) {
     return NextResponse.json(
       { error: "Invalid pagination parameters" },
       { status: 400 },
@@ -59,7 +65,11 @@ export async function GET(
   timer.end("fetch_profile");
 
   if (!djProfile || djProfile.status === "REJECTED") {
-    return notFound();
+    timer.flush();
+    return NextResponse.json(
+      { error: "DJ profile not found" },
+      { status: 404 },
+    );
   }
 
   // Fetch ratings with pagination and calculate average rating in parallel

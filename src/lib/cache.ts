@@ -104,6 +104,7 @@ export async function cacheSet<T>(
     await redis.set(key, serialized, { ex: ttlSeconds });
   } catch (err) {
     console.warn("cacheSet: Redis error, falling back to memory", err);
+    cleanupMemoryStore();
     memoryStore.set(key, {
       value: serialized,
       expiresAt: Date.now() + ttlSeconds * 1000,
@@ -134,23 +135,20 @@ export async function cacheDelete(key: string): Promise<void> {
  */
 export async function cacheInvalidatePattern(pattern: string): Promise<void> {
   if (!redis) {
-    // For in-memory, delete all keys that start with the pattern
+    // For in-memory, handle * wildcard: extract prefix before * for startsWith matching
     cleanupMemoryStore();
+    const prefix = pattern.endsWith("*") ? pattern.slice(0, -1) : pattern;
     for (const key of memoryStore.keys()) {
-      if (key.startsWith(pattern)) {
+      if (key.startsWith(prefix)) {
         memoryStore.delete(key);
       }
     }
     return;
   }
 
-  try {
-    // Upstash Redis doesn't support SCAN, so we'll need to track keys differently
-    // For now, we'll skip pattern invalidation in Redis
-    console.warn(
-      "cacheInvalidatePattern: Pattern invalidation not supported in Upstash Redis",
-    );
-  } catch (err) {
-    console.warn("cacheInvalidatePattern: Redis error", err);
-  }
+  // Upstash Redis doesn't support SCAN for pattern invalidation
+  // Explicitly reject unsupported pattern invalidation instead of silently doing nothing
+  throw new Error(
+    "cacheInvalidatePattern: Pattern invalidation not supported in Upstash Redis - requires key tracking or SCAN support",
+  );
 }

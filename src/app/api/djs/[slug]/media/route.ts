@@ -18,7 +18,13 @@ export async function GET(
   const limit = parseInt(searchParams.get("limit") || "12", 10);
   const type = searchParams.get("type") || null; // Optional filter: AUDIO, VIDEO, IMAGE
 
-  if (page < 1 || limit < 1 || limit > 50) {
+  if (
+    !Number.isInteger(page) ||
+    !Number.isInteger(limit) ||
+    page < 1 ||
+    limit < 1 ||
+    limit > 50
+  ) {
     return NextResponse.json(
       { error: "Invalid pagination parameters" },
       { status: 400 },

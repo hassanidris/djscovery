@@ -203,14 +203,18 @@ export async function batchGeocodeVenues(
 
     if (cityCoords) {
       // Cache city coordinates in database
-      await prisma.djVenue.update({
-        where: { id: venue.id },
-        data: {
-          latitude: cityCoords.lat,
-          longitude: cityCoords.lng,
-          geocodedAt: new Date(),
-        },
-      });
+      try {
+        await prisma.djVenue.update({
+          where: { id: venue.id },
+          data: {
+            latitude: cityCoords.lat,
+            longitude: cityCoords.lng,
+            geocodedAt: new Date(),
+          },
+        });
+      } catch (error) {
+        console.error(`Failed to persist coordinates for venue ${venue.id}:`, error);
+      }
       // Cache in Redis for 24 hours
       await cacheSet(cacheKey, cityCoords, 86400);
       results.push({

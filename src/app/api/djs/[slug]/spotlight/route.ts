@@ -50,7 +50,8 @@ export async function GET(
   timer.end("fetch_profile");
 
   if (!djProfile || djProfile.status === "REJECTED") {
-    return notFound();
+    timer.flush();
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   // Fetch spotlight media (max 1 audio and 1 video)

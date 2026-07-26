@@ -594,20 +594,18 @@ export default function DjProfileFree({
                   </>
                 )}
 
-                {hasPhotos ? (
+                {mediaIsLoading ? (
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-32 animate-pulse rounded-lg bg-white/5"
+                      />
+                    ))}
+                  </div>
+                ) : MEDIA.length > 0 ? (
                   <>
-                    {mediaIsLoading && MEDIA.length === 0 ? (
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        {[...Array(6)].map((_, i) => (
-                          <div
-                            key={i}
-                            className="h-32 animate-pulse rounded-lg bg-white/5"
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
-                    )}
+                    <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
                     {mediaHasNextPage && (
                       <div className="flex justify-center pt-4">
                         <Button
@@ -691,31 +689,29 @@ export default function DjProfileFree({
                 <SectionHeading sub="What people say about this DJ">
                   Reviews
                 </SectionHeading>
-                {REVIEWS.length > 0 ? (
-                  <>
-                    {ratingsIsLoading && REVIEWS.length === 0 ? (
-                      <div className="space-y-4">
-                        {[...Array(3)].map((_, i) => (
-                          <div
-                            key={i}
-                            className="flex gap-4 rounded-lg bg-white/5 p-4"
-                          >
-                            <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
-                            <div className="flex-1 space-y-2">
-                              <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
-                              <div className="h-3 w-full animate-pulse rounded bg-white/5" />
-                              <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
-                            </div>
-                          </div>
-                        ))}
+                {ratingsIsLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="flex gap-4 rounded-lg bg-white/5 p-4"
+                      >
+                        <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
+                          <div className="h-3 w-full animate-pulse rounded bg-white/5" />
+                          <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
+                        </div>
                       </div>
-                    ) : (
-                      <ProfileReviews
-                        avgRating={fetchedAvgRating || safeDJ.avgRating}
-                        ratingCount={ratingsTotalCount || safeDJ.ratingCount}
-                        reviews={REVIEWS}
-                      />
-                    )}
+                    ))}
+                  </div>
+                ) : REVIEWS.length > 0 ? (
+                  <>
+                    <ProfileReviews
+                      avgRating={fetchedAvgRating || safeDJ.avgRating}
+                      ratingCount={ratingsTotalCount || safeDJ.ratingCount}
+                      reviews={REVIEWS}
+                    />
                     {ratingsHasNextPage && (
                       <div className="flex justify-center pt-4">
                         <Button

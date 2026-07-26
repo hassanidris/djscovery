@@ -37,10 +37,13 @@ export function useLazyData<T>(
 
   useEffect(() => {
     const target = targetRef.current;
-    if (!target || !enabled) return;
+    if (!enabled) return;
 
-    // Fetch immediately for now (debugging)
-    fetchData();
+    // No target attached by the consumer: fall back to an immediate fetch.
+    if (!target) {
+      fetchData();
+      return;
+    }
 
     observerRef.current = new IntersectionObserver(
       (entries) => {

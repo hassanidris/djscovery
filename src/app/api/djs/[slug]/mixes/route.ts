@@ -7,23 +7,25 @@ export const revalidate = 300; // Cache for 5 minutes
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
   // Check cache first
   const cacheKey = `dj_mixes:${slug}`;
-  const cached = await cacheGet<Array<{
-    id: number;
-    type: "AUDIO";
-    url: string;
-    title: string | null;
-    duration: string | null;
-    thumbnail: string | null;
-    isSpotlight: boolean;
-    sortOrder: number;
-    playCount: number;
-  }>>(cacheKey);
+  const cached = await cacheGet<
+    Array<{
+      id: number;
+      type: "AUDIO";
+      url: string;
+      title: string | null;
+      duration: string | null;
+      thumbnail: string | null;
+      isSpotlight: boolean;
+      sortOrder: number;
+      playCount: number;
+    }>
+  >(cacheKey);
 
   if (cached) {
     return NextResponse.json(cached);
@@ -36,7 +38,10 @@ export async function GET(
   });
 
   if (!djProfile || djProfile.status === "REJECTED") {
-    return notFound();
+    return NextResponse.json(
+      { error: "DJ profile not found" },
+      { status: 404 },
+    );
   }
 
   // Fetch audio media (mixes)

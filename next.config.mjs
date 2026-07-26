@@ -68,8 +68,16 @@ const nextConfig = {
       { protocol: "https", hostname: "www.b4l.cz" },
       { protocol: "https", hostname: "www.discoverbenelux.com" },
       { protocol: "https", hostname: "assets.podomatic.net" },
-      { protocol: "https", hostname: "jarmybsjvztwrmsdcnje.supabase.co" },
-      { protocol: "https", hostname: "unrqebwfdfumpjgvavbk.supabase.co" },
+      {
+        protocol: "https",
+        hostname: "jarmybsjvztwrmsdcnje.supabase.co",
+        pathname: "/storage/v1/object/public/djscovery-media/**",
+      },
+      {
+        protocol: "https",
+        hostname: "unrqebwfdfumpjgvavbk.supabase.co",
+        pathname: "/storage/v1/object/public/djscovery-media/**",
+      },
       { protocol: "https", hostname: "*.tiktokcdn.com" },
       { protocol: "https", hostname: "*.tiktokcdn-eu.com" },
       { protocol: "https", hostname: "*.tiktokcdn-us.com" },

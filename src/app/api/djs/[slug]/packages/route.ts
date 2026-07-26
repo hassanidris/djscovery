@@ -7,23 +7,25 @@ export const revalidate = 300; // Cache for 5 minutes
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
   // Check cache first
   const cacheKey = `dj_packages:${slug}`;
-  const cached = await cacheGet<Array<{
-    id: number;
-    name: string;
-    priceFrom: number;
-    priceTo: number | null;
-    currency: string;
-    duration: string | null;
-    features: string[];
-    popular: boolean;
-    sortOrder: number;
-  }>>(cacheKey);
+  const cached = await cacheGet<
+    Array<{
+      id: number;
+      name: string;
+      priceFrom: number;
+      priceTo: number | null;
+      currency: string;
+      duration: string | null;
+      features: string[];
+      popular: boolean;
+      sortOrder: number;
+    }>
+  >(cacheKey);
 
   if (cached) {
     return NextResponse.json(cached);
@@ -36,7 +38,7 @@ export async function GET(
   });
 
   if (!djProfile || djProfile.status === "REJECTED") {
-    return notFound();
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   // Fetch packages
