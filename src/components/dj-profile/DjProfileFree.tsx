@@ -38,6 +38,7 @@ import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
+import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
@@ -61,6 +62,12 @@ import {
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { getVideoThumbnailUrl } from "@/lib/media-utils";
 import { useAudioThumbnail } from "@/lib/media-thumbnails";
+import { useBookingOptions } from "@/hooks/useBookingOptions";
+import { usePaginatedRatings } from "@/hooks/usePaginatedRatings";
+import { usePaginatedMedia } from "@/hooks/usePaginatedMedia";
+import { useLazyData } from "@/hooks/useLazyData";
+import { useLazyVenues } from "@/hooks/useLazyVenues";
+import { useDjAnalytics } from "@/hooks/useDjAnalytics";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 
 function EmptySectionState({
@@ -124,25 +131,120 @@ export default function DjProfileFree({
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
 
+  // Fetch booking options client-side (same as Premium)
+  const { options: clientBookingOptions } = useBookingOptions(
+    viewerContext?.organizerCountryId ?? undefined,
+    viewerContext?.organizerCityId ?? undefined,
+    (djData as any)?.countryId
+      ? parseInt((djData as any).countryId)
+      : undefined,
+    (djData as any)?.cityId ? parseInt((djData as any).cityId) : undefined,
+  );
+
+  const finalBookingOptions =
+    clientBookingOptions.countries.length > 0
+      ? clientBookingOptions
+      : bookingOptions;
+
+  // Fetch ratings client-side with pagination (same as Premium)
+  const slug = djData?.slug || "";
+  const {
+    ratings: fetchedRatings,
+    totalCount: ratingsTotalCount,
+    hasNextPage: ratingsHasNextPage,
+    avgRating: fetchedAvgRating,
+    isLoading: ratingsIsLoading,
+    loadNextPage: loadMoreRatings,
+  } = usePaginatedRatings(slug);
+
+  // Fetch media client-side with pagination (same as Premium)
+  const {
+    media: fetchedMedia,
+    hasNextPage: mediaHasNextPage,
+    isLoading: mediaIsLoading,
+    loadNextPage: loadMoreMedia,
+  } = usePaginatedMedia(slug);
+
+  // Lazy-load spotlight when scrolled into view (same as Premium)
+  const { data: lazySpotlight, hasLoaded: spotlightHasLoaded } =
+    useLazyData<any>(slug, "spotlight", true);
+
+  // Lazy-load venues when scrolled into view (same as Premium)
+  const {
+    venues: lazyVenues,
+    isLoading: venuesIsLoading,
+    hasLoaded: venuesHasLoaded,
+    targetRef: venuesTargetRef,
+  } = useLazyVenues(slug);
+
+  // Fetch analytics client-side (avgRating, eventsCount, responseRate, bookingRate)
+  const { analytics } = useDjAnalytics(slug);
+
+  // Lazy-load events when scrolled into view (same as Premium)
+  const {
+    data: lazyEvents,
+    isLoading: eventsIsLoading,
+    hasLoaded: eventsHasLoaded,
+  } = useLazyData<any>(slug, "events", true);
+
+  // Transform fetched ratings to reviews format
+  const transformedReviews = fetchedRatings.map((r) => ({
+    id: r.id,
+    rating: r.rating,
+    review: r.review || "",
+    date: new Date(r.createdAt).toISOString().split("T")[0],
+    user: {
+      name: r.user.name || r.user.username,
+      image: r.user.image || "",
+    },
+  }));
+
+  // Transform fetched media to photo format (free plan shows photos only)
+  const transformedMedia = fetchedMedia
+    .filter((m) => m.type === "IMAGE")
+    .map((m) => ({ id: m.id, url: m.url }));
+
   // In staging: use real data if available, supplement with demo data
   // In production: only use real data
-  const DJ = djData
-    ? mapFreeDjToProps(djData)
+  // Merge client-side analytics into djData for hero stats
+  const djDataWithAnalytics =
+    djData && analytics
+      ? {
+          ...djData,
+          stats: {
+            ...djData.stats,
+            rating: analytics.avgRating || djData.stats.rating,
+            events: analytics.publicEventsCount || djData.stats.events,
+            responseRate: analytics.responseRate,
+            bookingRate: analytics.bookingRate,
+          },
+        }
+      : djData;
+
+  const DJ = djDataWithAnalytics
+    ? mapFreeDjToProps(djDataWithAnalytics)
     : isStaging
       ? FREE_DEFAULT_DJ
       : null;
-  const EVENTS = djData
-    ? mapFreeEventsFromData(djData)
-    : isStaging
-      ? FREE_DEFAULT_EVENTS
-      : [];
+  const EVENTS =
+    eventsHasLoaded && lazyEvents
+      ? lazyEvents
+      : djData
+        ? mapFreeEventsFromData(djData)
+        : isStaging
+          ? FREE_DEFAULT_EVENTS
+          : [];
   const REVIEWS = djData
-    ? mapFreeReviewsFromData(djData)
+    ? transformedReviews.length > 0
+      ? transformedReviews
+      : mapFreeReviewsFromData(djData)
     : isStaging
       ? FREE_DEFAULT_REVIEWS
       : [];
   const MEDIA = djData
-    ? mapFreeMediaFromData(djData)
+    ? transformedMedia.length > 0
+      ? transformedMedia
+      : mapFreeMediaFromData(djData)
     : isStaging
       ? FREE_DEFAULT_MEDIA
       : [];
@@ -151,28 +253,75 @@ export default function DjProfileFree({
     : isStaging
       ? FREE_DEFAULT_FEATURED_MIX
       : null;
-  const videoUrl = djData?.spotlight.featuredVideo.videoUrl ?? "";
+
+  // Compute spotlight from lazy-loaded data or fall back to server data
+  const SPOTLIGHT =
+    spotlightHasLoaded && lazySpotlight
+      ? lazySpotlight
+      : djData
+        ? {
+            featuredMix: djData.spotlight?.featuredMix
+              ? {
+                  ...djData.spotlight.featuredMix,
+                  audioUrl:
+                    (djData.spotlight.featuredMix as any).audioUrl ||
+                    (djData.spotlight.featuredMix as any).url,
+                  plays:
+                    (djData.spotlight.featuredMix as any).plays ||
+                    (djData.spotlight.featuredMix as any).playCount,
+                }
+              : null,
+            featuredVideo: djData.spotlight?.featuredVideo
+              ? {
+                  ...djData.spotlight.featuredVideo,
+                  videoUrl:
+                    (djData.spotlight.featuredVideo as any).videoUrl ||
+                    (djData.spotlight.featuredVideo as any).url,
+                  views:
+                    (djData.spotlight.featuredVideo as any).views ||
+                    (djData.spotlight.featuredVideo as any).viewCount,
+                }
+              : null,
+          }
+        : null;
+
+  // Use lazy-loaded spotlight for featured mix if available
+  const effectiveFeaturedMix =
+    spotlightHasLoaded && SPOTLIGHT?.featuredMix
+      ? {
+          ...FEATURED_MIX,
+          audioUrl:
+            SPOTLIGHT.featuredMix.audioUrl || FEATURED_MIX?.audioUrl || "",
+          title: SPOTLIGHT.featuredMix.title || FEATURED_MIX?.title || "",
+          thumbnail: SPOTLIGHT.featuredMix.thumbnail || FEATURED_MIX?.thumbnail,
+          duration:
+            SPOTLIGHT.featuredMix.duration || FEATURED_MIX?.duration || "",
+          plays: SPOTLIGHT.featuredMix.plays ?? FEATURED_MIX?.plays ?? "0",
+        }
+      : FEATURED_MIX;
+
+  const videoUrl = SPOTLIGHT?.featuredVideo?.videoUrl ?? "";
   const videoThumb =
-    djData?.spotlight.featuredVideo.thumbnail ||
+    SPOTLIGHT?.featuredVideo?.thumbnail ||
     getVideoThumbnailUrl(videoUrl) ||
     "/gallery-2.png";
   const location = DJ ? `${DJ.city}, ${DJ.country}` : "";
 
-  const featuredMixAudioUrl = FEATURED_MIX?.audioUrl ?? "";
+  const featuredMixAudioUrl = effectiveFeaturedMix?.audioUrl ?? "";
   // Hooks must run unconditionally before any early return (Rules of Hooks)
   const autoMixThumb = useAudioThumbnail(featuredMixAudioUrl);
   const featuredMixThumb =
-    FEATURED_MIX?.thumbnail || autoMixThumb || "/gallery-2.png";
+    effectiveFeaturedMix?.thumbnail || autoMixThumb || "/gallery-2.png";
 
   // Early return in production if no data available
   if (!DJ && isProduction) {
     return null;
   }
 
-  // After this point, DJ and FEATURED_MIX are guaranteed to be non-null
+  // After this point, DJ and effectiveFeaturedMix are guaranteed to be non-null
   // (either from real data or demo defaults in staging)
   const safeDJ = DJ!;
-  const safeFEATURED_MIX = FEATURED_MIX!;
+  const safeFEATURED_MIX = effectiveFeaturedMix!;
 
   const isOwner = viewMode === "dj-owner";
   const editHref = "/dj/settings";
@@ -182,12 +331,26 @@ export default function DjProfileFree({
   };
 
   const hasFeaturedMix = safeFEATURED_MIX.audioUrl !== "";
-  const hasFeaturedVideo = !!djData?.spotlight.featuredVideo.videoUrl;
+  const hasFeaturedVideo = !!SPOTLIGHT?.featuredVideo?.videoUrl;
   const hasSpotlight = hasFeaturedMix || hasFeaturedVideo;
   const hasMixes = hasFeaturedMix;
   const hasPhotos = MEDIA.length > 0;
 
-  const completion = djData ? calculateProfileCompletion(djData) : null;
+  // Use client-fetched media for accurate completion check (server only has spotlight photos)
+  const djDataForCompletion =
+    djData && transformedMedia.length > 0
+      ? {
+          ...djData,
+          media: {
+            ...djData.media,
+            photos: transformedMedia.map((m) => m.url),
+          },
+        }
+      : djData;
+
+  const completion = djDataForCompletion
+    ? calculateProfileCompletion(djDataForCompletion)
+    : null;
 
   if (!djData) {
     return (
@@ -201,7 +364,7 @@ export default function DjProfileFree({
     <div className="min-h-screen bg-black">
       {/* ── HERO ── */}
       <DjProfileHero
-        djData={djData}
+        djData={djDataWithAnalytics ?? djData}
         viewMode={viewMode}
         isFollowed={isFollowed}
         reputationScore={reputationScore}
@@ -225,7 +388,7 @@ export default function DjProfileFree({
               viewer={bookingContext}
               variant="free"
               layout="mobile"
-              bookingOptions={bookingOptions}
+              bookingOptions={finalBookingOptions}
             />
 
             <div id="about">
@@ -364,7 +527,7 @@ export default function DjProfileFree({
                                 {safeFEATURED_MIX.plays} plays
                               </p>
                               <div className="mt-2 flex items-center gap-1">
-                                {safeFEATURED_MIX.genres.map((t) => (
+                                {(safeFEATURED_MIX.genres ?? []).map((t) => (
                                   <Badge
                                     key={t}
                                     className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400"
@@ -381,15 +544,13 @@ export default function DjProfileFree({
                       {/* Featured Video */}
                       {hasFeaturedVideo && (
                         <MediaVideoModal
-                          videoUrl={
-                            djData?.spotlight.featuredVideo.videoUrl ?? ""
-                          }
+                          videoUrl={videoUrl}
                           thumbnail={videoThumb}
                           title={
-                            djData?.spotlight.featuredVideo.title ??
+                            SPOTLIGHT?.featuredVideo?.title ??
                             "Live @ Berghain — Summer Closing 2024"
                           }
-                          mediaId={djData?.spotlight.featuredVideo.id}
+                          mediaId={SPOTLIGHT?.featuredVideo?.id}
                         >
                           <Card className="bg-h_blackLight/30 group hover:border-h_red/30 flex h-full cursor-pointer flex-col gap-0 overflow-hidden border-white/8 transition-all">
                             <div className="relative h-40 shrink-0 bg-linear-to-br from-slate-900 via-gray-900 to-black">
@@ -413,14 +574,12 @@ export default function DjProfileFree({
                             </div>
                             <div className="p-4">
                               <p className="text-sm font-semibold text-white">
-                                {djData?.spotlight.featuredVideo.title ??
+                                {SPOTLIGHT?.featuredVideo?.title ??
                                   "Live @ Berghain — Summer Closing 2024"}
                               </p>
                               <p className="mt-1 text-xs text-gray-500">
-                                {djData?.spotlight.featuredVideo.duration ??
-                                  "45 min"}{" "}
-                                · {djData?.spotlight.featuredVideo.views ?? 0}{" "}
-                                views
+                                {SPOTLIGHT?.featuredVideo?.duration ?? "45 min"}{" "}
+                                · {SPOTLIGHT?.featuredVideo?.views ?? 0} views
                               </p>
                               <div className="mt-2">
                                 <Badge className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400">
@@ -436,7 +595,32 @@ export default function DjProfileFree({
                 )}
 
                 {hasPhotos ? (
-                  <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
+                  <>
+                    {mediaIsLoading && MEDIA.length === 0 ? (
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        {[...Array(6)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="h-32 animate-pulse rounded-lg bg-white/5"
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
+                    )}
+                    {mediaHasNextPage && (
+                      <div className="flex justify-center pt-4">
+                        <Button
+                          onClick={loadMoreMedia}
+                          disabled={mediaIsLoading}
+                          variant="outline"
+                          className="border-white/10 bg-white/5 hover:bg-white/10"
+                        >
+                          {mediaIsLoading ? "Loading..." : "Load More Photos"}
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <EmptySectionState
                     icon={ImageIcon}
@@ -464,6 +648,39 @@ export default function DjProfileFree({
                 featuredPerformanceThumbnailUrl={
                   djData?.featuredPerformanceThumbnailUrl
                 }
+                showCalendar={false}
+              />
+            </div>
+
+            <Separator className="bg-white/8" />
+
+            {/* ── WHERE I'VE PLAYED ── */}
+            <div ref={venuesTargetRef}>
+              <WhereIvePlayed
+                venues={
+                  venuesHasLoaded && lazyVenues.length > 0
+                    ? lazyVenues.map((v) => ({
+                        id: v.id,
+                        venueName: v.venueName,
+                        eventDate: v.eventDate,
+                        description: v.description,
+                        city: { name: v.cityName },
+                        country: { name: v.countryName },
+                        latitude: v.latitude,
+                        longitude: v.longitude,
+                      }))
+                    : (djData?.venuesPlayed || []).map((v) => ({
+                        id: v.id || 0,
+                        venueName: v.venue,
+                        eventDate: v.date || null,
+                        description: v.description || null,
+                        city: { name: v.city },
+                        country: { name: v.country },
+                        latitude: v.latitude,
+                        longitude: v.longitude,
+                      }))
+                }
+                isOwner={isOwner}
               />
             </div>
 
@@ -475,11 +692,45 @@ export default function DjProfileFree({
                   Reviews
                 </SectionHeading>
                 {REVIEWS.length > 0 ? (
-                  <ProfileReviews
-                    avgRating={safeDJ.avgRating}
-                    ratingCount={safeDJ.ratingCount}
-                    reviews={REVIEWS}
-                  />
+                  <>
+                    {ratingsIsLoading && REVIEWS.length === 0 ? (
+                      <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="flex gap-4 rounded-lg bg-white/5 p-4"
+                          >
+                            <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
+                            <div className="flex-1 space-y-2">
+                              <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
+                              <div className="h-3 w-full animate-pulse rounded bg-white/5" />
+                              <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <ProfileReviews
+                        avgRating={fetchedAvgRating || safeDJ.avgRating}
+                        ratingCount={ratingsTotalCount || safeDJ.ratingCount}
+                        reviews={REVIEWS}
+                      />
+                    )}
+                    {ratingsHasNextPage && (
+                      <div className="flex justify-center pt-4">
+                        <Button
+                          onClick={loadMoreRatings}
+                          disabled={ratingsIsLoading}
+                          variant="outline"
+                          className="border-white/10 bg-white/5 hover:bg-white/10"
+                        >
+                          {ratingsIsLoading
+                            ? "Loading..."
+                            : "Load More Reviews"}
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <EmptySectionState
                     icon={Star}
@@ -586,7 +837,7 @@ export default function DjProfileFree({
               viewer={bookingContext}
               variant="free"
               layout="desktop"
-              bookingOptions={bookingOptions}
+              bookingOptions={finalBookingOptions}
             />
 
             {isOwner && (

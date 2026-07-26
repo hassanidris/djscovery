@@ -1,9 +1,5 @@
 export type BookingViewerRole =
-  | "guest"
-  | "fan"
-  | "organizer"
-  | "admin"
-  | "dj-owner";
+  "guest" | "fan" | "organizer" | "admin" | "dj-owner";
 
 export interface BookingViewerContext {
   role: BookingViewerRole;
@@ -12,6 +8,7 @@ export interface BookingViewerContext {
   organizerContactEmail?: string | null;
   organizerCityId?: number | null;
   organizerCityName?: string | null;
+  organizerCountryId?: number | null;
 }
 
 export type CountryOption = {

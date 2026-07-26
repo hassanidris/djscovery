@@ -83,119 +83,122 @@ export default async function DjProfilePage({
   }
 
   // ── Prisma DB lookup (production) ─────────────────────────────────────────
-  const dj = await prisma.djProfile.findUnique({
-    where: { slug },
-    select: {
-      id: true,
-      userId: true,
-      stageName: true,
-      slug: true,
-      bio: true,
-      experienceYears: true,
-      experienceLevel: true,
-      avatar: true,
-      coverImage: true,
-      countryId: true,
-      cityId: true,
-      city: {
-        select: {
-          id: true,
-          name: true,
+  // Split into focused queries for better performance
+  const [djCore, spotlightMedia, basicCounts] = await Promise.all([
+    // Core profile data for hero section
+    prisma.djProfile.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        userId: true,
+        stageName: true,
+        slug: true,
+        bio: true,
+        experienceYears: true,
+        experienceLevel: true,
+        avatar: true,
+        coverImage: true,
+        countryId: true,
+        cityId: true,
+        city: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        plan: true,
+        status: true,
+        featured: true,
+        hidden: true,
+        bookingEmail: true,
+        bookingPhone: true,
+        feeMin: true,
+        feeMax: true,
+        feeCurrency: true,
+        monthlyViews: true,
+        reputationScore: true,
+        user: {
+          select: {
+            id: true,
+          },
+        },
+        country: { select: { name: true } },
+        genres: { include: { genre: { select: { name: true } } } },
+        djTypes: true,
+        socialLinks: true,
+        // Non-critical fields removed (will be fetched separately):
+        // - managerName, managerEmail, managerPhone (ProfessionalTeamSidebar)
+        // - agentName, agentAgency, agentEmail (ProfessionalTeamSidebar)
+        // - availabilityTimezone, availabilityMonth, availabilityDays (availability section)
+        // - featuredPerformanceUrl, featuredPerformanceContext (featured performance section)
+        // - reputationDetail (owner-only analytics)
+      },
+    }),
+    // Spotlight media only (featured mix/video)
+    prisma.media.findMany({
+      where: { djProfile: { slug }, isSpotlight: true },
+      orderBy: { sortOrder: "asc" },
+      select: {
+        id: true,
+        type: true,
+        url: true,
+        title: true,
+        duration: true,
+        thumbnail: true,
+        isSpotlight: true,
+        sortOrder: true,
+        playCount: true,
+        viewCount: true,
+      },
+    }),
+    // Basic counts for stats display
+    prisma.djProfile.findUnique({
+      where: { slug },
+      select: {
+        _count: {
+          select: { ratings: true, followers: true },
         },
       },
-      plan: true,
-      status: true,
-      featured: true,
-      hidden: true,
-      bookingEmail: true,
-      bookingPhone: true,
-      feeMin: true,
-      feeMax: true,
-      feeCurrency: true,
-      managerName: true,
-      managerEmail: true,
-      managerPhone: true,
-      agentName: true,
-      agentAgency: true,
-      agentEmail: true,
-      availabilityTimezone: true,
-      availabilityMonth: true,
-      availabilityDays: true,
-      featuredPerformanceUrl: true,
-      featuredPerformanceContext: true,
-      monthlyViews: true,
-      reputationScore: true,
-      user: {
-        select: {
-          id: true,
-        },
-      },
-      country: true,
-      genres: { include: { genre: true } },
-      djTypes: true,
-      socialLinks: true,
-      ratings: {
-        take: 20,
-        orderBy: { createdAt: "desc" },
-        include: {
-          user: { select: { username: true, image: true, name: true } },
-        },
-      },
-      media: {
-        take: 50,
-        orderBy: { sortOrder: "asc" },
-        select: {
-          id: true,
-          type: true,
-          url: true,
-          title: true,
-          duration: true,
-          thumbnail: true,
-          isSpotlight: true,
-          sortOrder: true,
-          playCount: true,
-          viewCount: true,
-        },
-      },
-      packages: true,
-      highlights: true,
-      endorsements: true,
-      pressItems: true,
-      eventsOwned: {
-        where: { status: { in: ["PUBLISHED", "COMPLETED"] }, deletedAt: null },
-        take: 15,
-        orderBy: { startDate: "asc" },
-        include: { city: true, country: true },
-      },
-      venues: {
-        orderBy: { createdAt: "desc" },
-        include: { city: true, country: true },
-      },
-      reputationDetail: true,
-      _count: {
-        select: { ratings: true, followers: true },
-      },
-    },
-  });
+    }),
+  ]);
 
-  if (!dj || dj.status === "REJECTED") return notFound();
+  if (!djCore || djCore.status === "REJECTED") return notFound();
+
+  // Combine results for backward compatibility
+  const dj = {
+    ...djCore,
+    media: spotlightMedia,
+    _count: basicCounts?._count || { ratings: 0, followers: 0 },
+    // Add default values for removed non-critical fields
+    managerName: null,
+    managerEmail: null,
+    managerPhone: null,
+    agentName: null,
+    agentAgency: null,
+    agentEmail: null,
+    availabilityTimezone: null,
+    availabilityMonth: null,
+    availabilityDays: null,
+    featuredPerformanceUrl: null,
+    featuredPerformanceContext: null,
+    reputationDetail: null,
+  };
 
   // Geocode venues for map display
-  const venuesWithCoords = await batchGeocodeVenues(
-    (dj.venues || []).map((v) => ({
-      id: v.id,
-      venueName: v.venueName,
-      city: v.city,
-      country: v.country,
-      latitude: v.latitude,
-      longitude: v.longitude,
-    })),
-  );
+  // DISABLED: Venues will be lazy-loaded in Phase 4
+  // const venuesWithCoords = await batchGeocodeVenues(
+  //   (dj.venues || []).map((v) => ({
+  //     id: v.id,
+  //     venueName: v.venueName,
+  //     city: v.city,
+  //     country: v.country,
+  //     latitude: v.latitude,
+  //     longitude: v.longitude,
+  //   })),
+  // );
 
   // Lookup freshly geocoded coordinates by venue ID
-  const coordLookup = new Map(
-    venuesWithCoords.map((vc) => [vc.id, { lat: vc.lat, lng: vc.lng }]),
-  );
+  const coordLookup = new Map(); // Empty until venues are lazy-loaded
 
   const supabase = await createClient();
   const {
@@ -209,46 +212,21 @@ export default async function DjProfilePage({
 
   // Profile view tracking moved to client-side to avoid firing during prefetch/re-renders
 
-  // Accurate aggregates: avg rating over ALL ratings (not just the fetched 20),
-  // and event count limited to publicly visible events (matches the list shown).
-  const [
-    ratingAgg,
-    publicEventsCount,
-    responseRate,
-    bookingRate,
-    topCities,
-    ownerProfileStats,
-  ] = await Promise.all([
-    prisma.djRating.aggregate({
-      where: { djProfileId: dj.id },
-      _avg: { rating: true },
-    }),
-    prisma.event.count({
-      where: {
-        ownerDjId: dj.id,
-        status: { in: ["PUBLISHED", "COMPLETED"] },
-        deletedAt: null,
-      },
-    }),
-    getDjResponseRate(dj.id),
-    getDjBookingRate(dj.id),
-    getDjTopCities(dj.id, 5),
-    // Only returns data if the current viewer is the profile owner on a PREMIUM plan
-    getProfileStats(dj.id),
-  ]);
-  const avgRating = ratingAgg._avg.rating ?? 0;
+  // Analytics data is now fetched client-side via API endpoints with caching
+  // See: DjProfilePremium/DjProfileFree components for client-side fetching
+  const avgRating = 0; // Will be updated client-side
+  const publicEventsCount = 0; // Will be updated client-side
+  const responseRate = 0; // Will be updated client-side
+  const bookingRate = 0; // Will be updated client-side
+  const topCities: Array<{ city: string; country: string; count: number }> = []; // Will be updated client-side
+  const ownerProfileStats: {
+    profileViews?: { value: number; growth: number };
+    bookingRequests?: { value: number; growth: number };
+    newFollowers?: { value: number; growth: number };
+  } | null = null; // Will be updated client-side
 
-  // Fetch YouTube oEmbed thumbnail server-side for Featured Performance
-  let featuredPerformanceThumbnailUrl: string | undefined;
-  if (
-    dj.featuredPerformanceUrl &&
-    process.env.NEXT_PUBLIC_APP_ENV === "production"
-  ) {
-    const oEmbed = await fetchYouTubeOEmbed(dj.featuredPerformanceUrl);
-    if ("thumbnailUrl" in oEmbed && oEmbed.thumbnailUrl) {
-      featuredPerformanceThumbnailUrl = oEmbed.thumbnailUrl;
-    }
-  }
+  // DISABLED: YouTube oEmbed fetch since featuredPerformanceUrl is now null (will be fetched in Phase 5)
+  const featuredPerformanceThumbnailUrl: string | undefined = undefined;
 
   const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
   const isFollowedDj = viewMode === "fan" ? await isFollowingDj(dj.id) : false;
@@ -259,10 +237,7 @@ export default async function DjProfilePage({
   };
 
   let bookingOptions: BookingFormOptions = {
-    countries: await prisma.country.findMany({
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
-    }),
+    countries: [], // Will be fetched client-side
   };
 
   if (authUser) {
@@ -301,36 +276,8 @@ export default async function DjProfilePage({
       organizerContactEmail: organizerProfile?.contactEmail ?? undefined,
       organizerCityId: organizerProfile?.cityId ?? undefined,
       organizerCityName: organizerProfile?.city?.name ?? undefined,
+      organizerCountryId: organizerProfile?.countryId ?? undefined,
     };
-
-    if (organizerProfile?.countryId && organizerProfile?.cityId) {
-      const [initialCities, initialVenues] = await Promise.all([
-        getCitiesForCountry(organizerProfile.countryId),
-        getVenuesForCity(organizerProfile.cityId),
-      ]);
-
-      bookingOptions = {
-        ...bookingOptions,
-        initialCities,
-        initialVenues,
-        defaultCountryId: organizerProfile.countryId,
-        defaultCityId: organizerProfile.cityId,
-      };
-    } else if (dj.countryId && dj.cityId) {
-      // Fallback to DJ's location if organizer has no location
-      const [initialCities, initialVenues] = await Promise.all([
-        getCitiesForCountry(dj.countryId),
-        getVenuesForCity(dj.cityId),
-      ]);
-
-      bookingOptions = {
-        ...bookingOptions,
-        initialCities,
-        initialVenues,
-        defaultCountryId: dj.countryId,
-        defaultCityId: dj.cityId,
-      };
-    }
   }
 
   const djPlan = dj.plan;
@@ -408,15 +355,15 @@ export default async function DjProfilePage({
       })(),
     },
     analytics: {
-      profileViews: ownerProfileStats?.profileViews ?? {
+      profileViews: (ownerProfileStats as any)?.profileViews ?? {
         value: dj.monthlyViews ?? 0,
         growth: 0,
       },
-      bookingRequests: ownerProfileStats?.bookingRequests ?? {
+      bookingRequests: (ownerProfileStats as any)?.bookingRequests ?? {
         value: 0,
         growth: 0,
       },
-      newFollowers: ownerProfileStats?.newFollowers ?? {
+      newFollowers: (ownerProfileStats as any)?.newFollowers ?? {
         value: 0,
         growth: 0,
       },
@@ -466,17 +413,7 @@ export default async function DjProfilePage({
           ?.filter((d) => d.status === "tentative")
           .map((d) => d.day) ?? [],
     },
-    packages: dj.packages.map((p) => ({
-      id: p.id,
-      name: p.name,
-      priceFrom: p.priceFrom,
-      priceTo: p.priceTo ?? undefined,
-      currency: p.currency,
-      duration: p.duration ?? undefined,
-      features: p.features,
-      popular: p.popular,
-      sortOrder: p.sortOrder,
-    })),
+    packages: [], // Fetched client-side via API
     bio: dj.bio ?? "",
     specialties: dj.djTypes.map((t) => t.type),
     media: {
@@ -502,45 +439,11 @@ export default async function DjProfilePage({
           plays: m.playCount ?? 0,
         })),
     },
-    careerHighlights: dj.highlights.map((h) => ({
-      title: h.title,
-      year: parseInt(h.year, 10),
-    })),
-    endorsements: dj.endorsements.map((e) => ({
-      name: e.name,
-      role: e.role,
-      company: e.company ?? "",
-      quote: e.quote,
-    })),
-    press: dj.pressItems.map((p) => ({
-      id: p.id,
-      source: p.source,
-      type: p.type,
-      title: p.title,
-      date: p.date ?? "",
-      url: p.url ?? "",
-    })),
-    venuesPlayed: (dj.venues || []).map((v) => {
-      const coords = coordLookup.get(v.id);
-      return {
-        id: v.id,
-        venue: v.venueName,
-        city: v.city?.name ?? "",
-        country: v.country?.name ?? "",
-        date: v.eventDate ?? "",
-        description: v.description ?? "",
-        latitude: coords?.lat ?? v.latitude,
-        longitude: coords?.lng ?? v.longitude,
-        countryId: v.countryId,
-        cityId: v.cityId,
-      };
-    }),
-    reviewsList: dj.ratings.map((r) => ({
-      name: r.user.name ?? r.user.username,
-      rating: r.rating,
-      date: r.createdAt.toISOString().split("T")[0],
-      comment: r.review ?? "",
-    })),
+    careerHighlights: [], // Fetched client-side via API
+    endorsements: [], // Fetched client-side via API
+    press: [], // Fetched client-side via API
+    venuesPlayed: [], // Fetched client-side via API
+    reviewsList: [], // Fetched client-side via pagination API
     team: {
       manager: { name: dj.managerName ?? "", email: dj.managerEmail ?? "" },
       bookingAgent: {
@@ -555,21 +458,7 @@ export default async function DjProfilePage({
       website: websiteLink,
       feeRange: { min: djFeeMin, max: djFeeMax, currency: djFeeCurrency },
     },
-    upcomingEvents: dj.eventsOwned.map((e) => {
-      const eventDate = new Date(e.startDate);
-      const isPast = eventDate < new Date() || e.status === "COMPLETED";
-      return {
-        title: e.title,
-        venue: e.venue ?? "",
-        city: e.city?.name ?? "",
-        country: e.country?.name ?? "",
-        date: e.startDate.toISOString().split("T")[0],
-        slug: e.slug,
-        eventType: e.eventType,
-        category: e.category,
-        isPast,
-      };
-    }),
+    upcomingEvents: [], // Fetched client-side via API
   };
 
   const isPremium = djPlan === "PREMIUM";

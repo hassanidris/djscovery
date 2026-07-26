@@ -28,7 +28,7 @@ export default async function EditEventPage({
   });
   if (!djProfile) redirect("/become-dj");
 
-  const event = await prisma.event.findUnique({
+  const event = await prisma.event.findFirst({
     where: { slug, deletedAt: null },
     include: {
       city: { select: { id: true, name: true } },
