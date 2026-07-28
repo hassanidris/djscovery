@@ -66,7 +66,10 @@ export default function ProfileEventsSidebar({
   djName,
 }: Props) {
   const upcoming = events.filter((e) => !e.isPast);
-  const nextUp = upcoming.slice(0, 3);
+  const sortedUpcoming = [...upcoming].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  );
+  const nextUp = sortedUpcoming.slice(0, 3);
   const hasMore = upcoming.length > 3;
 
   return (
