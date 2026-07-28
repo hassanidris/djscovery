@@ -359,11 +359,6 @@ function DjProfileStats({
           label: "Events",
           icon: CalendarDays,
         },
-        {
-          val: formatNumber(dj.profileViews),
-          label: "Monthly Views",
-          icon: Eye,
-        },
       ];
 
   return (
