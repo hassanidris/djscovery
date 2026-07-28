@@ -66,14 +66,15 @@ export default function ProfileEventsSidebar({
   djName,
 }: Props) {
   const upcoming = events.filter((e) => !e.isPast);
-  const past = events.filter((e) => e.isPast);
+  const nextUp = upcoming.slice(0, 3);
+  const hasMore = upcoming.length > 3;
 
   return (
     <div className="space-y-5">
-      {/* Upcoming */}
+      {/* Next Up - top 3 upcoming events teaser */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">Upcoming Events</h3>
+          <h3 className="text-sm font-semibold text-white">Next Up</h3>
           {isOwner && (
             <Button
               size="sm"
@@ -89,7 +90,7 @@ export default function ProfileEventsSidebar({
           )}
         </div>
 
-        {upcoming.length === 0 ? (
+        {nextUp.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/8 px-3 py-6 text-center">
             <div className="mb-2 flex size-8 items-center justify-center rounded-full bg-white/5">
               <CalendarDays className="h-4 w-4 text-gray-600" />
@@ -101,27 +102,23 @@ export default function ProfileEventsSidebar({
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {upcoming.map((e) => (
-              <EventRow key={e.id} e={e} showStatus={showStatus} />
-            ))}
-          </div>
+          <>
+            <div className="flex flex-col gap-2">
+              {nextUp.map((e) => (
+                <EventRow key={e.id} e={e} showStatus={showStatus} />
+              ))}
+            </div>
+            {hasMore && (
+              <Link
+                href="#events"
+                className="mt-2 block text-center text-xs text-gray-500 transition-colors hover:text-white"
+              >
+                View all {upcoming.length} upcoming events →
+              </Link>
+            )}
+          </>
         )}
       </div>
-
-      {/* Past Performances */}
-      {past.length > 0 && (
-        <div>
-          <h3 className="mb-3 text-sm font-semibold text-white">
-            Past Performances
-          </h3>
-          <div className="flex flex-col gap-2">
-            {past.map((e) => (
-              <EventRow key={e.id} e={e} showStatus={false} />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
