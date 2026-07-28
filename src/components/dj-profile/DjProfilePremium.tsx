@@ -24,6 +24,7 @@ import {
   Plus,
   Pencil,
   Newspaper,
+  Zap,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -122,7 +123,7 @@ function EmptySectionState({
   icon: any;
   title: string;
   description: string;
-  actionLabel: string;
+  actionLabel?: string;
   actionHref?: string;
   onAction?: () => void;
 }) {
@@ -1514,65 +1515,59 @@ export default function DjProfilePremium({
               </>
             )}
 
-            {(REVIEWS.length > 0 || isOwner) && (
-              <>
-                <Separator className="bg-white/8" />
+            <Separator className="bg-white/8" />
 
-                <section>
-                  <SectionHeading sub="What people say about this DJ">
-                    Reviews
-                  </SectionHeading>
-                  {ratingsIsLoading ? (
-                    <div className="space-y-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="flex gap-4 rounded-lg bg-white/5 p-4"
-                        >
-                          <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
-                          <div className="flex-1 space-y-2">
-                            <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
-                            <div className="h-3 w-full animate-pulse rounded bg-white/5" />
-                            <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
-                          </div>
-                        </div>
-                      ))}
+            <section id="reviews">
+              <SectionHeading sub="What people say about this DJ">
+                Reviews
+              </SectionHeading>
+              {ratingsIsLoading ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex gap-4 rounded-lg bg-white/5 p-4"
+                    >
+                      <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
+                        <div className="h-3 w-full animate-pulse rounded bg-white/5" />
+                        <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
+                      </div>
                     </div>
-                  ) : REVIEWS.length > 0 ? (
-                    <>
-                      <ProfileReviews
-                        avgRating={fetchedAvgRating || safeDJ.avgRating}
-                        ratingCount={ratingsTotalCount || safeDJ.ratingCount}
-                        reviews={REVIEWS}
-                      />
-                      {/* Load More button for reviews */}
-                      {ratingsHasNextPage && (
-                        <div className="flex justify-center pt-4">
-                          <Button
-                            onClick={loadMoreRatings}
-                            disabled={ratingsIsLoading}
-                            variant="outline"
-                            className="border-white/10 bg-white/5 hover:bg-white/10"
-                          >
-                            {ratingsIsLoading
-                              ? "Loading..."
-                              : "Load More Reviews"}
-                          </Button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <EmptySectionState
-                      icon={Star}
-                      title="No reviews yet"
-                      description="Reviews build trust and help you get more bookings"
-                      actionLabel="Request Reviews"
-                      actionHref={editHref}
-                    />
+                  ))}
+                </div>
+              ) : REVIEWS.length > 0 ? (
+                <>
+                  <ProfileReviews
+                    avgRating={fetchedAvgRating || safeDJ.avgRating}
+                    ratingCount={ratingsTotalCount || safeDJ.ratingCount}
+                    reviews={REVIEWS}
+                  />
+                  {/* Load More button for reviews */}
+                  {ratingsHasNextPage && (
+                    <div className="flex justify-center pt-4">
+                      <Button
+                        onClick={loadMoreRatings}
+                        disabled={ratingsIsLoading}
+                        variant="outline"
+                        className="border-white/10 bg-white/5 hover:bg-white/10"
+                      >
+                        {ratingsIsLoading ? "Loading..." : "Load More Reviews"}
+                      </Button>
+                    </div>
                   )}
-                </section>
-              </>
-            )}
+                </>
+              ) : (
+                <EmptySectionState
+                  icon={Star}
+                  title="No reviews yet"
+                  description="Reviews build trust and help you get more bookings"
+                  actionLabel={isOwner ? "Request Reviews" : undefined}
+                  actionHref={isOwner ? editHref : undefined}
+                />
+              )}
+            </section>
 
             {/* ── BOOKING PACKAGES ── */}
             {(packages.length > 0 || isOwner) && (
@@ -1672,15 +1667,44 @@ export default function DjProfilePremium({
               bookingOptions={finalBookingOptions}
             />
 
+            {/* Trust & Social Proof Strip */}
+            <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
+                    <Zap className="h-4 w-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-white">
+                      Response Rate
+                    </p>
+                    <p className="text-[11px] text-gray-500">
+                      {safeDJ.responseRate > 0
+                        ? `${safeDJ.responseRate}% response rate`
+                        : "Typically replies within 24h"}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-white">
+                    {safeDJ.responseRate > 0
+                      ? `${safeDJ.responseRate}%`
+                      : "Fast"}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
             {/* Events — desktop only; mobile version is inline above */}
-            {/* <div className="hidden lg:block">
+            <div className="hidden lg:block">
               <ProfileEventsSidebar
                 events={EVENTS}
                 isOwner={isOwner}
                 djName={safeDJ.stageName}
               />
             </div>
-            <Separator className="bg-white/8" /> */}
+
+            <Separator className="bg-white/8" />
 
             {/* Professional Team */}
             <ProfessionalTeamSidebar

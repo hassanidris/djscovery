@@ -8,19 +8,29 @@ type Tab = {
   label: string;
 };
 
-const TABS: Tab[] = [
+const ALL_TABS: Tab[] = [
   { id: "about", label: "About" },
   { id: "events", label: "Events" },
   { id: "media", label: "Media" },
+  { id: "reviews", label: "Reviews" },
   { id: "press", label: "Press" },
   { id: "packages", label: "Packages" },
 ];
 
+const PREMIUM_TAB_IDS = new Set(["press", "packages"]);
+
 type Props = {
   onTabClick?: (tabId: string) => void;
+  showPremiumTabs?: boolean;
 };
 
-export default function DjProfileSubNav({ onTabClick }: Props) {
+export default function DjProfileSubNav({
+  onTabClick,
+  showPremiumTabs = true,
+}: Props) {
+  const TABS = showPremiumTabs
+    ? ALL_TABS
+    : ALL_TABS.filter((t) => !PREMIUM_TAB_IDS.has(t.id));
   const [activeTab, setActiveTab] = useState<string>("about");
 
   const scrollToSection = (tabId: string) => {
@@ -59,7 +69,7 @@ export default function DjProfileSubNav({ onTabClick }: Props) {
       });
     }, observerOptions);
 
-    // Observe all sections
+    // Observe all visible sections
     TABS.forEach((tab) => {
       const element = document.getElementById(tab.id);
       if (element) {
@@ -70,7 +80,7 @@ export default function DjProfileSubNav({ onTabClick }: Props) {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [TABS]);
 
   return (
     <div>

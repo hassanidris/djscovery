@@ -24,6 +24,7 @@ import {
   Pencil,
   ImageIcon,
   MapPin,
+  Zap,
 } from "lucide-react";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
@@ -38,12 +39,12 @@ import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
-import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
   SOCIAL_ICONS,
   SectionHeading,
+  formatPlays,
 } from "@/components/dj-profile/dj-profile-shared";
 import {
   FREE_DEFAULT_DJ,
@@ -58,15 +59,16 @@ import {
   mapFreeReviewsFromData,
   mapFreeMediaFromData,
   mapFreeFeaturedMix,
+  mapMixesFromData,
 } from "@/lib/dj-profile-mappers";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
+import { cn } from "@/lib/utils";
 import { getVideoThumbnailUrl } from "@/lib/media-utils";
 import { useAudioThumbnail } from "@/lib/media-thumbnails";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { usePaginatedRatings } from "@/hooks/usePaginatedRatings";
 import { usePaginatedMedia } from "@/hooks/usePaginatedMedia";
 import { useLazyData } from "@/hooks/useLazyData";
-import { useLazyVenues } from "@/hooks/useLazyVenues";
 import { useDjAnalytics } from "@/hooks/useDjAnalytics";
 import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
 
@@ -80,22 +82,77 @@ function EmptySectionState({
   icon: React.ElementType;
   title: string;
   description: string;
-  actionLabel: string;
-  actionHref: string;
+  actionLabel?: string;
+  actionHref?: string;
 }) {
-  return (
-    <Link href={actionHref}>
-      <div className="group flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 px-4 py-8 text-center transition-colors hover:border-white/20">
-        <div className="mb-3 flex size-10 items-center justify-center rounded-full bg-white/5 transition-colors group-hover:bg-white/8">
-          <Icon className="h-5 w-5 text-gray-600" />
-        </div>
-        <p className="text-sm font-medium text-gray-400">{title}</p>
-        <p className="mt-1 text-xs text-gray-600">{description}</p>
+  const content = (
+    <div className="group flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 px-4 py-8 text-center transition-colors hover:border-white/20">
+      <div className="mb-3 flex size-10 items-center justify-center rounded-full bg-white/5 transition-colors group-hover:bg-white/8">
+        <Icon className="h-5 w-5 text-gray-600" />
+      </div>
+      <p className="text-sm font-medium text-gray-400">{title}</p>
+      <p className="mt-1 text-xs text-gray-600">{description}</p>
+      {actionLabel && (
         <span className="text-h_red mt-3 text-xs font-medium">
           {actionLabel} →
         </span>
-      </div>
-    </Link>
+      )}
+    </div>
+  );
+
+  if (actionHref) {
+    return <Link href={actionHref}>{content}</Link>;
+  }
+
+  return content;
+}
+
+function MixPlayer({
+  mix,
+}: {
+  mix: {
+    id?: number;
+    title: string;
+    audioUrl: string;
+    platform: string;
+    duration: string;
+    plays: string;
+  };
+}) {
+  const thumb = useAudioThumbnail(mix.audioUrl);
+
+  return (
+    <MediaAudioPlayer
+      audioUrl={mix.audioUrl}
+      title={mix.title}
+      thumbnailUrl={thumb || undefined}
+      mediaId={mix.id}
+    >
+      <Card className="bg-h_blackLight/30 flex cursor-pointer flex-row items-center gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
+        <div className="from-h_red/30 to-h_redDark/10 mr-4 flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/8 bg-linear-to-br">
+          {thumb ? (
+            <Image
+              src={thumb}
+              alt={mix.title}
+              width={48}
+              height={48}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Music className="text-h_red h-4 w-4" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-white">{mix.title}</p>
+          <p className="mt-0.5 text-xs text-gray-500">
+            {mix.platform} · {mix.duration} · {mix.plays} plays
+          </p>
+        </div>
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white">
+          <Play className="ml-0.5 h-3 w-3" />
+        </div>
+      </Card>
+    </MediaAudioPlayer>
   );
 }
 
@@ -128,6 +185,9 @@ export default function DjProfileFree({
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [mediaTab, setMediaTab] = useState<"photos" | "videos" | "mixes">(
+    "photos",
+  );
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
 
@@ -163,19 +223,19 @@ export default function DjProfileFree({
     hasNextPage: mediaHasNextPage,
     isLoading: mediaIsLoading,
     loadNextPage: loadMoreMedia,
+    typeCounts: mediaTypeCounts,
   } = usePaginatedMedia(slug);
 
   // Lazy-load spotlight when scrolled into view (same as Premium)
   const { data: lazySpotlight, hasLoaded: spotlightHasLoaded } =
     useLazyData<any>(slug, "spotlight", true);
 
-  // Lazy-load venues when scrolled into view (same as Premium)
+  // Lazy-load mixes when scrolled into view
   const {
-    venues: lazyVenues,
-    isLoading: venuesIsLoading,
-    hasLoaded: venuesHasLoaded,
-    targetRef: venuesTargetRef,
-  } = useLazyVenues(slug);
+    data: lazyMixes,
+    isLoading: mixesIsLoading,
+    hasLoaded: mixesHasLoaded,
+  } = useLazyData<any>(slug, "mixes", true);
 
   // Fetch analytics client-side (avgRating, eventsCount, responseRate, bookingRate)
   const { analytics } = useDjAnalytics(slug);
@@ -199,14 +259,26 @@ export default function DjProfileFree({
     },
   }));
 
-  // Transform fetched media to photo format (free plan shows photos only)
+  // Transform fetched media: photos for gallery, videos for video tab
   const transformedMedia = fetchedMedia
     .filter((m) => m.type === "IMAGE")
     .map((m) => ({ id: m.id, url: m.url }));
 
+  const videoMedia = fetchedMedia
+    .filter((m) => m.type === "VIDEO")
+    .map((m) => ({
+      id: m.id,
+      url: m.thumbnail || "/gallery-1.png",
+      videoUrl: m.url,
+      title: m.title || "",
+      type: "video" as const,
+      views: m.viewCount ?? 0,
+    }));
+
   // In staging: use real data if available, supplement with demo data
   // In production: only use real data
   // Merge client-side analytics into djData for hero stats
+  // Note: responseRate & bookingRate are premium-only — not merged for free plans
   const djDataWithAnalytics =
     djData && analytics
       ? {
@@ -215,8 +287,6 @@ export default function DjProfileFree({
             ...djData.stats,
             rating: analytics.avgRating || djData.stats.rating,
             events: analytics.publicEventsCount || djData.stats.events,
-            responseRate: analytics.responseRate,
-            bookingRate: analytics.bookingRate,
           },
         }
       : djData;
@@ -285,7 +355,13 @@ export default function DjProfileFree({
           }
         : null;
 
-  // Use lazy-loaded spotlight for featured mix if available
+  // Mixes for the mixes tab (lazy-loaded, falls back to djData)
+  const MIXES =
+    mixesHasLoaded && lazyMixes
+      ? lazyMixes
+      : djData
+        ? mapMixesFromData(djData)
+        : [];
   const effectiveFeaturedMix =
     spotlightHasLoaded && SPOTLIGHT?.featuredMix
       ? {
@@ -335,6 +411,8 @@ export default function DjProfileFree({
   const hasSpotlight = hasFeaturedMix || hasFeaturedVideo;
   const hasMixes = hasFeaturedMix;
   const hasPhotos = MEDIA.length > 0;
+  const hasVideos = videoMedia.length > 0;
+  const hasMixesTab = MIXES.filter((m: any) => m.audioUrl).length > 0;
 
   // Use client-fetched media for accurate completion check (server only has spotlight photos)
   const djDataForCompletion =
@@ -379,7 +457,7 @@ export default function DjProfileFree({
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── STICKY SUB-NAVIGATION ── */}
             <div className="bg-h_blackLight/30 sticky top-28 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
-              <DjProfileSubNav />
+              <DjProfileSubNav showPremiumTabs={false} />
             </div>
             {/* ── MOBILE BOOK CTA ── */}
             <BookCTA
@@ -410,74 +488,33 @@ export default function DjProfileFree({
 
             <Separator className="bg-white/8" />
 
-            {/* ── MY SOUND ── */}
-            {(hasMixes || isOwner) && (
-              <section>
-                <SectionHeading sub="1 mix · Upgrade to share your full discography">
-                  My Sound
-                </SectionHeading>
-                {hasMixes ? (
-                  <MediaAudioPlayer
-                    audioUrl={safeFEATURED_MIX.audioUrl}
-                    title={safeFEATURED_MIX.title}
-                    thumbnailUrl={featuredMixThumb || undefined}
-                  >
-                    <Card className="bg-h_blackLight/30 cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
-                      <div className="flex items-center gap-4">
-                        <div className="from-h_red/30 to-h_redDark/10 relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/8 bg-linear-to-br">
-                          {featuredMixThumb ? (
-                            <Image
-                              src={featuredMixThumb}
-                              alt={safeFEATURED_MIX.title}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <Music className="text-h_red h-5 w-5" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-white">
-                            {safeFEATURED_MIX.title}
-                          </p>
-                          <p className="mt-0.5 text-xs text-gray-500">
-                            {safeFEATURED_MIX.platform} ·{" "}
-                            {safeFEATURED_MIX.duration} ·{" "}
-                            {safeFEATURED_MIX.plays} plays
-                          </p>
-                          <div className="mt-2 flex items-center gap-2">
-                            <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
-                              <div className="bg-h_red h-full w-1/3 rounded-full" />
-                            </div>
-                            <span className="text-[11px] text-gray-600">
-                              28:14 / 1:24:00
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white">
-                          <Play className="ml-0.5 h-3 w-3" />
-                        </div>
-                      </div>
-                    </Card>
-                  </MediaAudioPlayer>
-                ) : (
-                  <EmptySectionState
-                    icon={Music}
-                    title="No mixes added yet"
-                    description="Share your first mix or playlist link with your audience"
-                    actionLabel="Add Mix"
-                    actionHref={editHref}
-                  />
-                )}
-              </section>
-            )}
+            {/* ── EVENTS MODULE ── */}
+            <div id="events">
+              <DjEventsModule
+                events={EVENTS}
+                calendarDays={[]}
+                calendarLabel="Calendar"
+                isOwner={isOwner}
+                djName={safeDJ.stageName}
+                featuredPerformanceUrl={djData?.featuredPerformanceUrl}
+                featuredPerformanceContext={djData?.featuredPerformanceContext}
+                featuredPerformanceThumbnailUrl={
+                  djData?.featuredPerformanceThumbnailUrl
+                }
+                showCalendar={false}
+              />
+            </div>
 
-            {(hasMixes || isOwner) && <Separator className="bg-white/8" />}
+            <Separator className="bg-white/8" />
 
             {/* ── MEDIA ── */}
-            {(hasPhotos || hasSpotlight || isOwner) && (
+            {(hasPhotos ||
+              hasVideos ||
+              hasMixesTab ||
+              hasSpotlight ||
+              isOwner) && (
               <section id="media">
-                <SectionHeading sub="Upgrade to unlock video uploads">
+                <SectionHeading sub="2 video/audio uploads included in free plan">
                   Media
                 </SectionHeading>
 
@@ -594,150 +631,195 @@ export default function DjProfileFree({
                   </>
                 )}
 
-                {mediaIsLoading ? (
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-32 animate-pulse rounded-lg bg-white/5"
+                {/* ── MEDIA TABS ── */}
+                <div className="mb-4 flex gap-2">
+                  {(["photos", "videos", "mixes"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setMediaTab(tab)}
+                      className={cn(
+                        "rounded-full px-4 py-1.5 text-xs font-medium capitalize transition-all",
+                        mediaTab === tab
+                          ? "bg-h_red text-white"
+                          : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white",
+                      )}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                {mediaTab === "photos" && (
+                  <>
+                    {mediaIsLoading && MEDIA.length === 0 ? (
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        {[...Array(6)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="h-32 animate-pulse rounded-lg bg-white/5"
+                          />
+                        ))}
+                      </div>
+                    ) : MEDIA.length > 0 ? (
+                      <>
+                        <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
+                        {mediaHasNextPage && (
+                          <div className="flex justify-center pt-4">
+                            <Button
+                              onClick={loadMoreMedia}
+                              disabled={mediaIsLoading}
+                              variant="outline"
+                              className="border-white/10 bg-white/5 hover:bg-white/10"
+                            >
+                              {mediaIsLoading
+                                ? "Loading..."
+                                : "Load More Photos"}
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <EmptySectionState
+                        icon={ImageIcon}
+                        title="No photos yet"
+                        description="Add photos to show your vibe and past events"
+                        actionLabel="Add Photos"
+                        actionHref={editHref}
                       />
-                    ))}
-                  </div>
-                ) : MEDIA.length > 0 ? (
-                  <>
-                    <MediaGalleryLightbox photos={MEDIA} className="mb-3" />
-                    {mediaHasNextPage && (
-                      <div className="flex justify-center pt-4">
-                        <Button
-                          onClick={loadMoreMedia}
-                          disabled={mediaIsLoading}
-                          variant="outline"
-                          className="border-white/10 bg-white/5 hover:bg-white/10"
-                        >
-                          {mediaIsLoading ? "Loading..." : "Load More Photos"}
-                        </Button>
-                      </div>
                     )}
                   </>
-                ) : (
-                  <EmptySectionState
-                    icon={ImageIcon}
-                    title="No photos yet"
-                    description="Add photos to show your vibe and past events"
-                    actionLabel="Add Photos"
-                    actionHref={editHref}
-                  />
+                )}
+
+                {mediaTab === "videos" && (
+                  <>
+                    {mediaIsLoading && videoMedia.length === 0 ? (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {[...Array(2)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="aspect-video animate-pulse rounded-lg bg-white/5"
+                          />
+                        ))}
+                      </div>
+                    ) : videoMedia.length > 0 ? (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {videoMedia.map((m) => (
+                          <MediaVideoModal
+                            key={m.id}
+                            videoUrl={m.videoUrl}
+                            thumbnail={
+                              getVideoThumbnailUrl(m.videoUrl) || m.url
+                            }
+                            title={m.title || "Video"}
+                            mediaId={m.id}
+                          >
+                            <div className="hover:ring-h_red/40 group relative aspect-video cursor-pointer overflow-hidden rounded-lg ring-1 ring-white/5 transition-all">
+                              <Image
+                                src={getVideoThumbnailUrl(m.videoUrl) || m.url}
+                                alt="video"
+                                fill
+                                className="object-cover opacity-60 transition-transform duration-300 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="flex size-12 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors group-hover:bg-black/70">
+                                  <Play className="ml-0.5 h-4 w-4 text-white" />
+                                </div>
+                              </div>
+                              <div className="absolute right-3 bottom-3 rounded-full bg-black/60 px-2 py-1 text-xs text-gray-300">
+                                {formatPlays(m.views ?? 0)} views
+                              </div>
+                            </div>
+                          </MediaVideoModal>
+                        ))}
+                      </div>
+                    ) : (
+                      <EmptySectionState
+                        icon={Video}
+                        title="No videos yet"
+                        description="Free plan includes up to 2 video uploads"
+                        actionLabel="Add Video"
+                        actionHref={editHref}
+                      />
+                    )}
+                  </>
+                )}
+
+                {mediaTab === "mixes" && (
+                  <div className="flex flex-col gap-3">
+                    {hasMixesTab ? (
+                      MIXES.filter((m: any) => m.audioUrl).map(
+                        (mix: any, i: number) => (
+                          <MixPlayer key={mix.id || mix.title || i} mix={mix} />
+                        ),
+                      )
+                    ) : (
+                      <EmptySectionState
+                        icon={Music}
+                        title="No mixes yet"
+                        description="Free plan includes up to 2 audio uploads"
+                        actionLabel="Add Mix"
+                        actionHref={editHref}
+                      />
+                    )}
+                  </div>
                 )}
               </section>
             )}
 
-            {(hasPhotos || isOwner) && <Separator className="bg-white/8" />}
+            {(hasPhotos || hasVideos || hasMixesTab || isOwner) && (
+              <Separator className="bg-white/8" />
+            )}
 
-            {/* ── EVENTS MODULE ── */}
-            <div id="events">
-              <DjEventsModule
-                events={EVENTS}
-                calendarDays={[]}
-                calendarLabel="Calendar"
-                isOwner={isOwner}
-                djName={safeDJ.stageName}
-                featuredPerformanceUrl={djData?.featuredPerformanceUrl}
-                featuredPerformanceContext={djData?.featuredPerformanceContext}
-                featuredPerformanceThumbnailUrl={
-                  djData?.featuredPerformanceThumbnailUrl
-                }
-                showCalendar={false}
-              />
-            </div>
-
-            <Separator className="bg-white/8" />
-
-            {/* ── WHERE I'VE PLAYED ── */}
-            <div ref={venuesTargetRef}>
-              <WhereIvePlayed
-                venues={
-                  venuesHasLoaded && lazyVenues.length > 0
-                    ? lazyVenues.map((v) => ({
-                        id: v.id,
-                        venueName: v.venueName,
-                        eventDate: v.eventDate,
-                        description: v.description,
-                        city: { name: v.cityName },
-                        country: { name: v.countryName },
-                        latitude: v.latitude,
-                        longitude: v.longitude,
-                      }))
-                    : (djData?.venuesPlayed || []).map((v) => ({
-                        id: v.id || 0,
-                        venueName: v.venue,
-                        eventDate: v.date || null,
-                        description: v.description || null,
-                        city: { name: v.city },
-                        country: { name: v.country },
-                        latitude: v.latitude,
-                        longitude: v.longitude,
-                      }))
-                }
-                isOwner={isOwner}
-              />
-            </div>
-
-            <Separator className="bg-white/8" />
-
-            {(REVIEWS.length > 0 || isOwner) && (
-              <section>
-                <SectionHeading sub="What people say about this DJ">
-                  Reviews
-                </SectionHeading>
-                {ratingsIsLoading ? (
-                  <div className="space-y-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex gap-4 rounded-lg bg-white/5 p-4"
+            <section id="reviews">
+              <SectionHeading sub="What people say about this DJ">
+                Reviews
+              </SectionHeading>
+              {ratingsIsLoading ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex gap-4 rounded-lg bg-white/5 p-4"
+                    >
+                      <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
+                        <div className="h-3 w-full animate-pulse rounded bg-white/5" />
+                        <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : REVIEWS.length > 0 ? (
+                <>
+                  <ProfileReviews
+                    avgRating={fetchedAvgRating || safeDJ.avgRating}
+                    ratingCount={ratingsTotalCount || safeDJ.ratingCount}
+                    reviews={REVIEWS}
+                  />
+                  {ratingsHasNextPage && (
+                    <div className="flex justify-center pt-4">
+                      <Button
+                        onClick={loadMoreRatings}
+                        disabled={ratingsIsLoading}
+                        variant="outline"
+                        className="border-white/10 bg-white/5 hover:bg-white/10"
                       >
-                        <div className="h-12 w-12 animate-pulse rounded-full bg-white/10" />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 w-1/3 animate-pulse rounded bg-white/10" />
-                          <div className="h-3 w-full animate-pulse rounded bg-white/5" />
-                          <div className="h-3 w-2/3 animate-pulse rounded bg-white/5" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : REVIEWS.length > 0 ? (
-                  <>
-                    <ProfileReviews
-                      avgRating={fetchedAvgRating || safeDJ.avgRating}
-                      ratingCount={ratingsTotalCount || safeDJ.ratingCount}
-                      reviews={REVIEWS}
-                    />
-                    {ratingsHasNextPage && (
-                      <div className="flex justify-center pt-4">
-                        <Button
-                          onClick={loadMoreRatings}
-                          disabled={ratingsIsLoading}
-                          variant="outline"
-                          className="border-white/10 bg-white/5 hover:bg-white/10"
-                        >
-                          {ratingsIsLoading
-                            ? "Loading..."
-                            : "Load More Reviews"}
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <EmptySectionState
-                    icon={Star}
-                    title="No reviews yet"
-                    description="Reviews build trust and help you get more bookings"
-                    actionLabel="Request Reviews"
-                    actionHref={editHref}
-                  />
-                )}
-              </section>
-            )}
+                        {ratingsIsLoading ? "Loading..." : "Load More Reviews"}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <EmptySectionState
+                  icon={Star}
+                  title="No reviews yet"
+                  description="Reviews build trust and help you get more bookings"
+                  actionLabel={isOwner ? "Request Reviews" : undefined}
+                  actionHref={isOwner ? editHref : undefined}
+                />
+              )}
+            </section>
 
             {/* ── LOCKED PREMIUM TEASERS (DJ owner only) ── */}
             <OwnerOnlySection viewMode={viewMode}>
@@ -785,6 +867,11 @@ export default function DjProfileFree({
                         icon: Star,
                       },
                       {
+                        title: "Where I've Played",
+                        desc: "Interactive map of your past venues & locations",
+                        icon: MapPin,
+                      },
+                      {
                         title: "Press & Media",
                         desc: "Link your features, interviews & podcasts",
                         icon: Newspaper,
@@ -817,15 +904,6 @@ export default function DjProfileFree({
 
           {/* ── SIDEBAR ── */}
           <aside className="sticky top-28 hidden h-fit flex-col gap-5 lg:flex">
-            {/* Events — desktop only; mobile version is inline above */}
-            <div className="hidden lg:block">
-              <ProfileEventsSidebar
-                events={EVENTS}
-                isOwner={isOwner}
-                djName={safeDJ.stageName}
-              />
-            </div>
-
             {/* Book CTA — desktop only; mobile version is inline above */}
             <BookCTA
               stageName={`Dj. ${safeDJ.stageName}`}
@@ -835,6 +913,37 @@ export default function DjProfileFree({
               layout="desktop"
               bookingOptions={finalBookingOptions}
             />
+
+            {/* Trust & Social Proof Strip */}
+            <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
+                    <Zap className="h-4 w-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-white">
+                      Response Rate
+                    </p>
+                    <p className="text-[11px] text-gray-500">
+                      Typically replies within 24h
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-white">Fast</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Events — desktop only; mobile version is inline above */}
+            <div className="hidden lg:block">
+              <ProfileEventsSidebar
+                events={EVENTS}
+                isOwner={isOwner}
+                djName={safeDJ.stageName}
+              />
+            </div>
 
             {isOwner && (
               <>
