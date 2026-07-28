@@ -1521,7 +1521,7 @@ export default function DjProfilePremium({
               <SectionHeading sub="What people say about this DJ">
                 Reviews
               </SectionHeading>
-              {ratingsIsLoading ? (
+              {ratingsIsLoading && REVIEWS.length === 0 ? (
                 <div className="space-y-4">
                   {[...Array(3)].map((_, i) => (
                     <div
@@ -1541,7 +1541,7 @@ export default function DjProfilePremium({
                 <>
                   <ProfileReviews
                     avgRating={fetchedAvgRating || safeDJ.avgRating}
-                    ratingCount={ratingsTotalCount || safeDJ.ratingCount}
+                    ratingCount={REVIEWS.length}
                     reviews={REVIEWS}
                   />
                   {/* Load More button for reviews */}
@@ -1681,15 +1681,13 @@ export default function DjProfilePremium({
                     <p className="text-[11px] text-gray-500">
                       {safeDJ.responseRate > 0
                         ? `${safeDJ.responseRate}% response rate`
-                        : "Typically replies within 24h"}
+                        : "Not available"}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-white">
-                    {safeDJ.responseRate > 0
-                      ? `${safeDJ.responseRate}%`
-                      : "Fast"}
+                    {safeDJ.responseRate > 0 ? `${safeDJ.responseRate}%` : "—"}
                   </p>
                 </div>
               </div>

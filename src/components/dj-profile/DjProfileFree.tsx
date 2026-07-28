@@ -682,9 +682,13 @@ export default function DjProfileFree({
                       <EmptySectionState
                         icon={ImageIcon}
                         title="No photos yet"
-                        description="Add photos to show your vibe and past events"
-                        actionLabel="Add Photos"
-                        actionHref={editHref}
+                        description={
+                          isOwner
+                            ? "Add photos to show your vibe and past events"
+                            : "No photos have been shared yet"
+                        }
+                        actionLabel={isOwner ? "Add Photos" : undefined}
+                        actionHref={isOwner ? editHref : undefined}
                       />
                     )}
                   </>
@@ -736,9 +740,13 @@ export default function DjProfileFree({
                       <EmptySectionState
                         icon={Video}
                         title="No videos yet"
-                        description="Free plan includes up to 2 video uploads"
-                        actionLabel="Add Video"
-                        actionHref={editHref}
+                        description={
+                          isOwner
+                            ? "Free plan includes up to 2 video uploads"
+                            : "No videos have been shared yet"
+                        }
+                        actionLabel={isOwner ? "Add Video" : undefined}
+                        actionHref={isOwner ? editHref : undefined}
                       />
                     )}
                   </>
@@ -756,9 +764,13 @@ export default function DjProfileFree({
                       <EmptySectionState
                         icon={Music}
                         title="No mixes yet"
-                        description="Free plan includes up to 2 audio uploads"
-                        actionLabel="Add Mix"
-                        actionHref={editHref}
+                        description={
+                          isOwner
+                            ? "Free plan includes up to 2 audio uploads"
+                            : "No mixes have been shared yet"
+                        }
+                        actionLabel={isOwner ? "Add Mix" : undefined}
+                        actionHref={isOwner ? editHref : undefined}
                       />
                     )}
                   </div>
@@ -794,7 +806,7 @@ export default function DjProfileFree({
                 <>
                   <ProfileReviews
                     avgRating={fetchedAvgRating || safeDJ.avgRating}
-                    ratingCount={ratingsTotalCount || safeDJ.ratingCount}
+                    ratingCount={REVIEWS.length}
                     reviews={REVIEWS}
                   />
                   {ratingsHasNextPage && (
@@ -913,28 +925,6 @@ export default function DjProfileFree({
               layout="desktop"
               bookingOptions={finalBookingOptions}
             />
-
-            {/* Trust & Social Proof Strip */}
-            <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
-                    <Zap className="h-4 w-4 text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-white">
-                      Response Rate
-                    </p>
-                    <p className="text-[11px] text-gray-500">
-                      Typically replies within 24h
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-white">Fast</p>
-                </div>
-              </div>
-            </Card>
 
             {/* Events — desktop only; mobile version is inline above */}
             <div className="hidden lg:block">
