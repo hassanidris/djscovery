@@ -25,6 +25,7 @@ import { ReputationBadge } from "./ReputationBadge";
 import { ScoreBreakdown } from "./ScoreBreakdown";
 import SaveDjButton from "./FollowDjButton";
 import { ShareButton } from "./ShareButton";
+import { ReportButton } from "@/components/reporting/ReportButton";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 
 type HeroVariant = "free" | "premium";
@@ -243,6 +244,13 @@ function DjProfileHero({
               </>
             )}
             <ShareButton />
+            {viewMode === "fan" && (
+              <ReportButton
+                targetType="DJ_PROFILE"
+                targetId={String(djProfileId)}
+                className="text-gray-400 shadow-lg hover:text-white"
+              />
+            )}
           </div>
         </div>
 

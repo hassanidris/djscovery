@@ -71,12 +71,12 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "jarmybsjvztwrmsdcnje.supabase.co",
-        pathname: "/storage/v1/object/public/djscovery-media/**",
+        pathname: "/storage/v1/object/public/**",
       },
       {
         protocol: "https",
         hostname: "unrqebwfdfumpjgvavbk.supabase.co",
-        pathname: "/storage/v1/object/public/djscovery-media/**",
+        pathname: "/storage/v1/object/public/**",
       },
       { protocol: "https", hostname: "*.tiktokcdn.com" },
       { protocol: "https", hostname: "*.tiktokcdn-eu.com" },
