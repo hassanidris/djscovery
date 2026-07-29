@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ViewMode } from "@/types/dj-demo";
 import type { BookingViewerContext } from "@/types/booking";
 
@@ -27,15 +27,18 @@ export function useViewerContext(slug?: string): ViewerContextResult {
   const [viewerContext, setViewerContext] =
     useState<BookingViewerContext>(DEFAULT_CONTEXT);
   const [isLoading, setIsLoading] = useState(!!slug);
+  const prevSlugRef = useRef(slug);
 
   useEffect(() => {
-    if (!slug) {
-      setIsLoading(false);
-      return;
+    if (!slug) return;
+
+    // Only set loading to true if slug changed (not on initial mount)
+    if (slug !== prevSlugRef.current) {
+      setIsLoading(true);
     }
+    prevSlugRef.current = slug;
 
     let cancelled = false;
-    setIsLoading(true);
 
     fetch(`/api/djs/${slug}/viewer-context`)
       .then((res) => (res.ok ? res.json() : null))
