@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 86400; // Cache for 24 hours
+
 export default function ComingSoonPage() {
   return (
     <ComingSoonShell>

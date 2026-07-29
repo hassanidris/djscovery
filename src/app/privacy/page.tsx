@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     "Learn how DJcovery collects, uses, and protects your personal information.",
 };
 
+export const revalidate = 86400; // Cache for 24 hours
+
 const toc = [
   { id: "introduction", label: "Introduction" },
   { id: "information-we-collect", label: "Information We Collect" },

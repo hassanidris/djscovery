@@ -20,6 +20,8 @@ import { getProfileStats } from "@/lib/actions/dj-analytics";
 import { batchGeocodeVenues } from "@/lib/actions/geocoding";
 import JsonLd from "@/components/seo/JsonLd";
 
+export const revalidate = 3600; // Cache for 1 hour
+
 export default async function DjProfilePage({
   params,
 }: {
