@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
+import { ReportButton } from "@/components/reporting/ReportButton";
 
 type Props = {
   audioUrl: string;
@@ -101,13 +102,24 @@ export default function MediaAudioPlayer({
                   {title}
                 </p>
               </div>
-              <button
-                onClick={() => setOpen(false)}
-                aria-label="Close audio player"
-                className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                {mediaId && (
+                  <ReportButton
+                    targetType="MEDIA"
+                    targetId={String(mediaId)}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-400 hover:text-white"
+                  />
+                )}
+                <button
+                  onClick={() => setOpen(false)}
+                  aria-label="Close audio player"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             <div className="p-4">

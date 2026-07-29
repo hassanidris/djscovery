@@ -18,6 +18,7 @@ import { GigReviewForm } from "@/components/reputation/GigReviewForm";
 import { Button } from "@/components/ui/button";
 import { formatDuration } from "@/lib/utils/duration";
 import { formatNumber } from "@/lib/utils/currency";
+import { ReportButton } from "@/components/reporting/ReportButton";
 
 export async function generateMetadata({
   params,
@@ -148,11 +149,22 @@ export default async function GigDetailPage({
 
         {/* Title + badges */}
         <div className="mb-6">
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <GigStatusBadge status={gig.status} />
-            <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
-              {typeLabel}
-            </span>
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <GigStatusBadge status={gig.status} />
+              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
+                {typeLabel}
+              </span>
+            </div>
+            {!isOrganizer && !isAcceptedDj && (
+              <ReportButton
+                targetType="GIG"
+                targetId={String(gig.id)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              />
+            )}
           </div>
           <h1 className="text-2xl font-bold text-white">{gig.title}</h1>
         </div>

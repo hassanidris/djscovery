@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ReportButton } from "@/components/reporting/ReportButton";
 
 type Photo = { id: number; url: string };
 
@@ -34,13 +35,13 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
             key={m.id}
             onClick={() => open(i)}
             aria-label={`Open photo ${i + 1}`}
-            className="relative aspect-square rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-h_red/40 transition-all cursor-pointer group"
+            className="hover:ring-h_red/40 group relative aspect-square cursor-pointer overflow-hidden rounded-lg ring-1 ring-white/5 transition-all"
           >
             <Image
               src={m.url}
               alt="DJ photo"
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </button>
         ))}
@@ -51,28 +52,40 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
           onClick={close}
         >
-          <button
-            onClick={close}
-            aria-label="Close lightbox"
-            className="absolute top-4 right-4 size-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
+          <div
+            className="absolute top-4 right-4 z-10 flex items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="w-5 h-5" />
-          </button>
+            <ReportButton
+              targetType="MEDIA"
+              targetId={String(photos[index].id)}
+              variant="ghost"
+              size="icon"
+              className="size-10 text-gray-400 hover:text-white"
+            />
+            <button
+              onClick={close}
+              aria-label="Close lightbox"
+              className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
 
-          <p className="absolute top-5 left-1/2 -translate-x-1/2 text-gray-400 text-sm select-none">
+          <p className="absolute top-5 left-1/2 -translate-x-1/2 text-sm text-gray-400 select-none">
             {index + 1} / {photos.length}
           </p>
 
           <button
             onClick={prev}
             aria-label="Previous photo"
-            className="absolute left-3 sm:left-6 size-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10"
+            className="absolute left-3 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 sm:left-6"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
 
           <div
-            className="relative w-full max-w-4xl mx-16 max-h-[85vh] aspect-4/3"
+            className="relative mx-16 aspect-4/3 max-h-[85vh] w-full max-w-4xl"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -87,9 +100,9 @@ export default function MediaGalleryLightbox({ photos, className }: Props) {
           <button
             onClick={next}
             aria-label="Next photo"
-            className="absolute right-3 sm:right-6 size-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10"
+            className="absolute right-3 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 sm:right-6"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
       )}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { X, Play } from "lucide-react";
+import { ReportButton } from "@/components/reporting/ReportButton";
 
 type VideoProvider =
   "youtube" | "vimeo" | "tiktok" | "instagram" | "facebook" | "unknown";
@@ -214,12 +215,26 @@ export default function MediaVideoModal({
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4"
           onClick={() => setOpen(false)}
         >
-          <button
-            onClick={() => setOpen(false)}
-            className="absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+          <div
+            className="absolute top-4 right-4 z-10 flex items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="h-5 w-5" />
-          </button>
+            {mediaId && (
+              <ReportButton
+                targetType="MEDIA"
+                targetId={String(mediaId)}
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 text-gray-400 hover:text-white"
+              />
+            )}
+            <button
+              onClick={() => setOpen(false)}
+              className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
 
           <div
             className="w-full max-w-4xl"

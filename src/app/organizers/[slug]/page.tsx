@@ -11,6 +11,7 @@ import {
   CalendarDays,
   ExternalLink,
 } from "lucide-react";
+import { ReportButton } from "@/components/reporting/ReportButton";
 
 // ISR: revalidate every 60 seconds
 export const revalidate = 60;
@@ -239,39 +240,44 @@ export default async function OrganizerPublicProfilePage({
             </div>
 
             {/* Social links + website */}
-            {(profile.website || profile.socialLinks.length > 0) && (
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                {profile.website && safeHref(profile.website) && (
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {profile.website && safeHref(profile.website) && (
+                <a
+                  href={safeHref(profile.website)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-300 transition-colors hover:border-white/25 hover:text-white"
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  Website
+                  <ExternalLink className="h-3 w-3 opacity-60" />
+                </a>
+              )}
+              {profile.socialLinks.map((link) => {
+                const href = safeHref(link.url);
+                if (!href) return null;
+                return (
                   <a
-                    href={safeHref(profile.website)!}
+                    key={link.platform}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-300 transition-colors hover:border-white/25 hover:text-white"
+                    title={link.platform}
+                    className="rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-400 transition-colors hover:border-white/25 hover:text-white"
                   >
-                    <Globe className="h-3.5 w-3.5" />
-                    Website
-                    <ExternalLink className="h-3 w-3 opacity-60" />
+                    {SOCIAL_ICONS[link.platform] ?? "🔗"}{" "}
+                    <span className="capitalize">{link.platform}</span>
                   </a>
-                )}
-                {profile.socialLinks.map((link) => {
-                  const href = safeHref(link.url);
-                  if (!href) return null;
-                  return (
-                    <a
-                      key={link.platform}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={link.platform}
-                      className="rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-400 transition-colors hover:border-white/25 hover:text-white"
-                    >
-                      {SOCIAL_ICONS[link.platform] ?? "🔗"}{" "}
-                      <span className="capitalize">{link.platform}</span>
-                    </a>
-                  );
-                })}
-              </div>
-            )}
+                );
+              })}
+              <ReportButton
+                targetType="ORGANIZER_PROFILE"
+                targetId={String(profile.id)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              />
+            </div>
           </div>
         </div>
 

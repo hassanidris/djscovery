@@ -208,12 +208,19 @@ export type AdminReport = {
   id: number;
   targetType: string;
   targetId: string;
+  targetSlug: string | null;
   reason: string;
   description: string | null;
   status: string;
   adminNote: string | null;
   createdAt: Date;
-  reporter: { username: string; name: string | null; image: string | null };
+  reporter: {
+    username: string;
+    name: string | null;
+    image: string | null;
+    djProfile: { slug: string; stageName: string } | null;
+    organizerProfile: { slug: string; displayName: string } | null;
+  };
   reviewedBy: { username: string } | null;
 };
 
@@ -245,20 +252,13 @@ export async function getAdminReports({
       ...(status
         ? {
             status: status as
-              | "OPEN"
-              | "UNDER_REVIEW"
-              | "RESOLVED"
-              | "DISMISSED",
+              "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED",
           }
         : {}),
       ...(targetType
         ? {
             targetType: targetType as
-              | "DJ_PROFILE"
-              | "ORGANIZER_PROFILE"
-              | "GIG"
-              | "REVIEW"
-              | "MEDIA",
+              "DJ_PROFILE" | "ORGANIZER_PROFILE" | "GIG" | "REVIEW" | "MEDIA",
           }
         : {}),
     },
@@ -272,7 +272,16 @@ export async function getAdminReports({
       status: true,
       adminNote: true,
       createdAt: true,
-      reporter: { select: { username: true, name: true, image: true } },
+      reporter: {
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          image: true,
+          djProfile: { select: { slug: true, stageName: true } },
+          organizerProfile: { select: { slug: true, displayName: true } },
+        },
+      },
       reviewedBy: { select: { username: true } },
     },
   });
@@ -280,8 +289,55 @@ export async function getAdminReports({
   const hasNextPage = reports.length > take;
   if (hasNextPage) reports.pop();
 
+  // Fetch target slugs for each report
+  const reportsWithSlugs = await Promise.all(
+    reports.map(async (report) => {
+      let targetSlug: string | null = null;
+
+      switch (report.targetType) {
+        case "DJ_PROFILE":
+          const djProfile = await prisma.djProfile.findUnique({
+            where: { id: Number(report.targetId) },
+            select: { slug: true },
+          });
+          targetSlug = djProfile?.slug ?? null;
+          break;
+        case "ORGANIZER_PROFILE":
+          const orgProfile = await prisma.organizerProfile.findUnique({
+            where: { id: Number(report.targetId) },
+            select: { slug: true },
+          });
+          targetSlug = orgProfile?.slug ?? null;
+          break;
+        case "GIG":
+          const gig = await prisma.gig.findUnique({
+            where: { id: Number(report.targetId) },
+            select: { slug: true },
+          });
+          targetSlug = gig?.slug ?? null;
+          break;
+        case "REVIEW":
+          const gigReview = await prisma.gigReview.findUnique({
+            where: { id: Number(report.targetId) },
+            select: { djProfile: { select: { slug: true } } },
+          });
+          targetSlug = gigReview?.djProfile?.slug ?? null;
+          break;
+        case "MEDIA":
+          const media = await prisma.media.findUnique({
+            where: { id: Number(report.targetId) },
+            select: { djProfile: { select: { slug: true } } },
+          });
+          targetSlug = media?.djProfile?.slug ?? null;
+          break;
+      }
+
+      return { ...report, targetSlug };
+    }),
+  );
+
   return {
-    reports,
+    reports: reportsWithSlugs,
     nextCursor: hasNextPage ? (reports[reports.length - 1]?.id ?? null) : null,
   };
 }
