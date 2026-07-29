@@ -15,6 +15,7 @@ import HomeFaqSection from "@/components/home/HomeFaqSection";
 import {
   HomeDJsTabsSkeleton,
   HomeGigsSectionSkeleton,
+  HomeFeaturedDJsSkeleton,
 } from "@/components/ui/skeletons";
 
 export const revalidate = 120; // Cache for 2 minutes
@@ -42,10 +43,14 @@ const Homepage = async () => {
       <Hero />
 
       {/* Featured DJs */}
-      <HomeFeaturedDJs />
+      <Suspense fallback={<HomeFeaturedDJsSkeleton />}>
+        <HomeFeaturedDJs />
+      </Suspense>
 
       {/* Trending DJs */}
-      <HomeTrendingDJs />
+      <Suspense fallback={<HomeFeaturedDJsSkeleton />}>
+        <HomeTrendingDJs />
+      </Suspense>
 
       {/* DJ rows with tabs — streams independently */}
       <Suspense fallback={<HomeDJsTabsSkeleton />}>

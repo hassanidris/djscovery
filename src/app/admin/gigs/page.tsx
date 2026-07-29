@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   getAdminGigs,
@@ -11,6 +12,7 @@ import AdminActionButton from "@/components/admin/AdminActionButton";
 import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import AdminPagination from "@/components/admin/AdminPagination";
 import AdminFilters from "@/components/admin/AdminFilters";
+import AdminTableSkeleton from "@/components/admin/AdminTableSkeleton";
 import { formatDistanceToNow, format } from "date-fns";
 import { EyeOff, Users } from "lucide-react";
 
@@ -94,144 +96,146 @@ export default async function AdminGigsPage({
         ]}
       />
 
-      {gigs.length === 0 ? (
-        <AdminEmptyState
-          title="No gigs found"
-          description="Try adjusting your filters."
-        />
-      ) : (
-        <>
-          <div className="overflow-hidden rounded-xl border border-white/8">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-160 text-sm">
-                <thead>
-                  <tr className="border-b border-white/8 bg-white/2">
-                    <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Gig
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Organizer
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Location
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Event Date
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Applicants
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-400">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-gray-400">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {gigs.map((gig) => (
-                    <tr
-                      key={gig.id}
-                      className="transition-colors hover:bg-white/2"
-                    >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          {gig.hidden && (
-                            <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                          )}
-                          <div>
-                            <Link
-                              href={`/gigs/${gig.slug}`}
-                              className="font-medium text-white hover:underline"
-                              target="_blank"
-                            >
-                              {gig.title}
-                            </Link>
-                            <p className="text-muted-foreground text-xs">
-                              {gig.gigType.replace("_", " ")}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/organizers/${gig.organizerProfile.slug}`}
-                          className="text-xs text-gray-300 hover:text-white hover:underline"
-                          target="_blank"
-                        >
-                          {gig.organizerProfile.displayName}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-300">
-                        {[gig.city?.name, gig.country?.name]
-                          .filter(Boolean)
-                          .join(", ") || "—"}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-300">
-                        {format(new Date(gig.eventDate), "dd MMM yyyy")}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="flex items-center gap-1 text-xs text-gray-300">
-                          <Users className="h-3 w-3" />
-                          {gig._count.applications}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          className={`border text-xs ${STATUS_COLORS[gig.status] ?? ""}`}
-                        >
-                          {gig.status}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-1">
-                          {gig.hidden ? (
-                            <AdminActionButton
-                              label="Unhide"
-                              description={`Make "${gig.title}" visible again?`}
-                              confirmLabel="Unhide"
-                              fields={{ gigId: String(gig.id) }}
-                              action={unhideGig}
-                              successMessage="Gig is now visible"
-                              requireConfirm={false}
-                            />
-                          ) : (
-                            <AdminActionButton
-                              label="Hide"
-                              description={`Hide "${gig.title}" from public listings?`}
-                              confirmLabel="Hide"
-                              fields={{ gigId: String(gig.id) }}
-                              action={hideGig}
-                              successMessage="Gig hidden"
-                            />
-                          )}
-                          {gig.status !== "CANCELLED" && (
-                            <AdminActionButton
-                              label="Close"
-                              description={`Close "${gig.title}"? Status will be set to Cancelled.`}
-                              confirmLabel="Close Gig"
-                              fields={{ gigId: String(gig.id) }}
-                              action={closeGig}
-                              successMessage="Gig closed"
-                              variant="outline"
-                              className="border-red-500/30 text-red-400 hover:bg-red-500/10"
-                            />
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <AdminPagination
-            nextCursor={nextCursor ? String(nextCursor) : null}
-            hasPrev={!!cursor}
+      <Suspense fallback={<AdminTableSkeleton cols={7} rows={8} />}>
+        {gigs.length === 0 ? (
+          <AdminEmptyState
+            title="No gigs found"
+            description="Try adjusting your filters."
           />
-        </>
-      )}
+        ) : (
+          <>
+            <div className="overflow-hidden rounded-xl border border-white/8">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-160 text-sm">
+                  <thead>
+                    <tr className="border-b border-white/8 bg-white/2">
+                      <th className="px-4 py-3 text-left font-medium text-gray-400">
+                        Gig
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-400">
+                        Organizer
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-400">
+                        Location
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-400">
+                        Event Date
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-400">
+                        Applicants
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-400">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-400">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {gigs.map((gig) => (
+                      <tr
+                        key={gig.id}
+                        className="transition-colors hover:bg-white/2"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            {gig.hidden && (
+                              <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                            )}
+                            <div>
+                              <Link
+                                href={`/gigs/${gig.slug}`}
+                                className="font-medium text-white hover:underline"
+                                target="_blank"
+                              >
+                                {gig.title}
+                              </Link>
+                              <p className="text-muted-foreground text-xs">
+                                {gig.gigType.replace("_", " ")}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link
+                            href={`/organizers/${gig.organizerProfile.slug}`}
+                            className="text-xs text-gray-300 hover:text-white hover:underline"
+                            target="_blank"
+                          >
+                            {gig.organizerProfile.displayName}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-300">
+                          {[gig.city?.name, gig.country?.name]
+                            .filter(Boolean)
+                            .join(", ") || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-300">
+                          {format(new Date(gig.eventDate), "dd MMM yyyy")}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="flex items-center gap-1 text-xs text-gray-300">
+                            <Users className="h-3 w-3" />
+                            {gig._count.applications}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge
+                            className={`border text-xs ${STATUS_COLORS[gig.status] ?? ""}`}
+                          >
+                            {gig.status}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-1">
+                            {gig.hidden ? (
+                              <AdminActionButton
+                                label="Unhide"
+                                description={`Make "${gig.title}" visible again?`}
+                                confirmLabel="Unhide"
+                                fields={{ gigId: String(gig.id) }}
+                                action={unhideGig}
+                                successMessage="Gig is now visible"
+                                requireConfirm={false}
+                              />
+                            ) : (
+                              <AdminActionButton
+                                label="Hide"
+                                description={`Hide "${gig.title}" from public listings?`}
+                                confirmLabel="Hide"
+                                fields={{ gigId: String(gig.id) }}
+                                action={hideGig}
+                                successMessage="Gig hidden"
+                              />
+                            )}
+                            {gig.status !== "CANCELLED" && (
+                              <AdminActionButton
+                                label="Close"
+                                description={`Close "${gig.title}"? Status will be set to Cancelled.`}
+                                confirmLabel="Close Gig"
+                                fields={{ gigId: String(gig.id) }}
+                                action={closeGig}
+                                successMessage="Gig closed"
+                                variant="outline"
+                                className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                              />
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <AdminPagination
+              nextCursor={nextCursor ? String(nextCursor) : null}
+              hasPrev={!!cursor}
+            />
+          </>
+        )}
+      </Suspense>
     </div>
   );
 }

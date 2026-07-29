@@ -36,7 +36,7 @@ export async function getDashboardStats({
     openReports,
     newSignups,
     pendingDjApprovals,
-  ] = await prisma.$transaction([
+  ] = await Promise.all([
     prisma.user.count({ where: { deletedAt: null } }),
     prisma.djProfile.count({ where: { deletedAt: null, status: "APPROVED" } }),
     prisma.organizerProfile.count({
