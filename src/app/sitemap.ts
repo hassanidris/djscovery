@@ -4,6 +4,8 @@ import prisma from "@/lib/client";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djcovery.com";
 
+export const revalidate = 3600; // Cache for 1 hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!indexingEnabled) {
     return [];

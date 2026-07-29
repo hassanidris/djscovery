@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     "Learn about DJcovery — the professional platform connecting DJs with event organizers and music fans around the world.",
 };
 
+export const revalidate = 86400; // Cache for 24 hours
+
 const toc = [
   { id: "what-we-do", label: "What We Do" },
   { id: "why-we-built", label: "Why We Built DJcovery" },

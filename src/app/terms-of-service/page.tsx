@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     "Read the Terms of Service governing your access to and use of DJcovery.",
 };
 
+export const revalidate = 86400; // Cache for 24 hours
+
 const toc = [
   { id: "about", label: "About DJcovery" },
   { id: "eligibility", label: "Eligibility" },

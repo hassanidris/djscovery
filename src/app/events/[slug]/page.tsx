@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -12,16 +12,18 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import prisma from "@/lib/client";
-import { createClient } from "@/lib/supabase/server";
 import { getDemoEventBySlug } from "@/data/events-demo";
 import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
-import { EventReviewSection } from "@/components/reputation/EventReviewSection";
 import JsonLd from "@/components/seo/JsonLd";
-import AttendanceButton from "@/components/events/AttendanceButton";
 import { EventViewTracker } from "@/components/events/EventViewTracker";
-import { EventAnalytics } from "@/components/events/EventAnalytics";
-import { getEventAttendance } from "@/lib/actions/event-attendance";
+import {
+  EventViewerProvider,
+  EditEventLink,
+  AttendanceSlot,
+  PrivateVenueNote,
+  EventReviewSlot,
+} from "@/components/events/EventViewerContext";
 
 export const revalidate = 60;
 
@@ -74,10 +76,14 @@ export default async function EventDetailPage({
 }) {
   const { slug } = await params;
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // NOTE: This page is a static, ISR-cached shell (see `export const revalidate`
+  // above). It intentionally contains NO cookies()/auth reads so caching stays
+  // effective. Per-viewer state (ownership, attendance, review eligibility) is
+  // fetched client-side via EventViewerProvider -> /api/events/[slug]/viewer-context.
+  //
+  // As a result, DRAFT/ARCHIVED events are never publicly visible, even to
+  // their owner, via this URL. Owners manage/preview drafts through their
+  // event dashboard (/dj/events) instead.
 
   // ── DB lookup ────────────────────────────────────────────────────────────
   const dbEvent = await prisma.event.findFirst({
@@ -112,10 +118,6 @@ export default async function EventDetailPage({
           userId: true,
         },
       },
-      eventReviews: {
-        where: user ? { userId: user.id } : { userId: "" },
-        select: { djProfileId: true },
-      },
       country: { select: { name: true } },
       city: { select: { name: true } },
       participants: {
@@ -135,23 +137,11 @@ export default async function EventDetailPage({
 
   // ── Visibility guard for DB events ───────────────────────────────────────
   if (dbEvent) {
-    const isOwner = user ? dbEvent.ownerDj.userId === user.id : false;
-    const attendance = user
-      ? await prisma.eventAttendance.findUnique({
-          where: { eventId_userId: { eventId: dbEvent.id, userId: user.id } },
-        })
-      : null;
-    const hasAttended = attendance?.status === "ATTENDED";
-    const attendanceStatus = user
-      ? await getEventAttendance(dbEvent.id, user.id)
-      : { status: null };
-    const reviewedDjIds = dbEvent.eventReviews.map((r) => r.djProfileId);
-    const organizerProfile = user
-      ? await prisma.organizerProfile.findUnique({ where: { userId: user.id } })
-      : null;
-    const isOrganizer = Boolean(organizerProfile);
+    if (dbEvent.status === "DRAFT" || dbEvent.status === "ARCHIVED") {
+      notFound();
+    }
 
-    // Fetch attendance analytics
+    // Fetch attendance analytics (public aggregate counts, no auth needed)
     const [goingCount, interestedCount] = await Promise.all([
       prisma.eventAttendance.count({
         where: { eventId: dbEvent.id, status: "GOING" },
@@ -161,13 +151,7 @@ export default async function EventDetailPage({
       }),
     ]);
 
-    if (dbEvent.status === "DRAFT" || dbEvent.status === "ARCHIVED") {
-      if (isOwner) redirect(`/events/${dbEvent.slug}/edit`);
-      notFound();
-    }
-
     const isPrivate = dbEvent.eventType === "PRIVATE";
-    const showVenue = !isPrivate || isOwner;
     const location = [dbEvent.city?.name, dbEvent.country?.name]
       .filter(Boolean)
       .join(", ");
@@ -186,7 +170,7 @@ export default async function EventDetailPage({
         endTime={dbEvent.endTime}
         timezone={dbEvent.timezone}
         location={location}
-        venue={showVenue ? dbEvent.venue : null}
+        venue={isPrivate ? null : dbEvent.venue}
         isPrivate={isPrivate}
         description={dbEvent.description}
         ticketUrl={dbEvent.ticketUrl}
@@ -209,14 +193,7 @@ export default async function EventDetailPage({
           avatar: p.djProfile.avatar ?? null,
         }))}
         gallery={dbEvent.gallery}
-        isOwner={isOwner}
-        editHref={isOwner ? `/events/${dbEvent.slug}/edit` : null}
         eventId={dbEvent.id}
-        hasAttended={hasAttended}
-        reviewedDjIds={reviewedDjIds}
-        attendanceStatus={attendanceStatus.status}
-        user={user}
-        isOrganizer={isOrganizer}
         viewCount={dbEvent.viewCount ?? 0}
         goingCount={goingCount}
         interestedCount={interestedCount}
@@ -270,14 +247,7 @@ function EventDetailView(props: {
   ownerDj: DjMini;
   participants: (DjMini & { role: string | null })[];
   gallery: GalleryItem[];
-  isOwner: boolean;
-  editHref: string | null;
   eventId: number;
-  hasAttended: boolean;
-  reviewedDjIds: number[];
-  attendanceStatus: "GOING" | "INTERESTED" | null;
-  user: any;
-  isOrganizer: boolean;
   viewCount: number;
   goingCount: number;
   interestedCount: number;
@@ -306,14 +276,7 @@ function EventDetailView(props: {
     ownerDj,
     participants,
     gallery,
-    isOwner,
-    editHref,
     eventId,
-    hasAttended,
-    reviewedDjIds,
-    attendanceStatus,
-    user,
-    isOrganizer,
     viewCount,
     goingCount,
     interestedCount,
@@ -358,352 +321,349 @@ function EventDetailView(props: {
   };
 
   return (
-    <div className="min-h-screen bg-black pb-20">
-      <JsonLd data={jsonLd} />
-      <EventViewTracker eventId={eventId} />
-      {/* Top nav bar */}
-      <div className="sticky top-0 z-10 border-b border-zinc-800/60 bg-black/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
-          <Link
-            href="/events"
-            className="flex items-center gap-1.5 text-xs text-zinc-400 transition-colors hover:text-white"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Events
-          </Link>
-          {isOwner && editHref && (
+    <EventViewerProvider eventId={eventId}>
+      <div className="min-h-screen bg-black pb-20">
+        <JsonLd data={jsonLd} />
+        <EventViewTracker eventId={eventId} />
+        {/* Top nav bar */}
+        <div className="sticky top-0 z-10 border-b border-zinc-800/60 bg-black/80 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
             <Link
-              href={editHref}
-              className="rounded-full border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+              href="/events"
+              className="flex items-center gap-1.5 text-xs text-zinc-400 transition-colors hover:text-white"
             >
-              Edit Event
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to Events
             </Link>
-          )}
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start">
-          {/* ── Left column: Poster ── */}
-          <div className="w-full shrink-0 md:sticky md:top-20 md:w-70 lg:w-80">
-            <div className="aspect-2/3 w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl">
-              {posterUrl ? (
-                <Image
-                  src={posterUrl}
-                  alt={title}
-                  width={320}
-                  height={480}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-linear-to-br from-zinc-800 via-zinc-900 to-black">
-                  <Music className="h-14 w-14 text-zinc-700" />
-                  <p className="text-xs text-zinc-600">No poster</p>
-                </div>
-              )}
-            </div>
+            <EditEventLink editHref={`/events/${slug}/edit`} />
           </div>
+        </div>
 
-          {/* ── Right column: Details ── */}
-          <div className="min-w-0 flex-1">
-            {/* Badge row */}
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? STATUS_STYLES.PUBLISHED}`}
-              >
-                {status === "COMPLETED"
-                  ? "Past Event"
-                  : isUpcoming
-                    ? "Upcoming"
-                    : status.charAt(0) + status.slice(1).toLowerCase()}
-              </span>
-              {isPrivate && (
-                <span className="flex items-center gap-1 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
-                  <Lock className="h-3 w-3" /> Private
-                </span>
-              )}
-              {category && (
-                <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-400">
-                  {CATEGORY_LABELS[category] ?? category}
-                </span>
-              )}
-            </div>
-
-            {/* Title */}
-            <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl">
-              {title}
-            </h1>
-
-            {/* DJ Attribution */}
-            <Link
-              href={`/djs/${ownerDj.slug}`}
-              className="mb-6 flex items-center gap-3"
-            >
-              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                {ownerDj.avatar ? (
+        <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
+          <div className="flex flex-col gap-8 md:flex-row md:items-start">
+            {/* ── Left column: Poster ── */}
+            <div className="w-full shrink-0 md:sticky md:top-20 md:w-70 lg:w-80">
+              <div className="aspect-2/3 w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl">
+                {posterUrl ? (
                   <Image
-                    src={ownerDj.avatar}
-                    alt={ownerDj.stageName}
-                    width={40}
-                    height={40}
+                    src={posterUrl}
+                    alt={title}
+                    width={320}
+                    height={480}
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
-                    {ownerDj.stageName.charAt(0).toUpperCase()}
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-linear-to-br from-zinc-800 via-zinc-900 to-black">
+                    <Music className="h-14 w-14 text-zinc-700" />
+                    <p className="text-xs text-zinc-600">No poster</p>
                   </div>
                 )}
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-white">
-                  DJ. {ownerDj.stageName}
-                </p>
-                <p className="text-xs text-zinc-500">Organizer</p>
-              </div>
-            </Link>
-
-            {/* Stats Card Grid */}
-            <div className="mb-8 grid grid-cols-3 gap-3">
-              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
-                <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
-                  Views
-                </p>
-                <p className="mt-1 text-xl font-bold text-white">
-                  {viewCount > 0 ? viewCount.toLocaleString() : "—"}
-                </p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
-                <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
-                  Going
-                </p>
-                <p className="mt-1 text-xl font-bold text-white">
-                  {goingCount > 0 ? goingCount.toLocaleString() : "—"}
-                </p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
-                <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
-                  Interested
-                </p>
-                <p className="mt-1 text-xl font-bold text-white">
-                  {interestedCount > 0 ? interestedCount.toLocaleString() : "—"}
-                </p>
-              </div>
             </div>
 
-            {/* Attendance Button — only for authenticated users */}
-            {user && (
-              <AttendanceButton
-                eventId={eventId}
-                currentStatus={attendanceStatus}
-                isUpcoming={isUpcoming}
-              />
-            )}
-
-            {/* Description - moved before metadata */}
-            {description && (
-              <div className="mt-10 mb-8">
-                <h2 className="mb-3 text-sm font-semibold text-white">About</h2>
-                <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
-                  {description}
-                </p>
+            {/* ── Right column: Details ── */}
+            <div className="min-w-0 flex-1">
+              {/* Badge row */}
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? STATUS_STYLES.PUBLISHED}`}
+                >
+                  {status === "COMPLETED"
+                    ? "Past Event"
+                    : isUpcoming
+                      ? "Upcoming"
+                      : status.charAt(0) + status.slice(1).toLowerCase()}
+                </span>
+                {isPrivate && (
+                  <span className="flex items-center gap-1 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
+                    <Lock className="h-3 w-3" /> Private
+                  </span>
+                )}
+                {category && (
+                  <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-400">
+                    {CATEGORY_LABELS[category] ?? category}
+                  </span>
+                )}
               </div>
-            )}
 
-            {/* Date/Time and Venue Cards - side by side */}
-            <div className="mb-8 grid gap-4 sm:grid-cols-2">
-              {/* Date/Time Card */}
-              <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-zinc-500" />
-                  <h3 className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
-                    Date & Time
-                  </h3>
-                </div>
-                <div className="space-y-1 text-sm text-zinc-300">
-                  <p>{formatDate(startDate)}</p>
-                  {endDate &&
-                    endDate.toDateString() !== startDate.toDateString() && (
-                      <p className="text-zinc-500">to {formatDate(endDate)}</p>
-                    )}
-                  {(startTime || endTime) && (
-                    <p className="mt-2">
-                      {startTime}
-                      {endTime ? ` – ${endTime}` : ""}
-                      {timezone && (
-                        <span className="ml-1 text-zinc-500">({timezone})</span>
-                      )}
-                    </p>
+              {/* Title */}
+              <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+                {title}
+              </h1>
+
+              {/* DJ Attribution */}
+              <Link
+                href={`/djs/${ownerDj.slug}`}
+                className="mb-6 flex items-center gap-3"
+              >
+                <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                  {ownerDj.avatar ? (
+                    <Image
+                      src={ownerDj.avatar}
+                      alt={ownerDj.stageName}
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
+                      {ownerDj.stageName.charAt(0).toUpperCase()}
+                    </div>
                   )}
                 </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-white">
+                    DJ. {ownerDj.stageName}
+                  </p>
+                  <p className="text-xs text-zinc-500">Organizer</p>
+                </div>
+              </Link>
+
+              {/* Stats Card Grid */}
+              <div className="mb-8 grid grid-cols-3 gap-3">
+                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                  <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                    Views
+                  </p>
+                  <p className="mt-1 text-xl font-bold text-white">
+                    {viewCount > 0 ? viewCount.toLocaleString() : "—"}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                  <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                    Going
+                  </p>
+                  <p className="mt-1 text-xl font-bold text-white">
+                    {goingCount > 0 ? goingCount.toLocaleString() : "—"}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                  <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                    Interested
+                  </p>
+                  <p className="mt-1 text-xl font-bold text-white">
+                    {interestedCount > 0
+                      ? interestedCount.toLocaleString()
+                      : "—"}
+                  </p>
+                </div>
               </div>
 
-              {/* Venue Card */}
-              {(location || venue || isPrivate) && (
+              {/* Attendance Button — only for authenticated users */}
+              <AttendanceSlot eventId={eventId} isUpcoming={isUpcoming} />
+
+              {/* Description - moved before metadata */}
+              {description && (
+                <div className="mt-10 mb-8">
+                  <h2 className="mb-3 text-sm font-semibold text-white">
+                    About
+                  </h2>
+                  <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
+                    {description}
+                  </p>
+                </div>
+              )}
+
+              {/* Date/Time and Venue Cards - side by side */}
+              <div className="mb-8 grid gap-4 sm:grid-cols-2">
+                {/* Date/Time Card */}
                 <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
                   <div className="mb-3 flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-zinc-500" />
+                    <CalendarDays className="h-4 w-4 text-zinc-500" />
                     <h3 className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
-                      Venue
+                      Date & Time
                     </h3>
                   </div>
                   <div className="space-y-1 text-sm text-zinc-300">
-                    {venue && <p>{venue}</p>}
-                    {location && (
-                      <p className={venue ? "text-zinc-500" : ""}>{location}</p>
-                    )}
-                    {isPrivate && !venue && (
-                      <p className="text-zinc-500">
-                        Venue hidden — private event
+                    <p>{formatDate(startDate)}</p>
+                    {endDate &&
+                      endDate.toDateString() !== startDate.toDateString() && (
+                        <p className="text-zinc-500">
+                          to {formatDate(endDate)}
+                        </p>
+                      )}
+                    {(startTime || endTime) && (
+                      <p className="mt-2">
+                        {startTime}
+                        {endTime ? ` – ${endTime}` : ""}
+                        {timezone && (
+                          <span className="ml-1 text-zinc-500">
+                            ({timezone})
+                          </span>
+                        )}
                       </p>
                     )}
                   </div>
                 </div>
+
+                {/* Venue Card */}
+                {(location || venue || isPrivate) && (
+                  <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
+                    <div className="mb-3 flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-zinc-500" />
+                      <h3 className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                        Venue
+                      </h3>
+                    </div>
+                    <div className="space-y-1 text-sm text-zinc-300">
+                      {isPrivate ? (
+                        <PrivateVenueNote publicLocation={location} />
+                      ) : (
+                        <>
+                          {venue && <p>{venue}</p>}
+                          {location && (
+                            <p className={venue ? "text-zinc-500" : ""}>
+                              {location}
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Genres - clean chips */}
+              {genres.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="mb-3 text-sm font-semibold text-white">
+                    Genres
+                  </h2>
+                  <div className="flex flex-wrap gap-1.5">
+                    {genres.map((g) => (
+                      <span
+                        key={g}
+                        className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-zinc-300"
+                      >
+                        {g}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               )}
-            </div>
 
-            {/* Genres - clean chips */}
-            {genres.length > 0 && (
-              <div className="mb-8">
-                <h2 className="mb-3 text-sm font-semibold text-white">
-                  Genres
-                </h2>
-                <div className="flex flex-wrap gap-1.5">
-                  {genres.map((g) => (
-                    <span
-                      key={g}
-                      className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-zinc-300"
-                    >
-                      {g}
-                    </span>
-                  ))}
+              {/* Performers */}
+              {allPerformers.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                    Line-up
+                  </h2>
+                  <div className="space-y-2">
+                    {allPerformers.map((dj) => (
+                      <Link
+                        key={dj.slug}
+                        href={`/djs/${dj.slug}`}
+                        className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 transition-colors hover:border-zinc-700"
+                      >
+                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                          {dj.avatar ? (
+                            <Image
+                              src={dj.avatar}
+                              alt={dj.stageName}
+                              width={40}
+                              height={40}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
+                              {dj.stageName.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-white">
+                            DJ. {dj.stageName}
+                          </p>
+                          {dj.role && (
+                            <p className="text-xs text-zinc-500">{dj.role}</p>
+                          )}
+                        </div>
+                        <ExternalLink className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Performers */}
-            {allPerformers.length > 0 && (
-              <div className="mb-8">
-                <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-                  Line-up
-                </h2>
-                <div className="space-y-2">
-                  {allPerformers.map((dj) => (
-                    <Link
-                      key={dj.slug}
-                      href={`/djs/${dj.slug}`}
-                      className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 transition-colors hover:border-zinc-700"
-                    >
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        {dj.avatar ? (
-                          <Image
-                            src={dj.avatar}
-                            alt={dj.stageName}
-                            width={40}
-                            height={40}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
-                            {dj.stageName.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-white">
-                          DJ. {dj.stageName}
-                        </p>
-                        {dj.role && (
-                          <p className="text-xs text-zinc-500">{dj.role}</p>
-                        )}
-                      </div>
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+              {/* Ticket CTA — prominent but not sticky */}
+              {ticketUrl && isUpcoming && (
+                <a
+                  href={ticketUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-h_red hover:bg-h_redDark shadow-h_red/20 mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-semibold text-white shadow-lg transition-colors"
+                >
+                  <Ticket className="h-4 w-4" />
+                  Get Tickets
+                  <ExternalLink className="h-3.5 w-3.5 opacity-60" />
+                </a>
+              )}
 
-            {/* Ticket CTA — prominent but not sticky */}
-            {ticketUrl && isUpcoming && (
-              <a
-                href={ticketUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-h_red hover:bg-h_redDark shadow-h_red/20 mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-semibold text-white shadow-lg transition-colors"
-              >
-                <Ticket className="h-4 w-4" />
-                Get Tickets
-                <ExternalLink className="h-3.5 w-3.5 opacity-60" />
-              </a>
-            )}
-
-            {/* Fan reviews */}
-            {status === "COMPLETED" && hasAttended && (
-              <EventReviewSection
+              {/* Fan reviews */}
+              <EventReviewSlot
                 eventId={eventId}
+                status={status}
                 djs={allPerformers.map((dj) => ({
                   djProfileId: dj.djProfileId,
                   slug: dj.slug,
                   stageName: dj.stageName,
                   avatar: dj.avatar,
                 }))}
-                reviewedDjIds={reviewedDjIds}
-                isOrganizer={isOrganizer}
               />
-            )}
 
-            {/* Post-event recap */}
-            {recap && (
-              <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-                <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-                  Event Recap
-                </h2>
-                <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
-                  {recap}
-                </p>
-                {audioLink && (
-                  <a
-                    href={audioLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
-                  >
-                    <Music className="h-4 w-4" />
-                    Listen to the set
-                    <ExternalLink className="h-3.5 w-3.5 opacity-60" />
-                  </a>
-                )}
-              </div>
-            )}
-
-            {/* Gallery */}
-            {gallery.length > 0 && (
-              <div>
-                <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-                  Photos
-                </h2>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {gallery.map((img) => (
-                    <div
-                      key={img.id}
-                      className="aspect-square overflow-hidden rounded-lg"
+              {/* Post-event recap */}
+              {recap && (
+                <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                    Event Recap
+                  </h2>
+                  <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
+                    {recap}
+                  </p>
+                  {audioLink && (
+                    <a
+                      href={audioLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
                     >
-                      <Image
-                        src={img.url}
-                        alt={img.caption ?? title}
-                        width={200}
-                        height={200}
-                        className="h-full w-full object-cover transition-transform hover:scale-105"
-                      />
-                    </div>
-                  ))}
+                      <Music className="h-4 w-4" />
+                      Listen to the set
+                      <ExternalLink className="h-3.5 w-3.5 opacity-60" />
+                    </a>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Gallery */}
+              {gallery.length > 0 && (
+                <div>
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                    Photos
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {gallery.map((img) => (
+                      <div
+                        key={img.id}
+                        className="aspect-square overflow-hidden rounded-lg"
+                      >
+                        <Image
+                          src={img.url}
+                          alt={img.caption ?? title}
+                          width={200}
+                          height={200}
+                          className="h-full w-full object-cover transition-transform hover:scale-105"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </EventViewerProvider>
   );
 }
 
@@ -747,14 +707,7 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       }}
       participants={[]}
       gallery={[]}
-      isOwner={false}
-      editHref={null}
       eventId={0}
-      hasAttended={false}
-      reviewedDjIds={[]}
-      attendanceStatus={null}
-      user={null}
-      isOrganizer={false}
       viewCount={0}
       goingCount={0}
       interestedCount={0}

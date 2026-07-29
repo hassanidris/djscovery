@@ -66,6 +66,7 @@ import { cn } from "@/lib/utils";
 import { getVideoThumbnailUrl } from "@/lib/media-utils";
 import { useAudioThumbnail } from "@/lib/media-thumbnails";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
+import { useViewerContext } from "@/hooks/useViewerContext";
 import { usePaginatedRatings } from "@/hooks/usePaginatedRatings";
 import { usePaginatedMedia } from "@/hooks/usePaginatedMedia";
 import { useLazyData } from "@/hooks/useLazyData";
@@ -160,11 +161,11 @@ function MixPlayer({
 
 export default function DjProfileFree({
   djData,
-  viewMode = "fan",
-  isFollowed = false,
+  viewMode: viewModeProp = "fan",
+  isFollowed: isFollowedProp = false,
   reputationScore,
   reputationDetail,
-  viewerContext,
+  viewerContext: viewerContextProp,
   bookingOptions,
 }: {
   djData?: DjDemoData;
@@ -184,12 +185,24 @@ export default function DjProfileFree({
   bookingOptions?: BookingFormOptions;
 } = {}) {
   const djProfileId = djData ? parseInt(djData.id) : NaN;
+  const slug = djData?.slug || "";
   const [bioExpanded, setBioExpanded] = useState(false);
   const [mediaTab, setMediaTab] = useState<"photos" | "videos" | "mixes">(
     "photos",
   );
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
+
+  // Per-viewer state (follow status, booking role) is fetched client-side so
+  // the parent page can stay a static, ISR-cached shell with no auth reads.
+  const {
+    viewMode: fetchedViewMode,
+    isFollowed: fetchedIsFollowed,
+    viewerContext: fetchedViewerContext,
+  } = useViewerContext(slug || undefined);
+  const viewMode = slug ? fetchedViewMode : viewModeProp;
+  const isFollowed = slug ? fetchedIsFollowed : isFollowedProp;
+  const viewerContext = slug ? fetchedViewerContext : viewerContextProp;
 
   // Fetch booking options client-side (same as Premium)
   const { options: clientBookingOptions } = useBookingOptions(
@@ -207,7 +220,6 @@ export default function DjProfileFree({
       : bookingOptions;
 
   // Fetch ratings client-side with pagination (same as Premium)
-  const slug = djData?.slug || "";
   const {
     ratings: fetchedRatings,
     totalCount: ratingsTotalCount,

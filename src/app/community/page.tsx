@@ -7,6 +7,8 @@ import LeftMenu from "@/components/leftMenu/LeftMenu";
 import { Badge } from "@/components/ui/badge";
 import { Flame, Headphones, Music2, Users, Zap } from "lucide-react";
 
+export const revalidate = 60; // Cache for 1 minute
+
 const CommunityPage = () => {
   return (
     <>
