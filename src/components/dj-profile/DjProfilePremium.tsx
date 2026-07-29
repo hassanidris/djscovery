@@ -1053,7 +1053,7 @@ export default function DjProfilePremium({
           {/* ── MAIN COLUMN ── */}
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── STICKY SUB-NAVIGATION ── */}
-            <div className="bg-h_blackLight/30 sticky top-16.5 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
+            <div className="bg-h_blackLight/30 sticky top-[4.125rem] z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
               <DjProfileSubNav />
             </div>
             {/* ── MOBILE BOOK CTA ── */}
@@ -1653,7 +1653,7 @@ export default function DjProfilePremium({
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="sticky top-16.5 hidden h-fit flex-col gap-5 lg:flex">
+          <aside className="sticky top-[4.125rem] hidden h-fit flex-col gap-5 lg:flex">
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
               ref={bookCTARefDesktop}
