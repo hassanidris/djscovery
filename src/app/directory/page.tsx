@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import prisma from "@/lib/client";
 import { DjType } from "@prisma/client";
 import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
-import { getFollowedDjIds } from "@/lib/actions/follows";
 import FilterPanel from "@/components/directory/FilterPanel";
 import FilterBottomSheet from "@/components/directory/FilterBottomSheet";
 import DjGrid from "@/components/directory/DjGrid";
@@ -208,8 +207,8 @@ const DirectoryPage = async ({
     return list;
   };
 
-  const followedDjIds = await getFollowedDjIds();
-
+  // NOTE: followedDjIds is fetched client-side (see DjGrid -> useFollowedDjIds)
+  // so this page can stay a static, ISR-cached shell with no auth/cookie reads.
   const filteredDemoDjs = filterDemoDjs(demoDjs);
   const dbIds = new Set(djs.map((d) => d.id));
   const displayDjs = sortDjs(
@@ -397,7 +396,7 @@ const DirectoryPage = async ({
             <Suspense fallback={null}>
               <ActiveFilterBadges />
             </Suspense>
-            <DjGrid djs={displayDjs} followedDjIds={followedDjIds} />
+            <DjGrid djs={displayDjs} />
           </div>
         </div>
       </div>

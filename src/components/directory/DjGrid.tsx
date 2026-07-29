@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import { DjUser } from "@/lib/data";
+import { useFollowedDjIds } from "@/hooks/useFollowedDjIds";
 import DjCard from "./DjCard";
 
 const PAGE_SIZE = 12;
 
 type DjGridProps = {
   djs: DjUser[];
-  followedDjIds?: number[];
 };
 
-const DjGrid = ({ djs, followedDjIds = [] }: DjGridProps) => {
+const DjGrid = ({ djs }: DjGridProps) => {
+  // Fetched client-side so the parent /directory page stays a static,
+  // ISR-cached shell with no auth/cookie reads.
+  const followedDjIds = useFollowedDjIds();
   const followedSet = new Set(followedDjIds);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [prevDjs, setPrevDjs] = useState(djs);

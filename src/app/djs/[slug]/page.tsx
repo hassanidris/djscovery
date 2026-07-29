@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/client";
-import { createClient } from "@/lib/supabase/server";
 import DjProfileFree from "@/components/dj-profile/DjProfileFree";
 import DjProfilePremium from "@/components/dj-profile/DjProfilePremium";
 import { ProfileViewTracker } from "@/components/dj-profile/ProfileViewTracker";
-import { isFollowingDj } from "@/lib/actions/follows";
 import { getDemodjBySlug } from "@/data/djs";
-import type { DjDemoData, ViewMode } from "@/types/dj-demo";
-import type { BookingFormOptions, BookingViewerContext } from "@/types/booking";
+import type { DjDemoData } from "@/types/dj-demo";
 import { getCitiesForCountry, getVenuesForCity } from "@/lib/actions/locations";
 import { fetchYouTubeOEmbed } from "@/lib/actions/media";
 import {
@@ -177,7 +174,16 @@ export default async function DjProfilePage({
       }),
     ]);
 
-  if (!djCore || djCore.status === "REJECTED") return notFound();
+  // NOTE: This page is a static, ISR-cached shell (see `export const revalidate`
+  // above). It intentionally contains NO cookies()/auth reads so caching stays
+  // effective. Per-viewer state (follow status, booking role, dj-owner view)
+  // is fetched client-side via useViewerContext -> /api/djs/[slug]/viewer-context.
+  //
+  // As a result, pending/hidden profiles are never publicly visible, even to
+  // their owner, via this URL. Owners preview their pending/hidden profile
+  // through their authenticated dashboard instead.
+  if (!djCore || djCore.status !== "APPROVED" || djCore.hidden)
+    return notFound();
 
   // Combine results for backward compatibility
   const dj = {
@@ -215,16 +221,6 @@ export default async function DjProfilePage({
   // Lookup freshly geocoded coordinates by venue ID
   const coordLookup = new Map(); // Empty until venues are lazy-loaded
 
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
-
-  if (dj.status === "PENDING_APPROVAL" && authUser?.id !== dj.userId)
-    return notFound();
-
-  if (dj.hidden && authUser?.id !== dj.userId) return notFound();
-
   // Profile view tracking moved to client-side to avoid firing during prefetch/re-renders
 
   // Analytics data is now fetched client-side via API endpoints with caching
@@ -242,58 +238,6 @@ export default async function DjProfilePage({
 
   // DISABLED: YouTube oEmbed fetch since featuredPerformanceUrl is now null (will be fetched in Phase 5)
   const featuredPerformanceThumbnailUrl: string | undefined = undefined;
-
-  const viewMode: ViewMode = authUser?.id === dj.userId ? "dj-owner" : "fan";
-  const isFollowedDj = viewMode === "fan" ? await isFollowingDj(dj.id) : false;
-
-  let viewerContext: BookingViewerContext = {
-    role: "guest",
-    isAuthenticated: false,
-  };
-
-  let bookingOptions: BookingFormOptions = {
-    countries: [], // Will be fetched client-side
-  };
-
-  if (authUser) {
-    const [roleRows, organizerProfile] = await Promise.all([
-      prisma.userRole.findMany({
-        where: { userId: authUser.id },
-        select: { role: true },
-      }),
-      prisma.organizerProfile.findUnique({
-        where: { userId: authUser.id },
-        select: {
-          displayName: true,
-          contactEmail: true,
-          countryId: true,
-          cityId: true,
-          city: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      }),
-    ]);
-
-    const roleSet = new Set(roleRows.map((r) => r.role));
-    let bookingRole: BookingViewerContext["role"] = "fan";
-    if (authUser.id === dj.userId) bookingRole = "dj-owner";
-    else if (roleSet.has("ADMIN")) bookingRole = "admin";
-    else if (roleSet.has("ORGANIZER")) bookingRole = "organizer";
-
-    viewerContext = {
-      role: bookingRole,
-      isAuthenticated: true,
-      organizerDisplayName: organizerProfile?.displayName ?? undefined,
-      organizerContactEmail: organizerProfile?.contactEmail ?? undefined,
-      organizerCityId: organizerProfile?.cityId ?? undefined,
-      organizerCityName: organizerProfile?.city?.name ?? undefined,
-      organizerCountryId: organizerProfile?.countryId ?? undefined,
-    };
-  }
 
   const djPlan = dj.plan;
   const djVerified = dj.status === "APPROVED";
@@ -513,32 +457,18 @@ export default async function DjProfilePage({
         status={dj.status}
         hidden={dj.hidden}
       />
-      {dj.status === "PENDING_APPROVAL" && (
-        <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-center text-sm text-amber-400">
-          ⏳ Your profile is pending admin approval and is only visible to you.
-        </div>
-      )}
       {isPremium ? (
         <DjProfilePremium
           djData={djDemoData}
-          viewMode={viewMode}
-          isFollowed={isFollowedDj}
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
           status={dj.status}
-          viewerContext={viewerContext}
-          bookingOptions={bookingOptions}
-          countries={bookingOptions.countries}
         />
       ) : (
         <DjProfileFree
           djData={djDemoData}
-          viewMode={viewMode}
-          isFollowed={isFollowedDj}
           reputationScore={dj.reputationScore}
           reputationDetail={dj.reputationDetail}
-          viewerContext={viewerContext}
-          bookingOptions={bookingOptions}
         />
       )}
     </div>
