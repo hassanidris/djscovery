@@ -37,8 +37,7 @@ import { requireGigOwner } from "@/lib/auth/require-owner";
 // ============================================================
 
 export type ActionResult<T = undefined> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+  { success: true; data: T } | { success: false; error: string };
 
 // ============================================================
 // PRIVATE HELPERS
@@ -178,6 +177,11 @@ export async function createGig(
     },
     select: { id: true, slug: true },
   });
+
+  // Revalidate cached pages
+  revalidatePath(`/gigs/${gig.slug}`);
+  revalidatePath("/gigs");
+  revalidatePath("/");
 
   return { success: true, data: { gigId: gig.id, slug: gig.slug } };
 }

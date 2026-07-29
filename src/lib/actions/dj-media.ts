@@ -360,6 +360,12 @@ export async function createDjMedia(
     },
   });
 
+  // Revalidate cached DJ profile page
+  const slug = await getCurrentDjSlug();
+  if ("slug" in slug) {
+    revalidatePath(`/djs/${slug.slug}`);
+  }
+
   return { success: true, media };
 }
 

@@ -210,6 +210,12 @@ export async function createEvent(
     select: { id: true, slug: true },
   });
 
+  // Revalidate cached pages
+  revalidatePath(`/events/${event.slug}`);
+  revalidatePath("/events");
+  revalidatePath("/");
+  revalidatePath(`/djs/${djProfile.slug}`);
+
   return { success: true, id: event.id, slug: event.slug };
 }
 
