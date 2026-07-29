@@ -108,11 +108,14 @@ test.describe("Career Highlights", () => {
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
 
-      // Should see empty state (generous timeout: the tab shows a loading
-      // spinner while the async highlights fetch resolves, and cold-compile
-      // dev server responses in CI can take much longer than the default)
+      // Wait for loading to complete (Add Highlight button only appears after loading)
+      await expect(
+        page.getByRole("button", { name: "Add Highlight" }),
+      ).toBeVisible({ timeout: 15000 });
+
+      // Should see empty state
       await expect(page.getByText("No career highlights yet")).toBeVisible({
-        timeout: 15000,
+        timeout: 5000,
       });
     });
 
@@ -233,8 +236,15 @@ test.describe("Career Highlights", () => {
         timeout: 15000,
       });
 
+      // Wait for edit mode to exit (button should be visible again)
+      await expect(page.locator('button[aria-label="Edit"]')).toBeVisible({
+        timeout: 5000,
+      });
+
       // Should see updated highlight
-      await expect(page.getByText("Updated Highlight Title")).toBeVisible();
+      await expect(page.getByText("Updated Highlight Title")).toBeVisible({
+        timeout: 5000,
+      });
     });
 
     test("successfully deletes highlight", async ({ page }) => {
@@ -261,8 +271,12 @@ test.describe("Career Highlights", () => {
       // Click delete button
       await page.locator('button[aria-label="Delete"]').first().click();
 
-      // Count should decrease (delete is async: awaits server action before
-      // updating state, so poll instead of asserting immediately)
+      // Wait for success toast
+      await expect(page.getByText("Highlight deleted")).toBeVisible({
+        timeout: 5000,
+      });
+
+      // Count should decrease
       await expect(page.locator('[data-testid="highlight-item"]')).toHaveCount(
         countBeforeDelete - 1,
       );
