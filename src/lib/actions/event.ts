@@ -541,11 +541,26 @@ export async function resubmitEventForReview(
       eventId,
       status: "PENDING",
     },
-    select: { id: true, adminId: true },
+    select: { id: true, adminId: true, eventUpdatedAt: true },
   });
 
   if (!pendingModeration) {
     return { error: "No pending edit request found for this event." };
+  }
+
+  // Fetch event to verify it has been edited
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { slug: true, updatedAt: true },
+  });
+
+  if (!event) {
+    return { error: "Event not found." };
+  }
+
+  // Verify the event has been edited since the moderation was created
+  if (event.updatedAt <= pendingModeration.eventUpdatedAt) {
+    return { error: "Please edit the event before resubmitting for review." };
   }
 
   // Update moderation to RESOLVED and send notification to admin
@@ -565,7 +580,7 @@ export async function resubmitEventForReview(
   ]);
 
   revalidatePath("/dj/events");
-  revalidatePath(`/dj/events/${eventId}/edit`);
+  revalidatePath(`/events/${event.slug}/edit`);
 
   return { success: true };
 }

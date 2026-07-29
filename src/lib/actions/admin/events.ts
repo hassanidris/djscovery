@@ -127,29 +127,32 @@ export async function requestEventEdit(
       select: {
         slug: true,
         ownerDjId: true,
+        updatedAt: true,
         ownerDj: { select: { userId: true } },
       },
     });
     if (!event) return { error: "Event not found" };
 
-    const moderation = await prisma.eventModeration.create({
-      data: {
-        status: "PENDING",
-        adminComment: adminComment.trim(),
-        adminId,
-        eventId,
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      const moderation = await tx.eventModeration.create({
+        data: {
+          status: "PENDING",
+          adminComment: adminComment.trim(),
+          adminId,
+          eventId,
+          eventUpdatedAt: event.updatedAt,
+        },
+      });
 
-    await prisma.$transaction([
-      prisma.notification.create({
+      await tx.notification.create({
         data: {
           type: "EVENT_EDIT_REQUESTED",
           recipientId: event.ownerDj.userId,
           data: { eventId, moderationId: moderation.id },
         },
-      }),
-      prisma.adminActionLog.create({
+      });
+
+      await tx.adminActionLog.create({
         data: {
           adminId,
           action: "REQUEST_EVENT_EDIT",
@@ -157,8 +160,8 @@ export async function requestEventEdit(
           targetId: String(eventId),
           metadata: { comment: adminComment.trim() },
         },
-      }),
-    ]);
+      });
+    });
 
     revalidatePath("/admin/events");
     revalidatePath(`/admin/events/${eventId}`);
@@ -295,23 +298,29 @@ export async function getAdminEvents({
   await requireAdmin();
 
   try {
+    const validStatuses = [
+      "DRAFT",
+      "PUBLISHED",
+      "COMPLETED",
+      "CANCELLED",
+      "ARCHIVED",
+    ] as const;
+    const isValidStatus = status && validStatuses.includes(status as any);
+
     const events = await prisma.event.findMany({
       take: take + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       where: {
         deletedAt: null,
-        ...(status
-          ? {
-              status: status as
-                "DRAFT" | "PUBLISHED" | "COMPLETED" | "CANCELLED" | "ARCHIVED",
-            }
+        ...(isValidStatus
+          ? { status: status as (typeof validStatuses)[number] }
           : {}),
         ...(category ? { category } : {}),
         ...(country
           ? { country: { name: { contains: country, mode: "insensitive" } } }
           : {}),
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       select: {
         id: true,
         title: true,
@@ -404,6 +413,17 @@ export type EventDetail = {
       username: string;
     };
   }[];
+  moderations: {
+    id: number;
+    status: string;
+    adminComment: string;
+    createdAt: Date;
+    resolvedAt: Date | null;
+    admin: {
+      name: string | null;
+      username: string;
+    };
+  }[];
 };
 
 export async function getEventDetails(
@@ -413,31 +433,7 @@ export async function getEventDetails(
 
   const event = await prisma.event.findUnique({
     where: { id: eventId },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      description: true,
-      eventType: true,
-      category: true,
-      posterUrl: true,
-      venue: true,
-      startDate: true,
-      endDate: true,
-      startTime: true,
-      endTime: true,
-      timezone: true,
-      ticketUrl: true,
-      recap: true,
-      audioLink: true,
-      videoLink: true,
-      featured: true,
-      viewCount: true,
-      genres: true,
-      status: true,
-      hidden: true,
-      createdAt: true,
-      updatedAt: true,
+    include: {
       country: { select: { name: true } },
       city: { select: { name: true } },
       ownerDj: {
@@ -490,5 +486,58 @@ export async function getEventDetails(
     },
   });
 
-  return event;
+  if (!event) return null;
+
+  // Fetch moderations separately
+  const moderations = await prisma.eventModeration.findMany({
+    where: { eventId },
+    select: {
+      id: true,
+      status: true,
+      adminComment: true,
+      createdAt: true,
+      resolvedAt: true,
+      admin: {
+        select: {
+          name: true,
+          username: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return {
+    id: event.id,
+    title: event.title,
+    slug: event.slug,
+    description: event.description,
+    eventType: event.eventType,
+    category: event.category,
+    posterUrl: event.posterUrl,
+    venue: event.venue,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    startTime: event.startTime,
+    endTime: event.endTime,
+    timezone: event.timezone,
+    ticketUrl: event.ticketUrl,
+    recap: event.recap,
+    audioLink: event.audioLink,
+    videoLink: event.videoLink,
+    featured: event.featured,
+    viewCount: event.viewCount,
+    genres: event.genres,
+    status: event.status,
+    hidden: event.hidden,
+    createdAt: event.createdAt,
+    updatedAt: event.updatedAt,
+    country: event.country,
+    city: event.city,
+    ownerDj: event.ownerDj,
+    participants: event.participants,
+    gallery: event.gallery,
+    eventReviews: event.eventReviews,
+    moderations,
+  };
 }

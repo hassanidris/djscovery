@@ -564,3 +564,23 @@ DROP POLICY IF EXISTS "Public can submit contact form" ON "ContactSubmission";
 CREATE POLICY "Public can submit contact form" ON "ContactSubmission" FOR INSERT TO public WITH CHECK (true);
 DROP POLICY IF EXISTS "No public read contact submissions" ON "ContactSubmission";
 CREATE POLICY "No public read contact submissions" ON "ContactSubmission" FOR SELECT TO public USING (false);
+
+-- EventModeration: event owner DJ and admin can read; server-only writes via Prisma
+ALTER TABLE "EventModeration" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Event owner DJ can read event moderations" ON "EventModeration";
+CREATE POLICY "Event owner DJ can read event moderations" ON "EventModeration" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "Event" e
+    JOIN "DjProfile" dj ON dj.id = e."ownerDjId"
+    WHERE e.id = "EventModeration"."eventId" AND dj."userId" = (auth.uid())::text
+  )
+);
+DROP POLICY IF EXISTS "Admin can read event moderations" ON "EventModeration";
+CREATE POLICY "Admin can read event moderations" ON "EventModeration" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "UserRole" ur
+    WHERE ur."userId" = (auth.uid())::text AND ur.role = 'ADMIN'
+  )
+);
+DROP POLICY IF EXISTS "No user write to event moderations" ON "EventModeration";
+CREATE POLICY "No user write to event moderations" ON "EventModeration" FOR ALL TO public USING (false) WITH CHECK (false);

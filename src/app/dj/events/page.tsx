@@ -157,7 +157,7 @@ export default async function DjEventsPage() {
                         PENDING
                       </Badge>
                       <Link
-                        href={`/dj/events/${moderation.event.id}/edit`}
+                        href={`/events/${moderation.event.slug}/edit`}
                         className="font-medium text-white hover:underline"
                       >
                         {moderation.event.title}
@@ -172,7 +172,7 @@ export default async function DjEventsPage() {
                     </p>
                   </div>
                   <Button asChild size="sm" className="shrink-0">
-                    <Link href={`/dj/events/${moderation.event.id}/edit`}>
+                    <Link href={`/events/${moderation.event.slug}/edit`}>
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Edit Event
                     </Link>

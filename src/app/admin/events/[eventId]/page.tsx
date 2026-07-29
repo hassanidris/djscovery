@@ -38,9 +38,9 @@ export default async function AdminEventDetailPage({
 }) {
   const { eventId } = await params;
 
-  // Validate eventId is a valid number
+  // Validate eventId is a valid positive integer (rejects decimals, exponents, etc.)
   const eventIdNum = Number(eventId);
-  if (isNaN(eventIdNum) || eventIdNum <= 0) {
+  if (!Number.isInteger(eventIdNum) || eventIdNum <= 0) {
     return notFound();
   }
 
@@ -102,9 +102,7 @@ export default async function AdminEventDetailPage({
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="text-muted-foreground text-sm">
-                  Owner DJ
-                </label>
+                <span className="text-muted-foreground text-sm">Owner DJ</span>
                 <Link
                   href={`/djs/${event.ownerDj.slug}`}
                   className="flex items-center gap-2 text-white hover:underline"
@@ -123,17 +121,15 @@ export default async function AdminEventDetailPage({
                 </Link>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm">Type</label>
+                <span className="text-muted-foreground text-sm">Type</span>
                 <p className="text-white">{event.eventType}</p>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm">Venue</label>
+                <span className="text-muted-foreground text-sm">Venue</span>
                 <p className="text-white">{event.venue || "—"}</p>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm">
-                  Location
-                </label>
+                <span className="text-muted-foreground text-sm">Location</span>
                 <p className="flex items-center gap-1 text-white">
                   <MapPin className="h-3 w-3" />
                   {[event.city?.name, event.country?.name]
@@ -142,7 +138,7 @@ export default async function AdminEventDetailPage({
                 </p>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm">Date</label>
+                <span className="text-muted-foreground text-sm">Date</span>
                 <p className="flex items-center gap-1 text-white">
                   <Calendar className="h-3 w-3" />
                   {format(new Date(event.startDate), "dd MMM yyyy")}
@@ -151,7 +147,7 @@ export default async function AdminEventDetailPage({
                 </p>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm">Time</label>
+                <span className="text-muted-foreground text-sm">Time</span>
                 <p className="flex items-center gap-1 text-white">
                   <Clock className="h-3 w-3" />
                   {event.startTime || "—"}
@@ -161,9 +157,9 @@ export default async function AdminEventDetailPage({
               </div>
               {event.ticketUrl && (
                 <div className="md:col-span-2">
-                  <label className="text-muted-foreground text-sm">
+                  <span className="text-muted-foreground text-sm">
                     Ticket URL
-                  </label>
+                  </span>
                   <a
                     href={event.ticketUrl}
                     target="_blank"
@@ -177,18 +173,16 @@ export default async function AdminEventDetailPage({
               )}
             </div>
             <div className="mt-4">
-              <label className="text-muted-foreground text-sm">
-                Description
-              </label>
+              <span className="text-muted-foreground text-sm">Description</span>
               <p className="mt-1 whitespace-pre-wrap text-white">
                 {event.description || "—"}
               </p>
             </div>
             {event.recap && (
               <div className="mt-4">
-                <label className="text-muted-foreground text-sm">
+                <span className="text-muted-foreground text-sm">
                   Event Recap
-                </label>
+                </span>
                 <p className="mt-1 whitespace-pre-wrap text-white">
                   {event.recap}
                 </p>
@@ -196,9 +190,9 @@ export default async function AdminEventDetailPage({
             )}
             {event.genres && event.genres.length > 0 && (
               <div className="mt-4">
-                <label className="text-muted-foreground mb-2 block text-sm">
+                <span className="text-muted-foreground mb-2 block text-sm">
                   Genres
-                </label>
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {event.genres.map((genre) => (
                     <Badge
@@ -331,6 +325,87 @@ export default async function AdminEventDetailPage({
                         variant="outline"
                         className="border-red-500/30 text-xs text-red-400 hover:bg-red-500/10"
                       />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Moderation History */}
+          {event.moderations.length > 0 && (
+            <div className="rounded-xl border border-white/8 bg-white/3 p-6">
+              <h2 className="mb-4 text-lg font-semibold text-white">
+                Moderation History ({event.moderations.length})
+              </h2>
+              <div className="space-y-4">
+                {event.moderations.map((moderation) => (
+                  <div
+                    key={moderation.id}
+                    className="rounded-lg border border-white/10 bg-white/5 p-4"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            className={
+                              moderation.status === "PENDING"
+                                ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                                : moderation.status === "RESOLVED"
+                                  ? "border-green-500/30 bg-green-500/10 text-green-400"
+                                  : "border-gray-500/30 bg-gray-500/10 text-gray-400"
+                            }
+                          >
+                            {moderation.status}
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            {format(
+                              new Date(moderation.createdAt),
+                              "dd MMM yyyy",
+                            )}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-gray-300">
+                          {moderation.adminComment}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          By{" "}
+                          {moderation.admin.name || moderation.admin.username}
+                        </p>
+                        {moderation.resolvedAt && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            Resolved:{" "}
+                            {format(
+                              new Date(moderation.resolvedAt),
+                              "dd MMM yyyy",
+                            )}
+                          </p>
+                        )}
+                      </div>
+                      {moderation.status === "PENDING" && (
+                        <div className="flex gap-2">
+                          <AdminActionButton
+                            label="Resolve"
+                            description="Mark this moderation request as resolved?"
+                            confirmLabel="Resolve"
+                            fields={{ moderationId: String(moderation.id) }}
+                            action={resolveEventModeration}
+                            successMessage="Moderation resolved"
+                            variant="outline"
+                            className="border-green-500/30 text-xs text-green-400 hover:bg-green-500/10"
+                          />
+                          <AdminActionButton
+                            label="Dismiss"
+                            description="Dismiss this moderation request?"
+                            confirmLabel="Dismiss"
+                            fields={{ moderationId: String(moderation.id) }}
+                            action={dismissEventModeration}
+                            successMessage="Moderation dismissed"
+                            variant="outline"
+                            className="border-gray-500/30 text-xs text-gray-400 hover:bg-gray-500/10"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
