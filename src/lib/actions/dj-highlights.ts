@@ -58,6 +58,7 @@ export async function createDjHighlight(
   });
 
   revalidatePath("/djs/[slug]", "page");
+  revalidatePath("/dj/settings");
   return { success: true as const, id: highlight.id };
 }
 
@@ -104,6 +105,7 @@ export async function updateDjHighlight(
   await prisma.djCareerHighlight.update({ where: { id }, data });
 
   revalidatePath("/djs/[slug]", "page");
+  revalidatePath("/dj/settings");
   return { success: true as const };
 }
 
@@ -126,5 +128,6 @@ export async function deleteDjHighlight(
   await prisma.djCareerHighlight.delete({ where: { id } });
 
   revalidatePath("/djs/[slug]", "page");
+  revalidatePath("/dj/settings");
   return { success: true as const };
 }

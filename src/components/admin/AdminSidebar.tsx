@@ -9,6 +9,7 @@ import {
   Disc3,
   Building2,
   Briefcase,
+  Calendar,
   Flag,
   MapPin,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
     exact: false,
   },
   { href: "/admin/gigs", label: "Gigs", icon: Briefcase, exact: false },
+  { href: "/admin/events", label: "Events", icon: Calendar, exact: false },
   { href: "/admin/venues", label: "Venues", icon: MapPin, exact: false },
   { href: "/admin/reports", label: "Reports", icon: Flag, exact: false },
 ] as const;
