@@ -11,15 +11,16 @@ import { GigGridSkeleton } from "@/components/gigs/GigSkeleton";
 export const metadata = { title: "Gigs — DJcovery" };
 export const revalidate = 60;
 
-export default async function GigsPage({
-  searchParams,
+// ── Gigs Content Component (async for Suspense) ─────────────────────────────
+
+async function GigsContent({
+  typeFilter,
+  searchQuery,
 }: {
-  searchParams: Promise<Record<string, string | undefined>>;
+  typeFilter: string;
+  searchQuery: string;
 }) {
-  const sp = await searchParams;
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
-  const typeFilter = sp.type || "";
-  const searchQuery = sp.q || "";
 
   let dbGigs: DjGigListItem[] = [];
   try {
@@ -107,6 +108,41 @@ export default async function GigsPage({
   const gigs = filteredGigs;
 
   return (
+    <>
+      {gigs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 py-24 text-center">
+          <Briefcase className="mb-4 h-10 w-10 text-zinc-700" />
+          <p className="font-semibold text-white">No gigs available</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Check back later for new opportunities
+          </p>
+        </div>
+      ) : (
+        <GigGrid gigs={gigs} />
+      )}
+    </>
+  );
+}
+
+// ── Page Component ─────────────────────────────────────────────────────────────
+
+export default async function GigsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+
+  // Normalize query parameters to handle string arrays
+  const normalizeParam = (value: string | string[] | undefined): string => {
+    if (Array.isArray(value)) return value[0] || "";
+    return value || "";
+  };
+
+  const typeFilter = normalizeParam(sp.type);
+  const searchQuery = normalizeParam(sp.q);
+
+  return (
     <div className="min-h-screen bg-black">
       {/* Hero Banner */}
       <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
@@ -125,12 +161,6 @@ export default async function GigsPage({
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-h_red/10 text-h_red border-h_red/20 gap-1.5 border px-3 py-1">
-              <Briefcase className="h-3 w-3" /> {gigs.length} gig
-              {gigs.length !== 1 ? "s" : ""}
-            </Badge>
-          </div>
         </div>
       </section>
 
@@ -146,18 +176,9 @@ export default async function GigsPage({
           </Suspense>
         </div>
 
+        {/* Gigs Content with Suspense for loading state */}
         <Suspense fallback={<GigGridSkeleton />}>
-          {gigs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 py-24 text-center">
-              <Briefcase className="mb-4 h-10 w-10 text-zinc-700" />
-              <p className="font-semibold text-white">No gigs available</p>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Check back later for new opportunities
-              </p>
-            </div>
-          ) : (
-            <GigGrid gigs={gigs} />
-          )}
+          <GigsContent typeFilter={typeFilter} searchQuery={searchQuery} />
         </Suspense>
       </div>
     </div>

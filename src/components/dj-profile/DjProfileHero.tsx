@@ -244,7 +244,7 @@ function DjProfileHero({
               </>
             )}
             <ShareButton />
-            {viewMode === "fan" && (
+            {viewMode === "fan" && !isNaN(djProfileId) && (
               <ReportButton
                 targetType="DJ_PROFILE"
                 targetId={String(djProfileId)}

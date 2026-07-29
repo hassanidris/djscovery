@@ -215,7 +215,10 @@ export default function MediaVideoModal({
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4"
           onClick={() => setOpen(false)}
         >
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+          <div
+            className="absolute top-4 right-4 z-10 flex items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
             {mediaId && (
               <ReportButton
                 targetType="MEDIA"
