@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       if (typeof tag !== "string") {
         return NextResponse.json({ error: "Invalid tag" }, { status: 400 });
       }
-      revalidateTag(tag);
+      revalidateTag(tag, "page");
       console.log(`[Revalidation] Revalidated tag: ${tag}`);
     }
 
