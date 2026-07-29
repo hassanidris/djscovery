@@ -522,3 +522,63 @@ export async function deleteEvent(
 
   return { success: true };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function resubmitEventForReview(
+  eventId: number,
+): Promise<{ error: string } | { success: true }> {
+  const auth = await getAuthUserAndDjProfile();
+  if ("error" in auth) return auth;
+  const { djProfile } = auth;
+
+  const ownership = await requireEventOwner(eventId);
+  if ("error" in ownership) return ownership;
+
+  // Check for pending moderation request
+  const pendingModeration = await prisma.eventModeration.findFirst({
+    where: {
+      eventId,
+      status: "PENDING",
+    },
+    select: { id: true, adminId: true },
+  });
+
+  if (!pendingModeration) {
+    return { error: "No pending edit request found for this event." };
+  }
+
+  // Update moderation to RESOLVED and send notification to admin
+  await prisma.$transaction([
+    prisma.eventModeration.update({
+      where: { id: pendingModeration.id },
+      data: { status: "RESOLVED", resolvedAt: new Date() },
+    }),
+    prisma.notification.create({
+      data: {
+        type: "EVENT_EDIT_RESUBMITTED",
+        recipientId: pendingModeration.adminId,
+        senderId: djProfile.userId,
+        data: { eventId, moderationId: pendingModeration.id },
+      },
+    }),
+  ]);
+
+  revalidatePath("/dj/events");
+  revalidatePath(`/dj/events/${eventId}/edit`);
+
+  return { success: true };
+}
+
+export async function resubmitEventForReviewAction(
+  formData: FormData,
+): Promise<void> {
+  const eventId = Number(formData.get("eventId"));
+  if (!eventId || isNaN(eventId)) {
+    throw new Error("Invalid event ID");
+  }
+  const result = await resubmitEventForReview(eventId);
+  if ("error" in result) {
+    throw new Error(result.error);
+  }
+}

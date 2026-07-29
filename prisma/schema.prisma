@@ -117,6 +117,12 @@ enum EventType {
   PRIVATE
 }
 
+enum EventModerationStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
 enum GigStatus {
   DRAFT
   PUBLISHED
@@ -202,6 +208,8 @@ enum NotificationType {
   BOOKING_INQUIRY_MESSAGE
   ACCOUNT_SUSPENDED
   REPORT_SUBMITTED // Admin receives this when a user submits a report
+  EVENT_EDIT_REQUESTED // DJ receives this when admin requests edits
+  EVENT_EDIT_RESUBMITTED // Admin receives this when DJ resubmits for review
 }
 
 enum DjType {
@@ -396,9 +404,10 @@ model User {
   followedDjs DjFollow[]
   savedEvents SavedEvent[]
 
-  reportsSubmitted Report[]         @relation("ReportSubmitter")
-  reportsReviewed  Report[]         @relation("ReportReviewer")
+  reportsSubmitted Report[]          @relation("ReportSubmitter")
+  reportsReviewed  Report[]          @relation("ReportReviewer")
   adminActionLogs  AdminActionLog[]
+  eventModerations EventModeration[] @relation("EventModerationAdmin")
 
   gigReviews       GigReview[]
   eventReviews     EventReview[]
@@ -973,6 +982,7 @@ model Event {
   viewCount   Int         @default(0)
   genres      String[] // e.g. ["Afro House", "Melodic Techno"]
   status      EventStatus @default(DRAFT)
+  hidden      Boolean     @default(false) // Admin can hide without changing status
   deletedAt   DateTime?
 
   ownerDjId Int
@@ -986,7 +996,8 @@ model Event {
   gallery      EventMedia[]
   savedBy      SavedEvent[]
 
-  eventReviews EventReview[]
+  eventReviews     EventReview[]
+  eventModerations EventModeration[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -997,6 +1008,7 @@ model Event {
   @@index([status])
   @@index([startDate])
   @@index([featured])
+  @@index([hidden])
   @@index([countryId])
   @@index([cityId])
 }
@@ -1026,6 +1038,27 @@ model EventMedia {
   createdAt DateTime @default(now())
 
   @@index([eventId])
+}
+
+// Admin moderation requests for events
+model EventModeration {
+  id           Int                   @id @default(autoincrement())
+  status       EventModerationStatus @default(PENDING)
+  adminComment String // Admin's feedback on what needs editing
+
+  adminId String
+  admin   User   @relation("EventModerationAdmin", fields: [adminId], references: [id])
+
+  eventId Int
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([eventId])
+  @@index([status])
+  @@index([adminId])
 }
 
 // ------ GIGS MARKETPLACE ------

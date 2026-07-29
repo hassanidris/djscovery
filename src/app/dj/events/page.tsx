@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, AlertCircle, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import DjEventsTabs from "@/components/dj/DjEventsTabs";
 
 export const metadata = { title: "My Events — DJcovery" };
@@ -56,6 +57,33 @@ export default async function DjEventsPage() {
     },
   });
 
+  // Fetch pending moderation requests for DJ's owned events
+  const pendingModerations = await prisma.eventModeration.findMany({
+    where: {
+      status: "PENDING",
+      event: {
+        ownerDjId: djProfile.id,
+        deletedAt: null,
+      },
+    },
+    include: {
+      event: {
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+        },
+      },
+      admin: {
+        select: {
+          name: true,
+          username: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   const eventItems = events.map((event) => {
     const isOwner = event.ownerDj.id === djProfile.id;
     const participant = event.participants.find(
@@ -106,6 +134,55 @@ export default async function DjEventsPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Pending Moderation Requests */}
+      {pendingModerations.length > 0 && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6">
+          <div className="mb-4 flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-amber-400" />
+            <h2 className="text-lg font-semibold text-white">
+              Pending Edit Requests ({pendingModerations.length})
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {pendingModerations.map((moderation) => (
+              <div
+                key={moderation.id}
+                className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-400">
+                        PENDING
+                      </Badge>
+                      <Link
+                        href={`/dj/events/${moderation.event.id}/edit`}
+                        className="font-medium text-white hover:underline"
+                      >
+                        {moderation.event.title}
+                      </Link>
+                    </div>
+                    <p className="mb-2 text-sm text-gray-300">
+                      {moderation.adminComment}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Requested by{" "}
+                      {moderation.admin.name || moderation.admin.username}
+                    </p>
+                  </div>
+                  <Button asChild size="sm" className="shrink-0">
+                    <Link href={`/dj/events/${moderation.event.id}/edit`}>
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Edit Event
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {emptyState ? (
         <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 py-24 text-center">
