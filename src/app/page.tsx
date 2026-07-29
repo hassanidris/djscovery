@@ -17,6 +17,8 @@ import {
   HomeGigsSectionSkeleton,
 } from "@/components/ui/skeletons";
 
+export const revalidate = 120; // Cache for 2 minutes
+
 const Homepage = async () => {
   const navData = await getNavUser();
   const isDj = navData.navRole === "dj" || navData.navRole === "admin";

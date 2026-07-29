@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     "Find answers to common questions about DJcovery, DJ profiles, gigs, bookings, organizers, fans, and account features.",
 };
 
+export const revalidate = 86400; // Cache for 24 hours
+
 export default function FaqPage() {
   return (
     <div className="min-h-screen bg-black">

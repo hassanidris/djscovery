@@ -750,6 +750,11 @@ export async function updateDjProfile(
         error,
       });
     }
+
+    // Revalidate cached pages
+    revalidatePath(`/djs/${existing.slug}`);
+    revalidatePath("/directory");
+
     return { success: true as const, ...(slugChanged && { newSlug }) };
   } catch {
     return { error: "Something went wrong. Please try again." };

@@ -8,6 +8,7 @@ import { isValidTimezone } from "@/lib/timezones";
 import { requireEventOwner } from "@/lib/auth/require-owner";
 import { sendEmail } from "@/lib/email/send";
 import type { NewEventData } from "@/lib/email/types";
+import { revalidatePath } from "next/cache";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 
@@ -301,6 +302,11 @@ export async function updateEvent(
     select: { slug: true },
   });
 
+  // Revalidate cached pages
+  revalidatePath(`/events/${updated.slug}`);
+  revalidatePath("/events");
+  revalidatePath("/");
+
   return { success: true, slug: updated.slug };
 }
 
@@ -403,6 +409,12 @@ export async function publishEvent(
   } catch {
     // Notification failures must never block publish
   }
+
+  // Revalidate cached pages
+  revalidatePath(`/events/${updated.slug}`);
+  revalidatePath("/events");
+  revalidatePath("/");
+  revalidatePath("/sitemap");
 
   return { success: true, slug: updated.slug };
 }

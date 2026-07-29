@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     "Learn how DJcovery uses cookies and similar technologies when you visit our platform.",
 };
 
+export const revalidate = 86400; // Cache for 24 hours
+
 const toc = [
   { id: "what-are-cookies", label: "What Are Cookies?" },
   { id: "how-we-use-cookies", label: "How DJcovery Uses Cookies" },

@@ -16,6 +16,7 @@ import {
   buildDjGalleryPath,
 } from "@/lib/storage";
 import { uploadDjGalleryImage } from "@/lib/actions/dj-upload";
+import { revalidatePath } from "next/cache";
 
 const MAX_SPOTLIGHT_ITEMS = 2;
 
@@ -471,6 +472,12 @@ export async function updateDjMediaItem(
     where: { id: mediaId },
     data: updateData,
   });
+
+  // Revalidate cached DJ profile page
+  const slug = await getCurrentDjSlug();
+  if ("slug" in slug) {
+    revalidatePath(`/djs/${slug.slug}`);
+  }
 
   return { success: true, media: updatedMedia };
 }

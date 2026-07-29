@@ -2,6 +2,8 @@
 import { indexingEnabled } from "@/lib/seo/indexing";
 import type { MetadataRoute } from "next";
 
+export const revalidate = 86400; // Cache for 24 hours
+
 export default function robots(): MetadataRoute.Robots {
   if (!indexingEnabled) {
     return {
