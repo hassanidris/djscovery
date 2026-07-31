@@ -237,7 +237,9 @@ test.describe("Career Highlights", () => {
       });
 
       // Wait for edit mode to exit (button should be visible again)
-      await expect(page.locator('button[aria-label="Edit"]')).toBeVisible({
+      await expect(
+        page.locator('button[aria-label="Edit"]').first(),
+      ).toBeVisible({
         timeout: 5000,
       });
 
@@ -251,6 +253,11 @@ test.describe("Career Highlights", () => {
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
 
+      // Wait for the async highlights fetch to resolve
+      await expect(
+        page.getByRole("button", { name: "Add Highlight" }),
+      ).toBeVisible({ timeout: 15000 });
+
       const initialCount = await page
         .locator('[data-testid="highlight-item"]')
         .count();
@@ -261,7 +268,9 @@ test.describe("Career Highlights", () => {
         await page.getByLabel("Year").fill("2024");
         await page.getByLabel("Title").fill("Test Highlight");
         await page.getByRole("button", { name: "Save" }).click();
-        await page.waitForTimeout(1000);
+        await expect(page.getByText("Career highlights updated")).toBeVisible({
+          timeout: 15000,
+        });
       }
 
       const countBeforeDelete = await page

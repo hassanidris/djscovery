@@ -1,0 +1,33 @@
+{
+  "buildCommand": "npm run build-storybook",
+  "outputDirectory": "storybook-static",
+  "installCommand": "npm install",
+  "framework": null,
+  "devCommand": "npm run storybook",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
