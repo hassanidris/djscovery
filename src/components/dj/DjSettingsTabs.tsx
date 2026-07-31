@@ -796,6 +796,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState<number | null>(null);
+  const highlightsRequest = useRef(0);
 
   const isPremium = profile.plan === "PREMIUM";
 
@@ -805,7 +806,9 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
         setLoading(false);
         return;
       }
+      const requestId = ++highlightsRequest.current;
       const result = await getDjHighlights(profile.id);
+      if (requestId !== highlightsRequest.current) return;
       setHighlights(result);
       setLoading(false);
     }
@@ -827,6 +830,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
       toast.error(result.error);
       return;
     }
+    highlightsRequest.current += 1;
     setHighlights((prev) => prev.filter((h) => h.id !== id));
     toast.success("Highlight deleted.");
   }
@@ -839,6 +843,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
 
   function handleSave() {
     startTransition(async () => {
+      highlightsRequest.current += 1;
       const toAdd = highlights.filter((h) => h.id < 0);
       const toUpdate = highlights.filter((h) => h.id > 0);
       const toDelete = highlights.filter(
