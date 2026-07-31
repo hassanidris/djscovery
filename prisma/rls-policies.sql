@@ -72,7 +72,7 @@ CREATE POLICY "Involved users can read hire" ON "Hire" FOR SELECT TO public USIN
   )
 );
 
--- BookingInquiry: organizer and invited DJ can read
+-- BookingInquiry: organizer and invited DJ can read; admin can read all
 ALTER TABLE "BookingInquiry" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Participants can read booking inquiry" ON "BookingInquiry";
 CREATE POLICY "Participants can read booking inquiry" ON "BookingInquiry" FOR SELECT TO public USING (
@@ -83,8 +83,15 @@ CREATE POLICY "Participants can read booking inquiry" ON "BookingInquiry" FOR SE
       AND dj."userId" = (auth.uid())::text
   )
 );
+DROP POLICY IF EXISTS "Admin can read booking inquiries" ON "BookingInquiry";
+CREATE POLICY "Admin can read booking inquiries" ON "BookingInquiry" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "UserRole" ur
+    WHERE ur."userId" = (auth.uid())::text AND ur.role = 'ADMIN'
+  )
+);
 
--- BookingInquiryMessage: sharers only
+-- BookingInquiryMessage: participants can read; admin can read all
 ALTER TABLE "BookingInquiryMessage" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Participants can read booking inquiry messages" ON "BookingInquiryMessage";
 CREATE POLICY "Participants can read booking inquiry messages" ON "BookingInquiryMessage" FOR SELECT TO public USING (
@@ -97,6 +104,13 @@ CREATE POLICY "Participants can read booking inquiry messages" ON "BookingInquir
         bi."organizerId" = (auth.uid())::text
         OR dj."userId" = (auth.uid())::text
       )
+  )
+);
+DROP POLICY IF EXISTS "Admin can read booking inquiry messages" ON "BookingInquiryMessage";
+CREATE POLICY "Admin can read booking inquiry messages" ON "BookingInquiryMessage" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "UserRole" ur
+    WHERE ur."userId" = (auth.uid())::text AND ur.role = 'ADMIN'
   )
 );
 

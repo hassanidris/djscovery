@@ -12,6 +12,7 @@ import {
   Calendar,
   Flag,
   MapPin,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,12 @@ const NAV_ITEMS = [
   { href: "/admin/gigs", label: "Gigs", icon: Briefcase, exact: false },
   { href: "/admin/events", label: "Events", icon: Calendar, exact: false },
   { href: "/admin/venues", label: "Venues", icon: MapPin, exact: false },
+  {
+    href: "/admin/booking-inquiries",
+    label: "Booking Inquiries",
+    icon: MessageSquare,
+    exact: false,
+  },
   { href: "/admin/reports", label: "Reports", icon: Flag, exact: false },
 ] as const;
 
