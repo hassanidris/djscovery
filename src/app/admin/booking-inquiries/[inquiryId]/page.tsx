@@ -4,18 +4,17 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import {
   getBookingInquiryDetails,
   closeInquiry,
   reopenInquiry,
-  addAdminNoteAction,
   escalateDispute,
   resolveDispute,
   releaseContactInfo,
   hideContactInfo,
 } from "@/lib/actions/admin/booking-inquiries";
 import AdminActionButton from "@/components/admin/AdminActionButton";
+import AdminNoteForm from "@/components/admin/AdminNoteForm";
 import { formatDistanceToNow, format } from "date-fns";
 import {
   MessageSquare,
@@ -61,12 +60,13 @@ export default async function AdminBookingInquiryDetailPage({
     notFound();
   }
 
-  const hasDispute = inquiry.adminActions.some(
-    (action) => action.action === "ESCALATE_DISPUTE",
+  const latestDisputeAction = inquiry.adminActions.find(
+    (action) =>
+      action.action === "ESCALATE_DISPUTE" ||
+      action.action === "RESOLVE_DISPUTE",
   );
-  const disputeResolved = inquiry.adminActions.some(
-    (action) => action.action === "RESOLVE_DISPUTE",
-  );
+  const hasDispute = latestDisputeAction != null;
+  const disputeResolved = latestDisputeAction?.action === "RESOLVE_DISPUTE";
 
   return (
     <div className="space-y-6">
@@ -74,6 +74,7 @@ export default async function AdminBookingInquiryDetailPage({
         <div className="flex items-center gap-4">
           <Link
             href="/admin/booking-inquiries"
+            aria-label="Back to booking inquiries"
             className="text-gray-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -406,25 +407,7 @@ export default async function AdminBookingInquiryDetailPage({
           {/* Add Admin Note */}
           <div className="space-y-2">
             <p className="text-sm font-medium text-white">Add Admin Note</p>
-            <form action={addAdminNoteAction}>
-              <input type="hidden" name="inquiryId" value={inquiry.id} />
-              <Textarea
-                name="note"
-                placeholder="Add an admin-only note to this inquiry..."
-                className="min-h-20 border-white/10 bg-white/5 text-white placeholder:text-gray-500"
-                required
-              />
-              <div className="mt-2">
-                <Button
-                  type="submit"
-                  variant="outline"
-                  size="sm"
-                  className="border-white/10 text-white hover:bg-white/10"
-                >
-                  Add Note
-                </Button>
-              </div>
-            </form>
+            <AdminNoteForm inquiryId={inquiry.id} />
           </div>
 
           {/* Dispute Management */}

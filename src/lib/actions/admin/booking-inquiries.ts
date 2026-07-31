@@ -28,14 +28,6 @@ export async function closeInquiry(formData: FormData): Promise<ActionResult> {
         where: { id: inquiryId },
         data: { status: "CANCELLED" },
       }),
-      prisma.bookingInquiryMessage.create({
-        data: {
-          body: `[ADMIN NOTE] Inquiry closed by admin. Reason: ${reason.trim()}`,
-          senderRole: "ORGANIZER",
-          inquiryId,
-          senderId: adminId,
-        },
-      }),
       prisma.adminActionLog.create({
         data: {
           adminId,
@@ -69,33 +61,38 @@ export async function reopenInquiry(formData: FormData): Promise<ActionResult> {
     });
     if (!inquiry) return { error: "Inquiry not found" };
 
-    await prisma.$transaction([
-      prisma.bookingInquiry.update({
-        where: { id: inquiryId },
+    await prisma.$transaction(async (tx) => {
+      const updateResult = await tx.bookingInquiry.updateMany({
+        where: { id: inquiryId, status: "CANCELLED" },
         data: { status: "PENDING" },
-      }),
-      prisma.bookingInquiryMessage.create({
+      });
+      if (updateResult.count === 0) throw new Error("NOT_CANCELLED");
+
+      await tx.bookingInquiryMessage.create({
         data: {
           body: "[ADMIN NOTE] Inquiry reopened by admin",
           senderRole: "ORGANIZER",
           inquiryId,
           senderId: adminId,
         },
-      }),
-      prisma.adminActionLog.create({
+      });
+      await tx.adminActionLog.create({
         data: {
           adminId,
           action: "REOPEN_BOOKING_INQUIRY",
           targetType: "BookingInquiry",
           targetId: String(inquiryId),
         },
-      }),
-    ]);
+      });
+    });
 
     revalidatePath("/admin/booking-inquiries");
     revalidatePath(`/admin/booking-inquiries/${inquiryId}`);
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (e instanceof Error && e.message === "NOT_CANCELLED") {
+      return { error: "Only cancelled inquiries can be reopened" };
+    }
     return { error: "Failed to reopen inquiry" };
   }
 }

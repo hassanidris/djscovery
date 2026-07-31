@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
-import {
-  getAdminBookingInquiries,
-} from "@/lib/actions/admin/booking-inquiries";
+import { getAdminBookingInquiries } from "@/lib/actions/admin/booking-inquiries";
+import { getCountries } from "@/lib/actions/locations";
 import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import AdminPagination from "@/components/admin/AdminPagination";
 import AdminFilters from "@/components/admin/AdminFilters";
@@ -37,7 +36,11 @@ export default async function AdminBookingInquiriesPage({
       : undefined;
   const status = first(params.status);
   const country = first(params.country);
-  const dateRange = first(params.dateRange) as "7d" | "30d" | "90d" | undefined;
+  const rawDateRange = first(params.dateRange);
+  const dateRange =
+    rawDateRange === "7d" || rawDateRange === "30d" || rawDateRange === "90d"
+      ? rawDateRange
+      : undefined;
 
   const { inquiries, nextCursor } = await getAdminBookingInquiries({
     cursor,
@@ -45,6 +48,12 @@ export default async function AdminBookingInquiriesPage({
     country,
     dateRange,
   });
+  const countries = await getCountries();
+  const countryFilter = {
+    key: "country",
+    placeholder: "All Countries",
+    options: countries.map((c) => ({ value: c.name, label: c.name })),
+  };
 
   return (
     <div className="space-y-6">
@@ -56,7 +65,11 @@ export default async function AdminBookingInquiriesPage({
       </div>
 
       <AdminFilters
-        currentValues={{ status: status ?? "", country: country ?? "", dateRange: dateRange ?? "" }}
+        currentValues={{
+          status: status ?? "",
+          country: country ?? "",
+          dateRange: dateRange ?? "",
+        }}
         filters={[
           {
             key: "status",
@@ -68,6 +81,7 @@ export default async function AdminBookingInquiriesPage({
               { value: "CANCELLED", label: "Cancelled" },
             ],
           },
+          countryFilter,
           {
             key: "dateRange",
             placeholder: "All Time",
@@ -137,7 +151,7 @@ export default async function AdminBookingInquiriesPage({
                               {inquiry.eventName}
                             </Link>
                             {inquiry.venue && (
-                              <p className="text-muted-foreground text-xs mt-0.5">
+                              <p className="text-muted-foreground mt-0.5 text-xs">
                                 {inquiry.venue}
                               </p>
                             )}
@@ -158,7 +172,8 @@ export default async function AdminBookingInquiriesPage({
                             className="text-xs text-gray-300 hover:text-white hover:underline"
                             target="_blank"
                           >
-                            {inquiry.organizer.name || inquiry.organizer.username}
+                            {inquiry.organizer.name ||
+                              inquiry.organizer.username}
                           </Link>
                         </td>
                         <td className="px-4 py-3 text-xs text-gray-300">
@@ -179,17 +194,15 @@ export default async function AdminBookingInquiriesPage({
                         <td className="px-4 py-3 text-xs text-gray-300">
                           <div className="flex items-center gap-1">
                             <DollarSign className="h-3 w-3" />
-                            {inquiry.budgetType === "NEGOTIABLE" ? (
-                              "Negotiable"
-                            ) : inquiry.budgetType === "TBA" ? (
-                              "TBA"
-                            ) : inquiry.budgetMin && inquiry.budgetMax ? (
-                              `${inquiry.budgetCurrency || "$"}${inquiry.budgetMin.toLocaleString()} - ${inquiry.budgetMax.toLocaleString()}`
-                            ) : inquiry.budgetMin ? (
-                              `${inquiry.budgetCurrency || "$"}${inquiry.budgetMin.toLocaleString()}+`
-                            ) : (
-                              "—"
-                            )}
+                            {inquiry.budgetType === "NEGOTIABLE"
+                              ? "Negotiable"
+                              : inquiry.budgetType === "TBA"
+                                ? "TBA"
+                                : inquiry.budgetMin && inquiry.budgetMax
+                                  ? `${inquiry.budgetCurrency || "$"}${inquiry.budgetMin.toLocaleString()} - ${inquiry.budgetMax.toLocaleString()}`
+                                  : inquiry.budgetMin
+                                    ? `${inquiry.budgetCurrency || "$"}${inquiry.budgetMin.toLocaleString()}+`
+                                    : "—"}
                           </div>
                         </td>
                         <td className="px-4 py-3">

@@ -87,7 +87,11 @@ DROP POLICY IF EXISTS "Admin can read booking inquiries" ON "BookingInquiry";
 CREATE POLICY "Admin can read booking inquiries" ON "BookingInquiry" FOR SELECT TO public USING (
   EXISTS (
     SELECT 1 FROM "UserRole" ur
-    WHERE ur."userId" = (auth.uid())::text AND ur.role = 'ADMIN'
+    JOIN "User" u ON u.id = ur."userId"
+    WHERE ur."userId" = (auth.uid())::text
+      AND ur.role = 'ADMIN'
+      AND u.status = 'ACTIVE'
+      AND u."deletedAt" IS NULL
   )
 );
 
@@ -110,7 +114,11 @@ DROP POLICY IF EXISTS "Admin can read booking inquiry messages" ON "BookingInqui
 CREATE POLICY "Admin can read booking inquiry messages" ON "BookingInquiryMessage" FOR SELECT TO public USING (
   EXISTS (
     SELECT 1 FROM "UserRole" ur
-    WHERE ur."userId" = (auth.uid())::text AND ur.role = 'ADMIN'
+    JOIN "User" u ON u.id = ur."userId"
+    WHERE ur."userId" = (auth.uid())::text
+      AND ur.role = 'ADMIN'
+      AND u.status = 'ACTIVE'
+      AND u."deletedAt" IS NULL
   )
 );
 
