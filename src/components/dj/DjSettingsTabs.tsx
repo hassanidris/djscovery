@@ -830,8 +830,11 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
       toast.error(result.error);
       return;
     }
-    highlightsRequest.current += 1;
-    setHighlights((prev) => prev.filter((h) => h.id !== id));
+    const requestId = ++highlightsRequest.current;
+    const updated = await getDjHighlights(profile.id);
+    if (requestId === highlightsRequest.current) {
+      setHighlights(updated);
+    }
     toast.success("Highlight deleted.");
   }
 
@@ -843,7 +846,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
 
   function handleSave() {
     startTransition(async () => {
-      highlightsRequest.current += 1;
+      const requestId = ++highlightsRequest.current;
       const toAdd = highlights.filter((h) => h.id < 0);
       const toUpdate = highlights.filter((h) => h.id > 0);
       const toDelete = highlights.filter(
@@ -880,7 +883,9 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
 
       // Reload highlights
       const result = await getDjHighlights(profile.id);
-      setHighlights(result);
+      if (requestId === highlightsRequest.current) {
+        setHighlights(result);
+      }
       setEditId(null);
       toast.success("Career highlights updated.");
     });

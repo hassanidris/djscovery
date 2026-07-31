@@ -33,9 +33,6 @@ const meta: Meta<typeof Button> = {
         "icon-lg",
       ],
     },
-    asChild: {
-      control: "boolean",
-    },
   },
 };
 
@@ -81,6 +78,17 @@ export const Link: Story = {
     variant: "link",
     children: "Link Button",
   },
+};
+
+export const AsChild: Story = {
+  args: {
+    asChild: true,
+  },
+  render: () => (
+    <Button asChild>
+      <a href="#">Link Button</a>
+    </Button>
+  ),
 };
 
 export const Sizes: Story = {

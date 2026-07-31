@@ -17,7 +17,7 @@ const config: StorybookConfig = {
     config.resolve = config.resolve || {};
     config.resolve.tsconfigPaths = true;
 
-    // Mock next/navigation and next-themes
+    // Mock next/navigation, next-themes, and next/image
     config.resolve.alias = config.resolve.alias || {};
     config.resolve.alias["next/navigation"] = path.resolve(
       __dirname,
@@ -25,11 +25,11 @@ const config: StorybookConfig = {
     );
     config.resolve.alias["next-themes"] = path.resolve(
       __dirname,
-      "./next-navigation-mock.tsx",
+      "./next-themes-mock.tsx",
     );
     config.resolve.alias["next/image"] = path.resolve(
       __dirname,
-      "./next-navigation-mock.tsx",
+      "./next-image-mock.tsx",
     );
 
     return config;

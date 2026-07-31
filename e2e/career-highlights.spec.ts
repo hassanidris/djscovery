@@ -237,7 +237,9 @@ test.describe("Career Highlights", () => {
       });
 
       // Wait for edit mode to exit (button should be visible again)
-      await expect(page.locator('button[aria-label="Edit"]')).toBeVisible({
+      await expect(
+        page.locator('button[aria-label="Edit"]').first(),
+      ).toBeVisible({
         timeout: 5000,
       });
 

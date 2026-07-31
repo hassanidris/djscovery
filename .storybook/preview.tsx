@@ -30,16 +30,18 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story) => (
-      <div className="dark">
+    (Story, context) => (
+      <div className={context.globals.theme}>
         <Story />
       </div>
     ),
   ],
+  initialGlobals: {
+    theme: "dark",
+  },
   globalTypes: {
     theme: {
       description: "Global theme for components",
-      defaultValue: "dark",
       toolbar: {
         title: "Theme",
         icon: "circlehollow",
