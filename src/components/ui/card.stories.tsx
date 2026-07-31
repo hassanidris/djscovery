@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import {
   Card,
   CardHeader,
@@ -7,19 +7,19 @@ import {
   CardAction,
   CardContent,
   CardFooter,
-} from './card';
+} from "./card";
 
 const meta: Meta<typeof Card> = {
-  title: 'UI/Card',
+  title: "UI/Card",
   component: Card,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     size: {
-      control: 'select',
-      options: ['default', 'sm'],
+      control: "select",
+      options: ["default", "sm"],
     },
   },
 };
@@ -29,7 +29,7 @@ type Story = StoryObj<typeof Card>;
 
 export const Default: Story = {
   args: {
-    size: 'default',
+    size: "default",
     children: (
       <>
         <CardHeader>
@@ -42,7 +42,7 @@ export const Default: Story = {
           <p>This is the card content area where you can place any content.</p>
         </CardContent>
         <CardFooter>
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded">
+          <button className="bg-primary text-primary-foreground rounded px-4 py-2">
             Action
           </button>
         </CardFooter>
@@ -53,7 +53,7 @@ export const Default: Story = {
 
 export const Small: Story = {
   args: {
-    size: 'sm',
+    size: "sm",
     children: (
       <>
         <CardHeader>
@@ -70,7 +70,7 @@ export const Small: Story = {
 
 export const WithAction: Story = {
   args: {
-    size: 'default',
+    size: "default",
     children: (
       <>
         <CardHeader>
@@ -79,7 +79,7 @@ export const WithAction: Story = {
             This card has an action button in the header
           </CardDescription>
           <CardAction>
-            <button className="px-3 py-1.5 text-sm bg-accent text-accent-foreground rounded">
+            <button className="bg-accent text-accent-foreground rounded px-3 py-1.5 text-sm">
               Edit
             </button>
           </CardAction>
@@ -87,14 +87,14 @@ export const WithAction: Story = {
         <CardContent>
           <p>Content with header action button positioned to the right.</p>
         </CardContent>
-      </> 
+      </>
     ),
   },
 };
 
 export const Minimal: Story = {
   args: {
-    size: 'default',
+    size: "default",
     children: (
       <CardContent>
         <p>A minimal card with only content, no header or footer.</p>

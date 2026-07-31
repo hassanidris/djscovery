@@ -1,24 +1,40 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { Button } from "./button";
 
 const meta: Meta<typeof Button> = {
-  title: 'UI/Button',
+  title: "UI/Button",
   component: Button,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['default', 'outline', 'secondary', 'ghost', 'destructive', 'link'],
+      control: "select",
+      options: [
+        "default",
+        "outline",
+        "secondary",
+        "ghost",
+        "destructive",
+        "link",
+      ],
     },
     size: {
-      control: 'select',
-      options: ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-sm', 'icon-lg'],
+      control: "select",
+      options: [
+        "default",
+        "xs",
+        "sm",
+        "lg",
+        "icon",
+        "icon-xs",
+        "icon-sm",
+        "icon-lg",
+      ],
     },
     asChild: {
-      control: 'boolean',
+      control: "boolean",
     },
   },
 };
@@ -28,51 +44,51 @@ type Story = StoryObj<typeof Button>;
 
 export const Default: Story = {
   args: {
-    children: 'Default Button',
+    children: "Default Button",
   },
 };
 
 export const Outline: Story = {
   args: {
-    variant: 'outline',
-    children: 'Outline Button',
+    variant: "outline",
+    children: "Outline Button",
   },
 };
 
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
-    children: 'Secondary Button',
+    variant: "secondary",
+    children: "Secondary Button",
   },
 };
 
 export const Ghost: Story = {
   args: {
-    variant: 'ghost',
-    children: 'Ghost Button',
+    variant: "ghost",
+    children: "Ghost Button",
   },
 };
 
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
-    children: 'Destructive Button',
+    variant: "destructive",
+    children: "Destructive Button",
   },
 };
 
 export const Link: Story = {
   args: {
-    variant: 'link',
-    children: 'Link Button',
+    variant: "link",
+    children: "Link Button",
   },
 };
 
 export const Sizes: Story = {
   args: {
-    children: 'Button',
+    children: "Button",
   },
   render: () => (
-    <div className="flex gap-4 items-center">
+    <div className="flex items-center gap-4">
       <Button size="xs">XS</Button>
       <Button size="sm">Small</Button>
       <Button size="default">Default</Button>
@@ -83,7 +99,7 @@ export const Sizes: Story = {
 
 export const IconButtons: Story = {
   render: () => (
-    <div className="flex gap-4 items-center">
+    <div className="flex items-center gap-4">
       <Button size="icon-xs">✕</Button>
       <Button size="icon-sm">✕</Button>
       <Button size="icon">✕</Button>
@@ -94,7 +110,7 @@ export const IconButtons: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="flex gap-4 items-center flex-wrap">
+    <div className="flex flex-wrap items-center gap-4">
       <Button variant="default">Default</Button>
       <Button variant="outline">Outline</Button>
       <Button variant="secondary">Secondary</Button>
