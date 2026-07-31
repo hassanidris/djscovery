@@ -17,7 +17,9 @@
     "e2e:report": "playwright show-report",
     "seed": "tsx prisma/seed.ts",
     "create-admin": "tsx prisma/create-admin.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -72,6 +74,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "@storybook/addon-a11y": "^10.5.5",
+    "@storybook/nextjs": "^10.5.5",
+    "@storybook/nextjs-vite": "^10.5.5",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/leaflet": "^1.9.21",
@@ -82,15 +87,18 @@
     "@vitejs/plugin-react-swc": "^4.3.1",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.10",
+    "eslint-plugin-storybook": "^10.5.5",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.10",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "prisma": "^7.9.0",
     "shadcn": "^4.9.0",
+    "storybook": "^10.5.5",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
     "typescript": "^5.9.3",
+    "vite": "^8.2.0",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10"
   },
