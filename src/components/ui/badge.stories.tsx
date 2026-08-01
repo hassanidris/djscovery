@@ -11,7 +11,14 @@ const meta: Meta<typeof Badge> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "secondary", "destructive", "outline", "ghost", "link"],
+      options: [
+        "default",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
   },
 };
@@ -88,15 +95,21 @@ export const WithIcon: Story = {
   render: () => (
     <div className="flex flex-wrap gap-2">
       <Badge>
-        <span className="mr-1">✓</span>
+        <span className="mr-1" aria-hidden>
+          ✓
+        </span>
         Verified
       </Badge>
       <Badge variant="destructive">
-        <span className="mr-1">!</span>
+        <span className="mr-1" aria-hidden>
+          !
+        </span>
         Alert
       </Badge>
       <Badge variant="secondary">
-        <span className="mr-1">i</span>
+        <span className="mr-1" aria-hidden>
+          i
+        </span>
         Info
       </Badge>
     </div>

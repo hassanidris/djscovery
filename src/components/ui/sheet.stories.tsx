@@ -18,22 +18,14 @@ const meta: Meta<typeof Sheet> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    open: {
-      control: "boolean",
-    },
-  },
 };
 
 export default meta;
 type Story = StoryObj<typeof Sheet>;
 
 export const Right: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <Sheet open>
+    <Sheet defaultOpen>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Edit Profile</SheetTitle>
@@ -62,7 +54,7 @@ export const Left: Story = {
     open: true,
   },
   render: () => (
-    <Sheet open>
+    <Sheet defaultOpen>
       <SheetContent side="left">
         <SheetHeader>
           <SheetTitle>Navigation</SheetTitle>
@@ -89,7 +81,7 @@ export const Top: Story = {
     open: true,
   },
   render: () => (
-    <Sheet open>
+    <Sheet defaultOpen>
       <SheetContent side="top">
         <SheetHeader>
           <SheetTitle>Notifications</SheetTitle>
@@ -110,7 +102,7 @@ export const Bottom: Story = {
     open: true,
   },
   render: () => (
-    <Sheet open>
+    <Sheet defaultOpen>
       <SheetContent side="bottom">
         <SheetHeader>
           <SheetTitle>Mobile Menu</SheetTitle>
@@ -136,7 +128,7 @@ export const WithoutCloseButton: Story = {
     open: true,
   },
   render: () => (
-    <Sheet open>
+    <Sheet defaultOpen>
       <SheetContent side="right" showCloseButton={false}>
         <SheetHeader>
           <SheetTitle>Important</SheetTitle>

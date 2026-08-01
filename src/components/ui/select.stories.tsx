@@ -17,11 +17,6 @@ const meta: Meta<typeof Select> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    disabled: {
-      control: "boolean",
-    },
-  },
 };
 
 export default meta;
@@ -30,7 +25,7 @@ type Story = StoryObj<typeof Select>;
 export const Default: Story = {
   render: () => (
     <Select defaultValue="option1">
-      <SelectTrigger>
+      <SelectTrigger aria-label="Select an option">
         <SelectValue placeholder="Select an option" />
       </SelectTrigger>
       <SelectContent>
@@ -45,7 +40,7 @@ export const Default: Story = {
 export const WithPlaceholder: Story = {
   render: () => (
     <Select>
-      <SelectTrigger>
+      <SelectTrigger aria-label="Choose a framework">
         <SelectValue placeholder="Choose a framework" />
       </SelectTrigger>
       <SelectContent>
@@ -61,7 +56,7 @@ export const WithPlaceholder: Story = {
 export const Disabled: Story = {
   render: () => (
     <Select disabled>
-      <SelectTrigger>
+      <SelectTrigger aria-label="Disabled select">
         <SelectValue placeholder="Disabled select" />
       </SelectTrigger>
       <SelectContent>
@@ -75,7 +70,7 @@ export const Disabled: Story = {
 export const WithGroups: Story = {
   render: () => (
     <Select>
-      <SelectTrigger>
+      <SelectTrigger aria-label="Select a fruit">
         <SelectValue placeholder="Select a fruit" />
       </SelectTrigger>
       <SelectContent>
@@ -100,7 +95,7 @@ export const WithGroups: Story = {
 export const SmallSize: Story = {
   render: () => (
     <Select defaultValue="option1">
-      <SelectTrigger size="sm">
+      <SelectTrigger size="sm" aria-label="Small select">
         <SelectValue placeholder="Small select" />
       </SelectTrigger>
       <SelectContent>
@@ -114,7 +109,10 @@ export const SmallSize: Story = {
 export const WithLabel: Story = {
   render: () => (
     <div className="flex flex-col gap-2">
-      <label htmlFor="select-with-label" className="text-sm font-medium">
+      <label
+        htmlFor="select-with-label"
+        className="text-foreground text-sm font-medium"
+      >
         Select with Label
       </label>
       <Select defaultValue="option1">
@@ -134,7 +132,7 @@ export const WithLabel: Story = {
 export const LongOptions: Story = {
   render: () => (
     <Select>
-      <SelectTrigger>
+      <SelectTrigger aria-label="Select a country">
         <SelectValue placeholder="Select a country" />
       </SelectTrigger>
       <SelectContent>

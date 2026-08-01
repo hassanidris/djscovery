@@ -18,28 +18,20 @@ const meta: Meta<typeof Dialog> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    open: {
-      control: "boolean",
-    },
-  },
 };
 
 export default meta;
 type Story = StoryObj<typeof Dialog>;
 
 export const Default: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <Dialog open>
+    <Dialog defaultOpen>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your account
-            and remove your data from our servers.
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -52,11 +44,8 @@ export const Default: Story = {
 };
 
 export const WithoutCloseButton: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <Dialog open>
+    <Dialog defaultOpen>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>Important Notice</DialogTitle>
@@ -73,11 +62,8 @@ export const WithoutCloseButton: Story = {
 };
 
 export const WithFooterCloseButton: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <Dialog open>
+    <Dialog defaultOpen>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Success</DialogTitle>
@@ -95,19 +81,16 @@ export const WithFooterCloseButton: Story = {
 };
 
 export const SimpleContent: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <Dialog open>
+    <Dialog defaultOpen>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Welcome</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p className="text-sm text-muted-foreground">
-            This is a simple dialog with basic content. It demonstrates the dialog
-            structure without complex actions.
+          <p className="text-muted-foreground text-sm">
+            This is a simple dialog with basic content. It demonstrates the
+            dialog structure without complex actions.
           </p>
         </div>
         <DialogFooter>
@@ -119,11 +102,8 @@ export const SimpleContent: Story = {
 };
 
 export const LongContent: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <Dialog open>
+    <Dialog defaultOpen>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
@@ -131,14 +111,29 @@ export const LongContent: Story = {
             Please read and accept our terms to continue.
           </DialogDescription>
         </DialogHeader>
-        <div className="max-h-60 overflow-y-auto py-4">
-          <p className="text-sm text-muted-foreground space-y-2">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
-          </p>
+        <div className="max-h-60 overflow-y-auto py-4" tabIndex={0}>
+          <div className="text-muted-foreground space-y-2 text-sm">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p>
+              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur.
+            </p>
+            <p>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum.
+            </p>
+            <p>
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+              accusantium doloremque laudantium.
+            </p>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline">Decline</Button>

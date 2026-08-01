@@ -13,15 +13,6 @@ const meta: Meta<typeof Accordion> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    type: {
-      control: "select",
-      options: ["single", "multiple"],
-    },
-    collapsible: {
-      control: "boolean",
-    },
-  },
 };
 
 export default meta;
@@ -29,10 +20,16 @@ type Story = StoryObj<typeof Accordion>;
 
 export const Default: Story = {
   args: {
+    type: "single",
+    collapsible: true,
     defaultValue: "item-1",
   },
-  render: () => (
-    <Accordion type="single" defaultValue="item-1" collapsible>
+  render: (context) => (
+    <Accordion
+      type={context.args?.type}
+      defaultValue={context.args?.defaultValue}
+      collapsible={context.args?.collapsible}
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>
@@ -83,10 +80,14 @@ export const Multiple: Story = {
 
 export const WithoutCollapsible: Story = {
   args: {
+    type: "single",
     defaultValue: "item-1",
   },
-  render: () => (
-    <Accordion type="single" defaultValue="item-1">
+  render: (context) => (
+    <Accordion
+      type={context.args?.type}
+      defaultValue={context.args?.defaultValue}
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Can I collapse it?</AccordionTrigger>
         <AccordionContent>
@@ -146,17 +147,17 @@ export const WithLinks: Story = {
         <AccordionContent>
           <ul className="list-disc space-y-1 pl-4">
             <li>
-              <a href="#" className="text-primary hover:underline">
+              <a href="#" className="text-foreground hover:underline">
                 Documentation
               </a>
             </li>
             <li>
-              <a href="#" className="text-primary hover:underline">
+              <a href="#" className="text-foreground hover:underline">
                 API Reference
               </a>
             </li>
             <li>
-              <a href="#" className="text-primary hover:underline">
+              <a href="#" className="text-foreground hover:underline">
                 Community Forum
               </a>
             </li>
@@ -169,12 +170,12 @@ export const WithLinks: Story = {
           <p className="mb-2">Need help? Check out our support channels:</p>
           <ul className="list-disc space-y-1 pl-4">
             <li>
-              <a href="#" className="text-primary hover:underline">
+              <a href="#" className="text-foreground hover:underline">
                 Help Center
               </a>
             </li>
             <li>
-              <a href="#" className="text-primary hover:underline">
+              <a href="#" className="text-foreground hover:underline">
                 Contact Support
               </a>
             </li>

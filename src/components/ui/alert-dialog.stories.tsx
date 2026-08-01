@@ -20,28 +20,20 @@ const meta: Meta<typeof AlertDialog> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    open: {
-      control: "boolean",
-    },
-  },
 };
 
 export default meta;
 type Story = StoryObj<typeof AlertDialog>;
 
 export const Default: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <AlertDialog open>
+    <AlertDialog defaultOpen>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your account
-            and remove your data from our servers.
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -54,17 +46,14 @@ export const Default: Story = {
 };
 
 export const Destructive: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <AlertDialog open>
+    <AlertDialog defaultOpen>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Account</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete your account? This action cannot be undone
-            and all your data will be permanently removed.
+            Are you sure you want to delete your account? This action cannot be
+            undone and all your data will be permanently removed.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -79,11 +68,8 @@ export const Destructive: Story = {
 };
 
 export const WithMedia: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <AlertDialog open>
+    <AlertDialog defaultOpen>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia>
@@ -105,11 +91,8 @@ export const WithMedia: Story = {
 };
 
 export const SmallSize: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <AlertDialog open>
+    <AlertDialog defaultOpen>
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm Action</AlertDialogTitle>
@@ -136,7 +119,8 @@ export const WithTrigger: Story = {
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Account</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete your account? This action cannot be undone.
+            Are you sure you want to delete your account? This action cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -151,11 +135,8 @@ export const WithTrigger: Story = {
 };
 
 export const Success: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <AlertDialog open>
+    <AlertDialog defaultOpen>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia>
@@ -175,11 +156,8 @@ export const Success: Story = {
 };
 
 export const Info: Story = {
-  args: {
-    open: true,
-  },
   render: () => (
-    <AlertDialog open>
+    <AlertDialog defaultOpen>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia>

@@ -15,12 +15,6 @@ const meta: Meta<typeof Avatar> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    size: {
-      control: "select",
-      options: ["sm", "default", "lg"],
-    },
-  },
 };
 
 export default meta;
@@ -44,8 +38,11 @@ export const WithFallback: Story = {
 };
 
 export const Small: Story = {
-  render: () => (
-    <Avatar size="sm">
+  args: {
+    size: "sm",
+  },
+  render: (context) => (
+    <Avatar size={context.args?.size}>
       <AvatarImage src="https://i.pravatar.cc/150?img=2" alt="User" />
       <AvatarFallback>JD</AvatarFallback>
     </Avatar>
@@ -53,8 +50,11 @@ export const Small: Story = {
 };
 
 export const Large: Story = {
-  render: () => (
-    <Avatar size="lg">
+  args: {
+    size: "lg",
+  },
+  render: (context) => (
+    <Avatar size={context.args?.size}>
       <AvatarImage src="https://i.pravatar.cc/150?img=3" alt="User" />
       <AvatarFallback>JD</AvatarFallback>
     </Avatar>

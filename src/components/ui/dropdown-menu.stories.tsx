@@ -99,11 +99,11 @@ export const WithCheckboxItems: Story = {
         <Button>Checkbox Menu</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuCheckboxItem checked>
+        <DropdownMenuCheckboxItem defaultChecked>
           Show Bookmarks Bar
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem>Show Status Bar</DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked>
+        <DropdownMenuCheckboxItem defaultChecked>
           Enable Notifications
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
@@ -118,7 +118,7 @@ export const WithRadioItems: Story = {
         <Button>Radio Menu</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuRadioGroup value="top">
+        <DropdownMenuRadioGroup defaultValue="top">
           <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="left">Left</DropdownMenuRadioItem>

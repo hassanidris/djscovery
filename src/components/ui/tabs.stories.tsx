@@ -8,11 +8,6 @@ const meta: Meta<typeof Tabs> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    defaultValue: {
-      control: "text",
-    },
-  },
 };
 
 export default meta;
@@ -22,8 +17,8 @@ export const Default: Story = {
   args: {
     defaultValue: "account",
   },
-  render: () => (
-    <Tabs defaultValue="account">
+  render: (context) => (
+    <Tabs defaultValue={context.args?.defaultValue}>
       <TabsList>
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="password">Password</TabsTrigger>
@@ -52,8 +47,8 @@ export const LineVariant: Story = {
   args: {
     defaultValue: "overview",
   },
-  render: () => (
-    <Tabs defaultValue="overview">
+  render: (context) => (
+    <Tabs defaultValue={context.args?.defaultValue}>
       <TabsList variant="line">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -82,8 +77,8 @@ export const WithIcons: Story = {
   args: {
     defaultValue: "mail",
   },
-  render: () => (
-    <Tabs defaultValue="mail">
+  render: (context) => (
+    <Tabs defaultValue={context.args?.defaultValue}>
       <TabsList>
         <TabsTrigger value="mail">Mail</TabsTrigger>
         <TabsTrigger value="calendar">Calendar</TabsTrigger>
@@ -112,9 +107,9 @@ export const Vertical: Story = {
   args: {
     defaultValue: "profile",
   },
-  render: () => (
+  render: (context) => (
     <div className="flex gap-4">
-      <Tabs defaultValue="profile" orientation="vertical">
+      <Tabs defaultValue={context.args?.defaultValue} orientation="vertical">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="billing">Billing</TabsTrigger>
