@@ -8,32 +8,6 @@ const meta: Meta<typeof Button> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    variant: {
-      control: "select",
-      options: [
-        "default",
-        "outline",
-        "secondary",
-        "ghost",
-        "destructive",
-        "link",
-      ],
-    },
-    size: {
-      control: "select",
-      options: [
-        "default",
-        "xs",
-        "sm",
-        "lg",
-        "icon",
-        "icon-xs",
-        "icon-sm",
-        "icon-lg",
-      ],
-    },
-  },
 };
 
 export default meta;
@@ -108,10 +82,18 @@ export const Sizes: Story = {
 export const IconButtons: Story = {
   render: () => (
     <div className="flex items-center gap-4">
-      <Button size="icon-xs">✕</Button>
-      <Button size="icon-sm">✕</Button>
-      <Button size="icon">✕</Button>
-      <Button size="icon-lg">✕</Button>
+      <Button size="icon-xs" aria-label="Close">
+        ✕
+      </Button>
+      <Button size="icon-sm" aria-label="Close">
+        ✕
+      </Button>
+      <Button size="icon" aria-label="Close">
+        ✕
+      </Button>
+      <Button size="icon-lg" aria-label="Close">
+        ✕
+      </Button>
     </div>
   ),
 };
