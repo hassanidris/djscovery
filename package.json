@@ -18,7 +18,7 @@
     "seed": "tsx prisma/seed.ts",
     "create-admin": "tsx prisma/create-admin.ts",
     "postinstall": "prisma generate",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build"
   },
   "prisma": {

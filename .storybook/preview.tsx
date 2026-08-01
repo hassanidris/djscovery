@@ -1,6 +1,17 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import "../src/app/globals.css";
 
+// Load fonts for Storybook
+const link = document.createElement("link");
+link.href =
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap";
+link.rel = "stylesheet";
+document.head.appendChild(link);
+
+// Set CSS variables for fonts (normally set by Next.js font optimization)
+document.documentElement.style.setProperty("--font-inter", "Inter, sans-serif");
+document.documentElement.style.setProperty("--font-sora", "Sora, sans-serif");
+
 const preview: Preview = {
   parameters: {
     controls: {
