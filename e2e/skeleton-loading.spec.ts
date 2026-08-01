@@ -189,15 +189,19 @@ test.describe("admin table skeletons", () => {
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
-  test.beforeAll(async ({ browser }) => {
-    adminAuthState = await ensureAuthState(
-      browser,
-      TEST_USERS.ADMIN.email,
-      TEST_USERS.ADMIN.password,
-      ADMIN_STATE_PATH,
-      /\/admin/,
-    );
-  }, 120000);
+  test.beforeAll(
+    "setup admin auth",
+    async () => {
+      adminAuthState = await ensureAuthState(
+        null,
+        TEST_USERS.ADMIN.email,
+        TEST_USERS.ADMIN.password,
+        ADMIN_STATE_PATH,
+        /\/admin/,
+      );
+    },
+    120000,
+  );
 
   test("hires page shows table skeleton while loading", async ({ page }) => {
     const { skeletonVisible, skeletonCount } = await navigateAndCheckSkeleton(
@@ -427,9 +431,9 @@ test.describe("DJ dashboard skeletons", () => {
   let djAuthState: Awaited<ReturnType<BrowserContext["storageState"]>> | null =
     null;
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     djAuthState = await ensureAuthState(
-      browser,
+      null,
       TEST_USERS.FREE_DJ.email,
       TEST_USERS.FREE_DJ.password,
       FREE_DJ_STATE_PATH,
@@ -526,14 +530,14 @@ test.describe("DJ dashboard skeletons", () => {
 
 // ── Organizer Skeletons ───────────────────────────────────────────────────
 
-test.describe("organizer skeletons", () => {
+test.describe("organizer dashboard skeletons", () => {
   let organizerAuthState: Awaited<
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     organizerAuthState = await ensureAuthState(
-      browser,
+      null,
       TEST_USERS.ORGANIZER.email,
       TEST_USERS.ORGANIZER.password,
       ORGANIZER_STATE_PATH,
@@ -618,9 +622,9 @@ test.describe("fan skeletons", () => {
   let fanAuthState: Awaited<ReturnType<BrowserContext["storageState"]>> | null =
     null;
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     fanAuthState = await ensureAuthState(
-      browser,
+      null,
       TEST_USERS.FAN.email,
       TEST_USERS.FAN.password,
       FAN_STATE_PATH,
@@ -793,14 +797,14 @@ test.describe("public page skeletons", () => {
 
 // ── Skeleton Behavior Tests ───────────────────────────────────────────────
 
-test.describe("skeleton behavior", () => {
+test.describe("admin card skeletons", () => {
   let adminAuthState: Awaited<
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     adminAuthState = await ensureAuthState(
-      browser,
+      null,
       TEST_USERS.ADMIN.email,
       TEST_USERS.ADMIN.password,
       ADMIN_STATE_PATH,
