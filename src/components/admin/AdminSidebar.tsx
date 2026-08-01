@@ -13,6 +13,7 @@ import {
   Flag,
   MapPin,
   MessageSquare,
+  CheckCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,7 @@ const NAV_ITEMS = [
     exact: false,
   },
   { href: "/admin/gigs", label: "Gigs", icon: Briefcase, exact: false },
+  { href: "/admin/hires", label: "Hires", icon: CheckCircle, exact: false },
   { href: "/admin/events", label: "Events", icon: Calendar, exact: false },
   { href: "/admin/venues", label: "Venues", icon: MapPin, exact: false },
   {

@@ -19,7 +19,7 @@ export default meta;
 type Story = StoryObj<typeof Skeleton>;
 
 export const Default: Story = {
-  render: () => <Skeleton className="h-4 w-[250px]" />,
+  render: () => <Skeleton className="h-4 w-62.5" />,
 };
 
 export const Circle: Story = {
@@ -28,7 +28,7 @@ export const Circle: Story = {
 
 export const Card: Story = {
   render: () => (
-    <div className="w-[300px] space-y-4">
+    <div className="w-75 space-y-4">
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-4 w-1/2" />
       <Skeleton className="h-4 w-5/6" />
@@ -41,15 +41,15 @@ export const Avatar: Story = {
     <div className="flex items-center space-x-4">
       <Skeleton className="h-12 w-12 rounded-full" />
       <div className="space-y-2">
-        <Skeleton className="h-4 w-[250px]" />
-        <Skeleton className="h-4 w-[200px]" />
+        <Skeleton className="h-4 w-62.5" />
+        <Skeleton className="h-4 w-50" />
       </div>
     </div>
   ),
 };
 
 export const Button: Story = {
-  render: () => <Skeleton className="h-10 w-[120px] rounded-md" />,
+  render: () => <Skeleton className="h-10 w-30 rounded-md" />,
 };
 
 export const Input: Story = {
@@ -81,12 +81,12 @@ export const Table: Story = {
 
 export const ProfileCard: Story = {
   render: () => (
-    <div className="w-[300px] space-y-4 rounded-lg border p-4">
+    <div className="w-75 space-y-4 rounded-lg border p-4">
       <div className="flex items-center space-x-4">
         <Skeleton className="h-16 w-16 rounded-full" />
         <div className="space-y-2">
-          <Skeleton className="h-4 w-[150px]" />
-          <Skeleton className="h-3 w-[100px]" />
+          <Skeleton className="h-4 w-37.5" />
+          <Skeleton className="h-3 w-25" />
         </div>
       </div>
       <div className="space-y-2">
@@ -100,11 +100,11 @@ export const ProfileCard: Story = {
 
 export const List: Story = {
   render: () => (
-    <div className="w-[300px] space-y-3">
+    <div className="w-75 space-y-3">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center space-x-4">
           <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="space-y-2 flex-1">
+          <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-3 w-2/3" />
           </div>
