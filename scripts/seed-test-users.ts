@@ -253,7 +253,7 @@ async function main() {
   }
 
   console.log("\nSeed complete!");
-  console.log(`\nTest credentials (password: ${TEST_PASSWORD}):`);
+  console.log("\nTest credentials (password configured via E2E_TEST_PASSWORD):");
   for (const u of TEST_USERS) {
     console.log(`  ${u.role.padEnd(10)} → ${u.email}`);
   }
