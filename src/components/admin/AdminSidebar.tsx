@@ -14,6 +14,7 @@ import {
   MapPin,
   MessageSquare,
   CheckCircle,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,7 @@ const NAV_ITEMS = [
     exact: false,
   },
   { href: "/admin/reports", label: "Reports", icon: Flag, exact: false },
+  { href: "/admin/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;
 
 function NavLinks({

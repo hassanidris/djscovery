@@ -51,7 +51,7 @@ export default async function AdminHiresPage({
   const status = first(params.status);
   const country = first(params.country);
 
-  const { hires, nextCursor } = await getAdminHires({
+  const { hires, nextCursor, totalRevenue } = await getAdminHires({
     cursor,
     status: status as any,
     country,
@@ -90,6 +90,23 @@ export default async function AdminHiresPage({
           },
         ]}
       />
+
+      {totalRevenue > 0 && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+          <DollarSign className="h-5 w-5 text-emerald-400" />
+          <div>
+            <p className="text-xs font-medium text-emerald-400">
+              Total Revenue
+            </p>
+            <p className="text-lg font-bold text-white">
+              $
+              {typeof totalRevenue === "number"
+                ? totalRevenue.toFixed(2)
+                : Number(totalRevenue).toFixed(2)}
+            </p>
+          </div>
+        </div>
+      )}
 
       <Suspense
         fallback={

@@ -260,7 +260,11 @@ export async function getAdminHires({
   dateFrom?: Date;
   dateTo?: Date;
   country?: string;
-}): Promise<{ hires: AdminHire[]; nextCursor: number | null }> {
+}): Promise<{
+  hires: AdminHire[];
+  nextCursor: number | null;
+  totalRevenue: number;
+}> {
   await requireAdmin();
 
   const hires = await prisma.hire.findMany({
@@ -360,9 +364,44 @@ export async function getAdminHires({
   const hasNextPage = hires.length > take;
   if (hasNextPage) hires.pop();
 
+  // Calculate total revenue from all hires (not just current page)
+  const totalRevenue = await prisma.hire.aggregate({
+    where: {
+      ...(status ? { status } : {}),
+      ...(dateFrom || dateTo
+        ? {
+            application: {
+              gig: {
+                eventDate: {
+                  ...(dateFrom ? { gte: dateFrom } : {}),
+                  ...(dateTo ? { lte: dateTo } : {}),
+                },
+              },
+            },
+          }
+        : {}),
+      ...(country
+        ? {
+            application: {
+              gig: {
+                country: {
+                  name: { contains: country, mode: "insensitive" },
+                },
+              },
+            },
+          }
+        : {}),
+      agreedRate: { not: null },
+    },
+    _sum: {
+      agreedRate: true,
+    },
+  });
+
   return {
     hires: hires as AdminHire[],
     nextCursor: hasNextPage ? (hires[hires.length - 1]?.id ?? null) : null,
+    totalRevenue: totalRevenue._sum.agreedRate || 0,
   };
 }
 
