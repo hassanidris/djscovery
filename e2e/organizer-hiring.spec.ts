@@ -282,7 +282,7 @@ test.describe("admin hires management", () => {
     await page.goto("/admin/hires");
     await expect(page.getByText("Test Free DJ").first()).toBeVisible();
     await expect(page.getByText("Test Gig for Hiring").first()).toBeVisible();
-    await expect(page.getByText("500.00")).toBeVisible();
+    await expect(page.getByText("500.00").first()).toBeVisible();
     await expect(page.getByText("Active").first()).toBeVisible();
   });
 
