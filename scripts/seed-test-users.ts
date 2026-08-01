@@ -132,7 +132,9 @@ async function upsertPrismaUser(userDef: TestUserDef, authId: string) {
     select: { id: true, name: true },
   });
   if (!country) {
-    country = await prisma.country.create({ data: { name: "Sweden" } });
+    country = await prisma.country.create({
+      data: { name: "Sweden", code: "SE" },
+    });
     console.log(`  ✓ Created country: Sweden`);
   }
 
