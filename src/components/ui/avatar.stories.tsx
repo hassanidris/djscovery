@@ -38,11 +38,8 @@ export const WithFallback: Story = {
 };
 
 export const Small: Story = {
-  args: {
-    size: "sm",
-  },
-  render: ({ args }) => (
-    <Avatar size={args?.size}>
+  render: () => (
+    <Avatar size="sm">
       <AvatarImage src="https://i.pravatar.cc/150?img=2" alt="User" />
       <AvatarFallback>JD</AvatarFallback>
     </Avatar>
@@ -50,11 +47,8 @@ export const Small: Story = {
 };
 
 export const Large: Story = {
-  args: {
-    size: "lg",
-  },
-  render: ({ args }) => (
-    <Avatar size={args?.size}>
+  render: () => (
+    <Avatar size="lg">
       <AvatarImage src="https://i.pravatar.cc/150?img=3" alt="User" />
       <AvatarFallback>JD</AvatarFallback>
     </Avatar>

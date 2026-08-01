@@ -15,11 +15,8 @@ export default meta;
 type Story = StoryObj<typeof Alert>;
 
 export const Default: Story = {
-  args: {
-    variant: "default",
-  },
-  render: ({ args }) => (
-    <Alert variant={args?.variant}>
+  render: () => (
+    <Alert variant="default">
       <AlertTitle>Information</AlertTitle>
       <AlertDescription>
         This is an informational alert message.
@@ -29,11 +26,8 @@ export const Default: Story = {
 };
 
 export const Destructive: Story = {
-  args: {
-    variant: "destructive",
-  },
-  render: ({ args }) => (
-    <Alert variant={args?.variant}>
+  render: () => (
+    <Alert variant="destructive">
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         Something went wrong. Please try again later.

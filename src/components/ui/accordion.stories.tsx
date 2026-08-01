@@ -19,17 +19,8 @@ export default meta;
 type Story = StoryObj<typeof Accordion>;
 
 export const Default: Story = {
-  args: {
-    type: "single",
-    collapsible: true,
-    defaultValue: "item-1",
-  },
-  render: ({ args }) => (
-    <Accordion
-      type={args?.type}
-      defaultValue={args?.defaultValue}
-      collapsible={args?.collapsible}
-    >
+  render: () => (
+    <Accordion type="single" collapsible defaultValue="item-1">
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>
@@ -79,12 +70,8 @@ export const Multiple: Story = {
 };
 
 export const WithoutCollapsible: Story = {
-  args: {
-    type: "single",
-    defaultValue: "item-1",
-  },
-  render: ({ args }) => (
-    <Accordion type={args?.type} defaultValue={args?.defaultValue}>
+  render: () => (
+    <Accordion type="single" defaultValue="item-1">
       <AccordionItem value="item-1">
         <AccordionTrigger>Can I collapse it?</AccordionTrigger>
         <AccordionContent>
