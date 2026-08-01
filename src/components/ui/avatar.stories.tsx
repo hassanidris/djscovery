@@ -41,8 +41,8 @@ export const Small: Story = {
   args: {
     size: "sm",
   },
-  render: (context) => (
-    <Avatar size={context.args?.size}>
+  render: ({ args }) => (
+    <Avatar size={args?.size}>
       <AvatarImage src="https://i.pravatar.cc/150?img=2" alt="User" />
       <AvatarFallback>JD</AvatarFallback>
     </Avatar>
@@ -53,8 +53,8 @@ export const Large: Story = {
   args: {
     size: "lg",
   },
-  render: (context) => (
-    <Avatar size={context.args?.size}>
+  render: ({ args }) => (
+    <Avatar size={args?.size}>
       <AvatarImage src="https://i.pravatar.cc/150?img=3" alt="User" />
       <AvatarFallback>JD</AvatarFallback>
     </Avatar>

@@ -18,8 +18,8 @@ export const Default: Story = {
   args: {
     variant: "default",
   },
-  render: (context) => (
-    <Alert variant={context.args?.variant}>
+  render: ({ args }) => (
+    <Alert variant={args?.variant}>
       <AlertTitle>Information</AlertTitle>
       <AlertDescription>
         This is an informational alert message.
@@ -32,8 +32,8 @@ export const Destructive: Story = {
   args: {
     variant: "destructive",
   },
-  render: (context) => (
-    <Alert variant={context.args?.variant}>
+  render: ({ args }) => (
+    <Alert variant={args?.variant}>
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         Something went wrong. Please try again later.

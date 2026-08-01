@@ -24,11 +24,11 @@ export const Default: Story = {
     collapsible: true,
     defaultValue: "item-1",
   },
-  render: (context) => (
+  render: ({ args }) => (
     <Accordion
-      type={context.args?.type}
-      defaultValue={context.args?.defaultValue}
-      collapsible={context.args?.collapsible}
+      type={args?.type}
+      defaultValue={args?.defaultValue}
+      collapsible={args?.collapsible}
     >
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
@@ -83,11 +83,8 @@ export const WithoutCollapsible: Story = {
     type: "single",
     defaultValue: "item-1",
   },
-  render: (context) => (
-    <Accordion
-      type={context.args?.type}
-      defaultValue={context.args?.defaultValue}
-    >
+  render: ({ args }) => (
+    <Accordion type={args?.type} defaultValue={args?.defaultValue}>
       <AccordionItem value="item-1">
         <AccordionTrigger>Can I collapse it?</AccordionTrigger>
         <AccordionContent>

@@ -17,8 +17,8 @@ export const Default: Story = {
   args: {
     defaultValue: "account",
   },
-  render: (context) => (
-    <Tabs defaultValue={context.args?.defaultValue}>
+  render: ({ args }) => (
+    <Tabs defaultValue={args?.defaultValue}>
       <TabsList>
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="password">Password</TabsTrigger>
@@ -47,8 +47,8 @@ export const LineVariant: Story = {
   args: {
     defaultValue: "overview",
   },
-  render: (context) => (
-    <Tabs defaultValue={context.args?.defaultValue}>
+  render: ({ args }) => (
+    <Tabs defaultValue={args?.defaultValue}>
       <TabsList variant="line">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -77,8 +77,8 @@ export const WithIcons: Story = {
   args: {
     defaultValue: "mail",
   },
-  render: (context) => (
-    <Tabs defaultValue={context.args?.defaultValue}>
+  render: ({ args }) => (
+    <Tabs defaultValue={args?.defaultValue}>
       <TabsList>
         <TabsTrigger value="mail">Mail</TabsTrigger>
         <TabsTrigger value="calendar">Calendar</TabsTrigger>
