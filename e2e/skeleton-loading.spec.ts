@@ -189,19 +189,15 @@ test.describe("admin table skeletons", () => {
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
-  test.beforeAll(
-    "setup admin auth",
-    async () => {
-      adminAuthState = await ensureAuthState(
-        null,
-        TEST_USERS.ADMIN.email,
-        TEST_USERS.ADMIN.password,
-        ADMIN_STATE_PATH,
-        /\/admin/,
-      );
-    },
-    120000,
-  );
+  test.beforeAll(async ({ browser }) => {
+    adminAuthState = await ensureAuthState(
+      browser,
+      TEST_USERS.ADMIN.email,
+      TEST_USERS.ADMIN.password,
+      ADMIN_STATE_PATH,
+      /\/admin/,
+    );
+  }, 120000);
 
   test("hires page shows table skeleton while loading", async ({ page }) => {
     const { skeletonVisible, skeletonCount } = await navigateAndCheckSkeleton(
@@ -431,9 +427,9 @@ test.describe("DJ dashboard skeletons", () => {
   let djAuthState: Awaited<ReturnType<BrowserContext["storageState"]>> | null =
     null;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ browser }) => {
     djAuthState = await ensureAuthState(
-      null,
+      browser,
       TEST_USERS.FREE_DJ.email,
       TEST_USERS.FREE_DJ.password,
       FREE_DJ_STATE_PATH,
@@ -535,9 +531,9 @@ test.describe("organizer dashboard skeletons", () => {
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ browser }) => {
     organizerAuthState = await ensureAuthState(
-      null,
+      browser,
       TEST_USERS.ORGANIZER.email,
       TEST_USERS.ORGANIZER.password,
       ORGANIZER_STATE_PATH,
@@ -622,9 +618,9 @@ test.describe("fan skeletons", () => {
   let fanAuthState: Awaited<ReturnType<BrowserContext["storageState"]>> | null =
     null;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ browser }) => {
     fanAuthState = await ensureAuthState(
-      null,
+      browser,
       TEST_USERS.FAN.email,
       TEST_USERS.FAN.password,
       FAN_STATE_PATH,
@@ -802,9 +798,9 @@ test.describe("admin card skeletons", () => {
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ browser }) => {
     adminAuthState = await ensureAuthState(
-      null,
+      browser,
       TEST_USERS.ADMIN.email,
       TEST_USERS.ADMIN.password,
       ADMIN_STATE_PATH,
