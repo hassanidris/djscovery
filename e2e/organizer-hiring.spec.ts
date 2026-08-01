@@ -143,7 +143,9 @@ test.describe("organizer hiring flow", () => {
   test("shows gig in organizer gigs list", async ({ page }) => {
     await restoreAuthState(page, organizerAuthState!);
     await page.goto("/organizer/gigs");
-    await expect(page.getByText("Test Gig for Hiring")).toBeVisible();
+    await expect(
+      page.locator(`a[href="/organizer/gigs/${testGigId}"]`),
+    ).toBeVisible();
   });
 
   test("loads applications page and shows applicant", async ({ page }) => {

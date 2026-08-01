@@ -25,6 +25,7 @@ import {
   ArrowLeft,
   User,
   Building,
+  FileText,
 } from "lucide-react";
 
 export const metadata: Metadata = { title: "Hire Details" };
@@ -285,73 +286,86 @@ export default async function AdminHireDetailPage({
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Update Notes */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-white">Update Notes</p>
-            <AdminActionButton
-              label="Save Notes"
-              description="Update the admin notes for this hire?"
-              confirmLabel="Save"
-              fields={{ hireId: String(hire.id) }}
-              action={updateHireNotes}
-              successMessage="Notes updated"
-              requireConfirm={false}
-            >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-white">Admin Notes</p>
+              {hire.notes && (
+                <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <FileText className="h-3 w-3" />
+                  Has notes
+                </span>
+              )}
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
               <textarea
                 name="notes"
                 placeholder="Add admin notes about this hire..."
                 defaultValue={hire.notes || ""}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none"
-                rows={3}
+                className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none"
+                rows={4}
               />
-            </AdminActionButton>
-          </div>
-
-          {/* Status Actions */}
-          {hire.status === "ACTIVE" && (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-white">Status Actions</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-3 flex justify-end">
                 <AdminActionButton
-                  label="Mark Complete"
-                  description="Mark this hire as completed?"
-                  confirmLabel="Mark Complete"
+                  label="Save Notes"
+                  description="Update the admin notes for this hire?"
+                  confirmLabel="Save"
                   fields={{ hireId: String(hire.id) }}
-                  action={markHireCompleted}
-                  successMessage="Hire marked as completed"
-                  className="border-green-500/30 text-green-400 hover:bg-green-500/10"
+                  action={updateHireNotes}
+                  successMessage="Notes updated"
+                  requireConfirm={false}
+                  className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
                 >
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Mark Complete
-                </AdminActionButton>
-                <AdminActionButton
-                  label="Mark No Show"
-                  description="Mark this hire as no-show?"
-                  confirmLabel="Mark No Show"
-                  fields={{ hireId: String(hire.id) }}
-                  action={markHireNoShow}
-                  successMessage="Hire marked as no-show"
-                  className="border-red-500/30 text-red-400 hover:bg-red-500/10"
-                >
-                  <AlertTriangle className="mr-2 h-4 w-4" />
-                  Mark No Show
-                </AdminActionButton>
-                <AdminActionButton
-                  label="Cancel Hire"
-                  description="Cancel this hire?"
-                  confirmLabel="Cancel"
-                  fields={{ hireId: String(hire.id) }}
-                  action={cancelHire}
-                  successMessage="Hire cancelled"
-                  className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Cancel Hire
+                  Save Notes
                 </AdminActionButton>
               </div>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
+      {/* Status Actions */}
+      {hire.status === "ACTIVE" && (
+        <div className="flex justify-end space-y-3">
+          {/* <p className="text-sm font-medium text-white">Status Actions</p> */}
+          <div className="grid w-3/4 gap-3 p-4 sm:grid-cols-3">
+            <AdminActionButton
+              label="Mark Complete"
+              description="Mark this hire as completed?"
+              confirmLabel="Mark Complete"
+              fields={{ hireId: String(hire.id) }}
+              action={markHireCompleted}
+              successMessage="Hire marked as completed"
+              className="flex items-center justify-center gap-2 rounded-lg border border-green-500/30 bg-green-500/5 px-4 py-3 text-sm font-medium text-green-400 transition-colors hover:bg-green-500/10"
+            >
+              <CheckCircle className="h-4 w-4" />
+              Mark Complete
+            </AdminActionButton>
+            <AdminActionButton
+              label="Mark No Show"
+              description="Mark this hire as no-show?"
+              confirmLabel="Mark No Show"
+              fields={{ hireId: String(hire.id) }}
+              action={markHireNoShow}
+              successMessage="Hire marked as no-show"
+              className="flex items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
+            >
+              <AlertTriangle className="h-4 w-4" />
+              Mark No Show
+            </AdminActionButton>
+            <AdminActionButton
+              label="Cancel Hire"
+              description="Cancel this hire?"
+              confirmLabel="Cancel"
+              fields={{ hireId: String(hire.id) }}
+              action={cancelHire}
+              successMessage="Hire cancelled"
+              className="flex items-center justify-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/5 px-4 py-3 text-sm font-medium text-orange-400 transition-colors hover:bg-orange-500/10"
+            >
+              <XCircle className="h-4 w-4" />
+              Cancel Hire
+            </AdminActionButton>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
