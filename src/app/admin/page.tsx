@@ -10,15 +10,26 @@ import {
   CalendarDays,
   Flag,
   TrendingUp,
+  TrendingDown,
+  Minus,
   Clock,
   ArrowRight,
   Activity,
   Server,
   Wifi,
   HardDrive,
+  CheckCircle,
+  MessageSquare,
+  AlertTriangle,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { getDashboardStats } from "@/lib/actions/admin/stats";
+import {
+  getDashboardStats,
+  getRecentActivity,
+  getTrendingMetrics,
+  getGeographicDistribution,
+  getGenreBreakdown,
+} from "@/lib/actions/admin/stats";
 import { getPendingDjApprovals } from "@/lib/actions/admin/djs";
 import { getRecentUsers } from "@/lib/actions/admin/users";
 import { getRecentReports } from "@/lib/actions/admin/reports";
@@ -26,6 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import TrendingSparkline from "@/components/admin/TrendingSparkline";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -190,13 +202,25 @@ export default async function AdminDashboardPage({
   const range =
     rangeParam === "30d" || rangeParam === "90d" ? rangeParam : "7d";
 
-  const [stats, pendingApprovals, recentUsers, recentReports] =
-    await Promise.all([
-      getDashboardStats({ range }),
-      getPendingDjApprovals({ limit: 6 }),
-      getRecentUsers({ limit: 5 }),
-      getRecentReports({ limit: 5 }),
-    ]);
+  const [
+    stats,
+    pendingApprovals,
+    recentUsers,
+    recentReports,
+    recentActivity,
+    trendingMetrics,
+    geographicDistribution,
+    genreBreakdown,
+  ] = await Promise.all([
+    getDashboardStats({ range }),
+    getPendingDjApprovals({ limit: 6 }),
+    getRecentUsers({ limit: 5 }),
+    getRecentReports({ limit: 5 }),
+    getRecentActivity({ limit: 8 }),
+    getTrendingMetrics(),
+    getGeographicDistribution(),
+    getGenreBreakdown(),
+  ]);
 
   const systemHealth = [
     {
@@ -241,7 +265,9 @@ export default async function AdminDashboardPage({
         </div>
 
         {/* Alerts row — pending actions */}
-        {(stats.pendingDjApprovals > 0 || stats.openReports > 0) && (
+        {(stats.pendingDjApprovals > 0 ||
+          stats.openReports > 0 ||
+          stats.overdueHires > 0) && (
           <div className="flex flex-wrap gap-3">
             {stats.pendingDjApprovals > 0 && (
               <Link
@@ -251,6 +277,17 @@ export default async function AdminDashboardPage({
                 <Clock className="h-4 w-4" />
                 {stats.pendingDjApprovals} DJ profile
                 {stats.pendingDjApprovals !== 1 ? "s" : ""} awaiting approval
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            )}
+            {stats.overdueHires > 0 && (
+              <Link
+                href="/admin/hires?status=ACTIVE"
+                className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                {stats.overdueHires} overdue hire
+                {stats.overdueHires !== 1 ? "s" : ""} (past event date)
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             )}
@@ -323,6 +360,45 @@ export default async function AdminDashboardPage({
               href="/admin/reports"
               accent={stats.openReports > 0}
               badge={stats.openReports > 0 ? "Needs review" : undefined}
+            />
+            <StatCard
+              label="New Signups (30d)"
+              value={stats.newSignups}
+              icon={<TrendingUp className="text-muted-foreground h-5 w-5" />}
+            />
+          </div>
+        </div>
+
+        <div>
+          <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+            Operations
+          </h2>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard
+              label="Active Hires"
+              value={stats.activeHires}
+              icon={<CheckCircle className="text-muted-foreground h-5 w-5" />}
+              href="/admin/hires?status=ACTIVE"
+              accent={stats.overdueHires > 0}
+              badge={
+                stats.overdueHires > 0
+                  ? `${stats.overdueHires} overdue`
+                  : undefined
+              }
+            />
+            <StatCard
+              label="Completed Hires"
+              value={stats.completedHires}
+              icon={<CheckCircle className="h-5 w-5 text-emerald-400" />}
+              href="/admin/hires?status=COMPLETED"
+            />
+            <StatCard
+              label="Booking Inquiries"
+              value={stats.openBookingInquiries}
+              icon={<MessageSquare className="text-muted-foreground h-5 w-5" />}
+              href="/admin/booking-inquiries?status=PENDING"
+              accent={stats.openBookingInquiries > 0}
+              badge={stats.openBookingInquiries > 0 ? "Pending" : undefined}
             />
             <StatCard
               label="New Signups (30d)"
@@ -465,6 +541,297 @@ export default async function AdminDashboardPage({
                   </tbody>
                 </table>
               </div>
+            )}
+          </div>
+        </section>
+
+        {/* Trending Metrics */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-white">
+              Trending Metrics
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              30-day trends compared to previous period.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {trendingMetrics.map((metric) => {
+              const trendIcon =
+                metric.trend === "up" ? (
+                  <TrendingUp className="h-4 w-4 text-emerald-400" />
+                ) : metric.trend === "down" ? (
+                  <TrendingDown className="h-4 w-4 text-red-400" />
+                ) : (
+                  <Minus className="h-4 w-4 text-gray-400" />
+                );
+              const trendColor =
+                metric.trend === "up"
+                  ? "text-emerald-400"
+                  : metric.trend === "down"
+                    ? "text-red-400"
+                    : "text-gray-400";
+
+              return (
+                <div
+                  key={metric.label}
+                  className="flex flex-col gap-3 rounded-xl border border-white/8 bg-white/3 p-4"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-xs text-gray-400">{metric.label}</p>
+                      <p className="text-2xl font-bold text-white tabular-nums">
+                        {metric.currentValue.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {trendIcon}
+                      <span className={`text-xs font-medium ${trendColor}`}>
+                        {metric.changePercent > 0 ? "+" : ""}
+                        {metric.changePercent.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-12 w-full">
+                    <TrendingSparkline
+                      data={metric.data}
+                      trend={metric.trend}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Geographic Distribution */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-white">
+              Geographic Distribution
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Top countries by platform activity.
+            </p>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-white/8 bg-white/3 p-5">
+            {geographicDistribution.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 py-8 text-center">
+                <p className="text-sm font-semibold text-white">
+                  No geographic data available
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  Data will appear as users join the platform.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {geographicDistribution.map((item, index) => (
+                  <div key={item.country} className="flex items-center gap-3">
+                    <div className="w-8 text-xs font-medium text-gray-500">
+                      #{index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="text-sm font-medium text-white">
+                          {item.country}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {item.count.toLocaleString()} (
+                          {item.percentage.toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
+                        <div
+                          className="from-h_red h-full rounded-full bg-gradient-to-r to-red-500 transition-all"
+                          style={{ width: `${item.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Genre Breakdown */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-white">
+              Genre Breakdown
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Top music genres among DJs on the platform.
+            </p>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-white/8 bg-white/3 p-5">
+            {genreBreakdown.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 py-8 text-center">
+                <p className="text-sm font-semibold text-white">
+                  No genre data available
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  Data will appear as DJs add genres to their profiles.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {genreBreakdown.map((item, index) => (
+                  <div key={item.genre} className="flex items-center gap-3">
+                    <div className="w-8 text-xs font-medium text-gray-500">
+                      #{index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="text-sm font-medium text-white">
+                          {item.genre}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {item.count} ({item.percentage.toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
+                          style={{ width: `${item.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Quick Actions */}
+        {stats.pendingDjApprovals > 0 || stats.openReports > 0 ? (
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-white">
+                Quick Actions
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Common admin tasks that need your attention.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {stats.pendingDjApprovals > 0 && (
+                <Link
+                  href="/admin/djs?status=PENDING_APPROVAL"
+                  className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
+                >
+                  <Disc3 className="h-4 w-4" />
+                  Review {stats.pendingDjApprovals} DJ approval
+                  {stats.pendingDjApprovals !== 1 ? "s" : ""}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
+              {stats.openReports > 0 && (
+                <Link
+                  href="/admin/reports?status=OPEN"
+                  className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+                >
+                  <Flag className="h-4 w-4" />
+                  Resolve {stats.openReports} report
+                  {stats.openReports !== 1 ? "s" : ""}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
+              {stats.openBookingInquiries > 0 && (
+                <Link
+                  href="/admin/booking-inquiries?status=PENDING"
+                  className="flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-3 text-sm font-medium text-purple-400 transition-colors hover:bg-purple-500/20"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Review {stats.openBookingInquiries} booking inquiry
+                  {stats.openBookingInquiries !== 1 ? "s" : ""}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
+            </div>
+          </section>
+        ) : null}
+
+        {/* Recent Activity Feed */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">
+                Recent Activity
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Latest activity across the platform (last 7 days).
+              </p>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-white/8 bg-white/3">
+            {recentActivity.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 px-6 py-12 text-center">
+                <p className="text-sm font-semibold text-white">
+                  No recent activity
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  Activity will appear here as the platform grows.
+                </p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-white/5">
+                {recentActivity.map((activity) => {
+                  const activityColors: Record<string, string> = {
+                    DJ_APPROVAL: "text-amber-400",
+                    HIRE_CREATED: "text-blue-400",
+                    HIRE_COMPLETED: "text-emerald-400",
+                    BOOKING_INQUIRY: "text-purple-400",
+                    GIG_PUBLISHED: "text-cyan-400",
+                    EVENT_PUBLISHED: "text-pink-400",
+                    REPORT_CREATED: "text-red-400",
+                  };
+                  const activityIcons: Record<string, React.ReactNode> = {
+                    DJ_APPROVAL: <Disc3 className="h-4 w-4" />,
+                    HIRE_CREATED: <CheckCircle className="h-4 w-4" />,
+                    HIRE_COMPLETED: <CheckCircle className="h-4 w-4" />,
+                    BOOKING_INQUIRY: <MessageSquare className="h-4 w-4" />,
+                    GIG_PUBLISHED: <Briefcase className="h-4 w-4" />,
+                    EVENT_PUBLISHED: <CalendarDays className="h-4 w-4" />,
+                    REPORT_CREATED: <Flag className="h-4 w-4" />,
+                  };
+
+                  return (
+                    <li
+                      key={activity.id}
+                      className="transition-colors hover:bg-white/2"
+                    >
+                      <Link
+                        href={activity.link || "#"}
+                        className="flex items-start gap-3 px-5 py-4"
+                      >
+                        <div
+                          className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 ${activityColors[activity.type]}`}
+                        >
+                          {activityIcons[activity.type]}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-white">
+                            {activity.title}
+                          </p>
+                          <p className="text-muted-foreground mt-0.5 text-xs">
+                            {activity.description}
+                          </p>
+                          <p className="text-muted-foreground mt-1 text-xs">
+                            {formatDistanceToNow(new Date(activity.createdAt), {
+                              addSuffix: true,
+                            })}
+                          </p>
+                        </div>
+                        <ArrowRight className="h-4 w-4 shrink-0 text-gray-600" />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
           </div>
         </section>

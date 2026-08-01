@@ -110,7 +110,7 @@ test.describe("Career Highlights", () => {
 
       // Wait for loading to complete (Add Highlight button only appears after loading)
       await expect(
-        page.getByRole("button", { name: "Add Highlight" }),
+        page.getByRole("button", { name: /Add Highlight/i }),
       ).toBeVisible({ timeout: 15000 });
 
       // Should see empty state
@@ -126,7 +126,7 @@ test.describe("Career Highlights", () => {
       await page.getByRole("tab", { name: "Career Highlights" }).click();
 
       // Click add button
-      await page.getByRole("button", { name: "Add Highlight" }).click();
+      await page.getByRole("button", { name: /Add Highlight/i }).click();
 
       // Should see form fields
       await expect(page.getByLabel("Year")).toBeVisible();
@@ -137,7 +137,7 @@ test.describe("Career Highlights", () => {
     test("validates year format (YYYY)", async ({ page }) => {
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
-      await page.getByRole("button", { name: "Add Highlight" }).click();
+      await page.getByRole("button", { name: /Add Highlight/i }).click();
 
       // Fill with invalid year format
       await page.getByLabel("Year").fill("24");
@@ -153,7 +153,7 @@ test.describe("Career Highlights", () => {
     test("validates year range (1900 to current + 10)", async ({ page }) => {
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
-      await page.getByRole("button", { name: "Add Highlight" }).click();
+      await page.getByRole("button", { name: /Add Highlight/i }).click();
 
       // Fill with year out of range
       await page.getByLabel("Year").fill("1899");
@@ -173,7 +173,7 @@ test.describe("Career Highlights", () => {
 
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
-      await page.getByRole("button", { name: "Add Highlight" }).click();
+      await page.getByRole("button", { name: /Add Highlight/i }).click();
 
       // Fill valid data
       await page.getByLabel("Year").fill("2024");
@@ -205,7 +205,7 @@ test.describe("Career Highlights", () => {
       // reliable readiness signal before we inspect the highlight count
       // (an instant isVisible() check would race the loading spinner).
       await expect(
-        page.getByRole("button", { name: "Add Highlight" }),
+        page.getByRole("button", { name: /Add Highlight/i }),
       ).toBeVisible({ timeout: 15000 });
 
       // Ensure there's a highlight to edit, independent of whether the
@@ -215,7 +215,7 @@ test.describe("Career Highlights", () => {
         .locator('button[aria-label="Edit"]')
         .count();
       if (highlightCount === 0) {
-        await page.getByRole("button", { name: "Add Highlight" }).click();
+        await page.getByRole("button", { name: /Add Highlight/i }).click();
         await page.getByLabel("Year").fill("2024");
         await page.getByLabel("Title").fill("Seed Highlight");
         await page.getByRole("button", { name: "Save" }).click();
@@ -255,7 +255,7 @@ test.describe("Career Highlights", () => {
 
       // Wait for the async highlights fetch to resolve
       await expect(
-        page.getByRole("button", { name: "Add Highlight" }),
+        page.getByRole("button", { name: /Add Highlight/i }),
       ).toBeVisible({ timeout: 15000 });
 
       const initialCount = await page
@@ -264,7 +264,7 @@ test.describe("Career Highlights", () => {
 
       if (initialCount === 0) {
         // Create a highlight first
-        await page.getByRole("button", { name: "Add Highlight" }).click();
+        await page.getByRole("button", { name: /Add Highlight/i }).click();
         await page.getByLabel("Year").fill("2024");
         await page.getByLabel("Title").fill("Test Highlight");
         await page.getByRole("button", { name: "Save" }).click();

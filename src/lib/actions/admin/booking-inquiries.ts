@@ -414,7 +414,11 @@ export async function getAdminBookingInquiries({
   status?: string;
   country?: string;
   dateRange?: "7d" | "30d" | "90d";
-}): Promise<{ inquiries: AdminBookingInquiry[]; nextCursor: number | null }> {
+}): Promise<{
+  inquiries: AdminBookingInquiry[];
+  nextCursor: number | null;
+  averageResponseTime: number | null;
+}> {
   await requireAdmin();
 
   try {
@@ -473,15 +477,31 @@ export async function getAdminBookingInquiries({
     const hasNextPage = inquiries.length > take;
     if (hasNextPage) inquiries.pop();
 
+    // Calculate average response time (in hours)
+    const respondedInquiries = inquiries.filter(
+      (inq) => inq.lastRespondedAt !== null,
+    );
+    let averageResponseTime: number | null = null;
+    if (respondedInquiries.length > 0) {
+      const totalResponseTime = respondedInquiries.reduce((sum, inq) => {
+        const responseTime =
+          inq.lastRespondedAt!.getTime() - inq.createdAt.getTime();
+        return sum + responseTime;
+      }, 0);
+      averageResponseTime =
+        totalResponseTime / respondedInquiries.length / (1000 * 60 * 60); // Convert to hours
+    }
+
     return {
       inquiries,
       nextCursor: hasNextPage
         ? (inquiries[inquiries.length - 1]?.id ?? null)
         : null,
+      averageResponseTime,
     };
   } catch (error) {
     console.error("Error fetching admin booking inquiries:", error);
-    return { inquiries: [], nextCursor: null };
+    return { inquiries: [], nextCursor: null, averageResponseTime: null };
   }
 }
 
