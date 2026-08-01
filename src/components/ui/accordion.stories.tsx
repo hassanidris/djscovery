@@ -42,14 +42,14 @@ export const Default: Story = {
       <AccordionItem value="item-2">
         <AccordionTrigger>Is it styled?</AccordionTrigger>
         <AccordionContent>
-          Yes. It comes with default styles that match the other
-          components.
+          Yes. It comes with default styles that match the other components.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">
         <AccordionTrigger>Is it animated?</AccordionTrigger>
         <AccordionContent>
-          Yes. It's animated by default, but you can disable it if you prefer.
+          Yes. It&apos;s animated by default, but you can disable it if you
+          prefer.
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -74,7 +74,7 @@ export const Multiple: Story = {
       <AccordionItem value="item-3">
         <AccordionTrigger>Does it support TypeScript?</AccordionTrigger>
         <AccordionContent>
-          Yes. It's built with TypeScript and includes type definitions.
+          Yes. It&apos;s built with TypeScript and includes type definitions.
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -90,13 +90,13 @@ export const WithoutCollapsible: Story = {
       <AccordionItem value="item-1">
         <AccordionTrigger>Can I collapse it?</AccordionTrigger>
         <AccordionContent>
-          No. This accordion doesn't allow collapsing the active item.
+          No. This accordion doesn&apos;t allow collapsing the active item.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">
         <AccordionTrigger>What about this one?</AccordionTrigger>
         <AccordionContent>
-          This one also doesn't collapse the active item.
+          This one also doesn&apos;t collapse the active item.
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -118,8 +118,8 @@ export const LongContent: Story = {
             management, and real-time updates.
           </p>
           <p>
-            The architecture is designed to be scalable and maintainable, with
-            a focus on performance and user experience.
+            The architecture is designed to be scalable and maintainable, with a
+            focus on performance and user experience.
           </p>
         </AccordionContent>
       </AccordionItem>
@@ -127,8 +127,8 @@ export const LongContent: Story = {
         <AccordionTrigger>How does it work?</AccordionTrigger>
         <AccordionContent>
           The application uses a client-server architecture with a React
-          frontend and a Node.js backend. Data is stored in a PostgreSQL database
-          and served through a RESTful API.
+          frontend and a Node.js backend. Data is stored in a PostgreSQL
+          database and served through a RESTful API.
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -144,7 +144,7 @@ export const WithLinks: Story = {
       <AccordionItem value="item-1">
         <AccordionTrigger>Resources</AccordionTrigger>
         <AccordionContent>
-          <ul className="list-disc pl-4 space-y-1">
+          <ul className="list-disc space-y-1 pl-4">
             <li>
               <a href="#" className="text-primary hover:underline">
                 Documentation
@@ -166,10 +166,8 @@ export const WithLinks: Story = {
       <AccordionItem value="item-2">
         <AccordionTrigger>Support</AccordionTrigger>
         <AccordionContent>
-          <p className="mb-2">
-            Need help? Check out our support channels:
-          </p>
-          <ul className="list-disc pl-4 space-y-1">
+          <p className="mb-2">Need help? Check out our support channels:</p>
+          <ul className="list-disc space-y-1 pl-4">
             <li>
               <a href="#" className="text-primary hover:underline">
                 Help Center
@@ -192,21 +190,15 @@ export const AllCollapsed: Story = {
     <Accordion type="single" collapsible>
       <AccordionItem value="item-1">
         <AccordionTrigger>First Item</AccordionTrigger>
-        <AccordionContent>
-          Content for the first item.
-        </AccordionContent>
+        <AccordionContent>Content for the first item.</AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">
         <AccordionTrigger>Second Item</AccordionTrigger>
-        <AccordionContent>
-          Content for the second item.
-        </AccordionContent>
+        <AccordionContent>Content for the second item.</AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">
         <AccordionTrigger>Third Item</AccordionTrigger>
-        <AccordionContent>
-          Content for the third item.
-        </AccordionContent>
+        <AccordionContent>Content for the third item.</AccordionContent>
       </AccordionItem>
     </Accordion>
   ),

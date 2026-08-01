@@ -38,11 +38,11 @@ export const Right: Story = {
         <SheetHeader>
           <SheetTitle>Edit Profile</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you're done.
+            Make changes to your profile here. Click save when you&apos;re done.
           </SheetDescription>
         </SheetHeader>
         <div className="py-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Your profile information will be updated across the platform.
           </p>
         </div>
@@ -66,11 +66,9 @@ export const Left: Story = {
       <SheetContent side="left">
         <SheetHeader>
           <SheetTitle>Navigation</SheetTitle>
-          <SheetDescription>
-            Quick access to main sections
-          </SheetDescription>
+          <SheetDescription>Quick access to main sections</SheetDescription>
         </SheetHeader>
-        <div className="py-4 space-y-2">
+        <div className="space-y-2 py-4">
           <Button variant="ghost" className="w-full justify-start">
             Dashboard
           </Button>
@@ -95,11 +93,9 @@ export const Top: Story = {
       <SheetContent side="top">
         <SheetHeader>
           <SheetTitle>Notifications</SheetTitle>
-          <SheetDescription>
-            You have 3 new messages
-          </SheetDescription>
+          <SheetDescription>You have 3 new messages</SheetDescription>
         </SheetHeader>
-        <div className="py-4 space-y-2">
+        <div className="space-y-2 py-4">
           <div className="text-sm">New message from John</div>
           <div className="text-sm">Your event was approved</div>
           <div className="text-sm">Welcome to the platform!</div>
@@ -119,7 +115,7 @@ export const Bottom: Story = {
         <SheetHeader>
           <SheetTitle>Mobile Menu</SheetTitle>
         </SheetHeader>
-        <div className="py-4 space-y-2">
+        <div className="space-y-2 py-4">
           <Button variant="ghost" className="w-full justify-start">
             Home
           </Button>
@@ -149,7 +145,7 @@ export const WithoutCloseButton: Story = {
           </SheetDescription>
         </SheetHeader>
         <div className="py-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Complete the required action to proceed.
           </p>
         </div>
@@ -175,7 +171,7 @@ export const WithTrigger: Story = {
           </SheetDescription>
         </SheetHeader>
         <div className="py-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Sheet content goes here.
           </p>
         </div>

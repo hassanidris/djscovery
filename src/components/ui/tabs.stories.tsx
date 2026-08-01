@@ -30,17 +30,17 @@ export const Default: Story = {
         <TabsTrigger value="settings">Settings</TabsTrigger>
       </TabsList>
       <TabsContent value="account">
-        <p className="text-sm text-muted-foreground">
-          Make changes to your account here. Click save when you're done.
+        <p className="text-muted-foreground text-sm">
+          Make changes to your account here. Click save when you&apos;re done.
         </p>
       </TabsContent>
       <TabsContent value="password">
-        <p className="text-sm text-muted-foreground">
-          Change your password here. After saving, you'll be logged out.
+        <p className="text-muted-foreground text-sm">
+          Change your password here. After saving, you&apos;ll be logged out.
         </p>
       </TabsContent>
       <TabsContent value="settings">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Manage your account settings and preferences.
         </p>
       </TabsContent>
@@ -60,17 +60,17 @@ export const LineVariant: Story = {
         <TabsTrigger value="reports">Reports</TabsTrigger>
       </TabsList>
       <TabsContent value="overview">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Overview of your dashboard and key metrics.
         </p>
       </TabsContent>
       <TabsContent value="analytics">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Detailed analytics and performance data.
         </p>
       </TabsContent>
       <TabsContent value="reports">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Generate and view various reports.
         </p>
       </TabsContent>
@@ -90,17 +90,17 @@ export const WithIcons: Story = {
         <TabsTrigger value="contacts">Contacts</TabsTrigger>
       </TabsList>
       <TabsContent value="mail">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Manage your emails and messages.
         </p>
       </TabsContent>
       <TabsContent value="calendar">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           View and manage your calendar events.
         </p>
       </TabsContent>
       <TabsContent value="contacts">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Your contacts and address book.
         </p>
       </TabsContent>
@@ -121,17 +121,17 @@ export const Vertical: Story = {
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Update your profile information and preferences.
           </p>
         </TabsContent>
         <TabsContent value="billing">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Manage your billing information and payment methods.
           </p>
         </TabsContent>
         <TabsContent value="notifications">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Configure your notification preferences.
           </p>
         </TabsContent>
@@ -149,13 +149,13 @@ export const NoDefaultValue: Story = {
         <TabsTrigger value="tab3">Tab 3</TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
-        <p className="text-sm text-muted-foreground">Content for Tab 1</p>
+        <p className="text-muted-foreground text-sm">Content for Tab 1</p>
       </TabsContent>
       <TabsContent value="tab2">
-        <p className="text-sm text-muted-foreground">Content for Tab 2</p>
+        <p className="text-muted-foreground text-sm">Content for Tab 2</p>
       </TabsContent>
       <TabsContent value="tab3">
-        <p className="text-sm text-muted-foreground">Content for Tab 3</p>
+        <p className="text-muted-foreground text-sm">Content for Tab 3</p>
       </TabsContent>
     </Tabs>
   ),
