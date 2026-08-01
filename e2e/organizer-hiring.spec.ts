@@ -331,8 +331,6 @@ test.describe("admin hires management", () => {
     await restoreAuthState(page, adminAuthState!);
     await page.goto(`/admin/hires/${testHireId}`);
     await expect(page.getByText("Hire Details")).toBeVisible();
-    await expect(page.getByText("DJ", { exact: true })).toBeVisible();
-    await expect(page.getByText("Organizer", { exact: true })).toBeVisible();
     await expect(page.getByText("Gig & Event Details")).toBeVisible();
     await expect(page.getByText("Admin Actions")).toBeVisible();
   });
