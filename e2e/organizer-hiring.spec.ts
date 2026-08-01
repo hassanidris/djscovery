@@ -289,9 +289,15 @@ test.describe("admin hires management", () => {
   test("shows action buttons for ACTIVE hire", async ({ page }) => {
     await restoreAuthState(page, adminAuthState!);
     await page.goto("/admin/hires");
-    await expect(page.getByRole("button", { name: "Complete" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "No Show" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Complete" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "No Show" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Cancel" }).first(),
+    ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View" }).first(),
     ).toBeVisible();
