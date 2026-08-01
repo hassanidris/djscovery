@@ -433,15 +433,10 @@ export async function getRecentActivity({
         title: true,
         slug: true,
         createdAt: true,
-        participants: {
+        ownerDj: {
           select: {
-            djProfile: {
-              select: {
-                stageName: true,
-              },
-            },
+            stageName: true,
           },
-          take: 1,
         },
       },
       orderBy: { createdAt: "desc" },
@@ -516,7 +511,7 @@ export async function getRecentActivity({
 
   // Events
   recentEvents.forEach((event) => {
-    const djName = event.participants[0]?.djProfile?.stageName || "Unknown DJ";
+    const djName = event.ownerDj?.stageName || "Unknown DJ";
     activities.push({
       id: `event-${event.id}`,
       type: "EVENT_PUBLISHED",

@@ -401,7 +401,7 @@ export async function getAdminHires({
   return {
     hires: hires as AdminHire[],
     nextCursor: hasNextPage ? (hires[hires.length - 1]?.id ?? null) : null,
-    totalRevenue: totalRevenue._sum.agreedRate || 0,
+    totalRevenue: totalRevenue._sum.agreedRate?.toNumber() || 0,
   };
 }
 
