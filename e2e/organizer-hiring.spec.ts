@@ -373,7 +373,7 @@ test.describe("admin hires management", () => {
     await restoreAuthState(page, adminAuthState!);
     await page.goto(`/admin/hires/${testHireId}`);
     await expect(page.locator('textarea[name="notes"]')).toBeVisible();
-    await expect(page.getByText("Update Notes")).toBeVisible();
+    await expect(page.getByText("Admin Notes")).toBeVisible();
   });
 
   test("hires link to DJ profile and gig", async ({ page }) => {
