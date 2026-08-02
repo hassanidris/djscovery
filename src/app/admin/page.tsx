@@ -140,7 +140,7 @@ function AdminDashboardSkeleton() {
 }
 
 // Child components for each data section
-async function DashboardStats({ range }: { range: string }) {
+async function DashboardStats({ range }: { range: "7d" | "30d" | "90d" }) {
   const stats = await getDashboardStats({ range });
   return stats;
 }
@@ -244,7 +244,7 @@ export default async function AdminDashboardPage({
   const rangeParam = Array.isArray(params.range)
     ? params.range[0]
     : params.range;
-  const range =
+  const range: "7d" | "30d" | "90d" =
     rangeParam === "30d" || rangeParam === "90d" ? rangeParam : "7d";
 
   return (
@@ -254,7 +254,7 @@ export default async function AdminDashboardPage({
   );
 }
 
-async function DashboardContent({ range }: { range: string }) {
+async function DashboardContent({ range }: { range: "7d" | "30d" | "90d" }) {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -328,7 +328,7 @@ async function DashboardContent({ range }: { range: string }) {
   );
 }
 
-async function DashboardAlerts({ range }: { range: string }) {
+async function DashboardAlerts({ range }: { range: "7d" | "30d" | "90d" }) {
   const stats = await DashboardStats({ range });
 
   if (
@@ -378,7 +378,7 @@ async function DashboardAlerts({ range }: { range: string }) {
   );
 }
 
-async function DashboardStatsGrid({ range }: { range: string }) {
+async function DashboardStatsGrid({ range }: { range: "7d" | "30d" | "90d" }) {
   const stats = await DashboardStats({ range });
 
   return (
@@ -415,7 +415,11 @@ async function DashboardStatsGrid({ range }: { range: string }) {
   );
 }
 
-async function DashboardContentStats({ range }: { range: string }) {
+async function DashboardContentStats({
+  range,
+}: {
+  range: "7d" | "30d" | "90d";
+}) {
   const stats = await DashboardStats({ range });
 
   return (
@@ -453,7 +457,11 @@ async function DashboardContentStats({ range }: { range: string }) {
   );
 }
 
-async function DashboardOperationsStats({ range }: { range: string }) {
+async function DashboardOperationsStats({
+  range,
+}: {
+  range: "7d" | "30d" | "90d";
+}) {
   const stats = await DashboardStats({ range });
 
   return (
@@ -563,12 +571,14 @@ async function DashboardDJApprovalQueue() {
               >
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={dj.avatar} alt={dj.stageName} />
+                    <AvatarImage
+                      src={dj.avatar ?? undefined}
+                      alt={dj.stageName}
+                    />
                     <AvatarFallback>{dj.stageName.slice(0, 2)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium text-white">{dj.stageName}</p>
-                    <p className="text-xs text-gray-400">{dj.email}</p>
                   </div>
                 </div>
                 <Link
@@ -615,11 +625,14 @@ async function DashboardRecentUsers() {
             >
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.name.slice(0, 2)}</AvatarFallback>
+                  <AvatarFallback>
+                    {(user.name ?? "U").slice(0, 2)}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-white">{user.name}</p>
+                  <p className="font-medium text-white">
+                    {user.name ?? user.email}
+                  </p>
                   <p className="text-xs text-gray-400">{user.email}</p>
                 </div>
               </div>
@@ -665,9 +678,7 @@ async function DashboardRecentReports() {
             >
               <div>
                 <p className="font-medium text-white">{report.reason}</p>
-                <p className="text-xs text-gray-400">
-                  {report.reportedUser?.name || "Unknown"}
-                </p>
+                <p className="text-xs text-gray-400">{report.targetType}</p>
               </div>
               <span className="text-xs text-gray-500">
                 {formatDistanceToNow(new Date(report.createdAt), {
@@ -704,8 +715,8 @@ async function DashboardRecentActivity() {
               className="flex items-center justify-between p-4 transition-colors hover:bg-white/5"
             >
               <div>
-                <p className="font-medium text-white">{activity.action}</p>
-                <p className="text-xs text-gray-400">{activity.targetType}</p>
+                <p className="font-medium text-white">{activity.title}</p>
+                <p className="text-xs text-gray-400">{activity.description}</p>
               </div>
               <span className="text-xs text-gray-500">
                 {formatDistanceToNow(new Date(activity.createdAt), {
@@ -735,12 +746,12 @@ async function DashboardTrendingMetrics() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {trendingMetrics.map((metric) => (
           <div
-            key={metric.name}
+            key={metric.label}
             className="rounded-xl border border-white/8 bg-white/3 p-4"
           >
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-medium text-white">
-                {metric.name}
+                {metric.label}
               </span>
               <span
                 className={cn(
@@ -786,13 +797,13 @@ async function DashboardGeographicDistribution() {
 
       <div className="overflow-hidden rounded-xl border border-white/8 bg-white/3">
         <div className="divide-y divide-white/5">
-          {geographicDistribution.map((country) => (
+          {geographicDistribution.map((item) => (
             <div
-              key={country.name}
+              key={item.country}
               className="flex items-center justify-between p-4 transition-colors hover:bg-white/5"
             >
-              <span className="font-medium text-white">{country.name}</span>
-              <span className="text-sm text-gray-400">{country.count}</span>
+              <span className="font-medium text-white">{item.country}</span>
+              <span className="text-sm text-gray-400">{item.count}</span>
             </div>
           ))}
         </div>
@@ -815,13 +826,13 @@ async function DashboardGenreBreakdown() {
 
       <div className="overflow-hidden rounded-xl border border-white/8 bg-white/3">
         <div className="divide-y divide-white/5">
-          {genreBreakdown.map((genre) => (
+          {genreBreakdown.map((item) => (
             <div
-              key={genre.name}
+              key={item.genre}
               className="flex items-center justify-between p-4 transition-colors hover:bg-white/5"
             >
-              <span className="font-medium text-white">{genre.name}</span>
-              <span className="text-sm text-gray-400">{genre.count}</span>
+              <span className="font-medium text-white">{item.genre}</span>
+              <span className="text-sm text-gray-400">{item.count}</span>
             </div>
           ))}
         </div>

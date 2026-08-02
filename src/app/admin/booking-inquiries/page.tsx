@@ -196,7 +196,7 @@ export default async function AdminBookingInquiriesPage({
                         <td className="px-4 py-3 text-xs text-gray-300">
                           <div className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
-                            {[inquiry.city?.name, inquiry.country?.name]
+                            {[inquiry.cityName, inquiry.countryName]
                               .filter(Boolean)
                               .join(", ") || "—"}
                           </div>

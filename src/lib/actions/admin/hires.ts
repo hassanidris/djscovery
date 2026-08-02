@@ -247,6 +247,7 @@ export async function getAdminHires({
     | "COMPLETED"
     | "CANCELLED_BY_DJ"
     | "CANCELLED_BY_ORGANIZER"
+    | "CANCELLED_BY_ADMIN"
     | "NO_SHOW";
   dateFrom?: Date;
   dateTo?: Date;
@@ -259,32 +260,31 @@ export async function getAdminHires({
   await requireAdmin();
 
   // Create shared where constant merging eventDate and country under application.gig
-  const where = {
+  const where: any = {
     ...(status ? { status } : {}),
-    ...(dateFrom || dateTo || country
-      ? {
-          application: {
-            gig: {
-              ...(dateFrom || dateTo
-                ? {
-                    eventDate: {
-                      ...(dateFrom ? { gte: dateFrom } : {}),
-                      ...(dateTo ? { lte: dateTo } : {}),
-                    },
-                  }
-                : {}),
-              ...(country
-                ? {
-                    country: {
-                      name: { contains: country, mode: "insensitive" },
-                    },
-                  }
-                : {}),
-            },
-          },
-        }
-      : {}),
   };
+
+  if (dateFrom || dateTo || country) {
+    where.application = {
+      gig: {
+        ...(dateFrom || dateTo
+          ? {
+              eventDate: {
+                ...(dateFrom ? { gte: dateFrom } : {}),
+                ...(dateTo ? { lte: dateTo } : {}),
+              },
+            }
+          : {}),
+        ...(country
+          ? {
+              country: {
+                name: { contains: country, mode: "insensitive" as const },
+              },
+            }
+          : {}),
+      },
+    };
+  }
 
   const hires = await prisma.hire.findMany({
     take: take + 1,
@@ -369,7 +369,7 @@ export async function getAdminHires({
   return {
     hires: hires as AdminHire[],
     nextCursor: hasNextPage ? (hires[hires.length - 1]?.id ?? null) : null,
-    totalRevenue: totalRevenue._sum.agreedRate?.toNumber() || 0,
+    totalRevenue: totalRevenue._sum?.agreedRate?.toNumber() || 0,
   };
 }
 

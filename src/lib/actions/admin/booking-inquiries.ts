@@ -389,8 +389,8 @@ export type AdminBookingInquiry = {
   eventName: string;
   eventDate: Date | null;
   venue: string | null;
-  country: { name: string } | null;
-  city: { name: string } | null;
+  countryName: string | null;
+  cityName: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
   budgetCurrency: string | null;
@@ -447,7 +447,7 @@ export async function getAdminBookingInquiries({
         ? { status: status as (typeof validStatuses)[number] }
         : {}),
       ...(country
-        ? { country: { name: { contains: country, mode: "insensitive" } } }
+        ? { countryName: { contains: country, mode: "insensitive" as const } }
         : {}),
       ...(dateFilter || {}),
     };
@@ -488,8 +488,8 @@ export async function getAdminBookingInquiries({
         eventName: true,
         eventDate: true,
         venue: true,
-        country: { select: { name: true } },
-        city: { select: { name: true } },
+        countryName: true,
+        cityName: true,
         budgetMin: true,
         budgetMax: true,
         budgetCurrency: true,
@@ -506,7 +506,7 @@ export async function getAdminBookingInquiries({
     if (hasNextPage) inquiries.pop();
 
     return {
-      inquiries,
+      inquiries: inquiries as AdminBookingInquiry[],
       nextCursor: hasNextPage
         ? (inquiries[inquiries.length - 1]?.id ?? null)
         : null,
