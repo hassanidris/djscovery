@@ -36,40 +36,69 @@ export async function getTrendingMetrics(): Promise<TrendingMetric[]> {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-  // Get daily data for the last 30 days
-  const dailyData = await Promise.all(
-    Array.from({ length: 30 }, async (_, i) => {
-      const dayStart = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000);
-      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+  // Get daily data for the last 30 days using grouped aggregate queries
+  const [userCounts, hireCounts, inquiryCounts, gigCounts] = await Promise.all([
+    prisma.$queryRaw<Array<{ day: Date; count: bigint }>>`
+      SELECT date_trunc('day', "createdAt") as day, COUNT(*) as count
+      FROM "User"
+      WHERE "createdAt" >= ${thirtyDaysAgo}
+        AND "deletedAt" IS NULL
+      GROUP BY date_trunc('day', "createdAt")
+      ORDER BY day
+    `,
+    prisma.$queryRaw<Array<{ day: Date; count: bigint }>>`
+      SELECT date_trunc('day', "createdAt") as day, COUNT(*) as count
+      FROM "Hire"
+      WHERE "createdAt" >= ${thirtyDaysAgo}
+      GROUP BY date_trunc('day', "createdAt")
+      ORDER BY day
+    `,
+    prisma.$queryRaw<Array<{ day: Date; count: bigint }>>`
+      SELECT date_trunc('day', "createdAt") as day, COUNT(*) as count
+      FROM "BookingInquiry"
+      WHERE "createdAt" >= ${thirtyDaysAgo}
+      GROUP BY date_trunc('day', "createdAt")
+      ORDER BY day
+    `,
+    prisma.$queryRaw<Array<{ day: Date; count: bigint }>>`
+      SELECT date_trunc('day', "createdAt") as day, COUNT(*) as count
+      FROM "Gig"
+      WHERE "createdAt" >= ${thirtyDaysAgo}
+        AND "status" = 'PUBLISHED'
+      GROUP BY date_trunc('day', "createdAt")
+      ORDER BY day
+    `,
+  ]);
 
-      const [newUsers, newHires, newInquiries, newGigs] = await Promise.all([
-        prisma.user.count({
-          where: {
-            createdAt: { gte: dayStart, lt: dayEnd },
-            deletedAt: null,
-          },
-        }),
-        prisma.hire.count({
-          where: {
-            createdAt: { gte: dayStart, lt: dayEnd },
-          },
-        }),
-        prisma.bookingInquiry.count({
-          where: {
-            createdAt: { gte: dayStart, lt: dayEnd },
-          },
-        }),
-        prisma.gig.count({
-          where: {
-            createdAt: { gte: dayStart, lt: dayEnd },
-            status: "PUBLISHED",
-          },
-        }),
-      ]);
+  // Helper to bucket counts by day index (0-29)
+  const bucketByDay = (
+    counts: Array<{ day: Date; count: bigint }>,
+  ): number[] => {
+    const buckets = new Array(30).fill(0);
+    for (const { day, count } of counts) {
+      const dayIndex = Math.floor(
+        (day.getTime() - thirtyDaysAgo.getTime()) / (24 * 60 * 60 * 1000),
+      );
+      if (dayIndex >= 0 && dayIndex < 30) {
+        buckets[dayIndex] = Number(count);
+      }
+    }
+    return buckets;
+  };
 
-      return { day: i, newUsers, newHires, newInquiries, newGigs };
-    }),
-  );
+  const userBuckets = bucketByDay(userCounts);
+  const hireBuckets = bucketByDay(hireCounts);
+  const inquiryBuckets = bucketByDay(inquiryCounts);
+  const gigBuckets = bucketByDay(gigCounts);
+
+  // Build dailyData preserving existing shape
+  const dailyData = Array.from({ length: 30 }, (_, i) => ({
+    day: i,
+    newUsers: userBuckets[i],
+    newHires: hireBuckets[i],
+    newInquiries: inquiryBuckets[i],
+    newGigs: gigBuckets[i],
+  }));
 
   // Calculate totals for current and previous 30-day periods
   const currentPeriod = dailyData.slice(0, 30);
@@ -341,6 +370,7 @@ export async function getRecentActivity({
       where: {
         status: "PENDING_APPROVAL",
         createdAt: { gte: sevenDaysAgo },
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -408,6 +438,7 @@ export async function getRecentActivity({
       where: {
         status: "PUBLISHED",
         createdAt: { gte: sevenDaysAgo },
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -427,6 +458,7 @@ export async function getRecentActivity({
       where: {
         status: { in: ["PUBLISHED", "COMPLETED"] },
         createdAt: { gte: sevenDaysAgo },
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -609,6 +641,7 @@ export async function getDashboardStats({
         application: {
           gig: {
             eventDate: { lt: today },
+            deletedAt: null,
           },
         },
       },

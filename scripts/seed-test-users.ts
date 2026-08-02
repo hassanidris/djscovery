@@ -99,9 +99,25 @@ const TEST_USERS: TestUserDef[] = [
 ];
 
 async function upsertAuthUser(email: string, password: string) {
-  // Check if user already exists
-  const { data: existing } = await supabase.auth.admin.listUsers();
-  const found = existing?.users?.find((u) => u.email === email);
+  // Check if user already exists by iterating through all pages
+  let found = null;
+  let page = 1;
+  const maxPages = 100; // Safety limit to prevent infinite loops
+
+  while (page <= maxPages && !found) {
+    const { data: existing } = await supabase.auth.admin.listUsers({
+      page,
+      perPage: 100,
+    });
+    found = existing?.users?.find((u) => u.email === email);
+
+    // If we've reached the end of users, stop
+    if (!existing?.users || existing.users.length === 0) {
+      break;
+    }
+
+    page++;
+  }
 
   if (found) {
     // Update password and confirm email
@@ -242,6 +258,7 @@ async function upsertPrismaUser(userDef: TestUserDef, authId: string) {
 
 async function main() {
   console.log("Seeding E2E test users...\n");
+  let failures = 0;
 
   for (const userDef of TEST_USERS) {
     console.log(`\n→ Processing ${userDef.email}`);
@@ -250,12 +267,18 @@ async function main() {
       await upsertPrismaUser(userDef, authId);
       console.log(`  ✅ Done: ${userDef.email}`);
     } catch (err) {
+      failures++;
       console.error(`  ❌ Failed: ${userDef.email}`, err);
     }
   }
+  if (failures > 0) {
+    throw new Error(`${failures} test user(s) failed to seed`);
+  }
 
   console.log("\nSeed complete!");
-  console.log("\nTest credentials (password configured via E2E_TEST_PASSWORD):");
+  console.log(
+    "\nTest credentials (password configured via E2E_TEST_PASSWORD):",
+  );
   for (const u of TEST_USERS) {
     console.log(`  ${u.role.padEnd(10)} → ${u.email}`);
   }

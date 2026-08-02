@@ -18,11 +18,23 @@ import { Briefcase, DollarSign, Calendar, Clock } from "lucide-react";
 
 export const metadata: Metadata = { title: "Hires" };
 
+const VALID_STATUSES = [
+  "ACTIVE",
+  "COMPLETED",
+  "CANCELLED_BY_DJ",
+  "CANCELLED_BY_ORGANIZER",
+  "CANCELLED_BY_ADMIN",
+  "NO_SHOW",
+] as const;
+
+type HireStatus = (typeof VALID_STATUSES)[number];
+
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   COMPLETED: "border-green-500/30 bg-green-500/10 text-green-400",
   CANCELLED_BY_DJ: "border-orange-500/30 bg-orange-500/10 text-orange-400",
   CANCELLED_BY_ORGANIZER: "border-red-500/30 bg-red-500/10 text-red-400",
+  CANCELLED_BY_ADMIN: "border-purple-500/30 bg-purple-500/10 text-purple-400",
   NO_SHOW: "border-red-500/30 bg-red-500/10 text-red-400",
 };
 
@@ -31,6 +43,7 @@ const STATUS_LABELS: Record<string, string> = {
   COMPLETED: "Completed",
   CANCELLED_BY_DJ: "Cancelled by DJ",
   CANCELLED_BY_ORGANIZER: "Cancelled by Organizer",
+  CANCELLED_BY_ADMIN: "Cancelled by Admin",
   NO_SHOW: "No Show",
 };
 
@@ -48,12 +61,17 @@ export default async function AdminHiresPage({
     rawCursor && Number.isFinite(Number(rawCursor))
       ? Number(rawCursor)
       : undefined;
-  const status = first(params.status);
+  const rawStatus = first(params.status);
+  const status: HireStatus | undefined = VALID_STATUSES.includes(
+    rawStatus as HireStatus,
+  )
+    ? (rawStatus as HireStatus)
+    : undefined;
   const country = first(params.country);
 
   const { hires, nextCursor, totalRevenue } = await getAdminHires({
     cursor,
-    status: status as any,
+    status,
     country,
   });
 
@@ -79,6 +97,10 @@ export default async function AdminHiresPage({
               {
                 value: "CANCELLED_BY_ORGANIZER",
                 label: "Cancelled by Organizer",
+              },
+              {
+                value: "CANCELLED_BY_ADMIN",
+                label: "Cancelled by Admin",
               },
               { value: "NO_SHOW", label: "No Show" },
             ],

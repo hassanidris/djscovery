@@ -1,4 +1,10 @@
-import { test, expect, type Page, type BrowserContext } from "@playwright/test";
+import {
+  test,
+  expect,
+  type Page,
+  type BrowserContext,
+  type Browser,
+} from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
 import { TEST_USERS } from "./test-setup";
@@ -12,7 +18,7 @@ const FREE_DJ_STATE_PATH = path.join(AUTH_DIR, "free-dj.json");
 const FAN_STATE_PATH = path.join(AUTH_DIR, "fan.json");
 
 async function ensureAuthState(
-  browser: any,
+  browser: Browser,
   email: string,
   password: string,
   statePath: string,
@@ -44,6 +50,9 @@ async function ensureAuthState(
     .click();
   await page.waitForURL(expectedUrlPattern, { timeout: 30000 });
   const state = await context.storageState();
+  if (!fs.existsSync(AUTH_DIR)) {
+    fs.mkdirSync(AUTH_DIR, { recursive: true });
+  }
   fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
   await context.close();
   return state;
@@ -55,12 +64,10 @@ async function restoreAuthState(
 ) {
   await page.context().addCookies(state.cookies);
   for (const origin of state.origins ?? []) {
-    for (const { name, value } of origin.localStorage ?? []) {
-      await page.evaluate(([n, v]) => localStorage.setItem(n, v), [
-        name,
-        value,
-      ] as [string, string]);
-    }
+    await page.goto(origin.origin, { waitUntil: "commit" });
+    await page.evaluate((items) => {
+      for (const { name, value } of items) localStorage.setItem(name, value);
+    }, origin.localStorage ?? []);
   }
 }
 
@@ -200,26 +207,31 @@ test.describe("admin table skeletons", () => {
   }, 120000);
 
   test("hires page shows table skeleton while loading", async ({ page }) => {
-    const { skeletonVisible, skeletonCount } = await navigateAndCheckSkeleton(
-      page,
-      "/admin/hires",
-      adminAuthState!,
-    );
+    const { skeletonVisible, skeletonCount, client } =
+      await navigateAndInspectSkeleton(page, "/admin/hires", adminAuthState!);
     expect(skeletonVisible).toBe(true);
-    expect(skeletonCount).toBeGreaterThan(0);
+    try {
+      expect(skeletonCount).toBeGreaterThan(0);
+    } finally {
+      await unthrottleNetwork(client);
+    }
   });
 
   test("hires skeleton has no duplicate headers", async ({ page }) => {
-    const { skeletonVisible } = await navigateAndCheckSkeleton(
+    const { client } = await navigateAndInspectSkeleton(
       page,
       "/admin/hires",
       adminAuthState!,
     );
-    // During loading, there should be at most 1 h1
-    // The skeleton uses includeHeader={false} so it doesn't render its own h1
-    const h1s = page.locator("h1");
-    const count = await h1s.count();
-    expect(count).toBeLessThanOrEqual(1);
+    try {
+      // During loading, there should be at most 1 h1
+      // The skeleton uses includeHeader={false} so it doesn't render its own h1
+      const h1s = page.locator("h1");
+      const count = await h1s.count();
+      expect(count).toBeLessThanOrEqual(1);
+    } finally {
+      await unthrottleNetwork(client);
+    }
   });
 
   test("gigs page shows table skeleton while loading", async ({ page }) => {

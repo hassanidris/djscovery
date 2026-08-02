@@ -114,7 +114,6 @@
     "minimatch": "^10.2.5",
     "find-my-way": "^9.7.0",
     "valibot": "^1.4.2",
-    "sharp": "^0.35.3",
-    "elliptic": "npm:@noble/curves@^1.0.0"
+    "sharp": "^0.35.3"
   }
 }

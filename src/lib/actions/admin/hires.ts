@@ -26,26 +26,23 @@ export async function markHireCompleted(
   const { hireId } = parsed.data;
 
   try {
-    const hire = await prisma.hire.findUnique({
-      where: { id: hireId },
-      select: { id: true },
+    const result = await prisma.hire.updateMany({
+      where: { id: hireId, status: "ACTIVE" },
+      data: { status: "COMPLETED", completedAt: new Date() },
     });
-    if (!hire) return { error: "Hire not found" };
 
-    await prisma.$transaction([
-      prisma.hire.update({
-        where: { id: hireId },
-        data: { status: "COMPLETED", completedAt: new Date() },
-      }),
-      prisma.adminActionLog.create({
-        data: {
-          adminId,
-          action: "MARK_HIRE_COMPLETED",
-          targetType: "Hire",
-          targetId: String(hireId),
-        },
-      }),
-    ]);
+    if (result.count === 0) {
+      return { error: "Hire not found or not in ACTIVE status" };
+    }
+
+    await prisma.adminActionLog.create({
+      data: {
+        adminId,
+        action: "MARK_HIRE_COMPLETED",
+        targetType: "Hire",
+        targetId: String(hireId),
+      },
+    });
 
     revalidatePath("/admin/hires");
     revalidatePath(`/admin/hires/${hireId}`);
@@ -69,26 +66,23 @@ export async function markHireNoShow(
   const { hireId } = parsed.data;
 
   try {
-    const hire = await prisma.hire.findUnique({
-      where: { id: hireId },
-      select: { id: true },
+    const result = await prisma.hire.updateMany({
+      where: { id: hireId, status: "ACTIVE" },
+      data: { status: "NO_SHOW", noShow: true },
     });
-    if (!hire) return { error: "Hire not found" };
 
-    await prisma.$transaction([
-      prisma.hire.update({
-        where: { id: hireId },
-        data: { status: "NO_SHOW", noShow: true },
-      }),
-      prisma.adminActionLog.create({
-        data: {
-          adminId,
-          action: "MARK_HIRE_NO_SHOW",
-          targetType: "Hire",
-          targetId: String(hireId),
-        },
-      }),
-    ]);
+    if (result.count === 0) {
+      return { error: "Hire not found or not in ACTIVE status" };
+    }
+
+    await prisma.adminActionLog.create({
+      data: {
+        adminId,
+        action: "MARK_HIRE_NO_SHOW",
+        targetType: "Hire",
+        targetId: String(hireId),
+      },
+    });
 
     revalidatePath("/admin/hires");
     revalidatePath(`/admin/hires/${hireId}`);
@@ -111,31 +105,28 @@ export async function cancelHire(formData: FormData): Promise<ActionResult> {
   const { hireId, reason } = parsed.data;
 
   try {
-    const hire = await prisma.hire.findUnique({
-      where: { id: hireId },
-      select: { id: true },
+    const result = await prisma.hire.updateMany({
+      where: { id: hireId, status: "ACTIVE" },
+      data: {
+        status: "CANCELLED_BY_ADMIN",
+        cancelledAt: new Date(),
+        cancellationReason: reason,
+      },
     });
-    if (!hire) return { error: "Hire not found" };
 
-    await prisma.$transaction([
-      prisma.hire.update({
-        where: { id: hireId },
-        data: {
-          status: "CANCELLED_BY_ORGANIZER",
-          cancelledAt: new Date(),
-          cancellationReason: reason,
-        },
-      }),
-      prisma.adminActionLog.create({
-        data: {
-          adminId,
-          action: "CANCEL_HIRE",
-          targetType: "Hire",
-          targetId: String(hireId),
-          metadata: reason ? { reason } : undefined,
-        },
-      }),
-    ]);
+    if (result.count === 0) {
+      return { error: "Hire not found or not in ACTIVE status" };
+    }
+
+    await prisma.adminActionLog.create({
+      data: {
+        adminId,
+        action: "CANCEL_HIRE",
+        targetType: "Hire",
+        targetId: String(hireId),
+        metadata: reason ? { reason } : undefined,
+      },
+    });
 
     revalidatePath("/admin/hires");
     revalidatePath(`/admin/hires/${hireId}`);
@@ -267,35 +258,38 @@ export async function getAdminHires({
 }> {
   await requireAdmin();
 
+  // Create shared where constant merging eventDate and country under application.gig
+  const where = {
+    ...(status ? { status } : {}),
+    ...(dateFrom || dateTo || country
+      ? {
+          application: {
+            gig: {
+              ...(dateFrom || dateTo
+                ? {
+                    eventDate: {
+                      ...(dateFrom ? { gte: dateFrom } : {}),
+                      ...(dateTo ? { lte: dateTo } : {}),
+                    },
+                  }
+                : {}),
+              ...(country
+                ? {
+                    country: {
+                      name: { contains: country, mode: "insensitive" },
+                    },
+                  }
+                : {}),
+            },
+          },
+        }
+      : {}),
+  };
+
   const hires = await prisma.hire.findMany({
     take: take + 1,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-    where: {
-      ...(status ? { status } : {}),
-      ...(dateFrom || dateTo
-        ? {
-            application: {
-              gig: {
-                eventDate: {
-                  ...(dateFrom ? { gte: dateFrom } : {}),
-                  ...(dateTo ? { lte: dateTo } : {}),
-                },
-              },
-            },
-          }
-        : {}),
-      ...(country
-        ? {
-            application: {
-              gig: {
-                country: {
-                  name: { contains: country, mode: "insensitive" },
-                },
-              },
-            },
-          }
-        : {}),
-    },
+    where,
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -366,33 +360,7 @@ export async function getAdminHires({
 
   // Calculate total revenue from all hires (not just current page)
   const totalRevenue = await prisma.hire.aggregate({
-    where: {
-      ...(status ? { status } : {}),
-      ...(dateFrom || dateTo
-        ? {
-            application: {
-              gig: {
-                eventDate: {
-                  ...(dateFrom ? { gte: dateFrom } : {}),
-                  ...(dateTo ? { lte: dateTo } : {}),
-                },
-              },
-            },
-          }
-        : {}),
-      ...(country
-        ? {
-            application: {
-              gig: {
-                country: {
-                  name: { contains: country, mode: "insensitive" },
-                },
-              },
-            },
-          }
-        : {}),
-      agreedRate: { not: null },
-    },
+    where: { ...where, agreedRate: { not: null } },
     _sum: {
       agreedRate: true,
     },

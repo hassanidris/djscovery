@@ -27,6 +27,7 @@ import {
   Building,
   FileText,
 } from "lucide-react";
+import NotesForm from "./notes-form";
 
 export const metadata: Metadata = { title: "Hire Details" };
 
@@ -35,6 +36,7 @@ const STATUS_COLORS: Record<string, string> = {
   COMPLETED: "border-green-500/30 bg-green-500/10 text-green-400",
   CANCELLED_BY_DJ: "border-orange-500/30 bg-orange-500/10 text-orange-400",
   CANCELLED_BY_ORGANIZER: "border-red-500/30 bg-red-500/10 text-red-400",
+  CANCELLED_BY_ADMIN: "border-purple-500/30 bg-purple-500/10 text-purple-400",
   NO_SHOW: "border-red-500/30 bg-red-500/10 text-red-400",
 };
 
@@ -43,6 +45,7 @@ const STATUS_LABELS: Record<string, string> = {
   COMPLETED: "Completed",
   CANCELLED_BY_DJ: "Cancelled by DJ",
   CANCELLED_BY_ORGANIZER: "Cancelled by Organizer",
+  CANCELLED_BY_ADMIN: "Cancelled by Admin",
   NO_SHOW: "No Show",
 };
 
@@ -296,29 +299,7 @@ export default async function AdminHireDetailPage({
                 </span>
               )}
             </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-              <textarea
-                name="notes"
-                placeholder="Add admin notes about this hire..."
-                defaultValue={hire.notes || ""}
-                className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none"
-                rows={4}
-              />
-              <div className="mt-3 flex justify-end">
-                <AdminActionButton
-                  label="Save Notes"
-                  description="Update the admin notes for this hire?"
-                  confirmLabel="Save"
-                  fields={{ hireId: String(hire.id) }}
-                  action={updateHireNotes}
-                  successMessage="Notes updated"
-                  requireConfirm={false}
-                  className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
-                >
-                  Save Notes
-                </AdminActionButton>
-              </div>
-            </div>
+            <NotesForm hireId={hire.id} initialNotes={hire.notes || ""} />
           </div>
         </CardContent>
       </Card>

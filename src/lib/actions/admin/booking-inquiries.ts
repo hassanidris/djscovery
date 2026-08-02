@@ -441,18 +441,46 @@ export async function getAdminBookingInquiries({
       };
     }
 
+    // Extract shared filtering criteria
+    const filters = {
+      ...(isValidStatus
+        ? { status: status as (typeof validStatuses)[number] }
+        : {}),
+      ...(country
+        ? { country: { name: { contains: country, mode: "insensitive" } } }
+        : {}),
+      ...(dateFilter || {}),
+    };
+
+    // Calculate average response time across ALL matching inquiries (not just current page)
+    // Uses lastRespondedAt to measure the most recent response time per inquiry
+    let averageResponseTime: number | null = null;
+    const allRespondedInquiries = await prisma.bookingInquiry.findMany({
+      where: {
+        ...filters,
+        lastRespondedAt: { not: null },
+      },
+      select: {
+        lastRespondedAt: true,
+        createdAt: true,
+      },
+    });
+
+    if (allRespondedInquiries.length > 0) {
+      const totalResponseTime = allRespondedInquiries.reduce((sum, inq) => {
+        const responseTime =
+          inq.lastRespondedAt!.getTime() - inq.createdAt.getTime();
+        return sum + responseTime;
+      }, 0);
+      averageResponseTime =
+        totalResponseTime / allRespondedInquiries.length / (1000 * 60 * 60); // Convert to hours
+    }
+
+    // Fetch paginated inquiries for display
     const inquiries = await prisma.bookingInquiry.findMany({
       take: take + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      where: {
-        ...(isValidStatus
-          ? { status: status as (typeof validStatuses)[number] }
-          : {}),
-        ...(country
-          ? { country: { name: { contains: country, mode: "insensitive" } } }
-          : {}),
-        ...(dateFilter || {}),
-      },
+      where: filters,
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       select: {
         id: true,
@@ -476,21 +504,6 @@ export async function getAdminBookingInquiries({
 
     const hasNextPage = inquiries.length > take;
     if (hasNextPage) inquiries.pop();
-
-    // Calculate average response time (in hours)
-    const respondedInquiries = inquiries.filter(
-      (inq) => inq.lastRespondedAt !== null,
-    );
-    let averageResponseTime: number | null = null;
-    if (respondedInquiries.length > 0) {
-      const totalResponseTime = respondedInquiries.reduce((sum, inq) => {
-        const responseTime =
-          inq.lastRespondedAt!.getTime() - inq.createdAt.getTime();
-        return sum + responseTime;
-      }, 0);
-      averageResponseTime =
-        totalResponseTime / respondedInquiries.length / (1000 * 60 * 60); // Convert to hours
-    }
 
     return {
       inquiries,
