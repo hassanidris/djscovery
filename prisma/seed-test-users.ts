@@ -1,3 +1,26 @@
+import { existsSync, readFileSync } from "fs";
+import { resolve } from "path";
+
+// Load .env and .env.local relative to the project root (cwd)
+const inheritedEnvKeys = new Set(Object.keys(process.env));
+for (const file of [".env", ".env.local"]) {
+  const filePath = resolve(process.cwd(), file);
+  if (!existsSync(filePath)) continue;
+  for (const line of readFileSync(filePath, "utf8").split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx < 1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed
+      .slice(eqIdx + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
+    if (inheritedEnvKeys.has(key)) continue; // keep explicitly provided env vars
+    process.env[key] = val; // allow .env.local to override .env
+  }
+}
+
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";

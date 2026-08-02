@@ -53,6 +53,7 @@ test.describe("fan flows", () => {
       await page.getByRole("button", { name: "Sign In" }).click();
 
       await page.goto("/fan/settings");
+      await expect(page).toHaveURL("/fan/settings");
       await expect(page.locator("body")).toBeVisible();
     });
   });
@@ -75,6 +76,7 @@ test.describe("fan flows", () => {
       await page.getByRole("button", { name: "Sign In" }).click();
 
       await page.goto("/fan/followed-djs");
+      await expect(page).toHaveURL("/fan/followed-djs");
       await expect(page.locator("body")).toBeVisible();
     });
   });
@@ -97,6 +99,7 @@ test.describe("fan flows", () => {
       await page.getByRole("button", { name: "Sign In" }).click();
 
       await page.goto("/fan/saved-events");
+      await expect(page).toHaveURL("/fan/saved-events");
       await expect(page.locator("body")).toBeVisible();
     });
   });
@@ -119,6 +122,7 @@ test.describe("fan flows", () => {
       await page.getByRole("button", { name: "Sign In" }).click();
 
       await page.goto("/fan/reviews");
+      await expect(page).toHaveURL("/fan/reviews");
       await expect(page.locator("body")).toBeVisible();
     });
   });
@@ -141,6 +145,7 @@ test.describe("fan flows", () => {
       await page.getByRole("button", { name: "Sign In" }).click();
 
       await page.goto("/fan/notifications");
+      await expect(page).toHaveURL("/fan/notifications");
       await expect(page.locator("body")).toBeVisible();
     });
   });
