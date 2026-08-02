@@ -59,26 +59,35 @@ export function useAudioThumbnail(audioUrl: string | undefined): string | null {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!audioUrl) return;
+    // Clear thumbnail if audioUrl is empty or unsupported
+    if (!audioUrl) {
+      setThumbnail(null);
+      return;
+    }
+
     const provider = getMediaProvider(audioUrl);
 
-    if (provider === "soundcloud") {
-      let cancelled = false;
-      fetch(
-        `https://soundcloud.com/oembed?url=${encodeURIComponent(audioUrl)}&format=json`,
-      )
-        .then((res) => res.json())
-        .then((data: { thumbnail_url?: string }) => {
-          if (!cancelled && data.thumbnail_url)
-            setThumbnail(data.thumbnail_url);
-        })
-        .catch(() => {
-          // Ignore fetch failures; keep null so caller can fall back.
-        });
-      return () => {
-        cancelled = true;
-      };
+    // Clear thumbnail for unsupported providers
+    if (provider !== "soundcloud") {
+      setThumbnail(null);
+      return;
     }
+
+    // Fetch thumbnail for soundcloud
+    let cancelled = false;
+    fetch(
+      `https://soundcloud.com/oembed?url=${encodeURIComponent(audioUrl)}&format=json`,
+    )
+      .then((res) => res.json())
+      .then((data: { thumbnail_url?: string }) => {
+        if (!cancelled && data.thumbnail_url) setThumbnail(data.thumbnail_url);
+      })
+      .catch(() => {
+        // Ignore fetch failures; keep null so caller can fall back.
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [audioUrl]);
 
   return thumbnail;

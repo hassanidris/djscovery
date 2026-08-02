@@ -86,127 +86,86 @@ test.describe("organizer reviews", () => {
 
   test.describe("DJ review submission", () => {
     test("redirects to sign-in when not authenticated", async ({ page }) => {
-      await page.goto("/gigs/test-gig/organizer-review");
-      await expect(page).toHaveURL("/sign-in");
+      await page.goto(
+        "/gigs/demo-summer-house-night-stockholm/organizer-review",
+      );
+      await expect(page).toHaveURL(/\/sign-in(\?.*)?$/);
     });
 
-    test("shows review page when authenticated DJ", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // This would need a real gig slug from test data
-      // For now, just test the navigation works
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("shows review page when authenticated DJ", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("displays error when gig not completed", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // This would need test data setup with incomplete gig
-      // For now, test the form validation
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("displays error when gig not completed", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("successfully submits organizer review with valid data", async ({
+    test.skip("successfully submits organizer review with valid data", async ({
       page,
     }) => {
-      await restoreAuthState(page, djAuthState!);
-      // This would need:
-      // 1. Test data setup with completed gig
-      // 2. Navigation to review page
-      // 3. Form interaction
-      // 4. Success verification
-
-      // For now, test basic DJ dashboard access
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+      // TODO: Implement with seedCompletedGigForOrganizerReview and cleanupOrganizerReviewTestData
     });
 
-    test("validates all category ratings are required", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test form validation - all ratings must be provided
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
-    });
-
-    test("validates review text minimum length", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test 30 character minimum validation
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
-    });
-
-    test("shows already reviewed state for duplicate reviews", async ({
+    test.skip("validates all category ratings are required", async ({
       page,
     }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test that DJs can only review once per gig
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("shows review expired state after 30 days", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test 30-day window expiration
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("validates review text minimum length", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
+    });
+
+    test.skip("shows already reviewed state for duplicate reviews", async ({
+      page,
+    }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
+    });
+
+    test.skip("shows review expired state after 30 days", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
   });
 
   test.describe("organizer review display", () => {
-    test("displays reviews on organizer profile", async ({ page }) => {
-      // Test that reviews appear on organizer profile
-      await page.goto("/directory");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("displays reviews on organizer profile", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("shows rating breakdown distribution", async ({ page }) => {
-      // Test star rating distribution display
-      await page.goto("/directory");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("shows rating breakdown distribution", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("displays category ratings in review cards", async ({ page }) => {
-      // Test that communication, payment, professionalism, venue quality are shown
-      await page.goto("/directory");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("displays category ratings in review cards", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("allows reporting inappropriate reviews", async ({ page }) => {
-      // Test report button functionality
-      await page.goto("/directory");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("allows reporting inappropriate reviews", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
   });
 
   test.describe("velocity limits", () => {
-    test("enforces one review per week per DJ", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test velocity limit enforcement
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("enforces one review per week per DJ", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("enforces max 3 reviews per week per organizer", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test organizer velocity limit
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("enforces max 3 reviews per week per organizer", async ({
+      page,
+    }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
   });
 
   test.describe("reputation integration", () => {
-    test("updates organizer reputation score on review", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test that reputation score updates
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("updates organizer reputation score on review", async ({
+      page,
+    }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
 
-    test("sends notification to organizer on review", async ({ page }) => {
-      await restoreAuthState(page, djAuthState!);
-      // Test notification system
-      await page.goto("/dj/dashboard");
-      await expect(page.locator("body")).toBeVisible();
+    test.skip("sends notification to organizer on review", async ({ page }) => {
+      // TODO: Implement with seedCompletedGigForOrganizerReview
     });
   });
 });

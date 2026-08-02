@@ -172,7 +172,7 @@ export default async function OrganizerPublicProfilePage({
     take: 6,
   });
 
-  // Fetch organizer reviews
+  // Fetch organizer reviews (paginated for display)
   const organizerReviews = await prisma.organizerReview.findMany({
     where: {
       organizerProfileId: profile.id,
@@ -193,11 +193,15 @@ export default async function OrganizerPublicProfilePage({
     take: 10,
   });
 
-  const avgRating =
-    organizerReviews.length > 0
-      ? organizerReviews.reduce((sum, r) => sum + r.rating, 0) /
-        organizerReviews.length
-      : 0;
+  // Compute full-dataset review statistics
+  const reviewStats = await prisma.organizerReview.aggregate({
+    where: { organizerProfileId: profile.id },
+    _avg: { rating: true },
+    _count: { rating: true },
+  });
+
+  const avgRating = reviewStats._avg.rating ?? 0;
+  const ratingCount = reviewStats._count.rating;
 
   const typeLabel =
     ORGANIZER_TYPE_LABELS[profile.organizerType] ?? profile.organizerType;

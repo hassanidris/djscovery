@@ -202,6 +202,28 @@ async function createTestUser(
 }
 
 async function main() {
+  // Environment guard: only allow seeding in local, test, or staging environments
+  const nodeEnv = process.env.NODE_ENV;
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV;
+  const databaseUrl = process.env.DATABASE_URL;
+
+  const isLocal = nodeEnv === "development" || nodeEnv === "test";
+  const isStaging =
+    appEnv === "staging" ||
+    databaseUrl?.includes("jarmybsjvztwrmsdcnje.supabase.co");
+  const isTest =
+    databaseUrl?.includes("test") || databaseUrl?.includes("localhost");
+
+  if (!isLocal && !isStaging && !isTest) {
+    console.error(
+      "❌ Aborting: Test user seeding is only permitted in local, test, or staging environments.",
+    );
+    console.error(`   NODE_ENV: ${nodeEnv}`);
+    console.error(`   NEXT_PUBLIC_APP_ENV: ${appEnv}`);
+    console.error(`   DATABASE_URL: ${databaseUrl?.substring(0, 50)}...`);
+    process.exit(1);
+  }
+
   console.log("Seeding test users for E2E tests...\n");
 
   try {

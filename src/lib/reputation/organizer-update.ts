@@ -4,8 +4,15 @@ import { calculateOrganizerReputationScore } from "./organizer-calculate";
 
 export async function updateOrganizerReputationScore(
   organizerProfileId: number,
-  changeReason: string,
-) {
+  changeReason:
+    | "EVENT_REVIEW_ADDED"
+    | "GIG_REVIEW_ADDED"
+    | "GIG_COMPLETED"
+    | "HIRE_CANCELLED"
+    | "NO_SHOW_REPORTED"
+    | "PROFILE_UPDATED"
+    | "ORGANIZER_REVIEW_ADDED",
+): Promise<{ success: true } | { success: false; error: string }> {
   // Preload auth data outside the transaction
   let user;
   try {
@@ -13,7 +20,8 @@ export async function updateOrganizerReputationScore(
       where: { id: organizerProfileId },
       select: { userId: true },
     });
-    if (!organizerProfile) throw new Error(`Organizer profile not found: ${organizerProfileId}`);
+    if (!organizerProfile)
+      throw new Error(`Organizer profile not found: ${organizerProfileId}`);
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,62 +37,82 @@ export async function updateOrganizerReputationScore(
     }
     user = data.user;
   } catch (e) {
-    const message =
-      e instanceof Error
-        ? e.message
-        : "Failed to preload auth data for organizer reputation update.";
-    console.error(message);
-    return;
+    console.error(
+      "Failed to preload auth data for organizer reputation update:",
+      e,
+    );
+    return {
+      success: false,
+      error:
+        e instanceof Error ? e.message : "Unknown error during auth preload",
+    };
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
-      // Serialize reputation recomputes for this organizer
-      await tx.$executeRawUnsafe(
-        "SELECT pg_advisory_xact_lock(hashtextextended('organizer-reputation:' || $1::text, 0))",
-        organizerProfileId,
-      );
-
-      // Compute and read while holding the lock
-      const newScores = await calculateOrganizerReputationScore(organizerProfileId, tx, user);
-
-      const existing = await tx.organizerReputationScore.findUnique({
-        where: { organizerProfileId },
-      });
-
-      const previousTotal = existing?.totalScore ?? 0;
-
-      const reputationScore = await tx.organizerReputationScore.upsert({
-        where: { organizerProfileId },
-        create: {
+    await prisma.$transaction(
+      async (tx) => {
+        // Serialize reputation recomputes for this organizer
+        await tx.$executeRawUnsafe(
+          "SELECT pg_advisory_xact_lock(hashtextextended('organizer-reputation:' || $1::text, 0))",
           organizerProfileId,
-          ...newScores,
-          trendDirection: "STABLE",
-        },
-        update: {
-          ...newScores,
-          trendDirection:
-            newScores.totalScore > previousTotal + 20
-              ? "RISING"
-              : newScores.totalScore < previousTotal - 20
-                ? "FALLING"
-                : "STABLE",
-        },
-      });
+        );
 
-      await tx.organizerReputationHistory.create({
-        data: {
-          organizerReputationScoreId: reputationScore.id,
-          previousTotal,
-          newTotal: newScores.totalScore,
-          changeReason,
-        },
-      });
-    });
+        // Compute and read while holding the lock
+        const newScores = await calculateOrganizerReputationScore(
+          organizerProfileId,
+          tx,
+          user,
+        );
+
+        const existing = await tx.organizerReputationScore.findUnique({
+          where: { organizerProfileId },
+        });
+
+        const previousTotal = existing?.totalScore ?? 0;
+
+        const reputationScore = await tx.organizerReputationScore.upsert({
+          where: { organizerProfileId },
+          create: {
+            organizerProfileId,
+            ...newScores,
+            trendDirection: "STABLE",
+          },
+          update: {
+            ...newScores,
+            calculatedAt: new Date(),
+            trendDirection:
+              newScores.totalScore > previousTotal + 20
+                ? "RISING"
+                : newScores.totalScore < previousTotal - 20
+                  ? "FALLING"
+                  : "STABLE",
+          },
+        });
+
+        await tx.organizerReputationHistory.create({
+          data: {
+            organizerReputationScoreId: reputationScore.id,
+            previousTotal,
+            newTotal: newScores.totalScore,
+            changeReason,
+          },
+        });
+      },
+      {
+        maxWait: 5000, // 5 seconds to acquire transaction
+        timeout: 10000, // 10 seconds total transaction timeout
+      },
+    );
   } catch (e) {
-    const message =
-      e instanceof Error ? e.message : "Failed to update organizer reputation score.";
-    console.error(message);
-    return;
+    console.error("Failed to update organizer reputation score:", e);
+    return {
+      success: false,
+      error:
+        e instanceof Error
+          ? e.message
+          : "Unknown error during reputation update",
+    };
   }
+
+  return { success: true };
 }

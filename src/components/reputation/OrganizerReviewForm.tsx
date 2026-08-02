@@ -70,7 +70,8 @@ export function OrganizerReviewForm({
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const allRatingsSet = communication > 0 && payment > 0 && professionalism > 0 && venueQuality > 0;
+  const allRatingsSet =
+    communication > 0 && payment > 0 && professionalism > 0 && venueQuality > 0;
 
   function handleSubmit() {
     setError(null);
@@ -87,13 +88,17 @@ export function OrganizerReviewForm({
 
     startTransition(async () => {
       try {
-        await createOrganizerReview(gigId, organizerProfileId, {
+        const result = await createOrganizerReview(gigId, organizerProfileId, {
           communication,
           payment,
           professionalism,
           venueQuality,
           review: review.trim(),
         });
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
         setSuccess(true);
         setCommunication(0);
         setPayment(0);

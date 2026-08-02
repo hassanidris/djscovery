@@ -29,19 +29,53 @@ export async function calculateOrganizerReputationScore(
   const organizerProfile = await client.organizerProfile.findUnique({
     where: { id: organizerProfileId },
     include: {
-      organizerReviews: true,
       socialLinks: true,
-      gigs: {
-        include: {
-          applications: {
-            where: { status: "ACCEPTED" },
-          },
-        },
-      },
     },
   });
 
   if (!organizerProfile) throw new Error("Organizer profile not found");
+
+  // Aggregate review ratings and count
+  const reviewStats = await client.organizerReview.aggregate({
+    where: { organizerProfileId },
+    _avg: {
+      communication: true,
+      payment: true,
+      professionalism: true,
+      venueQuality: true,
+      rating: true,
+    },
+    _count: { rating: true },
+  });
+
+  // Count gigs with various filters
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const [totalGigs, completedGigsCount, recentGigsCount] = await Promise.all([
+    client.gig.count({
+      where: {
+        organizerProfileId,
+        status: { not: "DRAFT" },
+        deletedAt: null,
+      },
+    }),
+    client.hire.count({
+      where: {
+        application: {
+          gig: { organizerProfileId },
+          status: "ACCEPTED",
+        },
+        status: "COMPLETED",
+      },
+    }),
+    client.gig.count({
+      where: {
+        organizerProfileId,
+        createdAt: { gte: thirtyDaysAgo },
+      },
+    }),
+  ]);
 
   // 1. Profile Quality (0-150)
   const completionFields = [
@@ -96,28 +130,22 @@ export async function calculateOrganizerReputationScore(
   if (organizerProfile.status === "ACTIVE") verificationScore += 10;
 
   // 3. Review Score (0-550) — weighted Bayesian average
-  const communicationRatings = organizerProfile.organizerReviews.map(
-    (r) => r.communication,
-  );
-  const paymentRatings = organizerProfile.organizerReviews.map(
-    (r) => r.payment,
-  );
-  const professionalismRatings = organizerProfile.organizerReviews.map(
-    (r) => r.professionalism,
-  );
-  const venueQualityRatings = organizerProfile.organizerReviews.map(
-    (r) => r.venueQuality,
-  );
-  const overallRatings = organizerProfile.organizerReviews.map((r) => r.rating);
+  const totalReviewCount = reviewStats._count.rating;
+  const communicationAvg = reviewStats._avg.communication ?? 0;
+  const paymentAvg = reviewStats._avg.payment ?? 0;
+  const professionalismAvg = reviewStats._avg.professionalism ?? 0;
+  const venueQualityAvg = reviewStats._avg.venueQuality ?? 0;
+  const overallAvg = reviewStats._avg.rating ?? 0;
 
-  const communicationBayesian = bayesianAverage(communicationRatings, 3);
-  const paymentBayesian = bayesianAverage(paymentRatings, 3);
-  const professionalismBayesian = bayesianAverage(professionalismRatings, 3);
-  const venueQualityBayesian = bayesianAverage(venueQualityRatings, 3);
-  const overallBayesian = bayesianAverage(overallRatings, 3);
+  // Apply Bayesian shrinkage using the aggregate averages
+  const communicationBayesian = bayesianAverage([communicationAvg], 3);
+  const paymentBayesian = bayesianAverage([paymentAvg], 3);
+  const professionalismBayesian = bayesianAverage([professionalismAvg], 3);
+  const venueQualityBayesian = bayesianAverage([venueQualityAvg], 3);
+  const overallBayesian = bayesianAverage([overallAvg], 3);
 
   let reviewScore = 0;
-  if (overallRatings.length > 0) {
+  if (totalReviewCount > 0) {
     // Weight each category equally
     const categoryAverage =
       (communicationBayesian +
@@ -130,13 +158,7 @@ export async function calculateOrganizerReputationScore(
   }
 
   // 4. Reliability (0-150) — based on gig completion and hire outcomes
-  const totalGigs = organizerProfile.gigs.length;
-  const completedGigs = organizerProfile.gigs.filter((gig) => {
-    const acceptedApplications = gig.applications.filter(
-      (app) => app.status === "ACCEPTED",
-    );
-    return acceptedApplications.length > 0;
-  }).length;
+  const completedGigs = completedGigsCount;
 
   let reliabilityScore = 0;
   if (totalGigs > 0) {
@@ -145,12 +167,6 @@ export async function calculateOrganizerReputationScore(
   }
 
   // 5. Activity (0-100)
-  const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-  const recentGigs = organizerProfile.gigs.filter(
-    (gig) => gig.createdAt >= thirtyDaysAgo,
-  ).length;
   const hasUpdatedProfile = organizerProfile.updatedAt >= thirtyDaysAgo;
   const hasRecentLogin = authUser?.last_sign_in_at
     ? new Date(authUser.last_sign_in_at) >= thirtyDaysAgo
@@ -159,9 +175,9 @@ export async function calculateOrganizerReputationScore(
   const activityScore = Math.min(
     WEIGHTS.activity,
     (hasUpdatedProfile ? 25 : 0) +
-      Math.min(recentGigs, 5) * 15 +
+      Math.min(recentGigsCount, 5) * 15 +
       (hasRecentLogin ? 20 : 0) +
-      (organizerProfile.organizerReviews.length > 0 ? 10 : 0),
+      (totalReviewCount > 0 ? 10 : 0),
   );
 
   // Total
@@ -175,7 +191,6 @@ export async function calculateOrganizerReputationScore(
   );
 
   // Confidence level (0-1) based on data volume
-  const totalReviewCount = overallRatings.length;
   const confidenceLevel = Math.min(
     1,
     (totalReviewCount / 10) * 0.5 +

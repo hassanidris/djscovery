@@ -133,33 +133,59 @@ export async function createOrganizerReview(
     return actionError("Review window expired (30 days)");
   }
 
-  if (!data.review || data.review.length < 30) {
+  const trimmedReview = data.review?.trim();
+  if (!trimmedReview || trimmedReview.length < 30) {
     return actionError("Review must be at least 30 characters");
   }
 
   const h = await headers();
 
-  const review = await prisma.organizerReview.create({
-    data: {
-      gigId,
-      djProfileId: djProfile.id,
-      organizerProfileId,
-      communication: data.communication,
-      payment: data.payment,
-      professionalism: data.professionalism,
-      venueQuality: data.venueQuality,
-      rating: overallRating,
-      review: data.review,
-      ipAddress: h.get("x-forwarded-for") || "unknown",
-      userAgent: h.get("user-agent") || "unknown",
-    },
-  });
+  let review;
+  try {
+    review = await prisma.organizerReview.create({
+      data: {
+        gigId,
+        djProfileId: djProfile.id,
+        organizerProfileId,
+        communication: data.communication,
+        payment: data.payment,
+        professionalism: data.professionalism,
+        venueQuality: data.venueQuality,
+        rating: overallRating,
+        review: data.review,
+        ipAddress: h.get("x-forwarded-for") || "unknown",
+        userAgent: h.get("user-agent") || "unknown",
+      },
+    });
+  } catch (error) {
+    // Handle P2002 unique constraint violation (duplicate review)
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return actionError(
+        "You have already reviewed this organizer for this gig",
+      );
+    }
+    // Re-throw unrelated database errors
+    throw error;
+  }
 
   // Update organizer reputation score
-  await updateOrganizerReputationScore(
+  const reputationResult = await updateOrganizerReputationScore(
     organizerProfileId,
-    "ORGANIZER_REVIEW_ADDED",
+    "ORGANIZER_REVIEW_ADDED" as const,
   );
+
+  if (!reputationResult.success) {
+    console.error(
+      "Failed to update organizer reputation after review creation:",
+      reputationResult.error,
+    );
+    // Review is committed; proceed with notification and revalidation
+  }
 
   // Create notification for organizer
   await prisma.notification.create({

@@ -1183,7 +1183,10 @@ export default function DjProfilePremium({
                         <MediaVideoModal
                           videoUrl={safeSPOTLIGHT.featuredVideo.videoUrl}
                           thumbnail={featuredVideoThumb}
-                          title={safeSPOTLIGHT.featuredVideo?.title}
+                          title={
+                            safeSPOTLIGHT.featuredVideo?.title ??
+                            "Featured video"
+                          }
                           mediaId={safeSPOTLIGHT.featuredVideo?.id}
                         >
                           <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
@@ -1209,7 +1212,8 @@ export default function DjProfilePremium({
                             </div>
                             <div className="p-4">
                               <p className="text-sm font-semibold text-white">
-                                {safeSPOTLIGHT.featuredVideo?.title}
+                                {safeSPOTLIGHT.featuredVideo?.title ??
+                                  "Featured video"}
                               </p>
                               <p className="mt-1 text-xs text-gray-500">
                                 {safeSPOTLIGHT.featuredVideo?.duration} ·{" "}

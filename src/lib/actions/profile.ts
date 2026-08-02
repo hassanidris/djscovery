@@ -743,7 +743,7 @@ export async function updateDjProfile(
 
     const slugChanged = newSlug !== existing.slug;
     try {
-      await updateReputationScore(existing.id, "PROFILE_UPDATED");
+      await updateReputationScore(existing.id, "PROFILE_UPDATED" as const);
     } catch (error) {
       console.error("Failed to refresh DJ reputation after profile update", {
         djProfileId: existing.id,

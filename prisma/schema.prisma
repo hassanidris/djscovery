@@ -312,6 +312,16 @@ enum ContactCategory {
   PRESS_MEDIA
 }
 
+enum ReputationChangeReason {
+  EVENT_REVIEW_ADDED
+  GIG_REVIEW_ADDED
+  GIG_COMPLETED
+  HIRE_CANCELLED
+  NO_SHOW_REPORTED
+  PROFILE_UPDATED
+  ORGANIZER_REVIEW_ADDED
+}
+
 // ============================================================
 // SECTION 1: MVP MODELS
 // ============================================================
@@ -1305,7 +1315,7 @@ model ReputationHistory {
 
   previousTotal Int
   newTotal      Int
-  changeReason  String // REVIEW_ADDED, PROFILE_UPDATED, GIG_COMPLETED, etc.
+  changeReason  ReputationChangeReason
 
   createdAt DateTime @default(now())
 
@@ -1320,7 +1330,7 @@ model OrganizerReputationHistory {
 
   previousTotal Int
   newTotal      Int
-  changeReason  String // REVIEW_ADDED, PROFILE_UPDATED, GIG_COMPLETED, etc.
+  changeReason  ReputationChangeReason
 
   createdAt DateTime @default(now())
 

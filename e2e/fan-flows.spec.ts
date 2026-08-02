@@ -20,13 +20,17 @@ async function ensureAuthState(
   password: string,
   statePath: string,
   expectedUrlPattern: RegExp,
+  probeRoute: string,
 ): Promise<Awaited<ReturnType<BrowserContext["storageState"]>>> {
   if (fs.existsSync(statePath)) {
     const savedState = JSON.parse(fs.readFileSync(statePath, "utf-8"));
     const context = await browser.newContext({ storageState: savedState });
     const page = await context.newPage();
     try {
-      await page.goto("/", { waitUntil: "domcontentloaded", timeout: 10000 });
+      await page.goto(probeRoute, {
+        waitUntil: "domcontentloaded",
+        timeout: 10000,
+      });
       if (!page.url().includes("/sign-in")) {
         const state = await context.storageState();
         await context.close();
@@ -81,6 +85,7 @@ test.describe("fan flows", () => {
       TEST_USERS.FAN.password,
       FAN_STATE_PATH,
       /\/$/,
+      "/fan/profile",
     );
   });
 
