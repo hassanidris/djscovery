@@ -15,12 +15,10 @@ export default function NotesForm({ hireId, initialNotes }: Props) {
 
   return (
     <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-      <label htmlFor="hire-notes" className="sr-only">
-        Admin Notes
-      </label>
       <textarea
         id="hire-notes"
         name="notes"
+        aria-label="Admin Notes"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Add admin notes about this hire..."
