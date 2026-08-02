@@ -114,6 +114,17 @@ async function EventsTable({
   });
 
   if (events.length === 0) {
+    if (cursor) {
+      return (
+        <>
+          <AdminEmptyState
+            title="No events found"
+            description="Try adjusting your filters."
+          />
+          <AdminPagination nextCursor={null} hasPrev={true} />
+        </>
+      );
+    }
     return (
       <AdminEmptyState
         title="No events found"
