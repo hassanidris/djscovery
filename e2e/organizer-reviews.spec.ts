@@ -80,7 +80,7 @@ test.describe("organizer reviews", () => {
       TEST_USERS.FREE_DJ.email,
       TEST_USERS.FREE_DJ.password,
       FREE_DJ_STATE_PATH,
-      (url) => !url.pathname.includes("/sign-in"),
+      /\/$/,
     );
   });
 

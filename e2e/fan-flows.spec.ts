@@ -80,7 +80,7 @@ test.describe("fan flows", () => {
       TEST_USERS.FAN.email,
       TEST_USERS.FAN.password,
       FAN_STATE_PATH,
-      (url) => !url.pathname.includes("/sign-in"),
+      /\/$/,
     );
   });
 
