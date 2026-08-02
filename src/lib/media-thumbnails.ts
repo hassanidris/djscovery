@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type MediaProvider = "youtube" | "vimeo" | "soundcloud" | "unknown";
 
@@ -57,37 +57,40 @@ export function getVideoThumbnailUrl(url: string): string | null {
 
 export function useAudioThumbnail(audioUrl: string | undefined): string | null {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const prevAudioUrlRef = useRef<string | undefined>(audioUrl);
 
   useEffect(() => {
-    // Clear thumbnail if audioUrl is empty or unsupported
-    if (!audioUrl) {
-      setThumbnail(null);
-      return;
-    }
+    const prevAudioUrl = prevAudioUrlRef.current;
+    prevAudioUrlRef.current = audioUrl;
 
-    const provider = getMediaProvider(audioUrl);
+    // Clear thumbnail only when transitioning from valid to invalid
+    const isValidUrl = audioUrl && getMediaProvider(audioUrl) === "soundcloud";
+    const wasValidUrl =
+      prevAudioUrl && getMediaProvider(prevAudioUrl) === "soundcloud";
 
-    // Clear thumbnail for unsupported providers
-    if (provider !== "soundcloud") {
+    if (wasValidUrl && !isValidUrl) {
       setThumbnail(null);
       return;
     }
 
     // Fetch thumbnail for soundcloud
-    let cancelled = false;
-    fetch(
-      `https://soundcloud.com/oembed?url=${encodeURIComponent(audioUrl)}&format=json`,
-    )
-      .then((res) => res.json())
-      .then((data: { thumbnail_url?: string }) => {
-        if (!cancelled && data.thumbnail_url) setThumbnail(data.thumbnail_url);
-      })
-      .catch(() => {
-        // Ignore fetch failures; keep null so caller can fall back.
-      });
-    return () => {
-      cancelled = true;
-    };
+    if (isValidUrl) {
+      let cancelled = false;
+      fetch(
+        `https://soundcloud.com/oembed?url=${encodeURIComponent(audioUrl)}&format=json`,
+      )
+        .then((res) => res.json())
+        .then((data: { thumbnail_url?: string }) => {
+          if (!cancelled && data.thumbnail_url)
+            setThumbnail(data.thumbnail_url);
+        })
+        .catch(() => {
+          // Ignore fetch failures; keep null so caller can fall back.
+        });
+      return () => {
+        cancelled = true;
+      };
+    }
   }, [audioUrl]);
 
   return thumbnail;
