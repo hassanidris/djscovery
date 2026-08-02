@@ -20,6 +20,7 @@ export default function NotesForm({ hireId, initialNotes }: Props) {
       </label>
       <textarea
         id="hire-notes"
+        name="notes"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Add admin notes about this hire..."
