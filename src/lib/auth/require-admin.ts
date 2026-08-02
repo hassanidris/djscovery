@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 
@@ -11,7 +12,7 @@ import prisma from "@/lib/client";
  * @returns { userId: string } — the verified admin's Supabase Auth UUID.
  * @throws Redirects to /sign-in if unauthenticated, or / if not ADMIN.
  */
-export async function requireAdmin(): Promise<{ userId: string }> {
+export const requireAdmin = cache(async (): Promise<{ userId: string }> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -31,4 +32,4 @@ export async function requireAdmin(): Promise<{ userId: string }> {
   if (!adminRole) redirect("/");
 
   return { userId: user.id };
-}
+});

@@ -389,8 +389,8 @@ export type AdminBookingInquiry = {
   eventName: string;
   eventDate: Date | null;
   venue: string | null;
-  country: { name: string } | null;
-  city: { name: string } | null;
+  countryName: string | null;
+  cityName: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
   budgetCurrency: string | null;
@@ -414,7 +414,11 @@ export async function getAdminBookingInquiries({
   status?: string;
   country?: string;
   dateRange?: "7d" | "30d" | "90d";
-}): Promise<{ inquiries: AdminBookingInquiry[]; nextCursor: number | null }> {
+}): Promise<{
+  inquiries: AdminBookingInquiry[];
+  nextCursor: number | null;
+  averageResponseTime: number | null;
+}> {
   await requireAdmin();
 
   try {
@@ -437,18 +441,46 @@ export async function getAdminBookingInquiries({
       };
     }
 
+    // Extract shared filtering criteria
+    const filters = {
+      ...(isValidStatus
+        ? { status: status as (typeof validStatuses)[number] }
+        : {}),
+      ...(country
+        ? { countryName: { contains: country, mode: "insensitive" as const } }
+        : {}),
+      ...(dateFilter || {}),
+    };
+
+    // Calculate average response time across ALL matching inquiries (not just current page)
+    // Uses lastRespondedAt to measure the most recent response time per inquiry
+    let averageResponseTime: number | null = null;
+    const allRespondedInquiries = await prisma.bookingInquiry.findMany({
+      where: {
+        ...filters,
+        lastRespondedAt: { not: null },
+      },
+      select: {
+        lastRespondedAt: true,
+        createdAt: true,
+      },
+    });
+
+    if (allRespondedInquiries.length > 0) {
+      const totalResponseTime = allRespondedInquiries.reduce((sum, inq) => {
+        const responseTime =
+          inq.lastRespondedAt!.getTime() - inq.createdAt.getTime();
+        return sum + responseTime;
+      }, 0);
+      averageResponseTime =
+        totalResponseTime / allRespondedInquiries.length / (1000 * 60 * 60); // Convert to hours
+    }
+
+    // Fetch paginated inquiries for display
     const inquiries = await prisma.bookingInquiry.findMany({
       take: take + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      where: {
-        ...(isValidStatus
-          ? { status: status as (typeof validStatuses)[number] }
-          : {}),
-        ...(country
-          ? { country: { name: { contains: country, mode: "insensitive" } } }
-          : {}),
-        ...(dateFilter || {}),
-      },
+      where: filters,
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       select: {
         id: true,
@@ -456,8 +488,8 @@ export async function getAdminBookingInquiries({
         eventName: true,
         eventDate: true,
         venue: true,
-        country: { select: { name: true } },
-        city: { select: { name: true } },
+        countryName: true,
+        cityName: true,
         budgetMin: true,
         budgetMax: true,
         budgetCurrency: true,
@@ -474,14 +506,15 @@ export async function getAdminBookingInquiries({
     if (hasNextPage) inquiries.pop();
 
     return {
-      inquiries,
+      inquiries: inquiries as AdminBookingInquiry[],
       nextCursor: hasNextPage
         ? (inquiries[inquiries.length - 1]?.id ?? null)
         : null,
+      averageResponseTime,
     };
   } catch (error) {
     console.error("Error fetching admin booking inquiries:", error);
-    return { inquiries: [], nextCursor: null };
+    return { inquiries: [], nextCursor: null, averageResponseTime: null };
   }
 }
 

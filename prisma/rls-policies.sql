@@ -58,7 +58,7 @@ ALTER TABLE "EmailLog" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "User can read own email logs" ON "EmailLog";
 CREATE POLICY "User can read own email logs" ON "EmailLog" FOR SELECT TO public USING ("userId" IS NOT NULL AND (auth.uid())::text = "userId");
 
--- Hire: involved organizer/DJ can read; server-only writes
+-- Hire: involved organizer/DJ can read; admin can read all; server-only writes
 ALTER TABLE "Hire" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Involved users can read hire" ON "Hire";
 CREATE POLICY "Involved users can read hire" ON "Hire" FOR SELECT TO public USING (
@@ -69,6 +69,28 @@ CREATE POLICY "Involved users can read hire" ON "Hire" FOR SELECT TO public USIN
     JOIN "DjProfile" dj ON dj.id = ga."djProfileId"
     WHERE ga.id = "Hire"."applicationId"
       AND (op."userId" = (auth.uid())::text OR dj."userId" = (auth.uid())::text)
+  )
+);
+DROP POLICY IF EXISTS "Admin can read all hires" ON "Hire";
+CREATE POLICY "Admin can read all hires" ON "Hire" FOR SELECT TO public USING (
+  EXISTS (
+    SELECT 1 FROM "UserRole" ur
+    JOIN "User" u ON u.id = ur."userId"
+    WHERE ur."userId" = (auth.uid())::text
+      AND ur.role = 'ADMIN'
+      AND u.status = 'ACTIVE'
+      AND u."deletedAt" IS NULL
+  )
+);
+DROP POLICY IF EXISTS "Admin can update hires" ON "Hire";
+CREATE POLICY "Admin can update hires" ON "Hire" FOR UPDATE TO public USING (
+  EXISTS (
+    SELECT 1 FROM "UserRole" ur
+    JOIN "User" u ON u.id = ur."userId"
+    WHERE ur."userId" = (auth.uid())::text
+      AND ur.role = 'ADMIN'
+      AND u.status = 'ACTIVE'
+      AND u."deletedAt" IS NULL
   )
 );
 

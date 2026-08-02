@@ -9,7 +9,7 @@ import AdminPagination from "@/components/admin/AdminPagination";
 import AdminFilters from "@/components/admin/AdminFilters";
 import AdminTableSkeleton from "@/components/admin/AdminTableSkeleton";
 import { formatDistanceToNow, format } from "date-fns";
-import { MessageSquare, MapPin, DollarSign } from "lucide-react";
+import { MessageSquare, MapPin, DollarSign, Clock } from "lucide-react";
 
 export const metadata: Metadata = { title: "Booking Inquiries" };
 
@@ -42,12 +42,13 @@ export default async function AdminBookingInquiriesPage({
       ? rawDateRange
       : undefined;
 
-  const { inquiries, nextCursor } = await getAdminBookingInquiries({
-    cursor,
-    status,
-    country,
-    dateRange,
-  });
+  const { inquiries, nextCursor, averageResponseTime } =
+    await getAdminBookingInquiries({
+      cursor,
+      status,
+      country,
+      dateRange,
+    });
   const countries = await getCountries();
   const countryFilter = {
     key: "country",
@@ -93,6 +94,22 @@ export default async function AdminBookingInquiriesPage({
           },
         ]}
       />
+
+      {averageResponseTime !== null && (
+        <div className="flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-3">
+          <Clock className="h-5 w-5 text-purple-400" />
+          <div>
+            <p className="text-xs font-medium text-purple-400">
+              Average Response Time
+            </p>
+            <p className="text-lg font-bold text-white">
+              {averageResponseTime < 24
+                ? `${Math.round(averageResponseTime)}h`
+                : `${Math.round(averageResponseTime / 24)}d`}
+            </p>
+          </div>
+        </div>
+      )}
 
       <Suspense fallback={<AdminTableSkeleton cols={9} rows={8} />}>
         {inquiries.length === 0 ? (
@@ -179,7 +196,7 @@ export default async function AdminBookingInquiriesPage({
                         <td className="px-4 py-3 text-xs text-gray-300">
                           <div className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
-                            {[inquiry.city?.name, inquiry.country?.name]
+                            {[inquiry.cityName, inquiry.countryName]
                               .filter(Boolean)
                               .join(", ") || "—"}
                           </div>

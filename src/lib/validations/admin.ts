@@ -90,6 +90,26 @@ export const DismissReportSchema = z.object({
   adminNote: z.string().max(1000).optional(),
 });
 
+// ── Hires ───────────────────────────────────────────────────
+
+export const MarkHireCompletedSchema = z.object({
+  hireId: z.coerce.number().int().positive("Invalid hire ID"),
+});
+
+export const MarkHireNoShowSchema = z.object({
+  hireId: z.coerce.number().int().positive("Invalid hire ID"),
+});
+
+export const CancelHireSchema = z.object({
+  hireId: z.coerce.number().int().positive("Invalid hire ID"),
+  reason: z.string().max(500).optional(),
+});
+
+export const UpdateHireNotesSchema = z.object({
+  hireId: z.coerce.number().int().positive("Invalid hire ID"),
+  notes: z.string().max(2000).optional(),
+});
+
 // ── Inferred types ───────────────────────────────────────────
 
 export type SuspendUserInput = z.infer<typeof SuspendUserSchema>;
@@ -110,3 +130,7 @@ export type MarkReportUnderReviewInput = z.infer<
 >;
 export type ResolveReportInput = z.infer<typeof ResolveReportSchema>;
 export type DismissReportInput = z.infer<typeof DismissReportSchema>;
+export type MarkHireCompletedInput = z.infer<typeof MarkHireCompletedSchema>;
+export type MarkHireNoShowInput = z.infer<typeof MarkHireNoShowSchema>;
+export type CancelHireInput = z.infer<typeof CancelHireSchema>;
+export type UpdateHireNotesInput = z.infer<typeof UpdateHireNotesSchema>;
