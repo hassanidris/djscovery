@@ -73,8 +73,6 @@ test.describe("Career Highlights", () => {
     >;
 
     test.beforeAll(async ({ browser }) => {
-      await resetDjHighlights(TEST_USERS.PREMIUM_DJ.email);
-
       const context = await browser.newContext();
       const page = await context.newPage();
       await signIn(
@@ -91,6 +89,9 @@ test.describe("Career Highlights", () => {
     });
 
     test.beforeEach(async ({ page }) => {
+      // Reset data before each test to ensure isolation
+      await resetDjHighlights(TEST_USERS.PREMIUM_DJ.email);
+
       // Restore cookies, then seed localStorage (Supabase Auth persists its
       // session there) before any app script runs on first navigation.
       await page.context().addCookies(storageState.cookies);
@@ -112,6 +113,9 @@ test.describe("Career Highlights", () => {
       await expect(
         page.getByRole("button", { name: /Add Highlight/i }),
       ).toBeVisible({ timeout: 15000 });
+
+      // Wait a moment for the empty state to render
+      await page.waitForTimeout(500);
 
       // Should see empty state
       await expect(page.getByText("No career highlights yet")).toBeVisible({
@@ -167,10 +171,6 @@ test.describe("Career Highlights", () => {
     });
 
     test("successfully creates highlight with valid data", async ({ page }) => {
-      // Reset here (not just in beforeAll) so retries of this test don't
-      // accumulate duplicate highlights and trip strict-mode locators below.
-      await resetDjHighlights(TEST_USERS.PREMIUM_DJ.email);
-
       await page.goto("/dj/settings");
       await page.getByRole("tab", { name: "Career Highlights" }).click();
       await page.getByRole("button", { name: /Add Highlight/i }).click();
@@ -189,11 +189,16 @@ test.describe("Career Highlights", () => {
         timeout: 15000,
       });
 
+      // Wait for the list to refresh after creation
+      await page.waitForTimeout(1000);
+
       // Should see new highlight in list
       await expect(
         page.getByText("Headlined Afro Nation Portugal").first(),
-      ).toBeVisible();
-      await expect(page.getByText("2024").first()).toBeVisible();
+      ).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText("2024").first()).toBeVisible({
+        timeout: 5000,
+      });
     });
 
     test("successfully edits existing highlight", async ({ page }) => {
@@ -271,6 +276,9 @@ test.describe("Career Highlights", () => {
         await expect(page.getByText("Career highlights updated")).toBeVisible({
           timeout: 15000,
         });
+
+        // Wait for the list to refresh after creation
+        await page.waitForTimeout(1000);
       }
 
       const countBeforeDelete = await page
@@ -284,6 +292,9 @@ test.describe("Career Highlights", () => {
       await expect(page.getByText("Highlight deleted")).toBeVisible({
         timeout: 5000,
       });
+
+      // Wait for the list to refresh after deletion
+      await page.waitForTimeout(1000);
 
       // Count should decrease
       await expect(page.locator('[data-testid="highlight-item"]')).toHaveCount(
