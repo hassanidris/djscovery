@@ -106,7 +106,7 @@ export async function createGigReview(
     },
   });
 
-  await updateReputationScore(djProfileId, "GIG_REVIEW_ADDED");
+  await updateReputationScore(djProfileId, "GIG_REVIEW_ADDED" as const);
 
   await prisma.notification.create({
     data: {

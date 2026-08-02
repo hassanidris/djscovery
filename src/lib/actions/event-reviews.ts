@@ -110,7 +110,7 @@ export async function createEventReview(
     },
   });
 
-  await updateReputationScore(djProfileId, "EVENT_REVIEW_ADDED");
+  await updateReputationScore(djProfileId, "EVENT_REVIEW_ADDED" as const);
 
   const djProfile = await prisma.djProfile.findUnique({
     where: { id: djProfileId },

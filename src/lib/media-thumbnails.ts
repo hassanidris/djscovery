@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type MediaProvider = "youtube" | "vimeo" | "soundcloud" | "unknown";
 
@@ -57,12 +57,24 @@ export function getVideoThumbnailUrl(url: string): string | null {
 
 export function useAudioThumbnail(audioUrl: string | undefined): string | null {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const prevAudioUrlRef = useRef<string | undefined>(audioUrl);
 
   useEffect(() => {
-    if (!audioUrl) return;
-    const provider = getMediaProvider(audioUrl);
+    const prevAudioUrl = prevAudioUrlRef.current;
+    prevAudioUrlRef.current = audioUrl;
 
-    if (provider === "soundcloud") {
+    // Clear thumbnail only when transitioning from valid to invalid
+    const isValidUrl = audioUrl && getMediaProvider(audioUrl) === "soundcloud";
+    const wasValidUrl =
+      prevAudioUrl && getMediaProvider(prevAudioUrl) === "soundcloud";
+
+    if (wasValidUrl && !isValidUrl) {
+      setThumbnail(null);
+      return;
+    }
+
+    // Fetch thumbnail for soundcloud
+    if (isValidUrl) {
       let cancelled = false;
       fetch(
         `https://soundcloud.com/oembed?url=${encodeURIComponent(audioUrl)}&format=json`,

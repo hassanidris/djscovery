@@ -54,13 +54,20 @@ const TEST_USERS = {
     password: process.env.E2E_TEST_PASSWORD || "TestPassword123!",
     role: "FAN",
   },
+  ADMIN: {
+    email: process.env.E2E_TEST_ADMIN_EMAIL || "test-admin@example.com",
+    password: process.env.E2E_TEST_PASSWORD || "TestPassword123!",
+    role: "ADMIN",
+  },
 } as const;
 
 async function createTestUser(
   email: string,
   password: string,
-  role: "DJ" | "ORGANIZER" | "FAN",
+  role: "DJ" | "ORGANIZER" | "FAN" | "ADMIN",
   plan?: "FREE" | "PREMIUM",
+  stageName?: string,
+  slug?: string,
 ) {
   console.log(
     `Creating test user: ${email} (${role}${plan ? ` - ${plan}` : ""})`,
@@ -77,8 +84,17 @@ async function createTestUser(
   let userId: string;
 
   if (existingUser) {
-    console.log(`  User already exists, skipping creation`);
+    console.log(`  User already exists, resetting password`);
     userId = existingUser.id;
+    // Ensure the password matches what the E2E tests expect, in case the
+    // user was previously created with a different password.
+    const { error: pwError } = await admin.auth.admin.updateUserById(userId, {
+      password,
+      email_confirm: true,
+    });
+    if (pwError) {
+      throw new Error(`Failed to reset password: ${pwError.message}`);
+    }
   } else {
     // Create Supabase user
     const { data: userData, error: userError } =
@@ -102,7 +118,7 @@ async function createTestUser(
     // Create User record
     await tx.user.upsert({
       where: { id: userId },
-      update: {},
+      update: { onboardingComplete: true },
       create: {
         id: userId,
         email,
@@ -130,13 +146,18 @@ async function createTestUser(
         );
       }
 
+      const djSlug = slug || `test-dj-${userId.slice(0, 6)}`;
       await tx.djProfile.upsert({
         where: { userId },
-        update: { plan: plan || "FREE" },
+        update: {
+          plan: plan || "FREE",
+          ...(stageName ? { stageName } : {}),
+          slug: djSlug,
+        },
         create: {
           userId,
-          stageName: `Test DJ ${userId.slice(0, 6)}`,
-          slug: `test-dj-${userId.slice(0, 6)}`,
+          stageName: stageName || `Test DJ ${userId.slice(0, 6)}`,
+          slug: djSlug,
           plan: plan || "FREE",
           bio: "Test DJ profile for E2E tests",
           countryId: anyCity.countryId,
@@ -181,6 +202,28 @@ async function createTestUser(
 }
 
 async function main() {
+  // Environment guard: only allow seeding in local, test, or staging environments
+  const nodeEnv = process.env.NODE_ENV;
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV;
+  const databaseUrl = process.env.DATABASE_URL;
+
+  const isLocal = nodeEnv === "development" || nodeEnv === "test";
+  const isStaging =
+    appEnv === "staging" ||
+    databaseUrl?.includes("jarmybsjvztwrmsdcnje.supabase.co");
+  const isTest =
+    databaseUrl?.includes("test") || databaseUrl?.includes("localhost");
+
+  if (!isLocal && !isStaging && !isTest) {
+    console.error(
+      "❌ Aborting: Test user seeding is only permitted in local, test, or staging environments.",
+    );
+    console.error(`   NODE_ENV: ${nodeEnv}`);
+    console.error(`   NEXT_PUBLIC_APP_ENV: ${appEnv}`);
+    console.error(`   DATABASE_URL: ${databaseUrl?.substring(0, 50)}...`);
+    process.exit(1);
+  }
+
   console.log("Seeding test users for E2E tests...\n");
 
   try {
@@ -189,6 +232,8 @@ async function main() {
       TEST_USERS.PREMIUM_DJ.password,
       TEST_USERS.PREMIUM_DJ.role,
       TEST_USERS.PREMIUM_DJ.plan,
+      "Test Premium DJ",
+      "test-premium-dj",
     );
 
     await createTestUser(
@@ -196,6 +241,8 @@ async function main() {
       TEST_USERS.FREE_DJ.password,
       TEST_USERS.FREE_DJ.role,
       TEST_USERS.FREE_DJ.plan,
+      "Test Free DJ",
+      "test-free-dj",
     );
 
     await createTestUser(
@@ -208,6 +255,12 @@ async function main() {
       TEST_USERS.FAN.email,
       TEST_USERS.FAN.password,
       TEST_USERS.FAN.role,
+    );
+
+    await createTestUser(
+      TEST_USERS.ADMIN.email,
+      TEST_USERS.ADMIN.password,
+      TEST_USERS.ADMIN.role,
     );
 
     console.log("\n✅ Test users seeded successfully!");

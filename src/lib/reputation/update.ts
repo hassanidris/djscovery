@@ -5,7 +5,14 @@ import { updateSearchScore } from "@/lib/search/composite-score";
 
 export async function updateReputationScore(
   djProfileId: number,
-  changeReason: string,
+  changeReason:
+    | "EVENT_REVIEW_ADDED"
+    | "GIG_REVIEW_ADDED"
+    | "GIG_COMPLETED"
+    | "HIRE_CANCELLED"
+    | "NO_SHOW_REPORTED"
+    | "PROFILE_UPDATED"
+    | "ORGANIZER_REVIEW_ADDED",
 ) {
   // Preload auth data outside the transaction so the advisory lock and DB
   // connection are not held during the Supabase admin lookup.

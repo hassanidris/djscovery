@@ -518,3 +518,83 @@ export async function getPendingGigReviewsForOrganizer(userId: string) {
 export type PendingGigReview = Awaited<
   ReturnType<typeof getPendingGigReviewsForOrganizer>
 >[number];
+
+// ============================================================
+// 9. ORGANIZER REVIEW CONTEXT
+// Data needed to render the DJ review prompt for organizers.
+// Returns null if the current user is not the DJ or if there is no accepted application.
+// ============================================================
+
+export async function getOrganizerReviewContextBySlug(
+  slug: string,
+  userId: string,
+) {
+  const gig = await prisma.gig.findUnique({
+    where: { slug, deletedAt: null },
+    include: {
+      organizerProfile: {
+        select: {
+          id: true,
+          displayName: true,
+          userId: true,
+        },
+      },
+      applications: {
+        where: {
+          djProfile: {
+            userId,
+          },
+          status: "ACCEPTED",
+        },
+        include: {
+          hire: true,
+        },
+      },
+      organizerReviews: {
+        where: {
+          djProfile: {
+            userId,
+          },
+        },
+      },
+    },
+  });
+
+  if (!gig) return null;
+
+  const application = gig.applications[0];
+  if (!application) return null;
+
+  const hire = application.hire;
+  const isCompleted = hire?.status === "COMPLETED";
+  const alreadyReviewed = gig.organizerReviews.length > 0;
+
+  let reviewWindowOpen = false;
+  let daysRemaining = null;
+
+  if (isCompleted && !alreadyReviewed) {
+    const completedAt = hire.completedAt || gig.eventDate;
+    const daysSinceCompletion =
+      (Date.now() - new Date(completedAt).getTime()) / (1000 * 60 * 60 * 24);
+
+    if (daysSinceCompletion <= 30) {
+      reviewWindowOpen = true;
+      daysRemaining = Math.max(0, Math.floor(30 - daysSinceCompletion));
+    }
+  }
+
+  return {
+    gigId: gig.id,
+    gigTitle: gig.title,
+    organizerProfileId: gig.organizerProfile.id,
+    organizerName: gig.organizerProfile.displayName,
+    isCompleted,
+    alreadyReviewed,
+    reviewWindowOpen,
+    daysRemaining,
+  };
+}
+
+export type OrganizerReviewContext = NonNullable<
+  Awaited<ReturnType<typeof getOrganizerReviewContextBySlug>>
+>;

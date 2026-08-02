@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { ReportButton } from "@/components/reporting/ReportButton";
+import OrganizerReviews from "@/components/organizer/OrganizerReviews";
 
 // ISR: revalidate every 60 seconds
 export const revalidate = 60;
@@ -170,6 +171,37 @@ export default async function OrganizerPublicProfilePage({
     select: { id: true, title: true, gigType: true, updatedAt: true },
     take: 6,
   });
+
+  // Fetch organizer reviews (paginated for display)
+  const organizerReviews = await prisma.organizerReview.findMany({
+    where: {
+      organizerProfileId: profile.id,
+    },
+    include: {
+      djProfile: {
+        select: {
+          slug: true,
+          stageName: true,
+          avatar: true,
+          status: true,
+          city: { select: { name: true } },
+          country: { select: { name: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+
+  // Compute full-dataset review statistics
+  const reviewStats = await prisma.organizerReview.aggregate({
+    where: { organizerProfileId: profile.id },
+    _avg: { rating: true },
+    _count: { rating: true },
+  });
+
+  const avgRating = reviewStats._avg.rating ?? 0;
+  const ratingCount = reviewStats._count.rating;
 
   const typeLabel =
     ORGANIZER_TYPE_LABELS[profile.organizerType] ?? profile.organizerType;
@@ -378,22 +410,14 @@ export default async function OrganizerPublicProfilePage({
             </section>
           )}
 
-          {/* Reviews placeholder */}
-          <section>
-            <div className="mb-4 flex items-center gap-2">
-              <h2 className="text-base font-semibold text-white">DJ Reviews</h2>
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-gray-600">
-                Coming soon
-              </span>
-            </div>
-            <div className="rounded-xl border border-dashed border-white/8 p-8 text-center">
-              <CalendarDays className="mx-auto mb-2 h-6 w-6 text-gray-700" />
-              <p className="text-sm text-gray-600">
-                DJ reviews of this organizer will appear here in a future
-                update.
-              </p>
-            </div>
-          </section>
+          {/* Reviews */}
+          {organizerReviews.length > 0 && (
+            <OrganizerReviews
+              avgRating={avgRating}
+              ratingCount={organizerReviews.length}
+              reviews={organizerReviews}
+            />
+          )}
 
           {/* Contact */}
           {profile.website && (

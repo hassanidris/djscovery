@@ -122,7 +122,7 @@ export async function POST(
     },
   });
 
-  await updateReputationScore(djProfileId, "EVENT_REVIEW_ADDED");
+  await updateReputationScore(djProfileId, "EVENT_REVIEW_ADDED" as const);
 
   return NextResponse.json(createdReview, { status: 201 });
 }

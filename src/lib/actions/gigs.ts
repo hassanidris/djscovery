@@ -868,7 +868,10 @@ export async function completeGig(
     };
   }
 
-  await updateReputationScore(application.djProfile.id, "GIG_COMPLETED");
+  await updateReputationScore(
+    application.djProfile.id,
+    "GIG_COMPLETED" as const,
+  );
 
   revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath("/organizer/gigs", "layout");
@@ -974,7 +977,7 @@ export async function cancelHire(
     });
   });
 
-  await updateReputationScore(djProfile.id, "HIRE_CANCELLED");
+  await updateReputationScore(djProfile.id, "HIRE_CANCELLED" as const);
 
   revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath("/organizer/gigs", "layout");
@@ -1060,7 +1063,7 @@ export async function reportNoShow(
     });
   });
 
-  await updateReputationScore(djProfile.id, "NO_SHOW_REPORTED");
+  await updateReputationScore(djProfile.id, "NO_SHOW_REPORTED" as const);
 
   revalidatePath(`/gigs/${gig.slug}`);
   revalidatePath("/organizer/gigs", "layout");
