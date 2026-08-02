@@ -1018,15 +1018,15 @@ export default function DjProfilePremium({
         : isStaging
           ? PREMIUM_DEFAULT_SPOTLIGHT
           : null;
-  const featuredVideoUrl = SPOTLIGHT?.featuredVideo.videoUrl ?? "";
+  const featuredVideoUrl = SPOTLIGHT?.featuredVideo?.videoUrl ?? "";
   const featuredVideoThumb =
-    SPOTLIGHT?.featuredVideo.thumbnail ||
+    SPOTLIGHT?.featuredVideo?.thumbnail ||
     getVideoThumbnailUrl(featuredVideoUrl) ||
     "/gallery-2.png";
-  const featuredMixAudioUrl = SPOTLIGHT?.featuredMix.audioUrl ?? "";
+  const featuredMixAudioUrl = SPOTLIGHT?.featuredMix?.audioUrl ?? "";
   const autoMixThumb = useAudioThumbnail(featuredMixAudioUrl);
   const featuredMixThumb =
-    SPOTLIGHT?.featuredMix.thumbnail || autoMixThumb || "/gallery-2.png";
+    SPOTLIGHT?.featuredMix?.thumbnail || autoMixThumb || "/gallery-2.png";
   const location = DJ ? `${DJ.city}, ${DJ.country}` : "";
 
   // Early return in production if no data available
@@ -1130,14 +1130,14 @@ export default function DjProfilePremium({
 
               {/* ── SPOTLIGHT (nested inside Media) ── */}
               {safeSPOTLIGHT &&
-                (safeSPOTLIGHT.featuredMix.audioUrl ||
-                  safeSPOTLIGHT.featuredVideo.videoUrl) && (
+                (safeSPOTLIGHT.featuredMix?.audioUrl ||
+                  safeSPOTLIGHT.featuredVideo?.videoUrl) && (
                   <>
                     <h3 className="mb-4 text-sm font-semibold text-gray-400">
                       Spotlight
                     </h3>
                     <div className="mb-8 flex flex-nowrap gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid">
-                      {safeSPOTLIGHT.featuredMix.audioUrl && (
+                      {safeSPOTLIGHT.featuredMix?.audioUrl && (
                         <MediaAudioPlayer
                           audioUrl={safeSPOTLIGHT.featuredMix.audioUrl}
                           title={safeSPOTLIGHT.featuredMix.title}
@@ -1179,12 +1179,12 @@ export default function DjProfilePremium({
                           </Card>
                         </MediaAudioPlayer>
                       )}
-                      {safeSPOTLIGHT.featuredVideo.videoUrl && (
+                      {safeSPOTLIGHT.featuredVideo?.videoUrl && (
                         <MediaVideoModal
                           videoUrl={safeSPOTLIGHT.featuredVideo.videoUrl}
                           thumbnail={featuredVideoThumb}
-                          title={safeSPOTLIGHT.featuredVideo.title}
-                          mediaId={safeSPOTLIGHT.featuredVideo.id}
+                          title={safeSPOTLIGHT.featuredVideo?.title}
+                          mediaId={safeSPOTLIGHT.featuredVideo?.id}
                         >
                           <Card className="bg-h_blackLight/30 group h-full min-w-72 cursor-pointer gap-0 overflow-hidden border-white/8 transition-all hover:border-amber-500/30 sm:min-w-0">
                             <div className="relative h-44 overflow-hidden">
@@ -1209,11 +1209,13 @@ export default function DjProfilePremium({
                             </div>
                             <div className="p-4">
                               <p className="text-sm font-semibold text-white">
-                                {safeSPOTLIGHT.featuredVideo.title}
+                                {safeSPOTLIGHT.featuredVideo?.title}
                               </p>
                               <p className="mt-1 text-xs text-gray-500">
-                                {safeSPOTLIGHT.featuredVideo.duration} ·{" "}
-                                {formatPlays(safeSPOTLIGHT.featuredVideo.views)}{" "}
+                                {safeSPOTLIGHT.featuredVideo?.duration} ·{" "}
+                                {formatPlays(
+                                  safeSPOTLIGHT.featuredVideo?.views ?? 0,
+                                )}{" "}
                                 views
                               </p>
                             </div>

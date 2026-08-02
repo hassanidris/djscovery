@@ -24,6 +24,19 @@ CREATE POLICY "Organizer can update own gig review" ON "GigReview" FOR UPDATE TO
 DROP POLICY IF EXISTS "Organizer can delete own gig review" ON "GigReview";
 CREATE POLICY "Organizer can delete own gig review" ON "GigReview" FOR DELETE TO public USING ((auth.uid())::text = "organizerId");
 
+-- OrganizerReview: public read, DJ can write (server-side via Prisma, no direct RLS)
+ALTER TABLE "OrganizerReview" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read organizer reviews" ON "OrganizerReview";
+CREATE POLICY "Public read organizer reviews" ON "OrganizerReview" FOR SELECT TO public USING (true);
+
+-- OrganizerReputationScore: public read, server-only writes via Prisma
+ALTER TABLE "OrganizerReputationScore" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read organizer reputation scores" ON "OrganizerReputationScore";
+CREATE POLICY "Public read organizer reputation scores" ON "OrganizerReputationScore" FOR SELECT TO public USING (true);
+ALTER TABLE "OrganizerReputationHistory" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read organizer reputation history" ON "OrganizerReputationHistory";
+CREATE POLICY "Public read organizer reputation history" ON "OrganizerReputationHistory" FOR SELECT TO public USING (true);
+
 -- Report: reporter can read/insert own reports. Admin updates are done server-side via Prisma.
 ALTER TABLE "Report" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Reporter can read own reports" ON "Report";

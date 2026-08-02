@@ -512,6 +512,7 @@ model DjProfile {
   pressItems       DjPress[]
   profileViews     ProfileView[]
   venues           DjVenue[]
+  organizerReviews OrganizerReview[]
 
   @@index([slug])
   @@index([status])
@@ -705,8 +706,10 @@ model OrganizerProfile {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  socialLinks OrganizerSocialLink[]
-  gigs        Gig[]
+  socialLinks      OrganizerSocialLink[]
+  gigs             Gig[]
+  organizerReviews OrganizerReview[]
+  reputationDetail OrganizerReputationScore?
 
   @@index([slug])
   @@index([status])
@@ -1122,8 +1125,9 @@ model Gig {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  applications GigApplication[]
-  gigReviews   GigReview[]
+  applications     GigApplication[]
+  gigReviews       GigReview[]
+  organizerReviews OrganizerReview[]
 
   @@index([status])
   @@index([gigType])
@@ -1212,6 +1216,41 @@ model EventReview {
   @@index([reviewType])
 }
 
+model OrganizerReview {
+  id Int @id @default(autoincrement())
+
+  // Category ratings (1-5)
+  communication   Int
+  payment         Int
+  professionalism Int
+  venueQuality    Int
+
+  // Overall rating (1-5) - calculated from categories
+  rating Int
+
+  review String?
+
+  gigId              Int
+  gig                Gig              @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  djProfileId        Int
+  djProfile          DjProfile        @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  organizerProfileId Int
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+
+  // Anti-gaming audit
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gigId, djProfileId]) // one review per gig per DJ
+  @@index([djProfileId])
+  @@index([organizerProfileId])
+  @@index([gigId])
+  @@index([createdAt])
+}
+
 model ReputationScore {
   id          Int       @id @default(autoincrement())
   djProfileId Int       @unique
@@ -1236,6 +1275,29 @@ model ReputationScore {
   @@index([djProfileId])
 }
 
+model OrganizerReputationScore {
+  id                 Int              @id @default(autoincrement())
+  organizerProfileId Int              @unique
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+
+  totalScore          Int @default(0) // 0-1000
+  profileQualityScore Int @default(0) // 0-150
+  verificationScore   Int @default(0) // 0-50
+  reviewScore         Int @default(0) // 0-550
+  reliabilityScore    Int @default(0) // 0-150
+  activityScore       Int @default(0) // 0-100
+
+  confidenceLevel Float  @default(0) // 0.0-1.0
+  trendDirection  String @default("STABLE") // RISING, STABLE, FALLING
+
+  calculatedAt        DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  reputationHistories OrganizerReputationHistory[]
+
+  @@index([totalScore])
+  @@index([organizerProfileId])
+}
+
 model ReputationHistory {
   id                Int             @id @default(autoincrement())
   reputationScoreId Int
@@ -1248,6 +1310,21 @@ model ReputationHistory {
   createdAt DateTime @default(now())
 
   @@index([reputationScoreId])
+  @@index([createdAt])
+}
+
+model OrganizerReputationHistory {
+  id                         Int                      @id @default(autoincrement())
+  organizerReputationScoreId Int
+  organizerReputationScore   OrganizerReputationScore @relation(fields: [organizerReputationScoreId], references: [id], onDelete: Cascade)
+
+  previousTotal Int
+  newTotal      Int
+  changeReason  String // REVIEW_ADDED, PROFILE_UPDATED, GIG_COMPLETED, etc.
+
+  createdAt DateTime @default(now())
+
+  @@index([organizerReputationScoreId])
   @@index([createdAt])
 }
 
