@@ -85,6 +85,7 @@ export default async function GigDetailPage({
         },
       },
       gigReviews: { select: { id: true, organizerId: true } },
+      organizerReviews: { select: { id: true, djProfileId: true } },
       _count: { select: { applications: true } },
     },
   });
@@ -94,6 +95,7 @@ export default async function GigDetailPage({
   const isOrganizer = user?.id === gig.organizerProfile.userId;
   const accepted = gig.applications[0];
   const isAcceptedDj = user?.id === accepted?.djProfile.userId;
+  const hire = accepted?.hire;
   if (!isOrganizer && !isAcceptedDj && gig.status !== "PUBLISHED")
     return notFound();
 
@@ -125,12 +127,12 @@ export default async function GigDetailPage({
   const canReview =
     isOrganizer &&
     gig.status === "COMPLETED" &&
-    accepted?.hire?.status === "COMPLETED" &&
+    hire?.status === "COMPLETED" &&
     gig.gigReviews.length === 0;
 
   const daysRemaining =
-    canReview && accepted?.hire?.completedAt
-      ? getReviewDaysRemaining(accepted.hire.completedAt)
+    canReview && hire?.completedAt
+      ? getReviewDaysRemaining(hire.completedAt)
       : null;
 
   return (
@@ -187,6 +189,22 @@ export default async function GigDetailPage({
           </div>
         )}
 
+        {/* DJ organizer review prompt */}
+        {isAcceptedDj &&
+          accepted &&
+          hire?.status === "COMPLETED" &&
+          gig.organizerReviews.length === 0 && (
+            <div className="mb-8">
+              <Link
+                href={`/gigs/${gig.slug}/organizer-review`}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300 transition-colors hover:border-white/20 hover:text-white"
+              >
+                <Star className="h-4 w-4" />
+                Review {gig.organizerProfile.displayName}
+              </Link>
+            </div>
+          )}
+
         {isOrganizer &&
           gig.status === "COMPLETED" &&
           accepted &&
@@ -194,6 +212,16 @@ export default async function GigDetailPage({
             <div className="mb-8 flex items-center gap-2 rounded-xl border border-green-500/20 bg-green-500/5 px-4 py-3 text-sm text-green-300">
               <Star className="h-4 w-4" />
               You have reviewed this gig.
+            </div>
+          )}
+
+        {isAcceptedDj &&
+          accepted &&
+          hire?.status === "COMPLETED" &&
+          gig.organizerReviews.length > 0 && (
+            <div className="mb-8 flex items-center gap-2 rounded-xl border border-green-500/20 bg-green-500/5 px-4 py-3 text-sm text-green-300">
+              <Star className="h-4 w-4" />
+              You have reviewed this organizer.
             </div>
           )}
 

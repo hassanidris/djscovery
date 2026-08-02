@@ -16,6 +16,7 @@
     "e2e:ui": "playwright test --ui",
     "e2e:report": "playwright show-report",
     "seed": "tsx prisma/seed.ts",
+    "seed:test-users": "tsx prisma/seed-test-users.ts",
     "create-admin": "tsx prisma/create-admin.ts",
     "postinstall": "prisma generate",
     "storybook": "storybook dev -p 6007",
