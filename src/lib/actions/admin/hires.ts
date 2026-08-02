@@ -26,28 +26,36 @@ export async function markHireCompleted(
   const { hireId } = parsed.data;
 
   try {
-    const result = await prisma.hire.updateMany({
-      where: { id: hireId, status: "ACTIVE" },
-      data: { status: "COMPLETED", completedAt: new Date() },
-    });
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.hire.updateMany({
+        where: { id: hireId, status: "ACTIVE" },
+        data: { status: "COMPLETED", completedAt: new Date() },
+      });
 
-    if (result.count === 0) {
-      return { error: "Hire not found or not in ACTIVE status" };
-    }
+      if (result.count === 0) {
+        throw new Error("Hire not found or not in ACTIVE status");
+      }
 
-    await prisma.adminActionLog.create({
-      data: {
-        adminId,
-        action: "MARK_HIRE_COMPLETED",
-        targetType: "Hire",
-        targetId: String(hireId),
-      },
+      await tx.adminActionLog.create({
+        data: {
+          adminId,
+          action: "MARK_HIRE_COMPLETED",
+          targetType: "Hire",
+          targetId: String(hireId),
+        },
+      });
     });
 
     revalidatePath("/admin/hires");
     revalidatePath(`/admin/hires/${hireId}`);
     return { success: true };
-  } catch {
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Hire not found or not in ACTIVE status"
+    ) {
+      return { error: error.message };
+    }
     return { error: "Failed to mark hire as completed" };
   }
 }
@@ -66,28 +74,36 @@ export async function markHireNoShow(
   const { hireId } = parsed.data;
 
   try {
-    const result = await prisma.hire.updateMany({
-      where: { id: hireId, status: "ACTIVE" },
-      data: { status: "NO_SHOW", noShow: true },
-    });
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.hire.updateMany({
+        where: { id: hireId, status: "ACTIVE" },
+        data: { status: "NO_SHOW", noShow: true },
+      });
 
-    if (result.count === 0) {
-      return { error: "Hire not found or not in ACTIVE status" };
-    }
+      if (result.count === 0) {
+        throw new Error("Hire not found or not in ACTIVE status");
+      }
 
-    await prisma.adminActionLog.create({
-      data: {
-        adminId,
-        action: "MARK_HIRE_NO_SHOW",
-        targetType: "Hire",
-        targetId: String(hireId),
-      },
+      await tx.adminActionLog.create({
+        data: {
+          adminId,
+          action: "MARK_HIRE_NO_SHOW",
+          targetType: "Hire",
+          targetId: String(hireId),
+        },
+      });
     });
 
     revalidatePath("/admin/hires");
     revalidatePath(`/admin/hires/${hireId}`);
     return { success: true };
-  } catch {
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Hire not found or not in ACTIVE status"
+    ) {
+      return { error: error.message };
+    }
     return { error: "Failed to mark hire as no-show" };
   }
 }
@@ -105,33 +121,41 @@ export async function cancelHire(formData: FormData): Promise<ActionResult> {
   const { hireId, reason } = parsed.data;
 
   try {
-    const result = await prisma.hire.updateMany({
-      where: { id: hireId, status: "ACTIVE" },
-      data: {
-        status: "CANCELLED_BY_ADMIN",
-        cancelledAt: new Date(),
-        cancellationReason: reason,
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.hire.updateMany({
+        where: { id: hireId, status: "ACTIVE" },
+        data: {
+          status: "CANCELLED_BY_ADMIN",
+          cancelledAt: new Date(),
+          cancellationReason: reason,
+        },
+      });
 
-    if (result.count === 0) {
-      return { error: "Hire not found or not in ACTIVE status" };
-    }
+      if (result.count === 0) {
+        throw new Error("Hire not found or not in ACTIVE status");
+      }
 
-    await prisma.adminActionLog.create({
-      data: {
-        adminId,
-        action: "CANCEL_HIRE",
-        targetType: "Hire",
-        targetId: String(hireId),
-        metadata: reason ? { reason } : undefined,
-      },
+      await tx.adminActionLog.create({
+        data: {
+          adminId,
+          action: "CANCEL_HIRE",
+          targetType: "Hire",
+          targetId: String(hireId),
+          metadata: reason ? { reason } : undefined,
+        },
+      });
     });
 
     revalidatePath("/admin/hires");
     revalidatePath(`/admin/hires/${hireId}`);
     return { success: true };
-  } catch {
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Hire not found or not in ACTIVE status"
+    ) {
+      return { error: error.message };
+    }
     return { error: "Failed to cancel hire" };
   }
 }

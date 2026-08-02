@@ -209,8 +209,8 @@ test.describe("admin table skeletons", () => {
   test("hires page shows table skeleton while loading", async ({ page }) => {
     const { skeletonVisible, skeletonCount, client } =
       await navigateAndInspectSkeleton(page, "/admin/hires", adminAuthState!);
-    expect(skeletonVisible).toBe(true);
     try {
+      expect(skeletonVisible).toBe(true);
       expect(skeletonCount).toBeGreaterThan(0);
     } finally {
       await unthrottleNetwork(client);

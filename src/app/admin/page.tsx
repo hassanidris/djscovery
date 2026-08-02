@@ -42,6 +42,8 @@ import TrendingSparkline from "@/components/admin/TrendingSparkline";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
+type DashboardRange = "7d" | "30d" | "90d";
+
 // Dashboard Skeleton Component
 function AdminDashboardSkeleton() {
   return (
@@ -140,15 +142,19 @@ function AdminDashboardSkeleton() {
 }
 
 // Child components for each data section
-async function DashboardStats({ range }: { range: "7d" | "30d" | "90d" }) {
+const CachedDashboardStats = cache(async function DashboardStats({
+  range,
+}: {
+  range: DashboardRange;
+}) {
   const stats = await getDashboardStats({ range });
   return stats;
-}
+});
 
-async function PendingApprovals() {
+const CachedPendingApprovals = cache(async function PendingApprovals() {
   const pendingApprovals = await getPendingDjApprovals({ limit: 6 });
   return pendingApprovals;
-}
+});
 
 async function RecentUsers() {
   const recentUsers = await getRecentUsers({ limit: 5 });
@@ -244,7 +250,7 @@ export default async function AdminDashboardPage({
   const rangeParam = Array.isArray(params.range)
     ? params.range[0]
     : params.range;
-  const range: "7d" | "30d" | "90d" =
+  const range: DashboardRange =
     rangeParam === "30d" || rangeParam === "90d" ? rangeParam : "7d";
 
   return (
@@ -254,7 +260,7 @@ export default async function AdminDashboardPage({
   );
 }
 
-async function DashboardContent({ range }: { range: "7d" | "30d" | "90d" }) {
+async function DashboardContent({ range }: { range: DashboardRange }) {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -266,70 +272,137 @@ async function DashboardContent({ range }: { range: "7d" | "30d" | "90d" }) {
       </div>
 
       {/* Alerts row — pending actions */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-12 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardAlerts range={range} />
       </Suspense>
 
       {/* Stats grid */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+          </div>
+        }
+      >
         <DashboardStatsGrid range={range} />
       </Suspense>
 
       {/* Content stats */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+          </div>
+        }
+      >
         <DashboardContentStats range={range} />
       </Suspense>
 
       {/* Operations stats */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+          </div>
+        }
+      >
         <DashboardOperationsStats range={range} />
       </Suspense>
 
       {/* Pending actions */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-24 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardPendingActions />
       </Suspense>
 
       {/* DJ Approval Queue */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-32 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardDJApprovalQueue />
       </Suspense>
 
       {/* Recent Users */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-40 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardRecentUsers />
       </Suspense>
 
       {/* Recent Reports */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-40 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardRecentReports />
       </Suspense>
 
       {/* Recent Activity */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-40 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardRecentActivity />
       </Suspense>
 
       {/* Trending Metrics */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="h-32 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-32 rounded-lg border border-white/10 bg-white/5" />
+            <div className="h-32 rounded-lg border border-white/10 bg-white/5" />
+          </div>
+        }
+      >
         <DashboardTrendingMetrics />
       </Suspense>
 
       {/* Geographic Distribution */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-40 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardGeographicDistribution />
       </Suspense>
 
       {/* Genre Breakdown */}
-      <Suspense fallback={<AdminDashboardSkeleton />}>
+      <Suspense
+        fallback={
+          <div className="h-40 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
         <DashboardGenreBreakdown />
       </Suspense>
     </div>
   );
 }
 
-async function DashboardAlerts({ range }: { range: "7d" | "30d" | "90d" }) {
-  const stats = await DashboardStats({ range });
+async function DashboardAlerts({ range }: { range: DashboardRange }) {
+  const stats = await CachedDashboardStats({ range });
 
   if (
     stats.pendingDjApprovals === 0 &&
@@ -366,7 +439,7 @@ async function DashboardAlerts({ range }: { range: "7d" | "30d" | "90d" }) {
       {stats.openReports > 0 && (
         <Link
           href="/admin/reports?status=open"
-          className="border-h_red/30 bg-h_red/10 text-h_red hover:bg_h_red/20 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
+          className="border-h_red/30 bg-h_red/10 text-h_red hover:bg-h_red/20 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
         >
           <Flag className="h-4 w-4" />
           {stats.openReports} open report
@@ -378,8 +451,8 @@ async function DashboardAlerts({ range }: { range: "7d" | "30d" | "90d" }) {
   );
 }
 
-async function DashboardStatsGrid({ range }: { range: "7d" | "30d" | "90d" }) {
-  const stats = await DashboardStats({ range });
+async function DashboardStatsGrid({ range }: { range: DashboardRange }) {
+  const stats = await CachedDashboardStats({ range });
 
   return (
     <div>
@@ -415,12 +488,8 @@ async function DashboardStatsGrid({ range }: { range: "7d" | "30d" | "90d" }) {
   );
 }
 
-async function DashboardContentStats({
-  range,
-}: {
-  range: "7d" | "30d" | "90d";
-}) {
-  const stats = await DashboardStats({ range });
+async function DashboardContentStats({ range }: { range: DashboardRange }) {
+  const stats = await CachedDashboardStats({ range });
 
   return (
     <div>
@@ -448,7 +517,7 @@ async function DashboardContentStats({
           badge={stats.openReports > 0 ? "Needs review" : undefined}
         />
         <StatCard
-          label="New Signups (30d)"
+          label={`New Signups (${range})`}
           value={stats.newSignups}
           icon={<TrendingUp className="text-muted-foreground h-5 w-5" />}
         />
@@ -457,12 +526,8 @@ async function DashboardContentStats({
   );
 }
 
-async function DashboardOperationsStats({
-  range,
-}: {
-  range: "7d" | "30d" | "90d";
-}) {
-  const stats = await DashboardStats({ range });
+async function DashboardOperationsStats({ range }: { range: DashboardRange }) {
+  const stats = await CachedDashboardStats({ range });
 
   return (
     <div>
@@ -494,18 +559,13 @@ async function DashboardOperationsStats({
           accent={stats.openBookingInquiries > 0}
           badge={stats.openBookingInquiries > 0 ? "Pending" : undefined}
         />
-        <StatCard
-          label="New Signups (30d)"
-          value={stats.newSignups}
-          icon={<TrendingUp className="text-muted-foreground h-5 w-5" />}
-        />
       </div>
     </div>
   );
 }
 
 async function DashboardPendingActions() {
-  const stats = await DashboardStats({ range: "7d" });
+  const stats = await CachedDashboardStats({ range: "7d" });
 
   if (stats.pendingDjApprovals === 0) {
     return null;
@@ -530,7 +590,7 @@ async function DashboardPendingActions() {
 }
 
 async function DashboardDJApprovalQueue() {
-  const pendingApprovals = await PendingApprovals();
+  const pendingApprovals = await CachedPendingApprovals();
 
   return (
     <section className="space-y-4">
