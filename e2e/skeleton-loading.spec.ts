@@ -196,6 +196,7 @@ test.describe("admin table skeletons", () => {
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
+  // @ts-ignore - TypeScript overload resolution issue with destructured params
   test.beforeAll(async ({ browser }) => {
     adminAuthState = await ensureAuthState(
       browser,
@@ -439,6 +440,7 @@ test.describe("DJ dashboard skeletons", () => {
   let djAuthState: Awaited<ReturnType<BrowserContext["storageState"]>> | null =
     null;
 
+  // @ts-ignore - TypeScript overload resolution issue with destructured params
   test.beforeAll(async ({ browser }) => {
     djAuthState = await ensureAuthState(
       browser,
@@ -543,6 +545,7 @@ test.describe("organizer dashboard skeletons", () => {
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
+  // @ts-ignore - TypeScript overload resolution issue with destructured params
   test.beforeAll(async ({ browser }) => {
     organizerAuthState = await ensureAuthState(
       browser,
@@ -630,6 +633,7 @@ test.describe("fan skeletons", () => {
   let fanAuthState: Awaited<ReturnType<BrowserContext["storageState"]>> | null =
     null;
 
+  // @ts-ignore - TypeScript overload resolution issue with destructured params
   test.beforeAll(async ({ browser }) => {
     fanAuthState = await ensureAuthState(
       browser,
@@ -810,6 +814,7 @@ test.describe("admin card skeletons", () => {
     ReturnType<BrowserContext["storageState"]>
   > | null = null;
 
+  // @ts-ignore - TypeScript overload resolution issue with destructured params
   test.beforeAll(async ({ browser }) => {
     adminAuthState = await ensureAuthState(
       browser,
