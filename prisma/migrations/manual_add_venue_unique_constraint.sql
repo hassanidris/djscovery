@@ -52,21 +52,15 @@ WHERE id IN (SELECT delete_id FROM review_conflicts);
 UPDATE "VenueReview"
 SET "venueId" = vc.canonical_id
 FROM venue_canonical vc
-WHERE "VenueReview"."venueId" IN (
-  SELECT id FROM "Venue" v
-  JOIN venue_canonical vc ON v."name" = vc."name" AND v."cityId" = vc."cityId"
-  AND v.id != vc.canonical_id
-);
+JOIN "Venue" v ON "VenueReview"."venueId" = v.id
+WHERE v."name" = vc."name" AND v."cityId" = vc."cityId" AND v.id != vc.canonical_id;
 
 -- Remap VenueReputationScore records
 UPDATE "VenueReputationScore"
 SET "venueId" = vc.canonical_id
 FROM venue_canonical vc
-WHERE "VenueReputationScore"."venueId" IN (
-  SELECT id FROM "Venue" v
-  JOIN venue_canonical vc ON v."name" = vc."name" AND v."cityId" = vc."cityId"
-  AND v.id != vc.canonical_id
-);
+JOIN "Venue" v ON "VenueReputationScore"."venueId" = v.id
+WHERE v."name" = vc."name" AND v."cityId" = vc."cityId" AND v.id != vc.canonical_id;
 
 -- Step 4: Delete duplicate venues (keeping only the canonical one)
 DELETE FROM "Venue"
