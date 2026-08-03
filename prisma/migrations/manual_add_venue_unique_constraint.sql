@@ -2,6 +2,7 @@
 -- Created: 2026-08-03
 -- Purpose: Ensure no duplicate venues exist by name and city before adding constraint
 -- This migration should be run during a maintenance window with traffic disabled
+-- The deduplication and constraint creation are wrapped in a transaction for atomicity
 
 -- Step 1: Identify duplicate venues by name and cityId
 -- This shows which venues would conflict with the new unique constraint
@@ -9,6 +10,9 @@ SELECT "name", "cityId", COUNT(*) as count, array_agg(id ORDER BY id) as duplica
 FROM "Venue"
 GROUP BY "name", "cityId"
 HAVING COUNT(*) > 1;
+
+-- Begin transaction for the deduplication and constraint creation
+BEGIN;
 
 -- Step 2: Create a temporary table to track canonical venue IDs
 -- The canonical venue is the one with the lowest ID in each duplicate group
@@ -56,6 +60,9 @@ DROP TABLE venue_canonical;
 ALTER TABLE "Venue"
 ADD CONSTRAINT "Venue_name_cityId_key"
 UNIQUE ("name", "cityId");
+
+-- Commit the transaction
+COMMIT;
 
 -- Step 7: Verify no duplicates remain
 SELECT "name", "cityId", COUNT(*) as count
