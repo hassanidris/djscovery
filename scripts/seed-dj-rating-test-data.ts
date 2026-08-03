@@ -17,6 +17,30 @@ const now = Date.now();
 async function main() {
   const { default: prisma } = await import("../src/lib/client");
 
+  async function getOrCreateTestLocation() {
+    let country = await prisma.country.findFirst({
+      where: { name: "Sweden" },
+      select: { id: true },
+    });
+    if (!country) {
+      country = await prisma.country.create({
+        data: { name: "Sweden", code: "SE" },
+      });
+    }
+
+    let city = await prisma.city.findFirst({
+      where: { name: "Stockholm", countryId: country.id },
+      select: { id: true },
+    });
+    if (!city) {
+      city = await prisma.city.create({
+        data: { name: "Stockholm", countryId: country.id },
+      });
+    }
+
+    return { countryId: country.id, cityId: city.id };
+  }
+
   async function createReviewer(label: string, index: number) {
     const id = `test-reviewer-${now}-${index}`;
     const user = await prisma.user.create({
@@ -39,6 +63,7 @@ async function main() {
     djId: number,
     daysAgo: number,
     titleSuffix: string,
+    location: { countryId: number; cityId: number },
   ) {
     return prisma.event.create({
       data: {
@@ -50,8 +75,8 @@ async function main() {
         status: "COMPLETED",
         venue: "Test Arena",
         description: "Seed event for DjRating verification",
-        countryId: 1,
-        cityId: 1,
+        countryId: location.countryId,
+        cityId: location.cityId,
         ownerDjId: djId,
         genres: ["House", "Techno"],
       },
@@ -84,6 +109,11 @@ async function main() {
   console.log(`Premium DJ: ${premiumDj.stageName} (id=${premiumDj.id})`);
   console.log(`Free DJ: ${freeDj.stageName} (id=${freeDj.id})`);
 
+  const location = await getOrCreateTestLocation();
+  console.log(
+    `Using location: countryId=${location.countryId}, cityId=${location.cityId}`,
+  );
+
   // Create synthetic reviewer accounts
   const reviewers = await Promise.all([
     createReviewer("Alex Rivera", 1),
@@ -96,8 +126,13 @@ async function main() {
   console.log(`Created ${reviewers.length} synthetic reviewer accounts`);
 
   // ── Events ──────────────────────────────────────────────────────────────
-  const premiumEvent = await ensureEventForDj(premiumDj.id, 10, "premium");
-  const freeEvent = await ensureEventForDj(freeDj.id, 15, "free");
+  const premiumEvent = await ensureEventForDj(
+    premiumDj.id,
+    10,
+    "premium",
+    location,
+  );
+  const freeEvent = await ensureEventForDj(freeDj.id, 15, "free", location);
   console.log(`Created event for premium DJ: /events/${premiumEvent.slug}`);
   console.log(`Created event for free DJ: /events/${freeEvent.slug}`);
 
