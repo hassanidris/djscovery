@@ -121,7 +121,7 @@ export default async function EventDetailPage({
         },
       },
       country: { select: { name: true } },
-      city: { select: { name: true } },
+      city: { select: { name: true, id: true } },
       participants: {
         select: {
           role: true,
@@ -156,13 +156,35 @@ export default async function EventDetailPage({
     }
 
     // Fetch attendance analytics (public aggregate counts, no auth needed)
-    const [goingCount, interestedCount] = await Promise.all([
+    const [goingCount, interestedCount, venueAggregate] = await Promise.all([
       prisma.eventAttendance.count({
         where: { eventId: dbEvent.id, status: "GOING" },
       }),
       prisma.eventAttendance.count({
         where: { eventId: dbEvent.id, status: "INTERESTED" },
       }),
+      dbEvent.venue && dbEvent.city
+        ? prisma.venue
+            .findFirst({
+              where: { name: dbEvent.venue, cityId: dbEvent.city?.id },
+              select: { id: true },
+            })
+            .then((venue) =>
+              venue
+                ? prisma.venueReview.aggregate({
+                    where: { venueId: venue.id },
+                    _count: { _all: true },
+                    _avg: {
+                      rating: true,
+                      soundSystem: true,
+                      atmosphere: true,
+                      location: true,
+                      accessibility: true,
+                    },
+                  })
+                : null,
+            )
+        : Promise.resolve(null),
     ]);
 
     const isPrivate = dbEvent.eventType === "PRIVATE";
@@ -212,6 +234,7 @@ export default async function EventDetailPage({
         goingCount={goingCount}
         interestedCount={interestedCount}
         venueReviews={dbEvent.venueReviews}
+        venueAggregate={venueAggregate}
       />
     );
   }
@@ -286,6 +309,7 @@ function EventDetailView(props: {
   goingCount: number;
   interestedCount: number;
   venueReviews: VenueReviewItem[];
+  venueAggregate?: any;
 }) {
   const {
     slug,
@@ -663,16 +687,25 @@ function EventDetailView(props: {
                     Venue Reviews
                   </h2>
                   <VenueReviews
-                    avgRating={
-                      props.venueReviews.length > 0
-                        ? props.venueReviews.reduce(
-                            (sum: number, r: VenueReviewItem) => sum + r.rating,
-                            0,
-                          ) / props.venueReviews.length
-                        : 0
+                    avgRating={props.venueAggregate?._avg.rating ?? 0}
+                    ratingCount={
+                      props.venueAggregate?._count._all ??
+                      props.venueReviews.length
                     }
-                    ratingCount={props.venueReviews.length}
                     reviews={props.venueReviews}
+                    categoryAverages={
+                      props.venueAggregate?._avg
+                        ? {
+                            soundSystem:
+                              props.venueAggregate._avg.soundSystem ?? 0,
+                            atmosphere:
+                              props.venueAggregate._avg.atmosphere ?? 0,
+                            location: props.venueAggregate._avg.location ?? 0,
+                            accessibility:
+                              props.venueAggregate._avg.accessibility ?? 0,
+                          }
+                        : undefined
+                    }
                   />
                 </div>
               )}

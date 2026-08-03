@@ -44,36 +44,37 @@ export async function GET(
   }
 
   try {
-    const reviews = await prisma.venueReview.findMany({
-      where: { venueId },
-      include: {
-        user: {
-          select: {
-            username: true,
-            image: true,
+    const [reviews, aggregate] = await Promise.all([
+      prisma.venueReview.findMany({
+        where: { venueId },
+        include: {
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+          event: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+            },
           },
         },
-        event: {
-          select: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-      skip: offset,
-    });
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.venueReview.aggregate({
+        where: { venueId },
+        _count: { _all: true },
+        _avg: { rating: true },
+      }),
+    ]);
 
-    const totalCount = await prisma.venueReview.count({
-      where: { venueId },
-    });
-
-    const avgRating =
-      totalCount > 0
-        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-        : 0;
+    const totalCount = aggregate._count._all;
+    const avgRating = aggregate._avg.rating ?? 0;
 
     return NextResponse.json({
       reviews,

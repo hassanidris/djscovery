@@ -27,14 +27,31 @@ interface VenueReviewsProps {
   avgRating: number;
   ratingCount: number;
   reviews: VenueReview[];
+  categoryAverages?: {
+    soundSystem: number;
+    atmosphere: number;
+    location: number;
+    accessibility: number;
+  };
 }
 
 export function VenueReviews({
   avgRating,
   ratingCount,
   reviews,
+  categoryAverages,
 }: VenueReviewsProps) {
   if (reviews.length === 0) return null;
+
+  const categoryAvg = categoryAverages || {
+    soundSystem:
+      reviews.reduce((sum, r) => sum + r.soundSystem, 0) / reviews.length,
+    atmosphere:
+      reviews.reduce((sum, r) => sum + r.atmosphere, 0) / reviews.length,
+    location: reviews.reduce((sum, r) => sum + r.location, 0) / reviews.length,
+    accessibility:
+      reviews.reduce((sum, r) => sum + r.accessibility, 0) / reviews.length,
+  };
 
   const ratingDistribution = [5, 4, 3, 2, 1].map((star) => ({
     star,
@@ -97,36 +114,25 @@ export function VenueReviews({
           <div className="space-y-1">
             <p className="text-xs text-gray-500">Sound System</p>
             <p className="text-sm font-medium text-white">
-              {(
-                reviews.reduce((sum, r) => sum + r.soundSystem, 0) /
-                reviews.length
-              ).toFixed(1)}
+              {categoryAvg.soundSystem.toFixed(1)}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-gray-500">Atmosphere</p>
             <p className="text-sm font-medium text-white">
-              {(
-                reviews.reduce((sum, r) => sum + r.atmosphere, 0) /
-                reviews.length
-              ).toFixed(1)}
+              {categoryAvg.atmosphere.toFixed(1)}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-gray-500">Location</p>
             <p className="text-sm font-medium text-white">
-              {(
-                reviews.reduce((sum, r) => sum + r.location, 0) / reviews.length
-              ).toFixed(1)}
+              {categoryAvg.location.toFixed(1)}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-gray-500">Accessibility</p>
             <p className="text-sm font-medium text-white">
-              {(
-                reviews.reduce((sum, r) => sum + r.accessibility, 0) /
-                reviews.length
-              ).toFixed(1)}
+              {categoryAvg.accessibility.toFixed(1)}
             </p>
           </div>
         </div>
