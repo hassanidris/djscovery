@@ -23,14 +23,6 @@ export interface PostSubmitEffectsInput {
   eventTitle: string | null;
 }
 
-/**
- * Shared post-submit side effects used by both the server action and API route:
- *   - Reputation score update
- *   - Cache invalidation
- *   - Notification creation
- *   - Email sending
- *   - Path revalidation
- */
 export async function runPostSubmitEffects(input: PostSubmitEffectsInput) {
   const {
     rating,
@@ -46,19 +38,16 @@ export async function runPostSubmitEffects(input: PostSubmitEffectsInput) {
     eventTitle,
   } = input;
 
-  // --- Reputation ---
   await updateReputationScore(djProfileId, "EVENT_REVIEW_ADDED" as const).catch(
     (e) => console.error("Reputation update failed:", e),
   );
 
-  // --- Cache invalidation ---
   for (const filterKey of ["all", "direct", `event:${eventId ?? ""}`]) {
     await cacheDelete(`dj_ratings:${djProfileSlug}:1:10:${filterKey}`).catch(
       () => {},
     );
   }
 
-  // --- Notification ---
   try {
     await prisma.notification.create({
       data: {
@@ -75,7 +64,6 @@ export async function runPostSubmitEffects(input: PostSubmitEffectsInput) {
     console.error("Failed to create rating notification:", notifError);
   }
 
-  // --- Email ---
   try {
     const [djUser, reviewer] = await Promise.all([
       prisma.user.findUnique({
@@ -106,7 +94,6 @@ export async function runPostSubmitEffects(input: PostSubmitEffectsInput) {
     console.error("Failed to send review email:", emailError);
   }
 
-  // --- Revalidate paths ---
   revalidatePath(`/djs/${djProfileSlug}`);
   if (isEventReview && eventSlug) {
     revalidatePath(`/events/${eventSlug}`);
