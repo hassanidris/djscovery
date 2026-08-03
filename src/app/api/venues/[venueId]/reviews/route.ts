@@ -15,12 +15,32 @@ export async function GET(
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const offset = parseInt(searchParams.get("offset") || "0", 10);
 
+  if (!Number.isFinite(limit)) {
+    return NextResponse.json(
+      { error: "Limit must be a valid number" },
+      { status: 400 },
+    );
+  }
+
+  if (!Number.isFinite(offset)) {
+    return NextResponse.json(
+      { error: "Offset must be a valid number" },
+      { status: 400 },
+    );
+  }
+
   if (limit < 1 || limit > 50) {
-    return NextResponse.json({ error: "Limit must be between 1 and 50" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Limit must be between 1 and 50" },
+      { status: 400 },
+    );
   }
 
   if (offset < 0) {
-    return NextResponse.json({ error: "Offset must be non-negative" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Offset must be non-negative" },
+      { status: 400 },
+    );
   }
 
   try {
