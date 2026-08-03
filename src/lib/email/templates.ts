@@ -102,12 +102,16 @@ export function djReviewTemplate(data: DjReviewData): {
   subject: string;
   html: string;
 } {
+  // Clamp to the valid 1-5 range regardless of caller, so a malformed or
+  // out-of-range value can never drive an unbounded string allocation.
+  const filledStars = Math.min(5, Math.max(0, Math.round(data.rating)));
+  const emptyStars = 5 - filledStars;
   const html = `
     <h2>New Review Received</h2>
     <p>Hi ${escapeHtml(data.djName)},</p>
     <p>You've received a new review from <strong>${escapeHtml(data.reviewerName)}</strong>:</p>
     <p style="color: #ffffff; font-size: 18px; font-weight: 600;">${escapeHtml(data.eventTitle)}</p>
-    <p><strong>Rating:</strong> ${"★".repeat(data.rating)}${"☆".repeat(5 - data.rating)}</p>
+    <p><strong>Rating:</strong> ${"★".repeat(filledStars)}${"☆".repeat(emptyStars)}</p>
     <p><strong>Comment:</strong> ${escapeHtml(data.comment)}</p>
     <a href="${escapeHtml(data.reviewUrl)}" class="button">View Review</a>
   `;
