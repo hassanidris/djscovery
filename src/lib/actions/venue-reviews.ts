@@ -115,21 +115,28 @@ export async function createVenueReview(
 
   const h = await headers();
 
-  const review = await prisma.venueReview.create({
-    data: {
-      eventId,
-      venueId,
-      userId: user.id,
-      soundSystem: data.soundSystem,
-      atmosphere: data.atmosphere,
-      location: data.location,
-      accessibility: data.accessibility,
-      rating: overallRating,
-      review: data.review,
-      ipAddress: h.get("x-forwarded-for") || "unknown",
-      userAgent: h.get("user-agent") || "unknown",
-    },
-  });
+  try {
+    await prisma.venueReview.create({
+      data: {
+        eventId,
+        venueId,
+        userId: user.id,
+        soundSystem: data.soundSystem,
+        atmosphere: data.atmosphere,
+        location: data.location,
+        accessibility: data.accessibility,
+        rating: overallRating,
+        review: data.review,
+        ipAddress: h.get("x-forwarded-for") || "unknown",
+        userAgent: h.get("user-agent") || "unknown",
+      },
+    });
+  } catch (e) {
+    if (e instanceof Error && "code" in e && e.code === "P2002") {
+      return actionError("You have already reviewed this venue for this event");
+    }
+    throw e;
+  }
 
   // Update venue reputation score
   const { updateVenueReputationScore } =
