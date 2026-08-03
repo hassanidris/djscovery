@@ -111,7 +111,7 @@ async function seedVenueReviewsWithOptions(
           status: "ATTENDED",
         },
       });
-      console.log(`✅ Created attendance for ${user.email}`);
+      console.log(`✅ Created attendance for user ${user.id}`);
     }
   }
 
@@ -199,11 +199,11 @@ async function seedVenueReviewsWithOptions(
         },
       });
       console.log(
-        `⭐ Created venue review from ${user.email} (${overallRating}/5)`,
+        `⭐ Created venue review from user ${user.id} (${overallRating}/5)`,
       );
       createdCount++;
     } else {
-      console.log(`⏭️  Review already exists for ${user.email}`);
+      console.log(`⏭️  Review already exists for user ${user.id}`);
     }
   }
 

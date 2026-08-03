@@ -82,7 +82,7 @@ async function seedVenueReviews() {
           status: "ATTENDED",
         },
       });
-      console.log(`✅ Created attendance for ${user.email}`);
+      console.log(`✅ Created attendance for user ${user.id}`);
     }
   }
 
@@ -152,9 +152,9 @@ async function seedVenueReviews() {
           userAgent: "seed-script",
         },
       });
-      console.log(`⭐ Created venue review from ${user.email}`);
+      console.log(`⭐ Created venue review from user ${user.id}`);
     } else {
-      console.log(`⏭️  Review already exists for ${user.email}`);
+      console.log(`⏭️  Review already exists for user ${user.id}`);
     }
   }
 
