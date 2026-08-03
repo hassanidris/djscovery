@@ -8,9 +8,9 @@ This feature unifies the DjRating system to support both **direct reviews** (eve
 
 ### 1. Database Changes
 
-The schema changes are already applied via `prisma db push` and the manual SQL migration. On a fresh deployment or production, run:
+The schema changes are already applied via `prisma db push` and the manual SQL migrations. On a fresh deployment or production, run:
 
-**IMPORTANT:** Steps 1 and 3 must be executed back-to-back during a maintenance window or with user-facing traffic disabled. The old unique constraint is dropped in step 1 and replaced with partial unique indexes in step 3 — between these steps, the constraint is unprotected and duplicate entries could be created if traffic is active.
+**IMPORTANT:** Steps 1, 3, and 4 must be executed back-to-back during a maintenance window or with user-facing traffic disabled. The old unique constraint is dropped in step 1 and replaced with partial unique indexes in step 3 — between these steps, the constraint is unprotected and duplicate entries could be created if traffic is active. Step 4 adds the venue unique constraint which also requires a brief write-blocking window.
 
 ```bash
 # 1. Sync schema (adds eventId, reviewType, indexes, drops old unique constraint)
@@ -26,14 +26,18 @@ DATABASE_URL="your_db_url" psql -c "
   HAVING COUNT(*) > 1;
 "
 
-# 3. Apply partial unique indexes (cannot be done via Prisma schema)
+# 3. Apply partial unique indexes for DjRating (cannot be done via Prisma schema)
 # Run this immediately after step 2, without delay
 DATABASE_URL="your_db_url" npx prisma db execute --file=prisma/migrations/manual_add_dj_rating_event_support.sql
 
-# 4. Regenerate Prisma client
+# 4. Apply venue unique constraint (deduplicates venues by name and cityId)
+# Run this immediately after step 3, without delay
+DATABASE_URL="your_db_url" npx prisma db execute --file=prisma/migrations/manual_add_venue_unique_constraint.sql
+
+# 5. Regenerate Prisma client
 npx prisma generate
 
-# 5. Apply RLS policies (updated with clarifying comments)
+# 6. Apply RLS policies (updated with clarifying comments)
 DATABASE_URL="your_db_url" npx prisma db execute --file=prisma/rls-policies.sql
 ```
 
@@ -43,10 +47,13 @@ DATABASE_URL="your_db_url" npx prisma db execute --file=prisma/rls-policies.sql
 -- Check enum exists
 SELECT 1 FROM pg_type WHERE typname = 'DjRatingType';
 
--- Check partial unique indexes exist
+-- Check partial unique indexes exist for DjRating
 SELECT indexname FROM pg_indexes WHERE tablename = 'DjRating' AND indexname LIKE '%unique%';
 
--- Check columns exist
+-- Check venue unique constraint exists
+SELECT conname FROM pg_constraint WHERE conrelid = 'Venue'::regclass AND contype = 'u';
+
+-- Check columns exist for DjRating
 SELECT column_name FROM information_schema.columns WHERE table_name = 'DjRating' AND column_name IN ('eventId', 'reviewType');
 ```
 
@@ -202,7 +209,11 @@ If the DB schema causes issues:
    DROP INDEX IF EXISTS "DjRating_eventId_idx";
    DROP INDEX IF EXISTS "DjRating_reviewType_idx";
    ```
-4. **Re-add old unique constraint** (if needed by old code):
+4. **Drop venue unique constraint** (optional, it's harmless):
+   ```sql
+   ALTER TABLE "Venue" DROP CONSTRAINT IF EXISTS "Venue_name_cityId_key";
+   ```
+5. **Re-add old unique constraint** (if needed by old code):
    ```sql
    ALTER TABLE "DjRating" ADD CONSTRAINT "DjRating_userId_djProfileId_key"
      UNIQUE ("userId", "djProfileId");
@@ -225,7 +236,8 @@ If only event-anchored reviews have issues:
 ### Schema & Migration
 
 - `prisma/schema.prisma` — DjRatingType enum, eventId, reviewType, indexes
-- `prisma/migrations/manual_add_dj_rating_event_support.sql` — Partial unique indexes
+- `prisma/migrations/manual_add_dj_rating_event_support.sql` — Partial unique indexes for DjRating
+- `prisma/migrations/manual_add_venue_unique_constraint.sql` — Unique constraint on Venue (name, cityId) with deduplication
 - `prisma/rls-policies.sql` — Clarifying comments
 
 ### Scripts
