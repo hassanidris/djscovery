@@ -29,6 +29,8 @@ ALTER TABLE "DjRating" DROP CONSTRAINT IF EXISTS "DjRating_userId_djProfileId_ke
 ALTER TABLE "DjRating" DROP CONSTRAINT IF EXISTS "DjRating_userId_djProfileId_eventId_key";
 
 -- Step 5: Add partial unique indexes for proper constraint enforcement
+-- Note: These indexes are created without CONCURRENTLY, so they will briefly block writes.
+-- This is acceptable because the entire script is executed as one block during a maintenance window.
 -- Direct reviews: one per user per DJ (eventId IS NULL)
 CREATE UNIQUE INDEX IF NOT EXISTS "DjRating_userId_djProfileId_direct_unique"
   ON "DjRating" ("userId", "djProfileId")
@@ -40,5 +42,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "DjRating_userId_djProfileId_eventId_event_uni
   WHERE "eventId" IS NOT NULL;
 
 -- Step 6: Add indexes for efficient querying
+-- Note: These indexes are created without CONCURRENTLY, so they will briefly block writes.
+-- This is acceptable because the entire script is executed as one block during a maintenance window.
 CREATE INDEX IF NOT EXISTS "DjRating_eventId_idx" ON "DjRating" ("eventId");
 CREATE INDEX IF NOT EXISTS "DjRating_reviewType_idx" ON "DjRating" ("reviewType");
