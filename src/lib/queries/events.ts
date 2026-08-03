@@ -354,25 +354,18 @@ export async function getVenueReviewContextBySlug(
   // Check if event has a venue
   if (!event.venue) return null;
 
-  // Find or create venue record
-  let venue = await prisma.venue.findFirst({
+  // Return null if event has no cityId - venue lookup requires valid location
+  if (!event.cityId) return null;
+
+  // Read-only: find existing venue record
+  const venue = await prisma.venue.findFirst({
     where: {
       name: event.venue,
-      cityId: event.cityId || undefined,
+      cityId: event.cityId,
     },
   });
 
-  if (!venue) {
-    // Create venue record if it doesn't exist
-    venue = await prisma.venue.create({
-      data: {
-        name: event.venue,
-        cityId: event.cityId || 1,
-        countryId: event.countryId || 1,
-        source: "event",
-      },
-    });
-  }
+  if (!venue) return null;
 
   const isCompleted = event.status === "COMPLETED";
   const alreadyReviewed = event.venueReviews.length > 0;
