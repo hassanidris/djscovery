@@ -141,7 +141,7 @@ export async function createVenueReview(
   // Update venue reputation score
   const { updateVenueReputationScore } =
     await import("@/lib/reputation/venue-update");
-  await updateVenueReputationScore(venueId, "VENUE_REVIEW_ADDED" as any);
+  await updateVenueReputationScore(venueId, "VENUE_REVIEW_ADDED");
 
   // Create notification for venue owner (if applicable)
   // For now, venues don't have direct owners, but we could notify event organizers
