@@ -85,6 +85,7 @@ export interface DjDemoData {
   featuredPerformanceContext?: string;
   featuredPerformanceThumbnailUrl?: string;
   packages: Array<{
+    id: number;
     name: string;
     priceFrom: number;
     priceTo?: number;
@@ -92,6 +93,7 @@ export interface DjDemoData {
     duration?: string;
     features: string[];
     popular?: boolean;
+    sortOrder?: number;
   }>;
   bio: string;
   specialties: string[];
@@ -114,12 +116,19 @@ export interface DjDemoData {
       plays?: number;
     }>;
   };
-  careerHighlights: Array<{ title: string; year: number }>;
+  careerHighlights: Array<{
+    id: number;
+    title: string;
+    year: number;
+    description?: string;
+  }>;
   endorsements: Array<{
+    id: number;
     name: string;
     role: string;
     company: string;
     quote: string;
+    avatar?: string;
   }>;
   press: Array<{
     id: number;
@@ -164,5 +173,17 @@ export interface DjDemoData {
     date: string;
     slug?: string;
     isPast?: boolean;
+  }>;
+  events?: Array<{
+    id: number;
+    title: string;
+    startDate: string;
+    venue: string;
+    city: string;
+    country: string;
+    slug: string;
+    eventType: string;
+    category: string;
+    status: string;
   }>;
 }

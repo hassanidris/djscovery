@@ -471,18 +471,20 @@ export default function DjProfilePremium({
       longitude?: number | null;
     }>
   >(
-    (djData?.venuesPlayed || []).map((v) => ({
-      id: v.id || 0,
-      venueName: v.venue,
-      eventDate: v.date || "",
-      description: v.description || "",
-      countryId: v.countryId || 0,
-      cityId: v.cityId || 0,
-      countryName: v.country,
-      cityName: v.city,
-      latitude: v.latitude ?? null,
-      longitude: v.longitude ?? null,
-    })),
+    ((djData as any)?.venues || (djData as any)?.venuesPlayed || []).map(
+      (v: any) => ({
+        id: v.id || 0,
+        venueName: v.venueName || v.venue || "",
+        eventDate: v.eventDate || v.date || "",
+        description: v.description || "",
+        countryId: v.countryId || 0,
+        cityId: v.cityId || 0,
+        countryName: v.country?.name || v.country || "",
+        cityName: v.city?.name || v.city || "",
+        latitude: v.latitude ?? null,
+        longitude: v.longitude ?? null,
+      }),
+    ),
   );
   const [highlights, setHighlights] = useState<
     Array<{
@@ -492,7 +494,7 @@ export default function DjProfilePremium({
       description: string;
     }>
   >(
-    (djData?.careerHighlights || []).map((h: any, i: number) => ({
+    ((djData as any)?.careerHighlights || []).map((h: any, i: number) => ({
       id: h.id || 0,
       year: String(h.year),
       title: h.title,
@@ -512,7 +514,7 @@ export default function DjProfilePremium({
       sortOrder: number;
     }>
   >(
-    (djData?.packages || [])
+    ((djData as any)?.packages || [])
       .filter((p: any) => p.id != null && p.id !== undefined)
       .map((p: any) => ({
         id: p.id,
@@ -900,7 +902,7 @@ export default function DjProfilePremium({
     eventsHasLoaded && lazyEvents
       ? lazyEvents
       : djData
-        ? mapPremiumEventsFromData(djData)
+        ? mapPremiumEventsFromData(djData) || []
         : isStaging
           ? PREMIUM_DEFAULT_EVENTS
           : [];
@@ -908,7 +910,7 @@ export default function DjProfilePremium({
     djData
       ? transformedReviews.length > 0
         ? transformedReviews
-        : mapPremiumReviewsFromData(djData)
+        : mapPremiumReviewsFromData(djData) || []
       : isStaging
         ? PREMIUM_DEFAULT_REVIEWS
         : []
@@ -916,7 +918,7 @@ export default function DjProfilePremium({
   const MEDIA = djData
     ? transformedMedia.length > 0
       ? transformedMedia
-      : mapPremiumMediaFromData(djData)
+      : mapPremiumMediaFromData(djData) || []
     : isStaging
       ? PREMIUM_DEFAULT_MEDIA
       : [];
@@ -924,7 +926,7 @@ export default function DjProfilePremium({
     endorsementsHasLoaded && lazyEndorsements
       ? lazyEndorsements
       : djData
-        ? mapEndorsementsFromData(djData)
+        ? mapEndorsementsFromData(djData) || []
         : isStaging
           ? PREMIUM_DEFAULT_ENDORSEMENTS
           : [];
@@ -936,7 +938,7 @@ export default function DjProfilePremium({
           description: h.description ?? undefined,
         }))
       : djData
-        ? mapHighlightsFromData(djData)
+        ? mapHighlightsFromData(djData) || []
         : isStaging
           ? PREMIUM_DEFAULT_HIGHLIGHTS
           : [];
@@ -947,7 +949,7 @@ export default function DjProfilePremium({
           icon: PRESS_ICON_MAP[p.type] ?? Newspaper,
         }))
       : djData
-        ? mapPressFromData(djData)
+        ? mapPressFromData(djData) || []
         : isStaging
           ? PREMIUM_DEFAULT_PRESS
           : [];
@@ -955,7 +957,7 @@ export default function DjProfilePremium({
     packagesHasLoaded && lazyPackages
       ? lazyPackages
       : djData
-        ? mapPackagesFromData(djData)
+        ? mapPackagesFromData(djData) || []
         : isStaging
           ? PREMIUM_DEFAULT_PACKAGES
           : [];
@@ -1377,7 +1379,7 @@ export default function DjProfilePremium({
                         latitude: v.latitude,
                         longitude: v.longitude,
                       }))
-                    : (djData?.venuesPlayed || []).map((v) => ({
+                    : ((djData as any)?.venuesPlayed || []).map((v: any) => ({
                         id: v.id || 0,
                         venueName: v.venue,
                         eventDate: v.date || null,
@@ -1649,7 +1651,7 @@ export default function DjProfilePremium({
                           priceTo: p.priceTo,
                           currency: p.currency,
                           duration: p.duration,
-                          features: p.features,
+                          features: p.features || [],
                           popular: p.popular,
                         }))}
                       viewerRole={bookingContext.role}

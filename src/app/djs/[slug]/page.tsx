@@ -83,96 +83,137 @@ export default async function DjProfilePage({
 
   // ── Prisma DB lookup (production) ─────────────────────────────────────────
   // Split into focused queries for better performance
-  const [djCore, spotlightMedia, basicCounts, ratingAgg, eventCount] =
-    await Promise.all([
-      // Core profile data for hero section
-      prisma.djProfile.findUnique({
-        where: { slug },
-        select: {
-          id: true,
-          userId: true,
-          stageName: true,
-          slug: true,
-          bio: true,
-          experienceYears: true,
-          experienceLevel: true,
-          avatar: true,
-          coverImage: true,
-          countryId: true,
-          cityId: true,
-          city: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          plan: true,
-          status: true,
-          featured: true,
-          hidden: true,
-          bookingEmail: true,
-          bookingPhone: true,
-          feeMin: true,
-          feeMax: true,
-          feeCurrency: true,
-          monthlyViews: true,
-          reputationScore: true,
-          user: {
-            select: {
-              id: true,
-            },
-          },
-          country: { select: { name: true } },
-          genres: { include: { genre: { select: { name: true } } } },
-          djTypes: true,
-          socialLinks: true,
-          // Non-critical fields removed (will be fetched separately):
-          // - managerName, managerEmail, managerPhone (ProfessionalTeamSidebar)
-          // - agentName, agentAgency, agentEmail (ProfessionalTeamSidebar)
-          // - availabilityTimezone, availabilityMonth, availabilityDays (availability section)
-          // - featuredPerformanceUrl, featuredPerformanceContext (featured performance section)
-          // - reputationDetail (owner-only analytics)
-        },
-      }),
-      // Spotlight media only (featured mix/video)
-      prisma.media.findMany({
-        where: { djProfile: { slug }, isSpotlight: true },
-        orderBy: { sortOrder: "asc" },
-        select: {
-          id: true,
-          type: true,
-          url: true,
-          title: true,
-          duration: true,
-          thumbnail: true,
-          isSpotlight: true,
-          sortOrder: true,
-          playCount: true,
-          viewCount: true,
-        },
-      }),
-      // Basic counts for stats display
-      prisma.djProfile.findUnique({
-        where: { slug },
-        select: {
-          _count: {
-            select: { ratings: true, followers: true },
+  const [
+    djCore,
+    spotlightMedia,
+    basicCounts,
+    ratingAgg,
+    eventCount,
+    djEvents,
+    djCareerHighlights,
+    djEndorsements,
+    djPress,
+  ] = await Promise.all([
+    // Core profile data for hero section
+    prisma.djProfile.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        userId: true,
+        stageName: true,
+        slug: true,
+        bio: true,
+        experienceYears: true,
+        experienceLevel: true,
+        avatar: true,
+        coverImage: true,
+        countryId: true,
+        cityId: true,
+        city: {
+          select: {
+            id: true,
+            name: true,
           },
         },
-      }),
-      // Rating aggregate for avgRating
-      prisma.djRating.aggregate({
-        where: { djProfile: { slug } },
-        _avg: { rating: true },
-      }),
-      // Public events count (where DJ is owner)
-      prisma.event.count({
-        where: {
-          ownerDj: { slug },
-          status: "PUBLISHED",
+        plan: true,
+        status: true,
+        featured: true,
+        hidden: true,
+        bookingEmail: true,
+        bookingPhone: true,
+        feeMin: true,
+        feeMax: true,
+        feeCurrency: true,
+        monthlyViews: true,
+        reputationScore: true,
+        user: {
+          select: {
+            id: true,
+          },
         },
-      }),
-    ]);
+        country: { select: { name: true } },
+        genres: { include: { genre: { select: { name: true } } } },
+        djTypes: true,
+        socialLinks: true,
+        packages: {
+          orderBy: { sortOrder: "asc" },
+        },
+        venues: {
+          orderBy: { eventDate: "desc" },
+        },
+        // Non-critical fields removed (will be fetched separately):
+        // - managerName, managerEmail, managerPhone (ProfessionalTeamSidebar)
+        // - agentName, agentAgency, agentEmail (ProfessionalTeamSidebar)
+        // - availabilityTimezone, availabilityMonth, availabilityDays (availability section)
+        // - featuredPerformanceUrl, featuredPerformanceContext (featured performance section)
+        // - reputationDetail (owner-only analytics)
+      },
+    }),
+    // Spotlight media only (featured mix/video)
+    prisma.media.findMany({
+      where: { djProfile: { slug }, isSpotlight: true },
+      orderBy: { sortOrder: "asc" },
+      select: {
+        id: true,
+        type: true,
+        url: true,
+        title: true,
+        duration: true,
+        thumbnail: true,
+        isSpotlight: true,
+        sortOrder: true,
+        playCount: true,
+        viewCount: true,
+      },
+    }),
+    // Basic counts for stats display
+    prisma.djProfile.findUnique({
+      where: { slug },
+      select: {
+        _count: {
+          select: { ratings: true, followers: true },
+        },
+      },
+    }),
+    // Rating aggregate for avgRating
+    prisma.djRating.aggregate({
+      where: { djProfile: { slug } },
+      _avg: { rating: true },
+    }),
+    // Public events count (where DJ is owner)
+    prisma.event.count({
+      where: {
+        ownerDj: { slug },
+        status: "PUBLISHED",
+      },
+    }),
+    // Events data
+    prisma.event.findMany({
+      where: {
+        ownerDj: { slug },
+        status: { in: ["PUBLISHED", "COMPLETED"] },
+      },
+      orderBy: { startDate: "desc" },
+      include: {
+        country: { select: { name: true } },
+        city: { select: { name: true } },
+      },
+    }),
+    // Career highlights
+    prisma.djCareerHighlight.findMany({
+      where: { djProfile: { slug } },
+      orderBy: { year: "desc" },
+    }),
+    // Endorsements
+    prisma.djEndorsement.findMany({
+      where: { djProfile: { slug } },
+    }),
+    // Press
+    prisma.djPress.findMany({
+      where: { djProfile: { slug } },
+      orderBy: { date: "desc" },
+    }),
+  ]);
 
   // NOTE: This page is a static, ISR-cached shell (see `export const revalidate`
   // above). It intentionally contains NO cookies()/auth reads so caching stays
@@ -190,6 +231,13 @@ export default async function DjProfilePage({
     ...djCore,
     media: spotlightMedia,
     _count: basicCounts?._count || { ratings: 0, followers: 0 },
+    // Add database fields for premium features
+    packages: (djCore as any).packages || [],
+    venues: (djCore as any).venues || [],
+    events: djEvents || [],
+    careerHighlights: djCareerHighlights || [],
+    endorsements: djEndorsements || [],
+    press: djPress || [],
     // Add default values for removed non-critical fields
     managerName: null,
     managerEmail: null,
@@ -249,7 +297,8 @@ export default async function DjProfilePage({
   const djFeeCurrency = dj.feeCurrency ?? "USD";
 
   const websiteLink =
-    dj.socialLinks.find((s) => s.platform === "website")?.url ?? "";
+    (dj as any).socialLinks?.find((s: any) => s.platform === "website")?.url ??
+    "";
 
   const djDemoData: DjDemoData = {
     id: String(dj.id),
@@ -262,8 +311,8 @@ export default async function DjProfilePage({
     experienceYears: dj.experienceYears ?? undefined,
     experienceLevel: dj.experienceLevel ?? undefined,
     location: {
-      city: dj.city?.name ?? "",
-      country: dj.country?.name ?? "",
+      city: (dj as any).city?.name ?? "",
+      country: (dj as any).country?.name ?? "",
     },
     avatar: {
       url: dj.avatar || "/noAvatar.png",
@@ -273,9 +322,9 @@ export default async function DjProfilePage({
       url: dj.coverImage || "/noCover.png",
       alt: `${dj.stageName} cover`,
     },
-    genres: dj.genres.map((g) => g.genre.name),
-    socials: dj.socialLinks.reduce<DjDemoData["socials"]>(
-      (acc, s) => ({ ...acc, [s.platform]: s.url }),
+    genres: (dj as any).genres?.map((g: any) => g.genre.name) || [],
+    socials: ((dj as any).socialLinks || []).reduce(
+      (acc: any, s: any) => ({ ...acc, [s.platform]: s.url }),
       {},
     ),
     stats: {
@@ -372,9 +421,19 @@ export default async function DjProfilePage({
           ?.filter((d) => d.status === "tentative")
           .map((d) => d.day) ?? [],
     },
-    packages: [], // Fetched client-side via API
+    packages: dj.packages.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      priceFrom: p.priceFrom,
+      priceTo: p.priceTo,
+      currency: p.currency,
+      duration: p.duration,
+      features: p.features,
+      popular: p.popular,
+      sortOrder: p.sortOrder,
+    })),
     bio: dj.bio ?? "",
-    specialties: dj.djTypes.map((t) => t.type),
+    specialties: (dj as any).djTypes?.map((t: any) => t.type) || [],
     media: {
       photos: dj.media.filter((m) => m.type === "IMAGE").map((m) => m.url),
       videos: dj.media
@@ -398,11 +457,67 @@ export default async function DjProfilePage({
           plays: m.playCount ?? 0,
         })),
     },
-    careerHighlights: [], // Fetched client-side via API
-    endorsements: [], // Fetched client-side via API
-    press: [], // Fetched client-side via API
-    venuesPlayed: [], // Fetched client-side via API
+    careerHighlights: dj.careerHighlights.map((h: any) => ({
+      id: h.id,
+      year: h.year,
+      title: h.title,
+      description: h.description,
+    })),
+    endorsements: dj.endorsements.map((e: any) => ({
+      id: e.id,
+      name: e.name,
+      role: e.role,
+      company: e.company,
+      quote: e.quote,
+      avatar: e.avatar,
+    })),
+    press: dj.press.map((p: any) => ({
+      id: p.id,
+      source: p.source,
+      type: p.type,
+      title: p.title,
+      date: p.date,
+      url: p.url,
+    })),
+    venuesPlayed: dj.venues.map((v: any) => ({
+      id: v.id,
+      venue: v.venueName,
+      date: v.eventDate,
+      description: v.description,
+      city: v.city?.name || "",
+      country: v.country?.name || "",
+      cityId: v.cityId,
+      countryId: v.countryId,
+      latitude: v.latitude,
+      longitude: v.longitude,
+    })),
     reviewsList: [], // Fetched client-side via pagination API
+    events:
+      (dj as any).events?.map((e: any) => ({
+        id: e.id,
+        title: e.title,
+        startDate: e.startDate,
+        venue: e.venue,
+        city: e.city?.name || "",
+        country: e.country?.name || "",
+        slug: e.slug,
+        eventType: e.eventType,
+        category: e.category,
+        status: e.status,
+      })) || [],
+    upcomingEvents:
+      (dj as any).events
+        ?.filter((e: any) => new Date(e.startDate) >= new Date())
+        .map((e: any) => ({
+          id: e.id,
+          title: e.title,
+          date: e.startDate,
+          eventDate: e.startDate,
+          venue: e.venue,
+          city: e.city?.name || "",
+          country: e.country?.name || "",
+          slug: e.slug,
+        })) || [],
     team: {
       manager: { name: dj.managerName ?? "", email: dj.managerEmail ?? "" },
       bookingAgent: {
@@ -417,7 +532,6 @@ export default async function DjProfilePage({
       website: websiteLink,
       feeRange: { min: djFeeMin, max: djFeeMax, currency: djFeeCurrency },
     },
-    upcomingEvents: [], // Fetched client-side via API
   };
 
   const isPremium = djPlan === "PREMIUM";
@@ -428,15 +542,15 @@ export default async function DjProfilePage({
     name: dj.stageName,
     description:
       dj.bio ||
-      `Professional DJ based in ${dj.city?.name || ""}, ${dj.country?.name || ""}`,
+      `Professional DJ based in ${(dj as any).city?.name || ""}, ${(dj as any).country?.name || ""}`,
     url: `${process.env.NEXT_PUBLIC_SITE_URL}/djs/${dj.slug}`,
     image: dj.avatar,
     address: {
       "@type": "PostalAddress",
-      addressLocality: dj.city?.name,
-      addressCountry: dj.country?.name,
+      addressLocality: (dj as any).city?.name,
+      addressCountry: (dj as any).country?.name,
     },
-    knowsAbout: dj.genres.map((g) => g.genre.name),
+    knowsAbout: (dj as any).genres?.map((g: any) => g.genre.name) || [],
     aggregateRating:
       avgRating > 0
         ? {

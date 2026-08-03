@@ -104,7 +104,7 @@ export default function BookingPackages({
             </p>
           )}
           <ul className="flex flex-1 flex-col gap-1.5">
-            {pkg.features.map((feature, idx) => (
+            {(pkg.features || []).map((feature, idx) => (
               <li
                 key={`${pkg.id}-feature-${idx}`}
                 className="flex items-center gap-1.5 text-xs text-gray-400"
