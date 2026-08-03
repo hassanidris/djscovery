@@ -70,7 +70,8 @@ export function VenueReviewForm({
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const allRatingsSet = soundSystem > 0 && atmosphere > 0 && location > 0 && accessibility > 0;
+  const allRatingsSet =
+    soundSystem > 0 && atmosphere > 0 && location > 0 && accessibility > 0;
 
   function handleSubmit() {
     setError(null);
@@ -87,13 +88,17 @@ export function VenueReviewForm({
 
     startTransition(async () => {
       try {
-        await createVenueReview(eventId, venueId, {
+        const result = await createVenueReview(eventId, venueId, {
           soundSystem,
           atmosphere,
           location,
           accessibility,
           review: review.trim(),
         });
+        if (!result.success) {
+          setError(result.error || "Something went wrong.");
+          return;
+        }
         setSuccess(true);
         setSoundSystem(0);
         setAtmosphere(0);
