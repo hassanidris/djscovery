@@ -10,21 +10,35 @@ This feature unifies the DjRating system to support both **direct reviews** (eve
 
 The schema changes are already applied via `prisma db push` and the manual SQL migration. On a fresh deployment or production, run:
 
+**IMPORTANT:** Steps 1 and 3 must be executed back-to-back during a maintenance window or with user-facing traffic disabled. The old unique constraint is dropped in step 1 and replaced with partial unique indexes in step 3 — between these steps, the constraint is unprotected and duplicate entries could be created if traffic is active.
+
 ```bash
 # 1. Sync schema (adds eventId, reviewType, indexes, drops old unique constraint)
 npx prisma db push --accept-data-loss
 
-# 2. Apply partial unique indexes (cannot be done via Prisma schema)
+# 2. Check for existing duplicates in DjRating before creating replacement indexes
+# Run this immediately after step 1, before step 3
+# If duplicates exist, resolve them manually before proceeding
+DATABASE_URL="your_db_url" psql -c "
+  SELECT \"userId\", \"djProfileId\", COUNT(*) as count
+  FROM \"DjRating\"
+  GROUP BY \"userId\", \"djProfileId\"
+  HAVING COUNT(*) > 1;
+"
+
+# 3. Apply partial unique indexes (cannot be done via Prisma schema)
+# Run this immediately after step 2, without delay
 DATABASE_URL="your_db_url" npx prisma db execute --file=prisma/migrations/manual_add_dj_rating_event_support.sql
 
-# 3. Regenerate Prisma client
+# 4. Regenerate Prisma client
 npx prisma generate
 
-# 4. Apply RLS policies (updated with clarifying comments)
+# 5. Apply RLS policies (updated with clarifying comments)
 DATABASE_URL="your_db_url" npx prisma db execute --file=prisma/rls-policies.sql
 ```
 
 **Verify:**
+
 ```sql
 -- Check enum exists
 SELECT 1 FROM pg_type WHERE typname = 'DjRatingType';
@@ -87,6 +101,7 @@ npm run build
 ## Environment Variables
 
 No new environment variables required. The feature uses existing:
+
 - `DATABASE_URL` — PostgreSQL connection
 - `NEXT_PUBLIC_SITE_URL` — For email links
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` — For caching
@@ -120,11 +135,13 @@ No new environment variables required. The feature uses existing:
 ### Logging
 
 The following events are already logged via `console.error`:
+
 - Reputation update failures
 - Notification creation failures
 - Email sending failures
 
 These are non-fatal — the review is still created even if side effects fail. Monitor logs for:
+
 - Spike in "Reputation update failed" — indicates reputation calculation issue
 - Spike in "Failed to create rating notification" — indicates notification table issue
 - Spike in "Failed to send review email" — indicates email service issue
@@ -144,6 +161,7 @@ These are non-fatal — the review is still created even if side effects fail. M
    - Monitor cache hit rates
 
 2. **Verify data integrity**
+
    ```sql
    -- Check for reviews with inconsistent reviewType/eventId
    SELECT COUNT(*) FROM "DjRating"
@@ -205,22 +223,26 @@ If only event-anchored reviews have issues:
 ## Files Changed Summary
 
 ### Schema & Migration
+
 - `prisma/schema.prisma` — DjRatingType enum, eventId, reviewType, indexes
 - `prisma/migrations/manual_add_dj_rating_event_support.sql` — Partial unique indexes
 - `prisma/rls-policies.sql` — Clarifying comments
 
 ### Scripts
+
 - `scripts/migrate-event-reviews-to-dj-ratings.ts` — Data migration
 - `scripts/rollback-dj-rating-event-migration.ts` — Rollback
 - `scripts/check-event-review-data.ts` — Pre-migration analysis
 
 ### API & Validation
+
 - `src/app/api/djs/[slug]/ratings/route.ts` — GET + POST with event filtering
 - `src/app/api/events/[eventId]/viewer-context/route.ts` — Checks DjRating instead of EventReview
 - `src/lib/validation/dj-rating-validation.ts` — Shared validation (NEW)
 - `src/lib/actions/dj-ratings.ts` — Server action (NEW)
 
 ### UI Components
+
 - `src/components/reputation/DjRatingForm.tsx` — Form (NEW)
 - `src/components/reputation/ReviewModal.tsx` — Modal wrapper (NEW)
 - `src/components/reputation/ReviewModalContext.tsx` — Context provider (NEW)
@@ -234,13 +256,16 @@ If only event-anchored reviews have issues:
 - `src/app/layout.tsx` — ReviewModalProvider wrapper
 
 ### Hooks
+
 - `src/hooks/usePaginatedRatings.ts` — Event filter support
 
 ### Tests
+
 - `__tests__/unit/lib/dj-rating-validation.test.ts` — 30 tests
 - `__tests__/unit/hooks/usePaginatedRatings.test.ts` — 10 tests
 - `__tests__/unit/components/DjRatingForm.test.tsx` — 16 tests
 
 ### Documentation
+
 - `docs/dj-profile-spec.md` — Updated DjRating section
 - `docs/dj-rating-event-reviews-deployment.md` — This file
