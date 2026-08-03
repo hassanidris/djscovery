@@ -37,6 +37,19 @@ ALTER TABLE "OrganizerReputationHistory" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read organizer reputation history" ON "OrganizerReputationHistory";
 CREATE POLICY "Public read organizer reputation history" ON "OrganizerReputationHistory" FOR SELECT TO public USING (true);
 
+-- VenueReview: server-side only via Prisma (bypasses RLS). Deny all client access to protect audit fields (ipAddress, userAgent).
+ALTER TABLE "VenueReview" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "No client access to venue reviews" ON "VenueReview";
+CREATE POLICY "No client access to venue reviews" ON "VenueReview" FOR ALL TO public USING (false) WITH CHECK (false);
+
+-- VenueReputationScore: public read, server-only writes via Prisma
+ALTER TABLE "VenueReputationScore" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read venue reputation scores" ON "VenueReputationScore";
+CREATE POLICY "Public read venue reputation scores" ON "VenueReputationScore" FOR SELECT TO public USING (true);
+ALTER TABLE "VenueReputationHistory" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read venue reputation history" ON "VenueReputationHistory";
+CREATE POLICY "Public read venue reputation history" ON "VenueReputationHistory" FOR SELECT TO public USING (true);
+
 -- Report: reporter can read/insert own reports. Admin updates are done server-side via Prisma.
 ALTER TABLE "Report" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Reporter can read own reports" ON "Report";
