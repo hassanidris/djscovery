@@ -24,6 +24,8 @@ import {
   PrivateVenueNote,
   EventReviewSlot,
 } from "@/components/events/EventViewerContext";
+import { VenueReviews } from "@/components/venue/VenueReviews";
+import { EventDjReviews } from "@/components/events/EventDjReviews";
 
 export const revalidate = 60;
 
@@ -119,7 +121,7 @@ export default async function EventDetailPage({
         },
       },
       country: { select: { name: true } },
-      city: { select: { name: true } },
+      city: { select: { name: true, id: true } },
       participants: {
         select: {
           role: true,
@@ -132,6 +134,18 @@ export default async function EventDetailPage({
         select: { id: true, url: true, caption: true },
         orderBy: { sortOrder: "asc" },
       },
+      venueReviews: {
+        include: {
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      },
     },
   });
 
@@ -142,13 +156,35 @@ export default async function EventDetailPage({
     }
 
     // Fetch attendance analytics (public aggregate counts, no auth needed)
-    const [goingCount, interestedCount] = await Promise.all([
+    const [goingCount, interestedCount, venueAggregate] = await Promise.all([
       prisma.eventAttendance.count({
         where: { eventId: dbEvent.id, status: "GOING" },
       }),
       prisma.eventAttendance.count({
         where: { eventId: dbEvent.id, status: "INTERESTED" },
       }),
+      dbEvent.venue && dbEvent.city
+        ? prisma.venue
+            .findFirst({
+              where: { name: dbEvent.venue, cityId: dbEvent.city?.id },
+              select: { id: true },
+            })
+            .then((venue) =>
+              venue
+                ? prisma.venueReview.aggregate({
+                    where: { venueId: venue.id },
+                    _count: { _all: true },
+                    _avg: {
+                      rating: true,
+                      soundSystem: true,
+                      atmosphere: true,
+                      location: true,
+                      accessibility: true,
+                    },
+                  })
+                : null,
+            )
+        : Promise.resolve(null),
     ]);
 
     const isPrivate = dbEvent.eventType === "PRIVATE";
@@ -197,6 +233,8 @@ export default async function EventDetailPage({
         viewCount={dbEvent.viewCount ?? 0}
         goingCount={goingCount}
         interestedCount={interestedCount}
+        venueReviews={dbEvent.venueReviews}
+        venueAggregate={venueAggregate}
       />
     );
   }
@@ -222,6 +260,25 @@ type DjMini = {
   avatar: string | null;
 };
 type GalleryItem = { id: number; url: string; caption: string | null };
+type VenueReviewItem = {
+  id: number;
+  soundSystem: number;
+  atmosphere: number;
+  location: number;
+  accessibility: number;
+  rating: number;
+  review: string | null;
+  createdAt: Date;
+  user: {
+    username: string | null;
+    image: string | null;
+  };
+  event?: {
+    id: number;
+    slug: string;
+    title: string;
+  };
+};
 
 function EventDetailView(props: {
   slug: string;
@@ -251,6 +308,8 @@ function EventDetailView(props: {
   viewCount: number;
   goingCount: number;
   interestedCount: number;
+  venueReviews: VenueReviewItem[];
+  venueAggregate?: any;
 }) {
   const {
     slug,
@@ -603,6 +662,10 @@ function EventDetailView(props: {
               <EventReviewSlot
                 eventId={eventId}
                 status={status}
+                eventTitle={title}
+                eventSlug={slug}
+                eventStartDate={startDate}
+                eventCity={location}
                 djs={allPerformers.map((dj) => ({
                   djProfileId: dj.djProfileId,
                   slug: dj.slug,
@@ -610,6 +673,42 @@ function EventDetailView(props: {
                   avatar: dj.avatar,
                 }))}
               />
+
+              {/* Event-anchored DJ reviews (public, visible to all) */}
+              <EventDjReviews
+                eventId={eventId}
+                djSlugs={allPerformers.map((dj) => dj.slug)}
+              />
+
+              {/* Venue reviews */}
+              {props.venueReviews.length > 0 && venue && (
+                <div className="mb-8">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                    Venue Reviews
+                  </h2>
+                  <VenueReviews
+                    avgRating={props.venueAggregate?._avg.rating ?? 0}
+                    ratingCount={
+                      props.venueAggregate?._count._all ??
+                      props.venueReviews.length
+                    }
+                    reviews={props.venueReviews}
+                    categoryAverages={
+                      props.venueAggregate?._avg
+                        ? {
+                            soundSystem:
+                              props.venueAggregate._avg.soundSystem ?? 0,
+                            atmosphere:
+                              props.venueAggregate._avg.atmosphere ?? 0,
+                            location: props.venueAggregate._avg.location ?? 0,
+                            accessibility:
+                              props.venueAggregate._avg.accessibility ?? 0,
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
+              )}
 
               {/* Post-event recap */}
               {recap && (
@@ -693,6 +792,7 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       ticketUrl={event.ticketUrl}
       genres={event.genres}
       recap={null}
+      venueReviews={[]}
       audioLink={null}
       posterUrl={event.posterUrl ?? null}
       isUpcoming={isUpcoming}

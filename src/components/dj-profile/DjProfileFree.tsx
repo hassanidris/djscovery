@@ -45,6 +45,7 @@ import {
   SOCIAL_ICONS,
   SectionHeading,
   formatPlays,
+  type ReviewItem,
 } from "@/components/dj-profile/dj-profile-shared";
 import {
   FREE_DEFAULT_DJ,
@@ -269,6 +270,15 @@ export default function DjProfileFree({
       name: r.user.name || r.user.username,
       image: r.user.image || "",
     },
+    reviewType: r.reviewType as ReviewItem["reviewType"],
+    event: r.event
+      ? {
+          id: r.event.id,
+          slug: r.event.slug,
+          title: r.event.title,
+          startDate: new Date(r.event.startDate).toISOString().split("T")[0],
+        }
+      : null,
   }));
 
   // Transform fetched media: photos for gallery, videos for video tab
@@ -808,6 +818,11 @@ export default function DjProfileFree({
                     avgRating={fetchedAvgRating || safeDJ.avgRating}
                     ratingCount={ratingsTotalCount || safeDJ.ratingCount}
                     reviews={REVIEWS}
+                    djProfileId={djProfileId}
+                    djName={safeDJ.stageName}
+                    djAvatar={safeDJ.avatar}
+                    djSlug={slug}
+                    isOwner={isOwner}
                   />
                   {ratingsHasNextPage && (
                     <div className="flex justify-center pt-4">

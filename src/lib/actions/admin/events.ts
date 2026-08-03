@@ -72,6 +72,9 @@ export async function unhideEvent(formData: FormData): Promise<ActionResult> {
   }
 }
 
+// Deletes an event-anchored DjRating (the review is anchored to the event
+// being moderated, i.e. eventId is set). Direct reviews (eventId = null)
+// are not manageable from this admin page.
 export async function deleteEventReview(
   formData: FormData,
 ): Promise<ActionResult> {
@@ -81,19 +84,19 @@ export async function deleteEventReview(
   if (!reviewId || isNaN(reviewId)) return { error: "Invalid review ID" };
 
   try {
-    const review = await prisma.eventReview.findUnique({
+    const review = await prisma.djRating.findUnique({
       where: { id: reviewId },
       select: { eventId: true, event: { select: { slug: true } } },
     });
-    if (!review) return { error: "Review not found" };
+    if (!review || !review.event) return { error: "Review not found" };
 
     await prisma.$transaction([
-      prisma.eventReview.delete({ where: { id: reviewId } }),
+      prisma.djRating.delete({ where: { id: reviewId } }),
       prisma.adminActionLog.create({
         data: {
           adminId,
           action: "DELETE_EVENT_REVIEW",
-          targetType: "EventReview",
+          targetType: "DjRating",
           targetId: String(reviewId),
         },
       }),
@@ -282,6 +285,10 @@ export type AdminEvent = {
   _count: { participants: number; eventReviews: number };
 };
 
+// Note: "eventReviews" here refers to event-anchored DjRating rows
+// (djRatings relation where eventId is set), not the legacy EventReview
+// model, which has been superseded by the unified DjRating system.
+
 export async function getAdminEvents({
   cursor,
   take = 20,
@@ -336,15 +343,23 @@ export async function getAdminEvents({
         country: { select: { name: true } },
         city: { select: { name: true } },
         ownerDj: { select: { stageName: true, slug: true } },
-        _count: { select: { participants: true, eventReviews: true } },
+        _count: { select: { participants: true, djRatings: true } },
       },
     });
 
     const hasNextPage = events.length > take;
     if (hasNextPage) events.pop();
 
+    const mappedEvents: AdminEvent[] = events.map((e) => ({
+      ...e,
+      _count: {
+        participants: e._count.participants,
+        eventReviews: e._count.djRatings,
+      },
+    }));
+
     return {
-      events,
+      events: mappedEvents,
       nextCursor: hasNextPage ? (events[events.length - 1]?.id ?? null) : null,
     };
   } catch (error) {
@@ -466,7 +481,9 @@ export async function getEventDetails(
         },
         orderBy: { sortOrder: "asc" },
       },
-      eventReviews: {
+      // Event-anchored DjRating rows (the unified review system). The
+      // legacy EventReview model is no longer populated with new data.
+      djRatings: {
         select: {
           id: true,
           rating: true,
@@ -537,7 +554,7 @@ export async function getEventDetails(
     ownerDj: event.ownerDj,
     participants: event.participants,
     gallery: event.gallery,
-    eventReviews: event.eventReviews,
+    eventReviews: event.djRatings,
     moderations,
   };
 }
