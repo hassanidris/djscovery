@@ -20,9 +20,18 @@ npx prisma db push --accept-data-loss
 # Run this immediately after step 1, before step 3
 # If duplicates exist, resolve them manually before proceeding
 DATABASE_URL="your_db_url" psql -c "
-  SELECT \"userId\", \"djProfileId\", COUNT(*) as count
+  -- Check for direct review duplicates (userId + djProfileId where eventId IS NULL)
+  SELECT 'DIRECT' as review_type, \"userId\", \"djProfileId\", COUNT(*) as count
   FROM \"DjRating\"
+  WHERE \"eventId\" IS NULL
   GROUP BY \"userId\", \"djProfileId\"
+  HAVING COUNT(*) > 1;
+
+  -- Check for event-anchored review duplicates (userId + djProfileId + eventId where eventId IS NOT NULL)
+  SELECT 'EVENT' as review_type, \"userId\", \"djProfileId\", \"eventId\", COUNT(*) as count
+  FROM \"DjRating\"
+  WHERE \"eventId\" IS NOT NULL
+  GROUP BY \"userId\", \"djProfileId\", \"eventId\"
   HAVING COUNT(*) > 1;
 "
 
