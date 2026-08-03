@@ -80,26 +80,23 @@ export function validateFields(input: {
     input.eventId > 0;
 
   // --- reviewType (if provided) ---
+  // Only allow DIRECT and EVENT_ATTENDEE from client; EVENT_ORGANIZER is auto-detected
   if (
     input.reviewType != null &&
-    !VALID_REVIEW_TYPES.includes(input.reviewType as ReviewType)
+    !["DIRECT", "EVENT_ATTENDEE"].includes(input.reviewType as ReviewType)
   ) {
     return { ok: false, error: "Invalid reviewType" };
   }
 
   // --- reviewType / eventId consistency ---
-  // DIRECT must not have an eventId; EVENT_* must have an eventId.
+  // DIRECT must not have an eventId; EVENT_ATTENDEE must have an eventId.
   if (input.reviewType === "DIRECT" && isEventReview) {
     return {
       ok: false,
       error: "Direct reviews cannot be anchored to an event",
     };
   }
-  if (
-    (input.reviewType === "EVENT_ATTENDEE" ||
-      input.reviewType === "EVENT_ORGANIZER") &&
-    !isEventReview
-  ) {
+  if (input.reviewType === "EVENT_ATTENDEE" && !isEventReview) {
     return {
       ok: false,
       error: "Event reviews require an eventId",
@@ -237,9 +234,8 @@ export async function validateBusinessRules(
     eventTitle = event.title;
 
     // --- Resolve reviewType ---
-    if (ctx.reviewType === "EVENT_ORGANIZER") {
-      resolvedReviewType = "EVENT_ORGANIZER";
-    } else if (ctx.reviewType === "EVENT_ATTENDEE") {
+    // Do not accept client-supplied EVENT_ORGANIZER - must verify organizer status
+    if (ctx.reviewType === "EVENT_ATTENDEE") {
       resolvedReviewType = "EVENT_ATTENDEE";
     } else {
       // Auto-detect: organizer if user has an accepted gig for this DJ

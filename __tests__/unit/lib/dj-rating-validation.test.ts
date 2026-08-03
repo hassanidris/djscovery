@@ -47,7 +47,10 @@ describe("validateFields", () => {
     });
 
     it("rejects undefined rating", () => {
-      const result = validateFields({ rating: undefined, review: "A".repeat(30) });
+      const result = validateFields({
+        rating: undefined,
+        review: "A".repeat(30),
+      });
       expect(result.ok).toBe(false);
     });
 
@@ -188,8 +191,8 @@ describe("validateFields", () => {
   // ── reviewType validation ────────────────────────────────────────────────
 
   describe("reviewType", () => {
-    it("accepts all valid review types", () => {
-      for (const rt of VALID_REVIEW_TYPES) {
+    it("accepts DIRECT and EVENT_ATTENDEE from client", () => {
+      for (const rt of ["DIRECT", "EVENT_ATTENDEE"] as const) {
         const result = validateFields({
           rating: 5,
           review: "A".repeat(30),
@@ -198,6 +201,17 @@ describe("validateFields", () => {
         });
         expect(result.ok).toBe(true);
       }
+    });
+
+    it("rejects EVENT_ORGANIZER from client (must be auto-detected)", () => {
+      const result = validateFields({
+        rating: 5,
+        review: "A".repeat(30),
+        reviewType: "EVENT_ORGANIZER",
+        eventId: 42,
+      });
+      expect(result.ok).toBe(false);
+      expect(result.error).toMatch(/reviewType/i);
     });
 
     it("rejects invalid reviewType string", () => {
@@ -238,7 +252,7 @@ describe("validateFields", () => {
         reviewType: "EVENT_ORGANIZER",
       });
       expect(result.ok).toBe(false);
-      expect(result.error).toMatch(/event.*eventId/i);
+      expect(result.error).toMatch(/reviewType/i);
     });
 
     it("accepts EVENT_ATTENDEE with eventId", () => {
@@ -250,16 +264,6 @@ describe("validateFields", () => {
       });
       expect(result.ok).toBe(true);
       expect(result.isEventReview).toBe(true);
-    });
-
-    it("accepts EVENT_ORGANIZER with eventId", () => {
-      const result = validateFields({
-        rating: 5,
-        review: "A".repeat(30),
-        eventId: 42,
-        reviewType: "EVENT_ORGANIZER",
-      });
-      expect(result.ok).toBe(true);
     });
 
     it("accepts omitted reviewType (auto-detected later)", () => {
