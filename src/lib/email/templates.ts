@@ -102,9 +102,11 @@ export function djReviewTemplate(data: DjReviewData): {
   subject: string;
   html: string;
 } {
-  // Clamp to the valid 1-5 range regardless of caller, so a malformed or
-  // out-of-range value can never drive an unbounded string allocation.
-  const filledStars = Math.min(5, Math.max(0, Math.round(data.rating)));
+  // Normalize + clamp regardless of caller so malformed input can never
+  // control repeat counts or drive unbounded string allocation.
+  const numericRating = Number(data.rating);
+  const safeRating = Number.isFinite(numericRating) ? numericRating : 0;
+  const filledStars = Math.max(0, Math.min(5, Math.round(safeRating)));
   const emptyStars = 5 - filledStars;
   const html = `
     <h2>New Review Received</h2>
