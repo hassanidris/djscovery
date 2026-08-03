@@ -24,6 +24,7 @@ import {
   PrivateVenueNote,
   EventReviewSlot,
 } from "@/components/events/EventViewerContext";
+import { VenueReviews } from "@/components/venue/VenueReviews";
 
 export const revalidate = 60;
 
@@ -132,6 +133,18 @@ export default async function EventDetailPage({
         select: { id: true, url: true, caption: true },
         orderBy: { sortOrder: "asc" },
       },
+      venueReviews: {
+        include: {
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      },
     },
   });
 
@@ -197,6 +210,7 @@ export default async function EventDetailPage({
         viewCount={dbEvent.viewCount ?? 0}
         goingCount={goingCount}
         interestedCount={interestedCount}
+        venueReviews={dbEvent.venueReviews}
       />
     );
   }
@@ -222,6 +236,25 @@ type DjMini = {
   avatar: string | null;
 };
 type GalleryItem = { id: number; url: string; caption: string | null };
+type VenueReviewItem = {
+  id: number;
+  soundSystem: number;
+  atmosphere: number;
+  location: number;
+  accessibility: number;
+  rating: number;
+  review: string | null;
+  createdAt: Date;
+  user: {
+    username: string | null;
+    image: string | null;
+  };
+  event?: {
+    id: number;
+    slug: string;
+    title: string;
+  };
+};
 
 function EventDetailView(props: {
   slug: string;
@@ -251,6 +284,7 @@ function EventDetailView(props: {
   viewCount: number;
   goingCount: number;
   interestedCount: number;
+  venueReviews: VenueReviewItem[];
 }) {
   const {
     slug,
@@ -611,6 +645,27 @@ function EventDetailView(props: {
                 }))}
               />
 
+              {/* Venue reviews */}
+              {props.venueReviews.length > 0 && venue && (
+                <div className="mb-8">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                    Venue Reviews
+                  </h2>
+                  <VenueReviews
+                    avgRating={
+                      props.venueReviews.length > 0
+                        ? props.venueReviews.reduce(
+                            (sum: number, r: VenueReviewItem) => sum + r.rating,
+                            0,
+                          ) / props.venueReviews.length
+                        : 0
+                    }
+                    ratingCount={props.venueReviews.length}
+                    reviews={props.venueReviews}
+                  />
+                </div>
+              )}
+
               {/* Post-event recap */}
               {recap && (
                 <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
@@ -693,6 +748,7 @@ function DemoEventDetailView({ event }: { event: DemoEventWithDate }) {
       ticketUrl={event.ticketUrl}
       genres={event.genres}
       recap={null}
+      venueReviews={[]}
       audioLink={null}
       posterUrl={event.posterUrl ?? null}
       isUpcoming={isUpcoming}

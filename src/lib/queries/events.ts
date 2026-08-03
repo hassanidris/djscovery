@@ -313,3 +313,97 @@ export async function getDjEvents(djProfileId: number, limit = 12) {
 }
 
 export type DjEvent = Awaited<ReturnType<typeof getDjEvents>>[number];
+
+// ============================================================
+// VENUE REVIEW CONTEXT
+// Data needed to render the venue review prompt for a
+// specific event. Returns null if the current user did not attend
+// the event or if there is no venue associated.
+// ============================================================
+
+export async function getVenueReviewContextBySlug(
+  slug: string,
+  userId: string,
+) {
+  const event = await prisma.event.findUnique({
+    where: { slug },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      status: true,
+      startDate: true,
+      venue: true,
+      cityId: true,
+      countryId: true,
+      venueReviews: {
+        where: { userId },
+      },
+    },
+  });
+
+  if (!event) return null;
+
+  // Check if user attended the event
+  const attendance = await prisma.eventAttendance.findUnique({
+    where: { eventId_userId: { eventId: event.id, userId } },
+  });
+
+  if (!attendance || attendance.status !== "ATTENDED") return null;
+
+  // Check if event has a venue
+  if (!event.venue) return null;
+
+  // Find or create venue record
+  let venue = await prisma.venue.findFirst({
+    where: {
+      name: event.venue,
+      cityId: event.cityId || undefined,
+    },
+  });
+
+  if (!venue) {
+    // Create venue record if it doesn't exist
+    venue = await prisma.venue.create({
+      data: {
+        name: event.venue,
+        cityId: event.cityId || 1,
+        countryId: event.countryId || 1,
+        source: "event",
+      },
+    });
+  }
+
+  const isCompleted = event.status === "COMPLETED";
+  const alreadyReviewed = event.venueReviews.length > 0;
+
+  let reviewWindowOpen = false;
+  let daysRemaining = null;
+
+  if (isCompleted && !alreadyReviewed) {
+    const daysSince =
+      (Date.now() - new Date(event.startDate).getTime()) /
+      (1000 * 60 * 60 * 24);
+
+    if (daysSince <= 30) {
+      reviewWindowOpen = true;
+      daysRemaining = Math.max(0, Math.floor(30 - daysSince));
+    }
+  }
+
+  return {
+    eventId: event.id,
+    eventSlug: event.slug,
+    eventTitle: event.title,
+    venueId: venue.id,
+    venueName: venue.name,
+    isCompleted,
+    alreadyReviewed,
+    reviewWindowOpen,
+    daysRemaining,
+  };
+}
+
+export type VenueReviewContext = NonNullable<
+  Awaited<ReturnType<typeof getVenueReviewContextBySlug>>
+>;

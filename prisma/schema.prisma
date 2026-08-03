@@ -423,6 +423,7 @@ model User {
   gigReviews       GigReview[]
   eventReviews     EventReview[]
   bookingInquiries BookingInquiry[]
+  venueReviews     VenueReview[]
 
   @@index([status])
   @@index([deletedAt])
@@ -659,9 +660,47 @@ model Venue {
   popularity Int      @default(0) // Track usage for ranking
   createdAt  DateTime @default(now())
 
+  venueReviews         VenueReview[]
+  venueReputationScore VenueReputationScore?
+
   @@unique([name, cityId])
   @@index([name])
   @@index([countryId])
+}
+
+model VenueReview {
+  id Int @id @default(autoincrement())
+
+  // Category ratings (1-5)
+  soundSystem   Int
+  atmosphere    Int
+  location      Int
+  accessibility Int
+
+  // Overall rating (1-5) - calculated from categories
+  rating Int
+
+  review String?
+
+  venueId Int
+  venue   Venue  @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  eventId Int
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Anti-gaming audit
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([eventId, venueId, userId]) // one review per event per venue per user
+  @@index([venueId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 // ------ DJ ANALYTICS: PROFILE VIEWS ------
@@ -1013,8 +1052,9 @@ model Event {
   eventReviews     EventReview[]
   eventModerations EventModeration[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  venueReviews VenueReview[]
 
   @@index([ownerDjId])
   @@index([ownerDjId, status])
@@ -1335,6 +1375,44 @@ model OrganizerReputationHistory {
   createdAt DateTime @default(now())
 
   @@index([organizerReputationScoreId])
+  @@index([createdAt])
+}
+
+model VenueReputationScore {
+  id      Int   @id @default(autoincrement())
+  venueId Int   @unique
+  venue   Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  totalScore          Int @default(0) // 0-1000
+  profileQualityScore Int @default(0) // 0-150
+  verificationScore   Int @default(0) // 0-50
+  reviewScore         Int @default(0) // 0-550
+  reliabilityScore    Int @default(0) // 0-150
+  activityScore       Int @default(0) // 0-100
+
+  confidenceLevel Float  @default(0) // 0.0-1.0
+  trendDirection  String @default("STABLE") // RISING, STABLE, FALLING
+
+  calculatedAt        DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  reputationHistories VenueReputationHistory[]
+
+  @@index([totalScore])
+  @@index([venueId])
+}
+
+model VenueReputationHistory {
+  id                     Int                  @id @default(autoincrement())
+  venueReputationScoreId Int
+  venueReputationScore   VenueReputationScore @relation(fields: [venueReputationScoreId], references: [id], onDelete: Cascade)
+
+  previousTotal Int
+  newTotal      Int
+  changeReason  ReputationChangeReason
+
+  createdAt DateTime @default(now())
+
+  @@index([venueReputationScoreId])
   @@index([createdAt])
 }
 
