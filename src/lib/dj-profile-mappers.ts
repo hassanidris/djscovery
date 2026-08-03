@@ -50,19 +50,74 @@ export function mapEventsFromData(
   d: DjDemoData,
   opts?: { withStatus?: boolean },
 ) {
-  return getDemoEventsByDjSlug(d.slug).map((e, i) => ({
-    id: i + 1,
-    title: e.title,
-    date: e.eventDate.toISOString(),
-    venue: e.venue ?? "",
-    city: e.city,
-    country: e.country,
-    slug: e.slug,
-    isPast: e.daysOffset <= 0,
-    eventType: (e as any).eventType,
-    category: (e as any).category,
-    ...(opts?.withStatus ? { status: "confirmed" as const } : {}),
-  }));
+  // Safely parse a date value (string | Date | null | undefined) into a Date,
+  // returning null for missing/invalid input instead of throwing.
+  function safeDate(value: any): Date | null {
+    if (value == null) return null;
+    const dt = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(dt.getTime()) ? null : dt;
+  }
+
+  // First, try the demo events lookup (works for fictional demo DJs)
+  const demoEvents = getDemoEventsByDjSlug(d.slug);
+  if (demoEvents.length > 0) {
+    return demoEvents.map((e, i) => ({
+      id: i + 1,
+      title: e.title,
+      date: e.eventDate.toISOString(),
+      venue: e.venue ?? "",
+      city: e.city,
+      country: e.country,
+      slug: e.slug,
+      isPast: e.daysOffset <= 0,
+      eventType: (e as any).eventType,
+      category: (e as any).category,
+      ...(opts?.withStatus ? { status: "confirmed" as const } : {}),
+    }));
+  }
+
+  // Fall back to DB-backed events passed via DjDemoData.events
+  const dbEvents = (d as any).events;
+  if (Array.isArray(dbEvents) && dbEvents.length > 0) {
+    return dbEvents.map((e: any) => {
+      const dt = safeDate(e.startDate);
+      return {
+        id: e.id,
+        title: e.title,
+        date: dt ? dt.toISOString() : new Date(0).toISOString(),
+        venue: e.venue ?? "",
+        city: e.city ?? "",
+        country: e.country ?? "",
+        slug: e.slug ?? "",
+        isPast: dt ? dt < new Date() : true,
+        eventType: e.eventType,
+        category: e.category,
+        status: e.status,
+      };
+    });
+  }
+
+  // Fall back to upcomingEvents (legacy field)
+  const upcoming = d.upcomingEvents || [];
+  if (upcoming.length > 0) {
+    return upcoming.map((e, i) => {
+      const dt = safeDate(e.date || (e as any).eventDate);
+      return {
+        id: (e as any).id ?? i + 1,
+        title: e.title,
+        date: dt ? dt.toISOString() : new Date(0).toISOString(),
+        venue: e.venue ?? "",
+        city: e.city ?? "",
+        country: (e as any).country ?? "",
+        slug: e.slug ?? "",
+        isPast: e.isPast ?? (dt ? dt < new Date() : true),
+        eventType: (e as any).eventType,
+        category: (e as any).category,
+      };
+    });
+  }
+
+  return [];
 }
 
 export function mapVenuesFromData(
@@ -158,11 +213,44 @@ export function mapPremiumDjToProps(d: DjDemoData) {
 }
 
 export function mapPremiumEventsFromData(d: DjDemoData) {
-  return mapEventsFromData(d, { withStatus: true });
+  const events = Array.isArray((d as any).events) ? (d as any).events : [];
+  return events.map((e: any, i: number) => {
+    const dt =
+      e.startDate instanceof Date ? e.startDate : new Date(e.startDate);
+    const dateStr = Number.isNaN(dt.getTime())
+      ? new Date().toISOString()
+      : dt.toISOString();
+    return {
+      id: e.id,
+      title: e.title,
+      date: dateStr,
+      venue: e.venue || "",
+      city: e.city?.name || e.city || "",
+      country: e.country?.name || e.country || "",
+      slug: e.slug || "",
+      isPast: Number.isNaN(dt.getTime()) ? true : dt < new Date(),
+      eventType: e.eventType,
+      category: e.category,
+      status: e.status,
+    };
+  });
 }
 
 export function mapPremiumVenuesFromData(d: DjDemoData) {
-  return mapVenuesFromData(d);
+  const venues =
+    (Array.isArray((d as any).venues) && (d as any).venues.length > 0
+      ? (d as any).venues
+      : null) ?? (Array.isArray(d.venuesPlayed) ? d.venuesPlayed : []);
+  return venues.map((v: any, i: number) => ({
+    id: v.id || i + 1,
+    venueName: v.venueName || v.venue,
+    eventDate: v.eventDate || v.date || null,
+    description: v.description || null,
+    city: { name: v.city?.name || v.city || "" },
+    country: { name: v.country?.name || v.country || "" },
+    latitude: v.latitude,
+    longitude: v.longitude,
+  }));
 }
 
 export function mapPremiumReviewsFromData(d: DjDemoData) {
@@ -188,24 +276,34 @@ export function mapPremiumMediaFromData(d: DjDemoData): PremiumMediaItem[] {
 }
 
 export function mapEndorsementsFromData(d: DjDemoData) {
-  return d.endorsements.map((e, i) => ({
+  const endorsements = Array.isArray((d as any).endorsements)
+    ? (d as any).endorsements
+    : [];
+  return endorsements.map((e: any, i: number) => ({
+    id: e.id,
     name: e.name,
     role: `${e.role}, ${e.company}`,
     quote: e.quote,
-    avatar: ENDORSER_AVATARS[i % ENDORSER_AVATARS.length],
+    avatar: e.avatar || ENDORSER_AVATARS[i % ENDORSER_AVATARS.length],
   }));
 }
 
 export function mapHighlightsFromData(d: DjDemoData) {
-  return d.careerHighlights.map((h, i) => ({
+  const highlights = Array.isArray((d as any).careerHighlights)
+    ? (d as any).careerHighlights
+    : [];
+  return highlights.map((h: any, i: number) => ({
+    id: h.id,
     year: String(h.year),
     title: h.title,
+    description: h.description,
     icon: HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
   }));
 }
 
 export function mapPressFromData(d: DjDemoData) {
-  return d.press.map((p) => ({
+  const press = Array.isArray((d as any).press) ? (d as any).press : [];
+  return press.map((p: any) => ({
     id: p.id,
     outlet: p.source,
     type: p.type,
@@ -222,7 +320,10 @@ export function mapPackagesFromData(d: DjDemoData) {
     Festival: "from-amber-500/20 to-transparent",
     "Private Event": "from-blue-600/20 to-transparent",
   };
-  return d.packages.map((pkg, i) => {
+  const packages = Array.isArray((d as any).packages)
+    ? (d as any).packages
+    : [];
+  return packages.map((pkg: any, i: number) => {
     // Use duration string directly (e.g., "3-4 hours", "2 hours")
     const duration = pkg.duration || "";
 
@@ -233,6 +334,7 @@ export function mapPackagesFromData(d: DjDemoData) {
     }
 
     return {
+      id: pkg.id,
       name: pkg.name,
       icon:
         PACKAGE_ICON_MAP[pkg.name] ??
@@ -242,6 +344,10 @@ export function mapPackagesFromData(d: DjDemoData) {
       includes: pkg.features || [],
       color: PKG_COLORS[pkg.name] ?? "from-h_red/20 to-transparent",
       featured: pkg.popular ?? false,
+      priceFrom: pkg.priceFrom,
+      priceTo: pkg.priceTo,
+      currency: pkg.currency,
+      sortOrder: pkg.sortOrder || 0,
     };
   });
 }
@@ -278,13 +384,14 @@ export function buildCalendarFromData(d: DjDemoData) {
   const { availableDays, bookedDays, tentativeDays } = d.availability;
   return Array.from({ length: daysInMonth }, (_, i) => {
     const day = i + 1;
-    const status = bookedDays.includes(day)
-      ? "booked"
-      : tentativeDays.includes(day)
-        ? "tentative"
-        : availableDays.includes(day)
-          ? "available"
-          : "free";
+    const status =
+      Array.isArray(bookedDays) && bookedDays.includes(day)
+        ? "booked"
+        : Array.isArray(tentativeDays) && tentativeDays.includes(day)
+          ? "tentative"
+          : Array.isArray(availableDays) && availableDays.includes(day)
+            ? "available"
+            : "free";
     return { day, status };
   });
 }

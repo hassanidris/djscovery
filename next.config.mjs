@@ -86,6 +86,7 @@ const nextConfig = {
       { protocol: "https", hostname: "*.vimeocdn.com" },
       { protocol: "https", hostname: "*.instagram.com" },
       { protocol: "https", hostname: "*.cdninstagram.com" },
+      { protocol: "https", hostname: "api.dicebear.com" },
     ],
   },
 };
