@@ -41,17 +41,27 @@ async function createTestEventAndVenueReviews() {
 
   console.log(`📅 Created event: ${event.title} (${event.slug})`);
 
-  // Create venue record
-  const venue = await prisma.venue.create({
-    data: {
+  // Find or create venue record
+  let venue = await prisma.venue.findFirst({
+    where: {
       name: "Test Venue Club",
       cityId: 1,
-      countryId: 1,
-      source: "test",
     },
   });
 
-  console.log(`🏢 Created venue: ${venue.name}`);
+  if (!venue) {
+    venue = await prisma.venue.create({
+      data: {
+        name: "Test Venue Club",
+        cityId: 1,
+        countryId: 1,
+        source: "test",
+      },
+    });
+    console.log(`🏢 Created venue: ${venue.name}`);
+  } else {
+    console.log(`🏢 Using existing venue: ${venue.name}`);
+  }
 
   // Find test users
   const users = await prisma.user.findMany({
@@ -87,7 +97,7 @@ async function createTestEventAndVenueReviews() {
       });
 
       users.push(user);
-      console.log(`✅ Created test user: ${user.email}`);
+      console.log(`✅ Created test user: ${user.id}`);
     }
   }
 
@@ -102,7 +112,7 @@ async function createTestEventAndVenueReviews() {
         status: "ATTENDED",
       },
     });
-    console.log(`✅ Created attendance for ${user.email}`);
+    console.log(`✅ Created attendance for user ${user.id}`);
   }
 
   // Create venue reviews
@@ -161,7 +171,7 @@ async function createTestEventAndVenueReviews() {
       },
     });
     console.log(
-      `⭐ Created venue review from ${user.email} (${overallRating}/5)`,
+      `⭐ Created venue review from user ${user.id} (${overallRating}/5)`,
     );
   }
 
