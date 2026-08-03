@@ -9,7 +9,7 @@ import {
   upsertDjRating,
   type ReviewType,
 } from "@/lib/validation/dj-rating-validation";
-import { runPostSubmitEffects } from "@/lib/actions/dj-ratings";
+import { runPostSubmitEffects } from "@/lib/ratings/post-submit-effects";
 
 export const revalidate = 300; // Cache for 5 minutes
 
