@@ -1575,6 +1575,7 @@ export default function DjProfilePremium({
                     djName={safeDJ.stageName}
                     djAvatar={safeDJ.avatar}
                     djSlug={slug}
+                    isOwner={isOwner}
                   />
                   {/* Load More button for reviews */}
                   {ratingsHasNextPage && (

@@ -822,6 +822,7 @@ export default function DjProfileFree({
                     djName={safeDJ.stageName}
                     djAvatar={safeDJ.avatar}
                     djSlug={slug}
+                    isOwner={isOwner}
                   />
                   {ratingsHasNextPage && (
                     <div className="flex justify-center pt-4">

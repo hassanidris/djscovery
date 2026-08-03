@@ -26,6 +26,8 @@ type Props = {
   djName?: string;
   djAvatar?: string | null;
   djSlug?: string;
+  /** Whether the current user is the profile owner (suppresses "Write Review") */
+  isOwner?: boolean;
 };
 
 type FilterTab = "all" | "direct" | "event";
@@ -50,6 +52,7 @@ export default function ProfileReviews({
   djName,
   djAvatar,
   djSlug,
+  isOwner = false,
 }: Props) {
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const { openReviewModal } = useReviewModal();
@@ -84,7 +87,10 @@ export default function ProfileReviews({
   const showTabs = counts.direct > 0 && counts.event > 0;
 
   const canWriteReview =
-    djProfileId != null && !Number.isNaN(djProfileId) && djName != null;
+    djProfileId != null &&
+    !Number.isNaN(djProfileId) &&
+    djName != null &&
+    !isOwner;
 
   function handleWriteReview() {
     if (!djProfileId || !djName) return;
