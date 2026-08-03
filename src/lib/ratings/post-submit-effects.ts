@@ -48,50 +48,52 @@ export async function runPostSubmitEffects(input: PostSubmitEffectsInput) {
     );
   }
 
-  try {
-    await prisma.notification.create({
-      data: {
-        type: "NEW_RATING",
-        recipientId: djProfileUserId,
+  if (input.created) {
+    try {
+      await prisma.notification.create({
         data: {
-          rating,
-          reviewerType: isEventReview ? "event" : "direct",
-          ...(isEventReview && eventId ? { eventId, eventTitle } : {}),
+          type: "NEW_RATING",
+          recipientId: djProfileUserId,
+          data: {
+            rating,
+            reviewerType: isEventReview ? "event" : "direct",
+            ...(isEventReview && eventId ? { eventId, eventTitle } : {}),
+          },
         },
-      },
-    });
-  } catch (notifError) {
-    console.error("Failed to create rating notification:", notifError);
-  }
-
-  try {
-    const [djUser, reviewer] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: djProfileUserId },
-        select: { email: true },
-      }),
-      prisma.user.findUnique({
-        where: { id: reviewerId },
-        select: { name: true },
-      }),
-    ]);
-
-    if (djUser?.email) {
-      const emailData: DjReviewData = {
-        djName: djStageName,
-        reviewerName: reviewer?.name || "Someone",
-        rating,
-        comment: trimmedReview,
-        eventTitle: eventTitle ?? "",
-        reviewUrl:
-          isEventReview && eventSlug
-            ? `${SITE_URL}/events/${eventSlug}`
-            : `${SITE_URL}/djs/${djProfileSlug}`,
-      };
-      await sendEmail(djUser.email, "DJ_REVIEW", emailData);
+      });
+    } catch (notifError) {
+      console.error("Failed to create rating notification:", notifError);
     }
-  } catch (emailError) {
-    console.error("Failed to send review email:", emailError);
+
+    try {
+      const [djUser, reviewer] = await Promise.all([
+        prisma.user.findUnique({
+          where: { id: djProfileUserId },
+          select: { email: true },
+        }),
+        prisma.user.findUnique({
+          where: { id: reviewerId },
+          select: { name: true },
+        }),
+      ]);
+
+      if (djUser?.email) {
+        const emailData: DjReviewData = {
+          djName: djStageName,
+          reviewerName: reviewer?.name || "Someone",
+          rating,
+          comment: trimmedReview,
+          eventTitle: eventTitle ?? "",
+          reviewUrl:
+            isEventReview && eventSlug
+              ? `${SITE_URL}/events/${eventSlug}`
+              : `${SITE_URL}/djs/${djProfileSlug}`,
+        };
+        await sendEmail(djUser.email, "DJ_REVIEW", emailData);
+      }
+    } catch (emailError) {
+      console.error("Failed to send review email:", emailError);
+    }
   }
 
   revalidatePath(`/djs/${djProfileSlug}`);
