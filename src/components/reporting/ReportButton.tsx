@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReportModal from "./ReportModal";
+import { useUser } from "@/lib/supabase/useUser";
 
 interface ReportButtonProps {
   targetType: "DJ_PROFILE" | "ORGANIZER_PROFILE" | "GIG" | "REVIEW" | "MEDIA";
@@ -21,6 +22,12 @@ export function ReportButton({
   size = "icon",
 }: ReportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isLoaded } = useUser();
+
+  // Only signed-in users can report content. Hide the button entirely for
+  // guests (rather than showing it and failing on submit) — this applies
+  // everywhere ReportButton is used across the platform.
+  if (!isLoaded || !user) return null;
 
   return (
     <>

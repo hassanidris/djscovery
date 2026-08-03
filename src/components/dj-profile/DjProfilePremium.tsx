@@ -447,6 +447,15 @@ export default function DjProfilePremium({
       name: r.user.name || r.user.username,
       image: r.user.image || "",
     },
+    reviewType: r.reviewType as ReviewItem["reviewType"],
+    event: r.event
+      ? {
+          id: r.event.id,
+          slug: r.event.slug,
+          title: r.event.title,
+          startDate: new Date(r.event.startDate).toISOString().split("T")[0],
+        }
+      : null,
   }));
   const [venues, setVenues] = useState<
     Array<{
@@ -1562,6 +1571,10 @@ export default function DjProfilePremium({
                     avgRating={fetchedAvgRating || safeDJ.avgRating}
                     ratingCount={ratingsTotalCount || safeDJ.ratingCount}
                     reviews={REVIEWS}
+                    djProfileId={djProfileId}
+                    djName={safeDJ.stageName}
+                    djAvatar={safeDJ.avatar}
+                    djSlug={slug}
                   />
                   {/* Load More button for reviews */}
                   {ratingsHasNextPage && (

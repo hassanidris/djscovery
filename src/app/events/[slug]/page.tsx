@@ -25,6 +25,7 @@ import {
   EventReviewSlot,
 } from "@/components/events/EventViewerContext";
 import { VenueReviews } from "@/components/venue/VenueReviews";
+import { EventDjReviews } from "@/components/events/EventDjReviews";
 
 export const revalidate = 60;
 
@@ -637,12 +638,22 @@ function EventDetailView(props: {
               <EventReviewSlot
                 eventId={eventId}
                 status={status}
+                eventTitle={title}
+                eventSlug={slug}
+                eventStartDate={startDate}
+                eventCity={location}
                 djs={allPerformers.map((dj) => ({
                   djProfileId: dj.djProfileId,
                   slug: dj.slug,
                   stageName: dj.stageName,
                   avatar: dj.avatar,
                 }))}
+              />
+
+              {/* Event-anchored DJ reviews (public, visible to all) */}
+              <EventDjReviews
+                eventId={eventId}
+                djSlugs={allPerformers.map((dj) => dj.slug)}
               />
 
               {/* Venue reviews */}

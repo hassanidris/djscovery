@@ -9,7 +9,7 @@ import { toggleEventAttendance } from "@/lib/actions/event-attendance";
 
 interface Props {
   eventId: number;
-  currentStatus: "GOING" | "INTERESTED" | null;
+  currentStatus: "GOING" | "INTERESTED" | "ATTENDED" | null;
   isUpcoming: boolean;
 }
 
@@ -18,9 +18,9 @@ export default function AttendanceButton({
   currentStatus,
   isUpcoming,
 }: Props) {
-  const [status, setStatus] = useState<"GOING" | "INTERESTED" | null>(
-    currentStatus,
-  );
+  const [status, setStatus] = useState<
+    "GOING" | "INTERESTED" | "ATTENDED" | null
+  >(currentStatus);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 

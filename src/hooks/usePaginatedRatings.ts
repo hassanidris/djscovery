@@ -1,15 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-interface RatingItem {
+// Event context attached to event-anchored reviews (null for direct reviews)
+export type RatingEvent = {
+  id: number;
+  slug: string;
+  title: string;
+  startDate: Date;
+};
+
+export interface RatingItem {
   id: number;
   rating: number;
   review: string | null;
+  reviewType: string | null; // "DIRECT" | "EVENT_ATTENDEE" | "EVENT_ORGANIZER" | null
   createdAt: Date;
   user: {
     username: string;
     image: string | null;
     name: string | null;
   };
+  event: RatingEvent | null;
 }
 
 interface PaginatedRatingsResponse {
@@ -19,7 +29,30 @@ interface PaginatedRatingsResponse {
   avgRating: number;
 }
 
-export function usePaginatedRatings(slug: string) {
+/**
+ * Filter mode for the ratings query.
+ *   - undefined  -> all reviews (direct + event)
+ *   - "direct"   -> only direct reviews (eventId IS NULL)
+ *   - number     -> only event-anchored reviews for that event
+ */
+export type RatingFilter = undefined | "direct" | number;
+
+/**
+ * Fetch paginated DjRatings for a DJ profile.
+ *
+ * @param slug     - DJ profile slug
+ * @param filter   - Optional filter:
+ *                     undefined  : all reviews (default, backward compatible)
+ *                     "direct"   : only direct reviews
+ *                     number     : only event-anchored reviews for that event ID
+ *
+ * Backward compatibility: calling `usePaginatedRatings(slug)` (no filter)
+ * behaves exactly as before — returns all reviews.
+ */
+export function usePaginatedRatings(
+  slug: string,
+  filter: RatingFilter = undefined,
+) {
   const [data, setData] = useState<RatingItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -27,6 +60,13 @@ export function usePaginatedRatings(slug: string) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+
+  // Keep a ref to the latest filter so fetchRatings can read it without being
+  // re-created on every render (avoids stale closure issues in useEffect).
+  const filterRef = useRef(filter);
+  useEffect(() => {
+    filterRef.current = filter;
+  }, [filter]);
 
   const fetchRatings = async (pageNum: number, append = false) => {
     setIsLoading(true);
@@ -37,6 +77,14 @@ export function usePaginatedRatings(slug: string) {
         page: pageNum.toString(),
         limit: "10",
       });
+
+      // Add eventId filter when provided
+      const currentFilter = filterRef.current;
+      if (currentFilter === "direct") {
+        queryParams.set("eventId", "direct");
+      } else if (typeof currentFilter === "number") {
+        queryParams.set("eventId", String(currentFilter));
+      }
 
       const response = await fetch(`/api/djs/${slug}/ratings?${queryParams}`);
 
@@ -75,10 +123,11 @@ export function usePaginatedRatings(slug: string) {
     fetchRatings(1, false);
   };
 
+  // Refetch when slug OR filter changes
   useEffect(() => {
     queueMicrotask(() => fetchRatings(1, false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [slug, filter]);
 
   return {
     ratings: data,

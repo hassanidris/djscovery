@@ -13,6 +13,7 @@ import PublicShell from "@/components/PublicShell";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNavServer from "@/components/MobileBottomNavServer";
+import { ReviewModalProvider } from "@/components/reputation/ReviewModalContext";
 import { isComingSoonRoute } from "@/lib/coming-soon";
 
 const inter = Inter({
@@ -93,7 +94,7 @@ export default async function RootLayout({
               footer={<Footer />}
               mobileNav={<MobileBottomNavServer />}
             >
-              {children}
+              <ReviewModalProvider>{children}</ReviewModalProvider>
             </PublicShell>
             <Toaster
               position="bottom-right"

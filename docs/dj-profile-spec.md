@@ -198,7 +198,15 @@ model SocialLink {
 
 #### DjRating
 
+Supports both **direct reviews** (eventId = null) and **event-anchored reviews** (eventId != null). One direct review per user per DJ, one event review per user per event per DJ. Partial unique indexes enforce these constraints (see `prisma/migrations/manual_add_dj_rating_event_support.sql`).
+
 ```prisma
+enum DjRatingType {
+  DIRECT
+  EVENT_ATTENDEE
+  EVENT_ORGANIZER
+}
+
 model DjRating {
   id     Int     @id @default(autoincrement())
   rating Int     // 1-5
@@ -209,13 +217,25 @@ model DjRating {
   djProfileId Int
   djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
 
+  // Event-anchored review support (nullable for direct reviews)
+  eventId    Int?
+  event      Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reviewType DjRatingType? // DIRECT, EVENT_ATTENDEE, EVENT_ORGANIZER
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, djProfileId])
   @@index([djProfileId])
+  @@index([djProfileId, createdAt])
+  @@index([eventId])
+  @@index([reviewType])
 }
 ```
+
+**Unique constraints (via partial indexes in raw SQL):**
+
+- `DjRating_userId_djProfileId_direct_unique` — one direct review per user per DJ (WHERE eventId IS NULL)
+- `DjRating_userId_djProfileId_eventId_event_unique` — one event review per user per event per DJ (WHERE eventId IS NOT NULL)
 
 #### DjFollow (Follow System)
 
