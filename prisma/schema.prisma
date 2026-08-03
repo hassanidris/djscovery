@@ -229,6 +229,12 @@ enum DjPlan {
   PREMIUM
 }
 
+enum DjRatingType {
+  DIRECT
+  EVENT_ATTENDEE
+  EVENT_ORGANIZER
+}
+
 enum OrganizerType {
   INDIVIDUAL
   COMPANY
@@ -888,7 +894,9 @@ model Media {
 
 // ------ DJ RATINGS ------
 
-// One rating per user per DJ; user can update but not duplicate
+// Supports both direct reviews (eventId = null) and event-anchored reviews (eventId != null)
+// One direct review per user per DJ, one event review per user per event per DJ
+// Partial unique indexes are created via raw SQL migration to handle NULL eventId correctly
 model DjRating {
   id     Int     @id @default(autoincrement())
   rating Int // 1-5
@@ -899,12 +907,18 @@ model DjRating {
   djProfileId Int
   djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
 
+  // Event-anchored review support
+  eventId    Int?
+  event      Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reviewType DjRatingType? // DIRECT, EVENT_ATTENDEE, EVENT_ORGANIZER
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, djProfileId])
   @@index([djProfileId])
   @@index([djProfileId, createdAt])
+  @@index([eventId])
+  @@index([reviewType])
 }
 
 // ------ DJ PROFILE COMMENTS ------
@@ -1055,6 +1069,7 @@ model Event {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   venueReviews VenueReview[]
+  djRatings    DjRating[]
 
   @@index([ownerDjId])
   @@index([ownerDjId, status])

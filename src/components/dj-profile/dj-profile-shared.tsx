@@ -21,6 +21,15 @@ export type ReviewItem = {
   review: string;
   date: string;
   user: { name: string; image: string };
+  // Review type context (null for legacy/default reviews)
+  reviewType?: "DIRECT" | "EVENT_ATTENDEE" | "EVENT_ORGANIZER" | null;
+  // Event context for event-anchored reviews (null/omitted for direct reviews)
+  event?: {
+    id: number;
+    slug: string;
+    title: string;
+    startDate: string;
+  } | null;
 };
 
 export type VenueItem = {

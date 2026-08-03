@@ -5,9 +5,12 @@ import { useEffect, useRef, useState } from "react";
 export interface EventViewerState {
   isOwner: boolean;
   isOrganizer: boolean;
+  /** True once the user has RSVP'd (GOING) or is confirmed attended (ATTENDED). */
   hasAttended: boolean;
+  /** True only once attendance is confirmed post-event (ATTENDED). Use this to gate reviews. */
+  canReview: boolean;
   reviewedDjIds: number[];
-  attendanceStatus: "GOING" | "INTERESTED" | null;
+  attendanceStatus: "GOING" | "INTERESTED" | "ATTENDED" | null;
   privateVenue: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -17,6 +20,7 @@ const DEFAULT_STATE: Omit<EventViewerState, "isLoading"> = {
   isOwner: false,
   isOrganizer: false,
   hasAttended: false,
+  canReview: false,
   reviewedDjIds: [],
   attendanceStatus: null,
   privateVenue: null,
@@ -52,6 +56,7 @@ export function useEventViewerContext(eventId?: number): EventViewerState {
           isOwner: !!data.isOwner,
           isOrganizer: !!data.isOrganizer,
           hasAttended: !!data.hasAttended,
+          canReview: !!data.canReview,
           reviewedDjIds: data.reviewedDjIds ?? [],
           attendanceStatus: data.attendanceStatus ?? null,
           privateVenue: data.privateVenue ?? null,

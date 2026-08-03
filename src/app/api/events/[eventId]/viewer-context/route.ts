@@ -21,9 +21,11 @@ export async function GET(
       isOwner: false,
       isOrganizer: false,
       hasAttended: false,
+      canReview: false,
       reviewedDjIds: [],
       attendanceStatus: null,
       privateVenue: null,
+      isAuthenticated: false,
     });
   }
 
@@ -67,10 +69,22 @@ export async function GET(
     select: { status: true },
   });
 
-  const hasAttended = attendance?.status === "GOING";
+  // `hasAttended` is used for gating access that should apply once a user has
+  // RSVP'd (e.g. revealing a private venue address before the event) — it is
+  // true for both "GOING" (upcoming) and "ATTENDED" (post-event, auto-set by
+  // the complete-events cron job) statuses.
+  const hasAttended =
+    attendance?.status === "GOING" || attendance?.status === "ATTENDED";
+  // `canReview` is stricter: reviews should only be allowed once attendance
+  // has been confirmed post-event ("ATTENDED"). Since the complete-events
+  // cron atomically flips GOING -> ATTENDED when an event completes, review
+  // eligibility must check for "ATTENDED" specifically, not "GOING".
+  const canReview = attendance?.status === "ATTENDED";
   const attendanceStatus = attendance?.status ?? null;
 
-  const reviewedDjIds = await prisma.eventReview
+  // Check DjRating table for event-anchored reviews by this user.
+  // (Previously checked EventReview table; now unified into DjRating.)
+  const reviewedDjIds = await prisma.djRating
     .findMany({
       where: {
         eventId: numericEventId,
@@ -89,8 +103,10 @@ export async function GET(
     isOwner,
     isOrganizer,
     hasAttended,
+    canReview,
     reviewedDjIds,
     attendanceStatus,
     privateVenue,
+    isAuthenticated: true,
   });
 }

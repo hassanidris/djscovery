@@ -310,6 +310,8 @@ DROP POLICY IF EXISTS "Recipient can update own notifications" ON "Notification"
 CREATE POLICY "Recipient can update own notifications" ON "Notification" FOR UPDATE TO public USING ("recipientId" = (auth.uid())::text);
 
 -- DjRating: public read; owner can manage own rating
+-- Covers both direct reviews (eventId IS NULL) and event-anchored reviews (eventId IS NOT NULL).
+-- The userId-based policy is sufficient because all review types are owned by the same user.
 ALTER TABLE "DjRating" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read DJ ratings" ON "DjRating";
 CREATE POLICY "Public read DJ ratings" ON "DjRating" FOR SELECT TO public USING (true);
