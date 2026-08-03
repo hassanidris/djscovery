@@ -140,6 +140,10 @@ export default async function DjProfilePage({
         },
         venues: {
           orderBy: { eventDate: "desc" },
+          include: {
+            city: { select: { name: true } },
+            country: { select: { name: true } },
+          },
         },
         // Non-critical fields removed (will be fetched separately):
         // - managerName, managerEmail, managerPhone (ProfessionalTeamSidebar)
@@ -496,7 +500,7 @@ export default async function DjProfilePage({
       (dj as any).events?.map((e: any) => ({
         id: e.id,
         title: e.title,
-        startDate: e.startDate,
+        startDate: new Date(e.startDate).toISOString(),
         venue: e.venue,
         city: e.city?.name || "",
         country: e.country?.name || "",
@@ -508,16 +512,19 @@ export default async function DjProfilePage({
     upcomingEvents:
       (dj as any).events
         ?.filter((e: any) => new Date(e.startDate) >= new Date())
-        .map((e: any) => ({
-          id: e.id,
-          title: e.title,
-          date: e.startDate,
-          eventDate: e.startDate,
-          venue: e.venue,
-          city: e.city?.name || "",
-          country: e.country?.name || "",
-          slug: e.slug,
-        })) || [],
+        .map((e: any) => {
+          const dateStr = new Date(e.startDate).toISOString();
+          return {
+            id: e.id,
+            title: e.title,
+            date: dateStr,
+            eventDate: dateStr,
+            venue: e.venue,
+            city: e.city?.name || "",
+            country: e.country?.name || "",
+            slug: e.slug,
+          };
+        }) || [],
     team: {
       manager: { name: dj.managerName ?? "", email: dj.managerEmail ?? "" },
       bookingAgent: {

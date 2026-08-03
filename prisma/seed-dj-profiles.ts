@@ -66,7 +66,7 @@ const SOCIAL_PLATFORMS = [
 
 async function getOrCreateTestUser(
   email: string,
-  role: "DJ" | "FAN",
+  role: "DJ" | "FAN" | "ORGANIZER",
   password: string = "TestPassword123!",
 ) {
   const admin = createAdminClient();
@@ -320,14 +320,24 @@ async function seedDjProfile(
   });
   console.log(`  Added ${mediaCount} media items`);
 
-  // Seed ratings
+  // Seed ratings — each rating needs a distinct fan user due to the
+  // partial unique index DjRating_userId_djProfileId_direct_unique
+  // (one direct review per user per DJ where eventId IS NULL)
   const fanUserId = await getOrCreateTestUser(FAN_EMAIL, "FAN");
   const ratingCount = plan === "PREMIUM" ? 15 : 5;
   const ratings = [];
   for (let i = 0; i < ratingCount; i++) {
+    // Reuse the primary fan for the first rating, create distinct fans for the rest
+    const raterUserId =
+      i === 0
+        ? fanUserId
+        : await getOrCreateTestUser(
+            `fan-rater-${i}-${slug}@example.com`,
+            "FAN",
+          );
     ratings.push({
       djProfileId: djProfile.id,
-      userId: fanUserId,
+      userId: raterUserId,
       rating: Math.floor(Math.random() * 2) + 4, // 4-5 stars
       review:
         i === 0
@@ -341,7 +351,7 @@ async function seedDjProfile(
     data: ratings,
     skipDuplicates: true,
   });
-  console.log(`  Added ${ratingCount} ratings`);
+  console.log(`  Added ${ratingCount} direct ratings`);
 
   // Seed comments
   const comments = [
@@ -725,6 +735,87 @@ async function seedDjProfile(
   });
   console.log(`  Connected DJ to ${createdEventsList.length} events`);
 
+  // Seed event-anchored reviews (EVENT_ATTENDEE + EVENT_ORGANIZER)
+  // Linked to past events so they show up as completed event reviews
+  const pastEvents = await prisma.event.findMany({
+    where: {
+      ownerDjId: djProfile.id,
+      status: "COMPLETED",
+    },
+    select: { id: true, title: true },
+  });
+
+  if (pastEvents.length > 0) {
+    const eventReviews: Array<{
+      djProfileId: number;
+      userId: string;
+      rating: number;
+      review: string;
+      eventId: number;
+      reviewType: "EVENT_ATTENDEE" | "EVENT_ORGANIZER";
+    }> = [];
+
+    const attendeeReviews = [
+      "Incredible night! The DJ kept the energy high from start to finish.",
+      "Best event I've been to this year. The music selection was on point.",
+      "Amazing atmosphere and the set progression was perfect.",
+      "Loved every minute — the crowd was electric thanks to the DJ.",
+      "Unforgettable performance. Will definitely attend the next one!",
+    ];
+
+    const organizerReviews = [
+      "Professional, punctual, and delivered beyond expectations. Fully recommend.",
+      "Easy to work with and the crowd loved every set. Would book again.",
+      "Excellent communication before the event and an outstanding performance.",
+    ];
+
+    // 1 organizer review per past event
+    for (let e = 0; e < pastEvents.length; e++) {
+      const orgUserId = await getOrCreateTestUser(
+        `organizer-reviewer-${e}-${slug}@example.com`,
+        "ORGANIZER",
+      );
+      eventReviews.push({
+        djProfileId: djProfile.id,
+        userId: orgUserId,
+        rating: 5,
+        review: organizerReviews[e % organizerReviews.length],
+        eventId: pastEvents[e].id,
+        reviewType: "EVENT_ORGANIZER",
+      });
+    }
+
+    // 3 attendee reviews per past event (premium), 2 for free
+    const attendeeCountPerEvent = plan === "PREMIUM" ? 3 : 2;
+    for (let e = 0; e < pastEvents.length; e++) {
+      for (let a = 0; a < attendeeCountPerEvent; a++) {
+        const attendeeUserId = await getOrCreateTestUser(
+          `attendee-reviewer-${e}-${a}-${slug}@example.com`,
+          "FAN",
+        );
+        eventReviews.push({
+          djProfileId: djProfile.id,
+          userId: attendeeUserId,
+          rating: Math.floor(Math.random() * 2) + 4, // 4-5 stars
+          review:
+            attendeeReviews[
+              (e * attendeeCountPerEvent + a) % attendeeReviews.length
+            ],
+          eventId: pastEvents[e].id,
+          reviewType: "EVENT_ATTENDEE",
+        });
+      }
+    }
+
+    await prisma.djRating.createMany({
+      data: eventReviews,
+      skipDuplicates: true,
+    });
+    console.log(
+      `  Added ${eventReviews.length} event reviews (${pastEvents.length} events)`,
+    );
+  }
+
   // Seed profile views
   const viewCount = plan === "PREMIUM" ? 100 : 30;
   const views = [];
@@ -759,8 +850,27 @@ async function main() {
   const isStaging =
     appEnv === "staging" ||
     databaseUrl?.includes("jarmybsjvztwrmsdcnje.supabase.co");
-  const isTest =
-    databaseUrl?.includes("test") || databaseUrl?.includes("localhost");
+
+  // Check for "test" or "localhost" only at host/port boundaries to avoid
+  // matching arbitrary substrings (e.g. "contest-db" or "testing-prod.supabase.co")
+  const isTest = (() => {
+    if (!databaseUrl) return false;
+    try {
+      const url = new URL(databaseUrl);
+      const host = url.hostname;
+      const port = url.port;
+      // Match "localhost" as an exact hostname
+      if (host === "localhost") return true;
+      // Match "test" only as a complete host label (e.g. test.db.local, db.test.local)
+      if (host.split(".").includes("test")) return true;
+      // Match port 5433 (common test DB port) only if explicitly set
+      if (port === "5433") return true;
+      return false;
+    } catch {
+      // Non-URL DATABASE_URL (e.g. Supabase pooler) — fall back to exact localhost match
+      return /(?:^|[/:@])localhost(?=[:/?]|$)/.test(databaseUrl);
+    }
+  })();
 
   if (!isLocal && !isStaging && !isTest) {
     console.error(

@@ -119,7 +119,7 @@ export interface DjDemoData {
   careerHighlights: Array<{
     id: number;
     title: string;
-    year: number;
+    year: string | number;
     description?: string;
   }>;
   endorsements: Array<{

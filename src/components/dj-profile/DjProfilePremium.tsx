@@ -475,7 +475,7 @@ export default function DjProfilePremium({
       (v: any) => ({
         id: v.id || 0,
         venueName: v.venueName || v.venue || "",
-        eventDate: v.eventDate || v.date || "",
+        eventDate: String(v.eventDate || v.date || ""),
         description: v.description || "",
         countryId: v.countryId || 0,
         cityId: v.cityId || 0,
@@ -1379,13 +1379,17 @@ export default function DjProfilePremium({
                         latitude: v.latitude,
                         longitude: v.longitude,
                       }))
-                    : ((djData as any)?.venuesPlayed || []).map((v: any) => ({
+                    : (
+                        (djData as any)?.venues ||
+                        (djData as any)?.venuesPlayed ||
+                        []
+                      ).map((v: any) => ({
                         id: v.id || 0,
-                        venueName: v.venue,
-                        eventDate: v.date || null,
+                        venueName: v.venueName || v.venue,
+                        eventDate: v.eventDate || v.date || null,
                         description: v.description || null,
-                        city: { name: v.city },
-                        country: { name: v.country },
+                        city: { name: v.city?.name || v.city || "" },
+                        country: { name: v.country?.name || v.country || "" },
                         latitude: v.latitude,
                         longitude: v.longitude,
                       }))
