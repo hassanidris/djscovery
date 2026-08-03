@@ -5,6 +5,8 @@ import {
   useContext,
   useState,
   useCallback,
+  useRef,
+  useEffect,
   type ReactNode,
 } from "react";
 import { ReviewModal } from "./ReviewModal";
@@ -56,8 +58,14 @@ const ReviewModalContext = createContext<ReviewModalContextValue | null>(null);
 export function ReviewModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [modalState, setModalState] = useState<ReviewModalState | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const openReviewModal = useCallback((state: ReviewModalState) => {
+    // Clear any pending close timeout before opening
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
     setModalState(state);
     setIsOpen(true);
   }, []);
@@ -65,7 +73,19 @@ export function ReviewModalProvider({ children }: { children: ReactNode }) {
   const closeReviewModal = useCallback(() => {
     setIsOpen(false);
     // Clear state after a short delay to allow close animation
-    setTimeout(() => setModalState(null), 200);
+    closeTimeoutRef.current = setTimeout(() => {
+      setModalState(null);
+      closeTimeoutRef.current = null;
+    }, 200);
+  }, []);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
   }, []);
 
   return (

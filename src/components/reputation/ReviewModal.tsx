@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 import {
   Dialog,
@@ -68,20 +68,47 @@ export function ReviewModal({
   isOrganizer = false,
 }: ReviewModalProps) {
   const [showSuccess, setShowSuccess] = useState(false);
+  const successTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleSuccess = useCallback((created: boolean) => {
-    setShowSuccess(true);
-    // Auto-close after 2 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-      onClose();
-    }, 2000);
-  }, [onClose]);
+  const handleSuccess = useCallback(
+    (created: boolean) => {
+      setShowSuccess(true);
+      // Auto-close after 2 seconds
+      successTimeoutRef.current = setTimeout(() => {
+        setShowSuccess(false);
+        onClose();
+        successTimeoutRef.current = null;
+      }, 2000);
+    },
+    [onClose],
+  );
+
+  // Cancel success timeout when modal closes or unmounts
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+        successTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  // Cancel success timeout when isOpen becomes false
+  useEffect(() => {
+    if (!isOpen && successTimeoutRef.current) {
+      clearTimeout(successTimeoutRef.current);
+      successTimeoutRef.current = null;
+    }
+  }, [isOpen]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (!open) {
         setShowSuccess(false);
+        if (successTimeoutRef.current) {
+          clearTimeout(successTimeoutRef.current);
+          successTimeoutRef.current = null;
+        }
         onClose();
       }
     },
@@ -89,9 +116,7 @@ export function ReviewModal({
   );
 
   const isEventReview = eventId != null && eventId > 0;
-  const title = isEventReview
-    ? `Review DJ. ${djName}`
-    : `Review DJ. ${djName}`;
+  const title = isEventReview ? `Review DJ. ${djName}` : `Review DJ. ${djName}`;
   const description = isEventReview
     ? `Share your experience from "${eventTitle}"`
     : "Share your experience with this DJ";
