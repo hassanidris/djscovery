@@ -47,6 +47,18 @@ WITH review_conflicts AS (
 DELETE FROM "VenueReview"
 WHERE id IN (SELECT delete_id FROM review_conflicts);
 
+-- Step 2.6: Delete VenueReputationScore for non-canonical venues
+-- Each venue has exactly one reputation score. When merging duplicate venues,
+-- we delete the scores for non-canonical venues to avoid unique constraint violations.
+-- The canonical venue's score will be recomputed after the merge to include
+-- all reviews from the merged venues.
+DELETE FROM "VenueReputationScore"
+WHERE "venueId" IN (
+  SELECT v.id FROM "Venue" v
+  JOIN venue_canonical vc ON v."name" = vc."name" AND v."cityId" = vc."cityId"
+  AND v.id != vc.canonical_id
+);
+
 -- Step 3: Remap dependent records to canonical venues
 -- Remap VenueReview records
 UPDATE "VenueReview" vr
@@ -58,15 +70,9 @@ WHERE vr."venueId" IN (
   AND v.id != vc.canonical_id
 );
 
--- Remap VenueReputationScore records
-UPDATE "VenueReputationScore" vrs
-SET "venueId" = vc.canonical_id
-FROM venue_canonical vc
-WHERE vrs."venueId" IN (
-  SELECT v.id FROM "Venue" v
-  JOIN venue_canonical vc ON v."name" = vc."name" AND v."cityId" = vc."cityId"
-  AND v.id != vc.canonical_id
-);
+-- Note: VenueReputationScore records for non-canonical venues were deleted in Step 2.6
+-- The canonical venue's reputation score should be recomputed after the migration
+-- to include all reviews from the merged venues.
 
 -- Step 4: Delete duplicate venues (keeping only the canonical one)
 DELETE FROM "Venue"
@@ -76,10 +82,10 @@ WHERE id IN (
   AND v.id != vc.canonical_id
 );
 
--- Step 6: Drop temporary table
+-- Step 5: Drop temporary table
 DROP TABLE venue_canonical;
 
--- Step 7: Add the unique constraint
+-- Step 6: Add the unique constraint
 -- Note: This is created without CONCURRENTLY, so it will briefly block writes.
 -- This is acceptable because the entire script is executed as one block during a maintenance window.
 ALTER TABLE "Venue"
@@ -89,7 +95,7 @@ UNIQUE ("name", "cityId");
 -- Commit the transaction
 COMMIT;
 
--- Step 8: Verify no duplicates remain
+-- Step 7: Verify no duplicates remain
 SELECT "name", "cityId", COUNT(*) as count
 FROM "Venue"
 GROUP BY "name", "cityId"
