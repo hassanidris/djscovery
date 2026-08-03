@@ -26,8 +26,23 @@ export async function calculateVenueReputationScore(
 ) {
   const venue = await client.venue.findUnique({
     where: { id: venueId },
-    include: {
-      venueReviews: true,
+    select: {
+      name: true,
+      address: true,
+      latitude: true,
+      longitude: true,
+      popularity: true,
+      source: true,
+      venueReviews: {
+        select: {
+          soundSystem: true,
+          atmosphere: true,
+          location: true,
+          accessibility: true,
+          rating: true,
+          createdAt: true,
+        },
+      },
     },
   });
 
@@ -58,7 +73,8 @@ export async function calculateVenueReputationScore(
 
   // 2. Verification (0-50) - based on data source and popularity
   let verificationScore = 0;
-  if (venue.source === "mapbox" || venue.source === "osm") verificationScore += 30;
+  if (venue.source === "mapbox" || venue.source === "osm")
+    verificationScore += 30;
   if (venue.popularity > 10) verificationScore += 20;
 
   // 3. Review Score (0-550) — weighted Bayesian average
@@ -77,27 +93,28 @@ export async function calculateVenueReputationScore(
   let reviewScore = 0;
   if (overallRatings.length > 0) {
     // Weight each category equally
-    const categoryAverage = (
-      soundSystemBayesian + 
-      atmosphereBayesian + 
-      locationBayesian + 
-      accessibilityBayesian
-    ) / 4;
-    
-    reviewScore = Math.round(
-      (categoryAverage / 5) * WEIGHTS.review
-    );
+    const categoryAverage =
+      (soundSystemBayesian +
+        atmosphereBayesian +
+        locationBayesian +
+        accessibilityBayesian) /
+      4;
+
+    reviewScore = Math.round((categoryAverage / 5) * WEIGHTS.review);
   }
 
   // 4. Reliability (0-150) — based on consistency of reviews
   let reliabilityScore = 0;
   if (overallRatings.length > 0) {
     const stdDev = Math.sqrt(
-      overallRatings.reduce((sum, r) => sum + Math.pow(r - overallBayesian, 2), 0) / overallRatings.length
+      overallRatings.reduce(
+        (sum, r) => sum + Math.pow(r - overallBayesian, 2),
+        0,
+      ) / overallRatings.length,
     );
     // Lower standard deviation = higher reliability
     reliabilityScore = Math.round(
-      Math.max(0, (1 - stdDev / 2) * WEIGHTS.reliability)
+      Math.max(0, (1 - stdDev / 2) * WEIGHTS.reliability),
     );
   }
 
@@ -105,10 +122,10 @@ export async function calculateVenueReputationScore(
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const recentReviews = venue.venueReviews.filter((r) => 
-    r.createdAt >= thirtyDaysAgo
+  const recentReviews = venue.venueReviews.filter(
+    (r) => r.createdAt >= thirtyDaysAgo,
   ).length;
-  
+
   const activityScore = Math.min(
     WEIGHTS.activity,
     Math.min(recentReviews, 10) * 10 +
@@ -130,8 +147,7 @@ export async function calculateVenueReputationScore(
   const totalReviewCount = overallRatings.length;
   const confidenceLevel = Math.min(
     1,
-    (totalReviewCount / 10) * 0.6 +
-      (venue.popularity / 20) * 0.4,
+    (totalReviewCount / 10) * 0.6 + (venue.popularity / 20) * 0.4,
   );
 
   return {
