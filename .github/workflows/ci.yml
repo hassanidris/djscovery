@@ -1,5 +1,8 @@
 name: CI
 
+# Runs on pushes to main/dev/feature branches and PRs targeting main/dev.
+# Jobs: test (lint+types+unit), storybook (build), e2e (Playwright), security (audit+gitleaks).
+# e2e runs in parallel with storybook since Playwright builds the app itself.
 on:
   push:
     branches: ["main", "dev", "feature/**"]
