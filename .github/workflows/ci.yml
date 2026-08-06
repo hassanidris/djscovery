@@ -68,7 +68,7 @@ jobs:
   e2e:
     name: End-to-End Tests
     runs-on: ubuntu-latest
-    needs: [test, storybook]
+    needs: [test]
 
     steps:
       - name: Checkout code
