@@ -11,6 +11,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
+  const isBuildTime =
+    process.env.CI === "true" || process.env.NEXT_PUBLIC_APP_ENV === "staging";
+
   const staticUrls: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
@@ -94,6 +97,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   } catch (err) {
     console.error("[sitemap] Failed to fetch DJ profiles:", err);
+    if (!isBuildTime) {
+      throw err;
+    }
   }
 
   try {
@@ -118,6 +124,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   } catch (err) {
     console.error("[sitemap] Failed to fetch events:", err);
+    if (!isBuildTime) {
+      throw err;
+    }
   }
 
   try {
@@ -141,6 +150,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   } catch (err) {
     console.error("[sitemap] Failed to fetch organizer profiles:", err);
+    if (!isBuildTime) {
+      throw err;
+    }
   }
 
   return [...staticUrls, ...djUrls, ...eventUrls, ...organizerUrls];
