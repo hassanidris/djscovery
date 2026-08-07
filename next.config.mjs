@@ -1,7 +1,7 @@
 import { withSentryConfig } from "@sentry/nextjs";
 
-const isCI =
-  process.env.CI === "true" || process.env.NEXT_PUBLIC_APP_ENV === "staging";
+const disableImageOptimization =
+  process.env.DISABLE_IMAGE_OPTIMIZATION === "true";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -43,7 +43,7 @@ const nextConfig = {
     root: import.meta.dirname,
   },
   images: {
-    unoptimized: isCI,
+    unoptimized: disableImageOptimization,
     remotePatterns: [
       { protocol: "https", hostname: "images.pexels.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
