@@ -97,7 +97,7 @@ export default function DjBookingsTabs({ inquiries }: Props) {
 function EmptyState({ message }: { message: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 py-16 text-center">
-      <p className="text-sm text-gray-500">{message}</p>
+      <p className="text-sm text-gray-400">{message}</p>
     </div>
   );
 }

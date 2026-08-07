@@ -230,6 +230,7 @@ export default function MediaVideoModal({
             )}
             <button
               onClick={() => setOpen(false)}
+              aria-label="Close video modal"
               className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
             >
               <X className="h-5 w-5" />
@@ -276,7 +277,7 @@ export default function MediaVideoModal({
                       href={videoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-h_red text-sm underline"
+                      className="text-h_red/80 text-sm underline"
                     >
                       Open on {providerLabel}
                     </a>

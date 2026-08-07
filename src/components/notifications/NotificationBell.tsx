@@ -123,7 +123,7 @@ export default function NotificationBell() {
                 type="button"
                 onClick={handleMarkAllRead}
                 disabled={isPending}
-                className="text-h_red hover:text-h_redDark text-xs transition-colors disabled:opacity-50"
+                className="text-h_red/80 hover:text-h_red/80Dark text-xs transition-colors disabled:opacity-50"
               >
                 Mark all read
               </button>
@@ -139,7 +139,7 @@ export default function NotificationBell() {
             )}
 
             {loaded && notifications.length === 0 && (
-              <div className="px-4 py-8 text-center text-sm text-gray-500">
+              <div className="px-4 py-8 text-center text-sm text-gray-400">
                 No notifications yet
               </div>
             )}
@@ -170,7 +170,7 @@ export default function NotificationBell() {
                       >
                         {meta.title}
                       </p>
-                      <p className="mt-0.5 text-xs text-gray-600">
+                      <p className="mt-0.5 text-xs text-gray-400">
                         {formatDistanceToNow(new Date(n.createdAt), {
                           addSuffix: true,
                         })}

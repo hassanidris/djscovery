@@ -131,10 +131,10 @@ function EmptySectionState({
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/2 py-12 text-center">
       <div className="mb-3 flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/5">
-        <Icon className="h-5 w-5 text-gray-500" />
+        <Icon className="h-5 w-5 text-gray-400" />
       </div>
       <p className="text-sm font-medium text-white">{title}</p>
-      <p className="mt-1 max-w-xs text-xs text-gray-500">{description}</p>
+      <p className="mt-1 max-w-xs text-xs text-gray-400">{description}</p>
       {actionHref ? (
         <Button
           asChild
@@ -175,7 +175,7 @@ function StatPill({
           {trend}
         </span>
       )}
-      <span className="mt-1 text-center text-xs text-gray-500">{label}</span>
+      <span className="mt-1 text-center text-xs text-gray-400">{label}</span>
     </div>
   );
 }
@@ -212,12 +212,12 @@ function MixPlayer({
               className="h-full w-full object-cover"
             />
           ) : (
-            <Music className="text-h_red h-4 w-4" />
+            <Music className="text-h_red/80 h-4 w-4" />
           )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-white">{mix.title}</p>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             {mix.platform} · {mix.duration} · {mix.plays} plays
           </p>
         </div>
@@ -1181,7 +1181,7 @@ export default function DjProfilePremium({
                               <p className="text-sm font-semibold text-white">
                                 {safeSPOTLIGHT.featuredMix.title}
                               </p>
-                              <p className="mt-1 text-xs text-gray-500">
+                              <p className="mt-1 text-xs text-gray-400">
                                 {safeSPOTLIGHT.featuredMix.duration} ·{" "}
                                 {formatPlays(safeSPOTLIGHT.featuredMix.plays)}{" "}
                                 plays
@@ -1226,7 +1226,7 @@ export default function DjProfilePremium({
                                 {safeSPOTLIGHT.featuredVideo?.title ??
                                   "Featured video"}
                               </p>
-                              <p className="mt-1 text-xs text-gray-500">
+                              <p className="mt-1 text-xs text-gray-400">
                                 {safeSPOTLIGHT.featuredVideo?.duration} ·{" "}
                                 {formatPlays(
                                   safeSPOTLIGHT.featuredVideo?.views ?? 0,
@@ -1331,7 +1331,7 @@ export default function DjProfilePremium({
                       ),
                     )
                   ) : (
-                    <div className="py-8 text-center text-gray-500">
+                    <div className="py-8 text-center text-gray-400">
                       No mixes uploaded yet
                     </div>
                   )}
@@ -1441,7 +1441,7 @@ export default function DjProfilePremium({
                                   Venue
                                 </Badge>
                               </div>
-                              <p className="mb-2 text-xs text-gray-500">
+                              <p className="mb-2 text-xs text-gray-400">
                                 {e.role}
                               </p>
                               <p className="text-sm leading-relaxed text-gray-300 italic">
@@ -1499,17 +1499,17 @@ export default function DjProfilePremium({
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="mb-0.5 flex items-center gap-2">
-                                <span className="text-h_red text-xs font-bold">
+                                <span className="text-h_red/80 text-xs font-bold">
                                   {p.outlet}
                                 </span>
-                                <Badge className="border-white/8 bg-white/5 text-[11px] text-gray-500">
+                                <Badge className="border-white/8 bg-white/5 text-[11px] text-gray-400">
                                   {p.type}
                                 </Badge>
                               </div>
                               <p className="line-clamp-2 text-sm font-medium text-white">
                                 {p.title}
                               </p>
-                              <p className="mt-1 text-xs text-gray-600">
+                              <p className="mt-1 text-xs text-gray-400">
                                 {p.date}
                               </p>
                             </div>
@@ -1717,7 +1717,7 @@ export default function DjProfilePremium({
                     <p className="text-xs font-semibold text-white">
                       Response Rate
                     </p>
-                    <p className="text-[11px] text-gray-500">
+                    <p className="text-[11px] text-gray-400">
                       {safeDJ.responseRate > 0
                         ? `${safeDJ.responseRate}% response rate`
                         : "Typically replies within 24h"}
@@ -1765,11 +1765,11 @@ export default function DjProfilePremium({
                 <span className="text-2xl font-bold text-white">
                   {safeDJ.minFee}
                 </span>
-                <span className="mb-0.5 text-sm text-gray-500">
+                <span className="mb-0.5 text-sm text-gray-400">
                   – {safeDJ.maxFee}
                 </span>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 Per event · varies by duration & travel
               </p>
             </Card>

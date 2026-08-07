@@ -42,14 +42,14 @@ export default function GlobalError({
 
           <div className="relative z-10 flex max-w-lg flex-col items-center text-center">
             <div className="bg-h_red/10 border-h_red/20 mb-6 flex size-14 items-center justify-center rounded-xl border">
-              <AlertTriangle className="text-h_red h-6 w-6" />
+              <AlertTriangle className="text-h_red/80 h-6 w-6" />
             </div>
 
             <h1 className="font-heading mb-3 text-2xl text-white sm:text-3xl">
               Something went wrong
             </h1>
 
-            <p className="mb-8 max-w-sm text-sm leading-relaxed text-gray-500">
+            <p className="mb-8 max-w-sm text-sm leading-relaxed text-gray-400">
               A critical error occurred. You can try again or head back to the
               home page.
             </p>

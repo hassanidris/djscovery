@@ -178,7 +178,7 @@ async function EventsTable({
                         <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
                       )}
                       {event.hidden && (
-                        <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                        <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                       )}
                       <div>
                         <Link

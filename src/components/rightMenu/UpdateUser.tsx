@@ -61,13 +61,13 @@ const UpdateUser = ({ user }: { user: User }) => {
             className="relative flex w-full flex-col gap-2 overflow-y-scroll rounded-lg bg-white p-12 shadow-md md:w-1/2 xl:w-1/3"
           >
             <h1 className="text-2xl font-semibold">Update DJ Profile</h1>
-            <div className="mt-4 text-sm text-gray-500">
+            <div className="mt-4 text-sm text-gray-400">
               Update your DJ stage name and bio.
             </div>
 
             <div className="flex flex-wrap justify-start gap-2 xl:gap-3">
               <div className="flex w-full flex-col gap-1">
-                <label className="text-xs text-gray-500">DJ Stage Name</label>
+                <label className="text-xs text-gray-400">DJ Stage Name</label>
                 <input
                   type="text"
                   placeholder="Dj. Echo"
@@ -77,7 +77,7 @@ const UpdateUser = ({ user }: { user: User }) => {
               </div>
 
               <div className="flex w-full flex-col gap-1">
-                <label className="text-xs text-gray-500">Bio</label>
+                <label className="text-xs text-gray-400">Bio</label>
                 <textarea
                   placeholder="Tell your fans about yourself..."
                   className="w-full resize-none rounded-md p-3.25 text-sm ring-1 ring-gray-300"

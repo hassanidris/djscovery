@@ -52,7 +52,7 @@ export default async function GigApplicantsPage({
         <div className="mb-6">
           <Link
             href={`/organizer/gigs/${gigId}`}
-            className="mb-4 flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
+            className="mb-4 flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to Gig
@@ -115,7 +115,7 @@ export default async function GigApplicantsPage({
 
                       {(app.djProfile.city?.name ||
                         app.djProfile.country?.name) && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-400">
                           {[
                             app.djProfile.city?.name,
                             app.djProfile.country?.name,

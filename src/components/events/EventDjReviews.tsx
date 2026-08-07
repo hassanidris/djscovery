@@ -178,10 +178,10 @@ export function EventDjReviews({
                     targetId={String(r.id)}
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 text-gray-500 hover:text-white"
+                    className="h-6 w-6 text-gray-400 hover:text-white"
                   />
                 </div>
-                <span className="mt-1 block text-xs text-gray-600">
+                <span className="mt-1 block text-xs text-gray-400">
                   {new Date(r.createdAt).toLocaleDateString("en-GB", {
                     day: "numeric",
                     month: "short",

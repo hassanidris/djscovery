@@ -304,6 +304,7 @@ export default function MediaLibrary({
                 onClick={() => handleAddUrl("VIDEO")}
                 disabled={videoLoading || !videoUrl.trim()}
                 size="icon"
+                aria-label="Add video URL"
               >
                 {videoLoading ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -327,6 +328,7 @@ export default function MediaLibrary({
                 onClick={() => handleAddUrl("AUDIO")}
                 disabled={audioLoading || !audioUrl.trim()}
                 size="icon"
+                aria-label="Add audio URL"
               >
                 {audioLoading ? (
                   <Loader2 className="size-4 animate-spin" />

@@ -3,7 +3,7 @@ import type { GigStatus, GigApplicationStatus } from "@prisma/client";
 const GIG_STATUS: Record<GigStatus, { label: string; className: string }> = {
   DRAFT: {
     label: "Draft",
-    className: "border-white/10 bg-white/5 text-gray-500",
+    className: "border-white/10 bg-white/5 text-gray-400",
   },
   PUBLISHED: {
     label: "Published",
@@ -27,7 +27,7 @@ const GIG_STATUS: Record<GigStatus, { label: string; className: string }> = {
   },
   EXPIRED: {
     label: "Expired",
-    className: "border-white/8 bg-white/3 text-gray-600",
+    className: "border-white/8 bg-white/3 text-gray-400",
   },
 };
 
@@ -53,7 +53,7 @@ const APP_STATUS: Record<
   },
   WITHDRAWN: {
     label: "Withdrawn",
-    className: "border-white/10 bg-white/5 text-gray-500",
+    className: "border-white/10 bg-white/5 text-gray-400",
   },
 };
 

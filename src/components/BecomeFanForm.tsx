@@ -137,7 +137,7 @@ export default function BecomeFanForm({
             <h2 className="text-sm font-semibold text-gray-300">
               Profile Photo
             </h2>
-            <p className="mt-0.5 text-xs text-gray-500">
+            <p className="mt-0.5 text-xs text-gray-400">
               JPG, PNG or WebP · max 5 MB
             </p>
           </div>
@@ -187,7 +187,7 @@ export default function BecomeFanForm({
                   "Change photo"
                 )}
               </button>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-gray-400">
                 Click the photo or button to upload
               </p>
             </div>
@@ -205,7 +205,7 @@ export default function BecomeFanForm({
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="name" className="text-sm font-medium text-gray-300">
-          Display Name <span className="text-h_red">*</span>
+          Display Name <span className="text-h_red/80">*</span>
         </label>
         <input
           id="name"
@@ -217,7 +217,7 @@ export default function BecomeFanForm({
           placeholder="e.g. John Doe"
           className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
         />
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-400">
           This is how other users will see you on DJcovery.
         </p>
       </div>
@@ -225,7 +225,7 @@ export default function BecomeFanForm({
       <div className="flex flex-col gap-1.5">
         <label htmlFor="bio" className="text-sm font-medium text-gray-300">
           Bio{" "}
-          <span className="text-xs font-normal text-gray-500">(optional)</span>
+          <span className="text-xs font-normal text-gray-400">(optional)</span>
         </label>
         <textarea
           id="bio"
@@ -244,7 +244,7 @@ export default function BecomeFanForm({
             htmlFor="countryId"
             className="text-sm font-medium text-gray-300"
           >
-            Country <span className="text-h_red">*</span>
+            Country <span className="text-h_red/80">*</span>
           </label>
           <select
             id="countryId"
@@ -265,7 +265,7 @@ export default function BecomeFanForm({
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="cityId" className="text-sm font-medium text-gray-300">
-            City <span className="text-h_red">*</span>
+            City <span className="text-h_red/80">*</span>
           </label>
           <select
             id="cityId"
@@ -308,7 +308,7 @@ export default function BecomeFanForm({
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="text-center text-sm text-gray-500 transition-colors hover:text-gray-300"
+          className="text-center text-sm text-gray-400 transition-colors hover:text-gray-300"
         >
           Skip for now
         </button>

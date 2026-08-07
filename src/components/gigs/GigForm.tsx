@@ -173,13 +173,13 @@ function StepIndicator({ current }: { current: number }) {
                     ? "border-white/40 bg-white/15 text-white"
                     : active
                       ? "border-white bg-white text-black"
-                      : "border-white/15 text-gray-600"
+                      : "border-white/15 text-gray-400"
                 }`}
               >
                 {done ? "✓" : s}
               </div>
               <span
-                className={`hidden text-xs sm:block ${active ? "text-white" : "text-gray-600"}`}
+                className={`hidden text-xs sm:block ${active ? "text-white" : "text-gray-400"}`}
               >
                 {label}
               </span>

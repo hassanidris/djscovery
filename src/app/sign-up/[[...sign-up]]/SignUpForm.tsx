@@ -141,12 +141,12 @@ export default function SignUpForm({
           ))}
         </div>
         {selected && (
-          <p className="text-center text-xs text-gray-500">
+          <p className="text-center text-xs text-gray-400">
             {ROLES.find((r) => r.value === selected)?.description}
           </p>
         )}
         {!selected && (
-          <p className="text-center text-xs text-gray-500">
+          <p className="text-center text-xs text-gray-400">
             Browse DJs, follow artists &amp; attend events
           </p>
         )}
@@ -166,7 +166,7 @@ export default function SignUpForm({
 
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-white/10" />
-        <span className="text-xs text-gray-500">or</span>
+        <span className="text-xs text-gray-400">or</span>
         <div className="h-px flex-1 bg-white/10" />
       </div>
 
@@ -218,7 +218,7 @@ export default function SignUpForm({
 
       <p className="text-center text-sm text-gray-400">
         Already have an account?{" "}
-        <Link href="/sign-in" className="text-h_red hover:underline">
+        <Link href="/sign-in" className="text-h_red/80 hover:underline">
           Sign in
         </Link>
       </p>

@@ -27,14 +27,14 @@ export default function FaqPage() {
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
               <div className="bg-h_red/10 border-h_red/20 flex size-10 shrink-0 items-center justify-center rounded-xl border">
-                <CircleHelp className="text-h_red h-5 w-5" />
+                <CircleHelp className="text-h_red/80 h-5 w-5" />
               </div>
-              <span className="text-h_red text-xs font-semibold tracking-[0.15em] uppercase">
+              <span className="text-h_red/80 text-xs font-semibold tracking-[0.15em] uppercase">
                 Help Center
               </span>
             </div>
             <h1 className="font-heading text-4xl text-white md:text-6xl">
-              Frequently Asked <span className="text-h_red">Questions</span>
+              Frequently Asked <span className="text-h_red/80">Questions</span>
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-gray-400 md:text-lg">
               Find answers about DJ profiles, organizer tools, gigs, bookings,
@@ -58,7 +58,7 @@ export default function FaqPage() {
                   <a
                     key={cat.id}
                     href={`#${cat.id}`}
-                    className="hover:text-h_red group flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-white/4"
+                    className="hover:text-h_red/80 group flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-400 transition-colors hover:bg-white/4"
                   >
                     <span className="group-hover:bg-h_red/60 h-1.5 w-1.5 shrink-0 rounded-full bg-white/20 transition-colors" />
                     {cat.label}
@@ -67,12 +67,12 @@ export default function FaqPage() {
               </nav>
 
               <div className="mt-8 border-t border-white/5 pt-6">
-                <p className="mb-3 text-xs text-gray-600">
+                <p className="mb-3 text-xs text-gray-400">
                   Can&apos;t find your answer?
                 </p>
                 <Link
                   href="/contact"
-                  className="text-h_red hover:text-h_redDark inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
+                  className="text-h_red/80 hover:text-h_red/80Dark inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
                 >
                   <Mail className="h-3.5 w-3.5" />
                   Contact Support
@@ -92,7 +92,7 @@ export default function FaqPage() {
               >
                 {/* Category heading */}
                 <div className="mb-6 flex items-baseline gap-3 border-b border-white/5 pb-4">
-                  <span className="text-h_red font-heading text-sm font-bold tabular-nums">
+                  <span className="text-h_red/80 font-heading text-sm font-bold tabular-nums">
                     {String(catIndex + 1).padStart(2, "0")}
                   </span>
                   <h2

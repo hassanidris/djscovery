@@ -71,7 +71,7 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
           </span>
         </div>
 
-        <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+        <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-gray-400">
           <span className="flex items-center gap-1">
             <CalendarDays className="h-3 w-3" />
             {formatEventDate(gig.eventDate)}
@@ -86,7 +86,7 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-        <span className="flex items-center gap-1 text-xs text-gray-500">
+        <span className="flex items-center gap-1 text-xs text-gray-400">
           <Users className="h-3.5 w-3.5" />
           {gig._count.applications} applicant
           {gig._count.applications !== 1 ? "s" : ""}
@@ -149,7 +149,7 @@ export function DjGigCard({
               {typeLabel}
             </span>
             {isDemo && (
-              <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-xs text-gray-500">
+              <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-xs text-gray-400">
                 Demo
               </span>
             )}
@@ -170,7 +170,7 @@ export function DjGigCard({
       </div>
 
       {/* Meta row */}
-      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
         <span className="flex items-center gap-1">
           <CalendarDays className="h-3 w-3" />
           {formatEventDate(gig.eventDate)}
@@ -199,7 +199,7 @@ export function DjGigCard({
             </span>
           ))}
           {gig.requiredGenres.length > 4 && (
-            <span className="rounded-full bg-white/8 px-2 py-0.5 text-xs text-gray-500">
+            <span className="rounded-full bg-white/8 px-2 py-0.5 text-xs text-gray-400">
               +{gig.requiredGenres.length - 4} more
             </span>
           )}
@@ -232,7 +232,7 @@ export function DjGigCard({
             🎪
           </div>
         )}
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-400">
           {gig.organizerProfile.displayName}
         </span>
       </div>

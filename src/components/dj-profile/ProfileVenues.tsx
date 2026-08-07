@@ -72,11 +72,11 @@ export default function ProfileVenues({
               className="bg-h_blackLight/30 flex items-center gap-3 rounded-lg border border-white/5 p-3 transition-colors hover:border-white/10"
             >
               <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-white/8 bg-white/5">
-                <MapPinned className="text-h_red h-3.5 w-3.5" />
+                <MapPinned className="text-h_red/80 h-3.5 w-3.5" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-white">{v.name}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   {v.city}
                   {v.country ? `, ${v.country}` : ""}
                 </p>

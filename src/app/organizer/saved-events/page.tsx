@@ -16,10 +16,10 @@ export default async function OrganizerSavedEventsPage() {
         <h2 className="text-lg font-semibold text-white">Saved Events</h2>
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 py-20 text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
-            <CalendarHeart className="h-6 w-6 text-gray-500" />
+            <CalendarHeart className="h-6 w-6 text-gray-400" />
           </div>
           <p className="text-sm font-medium text-white">No saved events yet</p>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-400">
             Browse{" "}
             <Link
               href="/events"
@@ -38,7 +38,7 @@ export default async function OrganizerSavedEventsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Saved Events</h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-400">
           {events.length} saved {events.length === 1 ? "event" : "events"}
         </p>
       </div>
@@ -59,7 +59,7 @@ export default async function OrganizerSavedEventsPage() {
               />
             ) : (
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white/8">
-                <CalendarDays className="h-6 w-6 text-gray-600" />
+                <CalendarDays className="h-6 w-6 text-gray-400" />
               </div>
             )}
 
@@ -69,7 +69,7 @@ export default async function OrganizerSavedEventsPage() {
                   {event.title}
                 </p>
               </Link>
-              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                 <span className="flex items-center gap-1">
                   <CalendarDays className="h-3 w-3" />
                   {new Date(event.startDate).toLocaleDateString("en-US", {
@@ -88,7 +88,7 @@ export default async function OrganizerSavedEventsPage() {
                 )}
               </div>
               {event.ownerDj && (
-                <p className="mt-0.5 text-xs text-gray-600">
+                <p className="mt-0.5 text-xs text-gray-400">
                   by {event.ownerDj.stageName}
                 </p>
               )}
@@ -99,7 +99,7 @@ export default async function OrganizerSavedEventsPage() {
               className={
                 event.status === "PUBLISHED"
                   ? "border-green-500/30 text-green-400"
-                  : "border-white/10 text-gray-500"
+                  : "border-white/10 text-gray-400"
               }
             >
               {event.status === "PUBLISHED" ? "Live" : event.status}

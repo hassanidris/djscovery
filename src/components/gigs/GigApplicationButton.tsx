@@ -109,7 +109,7 @@ export function GigApplicationButton({
       <div className="flex flex-col gap-3 rounded-xl border border-white/15 p-4">
         <label className="text-sm font-medium text-white">
           Cover message{" "}
-          <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-normal text-gray-400">(optional)</span>
         </label>
         <textarea
           value={message}
@@ -117,7 +117,7 @@ export function GigApplicationButton({
           maxLength={1000}
           rows={4}
           placeholder="Introduce yourself and explain why you're a great fit…"
-          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none"
         />
         <div className="flex gap-2">
           <button

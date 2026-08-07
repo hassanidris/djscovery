@@ -13,10 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export type BookingInquiryStatus =
-  | "PENDING"
-  | "ACCEPTED"
-  | "DECLINED"
-  | "CANCELLED";
+  "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
 export type BookingMessage = {
   id: number;
   body: string;
@@ -190,11 +187,11 @@ export function BookingInquiryCard({
           {formattedEventMeta && (
             <p className="text-sm text-gray-400">{formattedEventMeta}</p>
           )}
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             With {inquiry.counterpartyName}
           </p>
         </div>
-        <p className="text-xs text-gray-500">{footerNote}</p>
+        <p className="text-xs text-gray-400">{footerNote}</p>
       </div>
 
       <div className="mt-5 space-y-4">
@@ -202,7 +199,7 @@ export function BookingInquiryCard({
           <h4 className="text-sm font-semibold text-white">Conversation</h4>
           <div className="mt-3 flex flex-col gap-3">
             {sortedMessages.length === 0 ? (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 No messages yet. Send the first message to confirm details.
               </p>
             ) : (
@@ -231,7 +228,7 @@ export function BookingInquiryCard({
                         {msg.body}
                       </p>
                     </div>
-                    <span className="text-[11px] tracking-wide text-gray-500 uppercase">
+                    <span className="text-[11px] tracking-wide text-gray-400 uppercase">
                       {msg.senderName} ·{" "}
                       {new Date(msg.createdAt).toLocaleString()}
                     </span>

@@ -132,7 +132,7 @@ export function SectionHeading({
         {children}
       </h2>
       {sub && (
-        <p className="mt-0.5 text-xs leading-relaxed text-gray-500">{sub}</p>
+        <p className="mt-0.5 text-xs leading-relaxed text-gray-400">{sub}</p>
       )}
     </div>
   );

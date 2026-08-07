@@ -41,9 +41,9 @@ export default function PrivacyPolicyPage() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="bg-h_red/10 border-h_red/20 flex size-10 shrink-0 items-center justify-center rounded-xl border">
-                <Shield className="text-h_red h-5 w-5" />
+                <Shield className="text-h_red/80 h-5 w-5" />
               </div>
-              <span className="text-h_red text-xs font-semibold tracking-[0.15em] uppercase">
+              <span className="text-h_red/80 text-xs font-semibold tracking-[0.15em] uppercase">
                 Legal
               </span>
             </div>
@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
               We are committed to protecting your privacy and handling your
               personal information transparently and securely.
             </p>
-            <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
+            <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
               <span>Last Updated:</span>
               <span className="font-medium text-gray-400">July 2026</span>
             </div>
@@ -76,9 +76,9 @@ export default function PrivacyPolicyPage() {
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    className="hover:text-h_red group flex items-baseline gap-2.5 text-sm text-gray-500 transition-colors"
+                    className="hover:text-h_red/80 group flex items-baseline gap-2.5 text-sm text-gray-400 transition-colors"
                   >
-                    <span className="text-h_red/40 group-hover:text-h_red min-w-5 text-[11px] font-medium tabular-nums transition-colors">
+                    <span className="text-h_red/80/40 group-hover:text-h_red/80 min-w-5 text-[11px] font-medium tabular-nums transition-colors">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {item.label}
@@ -387,16 +387,16 @@ export default function PrivacyPolicyPage() {
                         <p className="text-sm font-semibold text-white">
                           {provider.name}
                         </p>
-                        <p className="mt-0.5 text-xs text-gray-500">
+                        <p className="mt-0.5 text-xs text-gray-400">
                           {provider.role}
                         </p>
-                        <p className="mt-1 text-[11px] text-gray-600">
+                        <p className="mt-1 text-[11px] text-gray-400">
                           Legal basis: {provider.legal}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     Data processing agreements: Pending — to be executed with
                     Supabase, Vercel, and Sentry (standard GDPR-compliant DPAs)
                   </p>
@@ -530,16 +530,16 @@ export default function PrivacyPolicyPage() {
                         <p className="text-sm font-semibold text-white">
                           {provider.name}
                         </p>
-                        <p className="mt-0.5 text-xs text-gray-500">
+                        <p className="mt-0.5 text-xs text-gray-400">
                           {provider.region}
                         </p>
-                        <p className="mt-1 text-[11px] text-gray-600">
+                        <p className="mt-1 text-[11px] text-gray-400">
                           {provider.mechanism}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     Supplementary measures: Encryption in transit (TLS 1.3) and
                     at rest for all international transfers
                   </p>
@@ -578,22 +578,22 @@ export default function PrivacyPolicyPage() {
                       <p className="text-base font-semibold text-white">
                         Get in touch
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-400">
                         Use our contact form — we typically reply within 1–2
                         business days.
                       </p>
                     </div>
-                    <ArrowRight className="text-h_red h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="text-h_red/80 h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <div className="mt-4 rounded-xl border border-white/5 bg-white/2 px-4 py-3">
                     <p className="text-xs font-semibold text-white">
                       Data Protection Officer
                     </p>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-400">
                       Pending — to be appointed or designate privacy contact
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     Supervisory Authority: IMY (Swedish authority) or local
                     equivalent
                   </p>
@@ -602,7 +602,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Bottom divider */}
               <div className="border-t border-white/5 pt-6">
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-gray-400">
                   &copy; {new Date().getFullYear()} DJcovery. All rights
                   reserved.
                 </p>
@@ -618,7 +618,7 @@ export default function PrivacyPolicyPage() {
 function SectionHeading({ number, title }: { number: number; title: string }) {
   return (
     <div className="mb-5 flex items-baseline gap-3 border-b border-white/5 pb-4">
-      <span className="text-h_red font-heading text-sm font-bold tabular-nums">
+      <span className="text-h_red/80 font-heading text-sm font-bold tabular-nums">
         {String(number).padStart(2, "0")}
       </span>
       <h2 className="font-heading text-xl text-white">{title}</h2>

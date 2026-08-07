@@ -25,14 +25,14 @@ export default async function HomeTrendingDJs() {
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-gray-400">
               Hot DJs everyone&apos;s viewing
-              <span className="text-gray-500"> · Sorted by monthly views</span>
+              <span className="text-gray-400"> · Sorted by monthly views</span>
             </p>
           </div>
           <Button
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red hover:text-h_red hover:bg-white/5"
+            className="text-h_red/80 hover:text-h_red/80 hover:bg-white/5"
           >
             <Link href="/directory?sort=trending">View all →</Link>
           </Button>
@@ -68,7 +68,7 @@ export default async function HomeTrendingDJs() {
                     <p className="truncate text-base font-bold text-white">
                       Dj. {dj.stageName}
                     </p>
-                    <p className="mt-1 truncate text-sm text-gray-500">
+                    <p className="mt-1 truncate text-sm text-gray-400">
                       📍 {dj.city?.name}, {dj.country?.name}
                     </p>
                   </div>

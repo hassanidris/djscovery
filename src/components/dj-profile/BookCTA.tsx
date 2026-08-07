@@ -569,17 +569,17 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
             <div className="mt-3 flex justify-between border-t border-white/5 pt-3">
               <div className="text-center">
                 <p className="text-sm font-bold text-white">{responseRate}%</p>
-                <p className="text-[11px] text-gray-500">Response Rate</p>
+                <p className="text-[11px] text-gray-400">Response Rate</p>
               </div>
               <div className="text-center">
                 <p className="text-sm font-bold text-white">
                   {bookingSuccessRate}%
                 </p>
-                <p className="text-[11px] text-gray-500">Booking Rate</p>
+                <p className="text-[11px] text-gray-400">Booking Rate</p>
               </div>
               <div className="text-center">
                 <p className="text-sm font-bold text-white">&lt;2h</p>
-                <p className="text-[11px] text-gray-500">Reply Time</p>
+                <p className="text-[11px] text-gray-400">Reply Time</p>
               </div>
             </div>
           )}
@@ -689,7 +689,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                             ` – ${form.packagePriceTo.toLocaleString()}`}
                         </p>
                       )}
-                      <p className="mt-2 text-[11px] text-gray-500">
+                      <p className="mt-2 text-[11px] text-gray-400">
                         DJ will provide final quote based on your specific
                         requirements
                       </p>
@@ -796,7 +796,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                 </div>
 
                 {form.packageName && (
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[11px] text-gray-400">
                     If you want the DJ to play in another city,{" "}
                     <button
                       type="button"
@@ -814,7 +814,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                         setIsCustomVenue(false);
                         setVenueSelection("");
                       }}
-                      className="text-h_red hover:text-h_redDark cursor-pointer underline underline-offset-2"
+                      className="text-h_red/80 hover:text-h_red/80Dark cursor-pointer underline underline-offset-2"
                     >
                       use the general booking form
                     </button>
@@ -868,7 +868,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                             setVenueSelection("");
                             setForm((prev) => ({ ...prev, venue: "" }));
                           }}
-                          className="text-left text-xs text-gray-500 underline-offset-2 hover:text-gray-300 hover:underline"
+                          className="text-left text-xs text-gray-400 underline-offset-2 hover:text-gray-300 hover:underline"
                         >
                           Choose from known venues instead
                         </button>
@@ -928,7 +928,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                             <span className="text-sm font-medium">
                               {opt.label}
                             </span>
-                            <span className="text-[11px] text-gray-500">
+                            <span className="text-[11px] text-gray-400">
                               {opt.hint}
                             </span>
                           </button>
@@ -1016,7 +1016,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                   <p
                     className={cn(
                       "text-right text-xs",
-                      messageTooShort ? "text-amber-400" : "text-gray-500",
+                      messageTooShort ? "text-amber-400" : "text-gray-400",
                     )}
                   >
                     {messageLength}/{MIN_MESSAGE_LENGTH} min characters

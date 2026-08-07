@@ -38,7 +38,7 @@ export function ContactForm({
     return (
       <div className="flex flex-col items-center gap-6 rounded-2xl border border-white/5 bg-white/2 px-8 py-16 text-center">
         <div className="bg-h_red/10 border-h_red/20 flex size-16 items-center justify-center rounded-2xl border">
-          <CheckCircle2 className="text-h_red h-8 w-8" />
+          <CheckCircle2 className="text-h_red/80 h-8 w-8" />
         </div>
         <div className="flex flex-col gap-2">
           <h2 className="font-heading text-2xl text-white">Message sent!</h2>
@@ -49,7 +49,7 @@ export function ContactForm({
         </div>
         <button
           onClick={() => window.location.reload()}
-          className="text-h_red text-sm font-medium underline-offset-4 hover:underline"
+          className="text-h_red/80 text-sm font-medium underline-offset-4 hover:underline"
         >
           Send another message
         </button>
@@ -80,7 +80,7 @@ export function ContactForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <Label htmlFor="name">
-            Full name <span className="text-h_red">*</span>
+            Full name <span className="text-h_red/80">*</span>
           </Label>
           <Input
             id="name"
@@ -102,7 +102,7 @@ export function ContactForm({
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">
-            Email address <span className="text-h_red">*</span>
+            Email address <span className="text-h_red/80">*</span>
           </Label>
           <Input
             id="email"
@@ -126,7 +126,7 @@ export function ContactForm({
       {/* Category */}
       <div className="flex flex-col gap-2">
         <Label htmlFor="category">
-          Category <span className="text-h_red">*</span>
+          Category <span className="text-h_red/80">*</span>
         </Label>
         <select
           id="category"
@@ -157,7 +157,7 @@ export function ContactForm({
       {/* Message */}
       <div className="flex flex-col gap-2">
         <Label htmlFor="message">
-          Message <span className="text-h_red">*</span>
+          Message <span className="text-h_red/80">*</span>
         </Label>
         <textarea
           id="message"
@@ -177,7 +177,7 @@ export function ContactForm({
 
       {/* Submit */}
       <div className="flex items-center justify-between gap-4">
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-gray-400">
           We typically reply within 1–2 business days.
         </p>
         <Button

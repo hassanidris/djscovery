@@ -16,10 +16,10 @@ export default async function OrganizerFollowedDjsPage() {
         <h2 className="text-lg font-semibold text-white">Followed DJs</h2>
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 py-20 text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
-            <Users className="h-6 w-6 text-gray-500" />
+            <Users className="h-6 w-6 text-gray-400" />
           </div>
           <p className="text-sm font-medium text-white">No followed DJs yet</p>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-400">
             Browse the{" "}
             <Link
               href="/directory"
@@ -38,7 +38,7 @@ export default async function OrganizerFollowedDjsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Followed DJs</h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-400">
           Following {djs.length} {djs.length === 1 ? "DJ" : "DJs"}
         </p>
       </div>

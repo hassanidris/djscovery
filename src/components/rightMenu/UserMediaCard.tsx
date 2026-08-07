@@ -15,27 +15,27 @@ const UserMediaCard = async ({ user }: { user: User }) => {
   });
 
   return (
-    <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm flex flex-col gap-4">
+    <div className="bg-h_blackLight/50 flex flex-col gap-4 rounded-lg p-4 text-sm shadow-md">
       {/* Top */}
-      <div className="flex justify-between items-center font-medium">
+      <div className="flex items-center justify-between font-medium">
         <span className="text-gray-200">User Media</span>
         <Link
           href="#"
-          className="text-h_red hover:text-h_redDark text-xs"
+          className="text-h_red/80 hover:text-h_red/80Dark text-xs"
         >
           See all
         </Link>
       </div>
       {/* Bottom */}
-      <div className="flex gap-4 justify-between flex-wrap">
+      <div className="flex flex-wrap justify-between gap-4">
         {mediaItems.length ? (
           mediaItems.map((media) => (
-            <div className="relative w-1/5 h-24" key={media.id}>
+            <div className="relative h-24 w-1/5" key={media.id}>
               <Image
                 src={media.url}
                 alt=""
                 fill
-                className="object-cover rounded-md ring-1 ring-h_black"
+                className="ring-h_black rounded-md object-cover ring-1"
               />
             </div>
           ))

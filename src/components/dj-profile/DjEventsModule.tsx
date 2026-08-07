@@ -39,7 +39,7 @@ function EventCard({ e, isOwner }: { e: EventItem; isOwner?: boolean }) {
     <Card className="bg-h_blackLight/30 min-w-65 gap-0 border-white/8 p-4 transition-colors hover:border-white/15 sm:min-w-0">
       <div className="flex items-start gap-4">
         <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-md border">
-          <span className="text-h_red text-[10px] leading-none font-bold uppercase">
+          <span className="text-h_red/80 text-[10px] leading-none font-bold uppercase">
             {month}
           </span>
           <span className="mt-0.5 text-base leading-none font-bold text-white">
@@ -48,7 +48,7 @@ function EventCard({ e, isOwner }: { e: EventItem; isOwner?: boolean }) {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-white">{e.title}</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-gray-400">
             {[e.venue, e.city].filter(Boolean).join(" · ")}
           </p>
           <div className="mt-2 flex items-center gap-2">
@@ -82,12 +82,12 @@ function PastEventRow({ e }: { e: EventItem }) {
 
   return (
     <div className="flex min-w-65 items-center gap-4 rounded-lg border border-white/5 bg-white/5 px-4 py-3 sm:min-w-0">
-      <span className="shrink-0 text-xs text-gray-500">{formattedDate}</span>
+      <span className="shrink-0 text-xs text-gray-400">{formattedDate}</span>
       <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
         {e.title}
       </span>
-      <span className="shrink-0 text-xs text-gray-500">{e.venue}</span>
-      <span className="shrink-0 text-xs text-gray-500">{e.city}</span>
+      <span className="shrink-0 text-xs text-gray-400">{e.venue}</span>
+      <span className="shrink-0 text-xs text-gray-400">{e.city}</span>
     </div>
   );
 }
@@ -215,12 +215,12 @@ export default function DjEventsModule({
               "relative px-4 py-2.5 text-xs font-medium transition-colors",
               activeTab === tab.key
                 ? "text-white"
-                : "text-gray-500 hover:text-gray-300",
+                : "text-gray-400 hover:text-gray-300",
             )}
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className="ml-1.5 text-gray-600">({tab.count})</span>
+              <span className="ml-1.5 text-gray-400">({tab.count})</span>
             )}
             {activeTab === tab.key && (
               <div className="bg-h_red absolute right-0 bottom-0 left-0 h-0.5" />
@@ -235,7 +235,7 @@ export default function DjEventsModule({
           {upcoming.length === 0 ? (
             <div className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-white/10 px-4 py-8 text-center">
               <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-white/5">
-                <CalendarDays className="h-5 w-5 text-gray-600" />
+                <CalendarDays className="h-5 w-5 text-gray-400" />
               </div>
               <p className="text-sm font-medium text-gray-400">
                 Currently booking for Q3 2026 — check availability
@@ -298,7 +298,7 @@ export default function DjEventsModule({
           )}
           <div className="flex gap-2 overflow-x-auto pb-2 sm:flex-col sm:overflow-visible">
             {filteredPast.length === 0 ? (
-              <div className="min-w-0 flex-1 py-8 text-center text-sm text-gray-500">
+              <div className="min-w-0 flex-1 py-8 text-center text-sm text-gray-400">
                 No past events match the selected filters
               </div>
             ) : (
@@ -327,12 +327,12 @@ export default function DjEventsModule({
             ))}
           </div>
           <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-5">
-            <div className="mb-3 text-xs text-gray-500">{calendarLabel}</div>
+            <div className="mb-3 text-xs text-gray-400">{calendarLabel}</div>
             <div className="grid grid-cols-7 gap-1.5">
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
                 <div
                   key={d}
-                  className="pb-1 text-center text-[11px] font-semibold text-gray-600"
+                  className="pb-1 text-center text-[11px] font-semibold text-gray-400"
                 >
                   {d}
                 </div>
@@ -343,12 +343,12 @@ export default function DjEventsModule({
                   className={cn(
                     "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
                     status === "booked" &&
-                      "bg-h_red/20 text-h_red border-h_red/30 border",
+                      "bg-h_red/20 text-h_red/80 border-h_red/30 border",
                     status === "tentative" &&
                       "border border-amber-500/30 bg-amber-500/20 text-amber-400",
                     status === "available" &&
                       "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
-                    status === "free" && "text-gray-600 hover:bg-white/5",
+                    status === "free" && "text-gray-400 hover:bg-white/5",
                   )}
                 >
                   {day}

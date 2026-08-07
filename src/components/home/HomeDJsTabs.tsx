@@ -61,7 +61,7 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
                 {activeTab === "new"
                   ? "Fresh talent just joined"
                   : "Top performers"}
-                <span className="text-gray-500">
+                <span className="text-gray-400">
                   {" · "}
                   {activeTab === "new"
                     ? "Newest profiles first"
@@ -73,7 +73,7 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
               asChild
               variant="ghost"
               size="sm"
-              className="text-h_red hover:text-h_red shrink-0 hover:bg-white/5"
+              className="text-h_red/80 hover:text-h_red/80 shrink-0 hover:bg-white/5"
             >
               <Link href={viewAllHref}>View all →</Link>
             </Button>
@@ -128,7 +128,7 @@ function DJCard({
     >
       <Card className="bg-h_blackLight/50 hover:ring-h_red relative flex h-full w-56 shrink-0 cursor-pointer flex-col gap-3 overflow-visible p-4 ring-white/5 transition-all">
         {rank !== undefined && (
-          <Badge className="bg-h_redDark/50 text-h_red absolute top-2 left-2 border-0">
+          <Badge className="bg-h_redDark/50 text-h_red/80 absolute top-2 left-2 border-0">
             #{rank}
           </Badge>
         )}
@@ -160,7 +160,7 @@ function DJCard({
             <p className="mx-auto w-40 truncate text-sm leading-tight font-semibold text-white">
               Dj. {dj.stageName}
             </p>
-            <p className="mt-0.5 text-xs text-gray-500">
+            <p className="mt-0.5 text-xs text-gray-400">
               📍 {dj.city}, {dj.country}
             </p>
           </div>

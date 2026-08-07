@@ -28,7 +28,7 @@ const NotFound = () => {
         </h1>
 
         {/* Body */}
-        <p className="mb-8 max-w-sm text-sm leading-relaxed text-gray-500">
+        <p className="mb-8 max-w-sm text-sm leading-relaxed text-gray-400">
           The page you&apos;re looking for has been dropped from the setlist.
           Head back to the main stage.
         </p>

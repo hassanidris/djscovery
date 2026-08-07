@@ -60,12 +60,12 @@ function EmailSection({ currentEmail }: { currentEmail: string }) {
           <Mail className="h-4 w-4" />
           Email Address
         </h2>
-        <p className="mt-0.5 text-xs text-gray-500">
+        <p className="mt-0.5 text-xs text-gray-400">
           Your login email cannot be changed.
         </p>
       </div>
       <div className="flex items-center gap-2 rounded-lg border border-white/8 bg-white/3 px-3 py-2.5">
-        <Mail className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+        <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" />
         <span className="text-sm text-gray-300">{currentEmail}</span>
       </div>
     </section>
@@ -179,7 +179,7 @@ function LinkedAccountsSection({
         </p>
       </div>
       {identities.length === 0 ? (
-        <p className="text-sm text-gray-500">No linked social accounts.</p>
+        <p className="text-sm text-gray-400">No linked social accounts.</p>
       ) : (
         <div className="flex flex-col gap-2">
           {identities.map((identity) => (
@@ -190,7 +190,7 @@ function LinkedAccountsSection({
               <span className="text-sm text-white capitalize">
                 {PROVIDER_ICONS[identity.provider] ?? identity.provider}
               </span>
-              <span className="text-xs text-gray-500">Connected</span>
+              <span className="text-xs text-gray-400">Connected</span>
             </div>
           ))}
         </div>

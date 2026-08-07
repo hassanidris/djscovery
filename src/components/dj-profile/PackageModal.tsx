@@ -200,7 +200,7 @@ export default function PackageModal({
                 <button
                   type="button"
                   onClick={() => removePackage(index)}
-                  className="text-gray-500 transition-colors hover:text-red-400"
+                  className="text-gray-400 transition-colors hover:text-red-400"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -259,7 +259,7 @@ export default function PackageModal({
                       updatePackage(index, "name", e.target.value)
                     }
                     placeholder="Custom package name"
-                    className="focus:border-h_red/50 mt-2 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border_h_red/50 mt-2 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                 )}
               </div>
@@ -280,7 +280,7 @@ export default function PackageModal({
                       )
                     }
                     placeholder="2500"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                 </div>
                 <div>
@@ -298,7 +298,7 @@ export default function PackageModal({
                       )
                     }
                     placeholder="4000"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                 </div>
               </div>
@@ -312,7 +312,7 @@ export default function PackageModal({
                   onChange={(e) =>
                     updatePackage(index, "currency", e.target.value)
                   }
-                  className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-600"
+                  className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400"
                 >
                   {CURRENCIES.map((currency) => (
                     <option
@@ -337,7 +337,7 @@ export default function PackageModal({
                     updatePackage(index, "duration", e.target.value || null)
                   }
                   placeholder="3-4 hours"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                 />
               </div>
 
@@ -354,14 +354,14 @@ export default function PackageModal({
                           updateFeature(index, featureIndex, e.target.value)
                         }
                         placeholder="e.g., Custom setlist"
-                        className="focus:border-h_red/50 flex-1 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                        className="focus:border-h_red/50 flex-1 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => removeFeature(index, featureIndex)}
-                        className="text-gray-500 hover:text-red-400"
+                        className="text-gray-400 hover:text-red-400"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -411,7 +411,7 @@ export default function PackageModal({
                     )
                   }
                   placeholder="0"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                 />
               </div>
             </div>

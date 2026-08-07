@@ -42,12 +42,12 @@ export default function AccountSettingsForm({
             <Lock className="h-4 w-4" />
             Email Address
           </h2>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             Your login email cannot be changed.
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-white/8 bg-white/3 px-3 py-2.5">
-          <Lock className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+          <Lock className="h-3.5 w-3.5 shrink-0 text-gray-400" />
           <span className="text-sm text-gray-300">{currentEmail}</span>
         </div>
       </section>
@@ -60,7 +60,7 @@ export default function AccountSettingsForm({
             <KeyRound className="h-4 w-4" />
             Password
           </h2>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             Change your password. Must be at least 8 characters.
           </p>
         </div>
@@ -132,7 +132,7 @@ export default function AccountSettingsForm({
             <AlertTriangle className="h-4 w-4" />
             Danger Zone
           </h2>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             These actions are permanent and cannot be undone.
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function AccountSettingsForm({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-medium text-white">Delete Account</p>
-              <p className="mt-0.5 text-xs text-gray-500">
+              <p className="mt-0.5 text-xs text-gray-400">
                 Permanently delete your account and all associated data.
               </p>
             </div>

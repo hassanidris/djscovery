@@ -79,7 +79,7 @@ export default async function OrganizerGigDetailPage({
         <div className="mb-6 flex items-center justify-between">
           <Link
             href="/organizer/gigs"
-            className="flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
+            className="flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             My Gigs
@@ -128,8 +128,8 @@ export default async function OrganizerGigDetailPage({
               key={label}
               className="flex flex-col gap-1 rounded-xl border border-white/8 bg-white/3 p-4"
             >
-              <Icon className="mb-1 h-4 w-4 text-gray-600" />
-              <p className="text-xs text-gray-500">{label}</p>
+              <Icon className="mb-1 h-4 w-4 text-gray-400" />
+              <p className="text-xs text-gray-400">{label}</p>
               <p className="text-sm font-medium text-white">{value}</p>
             </div>
           ))}
@@ -155,7 +155,7 @@ export default async function OrganizerGigDetailPage({
           <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             {gig.requiredExperienceLevel !== "OPEN" && (
               <div>
-                <dt className="text-xs text-gray-500">Experience</dt>
+                <dt className="text-xs text-gray-400">Experience</dt>
                 <dd className="text-white capitalize">
                   {gig.requiredExperienceLevel.toLowerCase()}
                 </dd>
@@ -163,7 +163,7 @@ export default async function OrganizerGigDetailPage({
             )}
             {gig.setDurationMinutes && (
               <div>
-                <dt className="text-xs text-gray-500">Set duration</dt>
+                <dt className="text-xs text-gray-400">Set duration</dt>
                 <dd className="text-white">
                   {formatDuration(gig.setDurationMinutes)}
                 </dd>
@@ -171,32 +171,32 @@ export default async function OrganizerGigDetailPage({
             )}
             {gig.guestCount && (
               <div>
-                <dt className="text-xs text-gray-500">Guest count</dt>
+                <dt className="text-xs text-gray-400">Guest count</dt>
                 <dd className="text-white">~{gig.guestCount}</dd>
               </div>
             )}
             {gig.dressCode && (
               <div>
-                <dt className="text-xs text-gray-500">Dress code</dt>
+                <dt className="text-xs text-gray-400">Dress code</dt>
                 <dd className="text-white">{gig.dressCode}</dd>
               </div>
             )}
             {gig.mcRequired && (
               <div>
-                <dt className="text-xs text-gray-500">MC</dt>
+                <dt className="text-xs text-gray-400">MC</dt>
                 <dd className="text-white">Required</dd>
               </div>
             )}
             {gig.micRequired && (
               <div>
-                <dt className="text-xs text-gray-500">Microphone</dt>
+                <dt className="text-xs text-gray-400">Microphone</dt>
                 <dd className="text-white">Required</dd>
               </div>
             )}
           </dl>
           {gig.requiredGenres.length > 0 && (
             <div className="mt-4">
-              <dt className="mb-2 text-xs text-gray-500">Required genres</dt>
+              <dt className="mb-2 text-xs text-gray-400">Required genres</dt>
               <div className="flex flex-wrap gap-1.5">
                 {gig.requiredGenres.map((g) => (
                   <span
@@ -217,7 +217,7 @@ export default async function OrganizerGigDetailPage({
             <h2 className="mb-4 text-sm font-semibold text-white">Equipment</h2>
             {gig.venueProvides.length > 0 && (
               <div className="mb-3">
-                <p className="mb-2 text-xs text-gray-500">Venue provides</p>
+                <p className="mb-2 text-xs text-gray-400">Venue provides</p>
                 <div className="flex flex-wrap gap-1.5">
                   {gig.venueProvides.map((e) => (
                     <span
@@ -232,7 +232,7 @@ export default async function OrganizerGigDetailPage({
             )}
             {gig.djMustBring.length > 0 && (
               <div>
-                <p className="mb-2 text-xs text-gray-500">DJ must bring</p>
+                <p className="mb-2 text-xs text-gray-400">DJ must bring</p>
                 <div className="flex flex-wrap gap-1.5">
                   {gig.djMustBring.map((e) => (
                     <span
@@ -300,7 +300,7 @@ export default async function OrganizerGigDetailPage({
           className="flex items-center justify-between rounded-xl border border-white/10 px-5 py-4 transition-colors hover:border-white/20"
         >
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-gray-500" />
+            <Users className="h-4 w-4 text-gray-400" />
             <span className="text-sm text-white">View Applicants</span>
           </div>
           <span className="text-sm font-semibold text-white">

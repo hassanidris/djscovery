@@ -244,28 +244,28 @@ function EventCard({ event, djSlug }: { event: DjEventItem; djSlug: string }) {
           >
             {statusTheme.label}
           </Badge>
-          <span className="text-xs text-gray-500">{event.role}</span>
+          <span className="text-xs text-gray-400">{event.role}</span>
         </div>
 
         <div className="flex items-center gap-2 text-sm text-gray-300">
-          <CalendarDays className="h-3.5 w-3.5 text-gray-500" />
+          <CalendarDays className="h-3.5 w-3.5 text-gray-400" />
           <span>{dateDisplay}</span>
           {event.venue && (
             <>
-              <span className="text-gray-600">·</span>
-              <span className="text-gray-500">{event.venue}</span>
+              <span className="text-gray-400">·</span>
+              <span className="text-gray-400">{event.venue}</span>
             </>
           )}
         </div>
 
         {event.location && (
           <div className="flex items-center gap-2 text-sm text-gray-400">
-            <MapPin className="h-3.5 w-3.5 text-gray-500" />
+            <MapPin className="h-3.5 w-3.5 text-gray-400" />
             <span className="truncate">{event.location}</span>
           </div>
         )}
 
-        <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3 text-xs text-gray-500">
+        <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3 text-xs text-gray-400">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <Eye className="h-3.5 w-3.5" />
@@ -280,7 +280,7 @@ function EventCard({ event, djSlug }: { event: DjEventItem; djSlug: string }) {
               {event.galleryCount}
             </span>
           </div>
-          <span className="text-h_red group-hover:text-h_redLight flex items-center gap-1">
+          <span className="text-h_red/80 group-hover:text-h_red/80Light flex items-center gap-1">
             Details
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </span>
@@ -293,7 +293,7 @@ function EventCard({ event, djSlug }: { event: DjEventItem; djSlug: string }) {
 function EmptyState({ message }: { message: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 py-16 text-center">
-      <p className="text-sm text-gray-500">{message}</p>
+      <p className="text-sm text-gray-400">{message}</p>
     </div>
   );
 }

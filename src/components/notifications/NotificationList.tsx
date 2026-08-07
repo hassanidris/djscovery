@@ -54,7 +54,7 @@ export function NotificationList({
             type="button"
             onClick={handleMarkAllRead}
             disabled={isPending}
-            className="text-h_red hover:text-h_redDark flex items-center gap-1.5 text-sm font-medium transition-colors disabled:opacity-50"
+            className="text-h_red/80 hover:text-h_red/80Dark flex items-center gap-1.5 text-sm font-medium transition-colors disabled:opacity-50"
           >
             <CheckCheck className="h-4 w-4" />
             {isPending ? "Marking..." : "Mark all read"}

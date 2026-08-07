@@ -26,7 +26,7 @@ function StarRating({ rating }: { rating: number }) {
           className={`h-3.5 w-3.5 ${
             i < rating
               ? "fill-amber-400 text-amber-400"
-              : "fill-transparent text-gray-600"
+              : "fill-transparent text-gray-400"
           }`}
         />
       ))}
@@ -77,7 +77,7 @@ export default function ReviewListItem({ review: r }: { review: Review }) {
               )}
             </div>
             {(r.djProfile.city || r.djProfile.country) && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 {[r.djProfile.city?.name, r.djProfile.country?.name]
                   .filter(Boolean)
                   .join(", ")}
@@ -88,7 +88,9 @@ export default function ReviewListItem({ review: r }: { review: Review }) {
 
         <div className="flex shrink-0 flex-col items-end gap-1">
           <StarRating rating={r.rating} />
-          <span className="text-xs text-gray-600">{formatDate(r.updatedAt)}</span>
+          <span className="text-xs text-gray-400">
+            {formatDate(r.updatedAt)}
+          </span>
         </div>
       </div>
 

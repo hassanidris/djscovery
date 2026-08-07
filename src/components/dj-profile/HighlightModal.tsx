@@ -101,7 +101,7 @@ export default function HighlightModal({
                 <button
                   type="button"
                   onClick={() => removeHighlight(index)}
-                  className="text-gray-500 transition-colors hover:text-red-400"
+                  className="text-gray-400 transition-colors hover:text-red-400"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -119,7 +119,7 @@ export default function HighlightModal({
                     }
                     placeholder="e.g., 2024"
                     maxLength={4}
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function HighlightModal({
                     updateHighlight(index, "title", e.target.value)
                   }
                   placeholder="e.g., Headlined Afro Nation Portugal"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                 />
               </div>
               <div>
@@ -146,7 +146,7 @@ export default function HighlightModal({
                     updateHighlight(index, "description", e.target.value)
                   }
                   placeholder="Additional details about this achievement..."
-                  className="focus:border-h_red/50 min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  className="focus:border-h_red/50 min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                 />
               </div>
             </div>

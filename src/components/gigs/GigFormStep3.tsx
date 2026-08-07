@@ -49,7 +49,7 @@ function EquipmentAssignmentList({
     <div>
       {/* Quick actions */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-gray-500">Quick assign:</span>
+        <span className="text-xs text-gray-400">Quick assign:</span>
         <button
           type="button"
           onClick={() => {
@@ -83,7 +83,7 @@ function EquipmentAssignmentList({
       </div>
 
       {/* Column headers */}
-      <div className="mb-1 grid grid-cols-[1fr_60px_60px] items-center gap-2 px-3 text-xs font-medium text-gray-500">
+      <div className="mb-1 grid grid-cols-[1fr_60px_60px] items-center gap-2 px-3 text-xs font-medium text-gray-400">
         <span>Item</span>
         <span className="text-center">Venue</span>
         <span className="text-center">DJ</span>
@@ -114,7 +114,7 @@ function EquipmentAssignmentList({
                 className={`rounded-md py-1 text-xs font-medium transition-colors ${
                   inVenue
                     ? "bg-white text-black"
-                    : "border border-white/10 text-gray-500 hover:border-white/25 hover:text-gray-300"
+                    : "border border-white/10 text-gray-400 hover:border-white/25 hover:text-gray-300"
                 }`}
               >
                 Venue
@@ -125,7 +125,7 @@ function EquipmentAssignmentList({
                 className={`rounded-md py-1 text-xs font-medium transition-colors ${
                   inDJ
                     ? "bg-white text-black"
-                    : "border border-white/10 text-gray-500 hover:border-white/25 hover:text-gray-300"
+                    : "border border-white/10 text-gray-400 hover:border-white/25 hover:text-gray-300"
                 }`}
               >
                 DJ
@@ -137,7 +137,7 @@ function EquipmentAssignmentList({
 
       {/* Summary */}
       {(venueProvides.length > 0 || djMustBring.length > 0) && (
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-2 text-xs text-gray-400">
           {venueProvides.length > 0 &&
             `Venue: ${venueProvides.length} item${venueProvides.length > 1 ? "s" : ""}`}
           {venueProvides.length > 0 && djMustBring.length > 0 && " · "}
@@ -160,7 +160,7 @@ export function GigFormStep3({
     data.budgetType === "FIXED" || data.budgetType === "RANGE";
 
   const amountInputCls = (hasError: boolean) =>
-    `w-full rounded-lg border px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none ${
+    `w-full rounded-lg border px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:outline-none ${
       hasError
         ? "border-red-500/50 bg-red-500/5"
         : "border-white/10 bg-white/5 focus:border-white/25"
@@ -170,7 +170,7 @@ export function GigFormStep3({
     <div className="flex flex-col gap-8">
       {/* Equipment section */}
       <section>
-        <h3 className="mb-4 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+        <h3 className="mb-4 text-xs font-semibold tracking-wider text-gray-400 uppercase">
           Equipment
         </h3>
         <EquipmentAssignmentList
@@ -182,7 +182,7 @@ export function GigFormStep3({
 
       {/* Budget section */}
       <section>
-        <h3 className="mb-4 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+        <h3 className="mb-4 text-xs font-semibold tracking-wider text-gray-400 uppercase">
           Budget
         </h3>
 
@@ -202,7 +202,7 @@ export function GigFormStep3({
                 }`}
               >
                 <span className="text-sm font-medium">{opt.label}</span>
-                <span className="text-xs text-gray-500">{opt.hint}</span>
+                <span className="text-xs text-gray-400">{opt.hint}</span>
               </button>
             );
           })}
@@ -214,7 +214,7 @@ export function GigFormStep3({
             {data.budgetType === "RANGE" ? (
               <>
                 <div className="flex-1">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1 block text-xs text-gray-400">
                     Minimum
                   </label>
                   <input
@@ -232,7 +232,7 @@ export function GigFormStep3({
                   )}
                 </div>
                 <div className="flex-1">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1 block text-xs text-gray-400">
                     Maximum
                   </label>
                   <input
@@ -252,7 +252,7 @@ export function GigFormStep3({
               </>
             ) : (
               <div className="flex-1">
-                <label className="mb-1 block text-xs text-gray-500">
+                <label className="mb-1 block text-xs text-gray-400">
                   Amount
                 </label>
                 <input
@@ -271,7 +271,7 @@ export function GigFormStep3({
               </div>
             )}
             <div className="w-24 shrink-0">
-              <label className="mb-1 block text-xs text-gray-500">
+              <label className="mb-1 block text-xs text-gray-400">
                 Currency
               </label>
               <input
@@ -282,7 +282,7 @@ export function GigFormStep3({
                 }
                 maxLength={3}
                 placeholder="SEK"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white uppercase placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white uppercase placeholder:text-gray-400 focus:border-white/25 focus:outline-none"
               />
             </div>
           </div>

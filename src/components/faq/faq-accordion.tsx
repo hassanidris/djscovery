@@ -34,7 +34,7 @@ export default function FaqAccordion({
             value={value}
             className="border-b border-white/8 last:border-0"
           >
-            <AccordionTrigger className="hover:text-h_red data-[state=open]:text-h_red py-5 text-left text-sm font-semibold text-white transition-colors hover:no-underline sm:text-base">
+            <AccordionTrigger className="hover:text-h_red/80 data-[state=open]:text-h_red/80 py-5 text-left text-sm font-semibold text-white transition-colors hover:no-underline sm:text-base">
               {item.question}
             </AccordionTrigger>
             <AccordionContent className="pb-5 text-sm leading-relaxed text-gray-400">

@@ -74,7 +74,7 @@ export function GigReviewForm({
           Rate your experience with {djName}
         </CardTitle>
         {gigTitle && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             How did {djName} perform at{" "}
             <strong className="text-gray-300">{gigTitle}</strong>?
           </p>
@@ -97,12 +97,12 @@ export function GigReviewForm({
                 className={`h-6 w-6 ${
                   star <= activeRating
                     ? "fill-amber-400 text-amber-400"
-                    : "text-gray-600"
+                    : "text-gray-400"
                 }`}
               />
             </button>
           ))}
-          <span className="ml-2 text-xs text-gray-500">
+          <span className="ml-2 text-xs text-gray-400">
             {activeRating > 0 ? `${activeRating} / 5` : "Select a rating"}
           </span>
         </div>
@@ -112,13 +112,13 @@ export function GigReviewForm({
           onChange={(e) => setReview(e.target.value)}
           placeholder="Tell us about the DJ's performance, professionalism, and how they fit the event..."
           disabled={isPending}
-          className="focus-visible:ring-h_red min-h-25 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-600"
+          className="focus-visible:ring-h_red min-h-25 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-400"
         />
 
         {error && <p className="text-xs text-red-400">{error}</p>}
 
         <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             {review.trim().length}/30 characters minimum
           </p>
           <Button

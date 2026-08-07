@@ -42,7 +42,7 @@ export default function BecomeOrganizerForm() {
           htmlFor="displayName"
           className="text-sm font-medium text-gray-300"
         >
-          Display Name <span className="text-h_red">*</span>
+          Display Name <span className="text-h_red/80">*</span>
         </label>
         <input
           id="displayName"
@@ -54,7 +54,7 @@ export default function BecomeOrganizerForm() {
           maxLength={80}
           className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-500 ring-1 ring-white/20 transition-all outline-none"
         />
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-400">
           This is the name DJs will see on your profile and gig postings.
         </p>
       </div>
@@ -64,7 +64,7 @@ export default function BecomeOrganizerForm() {
           htmlFor="organizerType"
           className="text-sm font-medium text-gray-300"
         >
-          Organizer Type <span className="text-h_red">*</span>
+          Organizer Type <span className="text-h_red/80">*</span>
         </label>
         <select
           id="organizerType"
@@ -82,7 +82,7 @@ export default function BecomeOrganizerForm() {
             </option>
           ))}
         </select>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-400">
           Shown as a badge on your public profile. You can change it later.
         </p>
       </div>

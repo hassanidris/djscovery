@@ -59,7 +59,9 @@ export default function NotificationItem({
 
         <div className="mt-2 flex items-center gap-3">
           {meta.href && meta.cta && (
-            <span className="text-h_red text-sm font-medium">{meta.cta} →</span>
+            <span className="text-h_red/80 text-sm font-medium">
+              {meta.cta} →
+            </span>
           )}
           <span className="text-xs text-zinc-600">
             {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}

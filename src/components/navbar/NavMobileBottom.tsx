@@ -72,7 +72,7 @@ export default function NavMobileBottom({
                   "flex flex-1 flex-col items-center justify-center gap-1 py-3 transition-colors",
                   isActive
                     ? "text-white"
-                    : "text-gray-500 hover:text-gray-300 active:text-gray-200",
+                    : "text-gray-400 hover:text-gray-300 active:text-gray-200",
                 )}
                 aria-label="You"
                 aria-current={isActive ? "page" : undefined}
@@ -119,7 +119,7 @@ export default function NavMobileBottom({
                 "flex flex-1 flex-col items-center justify-center gap-1 py-3 transition-colors",
                 isActive
                   ? "text-white"
-                  : "text-gray-500 hover:text-gray-300 active:text-gray-200",
+                  : "text-gray-400 hover:text-gray-300 active:text-gray-200",
               )}
               aria-label={item.label}
               aria-current={isActive ? "page" : undefined}
@@ -127,7 +127,7 @@ export default function NavMobileBottom({
               <Icon
                 className={cn(
                   "h-5.5 w-5.5 shrink-0 transition-colors",
-                  isActive ? "text-h_red" : "",
+                  isActive ? "text-h_red/80" : "",
                 )}
                 aria-hidden
               />

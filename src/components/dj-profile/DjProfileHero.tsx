@@ -188,7 +188,8 @@ function DjProfileHero({
 
             {/* Location directly under the name */}
             <p className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-400">
-              <MapPin className="text-h_red h-3 w-3" /> {DJ.city}, {DJ.country}
+              <MapPin className="text-h_red/80 h-3 w-3" /> {DJ.city},{" "}
+              {DJ.country}
             </p>
 
             {isOwner && reputationDetail && (
@@ -403,7 +404,7 @@ function DjProfileStats({
                   ? "text-amber-400"
                   : s.green
                     ? "text-emerald-400"
-                    : "text-gray-500",
+                    : "text-gray-400",
               )}
             >
               <SIcon

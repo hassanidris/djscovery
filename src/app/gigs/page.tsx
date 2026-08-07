@@ -149,11 +149,11 @@ export default async function GigsPage({
         <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
-              <Briefcase className="text-h_red h-6 w-6" />
+              <Briefcase className="text-h_red/80 h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
               <h1 className="text-h_white text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-                Open <span className="text-h_red/80">Gigs</span>
+                Open <span className="text-h_red/80/80">Gigs</span>
               </h1>
               <p className="text-sm leading-relaxed text-gray-400">
                 Browse all available gig opportunities from organizers looking

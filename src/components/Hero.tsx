@@ -48,7 +48,7 @@ const Hero = async () => {
               Get Discovered. <br />
               Get Booked.
               <br />
-              <span className="text-h_red font-bold">
+              <span className="text-h_red/80 font-bold">
                 Build Your Reputation.{" "}
               </span>
             </h1>

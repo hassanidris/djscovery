@@ -130,7 +130,7 @@ export function OrganizerReviewForm({
           Rate your experience with {organizerName}
         </CardTitle>
         {gigTitle && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             How was your experience with{" "}
             <strong className="text-gray-300">{organizerName}</strong> for{" "}
             <strong className="text-gray-300">{gigTitle}</strong>?
@@ -170,13 +170,13 @@ export function OrganizerReviewForm({
           onChange={(e) => setReview(e.target.value)}
           placeholder="Tell us about the organizer's communication, payment process, professionalism, and venue quality..."
           disabled={isPending}
-          className="focus-visible:ring-h_red min-h-28 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-600"
+          className="focus-visible:ring-h_red min-h-28 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-400"
         />
 
         {error && <p className="text-xs text-red-400">{error}</p>}
 
         <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             {review.trim().length}/30 characters minimum
           </p>
           <Button

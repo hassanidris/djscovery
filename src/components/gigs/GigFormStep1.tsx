@@ -48,7 +48,7 @@ export function GigFormStep1({
   }, [data.countryId]);
 
   const inputCls =
-    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none";
+    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none";
   const selectCls =
     "w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white focus:border-white/25 focus:outline-none";
 
@@ -93,7 +93,7 @@ export function GigFormStep1({
           ))}
         </select>
         {typeDescription && (
-          <p className="mt-1.5 text-xs text-gray-500">{typeDescription}</p>
+          <p className="mt-1.5 text-xs text-gray-400">{typeDescription}</p>
         )}
         {errors.gigType && (
           <p className="mt-1 text-xs text-red-400">{errors.gigType}</p>
@@ -109,7 +109,7 @@ export function GigFormStep1({
           <div>
             <label
               htmlFor="event-date"
-              className="mb-1 block text-xs text-gray-500"
+              className="mb-1 block text-xs text-gray-400"
             >
               Date
             </label>
@@ -133,7 +133,7 @@ export function GigFormStep1({
           <div>
             <label
               htmlFor="event-time"
-              className="mb-1 block text-xs text-gray-500"
+              className="mb-1 block text-xs text-gray-400"
             >
               Time
             </label>
@@ -210,14 +210,14 @@ export function GigFormStep1({
       <div>
         <label className="mb-1.5 block text-sm font-medium text-white">
           Description{" "}
-          <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-normal text-gray-400">(optional)</span>
         </label>
         <textarea
           value={data.description}
           onChange={(e) => onChange("description", e.target.value)}
           rows={4}
           placeholder="Describe the gig, atmosphere, and what you're looking for in a DJ…"
-          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none"
         />
       </div>
 

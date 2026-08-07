@@ -166,7 +166,7 @@ export default async function DjEventsPage() {
                     <p className="mb-2 text-sm text-gray-300">
                       {moderation.adminComment}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-400">
                       Requested by{" "}
                       {moderation.admin.name || moderation.admin.username}
                     </p>
@@ -187,7 +187,7 @@ export default async function DjEventsPage() {
       {emptyState ? (
         <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 py-24 text-center">
           <h2 className="text-lg font-semibold text-white">No events yet</h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-400">
             Create your first event or get added as a performer by another DJ.
           </p>
           <Button className="mt-6" asChild>

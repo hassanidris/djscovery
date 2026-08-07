@@ -522,7 +522,7 @@ export function GigListingPageSkeleton() {
         <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
-              <Briefcase className="text-h_red h-6 w-6" />
+              <Briefcase className="text-h_red/80 h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
               <Skeleton className="h-9 w-40 rounded" />

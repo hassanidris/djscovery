@@ -198,7 +198,7 @@ const FilterBottomSheet = ({
                         onClick={() => toggleGenre(g)}
                         className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
                           draft.genre.includes(g)
-                            ? "bg-h_red/20 border-h_red text-h_red"
+                            ? "bg-h_red/20 border-h_red text-h_red/80"
                             : "border-gray-700 bg-transparent text-gray-400 hover:border-gray-500 hover:text-gray-200"
                         }`}
                       >
@@ -222,7 +222,7 @@ const FilterBottomSheet = ({
                       onClick={() => toggleDjType(t.value)}
                       className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
                         draft.djType.includes(t.value)
-                          ? "bg-h_red/20 border-h_red text-h_red"
+                          ? "bg-h_red/20 border-h_red text-h_red/80"
                           : "border-gray-700 bg-transparent text-gray-400 hover:border-gray-500 hover:text-gray-200"
                       }`}
                     >
@@ -265,7 +265,7 @@ const FilterBottomSheet = ({
               <section>
                 <p
                   className={`mb-3 text-xs font-semibold tracking-wider uppercase ${
-                    draft.country ? "text-gray-400" : "text-gray-600"
+                    draft.country ? "text-gray-400" : "text-gray-400"
                   }`}
                 >
                   City
@@ -279,7 +279,7 @@ const FilterBottomSheet = ({
                   className={`w-full rounded-lg px-3 py-2.5 text-sm ring-1 transition-colors outline-none ${
                     draft.country
                       ? "bg-h_black/60 focus:ring-h_red text-gray-300 ring-gray-700"
-                      : "bg-h_black/30 cursor-not-allowed text-gray-600 ring-gray-800"
+                      : "bg-h_black/30 cursor-not-allowed text-gray-400 ring-gray-800"
                   }`}
                 >
                   <option value="" className="bg-h_blackLight">

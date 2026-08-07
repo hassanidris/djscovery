@@ -68,20 +68,18 @@ export default async function HomeEventsSection({ userCountryName }: Props) {
     const dbSlugs = new Set(dbEvents.map((e) => e.slug));
     const demoUpcoming = getDemoEvents()
       .filter((e) => e.daysOffset > 0 && !dbSlugs.has(e.slug))
-      .map(
-        (e): EventCardItem => ({
-          slug: e.slug,
-          title: e.title,
-          eventType: e.eventType,
-          category: e.category,
-          startDate: e.eventDate,
-          posterUrl: e.posterUrl ?? null,
-          location: [e.city, e.country].filter(Boolean).join(", "),
-          djName: slugToName(e.djSlug),
-          djSlug: e.djSlug,
-          isDemo: true,
-        }),
-      );
+      .map((e): EventCardItem => ({
+        slug: e.slug,
+        title: e.title,
+        eventType: e.eventType,
+        category: e.category,
+        startDate: e.eventDate,
+        posterUrl: e.posterUrl ?? null,
+        location: [e.city, e.country].filter(Boolean).join(", "),
+        djName: slugToName(e.djSlug),
+        djSlug: e.djSlug,
+        isDemo: true,
+      }));
 
     events = [...events, ...demoUpcoming];
   }
@@ -123,7 +121,7 @@ export default async function HomeEventsSection({ userCountryName }: Props) {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red hover:text-h_red hover:bg-white/5"
+            className="text-h_red/80 hover:text-h_red/80 hover:bg-white/5"
           >
             <Link href="/events">View all →</Link>
           </Button>

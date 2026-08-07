@@ -45,14 +45,14 @@ export default async function Page({
             placeholder="Email"
             required
             autoFocus
-            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 outline-none ring-1 ring-white/20 transition-all"
+            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
           />
           <ForgotPasswordSubmitBtn />
         </form>
 
         <p className="text-center text-sm text-gray-400">
           Remember it?{" "}
-          <Link href="/sign-in" className="text-h_red hover:underline">
+          <Link href="/sign-in" className="text-h_red/80 hover:underline">
             Sign in
           </Link>
         </p>

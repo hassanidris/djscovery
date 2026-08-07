@@ -144,7 +144,7 @@ export default function ProfileReviews({
             {avgRating.toFixed(1)}
           </span>
           <Stars rating={avgRating} size="lg" />
-          <span className="text-xs text-gray-500">{ratingCount} reviews</span>
+          <span className="text-xs text-gray-400">{ratingCount} reviews</span>
         </div>
         <div className="flex flex-1 flex-col justify-center gap-2">
           {[5, 4, 3, 2, 1].map((s) => {
@@ -160,7 +160,7 @@ export default function ProfileReviews({
                 </span>
                 <Star className="h-3 w-3 shrink-0 text-amber-400" />
                 <Progress value={pct} className="h-1.5 flex-1 bg-white/8" />
-                <span className="w-8 text-right text-xs text-gray-600">
+                <span className="w-8 text-right text-xs text-gray-400">
                   {count}
                 </span>
               </div>
@@ -185,7 +185,7 @@ export default function ProfileReviews({
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTab === tab.key
                   ? "bg-white/10 text-white"
-                  : "text-gray-500 hover:bg-white/5 hover:text-gray-300"
+                  : "text-gray-400 hover:bg-white/5 hover:text-gray-300"
               }`}
             >
               {tab.label}
@@ -193,7 +193,7 @@ export default function ProfileReviews({
                 className={`rounded-full px-1.5 py-0.5 text-[10px] ${
                   activeTab === tab.key
                     ? "bg-white/15 text-white"
-                    : "bg-white/5 text-gray-600"
+                    : "bg-white/5 text-gray-400"
                 }`}
               >
                 {tab.count}
@@ -207,7 +207,7 @@ export default function ProfileReviews({
       <div className="flex flex-col gap-4">
         {filteredReviews.length === 0 ? (
           <div className="rounded-xl border border-white/5 bg-white/3 p-8 text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               {activeTab === "direct"
                 ? "No direct reviews yet."
                 : activeTab === "event"
@@ -258,13 +258,13 @@ export default function ProfileReviews({
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-600">{r.date}</span>
+                      <span className="text-xs text-gray-400">{r.date}</span>
                       <ReportButton
                         targetType="REVIEW"
                         targetId={String(r.id)}
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 text-gray-500 hover:text-white"
+                        className="h-6 w-6 text-gray-400 hover:text-white"
                       />
                     </div>
                   </div>
@@ -275,10 +275,10 @@ export default function ProfileReviews({
                       href={`/events/${r.event.slug}`}
                       className="mt-1.5 inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/3 px-2 py-1 text-xs text-gray-400 transition-colors hover:bg-white/5 hover:text-gray-200"
                     >
-                      <Calendar className="h-3 w-3 shrink-0 text-gray-500" />
+                      <Calendar className="h-3 w-3 shrink-0 text-gray-400" />
                       <span className="truncate">{r.event.title}</span>
-                      <span className="text-gray-600">·</span>
-                      <span className="shrink-0 text-gray-600">
+                      <span className="text-gray-400">·</span>
+                      <span className="shrink-0 text-gray-400">
                         {r.event.startDate}
                       </span>
                     </Link>

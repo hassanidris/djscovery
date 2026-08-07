@@ -294,7 +294,7 @@ export default async function AdminDjReviewPage({
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-gray-500">
+                      <div className="flex h-full items-center justify-center text-gray-400">
                         <Music className="h-8 w-8" />
                       </div>
                     )}

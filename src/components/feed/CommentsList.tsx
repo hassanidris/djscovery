@@ -105,13 +105,13 @@ const CommentsList = ({
             <input
               type="text"
               placeholder="Write a comment…"
-              className="text-h_white flex-1 bg-transparent outline-none placeholder:text-gray-500"
+              className="text-h_white flex-1 bg-transparent outline-none placeholder:text-gray-400"
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
             <button
               type="submit"
-              className="hover:text-h_red shrink-0 text-gray-500 transition-colors"
+              className="hover:text-h_red/80 shrink-0 text-gray-400 transition-colors"
             >
               <Send className="h-4 w-4" />
             </button>
@@ -120,7 +120,7 @@ const CommentsList = ({
       ) : (
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8 shrink-0 opacity-40 ring-1 ring-gray-700">
-            <AvatarFallback className="bg-gray-700 text-xs text-gray-500">
+            <AvatarFallback className="bg-gray-700 text-xs text-gray-400">
               ?
             </AvatarFallback>
           </Avatar>
@@ -128,10 +128,10 @@ const CommentsList = ({
             href="/sign-up"
             className="group hover:ring-h_red/50 flex flex-1 items-center justify-between rounded-xl bg-gray-800/40 px-4 py-2 ring-1 ring-gray-700 transition-all"
           >
-            <span className="text-sm text-gray-500 transition-colors group-hover:text-gray-400">
+            <span className="text-sm text-gray-400 transition-colors group-hover:text-gray-300">
               Sign up to join the conversation…
             </span>
-            <span className="text-h_red ml-3 shrink-0 text-xs font-semibold">
+            <span className="text-h_red/80 ml-3 shrink-0 text-xs font-semibold">
               Sign Up →
             </span>
           </Link>
@@ -176,7 +176,7 @@ const CommentsList = ({
                       {comment.content}
                     </p>
                   </div>
-                  <div className="mt-1 flex items-center gap-4 px-1 text-xs text-gray-500">
+                  <div className="mt-1 flex items-center gap-4 px-1 text-xs text-gray-400">
                     <span className="text-[11px]">
                       {comment.createdAt
                         ? new Date(comment.createdAt).toLocaleDateString(

@@ -220,7 +220,7 @@ export default async function AdminHiresPage({
                                 : Number(hire.agreedRate).toFixed(2)}
                             </span>
                           ) : (
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-400">
                               Not set
                             </span>
                           )}

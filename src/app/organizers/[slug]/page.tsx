@@ -267,7 +267,7 @@ export default async function OrganizerPublicProfilePage({
                   <MapPin className="h-3.5 w-3.5" /> {location}
                 </span>
               )}
-              <span className="text-gray-600">·</span>
+              <span className="text-gray-400">·</span>
               <span>Organizer since {memberSince}</span>
             </div>
 
@@ -331,7 +331,7 @@ export default async function OrganizerPublicProfilePage({
                 Active Gigs
               </h2>
               {activeGigs.length > 0 && (
-                <span className="bg-h_red/20 text-h_red rounded-full px-2 py-0.5 text-xs font-medium">
+                <span className="bg-h_red/20 text-h_red/80 rounded-full px-2 py-0.5 text-xs font-medium">
                   {activeGigs.length}
                 </span>
               )}
@@ -340,7 +340,7 @@ export default async function OrganizerPublicProfilePage({
             {activeGigs.length === 0 ? (
               <div className="rounded-xl border border-dashed border-white/10 p-8 text-center">
                 <Briefcase className="mx-auto mb-2 h-6 w-6 text-gray-700" />
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-300">
                   No active gigs at this time.
                 </p>
               </div>
@@ -353,7 +353,7 @@ export default async function OrganizerPublicProfilePage({
                   >
                     <div>
                       <p className="font-medium text-white">{gig.title}</p>
-                      <p className="mt-0.5 text-xs text-gray-500">
+                      <p className="mt-0.5 text-xs text-gray-400">
                         {new Date(gig.eventDate).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
@@ -398,7 +398,7 @@ export default async function OrganizerPublicProfilePage({
                     className="flex items-center justify-between rounded-xl border border-white/8 px-5 py-3 text-sm"
                   >
                     <span className="text-gray-400">{gig.title}</span>
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-gray-400">
                       {new Date(gig.updatedAt).toLocaleDateString("en-US", {
                         month: "short",
                         year: "numeric",
@@ -435,7 +435,7 @@ export default async function OrganizerPublicProfilePage({
                 Contact via website
                 <ExternalLink className="h-3.5 w-3.5 opacity-60" />
               </a>
-              <p className="mt-2 text-xs text-gray-600">
+              <p className="mt-2 text-xs text-gray-400">
                 Direct contact details are kept private.
               </p>
             </section>

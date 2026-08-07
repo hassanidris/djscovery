@@ -62,17 +62,17 @@ const PostInteraction = ({
           <Heart
             className={`h-4 w-4 transition-colors ${
               optimisticLike.isLiked
-                ? "fill-h_red text-h_red"
-                : "group-hover:text-h_red text-gray-500"
+                ? "fill-h_red text-h_red/80"
+                : "group-hover:text-h_red/80 text-gray-400"
             }`}
           />
-          <span className="text-xs text-gray-500 transition-colors group-hover:text-gray-300">
+          <span className="text-xs text-gray-400 transition-colors group-hover:text-gray-300">
             {optimisticLike.likeCount}
             <span className="hidden sm:inline"> Likes</span>
           </span>
         </button>
       </form>
-      <div className="flex items-center gap-1.5 text-gray-500">
+      <div className="flex items-center gap-1.5 text-gray-400">
         <MessageCircle className="h-4 w-4" />
         <span className="text-xs">
           {commentNumber}

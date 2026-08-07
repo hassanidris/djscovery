@@ -60,7 +60,7 @@ export default function ProfileAbout({
         </p>
         <button
           onClick={onToggleBio}
-          className="text-h_red mt-2 text-xs transition-colors hover:text-red-400"
+          className="text-h_red/80 mt-2 text-xs transition-colors hover:text-red-400"
         >
           {bioExpanded ? "Show less" : "Read more"}
         </button>
@@ -69,18 +69,18 @@ export default function ProfileAbout({
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-400">
           {experienceYears && experienceYears > 0 && (
             <span>
-              <span className="text-gray-500">Experience:</span>{" "}
+              <span className="text-gray-400">Experience:</span>{" "}
               {experienceYears} {experienceYears === 1 ? "year" : "years"}
             </span>
           )}
           {experienceLevel && experienceLevel !== "0" && (
             <span>
-              <span className="text-gray-500">Level:</span> {experienceLevel}
+              <span className="text-gray-400">Level:</span> {experienceLevel}
             </span>
           )}
           {(feeMin || feeMax) && (
             <span>
-              <span className="text-gray-500">Fee:</span>{" "}
+              <span className="text-gray-400">Fee:</span>{" "}
               {feeMin && feeMax
                 ? `${formatFee(feeMin)} - ${formatFee(feeMax)}`
                 : feeMin
@@ -93,7 +93,7 @@ export default function ProfileAbout({
             !experienceLevel &&
             !feeMin &&
             !feeMax && (
-              <span className="text-gray-600 italic">
+              <span className="text-gray-400 italic">
                 No experience or fee information added
               </span>
             )}
@@ -103,7 +103,7 @@ export default function ProfileAbout({
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-400">
           {bookingEmail && (
             <span>
-              <span className="text-gray-500">Email:</span>{" "}
+              <span className="text-gray-400">Email:</span>{" "}
               <a
                 href={`mailto:${bookingEmail}`}
                 className="text-gray-300 transition-colors hover:text-white"
@@ -114,7 +114,7 @@ export default function ProfileAbout({
           )}
           {bookingPhone && (
             <span>
-              <span className="text-gray-500">Phone:</span>{" "}
+              <span className="text-gray-400">Phone:</span>{" "}
               <a
                 href={`tel:${bookingPhone}`}
                 className="text-gray-300 transition-colors hover:text-white"
@@ -124,14 +124,14 @@ export default function ProfileAbout({
             </span>
           )}
           {isOwner && !bookingEmail && !bookingPhone && (
-            <span className="text-gray-600 italic">
+            <span className="text-gray-400 italic">
               No contact information added
             </span>
           )}
         </div>
       )}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="shrink-0 text-xs text-gray-500">Specializes in:</span>
+        <span className="shrink-0 text-xs text-gray-400">Specializes in:</span>
         {djTypes.map((t) => (
           <Badge
             key={t}

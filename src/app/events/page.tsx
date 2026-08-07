@@ -97,20 +97,18 @@ export default async function EventsPage({
           return false;
         return true;
       })
-      .map(
-        (e): EventCardItem => ({
-          slug: e.slug,
-          title: e.title,
-          eventType: e.eventType,
-          category: e.category,
-          startDate: e.eventDate,
-          posterUrl: e.posterUrl ?? null,
-          location: [e.city, e.country].filter(Boolean).join(", "),
-          djName: slugToName(e.djSlug),
-          djSlug: e.djSlug,
-          isDemo: true,
-        }),
-      );
+      .map((e): EventCardItem => ({
+        slug: e.slug,
+        title: e.title,
+        eventType: e.eventType,
+        category: e.category,
+        startDate: e.eventDate,
+        posterUrl: e.posterUrl ?? null,
+        location: [e.city, e.country].filter(Boolean).join(", "),
+        djName: slugToName(e.djSlug),
+        djSlug: e.djSlug,
+        isDemo: true,
+      }));
 
     events = [...events, ...demoFiltered];
 
@@ -128,11 +126,11 @@ export default async function EventsPage({
         <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
-              <CalendarDays className="text-h_red h-6 w-6" />
+              <CalendarDays className="text-h_red/80 h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
               <h1 className="text-h_white text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-                DJ <span className="text-h_red/80">Events</span>
+                DJ <span className="text-h_red/80/80">Events</span>
               </h1>
               <p className="text-sm leading-relaxed text-gray-400">
                 Discover DJ events happening around the world.
@@ -140,7 +138,7 @@ export default async function EventsPage({
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-h_red/10 text-h_red border-h_red/20 gap-1.5 border px-3 py-1">
+            <Badge className="bg-h_red/10 text-h_red/80 border-h_red/20 gap-1.5 border px-3 py-1">
               <CalendarDays className="h-3 w-3" /> {events.length} event
               {events.length !== 1 ? "s" : ""}
             </Badge>

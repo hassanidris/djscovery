@@ -108,6 +108,7 @@ export default function MediaCard({
             variant="secondary"
             className="h-7 w-7 bg-black/60 text-white backdrop-blur-sm hover:bg-black/80"
             onClick={() => onEdit(media)}
+            aria-label="Edit media"
           >
             <Pencil className="h-3.5 w-3.5" />
           </Button>
@@ -116,6 +117,7 @@ export default function MediaCard({
             variant="destructive"
             className="h-7 w-7 bg-black/60 backdrop-blur-sm hover:bg-red-600/80"
             onClick={() => onDelete(media)}
+            aria-label="Delete media"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
@@ -127,14 +129,14 @@ export default function MediaCard({
           {displayTitle}
         </h3>
 
-        <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+        <div className="mt-auto flex items-center justify-between text-xs text-gray-400">
           <span className="flex items-center gap-1">
             <Eye className="h-3.5 w-3.5" />
             {stat.toLocaleString()} {meta.statLabel}
           </span>
           <Link
             href={`/djs/${djSlug}`}
-            className="text-h_red hover:text-h_redLight"
+            className="text-h_red/80 hover:text-h_red/80Light"
             target="_blank"
           >
             View on profile

@@ -72,7 +72,7 @@ const SuggestedDJs = async () => {
   const cardHeader = (
     <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
       <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
-        <UserSearch className="text-h_red h-4 w-4" />
+        <UserSearch className="text-h_red/80 h-4 w-4" />
         Suggested DJs
       </CardTitle>
     </CardHeader>
@@ -109,7 +109,7 @@ const SuggestedDJs = async () => {
                 </div>
                 <Link
                   href={`/djs/${dj.slug}`}
-                  className="bg-h_red/10 text-h_red border-h_red/20 hover:bg-h_red/20 flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all"
+                  className="bg-h_red/10 text-h_red/80 border-h_red/20 hover:bg-h_red/20 flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all"
                 >
                   View
                 </Link>

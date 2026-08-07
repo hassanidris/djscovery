@@ -61,7 +61,7 @@ export default async function Page({
 
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-white/10" />
-          <span className="text-xs text-gray-500">or</span>
+          <span className="text-xs text-gray-400">or</span>
           <div className="h-px flex-1 bg-white/10" />
         </div>
 
@@ -84,7 +84,7 @@ export default async function Page({
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-xs text-gray-400 transition-colors hover:text-white"
+              className="text-xs text-gray-400 underline transition-colors hover:text-white"
             >
               Forgot password?
             </Link>
@@ -94,7 +94,7 @@ export default async function Page({
 
         <p className="text-center text-sm text-gray-400">
           No account?{" "}
-          <Link href="/sign-up" className="text-h_red hover:underline">
+          <Link href="/sign-up" className="text-h_red/80 hover:underline">
             Sign up
           </Link>
         </p>
