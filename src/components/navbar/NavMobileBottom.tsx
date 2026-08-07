@@ -127,7 +127,7 @@ export default function NavMobileBottom({
               <Icon
                 className={cn(
                   "h-5.5 w-5.5 shrink-0 transition-colors",
-                  isActive ? "text-h_red/80" : "",
+                  isActive ? "text-h_redLight" : "",
                 )}
                 aria-hidden
               />

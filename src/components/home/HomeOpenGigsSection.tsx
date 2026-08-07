@@ -153,7 +153,7 @@ export default async function HomeOpenGigsSection({
           </div>
           <Link
             href="/gigs"
-            className="text-h_red/80 hover:text-h_red/80/80 text-sm font-medium transition-colors"
+            className="text-h_redLight hover:text-h_redLight/80 text-sm font-medium transition-colors"
           >
             View all →
           </Link>

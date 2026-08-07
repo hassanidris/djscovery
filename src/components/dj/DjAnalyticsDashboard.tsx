@@ -246,7 +246,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <Eye className="text-h_red/80 h-4 w-4" />
+                    <Eye className="text-h_redLight h-4 w-4" />
                     Profile Views (30 days)
                   </CardTitle>
                 </CardHeader>
@@ -288,7 +288,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <Users className="text-h_red/80 h-4 w-4" />
+                    <Users className="text-h_redLight h-4 w-4" />
                     New Followers (30 days)
                   </CardTitle>
                 </CardHeader>
@@ -330,7 +330,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <Handshake className="text-h_red/80 h-4 w-4" />
+                    <Handshake className="text-h_redLight h-4 w-4" />
                     Booking Requests by Status
                   </CardTitle>
                 </CardHeader>
@@ -393,7 +393,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <TrendingUp className="text-h_red/80 h-4 w-4" />
+                    <TrendingUp className="text-h_redLight h-4 w-4" />
                     Profile View Sources
                   </CardTitle>
                 </CardHeader>
@@ -464,7 +464,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <MapPin className="text-h_red/80 h-4 w-4" />
+                    <MapPin className="text-h_redLight h-4 w-4" />
                     Top Cities
                   </CardTitle>
                 </CardHeader>

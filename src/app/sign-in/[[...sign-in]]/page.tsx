@@ -94,7 +94,7 @@ export default async function Page({
 
         <p className="text-center text-sm text-gray-400">
           No account?{" "}
-          <Link href="/sign-up" className="text-h_red/80 hover:underline">
+          <Link href="/sign-up" className="text-h_redLight hover:underline">
             Sign up
           </Link>
         </p>

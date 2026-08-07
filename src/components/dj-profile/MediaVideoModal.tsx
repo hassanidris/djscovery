@@ -277,7 +277,7 @@ export default function MediaVideoModal({
                       href={videoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-h_red/80 text-sm underline"
+                      className="text-h_redLight text-sm underline"
                     >
                       Open on {providerLabel}
                     </a>

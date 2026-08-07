@@ -36,7 +36,7 @@ const RecentAdded = () => {
       {/* Top */}
       <div className="flex items-center justify-between font-medium">
         <span className="text-gray-200">Recent Added Djs</span>
-        <Link href="#" className="text-h_red/80 text-xs">
+        <Link href="#" className="text-h_redLight text-xs">
           See all
         </Link>
       </div>

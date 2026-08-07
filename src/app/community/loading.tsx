@@ -16,11 +16,11 @@ export default function CommunityLoading() {
         <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
-              <Users className="text-h_red/80 h-6 w-6" />
+              <Users className="text-h_redLight h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
               <h1 className="text-h_white text-3xl font-bold md:text-5xl">
-                DJ <span className="text-h_red/80/80">Community</span>
+                DJ <span className="text-h_redLight/80">Community</span>
               </h1>
               <p className="text-sm tracking-wide text-gray-400">
                 Share posts and connect with the DJ community
@@ -28,7 +28,7 @@ export default function CommunityLoading() {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-h_red/10 text-h_red/80 border-h_red/20 gap-1.5 border px-3 py-1">
+            <Badge className="bg-h_red/10 text-h_redLight border-h_red/20 gap-1.5 border px-3 py-1">
               <Headphones className="h-3 w-3" /> 1.2k DJs
             </Badge>
             <Badge className="gap-1.5 border border-gray-700 bg-gray-800/80 px-3 py-1 text-gray-300">

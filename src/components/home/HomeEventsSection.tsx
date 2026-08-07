@@ -121,7 +121,7 @@ export default async function HomeEventsSection({ userCountryName }: Props) {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red/80 hover:text-h_red/80 hover:bg-white/5"
+            className="text-h_redLight hover:text-h_redLight hover:bg-white/5"
           >
             <Link href="/events">View all →</Link>
           </Button>

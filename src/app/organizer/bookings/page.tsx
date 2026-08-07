@@ -106,7 +106,7 @@ export default async function OrganizerBookingsPage() {
   return (
     <div className="space-y-10">
       <div className="space-y-2">
-        <Badge className="bg-h_red/20 text-h_red/80 text-xs tracking-widest uppercase">
+        <Badge className="bg-h_red/20 text-h_redLight text-xs tracking-widest uppercase">
           Bookings
         </Badge>
         <h1 className="text-2xl font-bold text-white">Booking Threads</h1>

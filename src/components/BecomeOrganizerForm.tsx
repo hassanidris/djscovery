@@ -42,7 +42,7 @@ export default function BecomeOrganizerForm() {
           htmlFor="displayName"
           className="text-sm font-medium text-gray-300"
         >
-          Display Name <span className="text-h_red/80">*</span>
+          Display Name <span className="text-h_redLight">*</span>
         </label>
         <input
           id="displayName"
@@ -64,7 +64,7 @@ export default function BecomeOrganizerForm() {
           htmlFor="organizerType"
           className="text-sm font-medium text-gray-300"
         >
-          Organizer Type <span className="text-h_red/80">*</span>
+          Organizer Type <span className="text-h_redLight">*</span>
         </label>
         <select
           id="organizerType"

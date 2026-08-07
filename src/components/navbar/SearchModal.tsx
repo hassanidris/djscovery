@@ -70,7 +70,7 @@ export default function SearchModal({ open, onClose }: Props) {
             <button
               type="submit"
               aria-label="Submit search"
-              className="text-h_red/80 hover:text-h_red/80Dark transition-colors"
+              className="text-h_redLight hover:text-h_redLightDark transition-colors"
             >
               <ArrowRight className="h-5 w-5" aria-hidden />
             </button>

@@ -123,7 +123,7 @@ export default function CareerHighlights({
             <div key={i} className="flex gap-4 pb-6 last:pb-0">
               <div className="flex flex-col items-center">
                 <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-full border">
-                  <HIcon className="text-h_red/80 h-3.5 w-3.5" />
+                  <HIcon className="text-h_redLight h-3.5 w-3.5" />
                 </div>
                 {i < highlightsWithIcons.length - 1 && (
                   <div className="mt-2 w-px flex-1 bg-white/8" />

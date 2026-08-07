@@ -153,7 +153,7 @@ export default function BurgerMenu({
                     >
                       <Icon className="h-4 w-4 shrink-0" aria-hidden />
                       <span className="flex-1">{item.label}</span>
-                      <span className="text-h_red/80/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
+                      <span className="text-h_redLight/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                         Soon
                       </span>
                     </span>
@@ -175,7 +175,7 @@ export default function BurgerMenu({
                       <Icon
                         className={cn(
                           "h-4 w-4 shrink-0",
-                          isActive ? "text-h_red/80" : "",
+                          isActive ? "text-h_redLight" : "",
                         )}
                         aria-hidden
                       />
@@ -223,7 +223,7 @@ export default function BurgerMenu({
                             <User
                               className={cn(
                                 "h-4 w-4 shrink-0",
-                                isProfileActive ? "text-h_red/80" : "",
+                                isProfileActive ? "text-h_redLight" : "",
                               )}
                               aria-hidden
                             />
@@ -253,7 +253,7 @@ export default function BurgerMenu({
                           className={cn(
                             "h-4 w-4 shrink-0",
                             pathname.startsWith("/dj/overview")
-                              ? "text-h_red/80"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -281,7 +281,7 @@ export default function BurgerMenu({
                           className={cn(
                             "h-4 w-4 shrink-0",
                             pathname.startsWith("/dj/events")
-                              ? "text-h_red/80"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -314,7 +314,7 @@ export default function BurgerMenu({
                             "h-4 w-4 shrink-0",
                             pathname === "/organizer" ||
                               pathname.startsWith("/organizer/")
-                              ? "text-h_red/80"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -356,7 +356,7 @@ export default function BurgerMenu({
                             pathname.startsWith("/dj/account") ||
                               pathname.startsWith("/organizer/account") ||
                               pathname.startsWith("/fan/account")
-                              ? "text-h_red/80"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -379,7 +379,7 @@ export default function BurgerMenu({
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
               >
                 <LogOut
-                  className="text-h_red/80 h-4 w-4 shrink-0"
+                  className="text-h_redLight h-4 w-4 shrink-0"
                   aria-hidden
                 />
                 <span>Sign out</span>
@@ -389,7 +389,7 @@ export default function BurgerMenu({
                 <Button
                   asChild
                   variant="outline"
-                  className="border-h_red/60 text-h_red/80 hover:bg-h_red/15 hover:text-h_red/80 hover:border-h_red w-full"
+                  className="border-h_red/60 text-h_redLight hover:bg-h_red/15 hover:text-h_redLight hover:border-h_red w-full"
                 >
                   <SheetClose asChild>
                     <Link href="/sign-in">

@@ -331,7 +331,7 @@ export default async function OrganizerPublicProfilePage({
                 Active Gigs
               </h2>
               {activeGigs.length > 0 && (
-                <span className="bg-h_red/20 text-h_red/80 rounded-full px-2 py-0.5 text-xs font-medium">
+                <span className="bg-h_red/20 text-h_redLight rounded-full px-2 py-0.5 text-xs font-medium">
                   {activeGigs.length}
                 </span>
               )}

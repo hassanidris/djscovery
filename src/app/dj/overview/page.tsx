@@ -322,7 +322,7 @@ export default async function DjOverviewPage() {
                 key={i}
                 className="flex items-start gap-2 text-xs text-gray-400"
               >
-                <span className="bg-h_red/15 text-h_red/80 mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
+                <span className="bg-h_red/15 text-h_redLight mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
                   {i + 1}
                 </span>
                 {tip}

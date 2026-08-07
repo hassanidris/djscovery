@@ -510,7 +510,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                   setAvatarFile(null);
                   setAvatarPreview(null);
                 }}
-                className="text-h_red/80 mt-2 flex items-center gap-1 text-xs hover:underline"
+                className="text-h_redLight mt-2 flex items-center gap-1 text-xs hover:underline"
               >
                 <X className="h-3 w-3" /> Remove
               </button>
@@ -566,7 +566,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                   setCoverFile(null);
                   setCoverPreview(null);
                 }}
-                className="text-h_red/80 mt-2 flex items-center gap-1 text-xs hover:underline"
+                className="text-h_redLight mt-2 flex items-center gap-1 text-xs hover:underline"
               >
                 <X className="h-3 w-3" /> Remove
               </button>
@@ -581,7 +581,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         <div className="flex flex-col gap-1.5">
           <label className={labelCls}>
-            DJ Stage Name <span className="text-h_red/80">*</span>
+            DJ Stage Name <span className="text-h_redLight">*</span>
           </label>
           <input
             {...register("stageName")}
@@ -621,7 +621,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         className={`${sectionCls} ${errors.djTypes ? "border-red-500/40" : ""}`}
       >
         <h2 className={sectionTitleCls}>
-          DJ Type <span className="text-h_red/80">*</span>
+          DJ Type <span className="text-h_redLight">*</span>
         </h2>
         <p className="-mt-2 text-xs text-gray-400">
           Select all that apply — this will be used for search filters.
@@ -676,7 +676,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       >
         <div className="mb-1 flex items-center justify-between border-b border-white/10 pb-3">
           <h2 className="text-base font-semibold text-white">
-            Genres <span className="text-h_red/80">*</span>
+            Genres <span className="text-h_redLight">*</span>
           </h2>
           <span
             className={`text-xs font-medium ${genreNames.length >= 5 ? "text-amber-400" : "text-gray-400"}`}
@@ -769,7 +769,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         <div className="flex flex-col gap-1.5">
           <label className={labelCls}>
-            Country <span className="text-h_red/80">*</span>
+            Country <span className="text-h_redLight">*</span>
           </label>
           <select
             {...register("countryId", { valueAsNumber: true })}
@@ -797,7 +797,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         {countryId > 0 && (
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>
-              City <span className="text-h_red/80">*</span>
+              City <span className="text-h_redLight">*</span>
             </label>
             {loadingCities ? (
               <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
@@ -835,7 +835,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       >
         <div className="flex items-center justify-between">
           <h2 className={sectionTitleCls}>
-            Social Media <span className="text-h_red/80">*</span>
+            Social Media <span className="text-h_redLight">*</span>
           </h2>
         </div>
 

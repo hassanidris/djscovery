@@ -214,7 +214,7 @@ function StatCard({ label, value, icon, href, accent, badge }: StatCardProps) {
           {icon}
         </div>
         {badge && (
-          <Badge className="border-h_red/30 bg-h_red/10 text-h_red/80 border text-[11px]">
+          <Badge className="border-h_red/30 bg-h_red/10 text-h_redLight border text-[11px]">
             {badge}
           </Badge>
         )}
@@ -439,7 +439,7 @@ async function DashboardAlerts({ range }: { range: DashboardRange }) {
       {stats.openReports > 0 && (
         <Link
           href="/admin/reports?status=open"
-          className="border-h_red/30 bg-h_red/10 text-h_red/80 hover:bg-h_red/20 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
+          className="border-h_red/30 bg-h_red/10 text-h_redLight hover:bg-h_red/20 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
         >
           <Flag className="h-4 w-4" />
           {stats.openReports} open report
@@ -511,7 +511,7 @@ async function DashboardContentStats({ range }: { range: DashboardRange }) {
         <StatCard
           label="Open Reports"
           value={stats.openReports}
-          icon={<Flag className="text-h_red/80 h-5 w-5" />}
+          icon={<Flag className="text-h_redLight h-5 w-5" />}
           href="/admin/reports"
           accent={stats.openReports > 0}
           badge={stats.openReports > 0 ? "Needs review" : undefined}
@@ -605,7 +605,7 @@ async function DashboardDJApprovalQueue() {
         </div>
         <Link
           href="/admin/djs?status=PENDING_APPROVAL"
-          className="text-h_red/80 hover:text-h_red/80/80 text-sm font-medium transition-colors"
+          className="text-h_redLight hover:text-h_redLight/80 text-sm font-medium transition-colors"
         >
           View all pending DJs
         </Link>

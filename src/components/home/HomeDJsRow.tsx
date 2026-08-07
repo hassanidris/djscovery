@@ -48,7 +48,7 @@ export default function HomeDJsRow({
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red/80 hover:text-h_red/80 hover:bg-white/5"
+            className="text-h_redLight hover:text-h_redLight hover:bg-white/5"
           >
             <Link href="/directory">View all →</Link>
           </Button>
@@ -64,7 +64,7 @@ export default function HomeDJsRow({
               >
                 <Card className="bg-h_blackLight/50 hover:ring-h_red relative flex min-h-64 w-56 shrink-0 cursor-pointer flex-col gap-3 overflow-visible p-4 ring-white/5 transition-all">
                   {variant === "trending" ? (
-                    <Badge className="bg-h_redDark/50 text-h_red/80 absolute top-2 left-2 border-0">
+                    <Badge className="bg-h_redDark/50 text-h_redLight absolute top-2 left-2 border-0">
                       #{index + 1}
                     </Badge>
                   ) : (

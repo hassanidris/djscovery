@@ -111,7 +111,7 @@ export function EventsSection({
               asChild
               variant="ghost"
               size="sm"
-              className="text-h_red/80 hover:text-h_red/80 shrink-0 hover:bg-white/5"
+              className="text-h_redLight hover:text-h_redLight shrink-0 hover:bg-white/5"
             >
               <Link href={viewAllHref}>View all →</Link>
             </Button>

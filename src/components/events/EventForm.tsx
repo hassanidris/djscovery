@@ -826,7 +826,7 @@ export function EventForm(props: EventFormProps) {
             {data.genres.map((genre) => (
               <span
                 key={genre}
-                className="border-h_red bg-h_red/15 text-h_red/80 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
+                className="border-h_red bg-h_red/15 text-h_redLight inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
               >
                 {genre}
                 <button

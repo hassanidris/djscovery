@@ -81,7 +81,7 @@ const CommunityRightPanel = () => {
       <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
         <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
           <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
-            <TrendingUp className="text-h_red/80 h-4 w-4" />
+            <TrendingUp className="text-h_redLight h-4 w-4" />
             Trending DJs
           </CardTitle>
         </CardHeader>
@@ -93,7 +93,7 @@ const CommunityRightPanel = () => {
                 {/* Rank number */}
                 <span
                   className={`w-4 shrink-0 text-right text-xs font-bold ${
-                    index === 0 ? "text-h_red/80" : "text-gray-400"
+                    index === 0 ? "text-h_redLight" : "text-gray-400"
                   }`}
                 >
                   {dj.rank}
@@ -143,7 +143,7 @@ const CommunityRightPanel = () => {
       <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
         <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
           <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
-            <CalendarDays className="text-h_red/80 h-4 w-4" />
+            <CalendarDays className="text-h_redLight h-4 w-4" />
             Upcoming Events
           </CardTitle>
         </CardHeader>
@@ -154,7 +154,7 @@ const CommunityRightPanel = () => {
               <div className="flex items-start gap-3 py-2.5">
                 {/* Date pill */}
                 <div className="bg-h_red/10 border-h_red/20 flex min-w-11 shrink-0 flex-col items-center rounded-lg border px-2 py-1">
-                  <span className="text-h_red/80 text-[11px] leading-none font-bold uppercase">
+                  <span className="text-h_redLight text-[11px] leading-none font-bold uppercase">
                     {event.date.split(" ")[0]}
                   </span>
                   <span className="text-h_white text-sm leading-snug font-bold">
@@ -184,7 +184,7 @@ const CommunityRightPanel = () => {
 
           <Link
             href="/events"
-            className="hover:text-h_red/80 mt-2 flex items-center justify-center gap-1 py-1 text-xs text-gray-400 transition-colors"
+            className="hover:text-h_redLight mt-2 flex items-center justify-center gap-1 py-1 text-xs text-gray-400 transition-colors"
           >
             View all events →
           </Link>
@@ -200,7 +200,7 @@ const CommunityRightPanel = () => {
       <Card className="bg-h_blackLight/50 gap-0 border-gray-800 py-0 shadow-md ring-0">
         <CardHeader className="border-b border-gray-800 px-4 pt-4 pb-3">
           <CardTitle className="text-h_white flex items-center gap-2 text-sm font-semibold">
-            <Hash className="text-h_red/80 h-4 w-4" />
+            <Hash className="text-h_redLight h-4 w-4" />
             Hot Tags
           </CardTitle>
         </CardHeader>
@@ -210,7 +210,7 @@ const CommunityRightPanel = () => {
             {hotTags.map((tag) => (
               <Badge
                 key={tag}
-                className="hover:bg-h_red/10 hover:text-h_red/80 hover:border-h_red/30 cursor-pointer border border-gray-700 bg-gray-800/80 px-2.5 py-1 text-xs text-gray-300 transition-all"
+                className="hover:bg-h_red/10 hover:text-h_redLight hover:border-h_red/30 cursor-pointer border border-gray-700 bg-gray-800/80 px-2.5 py-1 text-xs text-gray-300 transition-all"
               >
                 {tag}
               </Badge>

@@ -62,8 +62,8 @@ const PostInteraction = ({
           <Heart
             className={`h-4 w-4 transition-colors ${
               optimisticLike.isLiked
-                ? "fill-h_red text-h_red/80"
-                : "group-hover:text-h_red/80 text-gray-400"
+                ? "fill-h_red text-h_redLight"
+                : "group-hover:text-h_redLight text-gray-400"
             }`}
           />
           <span className="text-xs text-gray-400 transition-colors group-hover:text-gray-300">

@@ -111,7 +111,7 @@ const CommentsList = ({
             />
             <button
               type="submit"
-              className="hover:text-h_red/80 shrink-0 text-gray-400 transition-colors"
+              className="hover:text-h_redLight shrink-0 text-gray-400 transition-colors"
             >
               <Send className="h-4 w-4" />
             </button>
@@ -131,7 +131,7 @@ const CommentsList = ({
             <span className="text-sm text-gray-400 transition-colors group-hover:text-gray-300">
               Sign up to join the conversation…
             </span>
-            <span className="text-h_red/80 ml-3 shrink-0 text-xs font-semibold">
+            <span className="text-h_redLight ml-3 shrink-0 text-xs font-semibold">
               Sign Up →
             </span>
           </Link>

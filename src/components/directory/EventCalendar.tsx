@@ -108,7 +108,7 @@ const EventCalendar = () => {
                 isSelected
                   ? "bg-h_red font-bold text-white"
                   : isToday
-                    ? "ring-h_red text-h_red/80 ring-1"
+                    ? "ring-h_red text-h_redLight ring-1"
                     : "hover:bg-h_blackLight text-gray-300"
               }`}
             >

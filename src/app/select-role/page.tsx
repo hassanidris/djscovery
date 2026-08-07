@@ -41,7 +41,7 @@ export default async function SelectRolePage() {
                   discovered by event organizers.
                 </p>
               </div>
-              <span className="text-h_red/80 mt-auto text-sm font-semibold group-hover:underline">
+              <span className="text-h_redLight mt-auto text-sm font-semibold group-hover:underline">
                 Set up DJ profile →
               </span>
             </button>
@@ -63,7 +63,7 @@ export default async function SelectRolePage() {
                   in one place.
                 </p>
               </div>
-              <span className="text-h_red/80 mt-auto text-sm font-semibold group-hover:underline">
+              <span className="text-h_redLight mt-auto text-sm font-semibold group-hover:underline">
                 Set up organizer profile →
               </span>
             </button>

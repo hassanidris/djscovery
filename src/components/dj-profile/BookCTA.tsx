@@ -814,7 +814,7 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                         setIsCustomVenue(false);
                         setVenueSelection("");
                       }}
-                      className="text-h_red/80 hover:text-h_red/80Dark cursor-pointer underline underline-offset-2"
+                      className="text-h_redLight hover:text-h_redLightDark cursor-pointer underline underline-offset-2"
                     >
                       use the general booking form
                     </button>

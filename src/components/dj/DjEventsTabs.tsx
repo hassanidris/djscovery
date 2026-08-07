@@ -280,7 +280,7 @@ function EventCard({ event, djSlug }: { event: DjEventItem; djSlug: string }) {
               {event.galleryCount}
             </span>
           </div>
-          <span className="text-h_red/80 group-hover:text-h_red/80Light flex items-center gap-1">
+          <span className="text-h_redLight group-hover:text-h_redLightLight flex items-center gap-1">
             Details
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </span>

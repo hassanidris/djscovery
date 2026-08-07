@@ -205,7 +205,7 @@ export default function BecomeFanForm({
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="name" className="text-sm font-medium text-gray-300">
-          Display Name <span className="text-h_red/80">*</span>
+          Display Name <span className="text-h_redLight">*</span>
         </label>
         <input
           id="name"
@@ -244,7 +244,7 @@ export default function BecomeFanForm({
             htmlFor="countryId"
             className="text-sm font-medium text-gray-300"
           >
-            Country <span className="text-h_red/80">*</span>
+            Country <span className="text-h_redLight">*</span>
           </label>
           <select
             id="countryId"
@@ -265,7 +265,7 @@ export default function BecomeFanForm({
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="cityId" className="text-sm font-medium text-gray-300">
-            City <span className="text-h_red/80">*</span>
+            City <span className="text-h_redLight">*</span>
           </label>
           <select
             id="cityId"

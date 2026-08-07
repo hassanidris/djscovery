@@ -212,7 +212,7 @@ function MixPlayer({
               className="h-full w-full object-cover"
             />
           ) : (
-            <Music className="text-h_red/80 h-4 w-4" />
+            <Music className="text-h_redLight h-4 w-4" />
           )}
         </div>
         <div className="min-w-0 flex-1">
@@ -1499,7 +1499,7 @@ export default function DjProfilePremium({
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="mb-0.5 flex items-center gap-2">
-                                <span className="text-h_red/80 text-xs font-bold">
+                                <span className="text-h_redLight text-xs font-bold">
                                   {p.outlet}
                                 </span>
                                 <Badge className="border-white/8 bg-white/5 text-[11px] text-gray-400">

@@ -23,7 +23,7 @@ export default function ProfessionalTeamSidebar({
   return (
     <div>
       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
-        <BriefcaseBusiness className="text-h_red/80 h-3 w-3" />
+        <BriefcaseBusiness className="text-h_redLight h-3 w-3" />
         Professional Team
       </h3>
       <div className="flex flex-col gap-2">
@@ -36,7 +36,7 @@ export default function ProfessionalTeamSidebar({
             {managerEmail && (
               <a
                 href={`mailto:${managerEmail}`}
-                className="hover:text-h_red/80 mt-0.5 block truncate text-xs text-gray-400 transition-colors"
+                className="hover:text-h_redLight mt-0.5 block truncate text-xs text-gray-400 transition-colors"
               >
                 {managerEmail}
               </a>
@@ -55,7 +55,7 @@ export default function ProfessionalTeamSidebar({
             {agentEmail && (
               <a
                 href={`mailto:${agentEmail}`}
-                className="hover:text-h_red/80 mt-0.5 block truncate text-xs text-gray-400 transition-colors"
+                className="hover:text-h_redLight mt-0.5 block truncate text-xs text-gray-400 transition-colors"
               >
                 {agentEmail}
               </a>

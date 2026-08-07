@@ -198,7 +198,7 @@ const FilterBottomSheet = ({
                         onClick={() => toggleGenre(g)}
                         className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
                           draft.genre.includes(g)
-                            ? "bg-h_red/20 border-h_red text-h_red/80"
+                            ? "bg-h_red/20 border-h_red text-h_redLight"
                             : "border-gray-700 bg-transparent text-gray-400 hover:border-gray-500 hover:text-gray-200"
                         }`}
                       >
@@ -222,7 +222,7 @@ const FilterBottomSheet = ({
                       onClick={() => toggleDjType(t.value)}
                       className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
                         draft.djType.includes(t.value)
-                          ? "bg-h_red/20 border-h_red text-h_red/80"
+                          ? "bg-h_red/20 border-h_red text-h_redLight"
                           : "border-gray-700 bg-transparent text-gray-400 hover:border-gray-500 hover:text-gray-200"
                       }`}
                     >

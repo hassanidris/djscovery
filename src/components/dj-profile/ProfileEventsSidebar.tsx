@@ -20,7 +20,7 @@ function EventRow({ e, showStatus }: { e: EventItem; showStatus: boolean }) {
   const inner = (
     <>
       <div className="bg-h_red/10 border-h_red/20 flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-md border">
-        <span className="text-h_red/80 text-[10px] leading-none font-bold uppercase">
+        <span className="text-h_redLight text-[10px] leading-none font-bold uppercase">
           {month}
         </span>
         <span className="mt-0.5 text-sm leading-none font-bold text-white">

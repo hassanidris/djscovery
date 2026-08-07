@@ -102,7 +102,7 @@ const Post = ({
             <div className={post.content ? "px-4 pb-3" : "p-3"}>
               <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-black/20 p-4">
                 <div className="bg-h_red/10 border-h_red/20 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border">
-                  <Music2 className="text-h_red/80 h-5 w-5" />
+                  <Music2 className="text-h_redLight h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-h_white truncate text-sm font-semibold">

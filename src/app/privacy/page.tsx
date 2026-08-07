@@ -41,9 +41,9 @@ export default function PrivacyPolicyPage() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="bg-h_red/10 border-h_red/20 flex size-10 shrink-0 items-center justify-center rounded-xl border">
-                <Shield className="text-h_red/80 h-5 w-5" />
+                <Shield className="text-h_redLight h-5 w-5" />
               </div>
-              <span className="text-h_red/80 text-xs font-semibold tracking-[0.15em] uppercase">
+              <span className="text-h_redLight text-xs font-semibold tracking-[0.15em] uppercase">
                 Legal
               </span>
             </div>
@@ -76,9 +76,9 @@ export default function PrivacyPolicyPage() {
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    className="hover:text-h_red/80 group flex items-baseline gap-2.5 text-sm text-gray-400 transition-colors"
+                    className="hover:text-h_redLight group flex items-baseline gap-2.5 text-sm text-gray-400 transition-colors"
                   >
-                    <span className="text-h_red/80/40 group-hover:text-h_red/80 min-w-5 text-[11px] font-medium tabular-nums transition-colors">
+                    <span className="text-h_redLight/40 group-hover:text-h_redLight min-w-5 text-[11px] font-medium tabular-nums transition-colors">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {item.label}
@@ -583,7 +583,7 @@ export default function PrivacyPolicyPage() {
                         business days.
                       </p>
                     </div>
-                    <ArrowRight className="text-h_red/80 h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="text-h_redLight h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <div className="mt-4 rounded-xl border border-white/5 bg-white/2 px-4 py-3">
                     <p className="text-xs font-semibold text-white">
@@ -618,7 +618,7 @@ export default function PrivacyPolicyPage() {
 function SectionHeading({ number, title }: { number: number; title: string }) {
   return (
     <div className="mb-5 flex items-baseline gap-3 border-b border-white/5 pb-4">
-      <span className="text-h_red/80 font-heading text-sm font-bold tabular-nums">
+      <span className="text-h_redLight font-heading text-sm font-bold tabular-nums">
         {String(number).padStart(2, "0")}
       </span>
       <h2 className="font-heading text-xl text-white">{title}</h2>

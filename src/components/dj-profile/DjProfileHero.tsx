@@ -188,7 +188,7 @@ function DjProfileHero({
 
             {/* Location directly under the name */}
             <p className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-400">
-              <MapPin className="text-h_red/80 h-3 w-3" /> {DJ.city},{" "}
+              <MapPin className="text-h_redLight h-3 w-3" /> {DJ.city},{" "}
               {DJ.country}
             </p>
 

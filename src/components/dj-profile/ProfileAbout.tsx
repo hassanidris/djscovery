@@ -60,7 +60,7 @@ export default function ProfileAbout({
         </p>
         <button
           onClick={onToggleBio}
-          className="text-h_red/80 mt-2 text-xs transition-colors hover:text-red-400"
+          className="text-h_redLight mt-2 text-xs transition-colors hover:text-red-400"
         >
           {bioExpanded ? "Show less" : "Read more"}
         </button>

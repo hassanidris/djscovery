@@ -56,7 +56,7 @@ const AddPostWrapper = async () => {
       {/* Icons hint at what fans CAN do */}
       <div className="flex shrink-0 items-center gap-2">
         <div className="bg-h_red/10 border-h_red/20 flex h-9 w-9 items-center justify-center rounded-xl border">
-          <Music2 className="text-h_red/80 h-4 w-4" />
+          <Music2 className="text-h_redLight h-4 w-4" />
         </div>
       </div>
 
@@ -65,7 +65,7 @@ const AddPostWrapper = async () => {
         <p className="mt-0.5 text-xs text-gray-400">
           You can{" "}
           <span className="inline-flex items-center gap-1 text-gray-300">
-            <Heart className="text-h_red/80 h-3 w-3" /> like
+            <Heart className="text-h_redLight h-3 w-3" /> like
           </span>
           ,{" "}
           <span className="inline-flex items-center gap-1 text-gray-300">

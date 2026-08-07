@@ -18,7 +18,7 @@ export default function OrganizerError({
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 px-4 text-center">
       <div className="bg-h_red/10 border-h_red/20 flex size-12 items-center justify-center rounded-xl border">
-        <AlertTriangle className="text-h_red/80 h-5 w-5" />
+        <AlertTriangle className="text-h_redLight h-5 w-5" />
       </div>
       <div className="flex flex-col gap-1">
         <p className="text-base font-semibold text-white">

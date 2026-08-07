@@ -80,7 +80,7 @@ export default function NavDesktop({
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden />
                 <span>{item.label}</span>
-                <span className="text-h_red/80/60 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
+                <span className="text-h_redLight/60 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                   Soon
                 </span>
               </span>
@@ -102,7 +102,7 @@ export default function NavDesktop({
               <Icon
                 className={cn(
                   "h-4 w-4 shrink-0 transition-colors",
-                  isActive ? "text-h_red/80" : "",
+                  isActive ? "text-h_redLight" : "",
                 )}
                 aria-hidden
               />
@@ -168,7 +168,7 @@ export default function NavDesktop({
               asChild
               variant="outline"
               size="sm"
-              className="border-h_red/60 text-h_red/80 hover:bg-h_red/15 hover:text-h_red/80 hover:border-h_red transition-all"
+              className="border-h_red/60 text-h_redLight hover:bg-h_red/15 hover:text-h_redLight hover:border-h_red transition-all"
             >
               <Link href="/sign-in">Sign In</Link>
             </Button>

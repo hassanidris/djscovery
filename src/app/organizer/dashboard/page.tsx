@@ -220,7 +220,7 @@ export default async function OrganizerDashboardPage() {
                         with DJ{" "}
                         <Link
                           href={`/djs/${review.djSlug}`}
-                          className="text-h_red/80 hover:underline"
+                          className="text-h_redLight hover:underline"
                         >
                           {review.djName}
                         </Link>
@@ -318,7 +318,7 @@ export default async function OrganizerDashboardPage() {
         <Card className="hover:border-h_red/40 hover:bg-h_red/5 transition-colors">
           <CardContent className="flex items-center gap-4 py-5">
             <div className="bg-h_red/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-              <Briefcase className="text-h_red/80 h-5 w-5" />
+              <Briefcase className="text-h_redLight h-5 w-5" />
             </div>
             <div className="flex-1">
               <p className="font-semibold">Post a Gig</p>

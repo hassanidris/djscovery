@@ -696,7 +696,7 @@ export default function EditDjProfileForm({
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <Label className="text-xs text-gray-300">
-                  Stage Name <span className="text-h_red/80">*</span>
+                  Stage Name <span className="text-h_redLight">*</span>
                 </Label>
                 <span className="text-[11px] text-gray-400">
                   Displays as{" "}
@@ -782,7 +782,7 @@ export default function EditDjProfileForm({
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <Label className="text-xs text-gray-300">
-                  Country <span className="text-h_red/80">*</span>
+                  Country <span className="text-h_redLight">*</span>
                 </Label>
                 {submitted && countryError && (
                   <span className="text-[11px] text-red-400">
@@ -849,7 +849,7 @@ export default function EditDjProfileForm({
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <Label className="text-xs text-gray-300">
-                  Genres <span className="text-h_red/80">*</span>
+                  Genres <span className="text-h_redLight">*</span>
                 </Label>
                 <span
                   className={`text-[11px] ${genreNames.length >= 5 ? "text-amber-400" : "text-gray-400"}`}
@@ -929,7 +929,7 @@ export default function EditDjProfileForm({
             <div>
               <div className="mb-3 flex items-center justify-between">
                 <Label className="text-xs text-gray-300">
-                  DJ Type <span className="text-h_red/80">*</span>
+                  DJ Type <span className="text-h_redLight">*</span>
                 </Label>
                 {submitted && djTypesError && (
                   <span className="text-[11px] text-red-400">
@@ -1335,7 +1335,7 @@ export default function EditDjProfileForm({
                           onClick={() => cycleDayStatus(day)}
                           className={`flex h-9 items-center justify-center rounded-md text-xs font-medium transition-all ${
                             status === "booked"
-                              ? "bg-h_red/20 text-h_red/80 border-h_red/30 border"
+                              ? "bg-h_red/20 text-h_redLight border-h_red/30 border"
                               : status === "tentative"
                                 ? "border border-amber-500/30 bg-amber-500/20 text-amber-400"
                                 : status === "available"
@@ -1370,7 +1370,7 @@ export default function EditDjProfileForm({
         {/* Submit */}
         <div className="flex items-center justify-between pt-2">
           <p className="text-xs text-gray-400">
-            <span className="text-h_red/80">*</span> Required fields
+            <span className="text-h_redLight">*</span> Required fields
           </p>
           <Button
             type="submit"

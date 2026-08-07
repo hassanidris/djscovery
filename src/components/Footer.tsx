@@ -161,9 +161,9 @@ const Footer = async () => {
                         key={item.id}
                         className="flex items-center gap-2.5 text-sm text-gray-400 select-none"
                       >
-                        <Icon className="text-h_red/80Dark/40 h-3.5 w-3.5" />
+                        <Icon className="text-h_redLightDark/40 h-3.5 w-3.5" />
                         {item.label}
-                        <span className="text-h_red/80/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
+                        <span className="text-h_redLight/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                           Soon
                         </span>
                       </li>
@@ -173,9 +173,9 @@ const Footer = async () => {
                     <li key={item.id}>
                       <Link
                         href={item.href}
-                        className="hover:text-h_red/80 group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
+                        className="hover:text-h_redLight group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                       >
-                        <Icon className="text-h_red/80Dark group-hover:text-h_red/80 h-3.5 w-3.5 transition-colors" />
+                        <Icon className="text-h_redLightDark group-hover:text-h_redLight h-3.5 w-3.5 transition-colors" />
                         {item.label}
                       </Link>
                     </li>
@@ -194,9 +194,9 @@ const Footer = async () => {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="hover:text-h_red/80 group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
+                      className="hover:text-h_redLight group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                     >
-                      <Mic className="text-h_red/80Dark group-hover:text-h_red/80 h-3.5 w-3.5 transition-colors" />
+                      <Mic className="text-h_redLightDark group-hover:text-h_redLight h-3.5 w-3.5 transition-colors" />
                       {link.label}
                     </Link>
                   </li>
@@ -214,10 +214,10 @@ const Footer = async () => {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="hover:text-h_red/80 group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
+                      className="hover:text-h_redLight group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                     >
                       {link.icon && (
-                        <link.icon className="text-h_red/80Dark h-3.5 w-3.5" />
+                        <link.icon className="text-h_redLightDark h-3.5 w-3.5" />
                       )}
                       <span>{link.label}</span>
                     </Link>
@@ -254,21 +254,21 @@ const Footer = async () => {
           <div className="flex items-center gap-5">
             <Link
               href="/privacy"
-              className="hover:text-h_red/80 underline transition-colors"
+              className="hover:text-h_redLight underline transition-colors"
             >
               Privacy
             </Link>
             <span className="text-white/10">|</span>
             <Link
               href="/terms-of-service"
-              className="hover:text-h_red/80 underline transition-colors"
+              className="hover:text-h_redLight underline transition-colors"
             >
               Terms
             </Link>
             <span className="text-white/10">|</span>
             <Link
               href="/cookie-policy"
-              className="hover:text-h_red/80 underline transition-colors"
+              className="hover:text-h_redLight underline transition-colors"
             >
               Cookie
             </Link>

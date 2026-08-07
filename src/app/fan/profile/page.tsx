@@ -220,7 +220,7 @@ export default async function FanProfilePage() {
         <Card className="hover:border-h_red/40 hover:bg-h_red/5 transition-colors">
           <CardContent className="flex items-center gap-4 py-5">
             <div className="bg-h_red/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-              <Users className="text-h_red/80 h-5 w-5" />
+              <Users className="text-h_redLight h-5 w-5" />
             </div>
             <div className="flex-1">
               <p className="font-semibold">Browse DJs</p>

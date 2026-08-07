@@ -21,7 +21,7 @@ const UserMediaCard = async ({ user }: { user: User }) => {
         <span className="text-gray-200">User Media</span>
         <Link
           href="#"
-          className="text-h_red/80 hover:text-h_red/80Dark text-xs"
+          className="text-h_redLight hover:text-h_redLightDark text-xs"
         >
           See all
         </Link>

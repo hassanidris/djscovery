@@ -32,7 +32,7 @@ export default async function HomeTrendingDJs() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red/80 hover:text-h_red/80 hover:bg-white/5"
+            className="text-h_redLight hover:text-h_redLight hover:bg-white/5"
           >
             <Link href="/directory?sort=trending">View all →</Link>
           </Button>

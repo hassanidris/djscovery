@@ -667,7 +667,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               >
                 <div className="min-w-0 flex-1">
                   <div className="mb-0.5 flex items-center gap-2">
-                    <span className="text-h_red/80 text-xs font-bold">
+                    <span className="text-h_redLight text-xs font-bold">
                       {p.source}
                     </span>
                     <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-gray-400">
@@ -683,7 +683,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                       href={p.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-h_red/80 mt-1 inline-block text-xs underline"
+                      className="text-h_redLight mt-1 inline-block text-xs underline"
                     >
                       Read article →
                     </a>

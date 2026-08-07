@@ -95,7 +95,7 @@ function EmptySectionState({
       <p className="text-sm font-medium text-gray-400">{title}</p>
       <p className="mt-1 text-xs text-gray-400">{description}</p>
       {actionLabel && (
-        <span className="text-h_red/80 mt-3 text-xs font-medium">
+        <span className="text-h_redLight mt-3 text-xs font-medium">
           {actionLabel} →
         </span>
       )}
@@ -141,7 +141,7 @@ function MixPlayer({
               className="h-full w-full object-cover"
             />
           ) : (
-            <Music className="text-h_red/80 h-4 w-4" />
+            <Music className="text-h_redLight h-4 w-4" />
           )}
         </div>
         <div className="min-w-0 flex-1">

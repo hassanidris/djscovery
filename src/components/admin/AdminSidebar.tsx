@@ -71,7 +71,7 @@ function NavLinks({
               "group relative flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
               compact ? "h-10 w-10 justify-center p-0" : "px-3 py-2.5",
               isActive
-                ? "bg-h_red/10 text-h_red/80 border-h_red/20 border"
+                ? "bg-h_red/10 text-h_redLight border-h_red/20 border"
                 : "border border-transparent text-gray-400 hover:bg-white/5 hover:text-white",
             )}
             aria-current={isActive ? "page" : undefined}
@@ -79,7 +79,7 @@ function NavLinks({
             <Icon className="h-4 w-4 shrink-0" aria-hidden />
             {!compact && <span className="flex-1">{item.label}</span>}
             {!compact && showBadge && (
-              <Badge className="bg-h_red/20 text-h_red/80 border-h_red/30 border px-1.5 py-0 text-xs">
+              <Badge className="bg-h_red/20 text-h_redLight border-h_red/30 border px-1.5 py-0 text-xs">
                 {openReportCount > 99 ? "99+" : openReportCount}
               </Badge>
             )}
@@ -191,7 +191,7 @@ function SidebarFooter({
       </div>
       <Link
         href="/admin/settings"
-        className="text-h_red/80 hover:text-h_red/80/80 mt-3 inline-flex items-center text-xs font-medium transition-colors"
+        className="text-h_redLight hover:text-h_redLight/80 mt-3 inline-flex items-center text-xs font-medium transition-colors"
       >
         Manage account →
       </Link>

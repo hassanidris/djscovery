@@ -321,7 +321,7 @@ const UPGRADE_TRIGGERS = [
 function Cell({ val }: { val: boolean | string }) {
   if (val === true) return <CircleCheck className="h-4 w-4 text-emerald-500" />;
   if (val === false) return <X className="h-4 w-4 text-gray-700" />;
-  return <span className="text-h_red/80 text-xs font-semibold">{val}</span>;
+  return <span className="text-h_redLight text-xs font-semibold">{val}</span>;
 }
 
 const CATEGORIES = Array.from(new Set(ROWS.map((r) => r.category)));
@@ -445,7 +445,7 @@ export default function DjProfileComparePage() {
               >
                 <div className="flex items-start gap-3">
                   <div className="bg-h_red/10 border-h_red/20 mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border">
-                    <t.icon className="text-h_red/80 h-3.5 w-3.5" />
+                    <t.icon className="text-h_redLight h-3.5 w-3.5" />
                   </div>
                   <div className="flex-1">
                     <p className="mb-1 text-sm font-semibold text-white">
@@ -454,7 +454,7 @@ export default function DjProfileComparePage() {
                     <Badge className="mb-2 border-amber-500/20 bg-amber-500/10 text-[11px] text-amber-400">
                       {t.emotion}
                     </Badge>
-                    <p className="text-h_red/80 flex items-center gap-1 text-xs font-medium">
+                    <p className="text-h_redLight flex items-center gap-1 text-xs font-medium">
                       <ArrowRight className="h-2.5 w-2.5" />
                       {t.cta}
                     </p>

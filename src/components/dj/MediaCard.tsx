@@ -136,7 +136,7 @@ export default function MediaCard({
           </span>
           <Link
             href={`/djs/${djSlug}`}
-            className="text-h_red/80 hover:text-h_red/80Light"
+            className="text-h_redLight hover:text-h_redLightLight"
             target="_blank"
           >
             View on profile

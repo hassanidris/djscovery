@@ -34,7 +34,7 @@ export default async function HomeFeaturedDJs() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red/80 hover:text-h_red/80 hover:bg-white/5"
+            className="text-h_redLight hover:text-h_redLight hover:bg-white/5"
           >
             <Link href="/directory">View all →</Link>
           </Button>

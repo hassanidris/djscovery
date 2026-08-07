@@ -39,7 +39,7 @@ function EventCard({ e, isOwner }: { e: EventItem; isOwner?: boolean }) {
     <Card className="bg-h_blackLight/30 min-w-65 gap-0 border-white/8 p-4 transition-colors hover:border-white/15 sm:min-w-0">
       <div className="flex items-start gap-4">
         <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-md border">
-          <span className="text-h_red/80 text-[10px] leading-none font-bold uppercase">
+          <span className="text-h_redLight text-[10px] leading-none font-bold uppercase">
             {month}
           </span>
           <span className="mt-0.5 text-base leading-none font-bold text-white">
@@ -343,7 +343,7 @@ export default function DjEventsModule({
                   className={cn(
                     "flex h-9 cursor-pointer items-center justify-center rounded-md text-xs font-medium transition-all",
                     status === "booked" &&
-                      "bg-h_red/20 text-h_red/80 border-h_red/30 border",
+                      "bg-h_red/20 text-h_redLight border-h_red/30 border",
                     status === "tentative" &&
                       "border border-amber-500/30 bg-amber-500/20 text-amber-400",
                     status === "available" &&
