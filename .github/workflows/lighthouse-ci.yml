@@ -14,10 +14,22 @@ jobs:
   lighthouse:
     name: Lighthouse Performance & SEO Audit
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_APP_ENV: staging
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_BASE_URL: http://localhost:3000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      INDEXING_ENABLED: false
+      PRE_LAUNCH_MODE: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,22 +56,12 @@ jobs:
           done
           echo "Build failed after 3 attempts"
           exit 1
-        env:
-          NEXT_PUBLIC_APP_ENV: staging
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          NEXT_PUBLIC_BASE_URL: http://localhost:3000
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
-          INDEXING_ENABLED: false
-          PRE_LAUNCH_MODE: false
 
       - name: Run Lighthouse CI
         id: lighthouse
         run: |
           for i in 1 2 3; do
-            if npx @lhci/cli autorun; then
+            if npx lhci autorun; then
               echo "Lighthouse CI succeeded on attempt $i"
               exit 0
             fi
