@@ -1,0 +1,131 @@
+name: Lighthouse CI
+
+on:
+  pull_request:
+    branches: ["main", "dev"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lighthouse:
+    name: Lighthouse Performance & SEO Audit
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_APP_ENV: staging
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      # App's own runtime base (internal links, auth redirects) — stays local
+      # since this is the ephemeral CI server, not the public site.
+      NEXT_PUBLIC_BASE_URL: http://localhost:3000
+      # Canonical public domain used for SEO metadata (canonical/OG tags,
+      # sitemap). Must be the real staging URL, not localhost, so the SEO
+      # audit reflects genuine metadata rather than a meaningless local URL.
+      NEXT_PUBLIC_SITE_URL: https://staging-djscovery.vercel.app
+      # Indexing is only gated off for the real staging/production deploy.
+      # This ephemeral CI server is never public, so enabling it here lets
+      # the SEO audit validate the real robots/sitemap/canonical config
+      # instead of always failing on an artificially blocked crawl.
+      INDEXING_ENABLED: true
+      PRE_LAUNCH_MODE: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # On pull_request events, actions/checkout defaults to the ephemeral
+          # merge commit (GITHUB_SHA), which LHCI's git-based commit detection
+          # (`git rev-list --no-merges -n1 HEAD`) can't map back to a real
+          # commit on the PR — causing the status check to silently never
+          # appear. Checking out the actual PR head SHA (falling back to
+          # github.sha for the push-to-main trigger) fixes this. fetch-depth
+          # 20 gives enough history for --no-merges to resolve correctly even
+          # if the head commit itself happens to be a merge commit.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 20
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js app
+        id: build
+        run: |
+          for i in 1 2 3; do
+            if npm run build; then
+              echo "Build succeeded on attempt $i"
+              exit 0
+            fi
+            echo "Build attempt $i failed"
+            if [ "$i" -lt 3 ]; then
+              echo "Retrying in 15s..."
+              sleep 15
+            fi
+          done
+          echo "Build failed after 3 attempts"
+          exit 1
+
+      - name: Start Next.js server for Lighthouse
+        run: |
+          nohup npm run start &>/tmp/next-server.log & echo $! > .next-server.pid
+          ./node_modules/.bin/wait-on --timeout 120000 --interval 2000 http://localhost:3000 || {
+            echo "::error::Next.js server did not become ready. Server log:"
+            cat /tmp/next-server.log
+            exit 1
+          }
+        env:
+          PORT: 3000
+          # Dedicated read-only/staging credential — must NOT be the production
+          # DATABASE_URL. /events queries the DB directly, so the server needs
+          # a working connection, but no other step in this workflow does.
+          DATABASE_URL: ${{ secrets.LHCI_DATABASE_URL }}
+
+      - name: Verify routes respond
+        run: |
+          for url in http://localhost:3000/ http://localhost:3000/events; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+            echo "$url -> HTTP $code"
+            if [ "$code" -ge 400 ]; then
+              echo "::error::$url returned $code. Server log:"
+              cat /tmp/next-server.log
+              exit 1
+            fi
+          done
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: |
+          for i in 1 2 3; do
+            if npx lhci autorun; then
+              echo "Lighthouse CI succeeded on attempt $i"
+              exit 0
+            fi
+            echo "Lighthouse CI attempt $i failed"
+            if [ "$i" -lt 3 ]; then
+              echo "Retrying in 20s..."
+              sleep 20
+            fi
+          done
+          echo "Lighthouse CI failed after 3 attempts"
+          echo "::error::Lighthouse CI failed. Server log:"
+          cat /tmp/next-server.log
+          exit 1
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Stop Next.js server
+        if: always()
+        run: |
+          if [ -f .next-server.pid ]; then
+            kill "$(cat .next-server.pid)" || true
+            rm -f .next-server.pid
+          fi
