@@ -99,7 +99,7 @@ export default function AdminFilters({
           placeholder={searchPlaceholder}
           value={searchValue}
           onChange={handleSearchChange}
-          className="h-9 w-full border-white/10 bg-white/5 text-white placeholder:text-gray-500 focus-visible:ring-white/20 sm:w-52"
+          className="h-9 w-full border-white/10 bg-white/5 text-white placeholder:text-gray-400 focus-visible:ring-white/20 sm:w-52"
         />
       )}
       {filters.map((f) => (

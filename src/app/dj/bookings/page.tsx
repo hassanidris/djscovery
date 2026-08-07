@@ -105,7 +105,7 @@ export default async function DjBookingsPage() {
           <h2 className="text-lg font-semibold text-white">
             No booking inquiries yet
           </h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-400">
             When organizers send a booking request it will appear here for you
             to accept, decline, or message back.
           </p>

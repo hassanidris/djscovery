@@ -93,7 +93,7 @@ export default function FanEmailPreferencesForm({
 
       {/* Required (always-on) preferences */}
       <div>
-        <p className="mb-2 text-xs font-medium tracking-wider text-gray-500 uppercase">
+        <p className="mb-2 text-xs font-medium tracking-wider text-gray-400 uppercase">
           Always on
         </p>
         <div className="flex flex-col gap-1 overflow-hidden rounded-xl border border-white/10 opacity-60">

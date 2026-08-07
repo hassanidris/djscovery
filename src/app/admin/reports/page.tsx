@@ -190,7 +190,7 @@ export default async function AdminReportsPage({
                             href={getReporterUrl(report.reporter)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hover:text-h_red font-medium text-white transition-colors"
+                            className="hover:text-h_redLight font-medium text-white transition-colors"
                           >
                             {getReporterDisplayName(report.reporter)}
                           </Link>

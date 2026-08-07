@@ -17,12 +17,12 @@ export default async function AdminTopBar() {
           action="/directory"
           className="focus-within:border-h_red/40 focus-within:ring-h_red/30 flex h-9 min-w-0 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white transition-colors focus-within:ring-1"
         >
-          <Search className="h-4 w-4 shrink-0 text-gray-500" aria-hidden />
+          <Search className="h-4 w-4 shrink-0 text-gray-400" aria-hidden />
           <input
             name="q"
             type="search"
             placeholder="Search..."
-            className="w-28 min-w-0 bg-transparent text-sm outline-none placeholder:text-gray-500 sm:w-40 md:w-56"
+            className="w-28 min-w-0 bg-transparent text-sm outline-none placeholder:text-gray-400 sm:w-40 md:w-56"
           />
         </form>
       </div>

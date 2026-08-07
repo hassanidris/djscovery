@@ -153,7 +153,7 @@ export default async function HomeOpenGigsSection({
           </div>
           <Link
             href="/gigs"
-            className="text-h_red hover:text-h_red/80 text-sm font-medium transition-colors"
+            className="text-h_redLight hover:text-h_redLight/80 text-sm font-medium transition-colors"
           >
             View all →
           </Link>
@@ -194,7 +194,7 @@ export default async function HomeOpenGigsSection({
                         </Badge>
                       ))}
                       {gig.requiredGenres.length > 3 && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           +{gig.requiredGenres.length - 3}
                         </span>
                       )}
@@ -236,7 +236,7 @@ export default async function HomeOpenGigsSection({
                     <CalendarDays className="h-3 w-3" />
                     {formatEventDate(gig.eventDate)}
                   </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500 sm:justify-end">
+                  <span className="flex items-center gap-1 text-xs text-gray-400 sm:justify-end">
                     <Users className="h-3 w-3" />
                     {gig.applicationsCount} applied
                   </span>

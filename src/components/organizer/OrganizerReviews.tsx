@@ -38,7 +38,7 @@ function StarRating({ rating }: { rating: number }) {
           className={`h-4 w-4 ${
             i < rating
               ? "fill-amber-400 text-amber-400"
-              : "fill-transparent text-gray-600"
+              : "fill-transparent text-gray-400"
           }`}
         />
       ))}
@@ -69,7 +69,7 @@ export default function OrganizerReviews({
             {avgRating.toFixed(1)}
           </span>
           <StarRating rating={avgRating} />
-          <span className="text-xs text-gray-500">{ratingCount} reviews</span>
+          <span className="text-xs text-gray-400">{ratingCount} reviews</span>
         </div>
         <div className="flex flex-1 flex-col justify-center gap-2">
           {[5, 4, 3, 2, 1].map((s) => {
@@ -85,7 +85,7 @@ export default function OrganizerReviews({
                 </span>
                 <Star className="h-3 w-3 shrink-0 text-amber-400" />
                 <Progress value={pct} className="h-1.5 flex-1 bg-white/8" />
-                <span className="w-8 text-right text-xs text-gray-600">
+                <span className="w-8 text-right text-xs text-gray-400">
                   {count}
                 </span>
               </div>
@@ -116,7 +116,7 @@ export default function OrganizerReviews({
                     <StarRating rating={r.rating} />
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-gray-400">
                       {formatDate(r.createdAt)}
                     </span>
                     <ReportButton
@@ -124,7 +124,7 @@ export default function OrganizerReviews({
                       targetId={String(r.id)}
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 text-gray-500 hover:text-white"
+                      className="h-6 w-6 text-gray-400 hover:text-white"
                     />
                   </div>
                 </div>
@@ -132,19 +132,19 @@ export default function OrganizerReviews({
                 {/* Category Breakdown */}
                 <div className="mt-2 flex flex-wrap gap-3 text-xs">
                   <div className="flex items-center gap-1">
-                    <span className="text-gray-500">Communication:</span>
+                    <span className="text-gray-400">Communication:</span>
                     <span className="text-gray-300">{r.communication}/5</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-gray-500">Payment:</span>
+                    <span className="text-gray-400">Payment:</span>
                     <span className="text-gray-300">{r.payment}/5</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-gray-500">Professionalism:</span>
+                    <span className="text-gray-400">Professionalism:</span>
                     <span className="text-gray-300">{r.professionalism}/5</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-gray-500">Venue:</span>
+                    <span className="text-gray-400">Venue:</span>
                     <span className="text-gray-300">{r.venueQuality}/5</span>
                   </div>
                 </div>

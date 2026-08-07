@@ -79,6 +79,7 @@ export default function ScrollableCarousel({
           size="icon"
           variant="ghost"
           onClick={() => scrollBy(-1)}
+          aria-label="Previous"
           className="absolute top-1/2 left-0 z-10 flex size-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-black/80 text-white shadow-lg hover:bg-black"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -89,6 +90,7 @@ export default function ScrollableCarousel({
           size="icon"
           variant="ghost"
           onClick={() => scrollBy(1)}
+          aria-label="Next"
           className="absolute top-1/2 right-0 z-10 flex size-8 translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-black/80 text-white shadow-lg hover:bg-black"
         >
           <ChevronRight className="h-4 w-4" />

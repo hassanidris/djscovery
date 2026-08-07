@@ -46,9 +46,9 @@ export default function TermsOfServicePage() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="bg-h_red/10 border-h_red/20 flex size-10 shrink-0 items-center justify-center rounded-xl border">
-                <ScrollText className="text-h_red h-5 w-5" />
+                <ScrollText className="text-h_redLight h-5 w-5" />
               </div>
-              <span className="text-h_red text-xs font-semibold tracking-[0.15em] uppercase">
+              <span className="text-h_redLight text-xs font-semibold tracking-[0.15em] uppercase">
                 Legal
               </span>
             </div>
@@ -59,7 +59,7 @@ export default function TermsOfServicePage() {
               These Terms govern your access to and use of DJcovery. Please read
               them carefully before using the Platform.
             </p>
-            <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
+            <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
               <span>Last Updated:</span>
               <span className="font-medium text-gray-400">June 23, 2026</span>
             </div>
@@ -73,7 +73,7 @@ export default function TermsOfServicePage() {
           {/* ── Sticky TOC ── */}
           <aside className="shrink-0 lg:w-60">
             <div className="sticky top-24">
-              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/40 uppercase">
+              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/60 uppercase">
                 Contents
               </p>
               <nav className="flex flex-col gap-1.5">
@@ -81,9 +81,9 @@ export default function TermsOfServicePage() {
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    className="hover:text-h_red group flex items-baseline gap-2.5 text-sm text-gray-500 transition-colors"
+                    className="hover:text-h_redLight group flex items-baseline gap-2.5 text-sm text-gray-400 transition-colors"
                   >
-                    <span className="text-h_red/40 group-hover:text-h_red min-w-5 text-[11px] font-medium tabular-nums transition-colors">
+                    <span className="text-h_redLight group-hover:text-h_redLight min-w-5 text-[11px] font-medium tabular-nums transition-colors">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {item.label}
@@ -351,7 +351,7 @@ export default function TermsOfServicePage() {
                     Your use of DJcovery is also governed by our{" "}
                     <Link
                       href="/privacy"
-                      className="text-h_red hover:text-h_redDark underline underline-offset-2 transition-colors"
+                      className="text-h_redLight hover:text-h_redLightDark underline underline-offset-2 transition-colors"
                     >
                       Privacy Policy
                     </Link>
@@ -528,12 +528,12 @@ export default function TermsOfServicePage() {
                       <p className="text-base font-semibold text-white">
                         Get in touch
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-400">
                         Use our contact form — we typically reply within 1–2
                         business days.
                       </p>
                     </div>
-                    <ArrowRight className="text-h_red h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="text-h_redLight h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                 </div>
               </section>
@@ -544,7 +544,7 @@ export default function TermsOfServicePage() {
                   By using DJcovery, you acknowledge that you have read,
                   understood, and agree to these Terms of Service.
                 </InfoNote>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-gray-400">
                   &copy; {new Date().getFullYear()} DJcovery. All rights
                   reserved.
                 </p>
@@ -560,7 +560,7 @@ export default function TermsOfServicePage() {
 function SectionHeading({ number, title }: { number: number; title: string }) {
   return (
     <div className="mb-5 flex items-baseline gap-3 border-b border-white/5 pb-4">
-      <span className="text-h_red font-heading text-sm font-bold tabular-nums">
+      <span className="text-h_redLight font-heading text-sm font-bold tabular-nums">
         {String(number).padStart(2, "0")}
       </span>
       <h2 className="font-heading text-xl text-white">{title}</h2>

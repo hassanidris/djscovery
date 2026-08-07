@@ -260,7 +260,7 @@ function EmptyState({
   return (
     <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 py-16 text-center">
       <h3 className="text-lg font-semibold text-white">{title}</h3>
-      <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
+      <p className="mx-auto mt-2 max-w-md text-sm text-gray-400">
         {description}
       </p>
       <Button className="mt-6" onClick={onAdd}>

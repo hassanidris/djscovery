@@ -53,7 +53,7 @@ export default function SearchModal({ open, onClose }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search DJs, genres, events..."
-            className="flex-1 bg-transparent text-base text-white outline-none placeholder:text-gray-500"
+            className="flex-1 bg-transparent text-base text-white outline-none placeholder:text-gray-400"
             aria-label="Search DJcovery"
           />
           {query && (
@@ -61,7 +61,7 @@ export default function SearchModal({ open, onClose }: Props) {
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search"
-              className="text-gray-500 transition-colors hover:text-white"
+              className="text-gray-400 transition-colors hover:text-white"
             >
               <X className="h-4 w-4" aria-hidden />
             </button>
@@ -70,14 +70,14 @@ export default function SearchModal({ open, onClose }: Props) {
             <button
               type="submit"
               aria-label="Submit search"
-              className="text-h_red hover:text-h_redDark transition-colors"
+              className="text-h_redLight hover:text-h_redLightDark transition-colors"
             >
               <ArrowRight className="h-5 w-5" aria-hidden />
             </button>
           )}
         </form>
         <div className="px-4 py-3">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             Search across the DJ directory, genres, and more. Press{" "}
             <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5 text-[10px] text-gray-400">
               Enter

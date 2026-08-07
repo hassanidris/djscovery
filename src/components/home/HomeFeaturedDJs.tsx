@@ -24,7 +24,7 @@ export default async function HomeFeaturedDJs() {
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-gray-400">
               Curated talent you should know
-              <span className="text-gray-500">
+              <span className="text-gray-400">
                 {" "}
                 · Admin-picked + high reputation
               </span>
@@ -34,7 +34,7 @@ export default async function HomeFeaturedDJs() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red hover:text-h_red hover:bg-white/5"
+            className="text-h_redLight hover:text-h_redLight hover:bg-white/5"
           >
             <Link href="/directory">View all →</Link>
           </Button>
@@ -71,7 +71,7 @@ export default async function HomeFeaturedDJs() {
                     <p className="text-lg leading-tight font-bold text-white">
                       Dj. {dj.stageName}
                     </p>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-gray-400">
                       📍 {dj.city?.name}, {dj.country?.name}
                     </p>
                   </div>

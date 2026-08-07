@@ -311,7 +311,7 @@ export default async function AdminEventDetailPage({
                             {review.review}
                           </p>
                         )}
-                        <p className="mt-2 text-xs text-gray-500">
+                        <p className="mt-2 text-xs text-gray-400">
                           {format(new Date(review.createdAt), "dd MMM yyyy")}
                         </p>
                       </div>
@@ -358,7 +358,7 @@ export default async function AdminEventDetailPage({
                           >
                             {moderation.status}
                           </Badge>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-400">
                             {format(
                               new Date(moderation.createdAt),
                               "dd MMM yyyy",
@@ -368,12 +368,12 @@ export default async function AdminEventDetailPage({
                         <p className="mt-2 text-sm text-gray-300">
                           {moderation.adminComment}
                         </p>
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-gray-400">
                           By{" "}
                           {moderation.admin.name || moderation.admin.username}
                         </p>
                         {moderation.resolvedAt && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-xs text-gray-400">
                             Resolved:{" "}
                             {format(
                               new Date(moderation.resolvedAt),
@@ -529,7 +529,7 @@ export default async function AdminEventDetailPage({
               <textarea
                 name="adminComment"
                 placeholder="Describe what needs to be edited..."
-                className="focus:border-h_red/50 focus:ring-h_red/50 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white placeholder:text-gray-500 focus:ring-1 focus:outline-none"
+                className="focus:border-h_red/50 focus:ring-h_red/50 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white placeholder:text-gray-400 focus:ring-1 focus:outline-none"
                 rows={3}
                 required
               />

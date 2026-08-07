@@ -17,7 +17,7 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   },
   ARCHIVED: {
     label: "Archived",
-    className: "bg-white/8 text-gray-500",
+    className: "bg-white/8 text-gray-400",
   },
 };
 
@@ -61,7 +61,7 @@ export default function SavedEventListItem({ event }: { event: Event }) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <CalendarHeart className="h-5 w-5 text-gray-600" />
+              <CalendarHeart className="h-5 w-5 text-gray-400" />
             </div>
           )}
         </div>
@@ -90,14 +90,14 @@ export default function SavedEventListItem({ event }: { event: Event }) {
         </p>
 
         {(event.city || event.country) && (
-          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-gray-500">
+          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-gray-400">
             <MapPin className="h-3 w-3 shrink-0" />
             {[event.city?.name, event.country?.name].filter(Boolean).join(", ")}
           </p>
         )}
 
         {event.ownerDj && (
-          <p className="mt-1 truncate text-xs text-gray-500">
+          <p className="mt-1 truncate text-xs text-gray-400">
             by{" "}
             <Link
               href={`/djs/${event.ownerDj.slug}`}
@@ -109,7 +109,10 @@ export default function SavedEventListItem({ event }: { event: Event }) {
         )}
       </div>
 
-      <RemoveSavedEventButton eventId={event.id} onSuccess={() => setRemoved(true)} />
+      <RemoveSavedEventButton
+        eventId={event.id}
+        onSuccess={() => setRemoved(true)}
+      />
     </div>
   );
 }

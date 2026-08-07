@@ -158,7 +158,7 @@ export default async function FanProfilePage() {
                           className="object-cover"
                         />
                       ) : (
-                        <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-gray-500">
+                        <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-gray-400">
                           {event.title.slice(0, 2).toUpperCase()}
                         </span>
                       )}
@@ -167,7 +167,7 @@ export default async function FanProfilePage() {
                       <p className="text-sm font-medium text-white">
                         {event.title}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         {new Date(event.startDate).toLocaleDateString("en-GB", {
                           day: "numeric",
                           month: "short",
@@ -188,7 +188,7 @@ export default async function FanProfilePage() {
                         <Clock className="h-3.5 w-3.5" />
                         {event.daysRemaining} days left
                       </div>
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-zinc-400">
                         {event.reviewedCount} of {event.totalDjCount} reviewed
                       </p>
                     </div>
@@ -220,7 +220,7 @@ export default async function FanProfilePage() {
         <Card className="hover:border-h_red/40 hover:bg-h_red/5 transition-colors">
           <CardContent className="flex items-center gap-4 py-5">
             <div className="bg-h_red/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-              <Users className="text-h_red h-5 w-5" />
+              <Users className="text-h_redLight h-5 w-5" />
             </div>
             <div className="flex-1">
               <p className="font-semibold">Browse DJs</p>

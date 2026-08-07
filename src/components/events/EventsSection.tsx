@@ -99,7 +99,7 @@ export function EventsSection({
               </div>
               <p className="mt-1 text-sm leading-relaxed text-gray-400">
                 One rail, switch between trending and newest
-                <span className="text-gray-500">
+                <span className="text-gray-400">
                   {" · "}
                   {activeTab === "trending"
                     ? "Sorted by popularity"
@@ -111,7 +111,7 @@ export function EventsSection({
               asChild
               variant="ghost"
               size="sm"
-              className="text-h_red hover:text-h_red shrink-0 hover:bg-white/5"
+              className="text-h_redLight hover:text-h_redLight shrink-0 hover:bg-white/5"
             >
               <Link href={viewAllHref}>View all →</Link>
             </Button>

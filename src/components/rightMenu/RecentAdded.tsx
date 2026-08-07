@@ -32,41 +32,41 @@ const DJS = [
 
 const RecentAdded = () => {
   return (
-    <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm flex flex-col gap-4">
+    <div className="bg-h_blackLight/50 flex flex-col gap-4 rounded-lg p-4 text-sm shadow-md">
       {/* Top */}
-      <div className="flex justify-between items-center font-medium">
+      <div className="flex items-center justify-between font-medium">
         <span className="text-gray-200">Recent Added Djs</span>
-        <Link href="#" className="text-h_red text-xs">
+        <Link href="#" className="text-h_redLight text-xs">
           See all
         </Link>
       </div>
       {/* Users */}
       {DJS.map((dj, index) => (
         <React.Fragment key={dj.id}>
-          <div className=" flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <Link href="#">
-              <div className=" flex items-center gap-4">
+              <div className="flex items-center gap-4">
                 <Image
                   src={dj.imgSrc}
                   alt=""
                   width={40}
                   height={40}
-                  className=" w-10 h-10 object-cover rounded-full ring-1 ring-gray-400"
+                  className="h-10 w-10 rounded-full object-cover ring-1 ring-gray-400"
                 />
-                <div className=" flex flex-col gap-1">
-                  <span className=" text-h_white">{dj.name}</span>
-                  <span className=" text-gray-400 text-xs">{dj.location}</span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-h_white">{dj.name}</span>
+                  <span className="text-xs text-gray-400">{dj.location}</span>
                 </div>
               </div>
             </Link>
-            <div className="flex gap-3 justify-end">
-              <button className="bg-h_red hover:bg-h_redDark text-white text-xs px-2 py-1 rounded-md">
+            <div className="flex justify-end gap-3">
+              <button className="bg-h_red hover:bg-h_redDark rounded-md px-2 py-1 text-xs text-white">
                 Follow
               </button>
             </div>
           </div>
           {index < DJS.length - 1 && (
-            <hr className="border-t border-gray-800 w-full self-center" />
+            <hr className="w-full self-center border-t border-gray-800" />
           )}
         </React.Fragment>
       ))}

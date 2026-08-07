@@ -145,7 +145,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
         {activeMedia === "mix" && (
           <div className="px-4 pb-3">
             <div className="focus-within:ring-h_red/40 flex items-center gap-2 rounded-lg bg-black/20 px-3 py-2 ring-1 ring-white/10 transition-all">
-              <Music2 className="text-h_red/80 h-4 w-4 shrink-0" />
+              <Music2 className="text-h_redLight/80 h-4 w-4 shrink-0" />
               <input
                 type="url"
                 placeholder="Paste mix link (SoundCloud, Mixcloud…)"
@@ -214,8 +214,8 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
                   }}
                   className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                     activeMedia === "photo"
-                      ? "text-h_red bg-h_red/10 border-h_red/20 border"
-                      : "text-white/40 hover:bg-white/5 hover:text-white"
+                      ? "text-h_redLight bg-h_red/10 border-h_red/20 border"
+                      : "text-white/60 hover:bg-white/5 hover:text-white"
                   }`}
                 >
                   <ImageIcon className="h-3.5 w-3.5" />
@@ -230,8 +230,8 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
               onClick={() => switchMedia("video")}
               className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                 activeMedia === "video"
-                  ? "text-h_red bg-h_red/10 border-h_red/20 border"
-                  : "text-white/40 hover:bg-white/5 hover:text-white"
+                  ? "text-h_redLight bg-h_red/10 border-h_red/20 border"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
               }`}
             >
               <Video className="h-3.5 w-3.5" />
@@ -244,8 +244,8 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
               onClick={() => switchMedia("mix")}
               className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                 activeMedia === "mix"
-                  ? "text-h_red bg-h_red/10 border-h_red/20 border"
-                  : "text-white/40 hover:bg-white/5 hover:text-white"
+                  ? "text-h_redLight bg-h_red/10 border-h_red/20 border"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
               }`}
             >
               <Music2 className="h-3.5 w-3.5" />

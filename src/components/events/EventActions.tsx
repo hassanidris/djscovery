@@ -57,7 +57,7 @@ export function EventActions({ eventId, eventSlug, status }: Props) {
 
   return (
     <div className="flex items-center gap-1.5">
-      {isPending && <Loader2 className="h-4 w-4 animate-spin text-zinc-500" />}
+      {isPending && <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />}
 
       <Button
         asChild
@@ -106,7 +106,7 @@ export function EventActions({ eventId, eventSlug, status }: Props) {
           variant="ghost"
           onClick={handleDelete}
           disabled={isPending}
-          className="h-8 px-2 text-zinc-500 hover:bg-red-950 hover:text-red-400"
+          className="h-8 px-2 text-zinc-400 hover:bg-red-950 hover:text-red-400"
           title="Delete"
         >
           <Trash2 className="h-3.5 w-3.5" />

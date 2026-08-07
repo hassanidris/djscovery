@@ -34,7 +34,7 @@ export default function AdminNoteForm({ inquiryId }: { inquiryId: number }) {
       <Textarea
         name="note"
         placeholder="Add an admin-only note to this inquiry..."
-        className="min-h-20 border-white/10 bg-white/5 text-white placeholder:text-gray-500"
+        className="min-h-20 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
         required
       />
       <div className="mt-2">

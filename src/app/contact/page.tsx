@@ -76,14 +76,14 @@ export default async function ContactPage({
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
               <div className="bg-h_red/10 border-h_red/20 flex size-10 shrink-0 items-center justify-center rounded-xl border">
-                <Mail className="text-h_red h-5 w-5" />
+                <Mail className="text-h_redLight h-5 w-5" />
               </div>
-              <span className="text-h_red text-xs font-semibold tracking-[0.15em] uppercase">
+              <span className="text-h_redLight text-xs font-semibold tracking-[0.15em] uppercase">
                 Get in touch
               </span>
             </div>
             <h1 className="font-heading text-4xl text-white md:text-6xl">
-              Contact <span className="text-h_red">Us</span>
+              Contact <span className="text-h_redLight">Us</span>
             </h1>
             <p className="max-w-xl text-base leading-relaxed text-gray-400 md:text-lg">
               Have a question, a problem, or a partnership idea? Fill in the
@@ -105,11 +105,11 @@ export default async function ContactPage({
                   className="flex gap-4 rounded-2xl border border-white/5 bg-white/2 p-5"
                 >
                   <div className="bg-h_red/10 flex size-9 shrink-0 items-center justify-center rounded-xl">
-                    <Icon className="text-h_red h-4 w-4" />
+                    <Icon className="text-h_redLight h-4 w-4" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-sm font-semibold text-white">{title}</p>
-                    <p className="text-xs leading-relaxed text-gray-500">
+                    <p className="text-xs leading-relaxed text-gray-400">
                       {body}
                     </p>
                   </div>
@@ -118,7 +118,7 @@ export default async function ContactPage({
 
               <div className="mt-2 rounded-2xl border border-white/5 bg-white/2 p-5">
                 <div className="mb-3 flex items-center gap-2.5">
-                  <MessageSquare className="text-h_red h-4 w-4" />
+                  <MessageSquare className="text-h_redLight h-4 w-4" />
                   <p className="text-sm font-semibold text-white">
                     Common topics
                   </p>
@@ -151,9 +151,10 @@ export default async function ContactPage({
                 <h2 className="font-heading text-xl text-white">
                   Send us a message
                 </h2>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   All fields marked with{" "}
-                  <span className="text-h_red font-bold">*</span> are required.
+                  <span className="text-h_redLight font-bold">*</span> are
+                  required.
                 </p>
               </div>
               <ContactForm

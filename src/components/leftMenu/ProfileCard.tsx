@@ -75,14 +75,14 @@ const ProfileCard = async () => {
         <p className="text-h_white text-sm leading-tight font-semibold">
           {user.djProfile ? `Dj. ${displayName}` : displayName}
         </p>
-        <p className="mt-0.5 text-xs text-white/40">
+        <p className="mt-0.5 text-xs text-white/60">
           @{user.djProfile?.slug ?? user.username}
         </p>
         <div className="mt-3 flex items-center gap-1.5 border-t border-white/10 pt-3">
           <span className="text-h_white text-xs font-semibold">
             {user._count.followers}
           </span>
-          <span className="text-xs text-white/40">Followers</span>
+          <span className="text-xs text-white/60">Followers</span>
         </div>
       </div>
     </div>

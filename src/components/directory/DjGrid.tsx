@@ -26,7 +26,7 @@ const DjGrid = ({ djs }: DjGridProps) => {
 
   if (djs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+      <div className="flex flex-col items-center justify-center py-20 text-gray-400">
         <p className="text-lg">No DJs found</p>
         <p className="mt-1 text-sm">Try adjusting your filters</p>
       </div>

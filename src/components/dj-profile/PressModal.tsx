@@ -136,7 +136,7 @@ export default function PressModal({
                 <button
                   type="button"
                   onClick={() => removePressItem(index)}
-                  className="text-gray-500 transition-colors hover:text-red-400"
+                  className="text-gray-400 transition-colors hover:text-red-400"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -152,7 +152,7 @@ export default function PressModal({
                       updatePressItem(index, "source", e.target.value)
                     }
                     placeholder="e.g., Mixmag"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                 </div>
                 <div>
@@ -186,7 +186,7 @@ export default function PressModal({
                     updatePressItem(index, "title", e.target.value)
                   }
                   placeholder="e.g., The Sound of Lagos Goes Global"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                 />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -205,7 +205,7 @@ export default function PressModal({
                         variant="outline"
                         className={cn(
                           "focus:border-h_red/50 h-9 w-full justify-start border-white/10 bg-white/5 text-left font-normal text-white",
-                          !item.date && "text-gray-600",
+                          !item.date && "text-gray-400",
                         )}
                       >
                         <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
@@ -238,7 +238,7 @@ export default function PressModal({
                       updatePressItem(index, "url", e.target.value)
                     }
                     placeholder="https://..."
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                 </div>
               </div>

@@ -40,13 +40,15 @@ export default function DjProfileMobileBottomBar({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/95 backdrop-blur-md lg:hidden">
+    <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-black/95 backdrop-blur-md lg:hidden">
       <div className="mx-auto max-w-6xl px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {feeRange && (
             <div className="flex flex-col">
-              <span className="text-[11px] text-gray-500">Fee Range</span>
-              <span className="text-sm font-semibold text-white">{feeRange}</span>
+              <span className="text-[11px] text-gray-400">Fee Range</span>
+              <span className="text-sm font-semibold text-white">
+                {feeRange}
+              </span>
             </div>
           )}
           <Button

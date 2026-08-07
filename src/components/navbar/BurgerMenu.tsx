@@ -91,7 +91,7 @@ export default function BurgerMenu({
               <SheetClose asChild>
                 <button
                   aria-label="Close menu"
-                  className="flex size-8 items-center justify-center rounded-lg text-xl font-light text-gray-500 transition-colors hover:bg-white/5 hover:text-white"
+                  className="flex size-8 items-center justify-center rounded-lg text-xl font-light text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   ✕
                 </button>
@@ -114,7 +114,7 @@ export default function BurgerMenu({
                     {navRole === "dj" ? `Dj. ${displayName}` : displayName}
                   </p>
                   {username && (
-                    <p className="truncate text-xs text-gray-500">
+                    <p className="truncate text-xs text-gray-400">
                       @{username}
                     </p>
                   )}
@@ -132,7 +132,7 @@ export default function BurgerMenu({
             aria-label="Mobile navigation"
           >
             <div className="px-3">
-              <p className="mb-2 px-2 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
+              <p className="mb-2 px-2 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
                 Explore
               </p>
 
@@ -148,12 +148,12 @@ export default function BurgerMenu({
                   return (
                     <span
                       key={item.id}
-                      className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-600 select-none"
+                      className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-400 select-none"
                       aria-disabled="true"
                     >
                       <Icon className="h-4 w-4 shrink-0" aria-hidden />
                       <span className="flex-1">{item.label}</span>
-                      <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
+                      <span className="text-h_redLight/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                         Soon
                       </span>
                     </span>
@@ -175,7 +175,7 @@ export default function BurgerMenu({
                       <Icon
                         className={cn(
                           "h-4 w-4 shrink-0",
-                          isActive ? "text-h_red" : "",
+                          isActive ? "text-h_redLight" : "",
                         )}
                         aria-hidden
                       />
@@ -190,7 +190,7 @@ export default function BurgerMenu({
               <>
                 <Separator className="my-3 bg-white/8" />
                 <div className="px-3">
-                  <p className="mb-2 px-2 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
+                  <p className="mb-2 px-2 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
                     Account
                   </p>
 
@@ -223,7 +223,7 @@ export default function BurgerMenu({
                             <User
                               className={cn(
                                 "h-4 w-4 shrink-0",
-                                isProfileActive ? "text-h_red" : "",
+                                isProfileActive ? "text-h_redLight" : "",
                               )}
                               aria-hidden
                             />
@@ -253,7 +253,7 @@ export default function BurgerMenu({
                           className={cn(
                             "h-4 w-4 shrink-0",
                             pathname.startsWith("/dj/overview")
-                              ? "text-h_red"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -281,7 +281,7 @@ export default function BurgerMenu({
                           className={cn(
                             "h-4 w-4 shrink-0",
                             pathname.startsWith("/dj/events")
-                              ? "text-h_red"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -314,7 +314,7 @@ export default function BurgerMenu({
                             "h-4 w-4 shrink-0",
                             pathname === "/organizer" ||
                               pathname.startsWith("/organizer/")
-                              ? "text-h_red"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -356,7 +356,7 @@ export default function BurgerMenu({
                             pathname.startsWith("/dj/account") ||
                               pathname.startsWith("/organizer/account") ||
                               pathname.startsWith("/fan/account")
-                              ? "text-h_red"
+                              ? "text-h_redLight"
                               : "",
                           )}
                           aria-hidden
@@ -378,7 +378,10 @@ export default function BurgerMenu({
                 onClick={() => signOutFormRef.current?.requestSubmit()}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
               >
-                <LogOut className="text-h_red h-4 w-4 shrink-0" aria-hidden />
+                <LogOut
+                  className="text-h_redLight h-4 w-4 shrink-0"
+                  aria-hidden
+                />
                 <span>Sign out</span>
               </button>
             ) : (
@@ -386,7 +389,7 @@ export default function BurgerMenu({
                 <Button
                   asChild
                   variant="outline"
-                  className="border-h_red/60 text-h_red hover:bg-h_red/15 hover:text-h_red hover:border-h_red w-full"
+                  className="border-h_red/60 text-h_redLight hover:bg-h_red/15 hover:text-h_redLight hover:border-h_red w-full"
                 >
                   <SheetClose asChild>
                     <Link href="/sign-in">

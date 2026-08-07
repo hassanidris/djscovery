@@ -33,7 +33,7 @@ export default function ComingSoonPage() {
           DJcovery is getting a brand new home. We&apos;re putting the finishing
           touches on something special for DJs and event organizers.
         </p>
-        <div className="mt-10 flex items-center gap-2 text-sm text-gray-500">
+        <div className="mt-10 flex items-center gap-2 text-sm text-gray-400">
           <span className="bg-h_red inline-block h-2 w-2 animate-pulse rounded-full" />
           Stay tuned
         </div>

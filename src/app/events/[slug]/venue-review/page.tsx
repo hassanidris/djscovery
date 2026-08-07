@@ -39,7 +39,7 @@ export default async function VenueReviewPage({
           variant="ghost"
           size="sm"
           asChild
-          className="mb-6 text-gray-500 hover:text-white"
+          className="mb-6 text-gray-400 hover:text-white"
         >
           <Link href={`/events/${context.eventSlug}`}>
             <ArrowLeft className="mr-1.5 h-4 w-4" />
@@ -50,7 +50,7 @@ export default async function VenueReviewPage({
         <h1 className="mb-2 text-2xl font-bold text-white">
           Review {context.venueName}
         </h1>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-6 text-sm text-gray-400">
           for <span className="text-gray-300">{context.eventTitle}</span>
         </p>
 

@@ -104,7 +104,7 @@ export default async function EditEventPage({
               <p className="mb-2 text-sm text-gray-300">
                 Admin requested: {pendingModeration.adminComment}
               </p>
-              <p className="mb-4 text-xs text-gray-500">
+              <p className="mb-4 text-xs text-gray-400">
                 Requested by{" "}
                 {pendingModeration.admin.name ||
                   pendingModeration.admin.username}

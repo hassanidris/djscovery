@@ -12,36 +12,36 @@ export default async function SelectRolePage() {
   if (!user) redirect("/sign-in");
 
   return (
-    <div className="min-h-[calc(100vh-96px)] flex items-center justify-center px-4 py-12">
+    <div className="flex min-h-[calc(100vh-96px)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
         {/* Header */}
-        <div className="text-center mb-10 space-y-2">
+        <div className="mb-10 space-y-2 text-center">
           <h1 className="text-3xl font-bold text-white">
             What are you here for?
           </h1>
-          <p className="text-gray-400 text-sm">
-            Choose your role to unlock the right features. You can always
-            update this later.
+          <p className="text-sm text-gray-400">
+            Choose your role to unlock the right features. You can always update
+            this later.
           </p>
         </div>
 
         {/* Role cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* DJ card */}
           <form action={assignRole.bind(null, "DJ")}>
             <button
               type="submit"
-              className="w-full group bg-white/5 hover:bg-h_red/10 border border-white/10 hover:border-h_red/60 rounded-xl p-6 flex flex-col gap-3 text-left transition-all"
+              className="group hover:bg-h_red/10 hover:border-h_red/60 flex w-full flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-6 text-left transition-all"
             >
               <span className="text-4xl">🎛️</span>
               <div>
-                <p className="text-white font-bold text-lg">I&apos;m a DJ</p>
-                <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                <p className="text-lg font-bold text-white">I&apos;m a DJ</p>
+                <p className="mt-1 text-sm leading-relaxed text-gray-400">
                   Create a public profile, showcase your mixes, and get
                   discovered by event organizers.
                 </p>
               </div>
-              <span className="text-h_red text-sm font-semibold group-hover:underline mt-auto">
+              <span className="text-h_redLight mt-auto text-sm font-semibold group-hover:underline">
                 Set up DJ profile →
               </span>
             </button>
@@ -51,19 +51,19 @@ export default async function SelectRolePage() {
           <form action={assignRole.bind(null, "ORGANIZER")}>
             <button
               type="submit"
-              className="w-full group bg-white/5 hover:bg-h_red/10 border border-white/10 hover:border-h_red/60 rounded-xl p-6 flex flex-col gap-3 text-left transition-all"
+              className="group hover:bg-h_red/10 hover:border-h_red/60 flex w-full flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-6 text-left transition-all"
             >
               <span className="text-4xl">🎪</span>
               <div>
-                <p className="text-white font-bold text-lg">
+                <p className="text-lg font-bold text-white">
                   I&apos;m an Organizer
                 </p>
-                <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                <p className="mt-1 text-sm leading-relaxed text-gray-400">
                   Post gigs, hire DJs for your events, and manage bookings all
                   in one place.
                 </p>
               </div>
-              <span className="text-h_red text-sm font-semibold group-hover:underline mt-auto">
+              <span className="text-h_redLight mt-auto text-sm font-semibold group-hover:underline">
                 Set up organizer profile →
               </span>
             </button>
@@ -74,7 +74,7 @@ export default async function SelectRolePage() {
         <div className="text-center">
           <Link
             href="/"
-            className="text-gray-500 hover:text-gray-300 text-sm transition-colors"
+            className="text-sm text-gray-400 transition-colors hover:text-gray-300"
           >
             Skip for now — I&apos;ll just browse as a fan
           </Link>

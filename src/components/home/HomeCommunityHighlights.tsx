@@ -126,7 +126,7 @@ export default async function HomeCommunityHighlights() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red hover:text-h_red hover:bg-white/5"
+            className="text-h_redLight hover:text-h_redLight hover:bg-white/5"
           >
             <Link href="/community">View all →</Link>
           </Button>
@@ -147,7 +147,7 @@ export default async function HomeCommunityHighlights() {
                     <p className="text-sm font-semibold text-white">
                       {post.dj}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-400">
                       {post.city && post.country
                         ? `📍 ${post.city}, ${post.country} · `
                         : ""}
@@ -160,7 +160,7 @@ export default async function HomeCommunityHighlights() {
                   {post.content}
                 </p>
 
-                <div className="mt-auto flex items-center gap-4 border-t border-white/5 pt-3 text-xs text-gray-500">
+                <div className="mt-auto flex items-center gap-4 border-t border-white/5 pt-3 text-xs text-gray-400">
                   <span>❤️ {formatNumber(post.likes)} likes</span>
                   <span>💬 {post.comments} comments</span>
                 </div>

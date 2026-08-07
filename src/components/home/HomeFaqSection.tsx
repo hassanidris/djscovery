@@ -12,9 +12,9 @@ export default function HomeFaqSection() {
           <div className="flex flex-col gap-4 lg:w-72 lg:shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-xl border">
-                <CircleHelp className="text-h_red h-4.5 w-4.5" />
+                <CircleHelp className="text-h_redLight h-4.5 w-4.5" />
               </div>
-              <span className="text-h_red text-xs font-semibold tracking-[0.15em] uppercase">
+              <span className="text-h_redLight text-xs font-semibold tracking-[0.15em] uppercase">
                 FAQ
               </span>
             </div>
@@ -29,7 +29,7 @@ export default function HomeFaqSection() {
 
             <Link
               href="/faq"
-              className="text-h_red hover:text-h_redDark mt-2 inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
+              className="text-h_redLight hover:text-h_redLightDark mt-2 inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
             >
               View all FAQs
               <ArrowRight className="h-3.5 w-3.5" />

@@ -321,7 +321,7 @@ const UPGRADE_TRIGGERS = [
 function Cell({ val }: { val: boolean | string }) {
   if (val === true) return <CircleCheck className="h-4 w-4 text-emerald-500" />;
   if (val === false) return <X className="h-4 w-4 text-gray-700" />;
-  return <span className="text-h_red text-xs font-semibold">{val}</span>;
+  return <span className="text-h_redLight text-xs font-semibold">{val}</span>;
 }
 
 const CATEGORIES = Array.from(new Set(ROWS.map((r) => r.category)));
@@ -370,13 +370,13 @@ export default function DjProfileComparePage() {
           {/* Table header */}
           <div className="bg-h_blackLight/60 grid grid-cols-[1fr_100px_100px] border-b border-white/8 md:grid-cols-[1fr_140px_160px]">
             <div className="p-5">
-              <span className="text-sm font-semibold text-gray-500">
+              <span className="text-sm font-semibold text-gray-400">
                 Feature
               </span>
             </div>
             <div className="border-l border-white/8 p-5 text-center">
               <span className="text-sm font-bold text-white">Free</span>
-              <p className="mt-0.5 text-xs text-gray-500">£0 / mo</p>
+              <p className="mt-0.5 text-xs text-gray-400">£0 / mo</p>
             </div>
             <div className="border-l border-amber-500/20 bg-amber-500/5 p-5 text-center">
               <div className="flex items-center justify-center gap-1.5">
@@ -385,7 +385,7 @@ export default function DjProfileComparePage() {
                   Premium
                 </span>
               </div>
-              <p className="mt-0.5 text-xs text-gray-500">£19 / mo</p>
+              <p className="mt-0.5 text-xs text-gray-400">£19 / mo</p>
             </div>
           </div>
 
@@ -395,7 +395,7 @@ export default function DjProfileComparePage() {
               <div key={cat}>
                 {/* Category header */}
                 <div className="border-b border-white/5 bg-white/2 px-5 py-2.5">
-                  <span className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">
+                  <span className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
                     {cat}
                   </span>
                 </div>
@@ -409,7 +409,7 @@ export default function DjProfileComparePage() {
                         {row.feature}
                       </span>
                       {row.upgradeHook && (
-                        <span className="mt-0.5 text-xs text-gray-500 italic">
+                        <span className="mt-0.5 text-xs text-gray-400 italic">
                           {row.upgradeHook}
                         </span>
                       )}
@@ -433,7 +433,7 @@ export default function DjProfileComparePage() {
             <h2 className="font-heading mb-2 text-3xl text-white">
               What Makes DJs Upgrade
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               Designed psychological triggers that convert Free users to Premium
             </p>
           </div>
@@ -445,7 +445,7 @@ export default function DjProfileComparePage() {
               >
                 <div className="flex items-start gap-3">
                   <div className="bg-h_red/10 border-h_red/20 mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border">
-                    <t.icon className="text-h_red h-3.5 w-3.5" />
+                    <t.icon className="text-h_redLight h-3.5 w-3.5" />
                   </div>
                   <div className="flex-1">
                     <p className="mb-1 text-sm font-semibold text-white">
@@ -454,7 +454,7 @@ export default function DjProfileComparePage() {
                     <Badge className="mb-2 border-amber-500/20 bg-amber-500/10 text-[11px] text-amber-400">
                       {t.emotion}
                     </Badge>
-                    <p className="text-h_red flex items-center gap-1 text-xs font-medium">
+                    <p className="text-h_redLight flex items-center gap-1 text-xs font-medium">
                       <ArrowRight className="h-2.5 w-2.5" />
                       {t.cta}
                     </p>

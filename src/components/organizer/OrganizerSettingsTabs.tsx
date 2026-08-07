@@ -752,6 +752,7 @@ function SocialTab({ profile }: { profile: ProfileData }) {
               size="icon"
               onClick={() => removeLink(i)}
               className="text-muted-foreground hover:text-destructive shrink-0"
+              aria-label="Remove link"
             >
               <Trash2 className="h-4 w-4" />
             </Button>

@@ -10,11 +10,11 @@ export default function DirectoryLoading() {
           {/* Left — icon box + title + subtitle */}
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
-              <AudioLines className="text-h_red h-6 w-6" />
+              <AudioLines className="text-h_redLight h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
               <h1 className="text-h_white text-3xl font-bold md:text-5xl">
-                DJ <span className="text-h_red/80">Directory</span>
+                DJ <span className="text-h_redLight/80">Directory</span>
               </h1>
               <p className="text-sm tracking-wide text-gray-400">
                 Browse and discover talented DJs from around the world.

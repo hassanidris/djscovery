@@ -2,7 +2,14 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
-import { X, Upload, Link as LinkIcon, Headphones, Play, ImageIcon } from "lucide-react";
+import {
+  X,
+  Upload,
+  Link as LinkIcon,
+  Headphones,
+  Play,
+  ImageIcon,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +25,7 @@ import { createDjMedia, updateDjMediaItem } from "@/lib/actions/dj-media";
 import type { MediaItem } from "@/lib/actions/dj-media";
 
 export type MediaFormMode =
-  | { mode: "create" }
-  | { mode: "edit"; media: MediaItem };
+  { mode: "create" } | { mode: "edit"; media: MediaItem };
 
 type MediaFormProps = {
   open: boolean;
@@ -28,13 +34,22 @@ type MediaFormProps = {
   onSuccess: () => void;
 };
 
-const TYPE_OPTIONS: { value: MediaItem["type"]; label: string; icon: React.ElementType }[] = [
+const TYPE_OPTIONS: {
+  value: MediaItem["type"];
+  label: string;
+  icon: React.ElementType;
+}[] = [
   { value: "AUDIO", label: "Mix", icon: Headphones },
   { value: "VIDEO", label: "Video", icon: Play },
   { value: "IMAGE", label: "Press", icon: ImageIcon },
 ];
 
-export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormProps) {
+export default function MediaForm({
+  open,
+  onClose,
+  mode,
+  onSuccess,
+}: MediaFormProps) {
   const isEdit = mode.mode === "edit";
   const initial = isEdit ? mode.media : null;
 
@@ -115,7 +130,7 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-white/10 bg-h_black text-white">
+      <DialogContent className="bg-h_black max-h-[90vh] max-w-lg overflow-y-auto border-white/10 text-white">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Media" : "Add Media"}</DialogTitle>
         </DialogHeader>
@@ -135,7 +150,7 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
                     <TabsTrigger
                       key={option.value}
                       value={option.value}
-                      className="flex-1 gap-1 data-active:bg-h_redDark data-active:text-white"
+                      className="data-active:bg-h_redDark flex-1 gap-1 data-active:text-white"
                     >
                       <Icon className="h-4 w-4" />
                       {option.label}
@@ -154,7 +169,7 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Summer Arabic Mix 2025"
-              className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+              className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
             />
           </div>
 
@@ -163,7 +178,7 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
             <div className="space-y-1.5">
               <Label htmlFor="url">URL</Label>
               <div className="relative">
-                <LinkIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                <LinkIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <Input
                   id="url"
                   value={url}
@@ -173,10 +188,10 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
                       ? "YouTube, Vimeo, TikTok, Instagram..."
                       : "SoundCloud, Mixcloud..."
                   }
-                  className="border-white/10 bg-white/5 pl-9 text-white placeholder:text-gray-600"
+                  className="border-white/10 bg-white/5 pl-9 text-white placeholder:text-gray-400"
                 />
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 {type === "VIDEO"
                   ? "Supported: YouTube, Vimeo, TikTok, Instagram"
                   : "Supported: SoundCloud, Mixcloud"}
@@ -211,9 +226,13 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
                   </div>
                 ) : (
                   <>
-                    <Upload className="h-8 w-8 text-gray-500" />
-                    <p className="text-sm text-gray-400">Click to upload image</p>
-                    <p className="text-xs text-gray-600">JPEG, PNG, WebP up to 10MB</p>
+                    <Upload className="h-8 w-8 text-gray-400" />
+                    <p className="text-sm text-gray-400">
+                      Click to upload image
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      JPEG, PNG, WebP up to 10MB
+                    </p>
                   </>
                 )}
                 <input
@@ -233,7 +252,9 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
                 <Label htmlFor="spotlight" className="cursor-pointer">
                   Spotlight
                 </Label>
-                <p className="text-xs text-gray-500">Show on your profile spotlight</p>
+                <p className="text-xs text-gray-400">
+                  Show on your profile spotlight
+                </p>
               </div>
               <Switch
                 id="spotlight"
@@ -246,10 +267,19 @@ export default function MediaForm({ open, onClose, mode, onSuccess }: MediaFormP
           {error && <p className="text-sm text-red-400">{error}</p>}
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isPending}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isPending}
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending} className="bg-h_red hover:bg-h_redDark">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="bg-h_red hover:bg-h_redDark"
+            >
               {isPending ? "Saving..." : isEdit ? "Save Changes" : "Add Media"}
             </Button>
           </div>

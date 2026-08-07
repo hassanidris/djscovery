@@ -106,7 +106,7 @@ export default async function OrganizerBookingsPage() {
   return (
     <div className="space-y-10">
       <div className="space-y-2">
-        <Badge className="bg-h_red/20 text-h_red text-xs tracking-widest uppercase">
+        <Badge className="bg-h_red/20 text-h_redLight text-xs tracking-widest uppercase">
           Bookings
         </Badge>
         <h1 className="text-2xl font-bold text-white">Booking Threads</h1>
@@ -121,7 +121,7 @@ export default async function OrganizerBookingsPage() {
           <h2 className="text-lg font-semibold text-white">
             No booking conversations yet
           </h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-400">
             Submit a booking request from a DJ profile and the thread will
             appear here.
           </p>
@@ -147,7 +147,7 @@ export default async function OrganizerBookingsPage() {
 
           {archived.length > 0 && (
             <section>
-              <h2 className="mb-3 text-sm font-semibold tracking-wider text-gray-500 uppercase">
+              <h2 className="mb-3 text-sm font-semibold tracking-wider text-gray-400 uppercase">
                 Archived ({archived.length})
               </h2>
               <div className="space-y-5">

@@ -104,7 +104,7 @@ export function VenueReviews({
                   style={{ width: `${percentage}%` }}
                 />
               </div>
-              <span className="w-8 text-right text-gray-500">{count}</span>
+              <span className="w-8 text-right text-gray-400">{count}</span>
             </div>
           ))}
         </div>
@@ -112,25 +112,25 @@ export function VenueReviews({
         {/* Category breakdown */}
         <div className="grid grid-cols-2 gap-3 rounded-lg border border-white/5 bg-white/2 p-3">
           <div className="space-y-1">
-            <p className="text-xs text-gray-500">Sound System</p>
+            <p className="text-xs text-gray-400">Sound System</p>
             <p className="text-sm font-medium text-white">
               {categoryAvg.soundSystem.toFixed(1)}
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-gray-500">Atmosphere</p>
+            <p className="text-xs text-gray-400">Atmosphere</p>
             <p className="text-sm font-medium text-white">
               {categoryAvg.atmosphere.toFixed(1)}
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-gray-500">Location</p>
+            <p className="text-xs text-gray-400">Location</p>
             <p className="text-sm font-medium text-white">
               {categoryAvg.location.toFixed(1)}
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-gray-500">Accessibility</p>
+            <p className="text-xs text-gray-400">Accessibility</p>
             <p className="text-sm font-medium text-white">
               {categoryAvg.accessibility.toFixed(1)}
             </p>
@@ -156,7 +156,7 @@ export function VenueReviews({
                     <p className="text-sm font-medium text-white">
                       {review.user.username || "Anonymous"}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-400">
                       {new Date(review.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",

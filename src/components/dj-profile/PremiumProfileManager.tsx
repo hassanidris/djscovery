@@ -53,7 +53,7 @@ function Field({
       <Label className="mb-1.5 block text-xs text-gray-300">
         {label}
         {optional && (
-          <span className="ml-1 text-[11px] text-gray-600">(optional)</span>
+          <span className="ml-1 text-[11px] text-gray-400">(optional)</span>
         )}
       </Label>
       {children}
@@ -74,7 +74,7 @@ function Section({
     <Card className="bg-h_blackLight/40 gap-0 border-white/8 p-6">
       <div className="mb-5">
         <h2 className="text-sm font-semibold text-white">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>}
+        {subtitle && <p className="mt-0.5 text-xs text-gray-400">{subtitle}</p>}
       </div>
       <Separator className="mb-5 bg-white/8" />
       {children}
@@ -128,7 +128,7 @@ function HighlightForm({
             value={year}
             onChange={(e) => setYear(e.target.value)}
             placeholder="2024"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
         <Field label="Title">
@@ -136,7 +136,7 @@ function HighlightForm({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Residency at Fabric London"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
       </div>
@@ -145,7 +145,7 @@ function HighlightForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="6-month weekly residency..."
-          className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-400"
         />
       </Field>
       <div className="flex gap-2">
@@ -220,7 +220,7 @@ function EndorsementForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Marcus Osei"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
         <Field label="Role">
@@ -228,7 +228,7 @@ function EndorsementForm({
             value={role}
             onChange={(e) => setRole(e.target.value)}
             placeholder="Music Director"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
         <Field label="Company" optional>
@@ -236,7 +236,7 @@ function EndorsementForm({
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Elite Management"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
         <Field label="Avatar URL" optional>
@@ -244,7 +244,7 @@ function EndorsementForm({
             value={avatar}
             onChange={(e) => setAvatar(e.target.value)}
             placeholder="https://..."
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
       </div>
@@ -253,7 +253,7 @@ function EndorsementForm({
           value={quote}
           onChange={(e) => setQuote(e.target.value)}
           placeholder="One of the most exciting DJs..."
-          className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+          className="min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-400"
         />
       </Field>
       <div className="flex gap-2">
@@ -325,7 +325,7 @@ function PressForm({
             value={source}
             onChange={(e) => setSource(e.target.value)}
             placeholder="DJ Mag"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
         <Field label="Type">
@@ -346,7 +346,7 @@ function PressForm({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Top 10 Afrobeats DJs"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
         <Field label="Date" optional>
@@ -354,7 +354,7 @@ function PressForm({
             value={date}
             onChange={(e) => setDate(e.target.value)}
             placeholder="Sep 2024"
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
         <Field label="URL" optional>
@@ -362,7 +362,7 @@ function PressForm({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://..."
-            className="border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+            className="border-white/10 bg-white/5 text-white placeholder:text-gray-400"
           />
         </Field>
       </div>
@@ -488,7 +488,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
   if (!loaded) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
       </div>
     );
   }
@@ -518,7 +518,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-white">{h.title}</p>
-                  <p className="mt-0.5 text-xs text-gray-500">{h.year}</p>
+                  <p className="mt-0.5 text-xs text-gray-400">{h.year}</p>
                   {h.description && (
                     <p className="mt-1 text-xs text-gray-400">
                       {h.description}
@@ -529,7 +529,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                   <button
                     type="button"
                     onClick={() => setEditHlId(h.id)}
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white"
+                    className="flex size-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
                     aria-label="Edit"
                   >
                     <Pencil className="h-3 w-3" />
@@ -539,7 +539,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                     onClick={() =>
                       handleDelete(h.id, "highlight", deleteDjHighlight)
                     }
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
+                    className="flex size-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-900/30 hover:text-red-400"
                     aria-label="Delete"
                   >
                     <Trash2 className="h-3 w-3" />
@@ -592,7 +592,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-white">{e.name}</p>
-                  <p className="mt-0.5 text-xs text-gray-500">
+                  <p className="mt-0.5 text-xs text-gray-400">
                     {e.role}
                     {e.company ? `, ${e.company}` : ""}
                   </p>
@@ -604,7 +604,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                   <button
                     type="button"
                     onClick={() => setEditEndId(e.id)}
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white"
+                    className="flex size-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
                     aria-label="Edit"
                   >
                     <Pencil className="h-3 w-3" />
@@ -614,7 +614,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                     onClick={() =>
                       handleDelete(e.id, "endorsement", deleteDjEndorsement)
                     }
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
+                    className="flex size-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-900/30 hover:text-red-400"
                     aria-label="Delete"
                   >
                     <Trash2 className="h-3 w-3" />
@@ -667,7 +667,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
               >
                 <div className="min-w-0 flex-1">
                   <div className="mb-0.5 flex items-center gap-2">
-                    <span className="text-h_red text-xs font-bold">
+                    <span className="text-h_redLight text-xs font-bold">
                       {p.source}
                     </span>
                     <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-gray-400">
@@ -676,14 +676,14 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                   </div>
                   <p className="text-sm font-medium text-white">{p.title}</p>
                   {p.date && (
-                    <p className="mt-0.5 text-xs text-gray-600">{p.date}</p>
+                    <p className="mt-0.5 text-xs text-gray-400">{p.date}</p>
                   )}
                   {p.url && (
                     <a
                       href={p.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-h_red mt-1 inline-block text-xs underline"
+                      className="text-h_redLight mt-1 inline-block text-xs underline"
                     >
                       Read article →
                     </a>
@@ -693,7 +693,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                   <button
                     type="button"
                     onClick={() => setEditPressId(p.id)}
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white"
+                    className="flex size-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
                     aria-label="Edit"
                   >
                     <Pencil className="h-3 w-3" />
@@ -703,7 +703,7 @@ export default function PremiumProfileManager({ djProfileId, plan }: Props) {
                     onClick={() =>
                       handleDelete(p.id, "press item", deleteDjPressItem)
                     }
-                    className="flex size-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
+                    className="flex size-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-900/30 hover:text-red-400"
                     aria-label="Delete"
                   >
                     <Trash2 className="h-3 w-3" />

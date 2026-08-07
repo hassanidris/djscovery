@@ -91,15 +91,15 @@ export default function BookingPackages({
           )}
           {pkg.icon && (
             <div className="bg-h_red/10 border-h_red/20 mb-3 flex size-10 items-center justify-center rounded-lg border">
-              <pkg.icon className="text-h_red h-4 w-4" />
+              <pkg.icon className="text-h_redLight h-4 w-4" />
             </div>
           )}
           <p className="text-sm font-semibold text-white">{pkg.name}</p>
-          <p className="text-h_red mt-1 text-lg font-bold">
+          <p className="text-h_redLight mt-1 text-lg font-bold">
             {formatPrice(pkg.priceFrom, pkg.currency, pkg.priceTo)}
           </p>
           {pkg.duration && (
-            <p className="mb-3 text-xs text-gray-500">
+            <p className="mb-3 text-xs text-gray-400">
               {formatDuration(pkg.duration)}
             </p>
           )}

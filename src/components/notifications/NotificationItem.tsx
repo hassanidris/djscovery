@@ -55,11 +55,13 @@ export default function NotificationItem({
         >
           {meta.title}
         </p>
-        <p className="mt-0.5 text-sm text-zinc-500">{meta.body}</p>
+        <p className="mt-0.5 text-sm text-zinc-400">{meta.body}</p>
 
         <div className="mt-2 flex items-center gap-3">
           {meta.href && meta.cta && (
-            <span className="text-h_red text-sm font-medium">{meta.cta} →</span>
+            <span className="text-h_redLight text-sm font-medium">
+              {meta.cta} →
+            </span>
           )}
           <span className="text-xs text-zinc-600">
             {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}

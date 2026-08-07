@@ -101,7 +101,7 @@ export default async function GigEditPage({
         <div className="mb-6 flex items-center justify-between">
           <Link
             href={`/organizer/gigs/${gigId}`}
-            className="flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
+            className="flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to Gig

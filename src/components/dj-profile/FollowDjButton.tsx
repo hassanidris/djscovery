@@ -57,7 +57,7 @@ export default function SaveDjButton({
         aria-label={optimisticFollowing ? "Unfollow DJ" : "Follow DJ"}
         className={cn(
           "flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-40",
-          optimisticFollowing ? "text-white" : "text-gray-500 hover:text-white",
+          optimisticFollowing ? "text-white" : "text-gray-400 hover:text-white",
         )}
       >
         {optimisticFollowing ? (
