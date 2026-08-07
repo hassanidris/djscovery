@@ -161,7 +161,7 @@ export default async function EventsPage({
                 className={`border-b-2 px-4 py-2.5 text-sm font-medium capitalize transition-colors ${
                   activeTab === tab
                     ? "border-white text-white"
-                    : "border-transparent text-zinc-500 hover:text-zinc-300"
+                    : "border-transparent text-zinc-400 hover:text-zinc-300"
                 }`}
               >
                 {tab}

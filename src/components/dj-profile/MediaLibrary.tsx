@@ -358,7 +358,7 @@ export default function MediaLibrary({
               }`}
             >
               <div className="flex w-full items-center justify-start gap-2">
-                <GripVertical className="size-4 shrink-0 cursor-grab text-zinc-500 active:cursor-grabbing" />
+                <GripVertical className="size-4 shrink-0 cursor-grab text-zinc-400 active:cursor-grabbing" />
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded bg-zinc-800">
                   {item.thumbnail ? (
                     <Image
@@ -368,7 +368,7 @@ export default function MediaLibrary({
                       className="object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-zinc-500">
+                    <div className="flex h-full w-full items-center justify-center text-zinc-400">
                       {item.type === "VIDEO" &&
                       getMediaProvider(item.url) === "instagram" ? (
                         <svg
@@ -395,7 +395,7 @@ export default function MediaLibrary({
                     {item.type === "VIDEO" ? "Video" : "Audio"}
                     {item.type === "VIDEO" &&
                       getMediaProvider(item.url) === "instagram" && (
-                        <span className="ml-1 text-[10px] text-zinc-500">
+                        <span className="ml-1 text-[10px] text-zinc-400">
                           · Instagram
                         </span>
                       )}
@@ -426,7 +426,7 @@ export default function MediaLibrary({
                         className={`size-3.5 ${
                           item.isSpotlight
                             ? "fill-yellow-400 text-yellow-400"
-                            : "text-zinc-500"
+                            : "text-zinc-400"
                         }`}
                       />
                     </button>
@@ -434,7 +434,7 @@ export default function MediaLibrary({
                   <button
                     type="button"
                     onClick={() => handleDelete(item.id)}
-                    className="flex size-5 items-center justify-center rounded text-zinc-500 hover:bg-zinc-800 hover:text-white"
+                    className="flex size-5 items-center justify-center rounded text-zinc-400 hover:bg-zinc-800 hover:text-white"
                   >
                     <Trash2 className="size-3" />
                   </button>
@@ -444,7 +444,7 @@ export default function MediaLibrary({
           ))}
 
           {videoAudio.length === 0 && (
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-zinc-400">
               Add video or audio links to showcase your work.
             </p>
           )}

@@ -42,7 +42,7 @@ function RatingInput({ label, value, onChange, disabled }: RatingInputProps) {
             />
           </button>
         ))}
-        <span className="ml-2 text-xs text-zinc-500">
+        <span className="ml-2 text-xs text-zinc-400">
           {activeRating > 0 ? `${activeRating} / 5` : "Select rating"}
         </span>
       </div>

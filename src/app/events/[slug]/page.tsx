@@ -474,14 +474,14 @@ function EventDetailView(props: {
                   <p className="text-sm font-medium text-white">
                     DJ. {ownerDj.stageName}
                   </p>
-                  <p className="text-xs text-zinc-500">Organizer</p>
+                  <p className="text-xs text-zinc-400">Organizer</p>
                 </div>
               </Link>
 
               {/* Stats Card Grid */}
               <div className="mb-8 grid grid-cols-3 gap-3">
                 <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
-                  <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                  <p className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                     Views
                   </p>
                   <p className="mt-1 text-xl font-bold text-white">
@@ -489,7 +489,7 @@ function EventDetailView(props: {
                   </p>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
-                  <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                  <p className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                     Going
                   </p>
                   <p className="mt-1 text-xl font-bold text-white">
@@ -497,7 +497,7 @@ function EventDetailView(props: {
                   </p>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
-                  <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                  <p className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                     Interested
                   </p>
                   <p className="mt-1 text-xl font-bold text-white">
@@ -528,8 +528,8 @@ function EventDetailView(props: {
                 {/* Date/Time Card */}
                 <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
                   <div className="mb-3 flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-zinc-500" />
-                    <h3 className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                    <CalendarDays className="h-4 w-4 text-zinc-400" />
+                    <h3 className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                       Date & Time
                     </h3>
                   </div>
@@ -537,7 +537,7 @@ function EventDetailView(props: {
                     <p>{formatDate(startDate)}</p>
                     {endDate &&
                       endDate.toDateString() !== startDate.toDateString() && (
-                        <p className="text-zinc-500">
+                        <p className="text-zinc-400">
                           to {formatDate(endDate)}
                         </p>
                       )}
@@ -546,7 +546,7 @@ function EventDetailView(props: {
                         {startTime}
                         {endTime ? ` – ${endTime}` : ""}
                         {timezone && (
-                          <span className="ml-1 text-zinc-500">
+                          <span className="ml-1 text-zinc-400">
                             ({timezone})
                           </span>
                         )}
@@ -559,8 +559,8 @@ function EventDetailView(props: {
                 {(location || venue || isPrivate) && (
                   <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
                     <div className="mb-3 flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-zinc-500" />
-                      <h3 className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                      <MapPin className="h-4 w-4 text-zinc-400" />
+                      <h3 className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                         Venue
                       </h3>
                     </div>
@@ -571,7 +571,7 @@ function EventDetailView(props: {
                         <>
                           {venue && <p>{venue}</p>}
                           {location && (
-                            <p className={venue ? "text-zinc-500" : ""}>
+                            <p className={venue ? "text-zinc-400" : ""}>
                               {location}
                             </p>
                           )}
@@ -604,7 +604,7 @@ function EventDetailView(props: {
               {/* Performers */}
               {allPerformers.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
                     Line-up
                   </h2>
                   <div className="space-y-2">
@@ -634,7 +634,7 @@ function EventDetailView(props: {
                             DJ. {dj.stageName}
                           </p>
                           {dj.role && (
-                            <p className="text-xs text-zinc-500">{dj.role}</p>
+                            <p className="text-xs text-zinc-400">{dj.role}</p>
                           )}
                         </div>
                         <ExternalLink className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
@@ -683,7 +683,7 @@ function EventDetailView(props: {
               {/* Venue reviews */}
               {props.venueReviews.length > 0 && venue && (
                 <div className="mb-8">
-                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
                     Venue Reviews
                   </h2>
                   <VenueReviews
@@ -713,7 +713,7 @@ function EventDetailView(props: {
               {/* Post-event recap */}
               {recap && (
                 <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
                     Event Recap
                   </h2>
                   <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
@@ -737,7 +737,7 @@ function EventDetailView(props: {
               {/* Gallery */}
               {gallery.length > 0 && (
                 <div>
-                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+                  <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
                     Photos
                   </h2>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">

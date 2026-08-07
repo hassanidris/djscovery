@@ -215,7 +215,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
                   className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                     activeMedia === "photo"
                       ? "text-h_redLight bg-h_red/10 border-h_red/20 border"
-                      : "text-white/40 hover:bg-white/5 hover:text-white"
+                      : "text-white/60 hover:bg-white/5 hover:text-white"
                   }`}
                 >
                   <ImageIcon className="h-3.5 w-3.5" />
@@ -231,7 +231,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
               className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                 activeMedia === "video"
                   ? "text-h_redLight bg-h_red/10 border-h_red/20 border"
-                  : "text-white/40 hover:bg-white/5 hover:text-white"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
               }`}
             >
               <Video className="h-3.5 w-3.5" />
@@ -245,7 +245,7 @@ const AddPost = ({ avatarUrl, displayName }: AddPostProps = {}) => {
               className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all ${
                 activeMedia === "mix"
                   ? "text-h_redLight bg-h_red/10 border-h_red/20 border"
-                  : "text-white/40 hover:bg-white/5 hover:text-white"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
               }`}
             >
               <Music2 className="h-3.5 w-3.5" />

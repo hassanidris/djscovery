@@ -68,7 +68,7 @@ export default function AboutPage() {
           {/* ── Sticky TOC ── */}
           <aside className="shrink-0 lg:w-60">
             <div className="sticky top-24">
-              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/40 uppercase">
+              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/60 uppercase">
                 Contents
               </p>
               <nav className="flex flex-col gap-1.5">
@@ -78,7 +78,7 @@ export default function AboutPage() {
                     href={`#${item.id}`}
                     className="hover:text-h_redLight group flex items-baseline gap-2.5 text-sm text-gray-400 transition-colors"
                   >
-                    <span className="text-h_redLight/40 group-hover:text-h_redLight min-w-5 text-[11px] font-medium tabular-nums transition-colors">
+                    <span className="text-h_redLight group-hover:text-h_redLight min-w-5 text-[11px] font-medium tabular-nums transition-colors">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {item.label}

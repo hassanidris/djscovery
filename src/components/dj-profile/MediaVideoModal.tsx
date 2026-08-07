@@ -269,7 +269,7 @@ export default function MediaVideoModal({
                     className="object-cover opacity-40"
                   />
                   <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
-                    <Play className="h-10 w-10 text-white/40" />
+                    <Play className="h-10 w-10 text-white/60" />
                     <p className="text-sm text-gray-400">
                       Cannot embed this video automatically
                     </p>

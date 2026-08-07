@@ -84,7 +84,7 @@ export function PrivateVenueNote({
   const { privateVenue, isOwner } = useEventViewer();
   if (!isOwner || !privateVenue) {
     return (
-      <p className="text-zinc-500">
+      <p className="text-zinc-400">
         {publicLocation ? "Venue hidden — private event" : "Private event"}
       </p>
     );
@@ -92,7 +92,7 @@ export function PrivateVenueNote({
   return (
     <>
       <p>{privateVenue}</p>
-      {publicLocation && <p className="text-zinc-500">{publicLocation}</p>}
+      {publicLocation && <p className="text-zinc-400">{publicLocation}</p>}
     </>
   );
 }
@@ -137,7 +137,7 @@ export function EventReviewSlot({
 
   return (
     <section className="mb-8">
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
         Review the DJs
       </h2>
       <div className="space-y-2">
@@ -175,7 +175,7 @@ export function EventReviewSlot({
                     Reviewed
                   </p>
                 ) : (
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-zinc-400">
                     {isOrganizer
                       ? "Share your experience as organizer"
                       : "Share your experience"}

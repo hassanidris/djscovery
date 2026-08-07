@@ -112,7 +112,7 @@ export function EventDjReviews({
   if (isLoading) {
     return (
       <section className="mb-8">
-        <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+        <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
           DJ Reviews from this Event
         </h2>
         <div className="space-y-3">
@@ -137,7 +137,7 @@ export function EventDjReviews({
 
   return (
     <section className="mb-8">
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
         DJ Reviews from this Event
       </h2>
       <div className="space-y-3">

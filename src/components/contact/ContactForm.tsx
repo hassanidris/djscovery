@@ -138,7 +138,7 @@ export function ContactForm({
           aria-invalid={!!state.errors?.category}
           className="focus-visible:border-h_red/50 focus-visible:ring-h_red/20 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-2.5 text-sm text-white transition-colors outline-none focus-visible:ring-2"
         >
-          <option value="" disabled className="bg-neutral-900 text-white/40">
+          <option value="" disabled className="bg-neutral-900 text-white/60">
             Select a category
           </option>
           {CONTACT_CATEGORIES.map((cat) => (

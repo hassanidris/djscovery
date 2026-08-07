@@ -476,7 +476,7 @@ export function EventForm(props: EventFormProps) {
             value={data.title}
             onChange={(e) => set("title", e.target.value)}
             placeholder="e.g. Sunset Grooves Lisbon"
-            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
           />
           {errors.title && (
             <p className="text-xs text-red-400">{errors.title}</p>
@@ -504,7 +504,7 @@ export function EventForm(props: EventFormProps) {
               </button>
             ))}
           </div>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-400">
             {data.eventType === "PUBLIC"
               ? "Visible to everyone. Ticket URL can be added."
               : "Only you can see the full details. Location is hidden."}
@@ -582,7 +582,7 @@ export function EventForm(props: EventFormProps) {
             {posterUrl ? "Change Poster" : "Upload Poster"}
           </Button>
           {props.mode === "create" && (
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-400">
               Poster will be uploaded after the event is created.
             </p>
           )}
@@ -678,7 +678,7 @@ export function EventForm(props: EventFormProps) {
             value={data.venue}
             onChange={(e) => set("venue", e.target.value)}
             placeholder="e.g. DC-10, Berghain, Avicii Arena"
-            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
           />
         </div>
       </section>
@@ -775,9 +775,9 @@ export function EventForm(props: EventFormProps) {
             value={data.timezone}
             onChange={(e) => set("timezone", e.target.value)}
             placeholder="Europe/Stockholm"
-            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+            className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
           />
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-400">
             {data.timezone
               ? `Auto-detected from country — ${data.timezone} (UTC${getTimezoneOffsetLabel(data.timezone)}). Adjust if needed.`
               : "Auto-detected from country. Adjust if needed."}
@@ -804,7 +804,7 @@ export function EventForm(props: EventFormProps) {
             placeholder="Tell fans what to expect…"
             rows={4}
             maxLength={1000}
-            className="resize-none border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+            className="resize-none border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
           />
           <p className="text-right text-xs text-zinc-600">
             {data.description.length}/1000
@@ -817,7 +817,7 @@ export function EventForm(props: EventFormProps) {
             <Label className="flex items-center gap-1 text-zinc-300">
               <Music className="h-3.5 w-3.5" /> Genres
             </Label>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-zinc-400">
               {data.genres.length}/8 selected
             </span>
           </div>
@@ -891,7 +891,7 @@ export function EventForm(props: EventFormProps) {
                     }
                   }}
                   placeholder="Add a custom genre…"
-                  className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+                  className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
                 />
                 {showGenreDropdown && filteredGenres.length > 0 && (
                   <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-zinc-700 bg-zinc-900 shadow-lg">
@@ -945,7 +945,7 @@ export function EventForm(props: EventFormProps) {
                 value={data.ticketUrl}
                 onChange={(e) => set("ticketUrl", e.target.value)}
                 placeholder="https://ra.co/events/…"
-                className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+                className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
               />
               {errors.ticketUrl && (
                 <p className="text-xs text-red-400">{errors.ticketUrl}</p>
@@ -963,7 +963,7 @@ export function EventForm(props: EventFormProps) {
             <h2 className="flex items-center gap-2 text-sm font-semibold tracking-widest text-zinc-400 uppercase">
               <Link2 className="h-4 w-4" /> Post-Event
             </h2>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-400">
               Add a recap and audio link now the event is completed.
             </p>
 
@@ -978,7 +978,7 @@ export function EventForm(props: EventFormProps) {
                 placeholder="How did the night go? Share a summary…"
                 rows={4}
                 maxLength={2000}
-                className="resize-none border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+                className="resize-none border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
               />
               <p className="text-right text-xs text-zinc-600">
                 {data.recap.length}/2000
@@ -994,7 +994,7 @@ export function EventForm(props: EventFormProps) {
                 value={data.audioLink}
                 onChange={(e) => set("audioLink", e.target.value)}
                 placeholder="SoundCloud or Mixcloud link"
-                className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-zinc-500"
+                className="border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-400 focus:border-zinc-500"
               />
               {errors.audioLink && (
                 <p className="text-xs text-red-400">{errors.audioLink}</p>

@@ -60,7 +60,7 @@ const Post = ({
               <span className="text-h_white text-sm leading-tight font-semibold transition-colors group-hover:text-white/70">
                 Dj. {displayName}
               </span>
-              <span className="mt-0.5 text-xs leading-none text-white/40">
+              <span className="mt-0.5 text-xs leading-none text-white/60">
                 @{post.user.djProfile?.slug ?? post.user.username}
               </span>
             </div>
@@ -109,7 +109,7 @@ const Post = ({
                     {firstMedia.title ?? "Mix"}
                   </p>
                   {firstMedia.duration && (
-                    <p className="mt-0.5 text-xs text-white/40">
+                    <p className="mt-0.5 text-xs text-white/60">
                       {firstMedia.duration}
                     </p>
                   )}
@@ -121,6 +121,7 @@ const Post = ({
                   href={firstMedia.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Play media"
                   className="bg-h_red/90 hover:bg-h_red flex size-9 shrink-0 items-center justify-center rounded-full transition-colors"
                 >
                   <Play className="h-4 w-4 text-white" fill="white" />

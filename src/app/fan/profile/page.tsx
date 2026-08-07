@@ -188,7 +188,7 @@ export default async function FanProfilePage() {
                         <Clock className="h-3.5 w-3.5" />
                         {event.daysRemaining} days left
                       </div>
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-zinc-400">
                         {event.reviewedCount} of {event.totalDjCount} reviewed
                       </p>
                     </div>

@@ -50,7 +50,7 @@ export default function FaqPage() {
           {/* ── Sticky category nav ── */}
           <aside className="shrink-0 lg:w-56">
             <div className="sticky top-24">
-              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/40 uppercase">
+              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/60 uppercase">
                 Categories
               </p>
               <nav aria-label="FAQ categories" className="flex flex-col gap-1">
