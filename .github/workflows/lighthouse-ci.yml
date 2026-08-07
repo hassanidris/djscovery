@@ -57,6 +57,13 @@ jobs:
           echo "Build failed after 3 attempts"
           exit 1
 
+      - name: Start Next.js server for Lighthouse
+        run: |
+          nohup npm run start &>/tmp/next-server.log & echo $! > .next-server.pid
+          npx wait-on --timeout 120000 --interval 2000 http://localhost:3000
+        env:
+          PORT: 3000
+
       - name: Run Lighthouse CI
         id: lighthouse
         run: |
@@ -75,3 +82,11 @@ jobs:
           exit 1
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Stop Next.js server
+        if: always()
+        run: |
+          if [ -f .next-server.pid ]; then
+            kill "$(cat .next-server.pid)" || true
+            rm -f .next-server.pid
+          fi
