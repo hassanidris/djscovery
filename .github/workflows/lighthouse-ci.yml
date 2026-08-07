@@ -18,7 +18,6 @@ jobs:
       NEXT_PUBLIC_APP_ENV: staging
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-      DISABLE_IMAGE_OPTIMIZATION: true
       # App's own runtime base (internal links, auth redirects) — stays local
       # since this is the ephemeral CI server, not the public site.
       NEXT_PUBLIC_BASE_URL: http://localhost:3000

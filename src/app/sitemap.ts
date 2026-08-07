@@ -68,64 +68,80 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Fetch approved DJ profiles
-  const djProfiles = await prisma.djProfile.findMany({
-    where: {
-      status: "APPROVED",
-      deletedAt: null,
-      hidden: false,
-    },
-    select: {
-      slug: true,
-      updatedAt: true,
-    },
-  });
+  let djUrls: MetadataRoute.Sitemap = [];
+  let eventUrls: MetadataRoute.Sitemap = [];
+  let organizerUrls: MetadataRoute.Sitemap = [];
 
-  const djUrls: MetadataRoute.Sitemap = djProfiles.map((dj) => ({
-    url: `${SITE_URL}/djs/${dj.slug}`,
-    lastModified: dj.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  try {
+    // Fetch approved DJ profiles
+    const djProfiles = await prisma.djProfile.findMany({
+      where: {
+        status: "APPROVED",
+        deletedAt: null,
+        hidden: false,
+      },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+    });
 
-  // Fetch published events
-  const events = await prisma.event.findMany({
-    where: {
-      status: "PUBLISHED",
-      deletedAt: null,
-      startDate: { gte: new Date() },
-    },
-    select: {
-      slug: true,
-      updatedAt: true,
-    },
-  });
+    djUrls = djProfiles.map((dj) => ({
+      url: `${SITE_URL}/djs/${dj.slug}`,
+      lastModified: dj.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+  } catch (err) {
+    console.error("[sitemap] Failed to fetch DJ profiles:", err);
+  }
 
-  const eventUrls: MetadataRoute.Sitemap = events.map((event) => ({
-    url: `${SITE_URL}/events/${event.slug}`,
-    lastModified: event.updatedAt,
-    changeFrequency: "daily" as const,
-    priority: 0.7,
-  }));
+  try {
+    // Fetch published events
+    const events = await prisma.event.findMany({
+      where: {
+        status: "PUBLISHED",
+        deletedAt: null,
+        startDate: { gte: new Date() },
+      },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+    });
 
-  // Fetch approved organizer profiles
-  const organizerProfiles = await prisma.organizerProfile.findMany({
-    where: {
-      status: "ACTIVE",
-      deletedAt: null,
-    },
-    select: {
-      slug: true,
-      updatedAt: true,
-    },
-  });
+    eventUrls = events.map((event) => ({
+      url: `${SITE_URL}/events/${event.slug}`,
+      lastModified: event.updatedAt,
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    }));
+  } catch (err) {
+    console.error("[sitemap] Failed to fetch events:", err);
+  }
 
-  const organizerUrls: MetadataRoute.Sitemap = organizerProfiles.map((org) => ({
-    url: `${SITE_URL}/organizers/${org.slug}`,
-    lastModified: org.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+  try {
+    // Fetch approved organizer profiles
+    const organizerProfiles = await prisma.organizerProfile.findMany({
+      where: {
+        status: "ACTIVE",
+        deletedAt: null,
+      },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+    });
+
+    organizerUrls = organizerProfiles.map((org) => ({
+      url: `${SITE_URL}/organizers/${org.slug}`,
+      lastModified: org.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+  } catch (err) {
+    console.error("[sitemap] Failed to fetch organizer profiles:", err);
+  }
 
   return [...staticUrls, ...djUrls, ...eventUrls, ...organizerUrls];
 }
