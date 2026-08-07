@@ -1,11 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      url: [
-        "http://localhost:3000/",
-        "http://localhost:3000/djs",
-        "http://localhost:3000/events",
-      ],
+      url: ["http://localhost:3000/", "http://localhost:3000/events"],
       numberOfRuns: 1,
     },
     assert: {

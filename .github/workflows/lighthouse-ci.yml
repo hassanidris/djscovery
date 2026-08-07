@@ -60,9 +60,25 @@ jobs:
       - name: Start Next.js server for Lighthouse
         run: |
           nohup npm run start &>/tmp/next-server.log & echo $! > .next-server.pid
-          npx wait-on --timeout 120000 --interval 2000 http://localhost:3000
+          npx wait-on --timeout 120000 --interval 2000 http://localhost:3000 || {
+            echo "::error::Next.js server did not become ready. Server log:"
+            cat /tmp/next-server.log
+            exit 1
+          }
         env:
           PORT: 3000
+
+      - name: Verify routes respond
+        run: |
+          for url in http://localhost:3000/ http://localhost:3000/events; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+            echo "$url -> HTTP $code"
+            if [ "$code" -ge 400 ]; then
+              echo "::error::$url returned $code. Server log:"
+              cat /tmp/next-server.log
+              exit 1
+            fi
+          done
 
       - name: Run Lighthouse CI
         id: lighthouse
@@ -79,6 +95,8 @@ jobs:
             fi
           done
           echo "Lighthouse CI failed after 3 attempts"
+          echo "::error::Lighthouse CI failed. Server log:"
+          cat /tmp/next-server.log
           exit 1
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
