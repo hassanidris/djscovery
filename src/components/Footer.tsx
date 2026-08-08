@@ -116,12 +116,12 @@ const Footer = async () => {
               {/* Newsletter mini-CTA */}
               <div className="mt-1 flex items-center gap-2">
                 <div className="bg-h_blackLight/60 focus-within:ring-h_red flex flex-1 items-center gap-2 rounded-lg px-3 py-2.5 ring-1 ring-white/10 transition-colors">
-                  <Mail className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                  <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                   <input
                     type="email"
                     aria-label="Email address for newsletter"
                     placeholder="Your email…"
-                    className="w-full bg-transparent text-sm text-white outline-none placeholder:text-gray-500"
+                    className="w-full bg-transparent text-sm text-white outline-none placeholder:text-gray-400"
                   />
                 </div>
                 <button className="bg-h_red hover:bg-h_redDark shrink-0 rounded-lg px-3 py-2.5 text-xs font-semibold text-white transition-colors">
@@ -136,7 +136,7 @@ const Footer = async () => {
                     key={social.label}
                     href={social.href}
                     aria-label={social.label}
-                    className="bg-h_blackLight/60 hover:bg-h_red hover:ring-h_red flex size-9 items-center justify-center rounded-full text-gray-400 ring-1 ring-white/10 transition-all hover:text-white"
+                    className="bg-h_blackLight/60 hover:bg-h_red hover:ring-h_red flex size-9 items-center justify-center rounded-full text-gray-300 ring-1 ring-white/10 transition-all hover:text-white"
                   >
                     <FontAwesomeIcon
                       icon={social.icon}
@@ -159,11 +159,11 @@ const Footer = async () => {
                     return (
                       <li
                         key={item.id}
-                        className="flex items-center gap-2.5 text-sm text-gray-600 select-none"
+                        className="flex items-center gap-2.5 text-sm text-gray-400 select-none"
                       >
-                        <Icon className="text-h_redDark/40 h-3.5 w-3.5" />
+                        <Icon className="text-h_redLightDark/40 h-3.5 w-3.5" />
                         {item.label}
-                        <span className="text-h_red/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
+                        <span className="text-h_redLight/50 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                           Soon
                         </span>
                       </li>
@@ -173,9 +173,9 @@ const Footer = async () => {
                     <li key={item.id}>
                       <Link
                         href={item.href}
-                        className="hover:text-h_red group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
+                        className="hover:text-h_redLight group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                       >
-                        <Icon className="text-h_redDark group-hover:text-h_red h-3.5 w-3.5 transition-colors" />
+                        <Icon className="text-h_redLightDark group-hover:text-h_redLight h-3.5 w-3.5 transition-colors" />
                         {item.label}
                       </Link>
                     </li>
@@ -194,9 +194,9 @@ const Footer = async () => {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="hover:text-h_red group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
+                      className="hover:text-h_redLight group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                     >
-                      <Mic className="text-h_redDark group-hover:text-h_red h-3.5 w-3.5 transition-colors" />
+                      <Mic className="text-h_redLightDark group-hover:text-h_redLight h-3.5 w-3.5 transition-colors" />
                       {link.label}
                     </Link>
                   </li>
@@ -214,10 +214,10 @@ const Footer = async () => {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="hover:text-h_red group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
+                      className="hover:text-h_redLight group flex items-center gap-2.5 text-sm text-gray-400 transition-colors"
                     >
                       {link.icon && (
-                        <link.icon className="text-h_redDark h-3.5 w-3.5" />
+                        <link.icon className="text-h_redLightDark h-3.5 w-3.5" />
                       )}
                       <span>{link.label}</span>
                     </Link>
@@ -227,14 +227,14 @@ const Footer = async () => {
 
               {/* App badge placeholder */}
               <div className="mt-5 flex flex-col gap-2">
-                <p className="text-xs tracking-widest text-gray-600 uppercase">
+                <p className="text-xs tracking-widest text-gray-400 uppercase">
                   Coming soon
                 </p>
                 <div className="flex gap-2">
-                  <div className="bg-h_blackLight/60 rounded-md px-3 py-1.5 text-xs font-medium text-gray-500 ring-1 ring-white/10">
+                  <div className="bg-h_blackLight/60 rounded-md px-3 py-1.5 text-xs font-medium text-gray-400 ring-1 ring-white/10">
                     App Store
                   </div>
-                  <div className="bg-h_blackLight/60 rounded-md px-3 py-1.5 text-xs font-medium text-gray-500 ring-1 ring-white/10">
+                  <div className="bg-h_blackLight/60 rounded-md px-3 py-1.5 text-xs font-medium text-gray-400 ring-1 ring-white/10">
                     Google Play
                   </div>
                 </div>
@@ -246,7 +246,7 @@ const Footer = async () => {
 
       {/* Bottom bar */}
       <div className="border-t border-white/5 py-5">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 text-xs text-gray-500 sm:flex-row md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 text-xs text-gray-400 sm:flex-row md:px-8">
           <span>
             &copy; {new Date().getFullYear()} DJcovery. All rights reserved.
             Built for the culture.
@@ -254,21 +254,21 @@ const Footer = async () => {
           <div className="flex items-center gap-5">
             <Link
               href="/privacy"
-              className="hover:text-h_red transition-colors"
+              className="hover:text-h_redLight underline transition-colors"
             >
               Privacy
             </Link>
             <span className="text-white/10">|</span>
             <Link
               href="/terms-of-service"
-              className="hover:text-h_red transition-colors"
+              className="hover:text-h_redLight underline transition-colors"
             >
               Terms
             </Link>
             <span className="text-white/10">|</span>
             <Link
               href="/cookie-policy"
-              className="hover:text-h_red transition-colors"
+              className="hover:text-h_redLight underline transition-colors"
             >
               Cookie
             </Link>

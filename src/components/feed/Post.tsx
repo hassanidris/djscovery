@@ -60,7 +60,7 @@ const Post = ({
               <span className="text-h_white text-sm leading-tight font-semibold transition-colors group-hover:text-white/70">
                 Dj. {displayName}
               </span>
-              <span className="mt-0.5 text-xs leading-none text-white/40">
+              <span className="mt-0.5 text-xs leading-none text-white/60">
                 @{post.user.djProfile?.slug ?? post.user.username}
               </span>
             </div>
@@ -102,14 +102,14 @@ const Post = ({
             <div className={post.content ? "px-4 pb-3" : "p-3"}>
               <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-black/20 p-4">
                 <div className="bg-h_red/10 border-h_red/20 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border">
-                  <Music2 className="text-h_red h-5 w-5" />
+                  <Music2 className="text-h_redLight h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-h_white truncate text-sm font-semibold">
                     {firstMedia.title ?? "Mix"}
                   </p>
                   {firstMedia.duration && (
-                    <p className="mt-0.5 text-xs text-white/40">
+                    <p className="mt-0.5 text-xs text-white/60">
                       {firstMedia.duration}
                     </p>
                   )}
@@ -121,6 +121,7 @@ const Post = ({
                   href={firstMedia.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Play media"
                   className="bg-h_red/90 hover:bg-h_red flex size-9 shrink-0 items-center justify-center rounded-full transition-colors"
                 >
                   <Play className="h-4 w-4 text-white" fill="white" />

@@ -17,14 +17,14 @@ export function EventAnalytics({
         <Eye className="h-4 w-4 text-zinc-400" />
         <div className="flex items-center gap-1">
           <span className="text-sm font-semibold text-white">{viewCount}</span>
-          <span className="text-xs text-zinc-500">Views</span>
+          <span className="text-xs text-zinc-400">Views</span>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <Users className="h-4 w-4 text-zinc-400" />
         <div className="flex items-center gap-1">
           <span className="text-sm font-semibold text-white">{goingCount}</span>
-          <span className="text-xs text-zinc-500">Going</span>
+          <span className="text-xs text-zinc-400">Going</span>
         </div>
       </div>
       <div className="flex items-center gap-2">
@@ -33,7 +33,7 @@ export function EventAnalytics({
           <span className="text-sm font-semibold text-white">
             {interestedCount}
           </span>
-          <span className="text-xs text-zinc-500">Interested</span>
+          <span className="text-xs text-zinc-400">Interested</span>
         </div>
       </div>
     </div>

@@ -31,7 +31,7 @@ export default function HomeGenresSection() {
             asChild
             variant="ghost"
             size="sm"
-            className="text-h_red hover:text-h_red hover:bg-white/5"
+            className="text-h_redLight hover:text-h_redLight hover:bg-white/5"
           >
             <Link href="/directory">View all genres →</Link>
           </Button>
@@ -53,7 +53,7 @@ export default function HomeGenresSection() {
                 <span className="text-sm leading-tight font-semibold text-white">
                   {genre.name}
                 </span>
-                <span className="text-h_red translate-x-0 text-xs opacity-0 transition-all duration-200 group-hover:opacity-100">
+                <span className="text-h_redLight translate-x-0 text-xs opacity-0 transition-all duration-200 group-hover:opacity-100">
                   Explore →
                 </span>
               </div>

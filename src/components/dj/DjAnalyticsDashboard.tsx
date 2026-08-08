@@ -223,7 +223,7 @@ export default function DjAnalyticsDashboard({
       {!hasData && (
         <Card className="border-white/10 bg-white/5">
           <CardContent className="py-12 text-center">
-            <TrendingUp className="mx-auto mb-3 h-8 w-8 text-gray-500" />
+            <TrendingUp className="mx-auto mb-3 h-8 w-8 text-gray-400" />
             <h3 className="text-base font-semibold text-white">
               No analytics yet
             </h3>
@@ -246,7 +246,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <Eye className="text-h_red h-4 w-4" />
+                    <Eye className="text-h_redLight h-4 w-4" />
                     Profile Views (30 days)
                   </CardTitle>
                 </CardHeader>
@@ -288,7 +288,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <Users className="text-h_red h-4 w-4" />
+                    <Users className="text-h_redLight h-4 w-4" />
                     New Followers (30 days)
                   </CardTitle>
                 </CardHeader>
@@ -330,7 +330,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <Handshake className="text-h_red h-4 w-4" />
+                    <Handshake className="text-h_redLight h-4 w-4" />
                     Booking Requests by Status
                   </CardTitle>
                 </CardHeader>
@@ -393,7 +393,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <TrendingUp className="text-h_red h-4 w-4" />
+                    <TrendingUp className="text-h_redLight h-4 w-4" />
                     Profile View Sources
                   </CardTitle>
                 </CardHeader>
@@ -464,7 +464,7 @@ export default function DjAnalyticsDashboard({
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <MapPin className="text-h_red h-4 w-4" />
+                    <MapPin className="text-h_redLight h-4 w-4" />
                     Top Cities
                   </CardTitle>
                 </CardHeader>
@@ -529,7 +529,7 @@ export default function DjAnalyticsDashboard({
           ) : (
             <Card className="border-white/10 bg-white/5">
               <CardContent className="py-12 text-center">
-                <TrendingUp className="mx-auto mb-3 h-8 w-8 text-gray-500" />
+                <TrendingUp className="mx-auto mb-3 h-8 w-8 text-gray-400" />
                 <h3 className="text-base font-semibold text-white">
                   Upgrade to Premium for Advanced Analytics
                 </h3>
@@ -550,7 +550,7 @@ export default function DjAnalyticsDashboard({
             {topMedia.length === 0 ? (
               <Card className="border-white/10 bg-white/5">
                 <CardContent className="py-8 text-center">
-                  <Music2 className="mx-auto mb-2 h-6 w-6 text-gray-500" />
+                  <Music2 className="mx-auto mb-2 h-6 w-6 text-gray-400" />
                   <p className="text-muted-foreground text-sm">
                     Upload mixes and videos to see what performs best
                   </p>

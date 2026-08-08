@@ -112,7 +112,7 @@ export function EventDjReviews({
   if (isLoading) {
     return (
       <section className="mb-8">
-        <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+        <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
           DJ Reviews from this Event
         </h2>
         <div className="space-y-3">
@@ -137,7 +137,7 @@ export function EventDjReviews({
 
   return (
     <section className="mb-8">
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
         DJ Reviews from this Event
       </h2>
       <div className="space-y-3">
@@ -178,10 +178,10 @@ export function EventDjReviews({
                     targetId={String(r.id)}
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 text-gray-500 hover:text-white"
+                    className="h-6 w-6 text-gray-400 hover:text-white"
                   />
                 </div>
-                <span className="mt-1 block text-xs text-gray-600">
+                <span className="mt-1 block text-xs text-gray-400">
                   {new Date(r.createdAt).toLocaleDateString("en-GB", {
                     day: "numeric",
                     month: "short",

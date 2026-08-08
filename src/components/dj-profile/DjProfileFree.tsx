@@ -90,12 +90,12 @@ function EmptySectionState({
   const content = (
     <div className="group flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 px-4 py-8 text-center transition-colors hover:border-white/20">
       <div className="mb-3 flex size-10 items-center justify-center rounded-full bg-white/5 transition-colors group-hover:bg-white/8">
-        <Icon className="h-5 w-5 text-gray-600" />
+        <Icon className="h-5 w-5 text-gray-400" />
       </div>
       <p className="text-sm font-medium text-gray-400">{title}</p>
-      <p className="mt-1 text-xs text-gray-600">{description}</p>
+      <p className="mt-1 text-xs text-gray-400">{description}</p>
       {actionLabel && (
-        <span className="text-h_red mt-3 text-xs font-medium">
+        <span className="text-h_redLight mt-3 text-xs font-medium">
           {actionLabel} →
         </span>
       )}
@@ -141,12 +141,12 @@ function MixPlayer({
               className="h-full w-full object-cover"
             />
           ) : (
-            <Music className="text-h_red h-4 w-4" />
+            <Music className="text-h_redLight h-4 w-4" />
           )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-white">{mix.title}</p>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             {mix.platform} · {mix.duration} · {mix.plays} plays
           </p>
         </div>
@@ -581,7 +581,7 @@ export default function DjProfileFree({
                               <p className="text-sm font-semibold text-white">
                                 {safeFEATURED_MIX.title}
                               </p>
-                              <p className="mt-1 text-xs text-gray-500">
+                              <p className="mt-1 text-xs text-gray-400">
                                 {safeFEATURED_MIX.duration} ·{" "}
                                 {safeFEATURED_MIX.plays} plays
                               </p>
@@ -636,7 +636,7 @@ export default function DjProfileFree({
                                 {SPOTLIGHT?.featuredVideo?.title ??
                                   "Live @ Berghain — Summer Closing 2024"}
                               </p>
-                              <p className="mt-1 text-xs text-gray-500">
+                              <p className="mt-1 text-xs text-gray-400">
                                 {SPOTLIGHT?.featuredVideo?.duration ?? "45 min"}{" "}
                                 · {SPOTLIGHT?.featuredVideo?.views ?? 0} views
                               </p>
@@ -858,7 +858,7 @@ export default function DjProfileFree({
                       <Crown className="h-4 w-4 text-amber-400" />
                       Unlock Premium Features
                     </h2>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-gray-400">
                       Upgrade to share more and grow your bookings
                     </p>
                   </div>
@@ -918,9 +918,9 @@ export default function DjProfileFree({
                           <p className="text-sm font-medium text-white">
                             {f.title}
                           </p>
-                          <p className="text-xs text-gray-500">{f.desc}</p>
+                          <p className="text-xs text-gray-400">{f.desc}</p>
                         </div>
-                        <Lock className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+                        <Lock className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                       </div>
                     );
                   })}
@@ -952,7 +952,7 @@ export default function DjProfileFree({
                     <p className="text-xs font-semibold text-white">
                       Response Rate
                     </p>
-                    <p className="text-[11px] text-gray-500">
+                    <p className="text-[11px] text-gray-400">
                       Typically replies within 24h
                     </p>
                   </div>
@@ -990,7 +990,7 @@ export default function DjProfileFree({
                     value={completion?.percentage ?? 68}
                     className="mb-2 h-1.5 bg-white/8"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     {completion?.suggestions[0] ??
                       "Add more photos & connect Spotify to reach 100%."}
                   </p>

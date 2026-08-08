@@ -81,7 +81,7 @@ export function GigFormStep2({
   }
 
   const inputCls =
-    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none";
+    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none";
   const selectCls =
     "w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white focus:border-white/25 focus:outline-none";
 
@@ -101,7 +101,7 @@ export function GigFormStep2({
     <div className="flex flex-col gap-6">
       {!hasAnyField && (
         <div className="rounded-xl border border-white/8 bg-white/3 px-5 py-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             No additional requirements for this gig type.
           </p>
         </div>
@@ -112,7 +112,7 @@ export function GigFormStep2({
         <div>
           <label className="mb-1.5 block text-sm font-medium text-white">
             Required Genres{" "}
-            <span className="font-normal text-gray-500">
+            <span className="font-normal text-gray-400">
               (optional, up to {MAX_GENRES})
             </span>
           </label>
@@ -194,7 +194,7 @@ export function GigFormStep2({
           )}
 
           {data.requiredGenres.length >= MAX_GENRES && (
-            <p className="mt-1.5 text-xs text-gray-500">
+            <p className="mt-1.5 text-xs text-gray-400">
               Maximum of {MAX_GENRES} genres reached.
             </p>
           )}
@@ -250,11 +250,11 @@ export function GigFormStep2({
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-white">
                   Set Hours{" "}
-                  <span className="font-normal text-gray-500">(optional)</span>
+                  <span className="font-normal text-gray-400">(optional)</span>
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="mb-1 text-xs text-gray-500">Start Time</p>
+                    <p className="mb-1 text-xs text-gray-400">Start Time</p>
                     <input
                       type="time"
                       value={data.setStartTime}
@@ -275,7 +275,7 @@ export function GigFormStep2({
                     />
                   </div>
                   <div>
-                    <p className="mb-1 text-xs text-gray-500">End Time</p>
+                    <p className="mb-1 text-xs text-gray-400">End Time</p>
                     <input
                       type="time"
                       value={data.setEndTime}
@@ -297,7 +297,7 @@ export function GigFormStep2({
                   </div>
                 </div>
                 {totalMin > 0 && (
-                  <p className="mt-1.5 text-xs text-gray-500">
+                  <p className="mt-1.5 text-xs text-gray-400">
                     Duration: {dHrs > 0 ? `${dHrs}h ` : ""}
                     {dMins > 0 ? `${dMins}min` : ""}
                     {data.setEndTime < data.setStartTime &&
@@ -336,7 +336,7 @@ export function GigFormStep2({
             <div>
               <label className="mb-1.5 block text-sm font-medium text-white">
                 Set Duration{" "}
-                <span className="font-normal text-gray-500">(optional)</span>
+                <span className="font-normal text-gray-400">(optional)</span>
               </label>
               <div className="flex items-center gap-3">
                 <div className="flex flex-1 items-center gap-2">
@@ -367,7 +367,7 @@ export function GigFormStep2({
                 </div>
               </div>
               {totalMin > 0 && (
-                <p className="mt-1.5 text-xs text-gray-500">
+                <p className="mt-1.5 text-xs text-gray-400">
                   Total: {totalMin} minutes
                 </p>
               )}
@@ -446,7 +446,7 @@ export function GigFormStep2({
         <div>
           <label className="mb-1.5 block text-sm font-medium text-white">
             Languages Spoken{" "}
-            <span className="font-normal text-gray-500">(optional)</span>
+            <span className="font-normal text-gray-400">(optional)</span>
           </label>
           <div className="flex gap-2">
             <input

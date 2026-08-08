@@ -207,7 +207,7 @@ export default async function AdminBookingInquiryDetailPage({
               {inquiry.contactReleasedAt ? (
                 <span>{inquiry.djProfile.user.email || "—"}</span>
               ) : (
-                <span className="text-gray-500">
+                <span className="text-gray-400">
                   Hidden (contact not released)
                 </span>
               )}
@@ -246,7 +246,7 @@ export default async function AdminBookingInquiryDetailPage({
               {inquiry.contactReleasedAt ? (
                 <span>{inquiry.organizer.email || "—"}</span>
               ) : (
-                <span className="text-gray-500">
+                <span className="text-gray-400">
                   Hidden (contact not released)
                 </span>
               )}
@@ -524,7 +524,7 @@ export default async function AdminBookingInquiryDetailPage({
                       By {action.admin?.name || action.admin?.username}
                     </p>
                     {action.metadata && (
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-gray-400">
                         {JSON.stringify(action.metadata)}
                       </p>
                     )}

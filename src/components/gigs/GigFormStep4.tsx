@@ -12,7 +12,7 @@ function ReviewRow({ label, value }: { label: string; value?: string }) {
   if (!value) return null;
   return (
     <div className="flex justify-between gap-3 border-b border-white/5 py-1.5 text-sm last:border-0">
-      <span className="text-gray-500">{label}</span>
+      <span className="text-gray-400">{label}</span>
       <span className="max-w-xs truncate text-right text-white">{value}</span>
     </div>
   );
@@ -79,7 +79,7 @@ export function GigFormStep4({
   isPending,
 }: Step4Props) {
   const inputCls =
-    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none";
+    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none";
 
   return (
     <div className="flex flex-col gap-6">
@@ -87,13 +87,13 @@ export function GigFormStep4({
       <div>
         <label className="mb-1.5 block text-sm font-medium text-white">
           Application Deadline{" "}
-          <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-normal text-gray-400">(optional)</span>
         </label>
         <input
           type="date"
           value={data.applicationDeadline}
           onChange={(e) => onChange("applicationDeadline", e.target.value)}
-          className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white focus:border-white/25 focus:outline-none scheme-dark"
+          className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white scheme-dark focus:border-white/25 focus:outline-none"
         />
       </div>
 
@@ -101,7 +101,7 @@ export function GigFormStep4({
       <div>
         <label className="mb-1.5 block text-sm font-medium text-white">
           Venue Name{" "}
-          <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-normal text-gray-400">(optional)</span>
         </label>
         <input
           type="text"
@@ -130,7 +130,7 @@ export function GigFormStep4({
       <div>
         <label className="mb-1.5 block text-sm font-medium text-white">
           Venue Address{" "}
-          <span className="font-normal text-gray-500">
+          <span className="font-normal text-gray-400">
             (revealed to accepted DJ only)
           </span>
         </label>
@@ -139,7 +139,7 @@ export function GigFormStep4({
           onChange={(e) => onChange("venueAddress", e.target.value)}
           rows={2}
           placeholder="Street address…"
-          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none"
         />
       </div>
 
@@ -199,7 +199,7 @@ export function GigFormStep4({
           onChange={(e) => onChange("arrivalInstructions", e.target.value)}
           rows={3}
           placeholder="Where to park, which entrance to use, who to ask for…"
-          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none"
         />
       </div>
 
@@ -213,7 +213,7 @@ export function GigFormStep4({
           onChange={(e) => onChange("setupNotes", e.target.value)}
           rows={2}
           placeholder="Load-in time, sound check slot, stage access…"
-          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-white/25 focus:outline-none"
+          className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-gray-400 focus:border-white/25 focus:outline-none"
         />
       </div>
 
@@ -240,9 +240,8 @@ export function GigFormStep4({
         </button>
       </div>
 
-      <p className="text-center text-xs text-gray-600">
-        Gig is saved as a draft. Publish it from the gig detail page when
-        ready.
+      <p className="text-center text-xs text-gray-400">
+        Gig is saved as a draft. Publish it from the gig detail page when ready.
       </p>
     </div>
   );

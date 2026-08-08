@@ -55,7 +55,7 @@ export function PerfOverlay() {
       {/* Recent API calls */}
       <div className="space-y-1">
         {records.length === 0 ? (
-          <div className="text-white/40">Waiting for API calls...</div>
+          <div className="text-white/60">Waiting for API calls...</div>
         ) : (
           records.slice(0, 15).map((r, i) => (
             <div

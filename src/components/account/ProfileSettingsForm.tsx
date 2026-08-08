@@ -165,7 +165,7 @@ export default function ProfileSettingsForm({
               <User className="h-4 w-4" />
               Profile Photo
             </h2>
-            <p className="mt-0.5 text-xs text-gray-500">
+            <p className="mt-0.5 text-xs text-gray-400">
               JPG, PNG or WebP · max 5 MB
             </p>
           </div>
@@ -216,7 +216,7 @@ export default function ProfileSettingsForm({
                   "Change photo"
                 )}
               </Button>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-gray-400">
                 Click the photo or button to upload
               </p>
             </div>
@@ -241,12 +241,12 @@ export default function ProfileSettingsForm({
             <Lock className="h-4 w-4" />
             Email Address
           </h2>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             Your login email cannot be changed.
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-white/8 bg-white/3 px-3 py-2.5">
-          <Lock className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+          <Lock className="h-3.5 w-3.5 shrink-0 text-gray-400" />
           <span className="text-sm text-gray-300">{currentEmail}</span>
         </div>
       </section>
@@ -262,7 +262,7 @@ export default function ProfileSettingsForm({
                 <User className="h-4 w-4" />
                 Display Name
               </h2>
-              <p className="mt-0.5 text-xs text-gray-500">
+              <p className="mt-0.5 text-xs text-gray-400">
                 How your name appears on reviews and activity.
               </p>
             </div>
@@ -296,7 +296,7 @@ export default function ProfileSettingsForm({
                 <MapPin className="h-4 w-4" />
                 Location
               </h2>
-              <p className="mt-0.5 text-xs text-gray-500">
+              <p className="mt-0.5 text-xs text-gray-400">
                 Used to personalise DJ and event suggestions near you.
               </p>
             </div>
@@ -358,7 +358,7 @@ export default function ProfileSettingsForm({
             <KeyRound className="h-4 w-4" />
             Password
           </h2>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             Change your password. Must be at least 8 characters.
           </p>
         </div>
@@ -419,7 +419,7 @@ export default function ProfileSettingsForm({
             <AlertTriangle className="h-4 w-4" />
             Danger Zone
           </h2>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-gray-400">
             These actions are permanent and cannot be undone.
           </p>
         </div>
@@ -427,7 +427,7 @@ export default function ProfileSettingsForm({
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-white">Delete Account</p>
-              <p className="mt-0.5 text-xs text-gray-500">
+              <p className="mt-0.5 text-xs text-gray-400">
                 Permanently delete your account and all associated data.
               </p>
             </div>

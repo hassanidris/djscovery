@@ -20,7 +20,7 @@ function EventRow({ e, showStatus }: { e: EventItem; showStatus: boolean }) {
   const inner = (
     <>
       <div className="bg-h_red/10 border-h_red/20 flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-md border">
-        <span className="text-h_red text-[10px] leading-none font-bold uppercase">
+        <span className="text-h_redLight text-[10px] leading-none font-bold uppercase">
           {month}
         </span>
         <span className="mt-0.5 text-sm leading-none font-bold text-white">
@@ -29,7 +29,7 @@ function EventRow({ e, showStatus }: { e: EventItem; showStatus: boolean }) {
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-xs font-medium text-white">{e.title}</p>
-        <p className="mt-0.5 truncate text-[11px] text-gray-500">
+        <p className="mt-0.5 truncate text-[11px] text-gray-400">
           {[e.venue, e.city].filter(Boolean).join(" · ")}
         </p>
       </div>
@@ -93,9 +93,9 @@ export default function ProfileEventsSidebar({
         {nextUp.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/8 px-3 py-6 text-center">
             <div className="mb-2 flex size-8 items-center justify-center rounded-full bg-white/5">
-              <CalendarDays className="h-4 w-4 text-gray-600" />
+              <CalendarDays className="h-4 w-4 text-gray-400" />
             </div>
-            <p className="text-xs font-medium text-gray-500">
+            <p className="text-xs font-medium text-gray-400">
               {djName
                 ? `No upcoming events for Dj. ${djName}`
                 : "No upcoming events yet"}
@@ -111,7 +111,7 @@ export default function ProfileEventsSidebar({
             {hasMore && (
               <Link
                 href="#events"
-                className="mt-2 block text-center text-xs text-gray-500 transition-colors hover:text-white"
+                className="mt-2 block text-center text-xs text-gray-400 transition-colors hover:text-white"
               >
                 View all {upcoming.length} upcoming events →
               </Link>

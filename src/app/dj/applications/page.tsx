@@ -139,7 +139,7 @@ function ApplicationRow({ app }: { app: AppItem }) {
           <GigApplicationStatusBadge status={app.status} />
         </div>
 
-        <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+        <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-400">
           <span>{typeLabel}</span>
           <span className="flex items-center gap-1">
             <CalendarDays className="h-3 w-3" />
@@ -158,7 +158,7 @@ function ApplicationRow({ app }: { app: AppItem }) {
         </div>
 
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-xs text-gray-600">
+          <span className="text-xs text-gray-400">
             {app.gig.organizerProfile.displayName}
           </span>
           <GigStatusBadge status={app.gig.status} />

@@ -39,7 +39,7 @@ export default async function GigReviewPage({
           variant="ghost"
           size="sm"
           asChild
-          className="mb-6 text-gray-500 hover:text-white"
+          className="mb-6 text-gray-400 hover:text-white"
         >
           <Link href={`/gigs/${slug}`}>
             <ArrowLeft className="mr-1.5 h-4 w-4" />
@@ -50,7 +50,7 @@ export default async function GigReviewPage({
         <h1 className="mb-2 text-2xl font-bold text-white">
           Review {context.djName}
         </h1>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-6 text-sm text-gray-400">
           for <span className="text-gray-300">{context.gigTitle}</span>
         </p>
 

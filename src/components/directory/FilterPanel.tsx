@@ -194,6 +194,7 @@ const FilterPanel = ({
           <select
             value={currentCountry}
             onChange={(e) => updateCountry(e.target.value)}
+            aria-label="Select country"
             className="bg-h_black/50 focus:ring-h_red rounded-md px-3 py-2 text-xs text-gray-300 ring-1 ring-gray-700 outline-none"
           >
             <option value="" className="bg-h_blackLight hover:bg-white/5">
@@ -220,6 +221,7 @@ const FilterPanel = ({
             <select
               value={currentCity}
               onChange={(e) => updateParam("city", e.target.value)}
+              aria-label="Select city"
               className="bg-h_black/50 focus:ring-h_red rounded-md px-3 py-2 text-xs text-gray-300 ring-1 ring-gray-700 outline-none"
             >
               <option value="" className="bg-h_blackLight hover:bg-white/5">
@@ -314,6 +316,7 @@ const FilterPanel = ({
           <select
             value={currentSort}
             onChange={(e) => updateParam("sort", e.target.value)}
+            aria-label="Sort by"
             className="bg-h_black/50 focus:ring-h_red rounded-md px-3 py-2 text-xs text-gray-300 ring-1 ring-gray-700 outline-none"
           >
             {SORT_OPTIONS.map((o) => (

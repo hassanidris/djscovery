@@ -42,7 +42,7 @@ function RatingInput({ label, value, onChange, disabled }: RatingInputProps) {
             />
           </button>
         ))}
-        <span className="ml-2 text-xs text-zinc-500">
+        <span className="ml-2 text-xs text-zinc-400">
           {activeRating > 0 ? `${activeRating} / 5` : "Select rating"}
         </span>
       </div>
@@ -130,7 +130,7 @@ export function VenueReviewForm({
           Rate your experience at {venueName}
         </CardTitle>
         {eventTitle && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             How was {venueName} for{" "}
             <strong className="text-gray-300">{eventTitle}</strong>?
           </p>
@@ -169,13 +169,13 @@ export function VenueReviewForm({
           onChange={(e) => setReview(e.target.value)}
           placeholder="Tell us about the venue's sound quality, atmosphere, location convenience, and accessibility features..."
           disabled={isPending}
-          className="focus-visible:ring-h_red min-h-28 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-600"
+          className="focus-visible:ring-h_red min-h-28 border-white/10 bg-black/30 text-sm text-white placeholder:text-gray-400"
         />
 
         {error && <p className="text-xs text-red-400">{error}</p>}
 
         <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             {review.trim().length}/30 characters minimum
           </p>
           <Button

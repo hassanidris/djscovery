@@ -336,7 +336,7 @@ export default function VenueModal({
                     <button
                       type="button"
                       onClick={() => removeVenue(index)}
-                      className="text-gray-500 transition-colors hover:text-red-400"
+                      className="text-gray-400 transition-colors hover:text-red-400"
                       aria-label="Remove venue"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -367,7 +367,7 @@ export default function VenueModal({
                     <button
                       type="button"
                       onClick={() => removeVenue(index)}
-                      className="text-gray-500 transition-colors hover:text-red-400"
+                      className="text-gray-400 transition-colors hover:text-red-400"
                       aria-label="Remove venue"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -384,7 +384,7 @@ export default function VenueModal({
                       handleVenueNameChange(e.target.value, index)
                     }
                     placeholder="e.g., Berghain"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                   {showSuggestions[index] &&
                     venueSuggestions[index]?.length > 0 && (
@@ -420,7 +420,7 @@ export default function VenueModal({
                     onChange={(e) =>
                       updateVenue(index, "eventDate", e.target.value)
                     }
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white scheme-dark placeholder:text-gray-600 [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:transition-opacity [&::-webkit-calendar-picker-indicator]:hover:opacity-100"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white scheme-dark placeholder:text-gray-400 [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:transition-opacity [&::-webkit-calendar-picker-indicator]:hover:opacity-100"
                   />
                 </div>
                 <div>
@@ -433,7 +433,7 @@ export default function VenueModal({
                       updateVenue(index, "description", e.target.value)
                     }
                     placeholder="Brief description of the performance..."
-                    className="focus:border-h_red/50 min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                    className="focus:border-h_red/50 min-h-16 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-400"
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -446,7 +446,7 @@ export default function VenueModal({
                       onChange={(e) =>
                         handleVenueCountryChange(index, Number(e.target.value))
                       }
-                      className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-600"
+                      className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400"
                     >
                       <option value={0} className="bg-zinc-900">
                         Select country...
@@ -479,7 +479,7 @@ export default function VenueModal({
                       disabled={
                         !venue.countryId || loadingVenueCities[venue.countryId]
                       }
-                      className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-600 disabled:opacity-50"
+                      className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 disabled:opacity-50"
                     >
                       <option value={0} className="bg-zinc-900">
                         Select city...

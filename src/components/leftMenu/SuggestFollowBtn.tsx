@@ -52,7 +52,7 @@ const SuggestFollowBtn = ({
         className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all disabled:cursor-wait disabled:opacity-60 ${
           optimisticFollowing
             ? "cursor-pointer bg-gray-700 text-gray-300 hover:bg-gray-600"
-            : "bg-h_red/10 text-h_red border-h_red/20 hover:bg-h_red/20 cursor-pointer border"
+            : "bg-h_red/10 text-h_redLight border-h_red/20 hover:bg-h_red/20 cursor-pointer border"
         }`}
       >
         {optimisticFollowing ? (

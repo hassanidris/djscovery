@@ -230,6 +230,7 @@ export default function MediaVideoModal({
             )}
             <button
               onClick={() => setOpen(false)}
+              aria-label="Close video modal"
               className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
             >
               <X className="h-5 w-5" />
@@ -268,7 +269,7 @@ export default function MediaVideoModal({
                     className="object-cover opacity-40"
                   />
                   <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
-                    <Play className="h-10 w-10 text-white/40" />
+                    <Play className="h-10 w-10 text-white/60" />
                     <p className="text-sm text-gray-400">
                       Cannot embed this video automatically
                     </p>
@@ -276,7 +277,7 @@ export default function MediaVideoModal({
                       href={videoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-h_red text-sm underline"
+                      className="text-h_redLight text-sm underline"
                     >
                       Open on {providerLabel}
                     </a>

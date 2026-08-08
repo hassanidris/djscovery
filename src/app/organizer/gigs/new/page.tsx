@@ -41,7 +41,7 @@ export default async function GigCreatePage() {
       <div className="mx-auto max-w-3xl px-4 py-10 md:px-8">
         <Link
           href="/organizer/gigs"
-          className="mb-6 flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-white"
+          className="mb-6 flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-white"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           My Gigs

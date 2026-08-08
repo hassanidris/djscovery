@@ -63,14 +63,14 @@ const EventCalendar = () => {
   ];
 
   return (
-    <div className="bg-h_blackLight/50 rounded-xl p-4 flex flex-col gap-4 sticky top-28">
+    <div className="bg-h_blackLight/50 sticky top-28 flex flex-col gap-4 rounded-xl p-4">
       {/* Header */}
-      <h3 className="text-h_white font-semibold text-sm">Events Calendar</h3>
+      <h3 className="text-h_white text-sm font-semibold">Events Calendar</h3>
 
       <div className="flex items-center justify-between">
         <button
           onClick={prevMonth}
-          className="text-gray-400 hover:text-h_white text-xl px-1 leading-none"
+          className="hover:text-h_white px-1 text-xl leading-none text-gray-400"
         >
           ‹
         </button>
@@ -79,14 +79,14 @@ const EventCalendar = () => {
         </span>
         <button
           onClick={nextMonth}
-          className="text-gray-400 hover:text-h_white text-xl px-1 leading-none"
+          className="hover:text-h_white px-1 text-xl leading-none text-gray-400"
         >
           ›
         </button>
       </div>
 
       {/* Day labels */}
-      <div className="grid grid-cols-7 text-center text-xs text-gray-500">
+      <div className="grid grid-cols-7 text-center text-xs text-gray-400">
         {DAYS.map((d) => (
           <span key={d}>{d}</span>
         ))}
@@ -104,19 +104,18 @@ const EventCalendar = () => {
             <button
               key={i}
               onClick={() => setSelectedDate(isSelected ? null : ds)}
-              className={`relative flex flex-col items-center justify-center h-8 w-8 mx-auto rounded-full text-xs transition-colors
-                ${
-                  isSelected
-                    ? "bg-h_red text-white font-bold"
-                    : isToday
-                    ? "ring-1 ring-h_red text-h_red"
-                    : "text-gray-300 hover:bg-h_blackLight"
-                }`}
+              className={`relative mx-auto flex h-8 w-8 flex-col items-center justify-center rounded-full text-xs transition-colors ${
+                isSelected
+                  ? "bg-h_red font-bold text-white"
+                  : isToday
+                    ? "ring-h_red text-h_redLight ring-1"
+                    : "hover:bg-h_blackLight text-gray-300"
+              }`}
             >
               {day}
               {hasEvent && (
                 <span
-                  className={`absolute bottom-0.5 w-1 h-1 rounded-full ${
+                  className={`absolute bottom-0.5 h-1 w-1 rounded-full ${
                     isSelected ? "bg-black" : "bg-h_red"
                   }`}
                 />
@@ -127,15 +126,15 @@ const EventCalendar = () => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-2 text-xs text-gray-500">
-        <span className="w-2 h-2 rounded-full bg-h_red inline-block" />
+      <div className="flex items-center gap-2 text-xs text-gray-400">
+        <span className="bg-h_red inline-block h-2 w-2 rounded-full" />
         <span>Event day — click to view</span>
       </div>
 
       {/* Event list for selected date */}
       {selectedDate && (
         <div className="flex flex-col gap-2 border-t border-gray-700 pt-3">
-          <p className="text-gray-400 text-xs font-medium">
+          <p className="text-xs font-medium text-gray-400">
             {selectedEvents.length > 0
               ? `${selectedEvents.length} event${selectedEvents.length > 1 ? "s" : ""} on ${selectedDate}`
               : `No events on ${selectedDate}`}
@@ -143,12 +142,14 @@ const EventCalendar = () => {
           {selectedEvents.map((event) => (
             <div
               key={event.id}
-              className="bg-h_black/60 rounded-lg p-3 border-l-2 border-h_red"
+              className="bg-h_black/60 border-h_red rounded-lg border-l-2 p-3"
             >
-              <p className="text-h_white text-sm font-semibold">{event.djName}</p>
-              <p className="text-gray-400 text-xs mt-0.5">{event.venue}</p>
-              <p className="text-gray-500 text-xs">{event.location}</p>
-              <div className="flex flex-wrap gap-3 mt-1.5 text-xs text-gray-400">
+              <p className="text-h_white text-sm font-semibold">
+                {event.djName}
+              </p>
+              <p className="mt-0.5 text-xs text-gray-400">{event.venue}</p>
+              <p className="text-xs text-gray-400">{event.location}</p>
+              <div className="mt-1.5 flex flex-wrap gap-3 text-xs text-gray-400">
                 <span>Dress: {event.dressCode}</span>
                 <span>Entry: {event.entryFee}</span>
               </div>

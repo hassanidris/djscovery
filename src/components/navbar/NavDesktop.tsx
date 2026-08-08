@@ -74,13 +74,13 @@ export default function NavDesktop({
             return (
               <span
                 key={item.id}
-                className="relative flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 select-none"
+                className="relative flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-400 select-none"
                 aria-disabled="true"
                 title={`${item.label} — Coming Soon`}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden />
                 <span>{item.label}</span>
-                <span className="text-h_red/60 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
+                <span className="text-h_redLight/60 bg-h_red/10 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold tracking-wider uppercase">
                   Soon
                 </span>
               </span>
@@ -102,7 +102,7 @@ export default function NavDesktop({
               <Icon
                 className={cn(
                   "h-4 w-4 shrink-0 transition-colors",
-                  isActive ? "text-h_red" : "",
+                  isActive ? "text-h_redLight" : "",
                 )}
                 aria-hidden
               />
@@ -127,12 +127,12 @@ export default function NavDesktop({
           aria-label="Search DJcovery"
           className="focus-within:ring-h_red/50 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 ring-1 ring-white/8 transition-all"
         >
-          <Search className="h-3.5 w-3.5 shrink-0 text-gray-500" aria-hidden />
+          <Search className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
           <input
             name="q"
             type="search"
             placeholder="Search DJs, genres..."
-            className="w-28 bg-transparent text-sm text-white outline-none placeholder:text-gray-500 lg:w-36"
+            className="w-28 bg-transparent text-sm text-white outline-none placeholder:text-gray-400 lg:w-36"
             aria-label="Search"
           />
         </form>
@@ -145,7 +145,7 @@ export default function NavDesktop({
               title="Messages — Coming Soon"
               disabled
               aria-disabled="true"
-              className="flex size-9 cursor-not-allowed items-center justify-center rounded-full text-gray-500 opacity-70 focus-visible:outline-none"
+              className="flex size-9 cursor-not-allowed items-center justify-center rounded-full text-gray-400 opacity-70 focus-visible:outline-none"
             >
               <MessageCircle className="h-4.5 w-4.5" aria-hidden />
             </button>
@@ -168,7 +168,7 @@ export default function NavDesktop({
               asChild
               variant="outline"
               size="sm"
-              className="border-h_red/60 text-h_red hover:bg-h_red/15 hover:text-h_red hover:border-h_red transition-all"
+              className="border-h_red/60 text-h_redLight hover:bg-h_red/15 hover:text-h_redLight hover:border-h_red transition-all"
             >
               <Link href="/sign-in">Sign In</Link>
             </Button>

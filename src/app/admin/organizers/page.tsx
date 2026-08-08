@@ -129,7 +129,7 @@ export default async function AdminOrganizersPage({
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             {org.hidden && (
-                              <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                              <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                             )}
                             <div>
                               <Link

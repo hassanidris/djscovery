@@ -22,7 +22,7 @@ export default function NotesForm({ hireId, initialNotes }: Props) {
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Add admin notes about this hire..."
-        className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none"
+        className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none"
         rows={4}
       />
       <div className="mt-3 flex justify-end">

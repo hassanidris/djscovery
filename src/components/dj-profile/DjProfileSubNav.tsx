@@ -93,7 +93,7 @@ export default function DjProfileSubNav({
               "focus-visible:ring-h_red/50 relative rounded-md px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
               activeTab === tab.id
                 ? "bg-white/10 text-white shadow-sm"
-                : "text-gray-500 hover:bg-white/5 hover:text-gray-300",
+                : "text-gray-400 hover:bg-white/5 hover:text-gray-300",
             )}
           >
             {tab.label}

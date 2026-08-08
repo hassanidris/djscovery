@@ -131,7 +131,7 @@ export function DjRatingForm({
             <p className="text-sm font-semibold text-white">DJ. {djName}</p>
           )}
           {isEventReview && eventTitle ? (
-            <div className="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-500">
+            <div className="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400">
               <Calendar className="h-3 w-3 shrink-0" />
               {eventSlug ? (
                 <Link
@@ -145,7 +145,7 @@ export function DjRatingForm({
               )}
             </div>
           ) : (
-            <p className="mt-0.5 text-xs text-zinc-500">Direct review</p>
+            <p className="mt-0.5 text-xs text-zinc-400">Direct review</p>
           )}
           {isEventReview && eventCity && (
             <div className="mt-0.5 flex items-center gap-1 text-xs text-zinc-600">
@@ -175,12 +175,12 @@ export function DjRatingForm({
                 className={`h-7 w-7 transition-colors ${
                   star <= activeRating
                     ? "fill-amber-400 text-amber-400"
-                    : "text-zinc-700 hover:text-zinc-500"
+                    : "text-zinc-700 hover:text-zinc-400"
                 }`}
               />
             </button>
           ))}
-          <span className="ml-2 text-xs text-zinc-500">
+          <span className="ml-2 text-xs text-zinc-400">
             {activeRating > 0 ? `${activeRating} / 5` : "Select a rating"}
           </span>
         </div>

@@ -134,9 +134,9 @@ export default function ReportModal({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Please provide additional details..."
                 maxLength={1000}
-                className="focus:border-h_red/50 min-h-24 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-600"
+                className="focus:border-h_red/50 min-h-24 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-400"
               />
-              <p className="mt-1 text-right text-xs text-gray-500">
+              <p className="mt-1 text-right text-xs text-gray-400">
                 {description.length}/1000
               </p>
             </div>

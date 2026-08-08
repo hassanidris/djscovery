@@ -53,10 +53,10 @@ function EmptySectionState({
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/2 py-12 text-center">
       <div className="mb-3 flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/5">
-        <Icon className="h-5 w-5 text-gray-500" />
+        <Icon className="h-5 w-5 text-gray-400" />
       </div>
       <p className="text-sm font-medium text-white">{title}</p>
-      <p className="mt-1 max-w-xs text-xs text-gray-500">{description}</p>
+      <p className="mt-1 max-w-xs text-xs text-gray-400">{description}</p>
       {onAction && (
         <Button
           onClick={onAction}
@@ -123,7 +123,7 @@ export default function CareerHighlights({
             <div key={i} className="flex gap-4 pb-6 last:pb-0">
               <div className="flex flex-col items-center">
                 <div className="bg-h_red/10 border-h_red/20 flex size-9 shrink-0 items-center justify-center rounded-full border">
-                  <HIcon className="text-h_red h-3.5 w-3.5" />
+                  <HIcon className="text-h_redLight h-3.5 w-3.5" />
                 </div>
                 {i < highlightsWithIcons.length - 1 && (
                   <div className="mt-2 w-px flex-1 bg-white/8" />
@@ -131,7 +131,7 @@ export default function CareerHighlights({
               </div>
               <div className="pt-1.5 pb-1">
                 <p className="text-sm font-semibold text-white">{h.title}</p>
-                <p className="mt-0.5 text-xs text-gray-500">{h.year}</p>
+                <p className="mt-0.5 text-xs text-gray-400">{h.year}</p>
                 {h.description && (
                   <p className="mt-1 text-xs text-gray-400">{h.description}</p>
                 )}

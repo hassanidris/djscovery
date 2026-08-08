@@ -488,7 +488,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                 className="h-full w-full object-cover"
               />
             ) : (
-              <Camera className="h-8 w-8 text-gray-500" />
+              <Camera className="h-8 w-8 text-gray-400" />
             )}
             <input
               ref={avatarInputRef}
@@ -500,7 +500,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           </label>
           <div>
             <p className="text-sm text-gray-300">Upload your DJ photo</p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-400">
               JPG, PNG or WEBP · Max 5 MB
             </p>
             {avatarFile && (
@@ -510,7 +510,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                   setAvatarFile(null);
                   setAvatarPreview(null);
                 }}
-                className="text-h_red mt-2 flex items-center gap-1 text-xs hover:underline"
+                className="text-h_redLight mt-2 flex items-center gap-1 text-xs hover:underline"
               >
                 <X className="h-3 w-3" /> Remove
               </button>
@@ -523,7 +523,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>
           Cover Image{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
+          <span className="text-sm font-normal text-gray-400">(optional)</span>
         </h2>
         <p className="-mt-2 text-xs text-gray-400">
           A banner image for your profile header.
@@ -540,8 +540,8 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
               />
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <Camera className="h-8 w-8 text-gray-500" />
-                <span className="text-xs text-gray-500">
+                <Camera className="h-8 w-8 text-gray-400" />
+                <span className="text-xs text-gray-400">
                   16:9 ratio recommended
                 </span>
               </div>
@@ -556,7 +556,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           </label>
           <div>
             <p className="text-sm text-gray-300">Upload cover image</p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-400">
               JPG, PNG or WEBP · Max 10 MB
             </p>
             {coverFile && (
@@ -566,7 +566,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
                   setCoverFile(null);
                   setCoverPreview(null);
                 }}
-                className="text-h_red mt-2 flex items-center gap-1 text-xs hover:underline"
+                className="text-h_redLight mt-2 flex items-center gap-1 text-xs hover:underline"
               >
                 <X className="h-3 w-3" /> Remove
               </button>
@@ -581,7 +581,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         <div className="flex flex-col gap-1.5">
           <label className={labelCls}>
-            DJ Stage Name <span className="text-h_red">*</span>
+            DJ Stage Name <span className="text-h_redLight">*</span>
           </label>
           <input
             {...register("stageName")}
@@ -593,7 +593,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             <p className="text-xs text-red-400">{errors.stageName.message}</p>
           )}
           {slugPreview && (
-            <p className="mt-0.5 text-xs text-gray-500">
+            <p className="mt-0.5 text-xs text-gray-400">
               Profile URL:{" "}
               <span className="text-gray-400">
                 DJcovery.com/djs/{slugPreview}
@@ -610,7 +610,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             rows={4}
             className={`${inputCls} resize-none`}
           />
-          <p className="text-right text-xs text-gray-600">
+          <p className="text-right text-xs text-gray-400">
             {bio?.length || 0}/500
           </p>
         </div>
@@ -621,7 +621,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         className={`${sectionCls} ${errors.djTypes ? "border-red-500/40" : ""}`}
       >
         <h2 className={sectionTitleCls}>
-          DJ Type <span className="text-h_red">*</span>
+          DJ Type <span className="text-h_redLight">*</span>
         </h2>
         <p className="-mt-2 text-xs text-gray-400">
           Select all that apply — this will be used for search filters.
@@ -676,10 +676,10 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       >
         <div className="mb-1 flex items-center justify-between border-b border-white/10 pb-3">
           <h2 className="text-base font-semibold text-white">
-            Genres <span className="text-h_red">*</span>
+            Genres <span className="text-h_redLight">*</span>
           </h2>
           <span
-            className={`text-xs font-medium ${genreNames.length >= 5 ? "text-amber-400" : "text-gray-500"}`}
+            className={`text-xs font-medium ${genreNames.length >= 5 ? "text-amber-400" : "text-gray-400"}`}
           >
             {genreNames.length}/5
           </span>
@@ -756,7 +756,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
             </div>
           )}
         </div>
-        <p className="-mt-1 text-xs text-gray-600">
+        <p className="-mt-1 text-xs text-gray-400">
           New genres are saved to the database and will appear for future DJs.
         </p>
       </div>
@@ -769,7 +769,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
 
         <div className="flex flex-col gap-1.5">
           <label className={labelCls}>
-            Country <span className="text-h_red">*</span>
+            Country <span className="text-h_redLight">*</span>
           </label>
           <select
             {...register("countryId", { valueAsNumber: true })}
@@ -797,7 +797,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
         {countryId > 0 && (
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>
-              City <span className="text-h_red">*</span>
+              City <span className="text-h_redLight">*</span>
             </label>
             {loadingCities ? (
               <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
@@ -835,12 +835,12 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       >
         <div className="flex items-center justify-between">
           <h2 className={sectionTitleCls}>
-            Social Media <span className="text-h_red">*</span>
+            Social Media <span className="text-h_redLight">*</span>
           </h2>
         </div>
 
         {socialLinks.length === 0 && (
-          <p className="-mt-2 text-xs text-gray-500">
+          <p className="-mt-2 text-xs text-gray-400">
             Add at least one link so fans can find you.
           </p>
         )}
@@ -903,7 +903,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>
           Experience{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
+          <span className="text-sm font-normal text-gray-400">(optional)</span>
         </h2>
         <p className="-mt-2 text-xs text-gray-400">
           Help organizers understand your background and skill level.
@@ -936,7 +936,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>
           Fee/Pricing{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
+          <span className="text-sm font-normal text-gray-400">(optional)</span>
         </h2>
         <p className="-mt-2 text-xs text-gray-400">
           Set your booking fee range. Currency auto-detected from your country.
@@ -1007,7 +1007,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>
           Contact Information{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
+          <span className="text-sm font-normal text-gray-400">(optional)</span>
         </h2>
         <p className="-mt-2 text-xs text-gray-400">
           How organizers can reach you for bookings.
@@ -1053,7 +1053,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       <div className={sectionCls}>
         <h2 className={sectionTitleCls}>
           Media{" "}
-          <span className="text-sm font-normal text-gray-500">(optional)</span>
+          <span className="text-sm font-normal text-gray-400">(optional)</span>
         </h2>
         <p className="-mt-2 text-xs text-gray-400">
           Showcase your work — photos, video sets, and audio samples.
@@ -1145,7 +1145,7 @@ function MediaUploadSection({
       <div className="mb-1 flex items-center gap-2">
         <span className="text-gray-400">{icon}</span>
         <span className="text-sm font-medium text-gray-300">{label}</span>
-        <span className="text-xs text-gray-600">· {hint}</span>
+        <span className="text-xs text-gray-400">· {hint}</span>
       </div>
 
       {files.length > 0 && (
@@ -1159,7 +1159,7 @@ function MediaUploadSection({
               <button
                 type="button"
                 onClick={() => onRemove(i)}
-                className="ml-3 shrink-0 text-gray-500 transition-colors hover:text-red-400"
+                className="ml-3 shrink-0 text-gray-400 transition-colors hover:text-red-400"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -1168,7 +1168,7 @@ function MediaUploadSection({
         </div>
       )}
 
-      <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-500 transition-all hover:border-white/30 hover:text-gray-300">
+      <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-400 transition-all hover:border-white/30 hover:text-gray-300">
         <Plus className="h-3.5 w-3.5" />
         Add {label.toLowerCase()}
         <input
@@ -1220,7 +1220,7 @@ function LinkInputSection({
       <div className="mb-1 flex items-center gap-2">
         <span className="text-gray-400">{icon}</span>
         <span className="text-sm font-medium text-gray-300">{label}</span>
-        <span className="text-xs text-gray-600">· {hint}</span>
+        <span className="text-xs text-gray-400">· {hint}</span>
       </div>
 
       {links.length > 0 && (
@@ -1237,7 +1237,7 @@ function LinkInputSection({
               <button
                 type="button"
                 onClick={() => removeLink(i)}
-                className="shrink-0 text-gray-500 transition-colors hover:text-red-400"
+                className="shrink-0 text-gray-400 transition-colors hover:text-red-400"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -1249,7 +1249,7 @@ function LinkInputSection({
       <button
         type="button"
         onClick={addLink}
-        className="flex w-fit items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-500 transition-all hover:border-white/30 hover:text-gray-300"
+        className="flex w-fit items-center gap-2 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-gray-400 transition-all hover:border-white/30 hover:text-gray-300"
       >
         <Plus className="h-3.5 w-3.5" />
         Add link

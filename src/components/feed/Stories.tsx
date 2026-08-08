@@ -84,7 +84,7 @@ const Stories = () => {
               </span>
 
               {/* Genre tag */}
-              <span className="max-w-16 truncate text-center text-[11px] text-gray-500">
+              <span className="max-w-16 truncate text-center text-[11px] text-gray-400">
                 {dj.genre}
               </span>
             </div>

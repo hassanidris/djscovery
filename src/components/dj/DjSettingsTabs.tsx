@@ -266,7 +266,7 @@ function ProfileTab({
       <section className="flex flex-col gap-6">
         <div>
           <h3 className="text-sm font-semibold text-white">Basic Info</h3>
-          <p className="text-xs text-gray-500">Your public DJ identity.</p>
+          <p className="text-xs text-gray-400">Your public DJ identity.</p>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -280,7 +280,7 @@ function ProfileTab({
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-gray-500">
+              <div className="flex h-full items-center justify-center text-sm text-gray-400">
                 No cover image
               </div>
             )}
@@ -321,7 +321,7 @@ function ProfileTab({
                   className="object-cover"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center text-gray-500">
+                <div className="flex h-full items-center justify-center text-gray-400">
                   <Camera className="h-6 w-6" />
                 </div>
               )}
@@ -372,7 +372,7 @@ function ProfileTab({
             placeholder="Tell fans and organizers about your style..."
             className="resize-none"
           />
-          <p className="text-right text-xs text-gray-500">{bio.length}/800</p>
+          <p className="text-right text-xs text-gray-400">{bio.length}/800</p>
         </div>
       </section>
 
@@ -380,7 +380,7 @@ function ProfileTab({
       <section className="flex flex-col gap-6">
         <div>
           <h3 className="text-sm font-semibold text-white">Location</h3>
-          <p className="text-xs text-gray-500">Where you&apos;re based.</p>
+          <p className="text-xs text-gray-400">Where you&apos;re based.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -406,7 +406,7 @@ function ProfileTab({
           <div className="flex flex-col gap-2">
             <Label>City</Label>
             {loadingCities ? (
-              <div className="flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-sm text-gray-400">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading cities...
               </div>
             ) : (
@@ -435,7 +435,7 @@ function ProfileTab({
       <section className="flex flex-col gap-6">
         <div>
           <h3 className="text-sm font-semibold text-white">Contact</h3>
-          <p className="text-xs text-gray-500">How organizers can reach you.</p>
+          <p className="text-xs text-gray-400">How organizers can reach you.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -564,7 +564,7 @@ function MusicTab({
       <section className="flex flex-col gap-6">
         <div>
           <h3 className="text-sm font-semibold text-white">Genres</h3>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             Select up to 5 genres that describe your sound.
           </p>
         </div>
@@ -610,7 +610,7 @@ function MusicTab({
       <section className="flex flex-col gap-6">
         <div>
           <h3 className="text-sm font-semibold text-white">DJ Types</h3>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             What kind of events do you play?
           </p>
         </div>
@@ -641,7 +641,7 @@ function MusicTab({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-white">Social Links</h3>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-400">
               Links shown on your public profile.
             </p>
           </div>
@@ -682,7 +682,8 @@ function MusicTab({
                 variant="ghost"
                 size="icon"
                 onClick={() => removeLink(i)}
-                className="text-gray-500 hover:text-red-500"
+                className="text-gray-400 hover:text-red-500"
+                aria-label="Remove link"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -911,7 +912,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
       </div>
     );
   }
@@ -923,7 +924,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
           <h3 className="text-sm font-semibold text-white">
             Career Highlights
           </h3>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             Showcase your key milestones and achievements.
           </p>
         </div>
@@ -1010,7 +1011,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-white">{h.title}</p>
-                  <p className="mt-0.5 text-xs text-gray-500">{h.year}</p>
+                  <p className="mt-0.5 text-xs text-gray-400">{h.year}</p>
                   {h.description && (
                     <p className="mt-1 text-xs text-gray-400">
                       {h.description}
@@ -1023,7 +1024,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
                     variant="ghost"
                     size="icon"
                     onClick={() => setEditId(h.id)}
-                    className="text-gray-500 hover:text-white"
+                    className="text-gray-400 hover:text-white"
                     aria-label="Edit"
                   >
                     <Pencil className="h-4 w-4" />
@@ -1033,7 +1034,7 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
                     variant="ghost"
                     size="icon"
                     onClick={() => removeHighlight(h.id)}
-                    className="text-gray-500 hover:text-red-500"
+                    className="text-gray-400 hover:text-red-500"
                     aria-label="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -1047,11 +1048,11 @@ function HighlightsTab({ profile }: { profile: ProfileData }) {
 
       {highlights.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/2 py-12 text-center">
-          <Trophy className="h-8 w-8 text-gray-500" />
+          <Trophy className="h-8 w-8 text-gray-400" />
           <p className="mt-3 text-sm font-medium text-white">
             No career highlights yet
           </p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-gray-400">
             Add your key milestones and achievements to build credibility.
           </p>
         </div>
@@ -1109,7 +1110,7 @@ function TeamTab({ profile }: { profile: ProfileData }) {
     <div className="flex flex-col gap-6">
       <div>
         <h3 className="text-sm font-semibold text-white">Professional Team</h3>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-400">
           Add your manager and booking agent details.
         </p>
       </div>
@@ -1118,7 +1119,7 @@ function TeamTab({ profile }: { profile: ProfileData }) {
         {/* Manager */}
         <div className="flex flex-col gap-4">
           <div>
-            <h4 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+            <h4 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
               Manager
             </h4>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -1156,7 +1157,7 @@ function TeamTab({ profile }: { profile: ProfileData }) {
 
           {/* Booking Agent */}
           <div>
-            <h4 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+            <h4 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
               Booking Agent
             </h4>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

@@ -44,14 +44,14 @@ export default function AboutPage() {
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
               <div className="bg-h_red/10 border-h_red/20 flex size-10 shrink-0 items-center justify-center rounded-xl border">
-                <Headphones className="text-h_red h-5 w-5" />
+                <Headphones className="text-h_redLight h-5 w-5" />
               </div>
-              <span className="text-h_red text-xs font-semibold tracking-[0.15em] uppercase">
+              <span className="text-h_redLight text-xs font-semibold tracking-[0.15em] uppercase">
                 About Us
               </span>
             </div>
             <h1 className="font-heading text-4xl text-white md:text-6xl">
-              About <span className="text-h_red">DJcovery</span>
+              About <span className="text-h_redLight">DJcovery</span>
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-gray-400 md:text-lg">
               A professional platform designed to help DJs get discovered, build
@@ -68,7 +68,7 @@ export default function AboutPage() {
           {/* ── Sticky TOC ── */}
           <aside className="shrink-0 lg:w-60">
             <div className="sticky top-24">
-              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/40 uppercase">
+              <p className="mb-4 text-xs font-semibold tracking-[0.15em] text-white/60 uppercase">
                 Contents
               </p>
               <nav className="flex flex-col gap-1.5">
@@ -76,9 +76,9 @@ export default function AboutPage() {
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    className="hover:text-h_red group flex items-baseline gap-2.5 text-sm text-gray-500 transition-colors"
+                    className="hover:text-h_redLight group flex items-baseline gap-2.5 text-sm text-gray-400 transition-colors"
                   >
-                    <span className="text-h_red/40 group-hover:text-h_red min-w-5 text-[11px] font-medium tabular-nums transition-colors">
+                    <span className="text-h_redLight group-hover:text-h_redLight min-w-5 text-[11px] font-medium tabular-nums transition-colors">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {item.label}
@@ -203,17 +203,17 @@ export default function AboutPage() {
                   </p>
                   <div className="mt-2 grid gap-4 sm:grid-cols-3">
                     <VisionPillar
-                      icon={<Globe className="text-h_red h-5 w-5" />}
+                      icon={<Globe className="text-h_redLight h-5 w-5" />}
                       title="Transparency"
                       text="Open, honest profiles that build real trust between DJs and organizers."
                     />
                     <VisionPillar
-                      icon={<Star className="text-h_red h-5 w-5" />}
+                      icon={<Star className="text-h_redLight h-5 w-5" />}
                       title="Trust"
                       text="Community-driven reviews and reputation systems that mean something."
                     />
                     <VisionPillar
-                      icon={<Zap className="text-h_red h-5 w-5" />}
+                      icon={<Zap className="text-h_redLight h-5 w-5" />}
                       title="Discovery"
                       text="Better tools to make finding the right DJ easier than ever before."
                     />
@@ -241,7 +241,7 @@ export default function AboutPage() {
                         key={feature}
                         className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/2 px-4 py-3"
                       >
-                        <CheckCircle2 className="text-h_red mt-0.5 h-4 w-4 shrink-0" />
+                        <CheckCircle2 className="text-h_redLight mt-0.5 h-4 w-4 shrink-0" />
                         <span className="text-sm leading-relaxed">
                           {feature}
                         </span>
@@ -269,21 +269,21 @@ export default function AboutPage() {
                   {/* CTA cards */}
                   <div className="grid gap-4 sm:grid-cols-3">
                     <CtaCard
-                      icon={<Music2 className="text-h_red h-5 w-5" />}
+                      icon={<Music2 className="text-h_redLight h-5 w-5" />}
                       title="I'm a DJ"
                       description="Showcase your talent and get booked."
                       href="/become-dj"
                       label="Create DJ Profile"
                     />
                     <CtaCard
-                      icon={<Users className="text-h_red h-5 w-5" />}
+                      icon={<Users className="text-h_redLight h-5 w-5" />}
                       title="I'm an Organizer"
                       description="Find the right DJ for every event."
                       href="/become-organizer"
                       label="Join as Organizer"
                     />
                     <CtaCard
-                      icon={<Star className="text-h_red h-5 w-5" />}
+                      icon={<Star className="text-h_redLight h-5 w-5" />}
                       title="I'm a Fan"
                       description="Discover local talent and upcoming events."
                       href="/become-fan"
@@ -295,7 +295,7 @@ export default function AboutPage() {
 
               {/* Bottom divider */}
               <div className="border-t border-white/5 pt-6">
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-gray-400">
                   &copy; {new Date().getFullYear()} DJcovery. All rights
                   reserved.
                 </p>
@@ -311,7 +311,7 @@ export default function AboutPage() {
 function SectionHeading({ number, title }: { number: number; title: string }) {
   return (
     <div className="mb-6 flex items-baseline gap-3 border-b border-white/5 pb-4">
-      <span className="text-h_red font-heading text-sm font-bold tabular-nums">
+      <span className="text-h_redLight font-heading text-sm font-bold tabular-nums">
         {String(number).padStart(2, "0")}
       </span>
       <h2 className="font-heading text-xl text-white">{title}</h2>
@@ -333,12 +333,12 @@ function RoleCard({
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-white/2 p-5">
       <div className="flex items-center gap-2.5">
-        <span className="bg-h_red/10 text-h_red flex size-7 items-center justify-center rounded-lg">
+        <span className="bg-h_red/10 text-h_redLight flex size-7 items-center justify-center rounded-lg">
           {icon}
         </span>
         <h3 className="text-sm font-semibold text-white">{title}</h3>
       </div>
-      <p className="text-xs text-gray-500">{description}</p>
+      <p className="text-xs text-gray-400">{description}</p>
       <ul className="flex flex-col gap-2">
         {items.map((item) => (
           <li key={item} className="flex items-start gap-2">
@@ -368,7 +368,7 @@ function VisionPillar({
         {icon}
       </div>
       <p className="text-sm font-semibold text-white">{title}</p>
-      <p className="text-xs leading-relaxed text-gray-500">{text}</p>
+      <p className="text-xs leading-relaxed text-gray-400">{text}</p>
     </div>
   );
 }
@@ -396,11 +396,11 @@ function CtaCard({
       </div>
       <div>
         <p className="text-sm font-semibold text-white">{title}</p>
-        <p className="mt-1 text-xs leading-relaxed text-gray-500">
+        <p className="mt-1 text-xs leading-relaxed text-gray-400">
           {description}
         </p>
       </div>
-      <div className="text-h_red mt-auto flex items-center gap-1.5 text-xs font-semibold">
+      <div className="text-h_redLight mt-auto flex items-center gap-1.5 text-xs font-semibold">
         {label}
         <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
       </div>

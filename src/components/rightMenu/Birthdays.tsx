@@ -4,9 +4,9 @@ import React from "react";
 
 const Birthdays = () => {
   return (
-    <div className="p-4 bg-h_blackLight/50 rounded-lg shadow-md text-sm flex flex-col gap-4">
+    <div className="bg-h_blackLight/50 flex flex-col gap-4 rounded-lg p-4 text-sm shadow-md">
       {/* TOP */}
-      <div className="flex justify-between items-center font-medium">
+      <div className="flex items-center justify-between font-medium">
         <span className="text-gray-200">Birthdays</span>
       </div>
       {/* USER */}
@@ -17,24 +17,24 @@ const Birthdays = () => {
             alt=""
             width={40}
             height={40}
-            className="w-10 h-10 rounded-full object-cover right-1 ring-gray-300"
+            className="right-1 h-10 w-10 rounded-full object-cover ring-gray-300"
           />
           <span className="font-semibol text-h_white">Wayne Burton</span>
         </div>
-        <div className="flex gap-3 justify-end">
-          <button className="bg-h_red hover:bg-h_redDark text-white text-xs px-2 py-1 rounded-md">
+        <div className="flex justify-end gap-3">
+          <button className="bg-h_red hover:bg-h_redDark rounded-md px-2 py-1 text-xs text-white">
             Celebrate
           </button>
         </div>
       </div>
       {/* UPCOMING */}
-      <div className="p-4 bg-slate-100 rounded-lg flex items-center gap-4 right-1 ring-gray-300">
+      <div className="right-1 flex items-center gap-4 rounded-lg bg-slate-100 p-4 ring-gray-300">
         <Image src="/gift.png" alt="" width={24} height={24} />
         <Link href="/" className="flex flex-col gap-1 text-xs">
-          <span className="text-gray-700 font-semibold">
+          <span className="font-semibold text-gray-700">
             Upcoming Birthdays
           </span>
-          <span className="text-gray-500">
+          <span className="text-gray-400">
             See other 16 have upcoming birthdays
           </span>
         </Link>

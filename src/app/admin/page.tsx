@@ -214,12 +214,12 @@ function StatCard({ label, value, icon, href, accent, badge }: StatCardProps) {
           {icon}
         </div>
         {badge && (
-          <Badge className="border-h_red/30 bg-h_red/10 text-h_red border text-[11px]">
+          <Badge className="border-h_red/30 bg-h_red/10 text-h_redLight border text-[11px]">
             {badge}
           </Badge>
         )}
         {href && !badge && (
-          <ArrowRight className="h-4 w-4 text-gray-600 transition-colors group-hover:text-gray-400" />
+          <ArrowRight className="h-4 w-4 text-gray-400 transition-colors group-hover:text-gray-300" />
         )}
       </div>
       <div>
@@ -439,7 +439,7 @@ async function DashboardAlerts({ range }: { range: DashboardRange }) {
       {stats.openReports > 0 && (
         <Link
           href="/admin/reports?status=open"
-          className="border-h_red/30 bg-h_red/10 text-h_red hover:bg-h_red/20 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
+          className="border-h_red/30 bg-h_red/10 text-h_redLight hover:bg-h_red/20 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
         >
           <Flag className="h-4 w-4" />
           {stats.openReports} open report
@@ -456,7 +456,7 @@ async function DashboardStatsGrid({ range }: { range: DashboardRange }) {
 
   return (
     <div>
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-400 uppercase">
         Platform Stats
       </h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -493,7 +493,7 @@ async function DashboardContentStats({ range }: { range: DashboardRange }) {
 
   return (
     <div>
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-400 uppercase">
         Content
       </h2>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -511,7 +511,7 @@ async function DashboardContentStats({ range }: { range: DashboardRange }) {
         <StatCard
           label="Open Reports"
           value={stats.openReports}
-          icon={<Flag className="text-h_red h-5 w-5" />}
+          icon={<Flag className="text-h_redLight h-5 w-5" />}
           href="/admin/reports"
           accent={stats.openReports > 0}
           badge={stats.openReports > 0 ? "Needs review" : undefined}
@@ -531,7 +531,7 @@ async function DashboardOperationsStats({ range }: { range: DashboardRange }) {
 
   return (
     <div>
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-400 uppercase">
         Operations
       </h2>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -573,7 +573,7 @@ async function DashboardPendingActions() {
 
   return (
     <div>
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+      <h2 className="mb-4 text-xs font-semibold tracking-widest text-gray-400 uppercase">
         Pending Actions
       </h2>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -605,7 +605,7 @@ async function DashboardDJApprovalQueue() {
         </div>
         <Link
           href="/admin/djs?status=PENDING_APPROVAL"
-          className="text-h_red hover:text-h_red/80 text-sm font-medium transition-colors"
+          className="text-h_redLight hover:text-h_redLight/80 text-sm font-medium transition-colors"
         >
           View all pending DJs
         </Link>
@@ -618,7 +618,7 @@ async function DashboardDJApprovalQueue() {
             <p className="mt-3 text-sm font-medium text-white">
               No pending DJ approvals
             </p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-400">
               All DJ profiles have been reviewed
             </p>
           </div>
@@ -696,7 +696,7 @@ async function DashboardRecentUsers() {
                   <p className="text-xs text-gray-400">{user.email}</p>
                 </div>
               </div>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-400">
                 {formatDistanceToNow(new Date(user.createdAt), {
                   addSuffix: true,
                 })}
@@ -740,7 +740,7 @@ async function DashboardRecentReports() {
                 <p className="font-medium text-white">{report.reason}</p>
                 <p className="text-xs text-gray-400">{report.targetType}</p>
               </div>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-400">
                 {formatDistanceToNow(new Date(report.createdAt), {
                   addSuffix: true,
                 })}
@@ -778,7 +778,7 @@ async function DashboardRecentActivity() {
                 <p className="font-medium text-white">{activity.title}</p>
                 <p className="text-xs text-gray-400">{activity.description}</p>
               </div>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-400">
                 {formatDistanceToNow(new Date(activity.createdAt), {
                   addSuffix: true,
                 })}

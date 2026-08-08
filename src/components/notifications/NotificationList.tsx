@@ -54,7 +54,7 @@ export function NotificationList({
             type="button"
             onClick={handleMarkAllRead}
             disabled={isPending}
-            className="text-h_red hover:text-h_redDark flex items-center gap-1.5 text-sm font-medium transition-colors disabled:opacity-50"
+            className="text-h_redLight hover:text-h_redLightDark flex items-center gap-1.5 text-sm font-medium transition-colors disabled:opacity-50"
           >
             <CheckCheck className="h-4 w-4" />
             {isPending ? "Marking..." : "Mark all read"}
@@ -81,7 +81,7 @@ export function NotificationList({
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center gap-3 px-5 py-12 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
-              <Bell className="h-6 w-6 text-zinc-500" />
+              <Bell className="h-6 w-6 text-zinc-400" />
             </div>
             <p className="text-sm text-zinc-400">
               {filter === "unread"
@@ -125,7 +125,7 @@ function FilterButton({
         "flex-1 py-2.5 text-sm font-medium transition-colors",
         active
           ? "border-h_red border-b-2 text-white"
-          : "text-zinc-500 hover:text-zinc-300",
+          : "text-zinc-400 hover:text-zinc-300",
       )}
     >
       {label}
