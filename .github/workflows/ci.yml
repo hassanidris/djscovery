@@ -95,18 +95,18 @@ jobs:
           NEXT_PUBLIC_APP_ENV: staging
           E2E_TESTING: "true"
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
           NEXT_PUBLIC_BASE_URL: http://localhost:3000
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
           INDEXING_ENABLED: false
           PRE_LAUNCH_MODE: false
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_API_KEY: placeholder-api-key
           RESEND_FROM_EMAIL: noreply@djcovery.com
           RESEND_CONTACT_TO: support@djcovery.com
-          SUPABASE_WEBHOOK_SECRET: ${{ secrets.SUPABASE_WEBHOOK_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SUPABASE_WEBHOOK_SECRET: placeholder-webhook-secret
+          CRON_SECRET: placeholder-cron-secret
 
   visual-regression:
     name: Visual Regression Tests
@@ -137,18 +137,18 @@ jobs:
           NEXT_PUBLIC_APP_ENV: staging
           E2E_TESTING: "true"
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
           NEXT_PUBLIC_BASE_URL: http://localhost:3000
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
           INDEXING_ENABLED: false
           PRE_LAUNCH_MODE: false
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_API_KEY: placeholder-api-key
           RESEND_FROM_EMAIL: noreply@djcovery.com
           RESEND_CONTACT_TO: support@djcovery.com
-          SUPABASE_WEBHOOK_SECRET: ${{ secrets.SUPABASE_WEBHOOK_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SUPABASE_WEBHOOK_SECRET: placeholder-webhook-secret
+          CRON_SECRET: placeholder-cron-secret
 
       - name: Upload screenshot diffs
         if: failure()
@@ -191,10 +191,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -210,18 +214,18 @@ jobs:
         env:
           NEXT_PUBLIC_APP_ENV: staging
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
           NEXT_PUBLIC_BASE_URL: http://localhost:3000
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
           INDEXING_ENABLED: false
           PRE_LAUNCH_MODE: false
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_API_KEY: placeholder-api-key
           RESEND_FROM_EMAIL: noreply@djcovery.com
           RESEND_CONTACT_TO: support@djcovery.com
-          SUPABASE_WEBHOOK_SECRET: ${{ secrets.SUPABASE_WEBHOOK_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SUPABASE_WEBHOOK_SECRET: placeholder-webhook-secret
+          CRON_SECRET: placeholder-cron-secret
 
       - name: Check bundle sizes
         run: npm run bundle-check

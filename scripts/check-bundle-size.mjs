@@ -1,6 +1,7 @@
-import { readdirSync, statSync, existsSync } from "fs";
+import { readdirSync, statSync, existsSync, readFileSync } from "fs";
 import { join, resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { gzipSync } from "zlib";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..");
@@ -10,7 +11,6 @@ const KB = 1024;
 const BUDGETS = {
   perRoute: 250 * KB,
   perChunk: 500 * KB,
-  sharedChunks: 1200 * KB,
   sharedGzipped: 1200 * KB,
 };
 
@@ -39,6 +39,9 @@ function findFiles(dir, ext) {
 function getRouteFromPath(filePath) {
   const staticRelative = filePath.replace(STATIC_DIR + "/", "");
   const parts = staticRelative.split("/");
+  if (parts[0] === "app") {
+    return parts.slice(1, -1).join("/") || "/";
+  }
   if (parts[0] === "chunks") return "shared";
   if (parts[0] === "pages") {
     return parts.slice(1, -1).join("/") || "/";
@@ -64,14 +67,14 @@ function checkBundle() {
 
   const jsStats = jsFiles.map((file) => {
     const size = statSync(file).size;
-    const gzippedSize = Math.round(size * 0.3);
+    const gzippedSize = gzipSync(readFileSync(file)).length;
     const route = getRouteFromPath(file);
     return { file, size, gzippedSize, route, type: "js" };
   });
 
   const cssStats = cssFiles.map((file) => {
     const size = statSync(file).size;
-    const gzippedSize = Math.round(size * 0.3);
+    const gzippedSize = gzipSync(readFileSync(file)).length;
     const route = getRouteFromPath(file);
     return { file, size, gzippedSize, route, type: "css" };
   });
@@ -131,7 +134,9 @@ function checkBundle() {
   const totalJs = jsStats.reduce((sum, s) => sum + s.size, 0);
   const totalCss = cssStats.reduce((sum, s) => sum + s.size, 0);
   const totalAll = totalJs + totalCss;
-  const totalGzipped = Math.round(totalAll * 0.3);
+  const totalGzipped =
+    jsStats.reduce((sum, s) => sum + s.gzippedSize, 0) +
+    cssStats.reduce((sum, s) => sum + s.gzippedSize, 0);
 
   console.log("-".repeat(70));
   console.log(
@@ -143,7 +148,7 @@ function checkBundle() {
   console.log(`\nBudgets:`);
   console.log(`  Per-route:  ${formatBytes(BUDGETS.perRoute)}`);
   console.log(`  Per-chunk:  ${formatBytes(BUDGETS.perChunk)}`);
-  console.log(`  Shared:     ${formatBytes(BUDGETS.sharedChunks)}`);
+  console.log(`  Shared (gzip): ${formatBytes(BUDGETS.sharedGzipped)}`);
 
   if (violations.length > 0) {
     console.log("\nViolations:");
