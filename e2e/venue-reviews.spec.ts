@@ -5,11 +5,26 @@ async function signInAsFan(page: Page) {
   await page.goto("/sign-in");
   await page.locator('input[name="email"]').fill(TEST_USERS.FAN.email);
   await page.locator('input[name="password"]').fill(TEST_USERS.FAN.password);
-  await page.getByRole("button", { name: "Sign In" }).click();
+  await Promise.all([
+    page.getByRole("button", { name: "Sign In" }).click(),
+    page
+      .waitForNavigation({ waitUntil: "load", timeout: 20000 })
+      .catch(() => null),
+  ]);
 
-  // Wait for successful sign-in
+  const currentUrl = page.url();
+  if (currentUrl.includes("/sign-in?error=")) {
+    const bodyText = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
+    throw new Error(
+      `Sign-in failed: redirected to ${currentUrl}. Page body:\n${bodyText}`,
+    );
+  }
+
   await page.waitForURL((url) => !url.pathname.includes("/sign-in"), {
-    timeout: 10000,
+    timeout: 20000,
   });
 }
 
@@ -36,14 +51,16 @@ test.describe("venue reviews", () => {
       await expect(page.locator("body")).toBeVisible();
     });
 
-    test("successfully submits venue review with valid data", async ({ page }) => {
+    test("successfully submits venue review with valid data", async ({
+      page,
+    }) => {
       await signInAsFan(page);
       // This would need:
       // 1. Test data setup with completed event
       // 2. Navigation to review page
       // 3. Form interaction
       // 4. Success verification
-      
+
       // For now, test basic fan dashboard access
       await page.goto("/fan/profile");
       await expect(page.locator("body")).toBeVisible();
@@ -63,7 +80,9 @@ test.describe("venue reviews", () => {
       await expect(page.locator("body")).toBeVisible();
     });
 
-    test("shows already reviewed state for duplicate reviews", async ({ page }) => {
+    test("shows already reviewed state for duplicate reviews", async ({
+      page,
+    }) => {
       await signInAsFan(page);
       // Test that fans can only review once per event per venue
       await page.goto("/fan/profile");
