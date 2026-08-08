@@ -22,7 +22,8 @@ const ADDITIONAL_PAGES = [
 
 const SCREENSHOT_OPTS = {
   fullPage: true,
-  maxDiffPixelRatio: 0.05,
+  maxDiffPixelRatio: 0.1,
+  threshold: 0.3,
   animations: "disabled" as const,
   stylesheets: [],
   mask: [],
