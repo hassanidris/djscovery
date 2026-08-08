@@ -62,6 +62,14 @@ async function capturePage(
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
   await page.waitForTimeout(1000);
 
+  await page.addStyleTag({
+    content: `
+      * {
+        font-family: Arial, sans-serif !important;
+      }
+    `,
+  });
+
   await expect(page).toHaveScreenshot(`${name}.png`, {
     ...SCREENSHOT_OPTS,
     fullPage: true,
