@@ -29,8 +29,8 @@ const COOKIE_CONSENT = {
 };
 
 const SCREENSHOT_OPTS = {
-  maxDiffPixelRatio: 0.15,
-  threshold: 0.4,
+  maxDiffPixelRatio: 0.1,
+  threshold: 0.3,
   animations: "disabled" as const,
 };
 
@@ -63,17 +63,10 @@ async function capturePage(
   await page.waitForTimeout(1000);
 
   await page.addStyleTag({
-    content: `
-      * {
-        font-family: Arial, sans-serif !important;
-      }
-    `,
+    content: `* { font-family: Arial, sans-serif !important; }`,
   });
 
-  await expect(page).toHaveScreenshot(`${name}.png`, {
-    ...SCREENSHOT_OPTS,
-    fullPage: true,
-  });
+  await expect(page).toHaveScreenshot(`${name}.png`, SCREENSHOT_OPTS);
 }
 
 test.describe("Visual Regression - Critical Pages", () => {
