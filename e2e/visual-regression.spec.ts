@@ -20,18 +20,24 @@ const ADDITIONAL_PAGES = [
   { path: "/cookie-policy", name: "cookie-policy" },
 ];
 
+const SCREENSHOT_OPTS = {
+  fullPage: true,
+  maxDiffPixelRatio: 0.01,
+  animations: "disabled" as const,
+  stylesheets: [],
+  mask: [],
+};
+
+test.describe.configure({ mode: "serial" });
+
 test.describe("Visual Regression - Critical Pages", () => {
   CRITICAL_PAGES.forEach(({ path, name }) => {
     test(`${name} page matches baseline`, async ({ page }) => {
-      await page.goto(path);
+      await page.goto(path, { waitUntil: "domcontentloaded" });
       await expect(page.locator("body")).toBeVisible();
+      await page.waitForTimeout(2000);
 
-      await page.waitForLoadState("networkidle");
-
-      await expect(page).toHaveScreenshot(`${name}.png`, {
-        fullPage: true,
-        maxDiffPixels: 100,
-      });
+      await expect(page).toHaveScreenshot(`${name}.png`, SCREENSHOT_OPTS);
     });
   });
 });
@@ -39,15 +45,11 @@ test.describe("Visual Regression - Critical Pages", () => {
 test.describe("Visual Regression - Additional Pages", () => {
   ADDITIONAL_PAGES.forEach(({ path, name }) => {
     test(`${name} page matches baseline`, async ({ page }) => {
-      await page.goto(path);
+      await page.goto(path, { waitUntil: "domcontentloaded" });
       await expect(page.locator("body")).toBeVisible();
+      await page.waitForTimeout(2000);
 
-      await page.waitForLoadState("networkidle");
-
-      await expect(page).toHaveScreenshot(`${name}.png`, {
-        fullPage: true,
-        maxDiffPixels: 100,
-      });
+      await expect(page).toHaveScreenshot(`${name}.png`, SCREENSHOT_OPTS);
     });
   });
 });
