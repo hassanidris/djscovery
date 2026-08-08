@@ -37,6 +37,8 @@ const SCREENSHOT_OPTS = {
   mask: [] as import("@playwright/test").Locator[],
 };
 
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+
 test.use({ viewport: { width: 1280, height: 900 } });
 
 test.describe.configure({ mode: "serial" });
@@ -46,21 +48,28 @@ async function setupPage(page: import("@playwright/test").Page) {
     {
       name: "djcovery-consent",
       value: encodeURIComponent(JSON.stringify(COOKIE_CONSENT)),
-      domain: "localhost",
-      path: "/",
+      url: BASE_URL,
     },
   ]);
+}
+
+async function capturePage(
+  page: import("@playwright/test").Page,
+  path: string,
+  name: string,
+) {
+  await setupPage(page);
+  await page.goto(path, { waitUntil: "domcontentloaded" });
+  await expect(page.locator("body")).toBeVisible();
+  await page.waitForTimeout(2000);
+
+  await expect(page).toHaveScreenshot(`${name}.png`, SCREENSHOT_OPTS);
 }
 
 test.describe("Visual Regression - Critical Pages", () => {
   CRITICAL_PAGES.forEach(({ path, name }) => {
     test(`${name} page matches baseline`, async ({ page }) => {
-      await setupPage(page);
-      await page.goto(path, { waitUntil: "domcontentloaded" });
-      await expect(page.locator("body")).toBeVisible();
-      await page.waitForTimeout(2000);
-
-      await expect(page).toHaveScreenshot(`${name}.png`, SCREENSHOT_OPTS);
+      await capturePage(page, path, name);
     });
   });
 });
@@ -68,12 +77,7 @@ test.describe("Visual Regression - Critical Pages", () => {
 test.describe("Visual Regression - Additional Pages", () => {
   ADDITIONAL_PAGES.forEach(({ path, name }) => {
     test(`${name} page matches baseline`, async ({ page }) => {
-      await setupPage(page);
-      await page.goto(path, { waitUntil: "domcontentloaded" });
-      await expect(page.locator("body")).toBeVisible();
-      await page.waitForTimeout(2000);
-
-      await expect(page).toHaveScreenshot(`${name}.png`, SCREENSHOT_OPTS);
+      await capturePage(page, path, name);
     });
   });
 });
