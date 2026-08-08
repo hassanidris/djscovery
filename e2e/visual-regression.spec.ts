@@ -20,20 +20,42 @@ const ADDITIONAL_PAGES = [
   { path: "/cookie-policy", name: "cookie-policy" },
 ];
 
+const COOKIE_CONSENT = {
+  necessary: true,
+  analytics: false,
+  marketing: false,
+  preferences: false,
+  updatedAt: new Date().toISOString(),
+};
+
 const SCREENSHOT_OPTS = {
   fullPage: true,
   maxDiffPixelRatio: 0.15,
   threshold: 0.4,
   animations: "disabled" as const,
   stylesheets: [],
-  mask: [],
+  mask: [] as import("@playwright/test").Locator[],
 };
 
+test.use({ viewport: { width: 1280, height: 900 } });
+
 test.describe.configure({ mode: "serial" });
+
+async function setupPage(page: import("@playwright/test").Page) {
+  await page.context().addCookies([
+    {
+      name: "djcovery-consent",
+      value: encodeURIComponent(JSON.stringify(COOKIE_CONSENT)),
+      domain: "localhost",
+      path: "/",
+    },
+  ]);
+}
 
 test.describe("Visual Regression - Critical Pages", () => {
   CRITICAL_PAGES.forEach(({ path, name }) => {
     test(`${name} page matches baseline`, async ({ page }) => {
+      await setupPage(page);
       await page.goto(path, { waitUntil: "domcontentloaded" });
       await expect(page.locator("body")).toBeVisible();
       await page.waitForTimeout(2000);
@@ -46,6 +68,7 @@ test.describe("Visual Regression - Critical Pages", () => {
 test.describe("Visual Regression - Additional Pages", () => {
   ADDITIONAL_PAGES.forEach(({ path, name }) => {
     test(`${name} page matches baseline`, async ({ page }) => {
+      await setupPage(page);
       await page.goto(path, { waitUntil: "domcontentloaded" });
       await expect(page.locator("body")).toBeVisible();
       await page.waitForTimeout(2000);
