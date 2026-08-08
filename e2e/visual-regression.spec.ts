@@ -29,12 +29,9 @@ const COOKIE_CONSENT = {
 };
 
 const SCREENSHOT_OPTS = {
-  fullPage: true,
   maxDiffPixelRatio: 0.15,
   threshold: 0.4,
   animations: "disabled" as const,
-  stylesheets: [],
-  mask: [] as import("@playwright/test").Locator[],
 };
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
@@ -61,9 +58,14 @@ async function capturePage(
   await setupPage(page);
   await page.goto(path, { waitUntil: "domcontentloaded" });
   await expect(page.locator("body")).toBeVisible();
-  await page.waitForTimeout(2000);
 
-  await expect(page).toHaveScreenshot(`${name}.png`, SCREENSHOT_OPTS);
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await page.waitForTimeout(1000);
+
+  await expect(page).toHaveScreenshot(`${name}.png`, {
+    ...SCREENSHOT_OPTS,
+    fullPage: true,
+  });
 }
 
 test.describe("Visual Regression - Critical Pages", () => {
