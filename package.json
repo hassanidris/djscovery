@@ -31,7 +31,9 @@
     "create-admin": "tsx prisma/create-admin.ts",
     "postinstall": "prisma generate",
     "storybook": "storybook dev -p 6007",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "analyze": "ANALYZE=true next build",
+    "bundle-check": "node scripts/check-bundle-size.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -87,6 +89,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@lhci/cli": "^0.15.1",
+    "@next/bundle-analyzer": "^16.3.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "^10.5.5",
     "@storybook/nextjs-vite": "^10.5.5",
