@@ -10,10 +10,13 @@ import {
   Briefcase,
   CalendarDays,
   ExternalLink,
+  Star,
+  TrendingUp,
+  CheckCircle2,
 } from "lucide-react";
 import { ReportButton } from "@/components/reporting/ReportButton";
-import OrganizerReviews from "@/components/organizer/OrganizerReviews";
-import { DjGigReviewDisplay } from "@/components/reputation/DjGigReviewDisplay";
+import OrganizerProfileTabs from "@/components/organizer/OrganizerProfileTabs";
+import UnifiedReviewsSection from "@/components/organizer/UnifiedReviewsSection";
 
 // ISR: revalidate every 60 seconds
 export const revalidate = 60;
@@ -150,6 +153,7 @@ export default async function OrganizerPublicProfilePage({
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
+      slug: true,
       title: true,
       gigType: true,
       budgetType: true,
@@ -229,6 +233,45 @@ export default async function OrganizerPublicProfilePage({
 
   const avgRating = reviewStats._avg.rating ?? 0;
   const ratingCount = reviewStats._count.rating;
+
+  // Compute additional stats for hero banner
+  const [totalGigsCount, completedHiresCount, djGigReviewStats] =
+    await Promise.all([
+      prisma.gig.count({
+        where: {
+          organizerProfileId: profile.id,
+          deletedAt: null,
+          status: { not: "DRAFT" },
+        },
+      }),
+      prisma.hire.count({
+        where: {
+          application: {
+            gig: { organizerProfileId: profile.id },
+            status: "ACCEPTED",
+          },
+          status: "COMPLETED",
+        },
+      }),
+      prisma.djGigReview.aggregate({
+        where: { gig: { organizerProfileId: profile.id } },
+        _avg: { rating: true },
+        _count: { rating: true },
+      }),
+    ]);
+
+  const completionRate =
+    totalGigsCount > 0
+      ? Math.round((completedHiresCount / totalGigsCount) * 100)
+      : 0;
+  const totalReviewCount = ratingCount + djGigReviewStats._count.rating;
+  const combinedAvgRating =
+    totalReviewCount > 0
+      ? (avgRating * ratingCount +
+          (djGigReviewStats._avg.rating ?? 0) *
+            djGigReviewStats._count.rating) /
+        totalReviewCount
+      : 0;
 
   const typeLabel =
     ORGANIZER_TYPE_LABELS[profile.organizerType] ?? profile.organizerType;
@@ -340,143 +383,207 @@ export default async function OrganizerPublicProfilePage({
           </div>
         </div>
 
-        <div className="flex flex-col gap-10 pb-20">
-          {/* About */}
-          {profile.bio && (
-            <section>
-              <h2 className="mb-3 text-base font-semibold text-white">About</h2>
-              <p className="text-sm leading-relaxed whitespace-pre-line text-gray-400">
-                {profile.bio}
-              </p>
-            </section>
-          )}
-
-          {/* Active gigs */}
-          <section>
-            <div className="mb-4 flex items-center gap-2">
-              <h2 className="text-base font-semibold text-white">
-                Active Gigs
-              </h2>
-              {activeGigs.length > 0 && (
-                <span className="bg-h_red/20 text-h_redLight rounded-full px-2 py-0.5 text-xs font-medium">
-                  {activeGigs.length}
-                </span>
-              )}
+        {/* Stats banner */}
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-xl border border-white/8 bg-white/3 p-4">
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Star className="h-3.5 w-3.5 text-amber-400" />
+              Rating
             </div>
+            <p className="mt-1.5 text-2xl font-bold text-white">
+              {combinedAvgRating > 0 ? combinedAvgRating.toFixed(1) : "—"}
+            </p>
+            <p className="text-xs text-gray-500">
+              {totalReviewCount} {totalReviewCount === 1 ? "review" : "reviews"}
+            </p>
+          </div>
 
-            {activeGigs.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-white/10 p-8 text-center">
-                <Briefcase className="mx-auto mb-2 h-6 w-6 text-gray-700" />
-                <p className="text-sm text-gray-300">
-                  No active gigs at this time.
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {activeGigs.map((gig) => (
-                  <div
-                    key={gig.id}
-                    className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-5 py-4"
+          <div className="rounded-xl border border-white/8 bg-white/3 p-4">
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Briefcase className="text-h_redLight h-3.5 w-3.5" />
+              Total Gigs
+            </div>
+            <p className="mt-1.5 text-2xl font-bold text-white">
+              {totalGigsCount}
+            </p>
+            <p className="text-xs text-gray-500">{activeGigs.length} active</p>
+          </div>
+
+          <div className="rounded-xl border border-white/8 bg-white/3 p-4">
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
+              Completed
+            </div>
+            <p className="mt-1.5 text-2xl font-bold text-white">
+              {completedHiresCount}
+            </p>
+            <p className="text-xs text-gray-500">hires done</p>
+          </div>
+
+          <div className="rounded-xl border border-white/8 bg-white/3 p-4">
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <TrendingUp className="h-3.5 w-3.5 text-blue-400" />
+              Completion
+            </div>
+            <p className="mt-1.5 text-2xl font-bold text-white">
+              {completionRate}%
+            </p>
+            <p className="text-xs text-gray-500">success rate</p>
+          </div>
+        </div>
+
+        {/* Tabbed content */}
+        <OrganizerProfileTabs
+          defaultTab={totalReviewCount > 0 ? "reviews" : "about"}
+          about={
+            <>
+              {/* About */}
+              {profile.bio ? (
+                <section>
+                  <h2 className="mb-3 text-base font-semibold text-white">
+                    About
+                  </h2>
+                  <p className="text-sm leading-relaxed whitespace-pre-line text-gray-400">
+                    {profile.bio}
+                  </p>
+                </section>
+              ) : (
+                <div className="rounded-xl border border-dashed border-white/10 p-12 text-center">
+                  <p className="text-sm text-gray-400">No bio added yet.</p>
+                </div>
+              )}
+
+              {/* Contact */}
+              {profile.website && (
+                <section>
+                  <h2 className="mb-3 text-base font-semibold text-white">
+                    Get in Touch
+                  </h2>
+                  <a
+                    href={profile.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm text-gray-300 transition-colors hover:border-white/30 hover:text-white"
                   >
-                    <div>
-                      <p className="font-medium text-white">{gig.title}</p>
-                      <p className="mt-0.5 text-xs text-gray-400">
-                        {new Date(gig.eventDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                    {gig.budgetType === "FIXED" && gig.budgetMin != null && (
-                      <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
-                        {gig.currency} {formatNumber(gig.budgetMin)}
-                      </span>
-                    )}
-                    {gig.budgetType === "RANGE" &&
-                      gig.budgetMin != null &&
-                      gig.budgetMax != null && (
-                        <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
-                          {gig.currency} {formatNumber(gig.budgetMin)} –{" "}
-                          {formatNumber(gig.budgetMax)}
-                        </span>
-                      )}
+                    <Globe className="h-4 w-4" />
+                    Contact via website
+                    <ExternalLink className="h-3.5 w-3.5 opacity-60" />
+                  </a>
+                  <p className="mt-2 text-xs text-gray-400">
+                    Direct contact details are kept private.
+                  </p>
+                </section>
+              )}
+            </>
+          }
+          gigs={
+            <>
+              {/* Active gigs */}
+              <section>
+                <div className="mb-4 flex items-center gap-2">
+                  <h2 className="text-base font-semibold text-white">
+                    Active Gigs
+                  </h2>
+                  {activeGigs.length > 0 && (
+                    <span className="bg-h_red/20 text-h_redLight rounded-full px-2 py-0.5 text-xs font-medium">
+                      {activeGigs.length}
+                    </span>
+                  )}
+                </div>
+
+                {activeGigs.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-white/10 p-8 text-center">
+                    <Briefcase className="mx-auto mb-2 h-6 w-6 text-gray-700" />
+                    <p className="text-sm text-gray-300">
+                      No active gigs at this time.
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
-          </section>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {activeGigs.map((gig) => (
+                      <Link
+                        key={gig.id}
+                        href={`/gigs/${gig.slug ?? gig.id}`}
+                        className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:border-white/20 hover:bg-white/8"
+                      >
+                        <div>
+                          <p className="font-medium text-white">{gig.title}</p>
+                          <p className="mt-0.5 text-xs text-gray-400">
+                            {new Date(gig.eventDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              },
+                            )}
+                          </p>
+                        </div>
+                        {gig.budgetType === "FIXED" &&
+                          gig.budgetMin != null && (
+                            <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
+                              {gig.currency} {formatNumber(gig.budgetMin)}
+                            </span>
+                          )}
+                        {gig.budgetType === "RANGE" &&
+                          gig.budgetMin != null &&
+                          gig.budgetMax != null && (
+                            <span className="shrink-0 rounded-lg bg-white/8 px-3 py-1 text-sm font-medium text-gray-300">
+                              {gig.currency} {formatNumber(gig.budgetMin)} –{" "}
+                              {formatNumber(gig.budgetMax)}
+                            </span>
+                          )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </section>
 
-          {/* Past gigs */}
-          {pastGigs.length > 0 && (
-            <section>
-              <div className="mb-4 flex items-center gap-2">
-                <h2 className="text-base font-semibold text-white">
-                  Past Gigs
-                </h2>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-gray-400">
-                  {pastGigs.length}
-                </span>
-              </div>
-              <div className="flex flex-col gap-2">
-                {pastGigs.map((gig) => (
-                  <div
-                    key={gig.id}
-                    className="flex items-center justify-between rounded-xl border border-white/8 px-5 py-3 text-sm"
-                  >
-                    <span className="text-gray-400">{gig.title}</span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(gig.updatedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        year: "numeric",
-                      })}
+              {/* Past gigs */}
+              {pastGigs.length > 0 && (
+                <section>
+                  <div className="mb-4 flex items-center gap-2">
+                    <h2 className="text-base font-semibold text-white">
+                      Past Gigs
+                    </h2>
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-gray-400">
+                      {pastGigs.length}
                     </span>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Reviews */}
-          {organizerReviews.length > 0 && (
-            <OrganizerReviews
-              avgRating={avgRating}
-              ratingCount={organizerReviews.length}
-              reviews={organizerReviews}
+                  <div className="flex flex-col gap-2">
+                    {pastGigs.map((gig) => (
+                      <div
+                        key={gig.id}
+                        className="flex items-center justify-between rounded-xl border border-white/8 px-5 py-3 text-sm"
+                      >
+                        <span className="text-gray-400">{gig.title}</span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(gig.updatedAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </>
+          }
+          reviews={
+            <UnifiedReviewsSection
+              organizerReviews={organizerReviews.map((r) => ({
+                ...r,
+                type: "organizer" as const,
+              }))}
+              djGigReviews={djGigReviews.map((r) => ({
+                ...r,
+                type: "dj" as const,
+              }))}
+              avgRating={combinedAvgRating}
             />
-          )}
-
-          {/* DJ Gig Reviews (DJ-to-organizer reviews) */}
-          {djGigReviews.length > 0 && (
-            <DjGigReviewDisplay
-              reviews={djGigReviews}
-              showTitle={true}
-              showGig={true}
-            />
-          )}
-
-          {/* Contact */}
-          {profile.website && (
-            <section>
-              <h2 className="mb-3 text-base font-semibold text-white">
-                Get in Touch
-              </h2>
-              <a
-                href={profile.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm text-gray-300 transition-colors hover:border-white/30 hover:text-white"
-              >
-                <Globe className="h-4 w-4" />
-                Contact via website
-                <ExternalLink className="h-3.5 w-3.5 opacity-60" />
-              </a>
-              <p className="mt-2 text-xs text-gray-400">
-                Direct contact details are kept private.
-              </p>
-            </section>
-          )}
-        </div>
+          }
+        />
       </div>
     </div>
   );
