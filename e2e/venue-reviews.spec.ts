@@ -16,6 +16,14 @@ async function signInAsFan(page: Page) {
   await page.getByRole("button", { name: "Sign In" }).click();
 
   try {
+    await page
+      .waitForResponse(
+        (response) =>
+          response.url().includes("/api/auth") && response.status() === 200,
+        { timeout: 10000 },
+      )
+      .catch(() => null);
+
     await page.waitForURL((url) => url.pathname === "/fan/profile", {
       timeout: 20000,
     });
