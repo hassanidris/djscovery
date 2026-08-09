@@ -99,153 +99,166 @@ async function main() {
 
     console.log("✓ Found test users");
 
-    // Find or create a completed gig for the organizer
-    let gig = await prisma.gig.findFirst({
-      where: {
-        organizerProfileId: organizer.organizerProfile.id,
-        status: "COMPLETED",
-        deletedAt: null,
-      },
-      include: {
-        applications: {
-          where: { status: "ACCEPTED" },
-          include: { hire: true },
-        },
-      },
+    // Create multiple completed gigs for the organizer
+    const anyCity = await prisma.city.findFirst({
+      select: { id: true, countryId: true },
     });
+    if (!anyCity) {
+      console.error("❌ No City records found.");
+      process.exit(1);
+    }
 
-    if (!gig) {
-      // Create a completed gig
-      const anyCity = await prisma.city.findFirst({
-        select: { id: true, countryId: true },
-      });
-      if (!anyCity) {
-        console.error("❌ No City records found.");
-        process.exit(1);
-      }
+    const gigTypes = [
+      "CLUB",
+      "WEDDING",
+      "FESTIVAL",
+      "PRIVATE_PARTY",
+      "CORPORATE_EVENT",
+    ];
+    const gigTitles = [
+      "Test Completed Gig for DJ Reviews",
+      "Summer Festival DJ Set",
+      "Wedding Reception",
+      "Corporate Event",
+      "Private Party",
+    ];
 
+    const gigs = [];
+    for (let i = 0; i < 5; i++) {
       const eventDate = new Date();
-      eventDate.setDate(eventDate.getDate() - 15); // 15 days ago
+      eventDate.setDate(eventDate.getDate() - (15 + i * 5)); // Stagger dates
 
-      gig = await prisma.gig.create({
+      const gig = await prisma.gig.create({
         data: {
-          slug: `test-gig-${Date.now()}`,
+          slug: `test-gig-${Date.now()}-${i}`,
           organizerProfileId: organizer.organizerProfile.id,
-          title: "Test Completed Gig for DJ Reviews",
-          gigType: "CLUB",
-          description: "Test gig for DJ review functionality",
+          title: gigTitles[i],
+          gigType: gigTypes[i] as any,
+          description: `Test gig ${i + 1} for DJ review functionality`,
           status: "COMPLETED",
           eventDate,
           countryId: anyCity.countryId,
           cityId: anyCity.id,
-          budgetType: "FIXED",
-          budgetMin: 500,
+          budgetType: i % 2 === 0 ? "FIXED" : "NEGOTIABLE",
+          budgetMin: 500 + i * 100,
           currency: "SEK",
         },
-        include: {
-          applications: {
-            where: { status: "ACCEPTED" },
-            include: { hire: true },
-          },
-        },
       });
 
-      console.log("✓ Created test completed gig");
-    } else {
-      console.log("✓ Found existing completed gig");
+      gigs.push(gig);
+      console.log(`✓ Created test completed gig ${i + 1}: ${gig.title}`);
     }
 
-    // Create accepted applications and completed hires for both DJs
-    for (const djProfile of [premiumDj.djProfile, freeDj.djProfile]) {
-      let application = await prisma.gigApplication.findUnique({
-        where: {
-          gigId_djProfileId: {
-            gigId: gig!.id,
-            djProfileId: djProfile.id,
-          },
-        },
-        include: { hire: true },
-      });
+    // Create accepted applications and completed hires for DJs on each gig
+    const djs = [premiumDj.djProfile, freeDj.djProfile];
+    for (let gigIndex = 0; gigIndex < gigs.length; gigIndex++) {
+      const gig = gigs[gigIndex];
+      // Assign different DJs to different gigs for variety
+      const assignedDjs =
+        gigIndex % 2 === 0 ? djs : [djs[gigIndex % djs.length]];
 
-      if (!application) {
-        application = await prisma.gigApplication.create({
-          data: {
-            gigId: gig!.id,
-            djProfileId: djProfile.id,
-            status: "ACCEPTED",
-            acceptedAt: new Date(),
+      for (const djProfile of assignedDjs) {
+        let application = await prisma.gigApplication.findUnique({
+          where: {
+            gigId_djProfileId: {
+              gigId: gig.id,
+              djProfileId: djProfile.id,
+            },
           },
           include: { hire: true },
         });
 
-        // Create completed hire
-        await prisma.hire.create({
-          data: {
-            applicationId: application.id,
-            status: "COMPLETED",
-            completedAt: new Date(),
-          },
-        });
+        if (!application) {
+          application = await prisma.gigApplication.create({
+            data: {
+              gigId: gig.id,
+              djProfileId: djProfile.id,
+              status: "ACCEPTED",
+              acceptedAt: new Date(),
+            },
+            include: { hire: true },
+          });
 
-        console.log(
-          `✓ Created application and hire for ${djProfile.stageName}`,
-        );
-      } else if (!application.hire) {
-        // Create hire if missing
-        await prisma.hire.create({
-          data: {
-            applicationId: application.id,
-            status: "COMPLETED",
-            completedAt: new Date(),
-          },
-        });
-        console.log(`✓ Created hire for ${djProfile.stageName}`);
-      } else if (application.hire.status !== "COMPLETED") {
-        // Update hire to completed
-        await prisma.hire.update({
-          where: { id: application.hire.id },
-          data: { status: "COMPLETED", completedAt: new Date() },
-        });
-        console.log(`✓ Updated hire to COMPLETED for ${djProfile.stageName}`);
+          // Create completed hire
+          await prisma.hire.create({
+            data: {
+              applicationId: application.id,
+              status: "COMPLETED",
+              completedAt: new Date(),
+            },
+          });
+
+          console.log(
+            `✓ Created application and hire for ${djProfile.stageName} on ${gig.title}`,
+          );
+        } else if (!application.hire) {
+          // Create hire if missing
+          await prisma.hire.create({
+            data: {
+              applicationId: application.id,
+              status: "COMPLETED",
+              completedAt: new Date(),
+            },
+          });
+          console.log(
+            `✓ Created hire for ${djProfile.stageName} on ${gig.title}`,
+          );
+        } else if (application.hire.status !== "COMPLETED") {
+          // Update hire to completed
+          await prisma.hire.update({
+            where: { id: application.hire.id },
+            data: { status: "COMPLETED", completedAt: new Date() },
+          });
+          console.log(
+            `✓ Updated hire to COMPLETED for ${djProfile.stageName} on ${gig.title}`,
+          );
+        }
       }
     }
 
-    // Create DJ gig reviews
-    const djs = [premiumDj.djProfile, freeDj.djProfile];
-    for (const djProfile of djs) {
-      const existingReview = await prisma.djGigReview.findUnique({
-        where: {
-          gigId_djProfileId: {
-            gigId: gig!.id,
-            djProfileId: djProfile.id,
-          },
-        },
-      });
+    // Create DJ gig reviews for each gig
+    let totalReviewsCreated = 0;
+    for (let gigIndex = 0; gigIndex < gigs.length; gigIndex++) {
+      const gig = gigs[gigIndex];
+      const assignedDjs =
+        gigIndex % 2 === 0 ? djs : [djs[gigIndex % djs.length]];
 
-      if (!existingReview) {
-        const randomRating = Math.floor(Math.random() * 2) + 4; // 4-5 stars
-        const randomReview =
-          SAMPLE_REVIEWS[Math.floor(Math.random() * SAMPLE_REVIEWS.length)];
-
-        await prisma.djGigReview.create({
-          data: {
-            gigId: gig!.id,
-            djProfileId: djProfile.id,
-            organizerId: organizer.id,
-            rating: randomRating,
-            review: randomReview,
-            ipAddress: "127.0.0.1",
-            userAgent: "Test Script",
+      for (const djProfile of assignedDjs) {
+        const existingReview = await prisma.djGigReview.findUnique({
+          where: {
+            gigId_djProfileId: {
+              gigId: gig.id,
+              djProfileId: djProfile.id,
+            },
           },
         });
 
-        console.log(
-          `✓ Created DJ gig review for ${djProfile.stageName} (${randomRating} stars)`,
-        );
-      } else {
-        console.log(
-          `✓ DJ gig review already exists for ${djProfile.stageName}`,
-        );
+        if (!existingReview) {
+          const randomRating = Math.floor(Math.random() * 2) + 4; // 4-5 stars
+          const randomReview =
+            SAMPLE_REVIEWS[Math.floor(Math.random() * SAMPLE_REVIEWS.length)];
+
+          await prisma.djGigReview.create({
+            data: {
+              gigId: gig.id,
+              djProfileId: djProfile.id,
+              organizerId: organizer.id,
+              rating: randomRating,
+              review: randomReview,
+              ipAddress: "127.0.0.1",
+              userAgent: "Test Script",
+            },
+          });
+
+          totalReviewsCreated++;
+          console.log(
+            `✓ Created DJ gig review for ${djProfile.stageName} on ${gig.title} (${randomRating} stars)`,
+          );
+        } else {
+          console.log(
+            `✓ DJ gig review already exists for ${djProfile.stageName} on ${gig.title}`,
+          );
+        }
       }
     }
 
@@ -287,9 +300,9 @@ async function main() {
 
     console.log("\n✅ DJ gig review test data seeded successfully!");
     console.log("\nTest data summary:");
-    console.log(`- Completed gig: ${gig!.slug}`);
+    console.log(`- Completed gigs: ${gigs.length}`);
     console.log(`- Recent gig: ${recentGig.slug}`);
-    console.log(`- DJ reviews: ${djs.length}`);
+    console.log(`- DJ reviews: ${totalReviewsCreated}`);
     console.log(`- Test users: ${Object.values(TEST_EMAILS).join(", ")}`);
   } catch (error) {
     console.error("❌ Error seeding DJ gig review test data:", error);
