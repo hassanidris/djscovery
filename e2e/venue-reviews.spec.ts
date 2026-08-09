@@ -5,27 +5,22 @@ async function signInAsFan(page: Page) {
   await page.goto("/sign-in");
   await page.locator('input[name="email"]').fill(TEST_USERS.FAN.email);
   await page.locator('input[name="password"]').fill(TEST_USERS.FAN.password);
-  await Promise.all([
-    page.getByRole("button", { name: "Sign In" }).click(),
-    page
-      .waitForNavigation({ waitUntil: "load", timeout: 20000 })
-      .catch(() => null),
-  ]);
+  await page.getByRole("button", { name: "Sign In" }).click();
 
-  const currentUrl = page.url();
-  if (currentUrl.includes("/sign-in?error=")) {
+  await page.waitForURL((url) => url.pathname === "/fan/profile", {
+    timeout: 20000,
+  });
+
+  const currentUrl = new URL(page.url());
+  if (currentUrl.searchParams.has("error")) {
     const bodyText = await page
       .locator("body")
       .innerText()
       .catch(() => "");
     throw new Error(
-      `Sign-in failed: redirected to ${currentUrl}. Page body:\n${bodyText}`,
+      `Sign-in failed: redirected to ${currentUrl.href}. Page body:\n${bodyText}`,
     );
   }
-
-  await page.waitForURL((url) => !url.pathname.includes("/sign-in"), {
-    timeout: 20000,
-  });
 }
 
 test.describe("venue reviews", () => {
