@@ -61,6 +61,29 @@ const TEST_USERS = {
   },
 } as const;
 
+// `listUsers()` is paginated (50 users per page by default) and does not
+// support filtering by email, so a single call is not enough to reliably
+// find an existing user once the project has grown past one page. Page
+// through the full list until a match is found or pages are exhausted.
+async function findUserByEmail(
+  admin: ReturnType<typeof createAdminClient>,
+  email: string,
+) {
+  const perPage = 200;
+  for (let page = 1; ; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({
+      page,
+      perPage,
+    });
+    if (error) {
+      throw new Error(`Failed to list users: ${error.message}`);
+    }
+    const match = data.users.find((u) => u.email === email);
+    if (match) return match;
+    if (data.users.length < perPage) return null; // last page reached
+  }
+}
+
 async function createTestUser(
   email: string,
   password: string,
@@ -75,11 +98,8 @@ async function createTestUser(
 
   const admin = createAdminClient();
 
-  // Check if user already exists
-  const {
-    data: { users },
-  } = await admin.auth.admin.listUsers();
-  const existingUser = users.find((u) => u.email === email);
+  // Check if user already exists (paginated search — see findUserByEmail)
+  const existingUser = await findUserByEmail(admin, email);
 
   let userId: string;
 
