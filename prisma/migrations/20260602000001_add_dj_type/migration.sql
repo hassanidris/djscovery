@@ -1,5 +1,13 @@
 -- CreateEnum
-CREATE TYPE "DjType" AS ENUM ('CLUB', 'WEDDING', 'FESTIVAL', 'CORPORATE', 'BAR_LOUNGE');
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type WHERE typname = 'djtype'
+  ) THEN
+    CREATE TYPE "DjType" AS ENUM ('CLUB', 'WEDDING', 'FESTIVAL', 'CORPORATE', 'BAR_LOUNGE');
+  END IF;
+END
+$$;
 
 -- CreateTable
 CREATE TABLE "DjProfileType" (

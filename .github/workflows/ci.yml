@@ -90,6 +90,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Resolve already-applied migration
+        run: npx prisma migrate resolve --applied 20260602000001_add_dj_type
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Run DB migrations
         run: npx prisma migrate deploy
         env:
