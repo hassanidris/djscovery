@@ -4,10 +4,12 @@ import { TEST_USERS } from "./test-setup";
 async function signInAsFan(page: Page) {
   await page.goto("/sign-in");
 
-  await page
-    .getByRole("button", { name: /accept all|accept cookies|agree/i })
-    .click()
-    .catch(() => {});
+  const consentButton = page.getByRole("button", {
+    name: /accept all|accept cookies|agree/i,
+  });
+  if (await consentButton.isVisible().catch(() => false)) {
+    await consentButton.click();
+  }
 
   await page.locator('input[name="email"]').fill(TEST_USERS.FAN.email);
   await page.locator('input[name="password"]').fill(TEST_USERS.FAN.password);
