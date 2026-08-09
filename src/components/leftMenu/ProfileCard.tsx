@@ -33,17 +33,36 @@ const ProfileCard = async () => {
       djProfile: {
         select: { avatar: true, coverImage: true, stageName: true, slug: true },
       },
+      organizerProfile: {
+        select: {
+          logoUrl: true,
+          coverImageUrl: true,
+          displayName: true,
+          slug: true,
+        },
+      },
     },
   });
 
   if (!user) return null;
 
-  const avatarSrc = user.djProfile?.avatar ?? user.image ?? "/noAvatar.png";
-  const coverSrc = user.djProfile?.coverImage ?? "/noCover.png";
-  const displayName = user.djProfile?.stageName ?? user.username;
-  const profileHref = user.djProfile?.slug
+  const isDj = !!user.djProfile;
+  const isOrganizer = !!user.organizerProfile;
+
+  const avatarSrc = isDj
+    ? (user.djProfile?.avatar ?? user.image ?? "/noAvatar.png")
+    : (user.organizerProfile?.logoUrl ?? user.image ?? "/noAvatar.png");
+  const coverSrc = isDj
+    ? (user.djProfile?.coverImage ?? "/noCover.png")
+    : (user.organizerProfile?.coverImageUrl ?? "/noCover.png");
+  const displayName = isDj
+    ? user.djProfile?.stageName
+    : (user.organizerProfile?.displayName ?? user.username);
+  const profileHref = isDj
     ? `/djs/${user.djProfile.slug}`
-    : "/account";
+    : isOrganizer
+      ? `/organizers/${user.organizerProfile.slug}`
+      : "/account";
   const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
@@ -73,10 +92,19 @@ const ProfileCard = async () => {
       {/* ── Info ── */}
       <div className="px-4 pt-2 pb-4">
         <p className="text-h_white text-sm leading-tight font-semibold">
-          {user.djProfile ? `Dj. ${displayName}` : displayName}
+          {isDj
+            ? `Dj. ${displayName}`
+            : isOrganizer
+              ? displayName
+              : displayName}
         </p>
         <p className="mt-0.5 text-xs text-white/60">
-          @{user.djProfile?.slug ?? user.username}
+          @
+          {isDj
+            ? user.djProfile?.slug
+            : isOrganizer
+              ? user.organizerProfile?.slug
+              : user.username}
         </p>
         <div className="mt-3 flex items-center gap-1.5 border-t border-white/10 pt-3">
           <span className="text-h_white text-xs font-semibold">
