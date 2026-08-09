@@ -3,14 +3,59 @@ import { TEST_USERS } from "./test-setup";
 
 async function signInAsFan(page: Page) {
   await page.goto("/sign-in");
+
+  const consentButton = page.getByRole("button", {
+    name: /accept all|accept cookies|agree/i,
+  });
+  if (await consentButton.isVisible().catch(() => false)) {
+    await consentButton.click();
+  }
+
   await page.locator('input[name="email"]').fill(TEST_USERS.FAN.email);
   await page.locator('input[name="password"]').fill(TEST_USERS.FAN.password);
   await page.getByRole("button", { name: "Sign In" }).click();
 
-  // Wait for successful sign-in
-  await page.waitForURL((url) => !url.pathname.includes("/sign-in"), {
-    timeout: 10000,
-  });
+  try {
+    // The sign-in server action (src/lib/actions/auth.ts) only special-cases
+    // ADMIN (-> /admin) and incomplete onboarding (-> /select-role); a fan
+    // who has completed onboarding is redirected to "/", not "/fan/profile".
+    // So just wait for navigation away from /sign-in — callers that need the
+    // fan profile page navigate there explicitly afterward.
+    await page.waitForURL((url) => !url.pathname.startsWith("/sign-in"), {
+      timeout: 30000,
+    });
+  } catch (error) {
+    const errorMessage = await page
+      .locator('[role="alert"], .error, [data-testid="error-message"]')
+      .innerText()
+      .catch(() => "No error message found");
+
+    const currentUrl = new URL(page.url());
+    const bodyText = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
+    const html = await page.content().catch(() => "<no html>");
+
+    throw new Error(
+      `Sign-in failed at URL: ${currentUrl.href}\n` +
+        `Error: ${errorMessage}\n` +
+        `Body snippet:\n${bodyText.slice(0, 500)}\n\n` +
+        `Full HTML snapshot length: ${html.length}\n\n` +
+        `Original error: ${String(error)}`,
+    );
+  }
+
+  const currentUrl = new URL(page.url());
+  if (currentUrl.searchParams.has("error")) {
+    const bodyText = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
+    throw new Error(
+      `Sign-in failed: redirected to ${currentUrl.href}. Page body:\n${bodyText}`,
+    );
+  }
 }
 
 test.describe("venue reviews", () => {
@@ -36,14 +81,16 @@ test.describe("venue reviews", () => {
       await expect(page.locator("body")).toBeVisible();
     });
 
-    test("successfully submits venue review with valid data", async ({ page }) => {
+    test("successfully submits venue review with valid data", async ({
+      page,
+    }) => {
       await signInAsFan(page);
       // This would need:
       // 1. Test data setup with completed event
       // 2. Navigation to review page
       // 3. Form interaction
       // 4. Success verification
-      
+
       // For now, test basic fan dashboard access
       await page.goto("/fan/profile");
       await expect(page.locator("body")).toBeVisible();
@@ -63,7 +110,9 @@ test.describe("venue reviews", () => {
       await expect(page.locator("body")).toBeVisible();
     });
 
-    test("shows already reviewed state for duplicate reviews", async ({ page }) => {
+    test("shows already reviewed state for duplicate reviews", async ({
+      page,
+    }) => {
       await signInAsFan(page);
       // Test that fans can only review once per event per venue
       await page.goto("/fan/profile");
