@@ -16,16 +16,12 @@ async function signInAsFan(page: Page) {
   await page.getByRole("button", { name: "Sign In" }).click();
 
   try {
-    await Promise.race([
-      page.waitForResponse(
-        (response) =>
-          response.url().includes("/api/auth") && response.status() === 200,
-        { timeout: 20000 },
-      ),
-      page.waitForNavigation({ waitUntil: "networkidle", timeout: 20000 }),
-    ]);
-
-    await page.waitForURL((url) => url.pathname === "/fan/profile", {
+    // The sign-in server action (src/lib/actions/auth.ts) only special-cases
+    // ADMIN (-> /admin) and incomplete onboarding (-> /select-role); a fan
+    // who has completed onboarding is redirected to "/", not "/fan/profile".
+    // So just wait for navigation away from /sign-in — callers that need the
+    // fan profile page navigate there explicitly afterward.
+    await page.waitForURL((url) => !url.pathname.startsWith("/sign-in"), {
       timeout: 30000,
     });
   } catch (error) {
