@@ -16,16 +16,17 @@ async function signInAsFan(page: Page) {
   await page.getByRole("button", { name: "Sign In" }).click();
 
   try {
-    await page
-      .waitForResponse(
+    await Promise.race([
+      page.waitForResponse(
         (response) =>
           response.url().includes("/api/auth") && response.status() === 200,
-        { timeout: 10000 },
-      )
-      .catch(() => null);
+        { timeout: 20000 },
+      ),
+      page.waitForNavigation({ waitUntil: "networkidle", timeout: 20000 }),
+    ]);
 
     await page.waitForURL((url) => url.pathname === "/fan/profile", {
-      timeout: 20000,
+      timeout: 30000,
     });
   } catch (error) {
     const errorMessage = await page
@@ -43,8 +44,9 @@ async function signInAsFan(page: Page) {
     throw new Error(
       `Sign-in failed at URL: ${currentUrl.href}\n` +
         `Error: ${errorMessage}\n` +
-        `Body snippet:\n${bodyText.slice(0, 200)}\n\n` +
-        `Full HTML snapshot length: ${html.length}`,
+        `Body snippet:\n${bodyText.slice(0, 500)}\n\n` +
+        `Full HTML snapshot length: ${html.length}\n\n` +
+        `Original error: ${String(error)}`,
     );
   }
 
