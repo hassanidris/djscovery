@@ -11,6 +11,7 @@ import {
 } from "@/components/gigs/GigStatusBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { Button } from "@/components/ui/button";
+import PendingDjGigReviews from "./PendingDjigReviews";
 
 export const metadata = { title: "My Applications — DJcovery" };
 
@@ -28,6 +29,66 @@ export default async function DjApplicationsPage() {
   if (!djProfile) redirect("/become-dj");
 
   const applications = await getDjApplications(djProfile.id);
+
+  // Get completed gigs eligible for review
+  const completedGigs = await prisma.gig.findMany({
+    where: {
+      applications: {
+        some: {
+          djProfileId: djProfile.id,
+          status: "ACCEPTED",
+          hire: {
+            status: "COMPLETED",
+          },
+        },
+      },
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      organizerProfile: {
+        select: {
+          displayName: true,
+        },
+      },
+      applications: {
+        where: {
+          djProfileId: djProfile.id,
+          status: "ACCEPTED",
+        },
+        select: {
+          hire: {
+            select: {
+              completedAt: true,
+            },
+          },
+        },
+      },
+      djGigReviews: {
+        where: {
+          djProfileId: djProfile.id,
+        },
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  const pendingReviews = completedGigs
+    .filter(
+      (gig) =>
+        gig.djGigReviews.length === 0 && gig.applications[0]?.hire?.completedAt,
+    )
+    .map((gig) => ({
+      id: gig.id,
+      slug: gig.slug,
+      title: gig.title,
+      organizerDisplayName: gig.organizerProfile.displayName,
+      completedAt: gig.applications[0]?.hire?.completedAt || new Date(),
+    }));
 
   const active = applications.filter((a) =>
     ["APPLIED", "SHORTLISTED"].includes(a.status),
@@ -60,6 +121,9 @@ export default async function DjApplicationsPage() {
           </Button>
         </div>
       )}
+
+      {/* Pending DJ gig reviews */}
+      <PendingDjGigReviews pendingReviews={pendingReviews} />
 
       {accepted.length > 0 && (
         <section>

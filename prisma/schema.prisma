@@ -430,6 +430,7 @@ model User {
   eventReviews     EventReview[]
   bookingInquiries BookingInquiry[]
   venueReviews     VenueReview[]
+  djGigReviews     DjGigReview[]
 
   @@index([status])
   @@index([deletedAt])
@@ -530,6 +531,7 @@ model DjProfile {
   profileViews     ProfileView[]
   venues           DjVenue[]
   organizerReviews OrganizerReview[]
+  djGigReviews     DjGigReview[]
 
   @@index([slug])
   @@index([status])
@@ -1192,6 +1194,7 @@ model Gig {
 
   applications     GigApplication[]
   gigReviews       GigReview[]
+  djGigReviews     DjGigReview[]
   organizerReviews OrganizerReview[]
 
   @@index([status])
@@ -1233,6 +1236,32 @@ model GigApplication {
 }
 
 model GigReview {
+  id     Int     @id @default(autoincrement())
+  rating Int // 1-5
+  review String?
+
+  gigId       Int
+  gig         Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  djProfileId Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  organizerId String
+  organizer   User      @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  // Anti-gaming audit
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gigId, djProfileId]) // one review per gig per DJ
+  @@index([djProfileId])
+  @@index([organizerId])
+  @@index([gigId])
+  @@index([createdAt])
+}
+
+model DjGigReview {
   id     Int     @id @default(autoincrement())
   rating Int // 1-5
   review String?

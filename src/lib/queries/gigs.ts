@@ -446,6 +446,76 @@ export type GigReviewContext = NonNullable<
 >;
 
 // ============================================================
+// 8. DJ GIG REVIEWS
+// Get DJ reviews for a gig
+// ============================================================
+
+export async function getGigWithDjReviews(gigId: number) {
+  return await prisma.gig.findUnique({
+    where: { id: gigId, deletedAt: null },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      djGigReviews: {
+        select: {
+          id: true,
+          rating: true,
+          review: true,
+          createdAt: true,
+          djProfile: {
+            select: {
+              id: true,
+              stageName: true,
+              slug: true,
+              avatar: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+}
+
+export async function getRecentDjReviewsForOrganizer(
+  organizerProfileId: number,
+  limit = 5,
+) {
+  return await prisma.djGigReview.findMany({
+    where: {
+      gig: {
+        organizerProfileId,
+        deletedAt: null,
+      },
+    },
+    select: {
+      id: true,
+      rating: true,
+      review: true,
+      createdAt: true,
+      gig: {
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+        },
+      },
+      djProfile: {
+        select: {
+          id: true,
+          stageName: true,
+          slug: true,
+          avatar: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+}
+
+// ============================================================
 // 8. ORGANIZER — PENDING GIG REVIEWS
 // Completed gigs with an accepted DJ, no review yet, and within
 // the 30-day review window.
