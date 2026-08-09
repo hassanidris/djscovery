@@ -151,7 +151,7 @@ jobs:
         env:
           NEXT_PUBLIC_APP_ENV: staging
           E2E_TESTING: "true"
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.E2E_DATABASE_URL }}
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
           SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
@@ -228,7 +228,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_APP_ENV: staging
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.E2E_DATABASE_URL }}
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
           SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key

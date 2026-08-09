@@ -2,17 +2,22 @@
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_type WHERE typname = 'djtype' AND typnamespace = 'public'::regnamespace
-  ) OR NOT EXISTS (
-    SELECT 1 FROM pg_enum e
-    JOIN pg_type t ON e.enumtypid = t.oid
-    WHERE t.typname = 'djtype' AND t.typnamespace = 'public'::regnamespace
-    AND e.enumlabel IN ('CLUB', 'WEDDING', 'FESTIVAL', 'CORPORATE', 'BAR_LOUNGE', 'PRIVATE_PARTY', 'BIRTHDAY', 'CULTURAL_EVENT')
+    SELECT 1 FROM pg_type WHERE typname = 'DjType' AND typnamespace = 'public'::regnamespace
   ) THEN
     CREATE TYPE "DjType" AS ENUM ('CLUB', 'WEDDING', 'FESTIVAL', 'CORPORATE', 'BAR_LOUNGE', 'PRIVATE_PARTY', 'BIRTHDAY', 'CULTURAL_EVENT');
   END IF;
 END
 $$;
+
+-- Ensure all expected labels are present (idempotent; safe if type pre-existed with fewer values)
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'CLUB';
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'WEDDING';
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'FESTIVAL';
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'CORPORATE';
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'BAR_LOUNGE';
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'PRIVATE_PARTY';
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'BIRTHDAY';
+ALTER TYPE "DjType" ADD VALUE IF NOT EXISTS 'CULTURAL_EVENT';
 
 -- CreateTable
 CREATE TABLE "DjProfileType" (
