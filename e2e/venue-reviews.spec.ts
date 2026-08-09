@@ -7,9 +7,28 @@ async function signInAsFan(page: Page) {
   await page.locator('input[name="password"]').fill(TEST_USERS.FAN.password);
   await page.getByRole("button", { name: "Sign In" }).click();
 
-  await page.waitForURL((url) => url.pathname === "/fan/profile", {
-    timeout: 20000,
-  });
+  try {
+    await page.waitForURL((url) => url.pathname === "/fan/profile", {
+      timeout: 20000,
+    });
+  } catch (error) {
+    const errorMessage = await page
+      .locator('[role="alert"], .error, [data-testid="error-message"]')
+      .innerText()
+      .catch(() => "No error message found");
+
+    const currentUrl = new URL(page.url());
+    const bodyText = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
+
+    throw new Error(
+      `Sign-in failed at URL: ${currentUrl.href}\n` +
+        `Error: ${errorMessage}\n` +
+        `Body:\n${bodyText}`,
+    );
+  }
 
   const currentUrl = new URL(page.url());
   if (currentUrl.searchParams.has("error")) {
