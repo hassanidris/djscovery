@@ -4,7 +4,7 @@ BEGIN
   -- Check if column exists and is still a string type
   IF EXISTS (
     SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'reputationhistory' 
+    WHERE table_name = 'ReputationHistory' 
     AND column_name = 'changeReason'
     AND data_type = 'character varying'
   ) THEN
@@ -33,7 +33,7 @@ BEGIN
   -- Check if column exists and is still a string type
   IF EXISTS (
     SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'organizerreputationhistory' 
+    WHERE table_name = 'OrganizerReputationHistory' 
     AND column_name = 'changeReason'
     AND data_type = 'character varying'
   ) THEN
@@ -62,7 +62,7 @@ BEGIN
   -- Check if column exists and is still a string type
   IF EXISTS (
     SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'venuereputationhistory' 
+    WHERE table_name = 'VenueReputationHistory' 
     AND column_name = 'changeReason'
     AND data_type = 'character varying'
   ) THEN

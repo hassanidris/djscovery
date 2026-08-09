@@ -2,9 +2,14 @@
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_type WHERE typname = 'djtype'
+    SELECT 1 FROM pg_type WHERE typname = 'djtype' AND typnamespace = 'public'::regnamespace
+  ) OR NOT EXISTS (
+    SELECT 1 FROM pg_enum e
+    JOIN pg_type t ON e.enumtypid = t.oid
+    WHERE t.typname = 'djtype' AND t.typnamespace = 'public'::regnamespace
+    AND e.enumlabel IN ('CLUB', 'WEDDING', 'FESTIVAL', 'CORPORATE', 'BAR_LOUNGE', 'PRIVATE_PARTY', 'BIRTHDAY', 'CULTURAL_EVENT')
   ) THEN
-    CREATE TYPE "DjType" AS ENUM ('CLUB', 'WEDDING', 'FESTIVAL', 'CORPORATE', 'BAR_LOUNGE');
+    CREATE TYPE "DjType" AS ENUM ('CLUB', 'WEDDING', 'FESTIVAL', 'CORPORATE', 'BAR_LOUNGE', 'PRIVATE_PARTY', 'BIRTHDAY', 'CULTURAL_EVENT');
   END IF;
 END
 $$;
