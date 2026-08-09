@@ -3,6 +3,12 @@ import { TEST_USERS } from "./test-setup";
 
 async function signInAsFan(page: Page) {
   await page.goto("/sign-in");
+
+  await page
+    .getByRole("button", { name: /accept all|accept cookies|agree/i })
+    .click()
+    .catch(() => {});
+
   await page.locator('input[name="email"]').fill(TEST_USERS.FAN.email);
   await page.locator('input[name="password"]').fill(TEST_USERS.FAN.password);
   await page.getByRole("button", { name: "Sign In" }).click();
@@ -22,11 +28,13 @@ async function signInAsFan(page: Page) {
       .locator("body")
       .innerText()
       .catch(() => "");
+    const html = await page.content().catch(() => "<no html>");
 
     throw new Error(
       `Sign-in failed at URL: ${currentUrl.href}\n` +
         `Error: ${errorMessage}\n` +
-        `Body:\n${bodyText}`,
+        `Body snippet:\n${bodyText.slice(0, 200)}\n\n` +
+        `Full HTML snapshot length: ${html.length}`,
     );
   }
 
