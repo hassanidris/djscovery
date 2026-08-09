@@ -56,12 +56,12 @@ const ProfileCard = async () => {
     ? (user.djProfile?.coverImage ?? "/noCover.png")
     : (user.organizerProfile?.coverImageUrl ?? "/noCover.png");
   const displayName = isDj
-    ? user.djProfile?.stageName
+    ? (user.djProfile?.stageName ?? user.username)
     : (user.organizerProfile?.displayName ?? user.username);
   const profileHref = isDj
-    ? `/djs/${user.djProfile.slug}`
+    ? `/djs/${user.djProfile?.slug ?? ""}`
     : isOrganizer
-      ? `/organizers/${user.organizerProfile.slug}`
+      ? `/organizers/${user.organizerProfile?.slug ?? ""}`
       : "/account";
   const initials = displayName.slice(0, 2).toUpperCase();
 

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ReportButton } from "@/components/reporting/ReportButton";
 import OrganizerReviews from "@/components/organizer/OrganizerReviews";
+import { DjGigReviewDisplay } from "@/components/reputation/DjGigReviewDisplay";
 
 // ISR: revalidate every 60 seconds
 export const revalidate = 60;
@@ -198,6 +199,32 @@ export default async function OrganizerPublicProfilePage({
     where: { organizerProfileId: profile.id },
     _avg: { rating: true },
     _count: { rating: true },
+  });
+
+  // Fetch DJ gig reviews (DJ-to-organizer reviews)
+  const djGigReviews = await prisma.djGigReview.findMany({
+    where: {
+      gig: { organizerProfileId: profile.id },
+    },
+    include: {
+      djProfile: {
+        select: {
+          id: true,
+          stageName: true,
+          slug: true,
+          avatar: true,
+        },
+      },
+      gig: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
   });
 
   const avgRating = reviewStats._avg.rating ?? 0;
@@ -416,6 +443,15 @@ export default async function OrganizerPublicProfilePage({
               avgRating={avgRating}
               ratingCount={organizerReviews.length}
               reviews={organizerReviews}
+            />
+          )}
+
+          {/* DJ Gig Reviews (DJ-to-organizer reviews) */}
+          {djGigReviews.length > 0 && (
+            <DjGigReviewDisplay
+              reviews={djGigReviews}
+              showTitle={true}
+              showGig={true}
             />
           )}
 

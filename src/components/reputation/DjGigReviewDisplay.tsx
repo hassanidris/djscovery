@@ -13,16 +13,23 @@ interface DjGigReview {
     slug: string;
     avatar: string | null;
   };
+  gig?: {
+    id: number;
+    title: string;
+    slug: string;
+  };
 }
 
 interface DjGigReviewDisplayProps {
   reviews: DjGigReview[];
   showTitle?: boolean;
+  showGig?: boolean;
 }
 
 export function DjGigReviewDisplay({
   reviews,
   showTitle = true,
+  showGig = false,
 }: DjGigReviewDisplayProps) {
   if (reviews.length === 0) {
     return (
@@ -65,6 +72,14 @@ export function DjGigReviewDisplay({
                   >
                     {review.djProfile.stageName}
                   </Link>
+                  {showGig && review.gig && (
+                    <Link
+                      href={`/gigs/${review.gig.slug}`}
+                      className="block text-xs text-gray-400 hover:text-gray-300"
+                    >
+                      {review.gig.title}
+                    </Link>
+                  )}
                   <p className="text-xs text-gray-400">
                     {new Date(review.createdAt).toLocaleDateString()}
                   </p>
