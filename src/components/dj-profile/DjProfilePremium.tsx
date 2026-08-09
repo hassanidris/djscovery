@@ -331,6 +331,19 @@ export default function DjProfilePremium({
       ? clientBookingOptions
       : bookingOptions;
 
+  // Track which review tab is active so we can fetch with the right filter
+  const [ratingsFilter, setRatingsFilter] = useState<
+    "all" | "direct" | "event"
+  >("all");
+
+  // Map tab name to the filter expected by usePaginatedRatings
+  const ratingsFilterParam =
+    ratingsFilter === "direct"
+      ? ("direct" as const)
+      : ratingsFilter === "event"
+        ? ("event" as const)
+        : undefined;
+
   const {
     ratings: fetchedRatings,
     totalCount: ratingsTotalCount,
@@ -338,7 +351,7 @@ export default function DjProfilePremium({
     avgRating: fetchedAvgRating,
     isLoading: ratingsIsLoading,
     loadNextPage: loadMoreRatings,
-  } = usePaginatedRatings(slug);
+  } = usePaginatedRatings(slug, ratingsFilterParam);
 
   // Lazy-load venues when scrolled into view
   const {
@@ -1582,20 +1595,11 @@ export default function DjProfilePremium({
                     djAvatar={safeDJ.avatar}
                     djSlug={slug}
                     isOwner={isOwner}
+                    hasNextPage={ratingsHasNextPage}
+                    isLoadingMore={ratingsIsLoading}
+                    onLoadMore={loadMoreRatings}
+                    onTabChange={(tab) => setRatingsFilter(tab)}
                   />
-                  {/* Load More button for reviews */}
-                  {ratingsHasNextPage && (
-                    <div className="flex justify-center pt-4">
-                      <Button
-                        onClick={loadMoreRatings}
-                        disabled={ratingsIsLoading}
-                        variant="outline"
-                        className="border-white/10 bg-white/5 hover:bg-white/10"
-                      >
-                        {ratingsIsLoading ? "Loading..." : "Load More Reviews"}
-                      </Button>
-                    </div>
-                  )}
                 </>
               ) : (
                 <EmptySectionState

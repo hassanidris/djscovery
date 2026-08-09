@@ -33,9 +33,10 @@ interface PaginatedRatingsResponse {
  * Filter mode for the ratings query.
  *   - undefined  -> all reviews (direct + event)
  *   - "direct"   -> only direct reviews (eventId IS NULL)
+ *   - "event"    -> only event-anchored reviews (eventId IS NOT NULL)
  *   - number     -> only event-anchored reviews for that event
  */
-export type RatingFilter = undefined | "direct" | number;
+export type RatingFilter = undefined | "direct" | "event" | number;
 
 /**
  * Fetch paginated DjRatings for a DJ profile.
@@ -82,6 +83,8 @@ export function usePaginatedRatings(
       const currentFilter = filterRef.current;
       if (currentFilter === "direct") {
         queryParams.set("eventId", "direct");
+      } else if (currentFilter === "event") {
+        queryParams.set("eventId", "event");
       } else if (typeof currentFilter === "number") {
         queryParams.set("eventId", String(currentFilter));
       }

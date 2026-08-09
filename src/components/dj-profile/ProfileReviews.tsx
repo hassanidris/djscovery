@@ -28,6 +28,14 @@ type Props = {
   djSlug?: string;
   /** Whether the current user is the profile owner (suppresses "Write Review") */
   isOwner?: boolean;
+  /** Whether more reviews can be loaded from the server */
+  hasNextPage?: boolean;
+  /** Whether reviews are currently being loaded */
+  isLoadingMore?: boolean;
+  /** Callback to load more reviews from the server */
+  onLoadMore?: () => void;
+  /** Callback when the active tab changes (parent uses it to refetch with filter) */
+  onTabChange?: (tab: FilterTab) => void;
 };
 
 type FilterTab = "all" | "direct" | "event";
@@ -53,10 +61,20 @@ export default function ProfileReviews({
   djAvatar,
   djSlug,
   isOwner = false,
+  hasNextPage = false,
+  isLoadingMore = false,
+  onLoadMore,
+  onTabChange,
 }: Props) {
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const { openReviewModal } = useReviewModal();
   const { user, isLoaded } = useUser();
+
+  // Notify parent when tab changes so it can refetch with the right filter
+  const handleTabChange = (tab: FilterTab) => {
+    setActiveTab(tab);
+    onTabChange?.(tab);
+  };
 
   // Count reviews by type for tab badges
   const counts = useMemo(() => {
@@ -181,7 +199,7 @@ export default function ProfileReviews({
           ).map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => handleTabChange(tab.key)}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTab === tab.key
                   ? "bg-white/10 text-white"
@@ -227,9 +245,9 @@ export default function ProfileReviews({
             )}
           </div>
         ) : (
-          filteredReviews.map((r) => (
+          filteredReviews.map((r, idx) => (
             <Card
-              key={r.id}
+              key={`${r.id}-${r.reviewType ?? "direct"}-${r.event?.id ?? "none"}-${idx}`}
               className="bg-h_blackLight/30 gap-0 border-white/5 p-5"
             >
               <div className="flex items-start gap-3">
@@ -293,6 +311,20 @@ export default function ProfileReviews({
           ))
         )}
       </div>
+
+      {/* Load More button - only show when 6+ filtered reviews displayed and more exist */}
+      {onLoadMore && hasNextPage && filteredReviews.length >= 6 && (
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={onLoadMore}
+            disabled={isLoadingMore}
+            variant="outline"
+            className="border-white/10 bg-white/5 hover:bg-white/10"
+          >
+            {isLoadingMore ? "Loading..." : "Load More Reviews"}
+          </Button>
+        </div>
+      )}
     </section>
   );
 }

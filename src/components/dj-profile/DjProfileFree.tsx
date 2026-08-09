@@ -220,6 +220,19 @@ export default function DjProfileFree({
       ? clientBookingOptions
       : bookingOptions;
 
+  // Track which review tab is active so we can fetch with the right filter
+  const [ratingsFilter, setRatingsFilter] = useState<
+    "all" | "direct" | "event"
+  >("all");
+
+  // Map tab name to the filter expected by usePaginatedRatings
+  const ratingsFilterParam =
+    ratingsFilter === "direct"
+      ? ("direct" as const)
+      : ratingsFilter === "event"
+        ? ("event" as const)
+        : undefined;
+
   // Fetch ratings client-side with pagination (same as Premium)
   const {
     ratings: fetchedRatings,
@@ -228,7 +241,7 @@ export default function DjProfileFree({
     avgRating: fetchedAvgRating,
     isLoading: ratingsIsLoading,
     loadNextPage: loadMoreRatings,
-  } = usePaginatedRatings(slug);
+  } = usePaginatedRatings(slug, ratingsFilterParam);
 
   // Fetch media client-side with pagination (same as Premium)
   const {
@@ -823,19 +836,11 @@ export default function DjProfileFree({
                     djAvatar={safeDJ.avatar}
                     djSlug={slug}
                     isOwner={isOwner}
+                    hasNextPage={ratingsHasNextPage}
+                    isLoadingMore={ratingsIsLoading}
+                    onLoadMore={loadMoreRatings}
+                    onTabChange={(tab) => setRatingsFilter(tab)}
                   />
-                  {ratingsHasNextPage && (
-                    <div className="flex justify-center pt-4">
-                      <Button
-                        onClick={loadMoreRatings}
-                        disabled={ratingsIsLoading}
-                        variant="outline"
-                        className="border-white/10 bg-white/5 hover:bg-white/10"
-                      >
-                        {ratingsIsLoading ? "Loading..." : "Load More Reviews"}
-                      </Button>
-                    </div>
-                  )}
                 </>
               ) : (
                 <EmptySectionState

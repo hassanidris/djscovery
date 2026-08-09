@@ -66,9 +66,12 @@ export async function GET(
   // Optional filter: eventId
   const eventIdParam = searchParams.get("eventId");
   const directOnly = eventIdParam === "direct";
-  const eventId = !directOnly && eventIdParam ? Number(eventIdParam) : null;
+  const eventOnly = eventIdParam === "event"; // all event-anchored reviews
+  const eventId =
+    !directOnly && !eventOnly && eventIdParam ? Number(eventIdParam) : null;
   const filterByEvent =
     !directOnly &&
+    !eventOnly &&
     eventId !== null &&
     Number.isSafeInteger(eventId) &&
     eventId > 0;
@@ -87,7 +90,7 @@ export async function GET(
     );
   }
 
-  if (eventIdParam && !directOnly && !filterByEvent) {
+  if (eventIdParam && !directOnly && !eventOnly && !filterByEvent) {
     return NextResponse.json(
       { error: "Invalid eventId parameter" },
       { status: 400 },
@@ -95,11 +98,16 @@ export async function GET(
   }
 
   // Build the where clause based on filters
-  const where: { djProfileId: number; eventId?: number | null } = {
+  const where: {
+    djProfileId: number;
+    eventId?: number | null | { not: null };
+  } = {
     djProfileId: 0, // placeholder, set below
   };
   if (directOnly) {
     where.eventId = null;
+  } else if (eventOnly) {
+    where.eventId = { not: null };
   } else if (filterByEvent && eventId !== null) {
     where.eventId = eventId;
   }
@@ -108,9 +116,11 @@ export async function GET(
   // separately from the "all reviews" query.
   const filterKey = directOnly
     ? "direct"
-    : filterByEvent
-      ? `event:${eventId}`
-      : "all";
+    : eventOnly
+      ? "event"
+      : filterByEvent
+        ? `event:${eventId}`
+        : "all";
   const cacheKey = `dj_ratings:${slug}:${page}:${limit}:${filterKey}`;
 
   // Check cache first
