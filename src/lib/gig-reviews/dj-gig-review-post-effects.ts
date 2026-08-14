@@ -3,7 +3,6 @@ import { updateOrganizerReputationScore } from "@/lib/reputation/organizer-updat
 import { revalidatePath } from "next/cache";
 import { sendEmail } from "@/lib/email/send";
 import type { DjReviewData } from "@/lib/email/types";
-import { cacheDelete } from "@/lib/cache";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 
@@ -45,10 +44,14 @@ export async function runDjGigReviewPostSubmitEffects(
     "ORGANIZER_REVIEW_ADDED" as const,
   ).catch((e) => console.error("Organizer reputation update failed:", e));
 
-  // Invalidate cache entries for organizer profile
-  await cacheDelete(`organizer_reviews:${organizerProfileId}:1:10:all`).catch(
-    () => {},
-  );
+  // Revalidate the organizer profile page so the new review appears
+  const organizerProfile = await prisma.organizerProfile.findUnique({
+    where: { id: organizerProfileId },
+    select: { slug: true },
+  }).catch(() => null);
+  if (organizerProfile?.slug) {
+    revalidatePath(`/organizers/${organizerProfile.slug}`);
+  }
 
   if (input.created) {
     try {

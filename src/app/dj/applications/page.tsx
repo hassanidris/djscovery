@@ -12,8 +12,15 @@ import {
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { Button } from "@/components/ui/button";
 import PendingDjGigReviews from "./PendingDjigReviews";
+import { REVIEW_WINDOW_DAYS } from "@/lib/validation/dj-gig-review-validation";
 
 export const metadata = { title: "My Applications — DJcovery" };
+
+function isWithinReviewWindow(completedAt: Date | string): boolean {
+  const daysSinceCompletion =
+    (Date.now() - new Date(completedAt).getTime()) / (1000 * 60 * 60 * 24);
+  return daysSinceCompletion <= REVIEW_WINDOW_DAYS;
+}
 
 export default async function DjApplicationsPage() {
   const supabase = await createClient();
@@ -78,10 +85,12 @@ export default async function DjApplicationsPage() {
   });
 
   const pendingReviews = completedGigs
-    .filter(
-      (gig) =>
-        gig.djGigReviews.length === 0 && gig.applications[0]?.hire?.completedAt,
-    )
+    .filter((gig) => {
+      if (gig.djGigReviews.length > 0) return false;
+      const completedAt = gig.applications[0]?.hire?.completedAt;
+      if (!completedAt) return false;
+      return isWithinReviewWindow(completedAt);
+    })
     .map((gig) => ({
       id: gig.id,
       slug: gig.slug,

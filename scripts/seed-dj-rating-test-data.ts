@@ -15,6 +15,25 @@ config();
 const now = Date.now();
 
 async function main() {
+  // Environment guard — only permit seeding in local, test, or staging.
+  const nodeEnv = process.env.NODE_ENV;
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV;
+  const databaseUrl = process.env.DATABASE_URL;
+
+  const isLocal = nodeEnv === "development" || nodeEnv === "test";
+  const isStaging =
+    appEnv === "staging" ||
+    databaseUrl?.includes("jarmybsjvztwrmsdcnje.supabase.co");
+  const isTest =
+    databaseUrl?.includes("test") || databaseUrl?.includes("localhost");
+
+  if (!isLocal && !isStaging && !isTest) {
+    console.error(
+      "❌ Aborting: DJ rating test data seeding is only permitted in local, test, or staging environments.",
+    );
+    process.exit(1);
+  }
+
   const { default: prisma } = await import("../src/lib/client");
 
   async function getOrCreateTestLocation() {
@@ -163,7 +182,11 @@ async function main() {
     "Great set! The energy was electric and everyone had a fantastic time.",
   ];
   const nullReviews = await prisma.djRating.findMany({
-    where: { review: null, eventId: null },
+    where: {
+      review: null,
+      eventId: null,
+      djProfileId: { in: [premiumDj.id, freeDj.id] },
+    },
     select: { id: true },
   });
   for (let i = 0; i < nullReviews.length; i++) {
@@ -183,7 +206,11 @@ async function main() {
 
   // ── Fix existing event reviews with null review text ───────────────────
   const nullEventReviews = await prisma.djRating.findMany({
-    where: { review: null, eventId: { not: null } },
+    where: {
+      review: null,
+      eventId: { not: null },
+      djProfileId: { in: [premiumDj.id, freeDj.id] },
+    },
     select: { id: true },
   });
   for (let i = 0; i < nullEventReviews.length; i++) {
@@ -203,7 +230,11 @@ async function main() {
 
   // ── Fix existing reviews with null reviewType ──────────────────────────
   const nullTypeReviews = await prisma.djRating.findMany({
-    where: { reviewType: null, eventId: null },
+    where: {
+      reviewType: null,
+      eventId: null,
+      djProfileId: { in: [premiumDj.id, freeDj.id] },
+    },
     select: { id: true },
   });
   for (const r of nullTypeReviews) {
@@ -218,7 +249,18 @@ async function main() {
 
   // ── Fix existing users with no roles ───────────────────────────────────
   const usersWithoutRoles = await prisma.user.findMany({
-    where: { roles: { none: {} } },
+    where: {
+      roles: { none: {} },
+      OR: [
+        { username: { contains: "fan-rater" } },
+        { username: { contains: "organizer-reviewer" } },
+        { username: { contains: "attendee-reviewer" } },
+        { username: { contains: "test_reviewer" } },
+        { username: { contains: "test-fan" } },
+        { username: { equals: "test-organizer" } },
+        { email: { equals: "test-organizer@example.com" } },
+      ],
+    },
     select: { id: true, username: true },
   });
   for (const u of usersWithoutRoles) {

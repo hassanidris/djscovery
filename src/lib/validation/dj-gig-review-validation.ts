@@ -135,7 +135,7 @@ export async function validateBusinessRules(
 
   // --- Gig exists ---
   const gig = await prisma.gig.findUnique({
-    where: { id: ctx.gigId },
+    where: { id: ctx.gigId, deletedAt: null },
     select: {
       id: true,
       slug: true,
@@ -202,6 +202,12 @@ export async function validateBusinessRules(
     where: { id: gig.organizerProfileId },
     select: { userId: true },
   });
+  if (!organizerProfile?.userId) {
+    return {
+      ok: false,
+      error: "Organizer profile not found",
+    };
+  }
 
   return {
     ok: true,
@@ -210,7 +216,7 @@ export async function validateBusinessRules(
       slug: gig.slug,
       title: gig.title,
       organizerProfileId: gig.organizerProfileId,
-      organizerUserId: organizerProfile?.userId || "",
+      organizerUserId: organizerProfile.userId,
     },
     djProfile: {
       id: djProfile.id,

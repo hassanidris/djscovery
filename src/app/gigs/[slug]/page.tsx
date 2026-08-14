@@ -227,6 +227,8 @@ export default async function GigDetailPage({
         {isAcceptedDj &&
           accepted &&
           hire?.status === "COMPLETED" &&
+          hire.completedAt &&
+          getReviewDaysRemaining(hire.completedAt) > 0 &&
           gig.djGigReviews.length === 0 && (
             <div className="mb-8">
               <Link

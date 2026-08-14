@@ -130,7 +130,23 @@ export async function hasDjReviewedGig(
  * Returns null if the current user is not the DJ or if the gig
  * is not eligible for review.
  */
-export async function getDjGigReviewContext(gigSlug: string, userId: string) {
+export async function getDjGigReviewContext(gigSlug: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const userId = user.id;
+
+  // Resolve the current user's DJ profile before querying the gig so we can
+  // filter djGigReviews to only the current DJ's review.
+  const userDjProfile = await prisma.djProfile.findUnique({
+    where: { userId },
+    select: { id: true },
+  });
+
+  if (!userDjProfile) return null;
+
   const gig = await prisma.gig.findUnique({
     where: { slug: gigSlug, deletedAt: null },
     select: {
@@ -169,6 +185,7 @@ export async function getDjGigReviewContext(gigSlug: string, userId: string) {
         },
       },
       djGigReviews: {
+        where: { djProfileId: userDjProfile.id },
         select: {
           id: true,
           rating: true,
@@ -180,14 +197,6 @@ export async function getDjGigReviewContext(gigSlug: string, userId: string) {
   });
 
   if (!gig) return null;
-
-  // Find the application for the current user's DJ profile
-  const userDjProfile = await prisma.djProfile.findUnique({
-    where: { userId },
-    select: { id: true },
-  });
-
-  if (!userDjProfile) return null;
 
   const application = gig.applications.find(
     (app) => app.djProfile.id === userDjProfile.id,

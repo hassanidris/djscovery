@@ -362,7 +362,9 @@ export default function DjProfileFree({
   const REVIEWS = djData
     ? transformedReviews.length > 0
       ? transformedReviews
-      : mapFreeReviewsFromData(djData)
+      : ratingsFilterParam === undefined
+        ? mapFreeReviewsFromData(djData)
+        : []
     : isStaging
       ? FREE_DEFAULT_REVIEWS
       : [];

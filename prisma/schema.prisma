@@ -1261,6 +1261,9 @@ model GigReview {
   @@index([createdAt])
 }
 
+/// DJ review of an organizer/gig they have completed.
+/// djProfileId is the reviewer (the DJ who performed the gig).
+/// organizerId is the review subject (the organizer who hired the DJ).
 model DjGigReview {
   id     Int     @id @default(autoincrement())
   rating Int // 1-5

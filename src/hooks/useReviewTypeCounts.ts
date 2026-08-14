@@ -26,21 +26,21 @@ export function useReviewTypeCounts(slug: string): ReviewTypeCounts {
       try {
         const [directRes, eventRes, gigRes] = await Promise.all([
           fetch(`/api/djs/${slug}/ratings?page=1&limit=1&eventId=direct`).then(
-            (r) => r.json(),
+            (r) => (r.ok ? r.json() : null),
           ),
           fetch(`/api/djs/${slug}/ratings?page=1&limit=1&eventId=event`).then(
-            (r) => r.json(),
+            (r) => (r.ok ? r.json() : null),
           ),
           fetch(`/api/djs/${slug}/ratings?page=1&limit=1&eventId=gig`).then(
-            (r) => r.json(),
+            (r) => (r.ok ? r.json() : null),
           ),
         ]);
 
         if (!cancelled) {
           setCounts({
-            direct: directRes.totalCount ?? 0,
-            event: eventRes.totalCount ?? 0,
-            gig: gigRes.totalCount ?? 0,
+            direct: directRes?.totalCount,
+            event: eventRes?.totalCount,
+            gig: gigRes?.totalCount,
           });
         }
       } catch {

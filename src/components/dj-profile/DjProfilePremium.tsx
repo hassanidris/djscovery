@@ -943,7 +943,9 @@ export default function DjProfilePremium({
     djData
       ? transformedReviews.length > 0
         ? transformedReviews
-        : mapPremiumReviewsFromData(djData) || []
+        : ratingsFilterParam === undefined
+          ? mapPremiumReviewsFromData(djData) || []
+          : []
       : isStaging
         ? PREMIUM_DEFAULT_REVIEWS
         : []

@@ -208,7 +208,7 @@ export default async function OrganizerPublicProfilePage({
   // Fetch DJ gig reviews (DJ-to-organizer reviews)
   const djGigReviews = await prisma.djGigReview.findMany({
     where: {
-      gig: { organizerProfileId: profile.id },
+      gig: { organizerProfileId: profile.id, deletedAt: null },
     },
     include: {
       djProfile: {
@@ -254,7 +254,7 @@ export default async function OrganizerPublicProfilePage({
         },
       }),
       prisma.djGigReview.aggregate({
-        where: { gig: { organizerProfileId: profile.id } },
+        where: { gig: { organizerProfileId: profile.id, deletedAt: null } },
         _avg: { rating: true },
         _count: { rating: true },
       }),
@@ -282,6 +282,7 @@ export default async function OrganizerPublicProfilePage({
     month: "long",
     year: "numeric",
   });
+  const websiteHref = profile.website ? safeHref(profile.website) : null;
 
   return (
     <div className="min-h-screen bg-black">
@@ -343,9 +344,9 @@ export default async function OrganizerPublicProfilePage({
 
             {/* Social links + website */}
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              {profile.website && safeHref(profile.website) && (
+              {websiteHref && (
                 <a
-                  href={safeHref(profile.website)!}
+                  href={websiteHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1 text-sm text-gray-300 transition-colors hover:border-white/25 hover:text-white"
@@ -454,13 +455,13 @@ export default async function OrganizerPublicProfilePage({
               )}
 
               {/* Contact */}
-              {profile.website && (
+              {websiteHref && (
                 <section>
                   <h2 className="mb-3 text-base font-semibold text-white">
                     Get in Touch
                   </h2>
                   <a
-                    href={profile.website}
+                    href={websiteHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm text-gray-300 transition-colors hover:border-white/30 hover:text-white"

@@ -53,6 +53,7 @@ export async function calculateOrganizerReputationScore(
     where: {
       gig: {
         organizerProfileId,
+        deletedAt: null,
       },
     },
     _avg: {

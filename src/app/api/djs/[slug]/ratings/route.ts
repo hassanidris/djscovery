@@ -242,6 +242,14 @@ export async function GET(
   // When fetching "all", also fetch DjGigReview records and merge them
   const fetchGigReviewsToo = !directOnly && !eventOnly && !filterByEvent;
 
+  // In "all" mode we merge two sources (DjRating + DjGigReview) sorted by
+  // createdAt, so the correct page window must be sliced from the merged
+  // list. Fetching page * limit from each source (no skip) guarantees that
+  // the merged slice [(page-1)*limit, page*limit] contains neither skipped
+  // nor repeated records. Non-"all" modes use standard skip/take pagination.
+  const djRatingSkip = fetchGigReviewsToo ? 0 : (page - 1) * limit;
+  const djRatingTake = fetchGigReviewsToo ? page * limit : limit;
+
   timer.start("fetch_ratings");
   const [
     ratings,
@@ -254,8 +262,8 @@ export async function GET(
     prisma.djRating.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip: djRatingSkip,
+      take: djRatingTake,
       include: {
         user: {
           select: {
@@ -285,8 +293,7 @@ export async function GET(
       ? prisma.djGigReview.findMany({
           where: { djProfileId: djProfile.id },
           orderBy: { createdAt: "desc" },
-          skip: (page - 1) * limit,
-          take: limit,
+          take: page * limit,
           include: {
             organizer: {
               select: {
@@ -370,9 +377,14 @@ export async function GET(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
-  // Apply pagination to the merged list (in "all" mode, we fetched `limit` from each source,
-  // so we trim to `limit` total after merging; for non-all modes, gigReviews is empty)
-  const paginatedItems = allItems.slice(0, limit);
+  // Apply the page window to the merged list.
+  // In "all" mode we fetched page * limit from each source, so we slice
+  // [(page-1)*limit, page*limit] from the merged+sorted list.
+  // In non-"all" modes gigReviews is empty and djRatingItems already
+  // contains the correct page, so slice(0, limit) is a no-op.
+  const paginatedItems = fetchGigReviewsToo
+    ? allItems.slice((page - 1) * limit, page * limit)
+    : allItems.slice(0, limit);
 
   const combinedTotalCount = totalCount + gigTotalCount;
   const djAvgRating = ratingAgg._avg.rating ?? 0;

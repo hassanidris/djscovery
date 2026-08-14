@@ -29,7 +29,7 @@ export default async function DjGigReviewPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/sign-in");
 
-  const context = await getDjGigReviewContext(slug, user.id);
+  const context = await getDjGigReviewContext(slug);
   if (!context) return notFound();
 
   return (

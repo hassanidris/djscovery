@@ -40,7 +40,7 @@ type Props = {
 const REVIEW_TYPE_LABELS: Record<string, string> = {
   DIRECT: "Direct",
   EVENT_ATTENDEE: "Attendee",
-  EVENT_ORGANIZER: "Attendee",
+  EVENT_ORGANIZER: "Organizer",
   GIG_ORGANIZER: "Gig-Organizer",
 };
 

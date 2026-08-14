@@ -215,7 +215,16 @@ DJcovery uses Next.js Server Actions for all server-side logic:
 - Type-safe client-server communication
 - Automatic form handling
 - Built-in revalidation
-- No separate API route files needed
+- No separate API route files needed for mutations
+
+### API Routes
+
+For REST-style endpoints (reads, paginated data, webhooks, and cron jobs), the
+project uses Next.js Route Handlers under `src/app/api/`. These are distinct
+from Server Actions, which remain the preferred path for mutations. Notable
+examples include `src/app/api/djs/[slug]/ratings/route.ts` (paginated DJ
+ratings), media/spotlight/mixes endpoints, view-tracking routes, and the
+Supabase webhook handler.
 
 **Structure:**
 
@@ -245,7 +254,7 @@ export async function someAction(params: Params) {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return { error: "Unauthorized" };
+    return { success: false, error: "Unauthorized" };
   }
 
   // 2. Check user role
@@ -256,7 +265,7 @@ export async function someAction(params: Params) {
 
   const hasRole = dbUser?.roles.some((r) => r.role === requiredRole);
   if (!hasRole) {
-    return { error: "Forbidden" };
+    return { success: false, error: "Forbidden" };
   }
 
   // 3. Execute business logic

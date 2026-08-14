@@ -24,10 +24,12 @@ CREATE POLICY "Organizer can update own gig review" ON "GigReview" FOR UPDATE TO
 DROP POLICY IF EXISTS "Organizer can delete own gig review" ON "GigReview";
 CREATE POLICY "Organizer can delete own gig review" ON "GigReview" FOR DELETE TO public USING ((auth.uid())::text = "organizerId");
 
--- DjGigReview: public read, DJ can write for completed gigs, organizer can read own gig reviews
+-- DjGigReview: server-side reads via Prisma (bypasses RLS), DJ can write for completed gigs.
+-- Deny direct client SELECT to match OrganizerReview/VenueReview protected handling.
 ALTER TABLE "DjGigReview" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read DJ gig reviews" ON "DjGigReview";
-CREATE POLICY "Public read DJ gig reviews" ON "DjGigReview" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "No client read access to DJ gig reviews" ON "DjGigReview";
+CREATE POLICY "No client read access to DJ gig reviews" ON "DjGigReview" FOR SELECT TO public USING (false);
 DROP POLICY IF EXISTS "DJ can create own gig review" ON "DjGigReview";
 CREATE POLICY "DJ can create own gig review" ON "DjGigReview" FOR INSERT TO public WITH CHECK (
   (auth.uid())::text = (

@@ -42,12 +42,16 @@ export function DjGigReviewForm({
 
     startTransition(async () => {
       try {
-        await createDjGigReview({
+        const result = await createDjGigReview({
           gigId,
           djProfileId,
           rating,
           review: review.trim(),
         });
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
         setSuccess(true);
         setRating(0);
         setReview("");
