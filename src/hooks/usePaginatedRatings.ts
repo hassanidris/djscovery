@@ -45,6 +45,10 @@ interface PaginatedRatingsResponse {
  */
 export type RatingFilter = undefined | "direct" | "event" | "gig" | number;
 
+// Default page size. Matches the API route's default limit
+// (src/app/api/djs/[slug]/ratings/route.ts).
+export const DEFAULT_LIMIT = 10;
+
 /**
  * Fetch paginated DjRatings for a DJ profile.
  *
@@ -83,7 +87,7 @@ export function usePaginatedRatings(
     try {
       const queryParams = new URLSearchParams({
         page: pageNum.toString(),
-        limit: "6",
+        limit: String(DEFAULT_LIMIT),
       });
 
       // Add eventId filter when provided
