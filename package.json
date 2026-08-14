@@ -24,6 +24,7 @@
     "seed:venue-review": "tsx prisma/seed-venue-review-demo.ts",
     "seed:venue-review-full": "tsx prisma/seed-venue-review-with-data.ts",
     "seed:dj-profiles": "tsx prisma/seed-dj-profiles.ts",
+    "seed:dj-gig-review-test-data": "tsx scripts/seed-dj-gig-review-test-data.ts",
     "migrate:event-reviews": "tsx scripts/migrate-event-reviews-to-dj-ratings.ts",
     "migrate:event-reviews:apply": "tsx scripts/migrate-event-reviews-to-dj-ratings.ts --apply",
     "migrate:event-reviews:rollback": "tsx scripts/rollback-dj-rating-event-migration.ts --apply",

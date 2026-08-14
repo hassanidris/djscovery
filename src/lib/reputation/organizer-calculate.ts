@@ -48,6 +48,20 @@ export async function calculateOrganizerReputationScore(
     _count: { rating: true },
   });
 
+  // Aggregate DJ gig review ratings
+  const djGigReviewStats = await client.djGigReview.aggregate({
+    where: {
+      gig: {
+        organizerProfileId,
+        deletedAt: null,
+      },
+    },
+    _avg: {
+      rating: true,
+    },
+    _count: { rating: true },
+  });
+
   // Count gigs with various filters
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -130,12 +144,14 @@ export async function calculateOrganizerReputationScore(
   if (organizerProfile.status === "ACTIVE") verificationScore += 10;
 
   // 3. Review Score (0-550) — weighted Bayesian average
-  const totalReviewCount = reviewStats._count.rating;
+  const totalReviewCount =
+    reviewStats._count.rating + djGigReviewStats._count.rating;
   const communicationAvg = reviewStats._avg.communication ?? 0;
   const paymentAvg = reviewStats._avg.payment ?? 0;
   const professionalismAvg = reviewStats._avg.professionalism ?? 0;
   const venueQualityAvg = reviewStats._avg.venueQuality ?? 0;
   const overallAvg = reviewStats._avg.rating ?? 0;
+  const djGigReviewAvg = djGigReviewStats._avg.rating ?? 0;
 
   // Apply Bayesian shrinkage using the aggregate averages
   const communicationBayesian = bayesianAverage([communicationAvg], 3);
@@ -143,16 +159,18 @@ export async function calculateOrganizerReputationScore(
   const professionalismBayesian = bayesianAverage([professionalismAvg], 3);
   const venueQualityBayesian = bayesianAverage([venueQualityAvg], 3);
   const overallBayesian = bayesianAverage([overallAvg], 3);
+  const djGigReviewBayesian = bayesianAverage([djGigReviewAvg], 3);
 
   let reviewScore = 0;
   if (totalReviewCount > 0) {
-    // Weight each category equally
+    // Weight each category equally, including DJ gig reviews
     const categoryAverage =
       (communicationBayesian +
         paymentBayesian +
         professionalismBayesian +
-        venueQualityBayesian) /
-      4;
+        venueQualityBayesian +
+        djGigReviewBayesian) /
+      5;
 
     reviewScore = Math.round((categoryAverage / 5) * WEIGHTS.review);
   }

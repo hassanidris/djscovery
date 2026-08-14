@@ -19,7 +19,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { getPendingGigReviewsForOrganizer } from "@/lib/queries/gigs";
+import {
+  getPendingGigReviewsForOrganizer,
+  getRecentDjReviewsForOrganizer,
+} from "@/lib/queries/gigs";
 
 type CompletedGigNotificationData = {
   gigId?: number;
@@ -27,6 +30,24 @@ type CompletedGigNotificationData = {
   gigTitle?: string;
   djProfileId?: number;
   djName?: string;
+};
+
+type DjReviewData = {
+  id: number;
+  rating: number;
+  review: string | null;
+  createdAt: Date;
+  gig: {
+    id: number;
+    slug: string;
+    title: string;
+  };
+  djProfile: {
+    id: number;
+    stageName: string;
+    slug: string;
+    avatar: string | null;
+  };
 };
 
 function profileCompleteness(profile: {
@@ -83,19 +104,21 @@ export default async function OrganizerDashboardPage() {
     redirect("/become-organizer");
 
   const { score, missing } = profileCompleteness(profile);
-  const [pendingReviews, completedNotifications] = await Promise.all([
-    getPendingGigReviewsForOrganizer(user.id),
-    prisma.notification.findMany({
-      where: {
-        recipientId: user.id,
-        type: "GIG_COMPLETED",
-        read: false,
-      },
-      orderBy: { createdAt: "desc" },
-      take: 3,
-      select: { id: true, data: true, createdAt: true },
-    }),
-  ]);
+  const [pendingReviews, completedNotifications, recentDjReviews] =
+    (await Promise.all([
+      getPendingGigReviewsForOrganizer(user.id),
+      prisma.notification.findMany({
+        where: {
+          recipientId: user.id,
+          type: "GIG_COMPLETED",
+          read: false,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        select: { id: true, data: true, createdAt: true },
+      }),
+      getRecentDjReviewsForOrganizer(profile.id, 3),
+    ])) as [any[], any[], DjReviewData[]];
   return (
     <div className="flex flex-col gap-6">
       {/* Actions row */}
@@ -242,6 +265,71 @@ export default async function OrganizerDashboardPage() {
                         Leave Review
                       </Link>
                     </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Recent DJ reviews */}
+      {recentDjReviews.length > 0 && (
+        <section>
+          <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
+            Recent DJ Reviews
+          </h2>
+          <div className="grid gap-4">
+            {recentDjReviews.map((review) => (
+              <Card key={review.id} className="border-white/8 bg-white/3">
+                <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white/5">
+                      {review.djProfile.avatar ? (
+                        <Image
+                          src={review.djProfile.avatar}
+                          alt={review.djProfile.stageName}
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-400">
+                          {review.djProfile.stageName.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {review.djProfile.stageName}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        reviewed{" "}
+                        <Link
+                          href={`/gigs/${review.gig.slug}`}
+                          className="text-h_redLight hover:underline"
+                        >
+                          {review.gig.title}
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 items-center justify-between gap-4 sm:justify-end">
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-4 w-4 ${
+                            star <= review.rating
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-gray-400"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-400">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </CardContent>
               </Card>

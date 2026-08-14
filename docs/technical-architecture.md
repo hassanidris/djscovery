@@ -15,7 +15,7 @@ DJcovery is a full-stack web application built on modern web technologies, desig
 **Deployment Model:** Serverless (Vercel)  
 **Database:** PostgreSQL (Supabase)  
 **Authentication:** Supabase Auth  
-**Storage:** Supabase Storage  
+**Storage:** Supabase Storage
 
 ---
 
@@ -65,37 +65,37 @@ DJcovery is a full-stack web application built on modern web technologies, desig
 
 ### Frontend
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Next.js | 16.2.10 | React framework with App Router |
-| React | 19 | UI library |
-| TypeScript | Latest | Type safety |
-| TailwindCSS | Latest | Styling |
-| shadcn/ui | Latest | UI component library |
-| Lucide React | Latest | Icon library |
-| Sonner | Latest | Toast notifications |
-| Zod | Latest | Schema validation |
+| Technology   | Version | Purpose                         |
+| ------------ | ------- | ------------------------------- |
+| Next.js      | 16.2.10 | React framework with App Router |
+| React        | 19      | UI library                      |
+| TypeScript   | Latest  | Type safety                     |
+| TailwindCSS  | Latest  | Styling                         |
+| shadcn/ui    | Latest  | UI component library            |
+| Lucide React | Latest  | Icon library                    |
+| Sonner       | Latest  | Toast notifications             |
+| Zod          | Latest  | Schema validation               |
 
 ### Backend
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Next.js Server Actions | Latest | Server-side logic |
-| Prisma | v7 | ORM |
-| PostgreSQL | Latest | Database (via Supabase) |
-| Supabase Auth | Latest | Authentication |
-| Supabase Storage | Latest | File storage |
-| Resend | Latest | Email service |
+| Technology             | Version | Purpose                 |
+| ---------------------- | ------- | ----------------------- |
+| Next.js Server Actions | Latest  | Server-side logic       |
+| Prisma                 | v7      | ORM                     |
+| PostgreSQL             | Latest  | Database (via Supabase) |
+| Supabase Auth          | Latest  | Authentication          |
+| Supabase Storage       | Latest  | File storage            |
+| Resend                 | Latest  | Email service           |
 
 ### Development Tools
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| ESLint | Latest | Linting |
-| Prettier | Latest | Code formatting |
-| TypeScript | Latest | Type checking |
-| Git | Latest | Version control |
-| Vercel CLI | Latest | Deployment |
+| Technology | Version | Purpose         |
+| ---------- | ------- | --------------- |
+| ESLint     | Latest  | Linting         |
+| Prettier   | Latest  | Code formatting |
+| TypeScript | Latest  | Type checking   |
+| Git        | Latest  | Version control |
+| Vercel CLI | Latest  | Deployment      |
 
 ---
 
@@ -126,6 +126,7 @@ The schema is organized into logical sections:
 ### Key Models
 
 #### User System
+
 - **User** - Core user account
 - **UserRole** - Role assignments (DJ, ORGANIZER, FAN, ADMIN)
 - **DjProfile** - DJ profile data
@@ -133,6 +134,7 @@ The schema is organized into logical sections:
 - **FanProfile** - Fan profile data
 
 #### DJ Features
+
 - **DjGenre** - Genre assignments
 - **DjProfileType** - DJ type assignments
 - **SocialLink** - Social media links
@@ -147,39 +149,47 @@ The schema is organized into logical sections:
 - **ProfileView** - Analytics tracking
 
 #### Organizer Features
+
 - **Gig** - Gig postings
 - **GigApplication** - DJ applications
-- **GigReview** - Gig reviews
+- **GigReview** - Gig reviews (organizer to DJ)
+- **DjGigReview** - DJ gig reviews (DJ to organizer)
 - **OrganizerSocialLink** - Social media links
 
 #### Event System
+
 - **Event** - DJ events
 - **EventDj** - Event participants
 - **EventMedia** - Event gallery
 - **EventReview** - Event reviews
 
 #### Booking System
+
 - **BookingInquiry** - Booking requests
 - **BookingInquiryMessage** - Inquiry messages
 
 #### Community
+
 - **Post** - Community posts
 - **PostComment** - Post comments
 - **PostLike** - Post likes
 - **PostCommentLike** - Comment likes
 
 #### Notifications
+
 - **Notification** - Notification records
 - **EmailPreference** - Email settings
 - **EmailLog** - Email tracking
 
 #### Admin
+
 - **Report** - User reports
 - **AdminActionLog** - Audit trail
 
 ### Indexes
 
 Strategic indexes are placed on:
+
 - Foreign keys (all relations)
 - Status fields (for filtering)
 - Date fields (for time-based queries)
@@ -201,12 +211,23 @@ Strategic indexes are placed on:
 DJcovery uses Next.js Server Actions for all server-side logic:
 
 **Benefits:**
+
 - Type-safe client-server communication
 - Automatic form handling
 - Built-in revalidation
-- No separate API route files needed
+- No separate API route files needed for mutations
+
+### API Routes
+
+For REST-style endpoints (reads, paginated data, webhooks, and cron jobs), the
+project uses Next.js Route Handlers under `src/app/api/`. These are distinct
+from Server Actions, which remain the preferred path for mutations. Notable
+examples include `src/app/api/djs/[slug]/ratings/route.ts` (paginated DJ
+ratings), media/spotlight/mixes endpoints, view-tracking routes, and the
+Supabase webhook handler.
 
 **Structure:**
+
 ```
 src/lib/actions/
 ├── auth.ts           # Authentication actions
@@ -227,26 +248,29 @@ All server actions follow this authentication pattern:
 export async function someAction(params: Params) {
   // 1. Get user session
   const supabase = createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
   if (authError || !user) {
-    return { error: "Unauthorized" };
+    return { success: false, error: "Unauthorized" };
   }
-  
+
   // 2. Check user role
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    include: { roles: true }
+    include: { roles: true },
   });
-  
-  const hasRole = dbUser?.roles.some(r => r.role === requiredRole);
+
+  const hasRole = dbUser?.roles.some((r) => r.role === requiredRole);
   if (!hasRole) {
-    return { error: "Forbidden" };
+    return { success: false, error: "Forbidden" };
   }
-  
+
   // 3. Execute business logic
   // ...
-  
+
   // 4. Return result
   return { success: true, data };
 }
@@ -353,11 +377,13 @@ djscovery/
 ### Authorization
 
 **Role-Based Access Control (RBAC):**
+
 - Roles: ADMIN, DJ, ORGANIZER, FAN
 - Role checks in all server actions
 - Middleware protection for protected routes
 
 **Row-Level Security (RLS):**
+
 - Database-level access control
 - Policies for each table
 - User-based row ownership
@@ -366,12 +392,14 @@ djscovery/
 ### Data Protection
 
 **Sensitive Data:**
+
 - Organizer contact info (revealed after gig acceptance)
 - Venue addresses (revealed after gig acceptance)
 - User emails (never exposed publicly)
 - Personal identifiers (protected by RLS)
 
 **Encryption:**
+
 - TLS/SSL for all connections
 - Supabase manages encryption at rest
 - Passwords hashed by Supabase Auth
@@ -392,6 +420,7 @@ djscovery/
 ### Frontend Performance
 
 **Optimizations:**
+
 - Server Components for static content
 - Client Components for interactive features
 - Code splitting via dynamic imports
@@ -400,6 +429,7 @@ djscovery/
 - Lazy loading for heavy components
 
 **Monitoring:**
+
 - Vercel Analytics
 - Web Vitals tracking
 - Performance budgeting
@@ -407,12 +437,14 @@ djscovery/
 ### Backend Performance
 
 **Database Optimizations:**
+
 - Strategic indexes on frequently queried fields
 - Query optimization via Prisma
 - Connection pooling (Supabase managed)
 - Read replicas (future)
 
 **Caching Strategy:**
+
 - Next.js built-in caching (fetch, revalidate)
 - Static generation where possible
 - CDN caching via Vercel Edge Network
@@ -433,10 +465,12 @@ djscovery/
 ### Deployment: Vercel
 
 **Environment:**
+
 - **Staging:** `NEXT_PUBLIC_APP_ENV=staging`
 - **Production:** `NEXT_PUBLIC_APP_ENV=production`
 
 **Deployment Process:**
+
 1. Code pushed to GitHub
 2. Vercel triggers build
 3. Next.js builds application
@@ -445,6 +479,7 @@ djscovery/
 6. Serverless functions deployed
 
 **Infrastructure:**
+
 - **Edge Network:** Global CDN
 - **Serverless Functions:** Auto-scaling
 - **Database:** Supabase (separate instances for staging/production)
@@ -454,6 +489,7 @@ djscovery/
 ### Environment Variables
 
 **Required Variables:**
+
 ```
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 SUPABASE_SERVICE_ROLE_KEY
@@ -463,6 +499,7 @@ RESEND_API_KEY
 ```
 
 **Staging vs Production:**
+
 - Separate Supabase projects
 - Separate Resend API keys
 - Separate environment-specific configs
@@ -474,11 +511,13 @@ RESEND_API_KEY
 ### Current Scalability (MVP)
 
 **Horizontal Scaling:**
+
 - Vercel auto-scales serverless functions
 - Edge Network handles static assets
 - Database scaling via Supabase
 
 **Vertical Scaling:**
+
 - Supabase managed PostgreSQL
 - Automatic resource allocation
 - Connection pooling
@@ -486,17 +525,20 @@ RESEND_API_KEY
 ### Future Scalability Plans
 
 **Database:**
+
 - Read replicas for read-heavy workloads
 - Connection pooling optimization
 - Query optimization and indexing
 - Data archiving for old records
 
 **Application:**
+
 - Dedicated worker queues for background jobs
 - Redis for caching and session storage
 - Microservices for specific features (if needed)
 
 **Infrastructure:**
+
 - Load balancing (if moving off Vercel)
 - CDN optimization
 - Edge computing for heavy computations
@@ -508,12 +550,14 @@ RESEND_API_KEY
 ### Current Monitoring
 
 **Vercel Analytics:**
+
 - Page views
 - Web Vitals
 - Geographic distribution
 - Device breakdown
 
 **Supabase Dashboard:**
+
 - Database performance
 - Storage usage
 - Auth metrics
@@ -522,12 +566,14 @@ RESEND_API_KEY
 ### Future Monitoring
 
 **Application Monitoring:**
+
 - Error tracking (Sentry)
 - Performance monitoring (APM)
 - Log aggregation
 - Real user monitoring (RUM)
 
 **Business Metrics:**
+
 - User acquisition funnels
 - Feature usage analytics
 - Conversion tracking
@@ -540,6 +586,7 @@ RESEND_API_KEY
 ### Git Workflow
 
 **Branch Strategy:**
+
 - `main` - Production
 - `dev` - Staging
 - `feature/*` - Feature branches
@@ -547,6 +594,7 @@ RESEND_API_KEY
 - `hotfix/*` - Production hotfixes
 
 **Commit Convention:**
+
 ```
 feat: add new feature
 fix: fix bug
@@ -571,6 +619,7 @@ chore: maintenance tasks
 
 **Current State:** Manual testing  
 **Future State:**
+
 - Unit tests (Jest)
 - Integration tests (Playwright)
 - E2E tests (Playwright)
@@ -583,11 +632,13 @@ chore: maintenance tasks
 ### Backup Strategy
 
 **Database:**
+
 - Automated daily backups (Supabase)
 - Point-in-time recovery (7 days)
 - Manual backup before major changes
 
 **Storage:**
+
 - Supabase Storage replication
 - Version history for files
 - Manual backup for critical assets
@@ -595,6 +646,7 @@ chore: maintenance tasks
 ### Recovery Procedures
 
 **Database Recovery:**
+
 1. Identify issue
 2. Determine recovery point
 3. Restore from backup
@@ -602,6 +654,7 @@ chore: maintenance tasks
 5. Update application
 
 **Application Recovery:**
+
 1. Rollback to previous deployment
 2. Investigate root cause
 3. Fix issue
@@ -621,6 +674,7 @@ Server actions are self-documenting via TypeScript types. Each action:
 4. Has inline comments
 
 **Example:**
+
 ```typescript
 /**
  * Creates a new gig for an organizer
@@ -635,6 +689,7 @@ export async function createGig(formData: FormData) {
 ### Future API Documentation
 
 **Planned:**
+
 - OpenAPI/Swagger specification
 - Interactive API explorer
 - Postman collection
@@ -646,17 +701,18 @@ export async function createGig(formData: FormData) {
 
 ### Current Integrations
 
-| Service | Purpose | Usage |
-|---------|---------|-------|
-| Supabase Auth | Authentication | User auth, sessions |
-| Supabase DB | Database | Data persistence |
-| Supabase Storage | File Storage | Media files |
-| Resend | Email | Transactional emails |
-| Vercel | Deployment | Hosting, CDN |
+| Service          | Purpose        | Usage                |
+| ---------------- | -------------- | -------------------- |
+| Supabase Auth    | Authentication | User auth, sessions  |
+| Supabase DB      | Database       | Data persistence     |
+| Supabase Storage | File Storage   | Media files          |
+| Resend           | Email          | Transactional emails |
+| Vercel           | Deployment     | Hosting, CDN         |
 
 ### Future Integrations
 
 **Planned:**
+
 - Stripe - Payments
 - Google Calendar - Calendar sync
 - Social Media APIs - Content integration
@@ -669,6 +725,7 @@ export async function createGig(formData: FormData) {
 ### Data Protection
 
 **GDPR Compliance:**
+
 - User data stored in EU (Supabase EU region)
 - Right to deletion implemented
 - Data export functionality
@@ -677,6 +734,7 @@ export async function createGig(formData: FormData) {
 ### Terms of Service
 
 **Key Points:**
+
 - User-generated content ownership
 - Platform usage rights
 - Content moderation policies
@@ -685,6 +743,7 @@ export async function createGig(formData: FormData) {
 ### Privacy Policy
 
 **Data Collected:**
+
 - User profiles
 - Usage analytics
 - Contact information
@@ -697,6 +756,7 @@ export async function createGig(formData: FormData) {
 ### Environment Setup
 
 **Prerequisites:**
+
 - Node.js 20+
 - npm or yarn
 - Git
@@ -704,6 +764,7 @@ export async function createGig(formData: FormData) {
 - Vercel account
 
 **Setup Steps:**
+
 1. Clone repository
 2. Install dependencies: `npm install`
 3. Set up Supabase project
@@ -732,6 +793,7 @@ npm run lint            # Run ESLint
 ### Troubleshooting
 
 **Common Issues:**
+
 - **Database connection:** Check DATABASE_URL
 - **Auth issues:** Verify Supabase keys
 - **Build errors:** Check Node.js version
@@ -741,10 +803,10 @@ npm run lint            # Run ESLint
 
 ## Change Log
 
-| Date | Version | Changes | Author |
-|------|---------|---------|--------|
-| July 7, 2026 | 1.0 | Initial technical architecture document | Engineering Team |
+| Date         | Version | Changes                                 | Author           |
+| ------------ | ------- | --------------------------------------- | ---------------- |
+| July 7, 2026 | 1.0     | Initial technical architecture document | Engineering Team |
 
 ---
 
-*This document is a living document and will be updated as the architecture evolves. All changes should be documented in the Change Log section.*
+_This document is a living document and will be updated as the architecture evolves. All changes should be documented in the Change Log section._

@@ -11,8 +11,16 @@ import {
 } from "@/components/gigs/GigStatusBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { Button } from "@/components/ui/button";
+import PendingDjGigReviews from "./PendingDjigReviews";
+import { REVIEW_WINDOW_DAYS } from "@/lib/validation/dj-gig-review-validation";
 
 export const metadata = { title: "My Applications — DJcovery" };
+
+function isWithinReviewWindow(completedAt: Date | string): boolean {
+  const daysSinceCompletion =
+    (Date.now() - new Date(completedAt).getTime()) / (1000 * 60 * 60 * 24);
+  return daysSinceCompletion <= REVIEW_WINDOW_DAYS;
+}
 
 export default async function DjApplicationsPage() {
   const supabase = await createClient();
@@ -28,6 +36,68 @@ export default async function DjApplicationsPage() {
   if (!djProfile) redirect("/become-dj");
 
   const applications = await getDjApplications(djProfile.id);
+
+  // Get completed gigs eligible for review
+  const completedGigs = await prisma.gig.findMany({
+    where: {
+      applications: {
+        some: {
+          djProfileId: djProfile.id,
+          status: "ACCEPTED",
+          hire: {
+            status: "COMPLETED",
+          },
+        },
+      },
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      organizerProfile: {
+        select: {
+          displayName: true,
+        },
+      },
+      applications: {
+        where: {
+          djProfileId: djProfile.id,
+          status: "ACCEPTED",
+        },
+        select: {
+          hire: {
+            select: {
+              completedAt: true,
+            },
+          },
+        },
+      },
+      djGigReviews: {
+        where: {
+          djProfileId: djProfile.id,
+        },
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  const pendingReviews = completedGigs
+    .filter((gig) => {
+      if (gig.djGigReviews.length > 0) return false;
+      const completedAt = gig.applications[0]?.hire?.completedAt;
+      if (!completedAt) return false;
+      return isWithinReviewWindow(completedAt);
+    })
+    .map((gig) => ({
+      id: gig.id,
+      slug: gig.slug,
+      title: gig.title,
+      organizerDisplayName: gig.organizerProfile.displayName,
+      completedAt: gig.applications[0]?.hire?.completedAt || new Date(),
+    }));
 
   const active = applications.filter((a) =>
     ["APPLIED", "SHORTLISTED"].includes(a.status),
@@ -60,6 +130,9 @@ export default async function DjApplicationsPage() {
           </Button>
         </div>
       )}
+
+      {/* Pending DJ gig reviews */}
+      <PendingDjGigReviews pendingReviews={pendingReviews} />
 
       {accepted.length > 0 && (
         <section>
