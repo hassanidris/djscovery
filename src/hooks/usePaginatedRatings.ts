@@ -12,14 +12,20 @@ export interface RatingItem {
   id: number;
   rating: number;
   review: string | null;
-  reviewType: string | null; // "DIRECT" | "EVENT_ATTENDEE" | "EVENT_ORGANIZER" | null
+  reviewType: string | null; // "DIRECT" | "EVENT_ATTENDEE" | "EVENT_ORGANIZER" | "GIG_ORGANIZER" | null
   createdAt: Date;
   user: {
     username: string;
     image: string | null;
     name: string | null;
+    roles: string[];
   };
   event: RatingEvent | null;
+  gig: {
+    id: number;
+    slug: string | null;
+    title: string;
+  } | null;
 }
 
 interface PaginatedRatingsResponse {
@@ -31,12 +37,13 @@ interface PaginatedRatingsResponse {
 
 /**
  * Filter mode for the ratings query.
- *   - undefined  -> all reviews (direct + event)
+ *   - undefined  -> all reviews (direct + event + gig)
  *   - "direct"   -> only direct reviews (eventId IS NULL)
  *   - "event"    -> only event-anchored reviews (eventId IS NOT NULL)
+ *   - "gig"      -> only gig reviews (from DjGigReview table)
  *   - number     -> only event-anchored reviews for that event
  */
-export type RatingFilter = undefined | "direct" | "event" | number;
+export type RatingFilter = undefined | "direct" | "event" | "gig" | number;
 
 /**
  * Fetch paginated DjRatings for a DJ profile.
@@ -76,7 +83,7 @@ export function usePaginatedRatings(
     try {
       const queryParams = new URLSearchParams({
         page: pageNum.toString(),
-        limit: "10",
+        limit: "6",
       });
 
       // Add eventId filter when provided
@@ -85,6 +92,8 @@ export function usePaginatedRatings(
         queryParams.set("eventId", "direct");
       } else if (currentFilter === "event") {
         queryParams.set("eventId", "event");
+      } else if (currentFilter === "gig") {
+        queryParams.set("eventId", "gig");
       } else if (typeof currentFilter === "number") {
         queryParams.set("eventId", String(currentFilter));
       }

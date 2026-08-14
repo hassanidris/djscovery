@@ -58,7 +58,13 @@ interface UnifiedReviewsSectionProps {
   avgRating: number;
 }
 
-function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" }) {
+function StarRating({
+  rating,
+  size = "sm",
+}: {
+  rating: number;
+  size?: "sm" | "md";
+}) {
   const starSize = size === "md" ? "h-5 w-5" : "h-4 w-4";
   return (
     <div className="flex items-center gap-0.5">
@@ -125,9 +131,24 @@ export default function UnifiedReviewsSection({
     return { stars, count, pct };
   });
 
-  const filters: { id: FilterType; label: string; count: number; icon: React.ElementType }[] = [
-    { id: "all", label: "All Reviews", count: totalReviews, icon: MessageSquare },
-    { id: "organizer", label: "Organizer Reviews", count: organizerCount, icon: Star },
+  const filters: {
+    id: FilterType;
+    label: string;
+    count: number;
+    icon: React.ElementType;
+  }[] = [
+    {
+      id: "all",
+      label: "All Reviews",
+      count: totalReviews,
+      icon: MessageSquare,
+    },
+    {
+      id: "organizer",
+      label: "Organizer Reviews",
+      count: organizerCount,
+      icon: Star,
+    },
     { id: "dj", label: "DJ Reviews", count: djCount, icon: Music },
   ];
 
@@ -136,7 +157,7 @@ export default function UnifiedReviewsSection({
       <h2 className="mb-6 text-xl font-bold text-white">Reviews & Ratings</h2>
 
       {/* Rating summary card */}
-      <div className="mb-6 flex flex-col gap-6 rounded-2xl border border-white/8 bg-gradient-to-br from-white/5 to-transparent p-6 sm:flex-row">
+      <div className="mb-6 flex flex-col gap-6 rounded-2xl border border-white/8 bg-linear-to-br from-white/5 to-transparent p-6 sm:flex-row">
         {/* Overall score */}
         <div className="flex min-w-32 shrink-0 flex-col items-center justify-center gap-2">
           <span className="text-5xl leading-none font-bold text-white">
@@ -165,7 +186,7 @@ export default function UnifiedReviewsSection({
         </div>
 
         {/* Review type breakdown */}
-        <div className="flex shrink-0 flex-col justify-center gap-3 border-t border-white/10 pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+        <div className="flex shrink-0 flex-col justify-center gap-3 border-t border-white/10 pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
           <div className="text-xs font-medium tracking-wider text-gray-500 uppercase">
             Breakdown
           </div>
@@ -176,7 +197,7 @@ export default function UnifiedReviewsSection({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Music className="h-3.5 w-3.5 text-h_redLight" />
+            <Music className="text-h_redLight h-3.5 w-3.5" />
             <span className="text-sm text-gray-300">{djCount} DJ</span>
           </div>
         </div>
@@ -203,7 +224,9 @@ export default function UnifiedReviewsSection({
               <span
                 className={cn(
                   "rounded-full px-1.5 py-0.5 text-xs",
-                  isActive ? "bg-h_red/30 text-white" : "bg-white/10 text-gray-400",
+                  isActive
+                    ? "bg-h_red/30 text-white"
+                    : "bg-white/10 text-gray-400",
                 )}
               >
                 {f.count}
@@ -291,9 +314,7 @@ function OrganizerReviewCard({ review }: { review: OrganizerReviewItem }) {
             </span>
             <span className="text-gray-400">
               Professionalism:{" "}
-              <span className="text-gray-300">
-                {review.professionalism}/5
-              </span>
+              <span className="text-gray-300">{review.professionalism}/5</span>
             </span>
             <span className="text-gray-400">
               Venue:{" "}
@@ -331,7 +352,7 @@ function DjReviewCard({ review }: { review: DjGigReviewItem }) {
               >
                 {review.djProfile.stageName}
               </Link>
-              <span className="rounded-full bg-h_red/15 px-2 py-0.5 text-xs font-medium text-h_redLight">
+              <span className="bg-h_red/15 text-h_redLight rounded-full px-2 py-0.5 text-xs font-medium">
                 DJ Review
               </span>
             </div>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -69,6 +69,7 @@ import { useAudioThumbnail } from "@/lib/media-thumbnails";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { useViewerContext } from "@/hooks/useViewerContext";
 import { usePaginatedRatings } from "@/hooks/usePaginatedRatings";
+import { useReviewTypeCounts } from "@/hooks/useReviewTypeCounts";
 import { usePaginatedMedia } from "@/hooks/usePaginatedMedia";
 import { useLazyData } from "@/hooks/useLazyData";
 import { useDjAnalytics } from "@/hooks/useDjAnalytics";
@@ -222,7 +223,7 @@ export default function DjProfileFree({
 
   // Track which review tab is active so we can fetch with the right filter
   const [ratingsFilter, setRatingsFilter] = useState<
-    "all" | "direct" | "event"
+    "all" | "direct" | "event" | "gig"
   >("all");
 
   // Map tab name to the filter expected by usePaginatedRatings
@@ -231,7 +232,9 @@ export default function DjProfileFree({
       ? ("direct" as const)
       : ratingsFilter === "event"
         ? ("event" as const)
-        : undefined;
+        : ratingsFilter === "gig"
+          ? ("gig" as const)
+          : undefined;
 
   // Fetch ratings client-side with pagination (same as Premium)
   const {
@@ -242,6 +245,18 @@ export default function DjProfileFree({
     isLoading: ratingsIsLoading,
     loadNextPage: loadMoreRatings,
   } = usePaginatedRatings(slug, ratingsFilterParam);
+
+  // Fetch persistent review type counts (don't change with tab filter)
+  const reviewTypeCounts = useReviewTypeCounts(slug);
+
+  // Track whether reviews have been loaded at least once.
+  // This prevents the loading skeleton from showing during tab switches
+  // (which would unmount ProfileReviews and lose the active tab state).
+  const hasInitialRatingsRef = useRef(false);
+  if (fetchedRatings.length > 0 || ratingsTotalCount > 0) {
+    hasInitialRatingsRef.current = true;
+  }
+  const showRatingsSkeleton = ratingsIsLoading && !hasInitialRatingsRef.current;
 
   // Fetch media client-side with pagination (same as Premium)
   const {
@@ -282,6 +297,7 @@ export default function DjProfileFree({
     user: {
       name: r.user.name || r.user.username,
       image: r.user.image || "",
+      roles: r.user.roles ?? [],
     },
     reviewType: r.reviewType as ReviewItem["reviewType"],
     event: r.event
@@ -290,6 +306,13 @@ export default function DjProfileFree({
           slug: r.event.slug,
           title: r.event.title,
           startDate: new Date(r.event.startDate).toISOString().split("T")[0],
+        }
+      : null,
+    gig: r.gig
+      ? {
+          id: r.gig.id,
+          slug: r.gig.slug,
+          title: r.gig.title,
         }
       : null,
   }));
@@ -809,7 +832,7 @@ export default function DjProfileFree({
               <SectionHeading sub="What people say about this DJ">
                 Reviews
               </SectionHeading>
-              {ratingsIsLoading ? (
+              {showRatingsSkeleton ? (
                 <div className="space-y-4">
                   {[...Array(3)].map((_, i) => (
                     <div
@@ -840,6 +863,9 @@ export default function DjProfileFree({
                     isLoadingMore={ratingsIsLoading}
                     onLoadMore={loadMoreRatings}
                     onTabChange={(tab) => setRatingsFilter(tab)}
+                    totalDirectCount={reviewTypeCounts.direct}
+                    totalEventCount={reviewTypeCounts.event}
+                    totalGigCount={reviewTypeCounts.gig}
                   />
                 </>
               ) : (

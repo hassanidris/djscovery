@@ -41,21 +41,48 @@ async function main() {
     return { countryId: country.id, cityId: city.id };
   }
 
-  async function createReviewer(label: string, index: number) {
+  const TEST_AVATARS_FOR_REVIEWERS = [
+    "/rated-1.webp",
+    "/rated-2.webp",
+    "/rated-3.webp",
+    "/rated-4.webp",
+    "/rated-5.webp",
+    "/rated-6.webp",
+    "/rated-7.webp",
+    "/rated-8.webp",
+    "/rated-9.webp",
+    "/rated-10.webp",
+  ];
+
+  async function createReviewer(
+    label: string,
+    index: number,
+    role: "FAN" | "ORGANIZER" | "DJ" = "FAN",
+  ) {
     const id = `test-reviewer-${now}-${index}`;
+    const avatar =
+      TEST_AVATARS_FOR_REVIEWERS[
+        (index - 1) % TEST_AVATARS_FOR_REVIEWERS.length
+      ];
     const user = await prisma.user.create({
       data: {
         id,
         email: `test-reviewer-${now}-${index}@example.com`,
         username: `test_reviewer_${now}_${index}`,
         name: label,
+        image: avatar,
         status: "ACTIVE",
         onboardingComplete: true,
+        roles: {
+          create: [{ role }],
+        },
       },
     });
-    await prisma.fanProfile.create({
-      data: { userId: user.id, name: label },
-    });
+    if (role === "FAN") {
+      await prisma.fanProfile.create({
+        data: { userId: user.id, name: label },
+      });
+    }
     return user;
   }
 
@@ -106,6 +133,168 @@ async function main() {
     );
   }
 
+  // ── Delete the first 6 reviews for each test DJ (old data without proper fields) ──
+  for (const dj of [premiumDj, freeDj]) {
+    const oldestReviews = await prisma.djRating.findMany({
+      where: { djProfileId: dj.id },
+      orderBy: { id: "asc" },
+      take: 6,
+      select: { id: true },
+    });
+    if (oldestReviews.length > 0) {
+      await prisma.djRating.deleteMany({
+        where: { id: { in: oldestReviews.map((r) => r.id) } },
+      });
+      console.log(
+        `Deleted ${oldestReviews.length} old reviews for ${dj.stageName}`,
+      );
+    }
+  }
+
+  // ── Fix existing direct reviews with null review text ──────────────────
+  const nullReviewFixes = [
+    "Amazing energy and seamless transitions! The crowd was engaged all night.",
+    "Professional from start to finish. Great communication and an incredible set.",
+    "One of the best bookings we've made. Would definitely hire again.",
+    "Fantastic DJ - read the room perfectly and kept everyone on the dance floor.",
+    "Solid performance with great track selection. Highly recommended.",
+    "Exceeded our expectations. The music was perfect for our event vibe.",
+    "Reliable, professional, and talented. A pleasure to work with.",
+    "Great set! The energy was electric and everyone had a fantastic time.",
+  ];
+  const nullReviews = await prisma.djRating.findMany({
+    where: { review: null, eventId: null },
+    select: { id: true },
+  });
+  for (let i = 0; i < nullReviews.length; i++) {
+    await prisma.djRating.update({
+      where: { id: nullReviews[i].id },
+      data: {
+        review: nullReviewFixes[i % nullReviewFixes.length],
+        reviewType: "DIRECT",
+      },
+    });
+  }
+  if (nullReviews.length > 0) {
+    console.log(
+      `Updated ${nullReviews.length} direct reviews with review text`,
+    );
+  }
+
+  // ── Fix existing event reviews with null review text ───────────────────
+  const nullEventReviews = await prisma.djRating.findMany({
+    where: { review: null, eventId: { not: null } },
+    select: { id: true },
+  });
+  for (let i = 0; i < nullEventReviews.length; i++) {
+    await prisma.djRating.update({
+      where: { id: nullEventReviews[i].id },
+      data: {
+        review:
+          "Incredible live performance at the event! The DJ kept the crowd energized throughout the entire set.",
+      },
+    });
+  }
+  if (nullEventReviews.length > 0) {
+    console.log(
+      `Updated ${nullEventReviews.length} event reviews with review text`,
+    );
+  }
+
+  // ── Fix existing reviews with null reviewType ──────────────────────────
+  const nullTypeReviews = await prisma.djRating.findMany({
+    where: { reviewType: null, eventId: null },
+    select: { id: true },
+  });
+  for (const r of nullTypeReviews) {
+    await prisma.djRating.update({
+      where: { id: r.id },
+      data: { reviewType: "DIRECT" },
+    });
+  }
+  if (nullTypeReviews.length > 0) {
+    console.log(`Fixed ${nullTypeReviews.length} reviews with null reviewType`);
+  }
+
+  // ── Fix existing users with no roles ───────────────────────────────────
+  const usersWithoutRoles = await prisma.user.findMany({
+    where: { roles: { none: {} } },
+    select: { id: true, username: true },
+  });
+  for (const u of usersWithoutRoles) {
+    // Assign FAN role as default for users without any role
+    await prisma.userRole
+      .create({ data: { userId: u.id, role: "FAN" } })
+      .catch(() => {
+        // Ignore if already exists (race condition)
+      });
+  }
+  if (usersWithoutRoles.length > 0) {
+    console.log(`Assigned FAN role to ${usersWithoutRoles.length} users`);
+  }
+
+  // ── Add avatars and display names to all test reviewer users ───────────
+  const TEST_AVATARS = [
+    "/rated-1.webp",
+    "/rated-2.webp",
+    "/rated-3.webp",
+    "/rated-4.webp",
+    "/rated-5.webp",
+    "/rated-6.webp",
+    "/rated-7.webp",
+    "/rated-8.webp",
+    "/rated-9.webp",
+    "/rated-10.webp",
+  ];
+
+  // Generate a friendly display name from username
+  function nameFromUsername(username: string): string {
+    // e.g. "fan-rater-3-test-premium-dj" -> "Fan Rater 3"
+    const parts = username.split("-");
+    if (parts.length >= 2) {
+      const label = parts.slice(0, -3).join(" "); // drop "test-premium-dj" suffix
+      return label
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    }
+    return username;
+  }
+
+  // Update all test reviewer users (those with test-related usernames)
+  const testUsers = await prisma.user.findMany({
+    where: {
+      OR: [
+        { username: { contains: "fan-rater" } },
+        { username: { contains: "organizer-reviewer" } },
+        { username: { contains: "attendee-reviewer" } },
+        { username: { contains: "test_reviewer" } },
+        { username: { contains: "test-fan" } },
+        { username: { equals: "test-organizer" } },
+        { email: { equals: "test-organizer@example.com" } },
+      ],
+    },
+    select: { id: true, username: true, name: true, image: true },
+  });
+
+  let avatarCount = 0;
+  for (let i = 0; i < testUsers.length; i++) {
+    const u = testUsers[i];
+    const avatar = TEST_AVATARS[i % TEST_AVATARS.length];
+    const name = u.name || nameFromUsername(u.username);
+    // Only update if missing image or name
+    if (!u.image || !u.name) {
+      await prisma.user.update({
+        where: { id: u.id },
+        data: { image: avatar, name },
+      });
+      avatarCount++;
+    }
+  }
+  if (avatarCount > 0) {
+    console.log(`Added avatars and names to ${avatarCount} test users`);
+  }
+
   console.log(`Premium DJ: ${premiumDj.stageName} (id=${premiumDj.id})`);
   console.log(`Free DJ: ${freeDj.stageName} (id=${freeDj.id})`);
 
@@ -114,14 +303,14 @@ async function main() {
     `Using location: countryId=${location.countryId}, cityId=${location.cityId}`,
   );
 
-  // Create synthetic reviewer accounts
+  // Create synthetic reviewer accounts with different roles
   const reviewers = await Promise.all([
-    createReviewer("Alex Rivera", 1),
-    createReviewer("Jordan Lee", 2),
-    createReviewer("Sam Chen", 3),
-    createReviewer("Morgan Taylor", 4),
-    createReviewer("Casey Kim", 5),
-    createReviewer("Riley Nguyen", 6),
+    createReviewer("Alex Rivera", 1, "FAN"),
+    createReviewer("Jordan Lee", 2, "FAN"),
+    createReviewer("Sam Chen", 3, "ORGANIZER"),
+    createReviewer("Morgan Taylor", 4, "ORGANIZER"),
+    createReviewer("Casey Kim", 5, "FAN"),
+    createReviewer("Riley Nguyen", 6, "DJ"),
   ]);
   console.log(`Created ${reviewers.length} synthetic reviewer accounts`);
 
