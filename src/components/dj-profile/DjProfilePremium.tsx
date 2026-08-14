@@ -359,14 +359,11 @@ export default function DjProfilePremium({
   // Fetch persistent review type counts (don't change with tab filter)
   const reviewTypeCounts = useReviewTypeCounts(slug);
 
-  // Track whether reviews have been loaded at least once.
-  // This prevents the loading skeleton from showing during tab switches
-  // (which would unmount ProfileReviews and lose the active tab state).
-  const hasInitialRatingsRef = useRef(false);
-  if (fetchedRatings.length > 0 || ratingsTotalCount > 0) {
-    hasInitialRatingsRef.current = true;
-  }
-  const showRatingsSkeleton = ratingsIsLoading && !hasInitialRatingsRef.current;
+  // Show the loading skeleton only while loading AND no ratings have been
+  // loaded yet. usePaginatedRatings keeps previous data during tab switches,
+  // so the skeleton won't flash when switching between populated tabs.
+  const showRatingsSkeleton =
+    ratingsIsLoading && fetchedRatings.length === 0 && ratingsTotalCount === 0;
 
   // Lazy-load venues when scrolled into view
   const {
