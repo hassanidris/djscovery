@@ -43,6 +43,7 @@ npx prisma studio        # DB GUI
 npm run migrate:event-reviews:check    # Check EventReview data (dry run)
 npm run migrate:event-reviews:apply    # Migrate EventReview → DjRating
 npm run migrate:event-reviews:rollback # Roll back migration
+npm run seed:dj-gig-review-test-data   # Seed DJ gig review test data
 ```
 
 ## Code Conventions
@@ -96,14 +97,26 @@ scripts/                    # Utility scripts
 ### Validation (DjRating example)
 
 Validation is split into two phases to avoid DB access on invalid input:
+
 1. `validateFields()` — pure field validation (rating range, review length, type consistency)
 2. `validateBusinessRules()` — DB-backed checks (auth, attendance, event status, review window)
 
 Both are in `src/lib/validation/dj-rating-validation.ts` and used by both the API route and server action.
 
+### Validation (DjGigReview example)
+
+DjGigReview follows the same pattern as DjRating:
+
+1. `validateFields()` — pure field validation (rating range, review length)
+2. `validateBusinessRules()` — DB-backed checks (DJ profile, gig completion, hire status, review window)
+
+Both are in `src/lib/validation/dj-gig-review-validation.ts` and used by the server action.
+
 ### Upsert with Race Condition Protection
 
 `upsertDjRating()` in the validation module handles concurrent submissions by catching P2002 (unique constraint violation) and retrying as an update.
+
+`upsertDjGigReview()` follows the same pattern for DJ gig reviews.
 
 ### Review Modal System
 
@@ -111,6 +124,17 @@ Both are in `src/lib/validation/dj-rating-validation.ts` and used by both the AP
 - `ReviewModal.tsx` — Dialog wrapper
 - `DjRatingForm.tsx` — Form content
 - `useReviewModal()` hook — Opens modal from any component
+
+### DjGigReview System
+
+DJ gig reviews allow DJs to review organizers and gigs they've completed:
+
+- `DjGigReviewForm.tsx` — DJ gig review form component
+- `DjGigReviewDisplay.tsx` — Display component for DJ reviews
+- `/gigs/[slug]/dj-review` — Dedicated review page for DJs
+- Server actions in `src/lib/actions/dj-gig-reviews.ts`
+- Validation in `src/lib/validation/dj-gig-review-validation.ts`
+- Post-submit effects in `src/lib/gig-reviews/dj-gig-review-post-effects.ts`
 
 ## Database Notes
 
@@ -121,6 +145,7 @@ Both are in `src/lib/validation/dj-rating-validation.ts` and used by both the AP
 ## Deployment
 
 See `docs/dj-rating-event-reviews-deployment.md` for the full deployment guide including:
+
 - Pre-deployment checklist
 - Migration execution plan
 - Monitoring setup

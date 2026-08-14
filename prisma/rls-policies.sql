@@ -24,6 +24,40 @@ CREATE POLICY "Organizer can update own gig review" ON "GigReview" FOR UPDATE TO
 DROP POLICY IF EXISTS "Organizer can delete own gig review" ON "GigReview";
 CREATE POLICY "Organizer can delete own gig review" ON "GigReview" FOR DELETE TO public USING ((auth.uid())::text = "organizerId");
 
+-- DjGigReview: public read, DJ can write for completed gigs, organizer can read own gig reviews
+ALTER TABLE "DjGigReview" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read DJ gig reviews" ON "DjGigReview";
+CREATE POLICY "Public read DJ gig reviews" ON "DjGigReview" FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "DJ can create own gig review" ON "DjGigReview";
+CREATE POLICY "DJ can create own gig review" ON "DjGigReview" FOR INSERT TO public WITH CHECK (
+  (auth.uid())::text = (
+    SELECT "dj"."userId" FROM "DjProfile" dj
+    WHERE dj.id = "DjGigReview"."djProfileId"
+  )
+  AND EXISTS (
+    SELECT 1 FROM "GigApplication" ga
+    JOIN "Hire" h ON h."applicationId" = ga.id
+    WHERE ga."gigId" = "DjGigReview"."gigId"
+      AND ga."djProfileId" = "DjGigReview"."djProfileId"
+      AND ga.status = 'ACCEPTED'
+      AND h.status = 'COMPLETED'
+  )
+);
+DROP POLICY IF EXISTS "DJ can update own gig review" ON "DjGigReview";
+CREATE POLICY "DJ can update own gig review" ON "DjGigReview" FOR UPDATE TO public USING (
+  (auth.uid())::text = (
+    SELECT "dj"."userId" FROM "DjProfile" dj
+    WHERE dj.id = "DjGigReview"."djProfileId"
+  )
+);
+DROP POLICY IF EXISTS "DJ can delete own gig review" ON "DjGigReview";
+CREATE POLICY "DJ can delete own gig review" ON "DjGigReview" FOR DELETE TO public USING (
+  (auth.uid())::text = (
+    SELECT "dj"."userId" FROM "DjProfile" dj
+    WHERE dj.id = "DjGigReview"."djProfileId"
+  )
+);
+
 -- OrganizerReview: server-side only via Prisma (bypasses RLS). Deny all client access to protect audit fields (ipAddress, userAgent).
 ALTER TABLE "OrganizerReview" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "No client access to organizer reviews" ON "OrganizerReview";

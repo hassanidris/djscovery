@@ -24,12 +24,18 @@ type RatingItem = {
     username: string;
     image: string | null;
     name: string | null;
+    roles: string[];
   };
   event: {
     id: number;
     slug: string;
     title: string;
     startDate: Date;
+  } | null;
+  gig: {
+    id: number;
+    slug: string | null;
+    title: string;
   } | null;
 };
 
@@ -66,9 +72,16 @@ export async function GET(
   // Optional filter: eventId
   const eventIdParam = searchParams.get("eventId");
   const directOnly = eventIdParam === "direct";
-  const eventId = !directOnly && eventIdParam ? Number(eventIdParam) : null;
+  const eventOnly = eventIdParam === "event"; // all event-anchored reviews
+  const gigOnly = eventIdParam === "gig"; // all gig reviews (from DjGigReview)
+  const eventId =
+    !directOnly && !eventOnly && !gigOnly && eventIdParam
+      ? Number(eventIdParam)
+      : null;
   const filterByEvent =
     !directOnly &&
+    !eventOnly &&
+    !gigOnly &&
     eventId !== null &&
     Number.isSafeInteger(eventId) &&
     eventId > 0;
@@ -87,19 +100,24 @@ export async function GET(
     );
   }
 
-  if (eventIdParam && !directOnly && !filterByEvent) {
+  if (eventIdParam && !directOnly && !eventOnly && !gigOnly && !filterByEvent) {
     return NextResponse.json(
       { error: "Invalid eventId parameter" },
       { status: 400 },
     );
   }
 
-  // Build the where clause based on filters
-  const where: { djProfileId: number; eventId?: number | null } = {
+  // Build the where clause for DjRating based on filters
+  const where: {
+    djProfileId: number;
+    eventId?: number | null | { not: null };
+  } = {
     djProfileId: 0, // placeholder, set below
   };
   if (directOnly) {
     where.eventId = null;
+  } else if (eventOnly) {
+    where.eventId = { not: null };
   } else if (filterByEvent && eventId !== null) {
     where.eventId = eventId;
   }
@@ -108,9 +126,13 @@ export async function GET(
   // separately from the "all reviews" query.
   const filterKey = directOnly
     ? "direct"
-    : filterByEvent
-      ? `event:${eventId}`
-      : "all";
+    : eventOnly
+      ? "event"
+      : gigOnly
+        ? "gig"
+        : filterByEvent
+          ? `event:${eventId}`
+          : "all";
   const cacheKey = `dj_ratings:${slug}:${page}:${limit}:${filterKey}`;
 
   // Check cache first
@@ -142,9 +164,93 @@ export async function GET(
   // Finalize where clause with the real DJ profile id
   where.djProfileId = djProfile.id;
 
-  // Fetch ratings with pagination and calculate average rating in parallel
+  // ── Gig-only mode: fetch from DjGigReview table ──────────────────────
+  if (gigOnly) {
+    timer.start("fetch_gig_reviews");
+    const gigWhere = { djProfileId: djProfile.id };
+    const [gigReviews, gigTotalCount, gigRatingAgg] = await Promise.all([
+      prisma.djGigReview.findMany({
+        where: gigWhere,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          organizer: {
+            select: {
+              username: true,
+              image: true,
+              name: true,
+              roles: { select: { role: true } },
+            },
+          },
+          gig: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+            },
+          },
+        },
+      }),
+      prisma.djGigReview.count({ where: gigWhere }),
+      prisma.djGigReview.aggregate({
+        where: gigWhere,
+        _avg: { rating: true },
+      }),
+    ]);
+    timer.end("fetch_gig_reviews");
+
+    const gigHasNextPage = page * limit < gigTotalCount;
+    const gigAvgRating = gigRatingAgg._avg.rating ?? 0;
+
+    const gigResult: RatingsResponse = {
+      ratings: gigReviews.map((r) => ({
+        id: r.id,
+        rating: r.rating,
+        review: r.review,
+        reviewType: "GIG_ORGANIZER",
+        createdAt: r.createdAt,
+        user: {
+          username: r.organizer.username,
+          image: r.organizer.image,
+          name: r.organizer.name,
+          roles: r.organizer.roles.map((ur) => ur.role),
+        },
+        event: null,
+        gig: r.gig
+          ? {
+              id: r.gig.id,
+              slug: r.gig.slug,
+              title: r.gig.title,
+            }
+          : null,
+      })),
+      totalCount: gigTotalCount,
+      hasNextPage: gigHasNextPage,
+      avgRating: gigAvgRating,
+    };
+
+    timer.start("cache_set");
+    await cacheSet(cacheKey, gigResult, 300);
+    timer.end("cache_set");
+
+    timer.flush();
+    return NextResponse.json(gigResult);
+  }
+
+  // ── DjRating mode (all, direct, event, specific event) ──────────────
+  // When fetching "all", also fetch DjGigReview records and merge them
+  const fetchGigReviewsToo = !directOnly && !eventOnly && !filterByEvent;
+
   timer.start("fetch_ratings");
-  const [ratings, totalCount, ratingAgg] = await Promise.all([
+  const [
+    ratings,
+    totalCount,
+    ratingAgg,
+    gigReviews,
+    gigTotalCount,
+    gigRatingAgg,
+  ] = await Promise.all([
     prisma.djRating.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -156,6 +262,7 @@ export async function GET(
             username: true,
             image: true,
             name: true,
+            roles: { select: { role: true } },
           },
         },
         event: {
@@ -173,37 +280,116 @@ export async function GET(
       where,
       _avg: { rating: true },
     }),
+    // Only fetch gig reviews when in "all" mode
+    fetchGigReviewsToo
+      ? prisma.djGigReview.findMany({
+          where: { djProfileId: djProfile.id },
+          orderBy: { createdAt: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+          include: {
+            organizer: {
+              select: {
+                username: true,
+                image: true,
+                name: true,
+                roles: { select: { role: true } },
+              },
+            },
+            gig: {
+              select: {
+                id: true,
+                slug: true,
+                title: true,
+              },
+            },
+          },
+        })
+      : Promise.resolve([]),
+    fetchGigReviewsToo
+      ? prisma.djGigReview.count({ where: { djProfileId: djProfile.id } })
+      : Promise.resolve(0),
+    fetchGigReviewsToo
+      ? prisma.djGigReview.aggregate({
+          where: { djProfileId: djProfile.id },
+          _avg: { rating: true },
+        })
+      : Promise.resolve({ _avg: { rating: null as number | null } }),
   ]);
   timer.end("fetch_ratings");
 
-  const hasNextPage = page * limit < totalCount;
-  const avgRating = ratingAgg._avg.rating ?? 0;
+  // Map DjRating records to response shape
+  const djRatingItems: RatingItem[] = ratings.map((r) => ({
+    id: r.id,
+    rating: r.rating,
+    review: r.review,
+    reviewType: r.reviewType,
+    createdAt: r.createdAt,
+    user: {
+      username: r.user.username,
+      image: r.user.image,
+      name: r.user.name,
+      roles: r.user.roles.map((ur) => ur.role),
+    },
+    event: r.event
+      ? {
+          id: r.event.id,
+          slug: r.event.slug,
+          title: r.event.title,
+          startDate: r.event.startDate,
+        }
+      : null,
+    gig: null,
+  }));
 
-  // Map to response shape
+  // Map DjGigReview records to the same response shape (only in "all" mode)
+  const gigReviewItems: RatingItem[] = gigReviews.map((r) => ({
+    id: r.id,
+    rating: r.rating,
+    review: r.review,
+    reviewType: "GIG_ORGANIZER",
+    createdAt: r.createdAt,
+    user: {
+      username: r.organizer.username,
+      image: r.organizer.image,
+      name: r.organizer.name,
+      roles: r.organizer.roles.map((ur) => ur.role),
+    },
+    event: null,
+    gig: r.gig
+      ? {
+          id: r.gig.id,
+          slug: r.gig.slug,
+          title: r.gig.title,
+        }
+      : null,
+  }));
+
+  // Merge and sort by createdAt desc (only in "all" mode; otherwise gigReviews is empty)
+  const allItems = [...djRatingItems, ...gigReviewItems].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+
+  // Apply pagination to the merged list (in "all" mode, we fetched `limit` from each source,
+  // so we trim to `limit` total after merging; for non-all modes, gigReviews is empty)
+  const paginatedItems = allItems.slice(0, limit);
+
+  const combinedTotalCount = totalCount + gigTotalCount;
+  const djAvgRating = ratingAgg._avg.rating ?? 0;
+  const gigAvgRating = gigRatingAgg._avg.rating ?? 0;
+  const combinedAvgRating =
+    combinedTotalCount > 0
+      ? (djAvgRating * totalCount + gigAvgRating * gigTotalCount) /
+        combinedTotalCount
+      : 0;
+
+  const hasNextPage = page * limit < combinedTotalCount;
+
   const result: RatingsResponse = {
-    ratings: ratings.map((r) => ({
-      id: r.id,
-      rating: r.rating,
-      review: r.review,
-      reviewType: r.reviewType,
-      createdAt: r.createdAt,
-      user: {
-        username: r.user.username,
-        image: r.user.image,
-        name: r.user.name,
-      },
-      event: r.event
-        ? {
-            id: r.event.id,
-            slug: r.event.slug,
-            title: r.event.title,
-            startDate: r.event.startDate,
-          }
-        : null,
-    })),
-    totalCount,
+    ratings: paginatedItems,
+    totalCount: combinedTotalCount,
     hasNextPage,
-    avgRating,
+    avgRating: combinedAvgRating,
   };
 
   // Cache for 5 minutes

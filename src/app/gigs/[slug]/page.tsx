@@ -15,6 +15,8 @@ import prisma from "@/lib/client";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { GigReviewForm } from "@/components/reputation/GigReviewForm";
+import { DjGigReviewDisplay } from "@/components/reputation/DjGigReviewDisplay";
+import { getGigWithDjReviews } from "@/lib/queries/gigs";
 import { Button } from "@/components/ui/button";
 import { formatDuration } from "@/lib/utils/duration";
 import { formatNumber } from "@/lib/utils/currency";
@@ -85,6 +87,22 @@ export default async function GigDetailPage({
         },
       },
       gigReviews: { select: { id: true, organizerId: true } },
+      djGigReviews: {
+        select: {
+          id: true,
+          rating: true,
+          review: true,
+          createdAt: true,
+          djProfile: {
+            select: {
+              id: true,
+              stageName: true,
+              slug: true,
+              avatar: true,
+            },
+          },
+        },
+      },
       organizerReviews: { select: { id: true, djProfileId: true } },
       _count: { select: { applications: true } },
     },
@@ -205,6 +223,22 @@ export default async function GigDetailPage({
             </div>
           )}
 
+        {/* DJ gig review prompt */}
+        {isAcceptedDj &&
+          accepted &&
+          hire?.status === "COMPLETED" &&
+          gig.djGigReviews.length === 0 && (
+            <div className="mb-8">
+              <Link
+                href={`/gigs/${gig.slug}/dj-review`}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300 transition-colors hover:border-white/20 hover:text-white"
+              >
+                <Star className="h-4 w-4" />
+                Review this gig
+              </Link>
+            </div>
+          )}
+
         {isOrganizer &&
           gig.status === "COMPLETED" &&
           accepted &&
@@ -224,6 +258,23 @@ export default async function GigDetailPage({
               You have reviewed this organizer.
             </div>
           )}
+
+        {isAcceptedDj &&
+          accepted &&
+          hire?.status === "COMPLETED" &&
+          gig.djGigReviews.length > 0 && (
+            <div className="mb-8 flex items-center gap-2 rounded-xl border border-green-500/20 bg-green-500/5 px-4 py-3 text-sm text-green-300">
+              <Star className="h-4 w-4" />
+              You have reviewed this gig.
+            </div>
+          )}
+
+        {/* DJ gig reviews display */}
+        {gig.djGigReviews.length > 0 && (
+          <div className="mb-8">
+            <DjGigReviewDisplay reviews={gig.djGigReviews} showTitle />
+          </div>
+        )}
 
         {/* Quick stats */}
         <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
