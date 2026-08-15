@@ -5,8 +5,16 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Stars } from "@/components/dj-profile/dj-profile-shared";
-import { Calendar, Star } from "lucide-react";
+import { Calendar, Star, ArrowUpDown } from "lucide-react";
 import { ReportButton } from "@/components/reporting/ReportButton";
+import { DjRatingHelpfulButton } from "@/components/reputation/DjRatingHelpfulButton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type EventReview = {
   id: number;
@@ -14,6 +22,7 @@ type EventReview = {
   review: string | null;
   reviewType: string | null;
   createdAt: Date;
+  helpfulCount: number;
   user: {
     username: string;
     image: string | null;
@@ -60,6 +69,9 @@ export function EventDjReviews({
 }) {
   const [reviews, setReviews] = useState<EventReview[]>([]);
   const [isLoading, setIsLoading] = useState(djSlugs.length > 0);
+  const [sortBy, setSortBy] = useState<
+    "recent" | "helpful" | "highest" | "lowest"
+  >("recent");
 
   // Stable string key for dependency array
   const djSlugsKey = djSlugs.join(",");
@@ -90,12 +102,26 @@ export function EventDjReviews({
             allReviews.push(...result.ratings);
           }
         }
-        allReviews.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
 
-        setReviews(allReviews);
+        // Sort based on current selection
+        const sortedReviews = [...allReviews].sort((a, b) => {
+          switch (sortBy) {
+            case "helpful":
+              return b.helpfulCount - a.helpfulCount;
+            case "highest":
+              return b.rating - a.rating;
+            case "lowest":
+              return a.rating - b.rating;
+            case "recent":
+            default:
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+          }
+        });
+
+        setReviews(sortedReviews);
       } catch (error) {
         console.error("Failed to fetch event DJ reviews:", error);
       } finally {
@@ -107,7 +133,7 @@ export function EventDjReviews({
     return () => {
       cancelled = true;
     };
-  }, [eventId, djSlugsKey]);
+  }, [eventId, djSlugsKey, sortBy]);
 
   if (isLoading) {
     return (
@@ -137,9 +163,28 @@ export function EventDjReviews({
 
   return (
     <section className="mb-8">
-      <h2 className="mb-4 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
-        DJ Reviews from this Event
-      </h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xs font-semibold tracking-widest text-zinc-400 uppercase">
+          DJ Reviews from this Event
+        </h2>
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="h-4 w-4 text-gray-400" />
+          <Select
+            value={sortBy}
+            onValueChange={(value: any) => setSortBy(value)}
+          >
+            <SelectTrigger className="h-8 w-35 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Recent</SelectItem>
+              <SelectItem value="helpful">Helpful</SelectItem>
+              <SelectItem value="highest">Highest</SelectItem>
+              <SelectItem value="lowest">Lowest</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       <div className="space-y-3">
         {reviews.map((r) => (
           <Card
@@ -173,13 +218,19 @@ export function EventDjReviews({
                       </span>
                     )}
                   </div>
-                  <ReportButton
-                    targetType="REVIEW"
-                    targetId={String(r.id)}
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 text-gray-400 hover:text-white"
-                  />
+                  <div className="flex items-center gap-1">
+                    <DjRatingHelpfulButton
+                      ratingId={r.id}
+                      initialHelpfulCount={r.helpfulCount}
+                    />
+                    <ReportButton
+                      targetType="REVIEW"
+                      targetId={String(r.id)}
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 text-gray-400 hover:text-white"
+                    />
+                  </div>
                 </div>
                 <span className="mt-1 block text-xs text-gray-400">
                   {new Date(r.createdAt).toLocaleDateString("en-GB", {
