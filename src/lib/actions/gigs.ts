@@ -843,19 +843,53 @@ export async function completeGig(
       data: { status: "COMPLETED" },
     });
 
-    await tx.notification.create({
-      data: {
-        type: "GIG_COMPLETED",
-        recipientId: gig.organizerProfile.userId,
-        data: {
-          gigId: gig.id,
-          gigSlug: gig.slug,
-          gigTitle: gig.title,
-          djName: application.djProfile.stageName,
-          djProfileId: application.djProfile.id,
+    // Check if organizer has already dismissed this notification
+    const existingTracking = await tx.reviewNotificationTracking.findUnique({
+      where: {
+        userId_targetType_targetId: {
+          userId: gig.organizerProfile.userId,
+          targetType: "GIG",
+          targetId: gig.id,
         },
       },
     });
+
+    // Track notification to prevent spam
+    await tx.reviewNotificationTracking.upsert({
+      where: {
+        userId_targetType_targetId: {
+          userId: gig.organizerProfile.userId,
+          targetType: "GIG",
+          targetId: gig.id,
+        },
+      },
+      create: {
+        userId: gig.organizerProfile.userId,
+        targetType: "GIG",
+        targetId: gig.id,
+        notifiedAt: now,
+      },
+      update: {
+        notifiedAt: now,
+      },
+    });
+
+    // Only create notification if not previously dismissed
+    if (!existingTracking || !existingTracking.dismissedAt) {
+      await tx.notification.create({
+        data: {
+          type: "GIG_COMPLETED",
+          recipientId: gig.organizerProfile.userId,
+          data: {
+            gigId: gig.id,
+            gigSlug: gig.slug,
+            gigTitle: gig.title,
+            djName: application.djProfile.stageName,
+            djProfileId: application.djProfile.id,
+          },
+        },
+      });
+    }
 
     return { hire: updatedHire, completed: true };
   });

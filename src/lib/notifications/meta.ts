@@ -85,7 +85,7 @@ function getBaseMeta(
       return {
         icon: PartyPopper,
         title: "Gig Completed",
-        cta: "Leave Review",
+        cta: "Review DJ",
         ...green,
       };
     case "GIG_APPLICATION_ACCEPTED":
@@ -102,7 +102,7 @@ function getBaseMeta(
     case "EVENT_COMPLETED":
       return {
         icon: Calendar,
-        title: "Event Over",
+        title: "Event Completed",
         cta: "Review DJs",
         ...purple,
       };

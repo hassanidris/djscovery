@@ -415,6 +415,8 @@ model User {
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationSender")
 
+  reviewNotificationTracking ReviewNotificationTracking[] @relation("ReviewNotificationTracking")
+
   followers  Follower[] @relation("UserFollowers")
   followings Follower[] @relation("UserFollowings")
 
@@ -1548,6 +1550,24 @@ model Notification {
 
   @@index([recipientId, read])
   @@index([recipientId, createdAt])
+}
+
+// ------ REVIEW NOTIFICATION TRACKING ------
+
+model ReviewNotificationTracking {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  targetType  String // "EVENT" or "GIG"
+  targetId    Int // eventId or gigId
+  notifiedAt  DateTime  @default(now())
+  remindedAt  DateTime?
+  dismissedAt DateTime?
+
+  user User @relation("ReviewNotificationTracking", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetType, targetId])
+  @@index([userId])
+  @@index([targetType, targetId])
 }
 
 // ------ EMAIL PREFERENCES ------
