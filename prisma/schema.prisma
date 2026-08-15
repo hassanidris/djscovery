@@ -274,6 +274,13 @@ enum ReportStatus {
   DISMISSED
 }
 
+enum ReviewModerationStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+  FLAGGED
+}
+
 enum EmailType {
   WELCOME
   PROFILE_APPROVED
@@ -410,7 +417,6 @@ model User {
 
   djComments     DjComment[]
   djCommentLikes DjCommentLike[]
-  djRatings      DjRating[]
 
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationSender")
@@ -434,6 +440,8 @@ model User {
   venueReviews         VenueReview[]
   djGigReviews         DjGigReview[]
   djRatingHelpfulVotes DjRatingHelpfulVote[]
+  djRatings            DjRating[]            @relation("DjRatingAuthor")
+  moderatedDjRatings   DjRating[]            @relation("DjRatingModerator")
 
   @@index([status])
   @@index([deletedAt])
@@ -908,7 +916,7 @@ model DjRating {
   review String?
 
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation("DjRatingAuthor", fields: [userId], references: [id], onDelete: Cascade)
   djProfileId Int
   djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
 
@@ -925,6 +933,13 @@ model DjRating {
   response    String?
   respondedAt DateTime?
 
+  // Moderation
+  moderationStatus ReviewModerationStatus @default(APPROVED)
+  moderatedAt      DateTime?
+  moderatedById    String?
+  moderator        User?                  @relation("DjRatingModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  moderatorNote    String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -934,6 +949,8 @@ model DjRating {
   @@index([reviewType])
   @@index([helpfulCount])
   @@index([respondedAt])
+  @@index([moderationStatus])
+  @@index([moderatedById])
 }
 
 // Review helpfulness votes
