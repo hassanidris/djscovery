@@ -180,10 +180,8 @@ FORCE_SEED=true npm run seed:test-users
 
   console.log("\n✅ Test users seeded successfully!");
   console.log("\nTest credentials:");
-  console.log(
-    `  Admin: ${TEST_USERS.ADMIN.email} / ${TEST_USERS.ADMIN.password}`,
-  );
-  console.log(`  Fan: ${TEST_USERS.FAN.email} / ${TEST_USERS.FAN.password}`);
+  console.log(`  Admin: ${TEST_USERS.ADMIN.email} / [REDACTED]`);
+  console.log(`  Fan: ${TEST_USERS.FAN.email} / [REDACTED]`);
 }
 
 main()
