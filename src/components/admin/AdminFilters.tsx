@@ -19,12 +19,24 @@ export type FilterConfig = {
   options: { value: string; label: string }[];
 };
 
+type DateRangeConfig = {
+  startDateKey: string;
+  endDateKey: string;
+};
+
+type RatingRangeConfig = {
+  minKey: string;
+  maxKey: string;
+};
+
 type Props = {
   filters: FilterConfig[];
   currentValues: Record<string, string>;
   searchKey?: string;
   searchPlaceholder?: string;
   currentSearch?: string;
+  dateRange?: DateRangeConfig;
+  ratingRange?: RatingRangeConfig;
 };
 
 export default function AdminFilters({
@@ -33,6 +45,8 @@ export default function AdminFilters({
   searchKey,
   searchPlaceholder = "Search...",
   currentSearch = "",
+  dateRange,
+  ratingRange,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -84,6 +98,28 @@ export default function AdminFilters({
     }, 400);
   }
 
+  function handleDateChange(key: string, value: string) {
+    const params = new URLSearchParams();
+    Object.entries(currentValues).forEach(([k, v]) => {
+      if (v && v !== "all") params.set(k, v);
+    });
+    if (value) params.set(key, value);
+    else params.delete(key);
+    params.delete("cursor");
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  function handleRatingChange(key: string, value: string) {
+    const params = new URLSearchParams();
+    Object.entries(currentValues).forEach(([k, v]) => {
+      if (v && v !== "all") params.set(k, v);
+    });
+    if (value) params.set(key, value);
+    else params.delete(key);
+    params.delete("cursor");
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
   const hasActiveFilters =
     Object.values(currentValues).some((v) => v && v !== "all") ||
     !!currentSearch;
@@ -121,6 +157,54 @@ export default function AdminFilters({
           </SelectContent>
         </Select>
       ))}
+      {dateRange && (
+        <>
+          <Input
+            type="date"
+            placeholder="Start Date"
+            value={currentValues[dateRange.startDateKey] || ""}
+            onChange={(e) =>
+              handleDateChange(dateRange.startDateKey, e.target.value)
+            }
+            className="h-9 w-36 border-white/10 bg-white/5 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
+          />
+          <Input
+            type="date"
+            placeholder="End Date"
+            value={currentValues[dateRange.endDateKey] || ""}
+            onChange={(e) =>
+              handleDateChange(dateRange.endDateKey, e.target.value)
+            }
+            className="h-9 w-36 border-white/10 bg-white/5 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
+          />
+        </>
+      )}
+      {ratingRange && (
+        <>
+          <Input
+            type="number"
+            min="1"
+            max="5"
+            placeholder="Min Rating"
+            value={currentValues[ratingRange.minKey] || ""}
+            onChange={(e) =>
+              handleRatingChange(ratingRange.minKey, e.target.value)
+            }
+            className="h-9 w-28 border-white/10 bg-white/5 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
+          />
+          <Input
+            type="number"
+            min="1"
+            max="5"
+            placeholder="Max Rating"
+            value={currentValues[ratingRange.maxKey] || ""}
+            onChange={(e) =>
+              handleRatingChange(ratingRange.maxKey, e.target.value)
+            }
+            className="h-9 w-28 border-white/10 bg-white/5 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
+          />
+        </>
+      )}
       {hasActiveFilters && (
         <Button
           variant="ghost"

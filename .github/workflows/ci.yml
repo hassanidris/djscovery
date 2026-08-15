@@ -73,6 +73,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_e2e
     services:
       postgres:
         image: postgres:16
@@ -83,10 +85,10 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 20
 
     steps:
       - name: Checkout code
@@ -104,26 +106,34 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Wait for Postgres to be ready
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            echo "waiting for postgres..."
+            sleep 2
+          done
+
+      - name: Debug DB env
+        run: |
+          echo "DB user from env: $(node -e "console.log(process.env.DATABASE_URL?.split('://')[1]?.split(':')[0])")"
+
       # Ephemeral, disposable Postgres service container (see `services` above) —
       # isolated per CI run, never touches staging/production. `db push` (not
       # `migrate deploy`) is used because it applies schema.prisma directly,
       # sidestepping the historical migration chain.
       - name: Push DB schema
         run: npx prisma db push --accept-data-loss
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_e2e
 
       - name: Seed base data (countries, cities, genres)
         run: npx tsx prisma/seed.ts
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_e2e
 
       - name: Seed test users & test data
         run: npx tsx prisma/seed-test-users.ts
         env:
           NODE_ENV: test
           NEXT_PUBLIC_APP_ENV: staging
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_e2e
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
@@ -132,7 +142,6 @@ jobs:
         env:
           NEXT_PUBLIC_APP_ENV: staging
           E2E_TESTING: "true"
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_e2e
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -152,6 +161,8 @@ jobs:
     needs: [test]
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
     continue-on-error: true
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_visual
     services:
       postgres:
         image: postgres:16
@@ -162,10 +173,10 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 20
 
     steps:
       - name: Checkout code
@@ -183,20 +194,26 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Wait for Postgres to be ready
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            echo "waiting for postgres..."
+            sleep 2
+          done
+
       # Ephemeral, disposable Postgres service container — isolated per CI run,
       # never touches staging/production. `db push` applies schema.prisma
       # directly, sidestepping the historical migration chain.
       - name: Push DB schema
         run: npx prisma db push --accept-data-loss
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_visual
 
       - name: Run visual regression tests
         run: npx playwright test e2e/visual-regression.spec.ts
         env:
           NEXT_PUBLIC_APP_ENV: staging
           E2E_TESTING: "true"
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_visual
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
           SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
@@ -253,6 +270,8 @@ jobs:
     if: github.event_name == 'pull_request'
     permissions:
       contents: read
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_bundle
     services:
       postgres:
         image: postgres:16
@@ -263,10 +282,10 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 20
 
     steps:
       - name: Checkout code
@@ -283,19 +302,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Wait for Postgres to be ready
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            echo "waiting for postgres..."
+            sleep 2
+          done
+
       # Ephemeral, disposable Postgres service container — isolated per CI run,
       # never touches staging/production. `db push` applies schema.prisma
       # directly, sidestepping the historical migration chain.
       - name: Push DB schema
         run: npx prisma db push --accept-data-loss
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_bundle
 
       - name: Build
         run: npm run build
         env:
           NEXT_PUBLIC_APP_ENV: staging
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/djscovery_bundle
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
           SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key

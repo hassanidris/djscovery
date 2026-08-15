@@ -44,6 +44,7 @@ const nextConfig = {
       bodySizeLimit: "11mb",
     },
   },
+  serverExternalPackages: ["pg", "@prisma/adapter-pg"],
   turbopack: {
     root: import.meta.dirname,
   },
@@ -86,6 +87,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "unrqebwfdfumpjgvavbk.supabase.co",
         pathname: "/storage/v1/object/public/djscovery-media/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
       },
       { protocol: "https", hostname: "*.tiktokcdn.com" },
       { protocol: "https", hostname: "*.tiktokcdn-eu.com" },
