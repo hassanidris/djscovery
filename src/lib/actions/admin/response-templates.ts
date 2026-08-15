@@ -15,7 +15,7 @@ export interface ResponseTemplate {
   updatedAt: Date;
 }
 
-export const DEFAULT_TEMPLATES: Omit<
+const DEFAULT_TEMPLATES: Omit<
   ResponseTemplate,
   "id" | "usageCount" | "createdAt" | "updatedAt"
 >[] = [

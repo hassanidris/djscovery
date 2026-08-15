@@ -14,10 +14,8 @@ import {
   MessageSquare,
   Clock,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdvancedFeaturesContentProps {
   spamStats: any;
@@ -38,46 +36,89 @@ export default function AdvancedFeaturesContent({
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white/5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="spam">Spam Detection</TabsTrigger>
-          <TabsTrigger value="duplicates">Duplicates</TabsTrigger>
-          <TabsTrigger value="sentiment">Sentiment</TabsTrigger>
-          <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-        </TabsList>
+      <div className="flex gap-2 border-b border-white/10 pb-4">
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "overview"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveTab("spam")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "spam"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Spam Detection
+        </button>
+        <button
+          onClick={() => setActiveTab("duplicates")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "duplicates"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Duplicates
+        </button>
+        <button
+          onClick={() => setActiveTab("sentiment")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "sentiment"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Sentiment
+        </button>
+        <button
+          onClick={() => setActiveTab("suggestions")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "suggestions"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Suggestions
+        </button>
+        <button
+          onClick={() => setActiveTab("reports")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "reports"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Reports
+        </button>
+      </div>
 
-        <TabsContent value="overview" className="space-y-6">
-          <OverviewTab
-            spamStats={spamStats}
-            duplicateStats={duplicateStats}
-            sentimentStats={sentimentStats}
-            moderationQueue={moderationQueue}
-            reportStats={reportStats}
-          />
-        </TabsContent>
-
-        <TabsContent value="spam" className="space-y-6">
-          <SpamTab spamStats={spamStats} />
-        </TabsContent>
-
-        <TabsContent value="duplicates" className="space-y-6">
-          <DuplicatesTab duplicateStats={duplicateStats} />
-        </TabsContent>
-
-        <TabsContent value="sentiment" className="space-y-6">
-          <SentimentTab sentimentStats={sentimentStats} />
-        </TabsContent>
-
-        <TabsContent value="suggestions" className="space-y-6">
-          <SuggestionsTab moderationQueue={moderationQueue} />
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-6">
-          <ReportsTab reportStats={reportStats} />
-        </TabsContent>
-      </Tabs>
+      {activeTab === "overview" && (
+        <OverviewTab
+          spamStats={spamStats}
+          duplicateStats={duplicateStats}
+          sentimentStats={sentimentStats}
+          moderationQueue={moderationQueue}
+          reportStats={reportStats}
+        />
+      )}
+      {activeTab === "spam" && <SpamTab spamStats={spamStats} />}
+      {activeTab === "duplicates" && (
+        <DuplicatesTab duplicateStats={duplicateStats} />
+      )}
+      {activeTab === "sentiment" && (
+        <SentimentTab sentimentStats={sentimentStats} />
+      )}
+      {activeTab === "suggestions" && (
+        <SuggestionsTab moderationQueue={moderationQueue} />
+      )}
+      {activeTab === "reports" && <ReportsTab reportStats={reportStats} />}
     </div>
   );
 }
@@ -187,9 +228,12 @@ function OverviewTab({
                   {suggestion.reasons.join(", ")}
                 </p>
               </div>
-              <Button variant="outline" size="sm" asChild>
-                <a href={`/admin/reviews/${suggestion.reviewId}`}>Review</a>
-              </Button>
+              <a
+                href={`/admin/reviews/${suggestion.reviewId}`}
+                className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+              >
+                Review
+              </a>
             </div>
           ))}
         </div>

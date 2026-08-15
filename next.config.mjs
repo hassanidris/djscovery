@@ -43,8 +43,8 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "11mb",
     },
-    serverComponentsExternalPackages: ["pg", "@prisma/adapter-pg"],
   },
+  serverExternalPackages: ["pg", "@prisma/adapter-pg"],
   turbopack: {
     root: import.meta.dirname,
   },

@@ -11,7 +11,7 @@ export interface ReminderRule {
   enabled: boolean;
 }
 
-export const DEFAULT_REMINDER_RULES: ReminderRule[] = [
+const DEFAULT_REMINDER_RULES: ReminderRule[] = [
   {
     id: "urgent_24h",
     name: "Urgent - 24 hours",
@@ -72,7 +72,9 @@ export async function getReviewsNeedingReminder(
   const reviewsNeedingReminder: ReviewNeedingReminder[] = [];
 
   for (const rule of enabledRules) {
-    const thresholdDate = new Date(now.getTime() - rule.hoursThreshold * 60 * 60 * 1000);
+    const thresholdDate = new Date(
+      now.getTime() - rule.hoursThreshold * 60 * 60 * 1000,
+    );
 
     const reviews = await prisma.djRating.findMany({
       where: {
@@ -107,11 +109,14 @@ export async function getReviewsNeedingReminder(
     });
 
     for (const review of reviews) {
-      const hoursSinceReview = (now.getTime() - review.createdAt.getTime()) / (1000 * 60 * 60);
-      
+      const hoursSinceReview =
+        (now.getTime() - review.createdAt.getTime()) / (1000 * 60 * 60);
+
       // Check if this review already matches a higher priority rule
       const alreadyMatched = reviewsNeedingReminder.some(
-        (r) => r.id === review.id && r.ruleMatched.hoursThreshold < rule.hoursThreshold,
+        (r) =>
+          r.id === review.id &&
+          r.ruleMatched.hoursThreshold < rule.hoursThreshold,
       );
 
       if (!alreadyMatched) {
@@ -125,7 +130,9 @@ export async function getReviewsNeedingReminder(
   }
 
   // Sort by hours since review (oldest first)
-  return reviewsNeedingReminder.sort((a, b) => b.hoursSinceReview - a.hoursSinceReview);
+  return reviewsNeedingReminder.sort(
+    (a, b) => b.hoursSinceReview - a.hoursSinceReview,
+  );
 }
 
 export async function sendReminderNotification(
@@ -173,7 +180,8 @@ export async function sendReminderNotification(
           djProfileId: review.djProfileId,
           rating: review.rating,
           review: review.review,
-          customMessage: customMessage || "You have a review that needs your response.",
+          customMessage:
+            customMessage || "You have a review that needs your response.",
         },
       },
     });
@@ -235,7 +243,9 @@ export async function getReminderStats(): Promise<{
   const now = new Date();
   const urgentThreshold = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const standardThreshold = new Date(now.getTime() - 72 * 60 * 60 * 1000);
-  const lowPriorityThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const lowPriorityThreshold = new Date(
+    now.getTime() - 7 * 24 * 60 * 60 * 1000,
+  );
 
   const [totalUnresponded, urgentReviews, standardReviews, lowPriorityReviews] =
     await Promise.all([
@@ -271,7 +281,8 @@ export async function getReminderStats(): Promise<{
   const avgTimeUnresponded =
     unrespondedReviews.length > 0
       ? unrespondedReviews.reduce((sum, r) => {
-          const hours = (now.getTime() - r.createdAt.getTime()) / (1000 * 60 * 60);
+          const hours =
+            (now.getTime() - r.createdAt.getTime()) / (1000 * 60 * 60);
           return sum + hours;
         }, 0) / unrespondedReviews.length
       : 0;

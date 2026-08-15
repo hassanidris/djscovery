@@ -11,10 +11,8 @@ import {
   Bell,
   ArrowUpRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
 
 interface ResponseManagementContentProps {
@@ -34,39 +32,76 @@ export default function ResponseManagementContent({
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white/5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="unresponded">Unresponded</TabsTrigger>
-          <TabsTrigger value="reminders">Reminders</TabsTrigger>
-          <TabsTrigger value="escalations">Escalations</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-        </TabsList>
+      <div className="flex gap-2 border-b border-white/10 pb-4">
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "overview"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveTab("unresponded")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "unresponded"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Unresponded
+        </button>
+        <button
+          onClick={() => setActiveTab("reminders")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "reminders"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Reminders
+        </button>
+        <button
+          onClick={() => setActiveTab("escalations")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "escalations"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Escalations
+        </button>
+        <button
+          onClick={() => setActiveTab("templates")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "templates"
+              ? "border-h_redLight border-b-2 text-white"
+              : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Templates
+        </button>
+      </div>
 
-        <TabsContent value="overview" className="space-y-6">
-          <OverviewTab
-            trackingData={trackingData}
-            reminderStats={reminderStats}
-            escalationStats={escalationStats}
-          />
-        </TabsContent>
-
-        <TabsContent value="unresponded" className="space-y-6">
-          <UnrespondedTab unrespondedReviews={trackingData.unrespondedReviews} />
-        </TabsContent>
-
-        <TabsContent value="reminders" className="space-y-6">
-          <RemindersTab reminderStats={reminderStats} />
-        </TabsContent>
-
-        <TabsContent value="escalations" className="space-y-6">
-          <EscalationsTab escalationStats={escalationStats} />
-        </TabsContent>
-
-        <TabsContent value="templates" className="space-y-6">
-          <TemplatesTab templates={templates} />
-        </TabsContent>
-      </Tabs>
+      {activeTab === "overview" && (
+        <OverviewTab
+          trackingData={trackingData}
+          reminderStats={reminderStats}
+          escalationStats={escalationStats}
+        />
+      )}
+      {activeTab === "unresponded" && (
+        <UnrespondedTab unrespondedReviews={trackingData.unrespondedReviews} />
+      )}
+      {activeTab === "reminders" && (
+        <RemindersTab reminderStats={reminderStats} />
+      )}
+      {activeTab === "escalations" && (
+        <EscalationsTab escalationStats={escalationStats} />
+      )}
+      {activeTab === "templates" && <TemplatesTab templates={templates} />}
     </div>
   );
 }
@@ -177,11 +212,15 @@ function OverviewTab({
                     dj.responseRate >= 80
                       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                       : dj.responseRate >= 50
-                      ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
-                      : "border-red-500/30 bg-red-500/10 text-red-400"
+                        ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                        : "border-red-500/30 bg-red-500/10 text-red-400"
                   }
                 >
-                  {dj.responseRate >= 80 ? "Excellent" : dj.responseRate >= 50 ? "Good" : "Needs Improvement"}
+                  {dj.responseRate >= 80
+                    ? "Excellent"
+                    : dj.responseRate >= 50
+                      ? "Good"
+                      : "Needs Improvement"}
                 </Badge>
               </div>
             </div>
@@ -196,8 +235,13 @@ function UnrespondedTab({ unrespondedReviews }: { unrespondedReviews: any[] }) {
   return (
     <Card className="border-white/8 bg-white/3 p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Unresponded Reviews</h2>
-        <Badge variant="outline" className="border-red-500/30 bg-red-500/10 text-red-400">
+        <h2 className="text-lg font-semibold text-white">
+          Unresponded Reviews
+        </h2>
+        <Badge
+          variant="outline"
+          className="border-red-500/30 bg-red-500/10 text-red-400"
+        >
           {unrespondedReviews.length} pending
         </Badge>
       </div>
@@ -223,19 +267,26 @@ function UnrespondedTab({ unrespondedReviews }: { unrespondedReviews: any[] }) {
                     by {review.user.name || review.user.email}
                   </span>
                   <span className="text-sm text-gray-400">
-                    {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(review.createdAt), {
+                      addSuffix: true,
+                    })}
                   </span>
                 </div>
                 {review.review && (
-                  <p className="text-sm text-gray-300 line-clamp-2">{review.review}</p>
+                  <p className="line-clamp-2 text-sm text-gray-300">
+                    {review.review}
+                  </p>
                 )}
                 <p className="mt-2 text-xs text-gray-400">
                   DJ: {review.djProfile.stageName}
                 </p>
               </div>
-              <Button variant="outline" size="sm" asChild>
-                <a href={`/admin/reviews/${review.id}`}>View</a>
-              </Button>
+              <a
+                href={`/admin/reviews/${review.id}`}
+                className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+              >
+                View
+              </a>
             </div>
           ))}
         </div>
@@ -306,7 +357,9 @@ function RemindersTab({ reminderStats }: { reminderStats: any }) {
       </div>
 
       <Card className="border-white/8 bg-white/3 p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">Reminder Rules</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">
+          Reminder Rules
+        </h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between rounded-lg border border-red-500/20 bg-red-500/5 p-4">
             <div>
@@ -411,11 +464,15 @@ function EscalationsTab({ escalationStats }: { escalationStats: any }) {
       </div>
 
       <Card className="border-white/8 bg-white/3 p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">Escalation Rules</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">
+          Escalation Rules
+        </h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between rounded-lg border border-red-500/20 bg-red-500/5 p-4">
             <div>
-              <p className="font-medium text-white">Critical - 1 Star Reviews (24h)</p>
+              <p className="font-medium text-white">
+                Critical - 1 Star Reviews (24h)
+              </p>
               <p className="text-sm text-gray-400">
                 1-star reviews unresponded for 24+ hours
               </p>
@@ -427,7 +484,9 @@ function EscalationsTab({ escalationStats }: { escalationStats: any }) {
 
           <div className="flex items-center justify-between rounded-lg border border-orange-500/20 bg-orange-500/5 p-4">
             <div>
-              <p className="font-medium text-white">High - 2 Star Reviews (48h)</p>
+              <p className="font-medium text-white">
+                High - 2 Star Reviews (48h)
+              </p>
               <p className="text-sm text-gray-400">
                 2-star reviews unresponded for 48+ hours
               </p>
@@ -439,7 +498,9 @@ function EscalationsTab({ escalationStats }: { escalationStats: any }) {
 
           <div className="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
             <div>
-              <p className="font-medium text-white">Medium - Multiple Unresponded</p>
+              <p className="font-medium text-white">
+                Medium - Multiple Unresponded
+              </p>
               <p className="text-sm text-gray-400">
                 DJs with 5+ unresponded reviews (72h)
               </p>
@@ -459,10 +520,10 @@ function TemplatesTab({ templates }: { templates: any[] }) {
     <Card className="border-white/8 bg-white/3 p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Response Templates</h2>
-        <Button variant="outline" size="sm">
+        <button className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
           <FileText className="mr-2 h-4 w-4" />
           Create Template
-        </Button>
+        </button>
       </div>
 
       {templates.length === 0 ? (
@@ -479,7 +540,9 @@ function TemplatesTab({ templates }: { templates: any[] }) {
             >
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <span className="font-medium text-white">{template.name}</span>
+                  <span className="font-medium text-white">
+                    {template.name}
+                  </span>
                   <Badge
                     variant="outline"
                     className="border-white/10 bg-white/5 text-xs text-gray-400"
@@ -492,16 +555,16 @@ function TemplatesTab({ templates }: { templates: any[] }) {
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-gray-300 line-clamp-2">
+                <p className="line-clamp-2 text-sm text-gray-300">
                   {template.content}
                 </p>
                 <p className="mt-2 text-xs text-gray-400">
                   Used {template.usageCount} times
                 </p>
               </div>
-              <Button variant="ghost" size="sm">
+              <button className="inline-flex items-center justify-center rounded-lg bg-transparent px-2 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
                 <ArrowUpRight className="h-4 w-4" />
-              </Button>
+              </button>
             </div>
           ))}
         </div>

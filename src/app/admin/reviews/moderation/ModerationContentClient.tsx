@@ -1,7 +1,6 @@
 "use client";
 
 import { Shield, AlertTriangle, CheckCircle, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import BulkActions from "./BulkActions";
 import ModerationQueue from "./ModerationQueue";
@@ -12,9 +11,9 @@ interface ModerationContentClientProps {
   stats: any;
 }
 
-export default function ModerationContentClient({ 
-  queue, 
-  stats 
+export default function ModerationContentClient({
+  queue,
+  stats,
 }: ModerationContentClientProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [adminNote, setAdminNote] = useState("");
@@ -81,7 +80,7 @@ export default function ModerationContentClient({
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions 
+      <BulkActions
         reviewIds={queue.map((item) => item.reviewId)}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
@@ -104,8 +103,8 @@ export default function ModerationContentClient({
               </p>
             </div>
           ) : (
-            <ModerationQueue 
-              queue={queue} 
+            <ModerationQueue
+              queue={queue}
               selectedIds={selectedIds}
               onSelectionChange={setSelectedIds}
             />
