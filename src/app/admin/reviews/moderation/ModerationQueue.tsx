@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatDistanceToNow } from "date-fns";
 
@@ -109,14 +108,12 @@ export default function ModerationQueue({
                     addSuffix: true,
                   })}
                 </p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2 text-xs"
-                  asChild
+                <a
+                  href={`/admin/reviews/${item.reviewId}`}
+                  className="mt-2 inline-block text-xs text-gray-400 transition-colors hover:text-white"
                 >
-                  <a href={`/admin/reviews/${item.reviewId}`}>View Details</a>
-                </Button>
+                  View Details
+                </a>
               </div>
             </div>
           </div>

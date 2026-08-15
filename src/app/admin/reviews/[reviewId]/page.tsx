@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Star, Calendar, User, MessageSquare, ArrowLeft } from "lucide-react";
 import {
   getAdminReviewById,
@@ -247,13 +246,12 @@ export default async function AdminReviewDetailPage({
                     name="ratingId"
                     value={review.id.toString()}
                   />
-                  <Button
+                  <button
                     type="submit"
-                    variant="outline"
-                    className="w-full border-green-500/30 text-green-400 hover:bg-green-500/10"
+                    className="inline-flex w-full items-center justify-center rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm font-medium text-green-400 transition-colors hover:bg-green-500/20"
                   >
                     Approve Review
-                  </Button>
+                  </button>
                 </form>
               )}
               {review.moderationStatus !== "HIDDEN" && (
@@ -263,13 +261,12 @@ export default async function AdminReviewDetailPage({
                     name="ratingId"
                     value={review.id.toString()}
                   />
-                  <Button
+                  <button
                     type="submit"
-                    variant="outline"
-                    className="w-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                    className="inline-flex w-full items-center justify-center rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
                   >
                     Hide Review
-                  </Button>
+                  </button>
                 </form>
               )}
               {review.moderationStatus !== "FLAGGED" && (
@@ -279,13 +276,12 @@ export default async function AdminReviewDetailPage({
                     name="ratingId"
                     value={review.id.toString()}
                   />
-                  <Button
+                  <button
                     type="submit"
-                    variant="outline"
-                    className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10"
+                    className="inline-flex w-full items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
                   >
                     Flag Review
-                  </Button>
+                  </button>
                 </form>
               )}
               <form action={deleteReview}>
@@ -294,9 +290,12 @@ export default async function AdminReviewDetailPage({
                   name="ratingId"
                   value={review.id.toString()}
                 />
-                <Button type="submit" variant="destructive" className="w-full">
+                <button
+                  type="submit"
+                  className="inline-flex w-full items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+                >
                   Delete Review
-                </Button>
+                </button>
               </form>
             </div>
           </div>

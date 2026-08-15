@@ -17,12 +17,17 @@ export interface EscalationRule {
 }
 
 export interface EscalationAction {
-  type: "notify_admin" | "notify_dj" | "flag_review" | "create_ticket" | "email_alert";
+  type:
+    | "notify_admin"
+    | "notify_dj"
+    | "flag_review"
+    | "create_ticket"
+    | "email_alert";
   recipients?: string[]; // For email alerts
   message?: string;
 }
 
-export const DEFAULT_ESCALATION_RULES: EscalationRule[] = [
+const DEFAULT_ESCALATION_RULES: EscalationRule[] = [
   {
     id: "critical_1star_24h",
     name: "Critical - 1 Star Reviews (24h)",
@@ -32,7 +37,10 @@ export const DEFAULT_ESCALATION_RULES: EscalationRule[] = [
       hoursWithoutResponse: 24,
     },
     actions: [
-      { type: "notify_admin", message: "Critical 1-star review unresponded for 24+ hours" },
+      {
+        type: "notify_admin",
+        message: "Critical 1-star review unresponded for 24+ hours",
+      },
       { type: "flag_review" },
       { type: "email_alert" },
     ],
@@ -47,8 +55,14 @@ export const DEFAULT_ESCALATION_RULES: EscalationRule[] = [
       hoursWithoutResponse: 48,
     },
     actions: [
-      { type: "notify_admin", message: "2-star review unresponded for 48+ hours" },
-      { type: "notify_dj", message: "You have an unresponded review that requires attention" },
+      {
+        type: "notify_admin",
+        message: "2-star review unresponded for 48+ hours",
+      },
+      {
+        type: "notify_dj",
+        message: "You have an unresponded review that requires attention",
+      },
     ],
     enabled: true,
   },
@@ -62,7 +76,10 @@ export const DEFAULT_ESCALATION_RULES: EscalationRule[] = [
     },
     actions: [
       { type: "notify_admin", message: "DJ has 5+ unresponded reviews" },
-      { type: "notify_dj", message: "You have multiple unresponded reviews requiring attention" },
+      {
+        type: "notify_dj",
+        message: "You have multiple unresponded reviews requiring attention",
+      },
     ],
     enabled: true,
   },
@@ -74,7 +91,10 @@ export const DEFAULT_ESCALATION_RULES: EscalationRule[] = [
       hoursWithoutResponse: 168,
     },
     actions: [
-      { type: "notify_dj", message: "Reminder: You have reviews awaiting your response" },
+      {
+        type: "notify_dj",
+        message: "Reminder: You have reviews awaiting your response",
+      },
     ],
     enabled: true,
   },
@@ -177,9 +197,7 @@ export async function getEscalatedReviews(
         orderBy: { createdAt: "desc" },
       });
 
-      const escalationStatus = existingEscalation
-        ? "escalated"
-        : "pending";
+      const escalationStatus = existingEscalation ? "escalated" : "pending";
       const escalatedAt = existingEscalation?.createdAt;
 
       // Check if this review already matches a higher priority rule
@@ -206,7 +224,8 @@ export async function getEscalatedReviews(
   const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
   return escalatedReviews.sort((a, b) => {
     const priorityDiff =
-      priorityOrder[a.ruleMatched.priority] - priorityOrder[b.ruleMatched.priority];
+      priorityOrder[a.ruleMatched.priority] -
+      priorityOrder[b.ruleMatched.priority];
     if (priorityDiff !== 0) return priorityDiff;
     return b.hoursWithoutResponse - a.hoursWithoutResponse;
   });
@@ -294,7 +313,9 @@ export async function escalateReview(
 
         case "email_alert":
           // In production, this would send an actual email
-          console.log(`Email alert sent for review ${reviewId}: ${action.message}`);
+          console.log(
+            `Email alert sent for review ${reviewId}: ${action.message}`,
+          );
           break;
 
         case "create_ticket":

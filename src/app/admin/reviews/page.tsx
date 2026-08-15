@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Star, Calendar, User, MessageSquare } from "lucide-react";
 import {
   getAdminReviews,
@@ -276,14 +275,12 @@ export default async function AdminReviewsPage({
                                   name="ratingId"
                                   value={review.id.toString()}
                                 />
-                                <Button
+                                <button
                                   type="submit"
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-7 border-green-500/30 text-xs text-green-400 hover:bg-green-500/10"
+                                  className="inline-flex h-7 items-center justify-center rounded-lg border border-green-500/30 bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-400 transition-colors hover:bg-green-500/20"
                                 >
                                   Approve
-                                </Button>
+                                </button>
                               </form>
                             )}
                             {review.moderationStatus !== "HIDDEN" && (
@@ -293,14 +290,12 @@ export default async function AdminReviewsPage({
                                   name="ratingId"
                                   value={review.id.toString()}
                                 />
-                                <Button
+                                <button
                                   type="submit"
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-7 border-amber-500/30 text-xs text-amber-400 hover:bg-amber-500/10"
+                                  className="inline-flex h-7 items-center justify-center rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
                                 >
                                   Hide
-                                </Button>
+                                </button>
                               </form>
                             )}
                             {review.moderationStatus !== "FLAGGED" && (
@@ -310,14 +305,12 @@ export default async function AdminReviewsPage({
                                   name="ratingId"
                                   value={review.id.toString()}
                                 />
-                                <Button
+                                <button
                                   type="submit"
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-7 border-red-500/30 text-xs text-red-400 hover:bg-red-500/10"
+                                  className="inline-flex h-7 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/20"
                                 >
                                   Flag
-                                </Button>
+                                </button>
                               </form>
                             )}
                             <form action={deleteReview}>
@@ -326,14 +319,12 @@ export default async function AdminReviewsPage({
                                 name="ratingId"
                                 value={review.id.toString()}
                               />
-                              <Button
+                              <button
                                 type="submit"
-                                variant="destructive"
-                                size="sm"
-                                className="h-7 text-xs"
+                                className="inline-flex h-7 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/20"
                               >
                                 Delete
-                              </Button>
+                              </button>
                             </form>
                           </div>
                         </td>
@@ -346,30 +337,26 @@ export default async function AdminReviewsPage({
 
             {nextCursor && (
               <div className="flex items-center justify-end gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
+                <Link
+                  href={(() => {
                     const newParams = new URLSearchParams(params);
                     newParams.delete("cursor");
-                    window.location.href = `/admin/reviews?${newParams.toString()}`;
-                  }}
-                  className="border-white/10 bg-white/5 text-white hover:bg-white/10"
+                    return `/admin/reviews?${newParams.toString()}`;
+                  })()}
+                  className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
                 >
                   First
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
+                </Link>
+                <Link
+                  href={(() => {
                     const newParams = new URLSearchParams(params);
                     newParams.set("cursor", nextCursor.toString());
-                    window.location.href = `/admin/reviews?${newParams.toString()}`;
-                  }}
-                  className="border-white/10 bg-white/5 text-white hover:bg-white/10"
+                    return `/admin/reviews?${newParams.toString()}`;
+                  })()}
+                  className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
                 >
                   Next
-                </Button>
+                </Link>
               </div>
             )}
           </>

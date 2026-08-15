@@ -29,8 +29,10 @@ async function ResponseManagementData() {
     await import("@/lib/actions/admin/response-reminders");
   const { getEscalationStats } =
     await import("@/lib/actions/admin/response-escalation");
-  const { getResponseTemplates } =
+  const { getResponseTemplates, initializeDefaultTemplates } =
     await import("@/lib/actions/admin/response-templates");
+
+  await initializeDefaultTemplates();
 
   const [trackingData, reminderStats, escalationStats, templates] =
     await Promise.all([
