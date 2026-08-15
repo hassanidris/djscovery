@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { randomUUID } from "crypto";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -44,6 +45,11 @@ FORCE_SEED=true npm run seed:test-users
   }
 
   console.log("👤 Seeding test users (database records only)...");
+  console.log(`DATABASE_URL: ${databaseUrl.substring(0, 20)}...`);
+
+  // Generate unique usernames to avoid conflicts
+  const adminUsername = `test-admin-${Date.now()}`;
+  const fanUsername = `test-fan-${Date.now()}`;
 
   const adminUser = await prisma.user.upsert({
     where: { email: TEST_USERS.ADMIN.email },
@@ -51,9 +57,9 @@ FORCE_SEED=true npm run seed:test-users
       name: TEST_USERS.ADMIN.name,
     },
     create: {
-      id: "00000000-0000-0000-0000-000000000001",
+      id: randomUUID(),
       email: TEST_USERS.ADMIN.email,
-      username: "test-admin",
+      username: adminUsername,
       name: TEST_USERS.ADMIN.name,
     },
   });
@@ -67,7 +73,9 @@ FORCE_SEED=true npm run seed:test-users
     },
   });
 
-  console.log(`✅ Admin user created/updated: ${adminUser.email}`);
+  console.log(
+    `✅ Admin user created/updated: ${adminUser.email} (username: ${adminUsername})`,
+  );
 
   const fanUser = await prisma.user.upsert({
     where: { email: TEST_USERS.FAN.email },
@@ -75,9 +83,9 @@ FORCE_SEED=true npm run seed:test-users
       name: TEST_USERS.FAN.name,
     },
     create: {
-      id: "00000000-0000-0000-0000-000000000002",
+      id: randomUUID(),
       email: TEST_USERS.FAN.email,
-      username: "test-fan",
+      username: fanUsername,
       name: TEST_USERS.FAN.name,
     },
   });
@@ -91,7 +99,9 @@ FORCE_SEED=true npm run seed:test-users
     },
   });
 
-  console.log(`✅ Fan user created/updated: ${fanUser.email}`);
+  console.log(
+    `✅ Fan user created/updated: ${fanUser.email} (username: ${fanUsername})`,
+  );
 
   console.log("\n✅ Test users seeded successfully!");
   console.log("\n⚠️  Note: This project uses Supabase Auth.");
