@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import { randomUUID } from "crypto";
+import { createClient } from "@supabase/supabase-js";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -10,13 +10,68 @@ const prisma = new PrismaClient({ adapter });
 const TEST_USERS = {
   ADMIN: {
     email: process.env.E2E_TEST_ADMIN_EMAIL || "test-admin@example.com",
+    password: process.env.E2E_TEST_PASSWORD || "TestPassword123!",
     name: "Test Admin",
   },
   FAN: {
     email: process.env.E2E_TEST_FAN_EMAIL || "test-fan@example.com",
+    password: process.env.E2E_TEST_PASSWORD || "TestPassword123!",
     name: "Test Fan",
   },
 };
+
+/**
+ * E2E sign-in flows authenticate through the real Supabase Auth email/password
+ * form, so seeding must create actual Supabase Auth accounts (not just Prisma
+ * `User` rows). We use the Supabase Admin API (service role key) to create or
+ * reuse the auth user, then upsert the matching `User`/`UserRole` rows using
+ * the auth user's id — mirroring what `src/app/api/webhooks/supabase/route.ts`
+ * does for real sign-ups.
+ */
+async function ensureSupabaseAuthUser(
+  supabaseUrl: string,
+  serviceRoleKey: string,
+  email: string,
+  password: string,
+): Promise<string> {
+  const admin = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data: created, error: createError } =
+    await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+
+  if (!createError && created.user) {
+    return created.user.id;
+  }
+
+  // User already exists in Supabase Auth — look it up and reset the password
+  // so it matches what E2E tests expect, in case it drifted.
+  const { data: list, error: listError } = await admin.auth.admin.listUsers();
+  if (listError) {
+    throw new Error(
+      `Failed to create or find Supabase Auth user for ${email}: ${createError?.message} / ${listError.message}`,
+    );
+  }
+
+  const existing = list.users.find((u) => u.email === email);
+  if (!existing) {
+    throw new Error(
+      `Failed to create Supabase Auth user for ${email}: ${createError?.message}`,
+    );
+  }
+
+  await admin.auth.admin.updateUserById(existing.id, {
+    password,
+    email_confirm: true,
+  });
+
+  return existing.id;
+}
 
 async function main() {
   const appEnv = process.env.NEXT_PUBLIC_APP_ENV;
@@ -44,41 +99,37 @@ FORCE_SEED=true npm run seed:test-users
     process.exit(1);
   }
 
-  console.log("👤 Seeding test users (database records only)...");
-  console.log(`DATABASE_URL: ${databaseUrl.substring(0, 20)}...`);
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  // Clean up existing test users to avoid duplicate key violations
-  console.log("🧹 Cleaning up existing test users...");
-  await prisma.userRole.deleteMany({
-    where: {
-      user: {
-        email: {
-          startsWith: "test-",
-        },
-      },
-    },
-  });
-  await prisma.user.deleteMany({
-    where: {
-      email: {
-        startsWith: "test-",
-      },
-    },
-  });
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.error(
+      "❌  NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required " +
+        "to create real Supabase Auth accounts for E2E test users.",
+    );
+    process.exit(1);
+  }
 
-  // Generate unique usernames to avoid conflicts
-  const adminUsername = `test-admin-${Date.now()}`;
-  const fanUsername = `test-fan-${Date.now()}`;
+  console.log("👤 Seeding test users (Supabase Auth + database records)...");
+
+  console.log(`\n→ Ensuring Supabase Auth user: ${TEST_USERS.ADMIN.email}`);
+  const adminAuthId = await ensureSupabaseAuthUser(
+    supabaseUrl,
+    serviceRoleKey,
+    TEST_USERS.ADMIN.email,
+    TEST_USERS.ADMIN.password,
+  );
 
   const adminUser = await prisma.user.upsert({
-    where: { email: TEST_USERS.ADMIN.email },
+    where: { id: adminAuthId },
     update: {
+      email: TEST_USERS.ADMIN.email,
       name: TEST_USERS.ADMIN.name,
     },
     create: {
-      id: randomUUID(),
+      id: adminAuthId,
       email: TEST_USERS.ADMIN.email,
-      username: adminUsername,
+      username: `test-admin-${adminAuthId.slice(0, 8)}`,
       name: TEST_USERS.ADMIN.name,
     },
   });
@@ -92,19 +143,26 @@ FORCE_SEED=true npm run seed:test-users
     },
   });
 
-  console.log(
-    `✅ Admin user created/updated: ${adminUser.email} (username: ${adminUsername})`,
+  console.log(`✅ Admin user ready: ${adminUser.email} (id: ${adminUser.id})`);
+
+  console.log(`\n→ Ensuring Supabase Auth user: ${TEST_USERS.FAN.email}`);
+  const fanAuthId = await ensureSupabaseAuthUser(
+    supabaseUrl,
+    serviceRoleKey,
+    TEST_USERS.FAN.email,
+    TEST_USERS.FAN.password,
   );
 
   const fanUser = await prisma.user.upsert({
-    where: { email: TEST_USERS.FAN.email },
+    where: { id: fanAuthId },
     update: {
+      email: TEST_USERS.FAN.email,
       name: TEST_USERS.FAN.name,
     },
     create: {
-      id: randomUUID(),
+      id: fanAuthId,
       email: TEST_USERS.FAN.email,
-      username: fanUsername,
+      username: `test-fan-${fanAuthId.slice(0, 8)}`,
       name: TEST_USERS.FAN.name,
     },
   });
@@ -118,17 +176,14 @@ FORCE_SEED=true npm run seed:test-users
     },
   });
 
-  console.log(
-    `✅ Fan user created/updated: ${fanUser.email} (username: ${fanUsername})`,
-  );
+  console.log(`✅ Fan user ready: ${fanUser.email} (id: ${fanUser.id})`);
 
   console.log("\n✅ Test users seeded successfully!");
-  console.log("\n⚠️  Note: This project uses Supabase Auth.");
-  console.log("   You need to sign up these users via the Supabase auth flow");
-  console.log("   to get proper auth sessions for E2E tests.");
-  console.log("\nTest email addresses:");
-  console.log(`  Admin: ${TEST_USERS.ADMIN.email}`);
-  console.log(`  Fan: ${TEST_USERS.FAN.email}`);
+  console.log("\nTest credentials:");
+  console.log(
+    `  Admin: ${TEST_USERS.ADMIN.email} / ${TEST_USERS.ADMIN.password}`,
+  );
+  console.log(`  Fan: ${TEST_USERS.FAN.email} / ${TEST_USERS.FAN.password}`);
 }
 
 main()
