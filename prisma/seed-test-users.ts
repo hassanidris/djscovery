@@ -47,6 +47,25 @@ FORCE_SEED=true npm run seed:test-users
   console.log("👤 Seeding test users (database records only)...");
   console.log(`DATABASE_URL: ${databaseUrl.substring(0, 20)}...`);
 
+  // Clean up existing test users to avoid duplicate key violations
+  console.log("🧹 Cleaning up existing test users...");
+  await prisma.userRole.deleteMany({
+    where: {
+      user: {
+        email: {
+          startsWith: "test-",
+        },
+      },
+    },
+  });
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        startsWith: "test-",
+      },
+    },
+  });
+
   // Generate unique usernames to avoid conflicts
   const adminUsername = `test-admin-${Date.now()}`;
   const fanUsername = `test-fan-${Date.now()}`;
