@@ -90,21 +90,28 @@ export async function createDjRating(
   });
 
   // --- Post-submit side effects ---
-  await runPostSubmitEffects({
-    ratingId,
-    created,
-    rating: input.rating,
-    trimmedReview: trimmedReview!,
-    isEventReview: isEvent,
-    eventId: isEvent ? (input.eventId as number) : null,
-    djProfileId: djProfile!.id,
-    djProfileSlug: djProfile!.slug,
-    djProfileUserId: djProfile!.userId,
-    djStageName: djProfile!.stageName,
-    reviewerId: user.id,
-    eventSlug: eventSlug ?? null,
-    eventTitle: eventTitle ?? null,
-  });
+  try {
+    await runPostSubmitEffects({
+      ratingId,
+      created,
+      rating: input.rating,
+      trimmedReview: trimmedReview!,
+      isEventReview: isEvent,
+      eventId: isEvent ? (input.eventId as number) : null,
+      djProfileId: djProfile!.id,
+      djProfileSlug: djProfile!.slug,
+      djProfileUserId: djProfile!.userId,
+      djStageName: djProfile!.stageName,
+      reviewerId: user.id,
+      eventSlug: eventSlug ?? null,
+      eventTitle: eventTitle ?? null,
+    });
+  } catch (error) {
+    // Log error but don't fail the review submission
+    console.error("Post-submit effects failed for rating", ratingId, error);
+    // The review is still created, so we return success
+    // This is intentional - side effects should not block review submission
+  }
 
   return actionSuccess({ id: ratingId, created });
 }
