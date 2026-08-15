@@ -16,6 +16,7 @@ import {
   CheckCircle,
   Settings,
   Star,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +42,13 @@ const NAV_ITEMS = [
     icon: MessageSquare,
     exact: false,
   },
-  { href: "/admin/reviews", label: "Reviews", icon: Star, exact: false },
+  { href: "/admin/reviews", label: "Reviews", icon: Star, exact: true },
+  {
+    href: "/admin/reviews/analytics",
+    label: "Review Analytics",
+    icon: BarChart3,
+    exact: false,
+  },
   { href: "/admin/reports", label: "Reports", icon: Flag, exact: false },
   { href: "/admin/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;
