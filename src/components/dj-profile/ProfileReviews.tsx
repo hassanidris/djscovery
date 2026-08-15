@@ -7,7 +7,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { Star, Calendar, PenLine, Briefcase } from "lucide-react";
+import {
+  Star,
+  Calendar,
+  PenLine,
+  Briefcase,
+  ArrowUpDown,
+  Filter,
+} from "lucide-react";
 import {
   Stars,
   SectionHeading,
@@ -15,9 +22,12 @@ import {
 } from "@/components/dj-profile/dj-profile-shared";
 import { ReportButton } from "@/components/reporting/ReportButton";
 import { useReviewModal } from "@/components/reputation/ReviewModalContext";
+import { DjRatingHelpfulButton } from "@/components/reputation/DjRatingHelpfulButton";
+import { DjRatingResponse } from "@/components/reputation/DjRatingResponse";
 import { useUser } from "@/lib/supabase/useUser";
 
 type FilterTab = "all" | "direct" | "event" | "gig";
+type SortOption = "newest" | "oldest" | "highest" | "lowest" | "mostHelpful";
 
 type Props = {
   avgRating: number;
@@ -32,6 +42,7 @@ type Props = {
   isLoadingMore?: boolean;
   onLoadMore?: () => void;
   onTabChange?: (tab: FilterTab) => void;
+  onSortChange?: (sort: SortOption) => void;
   totalDirectCount?: number;
   totalEventCount?: number;
   totalGigCount?: number;
@@ -88,17 +99,24 @@ export default function ProfileReviews({
   isLoadingMore = false,
   onLoadMore,
   onTabChange,
+  onSortChange,
   totalDirectCount,
   totalEventCount,
   totalGigCount,
 }: Props) {
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const [activeSort, setActiveSort] = useState<SortOption>("newest");
   const { openReviewModal } = useReviewModal();
   const { user, isLoaded } = useUser();
 
   const handleTabChange = (tab: FilterTab) => {
     setActiveTab(tab);
     onTabChange?.(tab);
+  };
+
+  const handleSortChange = (sort: SortOption) => {
+    setActiveSort(sort);
+    onSortChange?.(sort);
   };
 
   // Count reviews by type for tab badges.
@@ -136,19 +154,41 @@ export default function ProfileReviews({
   // The API filters server-side, so reviews already match the active tab.
   // Client-side filter is a fallback for backward compatibility.
   const filteredReviews = useMemo(() => {
+    let filtered = reviews;
+
     if (activeTab === "direct") {
-      return reviews.filter(
+      filtered = reviews.filter(
         (r) => !r.event && !r.gig && r.reviewType !== "GIG_ORGANIZER",
       );
+    } else if (activeTab === "event") {
+      filtered = reviews.filter((r) => r.event);
+    } else if (activeTab === "gig") {
+      filtered = reviews.filter(
+        (r) => r.reviewType === "GIG_ORGANIZER" || r.gig,
+      );
     }
-    if (activeTab === "event") {
-      return reviews.filter((r) => r.event);
+
+    // Apply sorting
+    if (activeSort === "newest") {
+      filtered = [...filtered].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
+    } else if (activeSort === "oldest") {
+      filtered = [...filtered].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
+    } else if (activeSort === "highest") {
+      filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+    } else if (activeSort === "lowest") {
+      filtered = [...filtered].sort((a, b) => a.rating - b.rating);
+    } else if (activeSort === "mostHelpful") {
+      filtered = [...filtered].sort(
+        (a, b) => (b.helpfulCount ?? 0) - (a.helpfulCount ?? 0),
+      );
     }
-    if (activeTab === "gig") {
-      return reviews.filter((r) => r.reviewType === "GIG_ORGANIZER" || r.gig);
-    }
-    return reviews;
-  }, [reviews, activeTab]);
+
+    return filtered;
+  }, [reviews, activeTab, activeSort]);
 
   // Show tabs if there are any reviews at all
   const showTabs = counts.all > 0;
@@ -257,17 +297,45 @@ export default function ProfileReviews({
               }`}
             >
               {tab.label}
-              <span
-                className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-                  activeTab === tab.key
-                    ? "bg-white/15 text-white"
-                    : "bg-white/5 text-gray-400"
-                }`}
-              >
-                {tab.count}
-              </span>
+              {tab.count > 0 && (
+                <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[10px]">
+                  {tab.count}
+                </span>
+              )}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Sort controls */}
+      {showTabs && (
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-gray-400" />
+            <span className="text-xs text-gray-400">Sort by:</span>
+          </div>
+          <div className="flex gap-1">
+            {[
+              { key: "newest", label: "Newest" },
+              { key: "oldest", label: "Oldest" },
+              { key: "highest", label: "Highest Rated" },
+              { key: "lowest", label: "Lowest Rated" },
+              { key: "mostHelpful", label: "Most Helpful" },
+            ].map((sort) => (
+              <button
+                key={sort.key}
+                onClick={() => handleSortChange(sort.key as SortOption)}
+                className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium transition-colors ${
+                  activeSort === sort.key
+                    ? "bg-white/10 text-white"
+                    : "text-gray-400 hover:bg-white/5 hover:text-gray-300"
+                }`}
+              >
+                {sort.label}
+                {activeSort === sort.key && <ArrowUpDown className="h-3 w-3" />}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -360,6 +428,10 @@ export default function ProfileReviews({
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-400">{r.date}</span>
+                        <DjRatingHelpfulButton
+                          ratingId={r.id}
+                          initialHelpfulCount={r.helpfulCount ?? 0}
+                        />
                         <ReportButton
                           targetType="REVIEW"
                           targetId={String(r.id)}
@@ -405,6 +477,19 @@ export default function ProfileReviews({
                       <p className="mt-2 text-sm leading-relaxed text-gray-300">
                         {r.review}
                       </p>
+                    )}
+
+                    {/* DJ response */}
+                    {(r.response || isOwner) && (
+                      <DjRatingResponse
+                        ratingId={r.id}
+                        djProfileId={r.djProfileId ?? djProfileId ?? 0}
+                        existingResponse={r.response}
+                        respondedAt={
+                          r.respondedAt ? new Date(r.respondedAt) : undefined
+                        }
+                        djName={djName}
+                      />
                     )}
                   </div>
                 </div>

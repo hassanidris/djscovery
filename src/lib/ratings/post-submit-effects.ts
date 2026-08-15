@@ -57,7 +57,9 @@ export async function runPostSubmitEffects(input: PostSubmitEffectsInput) {
           data: {
             rating,
             reviewerType: isEventReview ? "event" : "direct",
+            reviewType: isEventReview ? "EVENT_ATTENDEE" : "DIRECT",
             ...(isEventReview && eventId ? { eventId, eventTitle } : {}),
+            reviewUrl: `${SITE_URL}/djs/${djProfileSlug}`,
           },
         },
       });
