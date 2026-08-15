@@ -17,6 +17,7 @@ import {
   Settings,
   Star,
   BarChart3,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,12 @@ const NAV_ITEMS = [
     href: "/admin/reviews/analytics",
     label: "Review Analytics",
     icon: BarChart3,
+    exact: false,
+  },
+  {
+    href: "/admin/reviews/moderation",
+    label: "Review Moderation",
+    icon: Shield,
     exact: false,
   },
   { href: "/admin/reports", label: "Reports", icon: Flag, exact: false },

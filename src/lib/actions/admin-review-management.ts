@@ -467,6 +467,170 @@ export async function getAdminReviewById(
   return actionSuccess(review);
 }
 
+export async function bulkApproveReviews(formData: FormData): Promise<void> {
+  const { userId: adminId } = await requireAdmin();
+
+  const ratingIds = formData.getAll("ratingIds").map((id) => Number(id));
+
+  if (ratingIds.length === 0) {
+    throw new Error("No reviews selected");
+  }
+
+  try {
+    await prisma.$transaction([
+      prisma.djRating.updateMany({
+        where: { id: { in: ratingIds } },
+        data: {
+          moderationStatus: "APPROVED",
+          moderatedAt: new Date(),
+          moderatedById: adminId,
+        },
+      }),
+      prisma.adminActionLog.create({
+        data: {
+          adminId,
+          action: "BULK_APPROVE_REVIEWS",
+          targetType: "DjRating",
+          targetId: ratingIds.join(","),
+          metadata: { count: ratingIds.length },
+        },
+      }),
+    ]);
+
+    revalidatePath("/admin/reviews");
+    revalidatePath("/admin/reviews/moderation");
+  } catch (error) {
+    console.error("Failed to bulk approve reviews:", error);
+    throw new Error("Failed to bulk approve reviews");
+  }
+}
+
+export async function bulkHideReviews(formData: FormData): Promise<void> {
+  const { userId: adminId } = await requireAdmin();
+
+  const ratingIds = formData.getAll("ratingIds").map((id) => Number(id));
+  const adminNote = formData.get("adminNote") as string | null;
+
+  if (ratingIds.length === 0) {
+    throw new Error("No reviews selected");
+  }
+
+  try {
+    await prisma.$transaction([
+      prisma.djRating.updateMany({
+        where: { id: { in: ratingIds } },
+        data: {
+          moderationStatus: "HIDDEN",
+          moderatedAt: new Date(),
+          moderatedById: adminId,
+          moderatorNote: adminNote ?? null,
+        },
+      }),
+      prisma.adminActionLog.create({
+        data: {
+          adminId,
+          action: "BULK_HIDE_REVIEWS",
+          targetType: "DjRating",
+          targetId: ratingIds.join(","),
+          metadata: adminNote
+            ? { adminNote, count: ratingIds.length }
+            : { count: ratingIds.length },
+        },
+      }),
+    ]);
+
+    revalidatePath("/admin/reviews");
+    revalidatePath("/admin/reviews/moderation");
+  } catch (error) {
+    console.error("Failed to bulk hide reviews:", error);
+    throw new Error("Failed to bulk hide reviews");
+  }
+}
+
+export async function bulkFlagReviews(formData: FormData): Promise<void> {
+  const { userId: adminId } = await requireAdmin();
+
+  const ratingIds = formData.getAll("ratingIds").map((id) => Number(id));
+  const adminNote = formData.get("adminNote") as string | null;
+
+  if (ratingIds.length === 0) {
+    throw new Error("No reviews selected");
+  }
+
+  try {
+    await prisma.$transaction([
+      prisma.djRating.updateMany({
+        where: { id: { in: ratingIds } },
+        data: {
+          moderationStatus: "FLAGGED",
+          moderatedAt: new Date(),
+          moderatedById: adminId,
+          moderatorNote: adminNote ?? null,
+        },
+      }),
+      prisma.adminActionLog.create({
+        data: {
+          adminId,
+          action: "BULK_FLAG_REVIEWS",
+          targetType: "DjRating",
+          targetId: ratingIds.join(","),
+          metadata: adminNote
+            ? { adminNote, count: ratingIds.length }
+            : { count: ratingIds.length },
+        },
+      }),
+    ]);
+
+    revalidatePath("/admin/reviews");
+    revalidatePath("/admin/reviews/moderation");
+  } catch (error) {
+    console.error("Failed to bulk flag reviews:", error);
+    throw new Error("Failed to bulk flag reviews");
+  }
+}
+
+export async function bulkDeleteReviews(formData: FormData): Promise<void> {
+  const { userId: adminId } = await requireAdmin();
+
+  const ratingIds = formData.getAll("ratingIds").map((id) => Number(id));
+  const adminNote = formData.get("adminNote") as string | null;
+
+  if (ratingIds.length === 0) {
+    throw new Error("No reviews selected");
+  }
+
+  try {
+    const reviews = await prisma.djRating.findMany({
+      where: { id: { in: ratingIds } },
+      select: { djProfileId: true, rating: true },
+    });
+
+    await prisma.$transaction([
+      prisma.djRating.deleteMany({
+        where: { id: { in: ratingIds } },
+      }),
+      prisma.adminActionLog.create({
+        data: {
+          adminId,
+          action: "BULK_DELETE_REVIEWS",
+          targetType: "DjRating",
+          targetId: ratingIds.join(","),
+          metadata: adminNote
+            ? { adminNote, count: ratingIds.length, reviews }
+            : { count: ratingIds.length },
+        },
+      }),
+    ]);
+
+    revalidatePath("/admin/reviews");
+    revalidatePath("/admin/reviews/moderation");
+    revalidatePath("/djs/[slug]/reviews");
+  } catch (error) {
+    console.error("Failed to bulk delete reviews:", error);
+    throw new Error("Failed to bulk delete reviews");
+  }
+}
+
 export async function getReportedReviews(
   page = 1,
   limit = 20,
