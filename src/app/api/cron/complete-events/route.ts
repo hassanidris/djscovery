@@ -28,8 +28,23 @@ export async function GET(request: Request) {
       id: true,
       slug: true,
       title: true,
+      ownerDj: {
+        select: {
+          id: true,
+          stageName: true,
+          slug: true,
+        },
+      },
       participants: {
-        select: { djProfileId: true },
+        select: {
+          djProfile: {
+            select: {
+              id: true,
+              stageName: true,
+              slug: true,
+            },
+          },
+        },
       },
     },
   });
@@ -55,18 +70,63 @@ export async function GET(request: Request) {
         });
 
         if (attendees.length > 0) {
-          await tx.notification.createMany({
-            data: attendees.map((attendee) => ({
-              type: "EVENT_COMPLETED" as const,
-              recipientId: attendee.userId,
-              data: {
-                eventId: event.id,
-                eventSlug: event.slug,
-                eventTitle: event.title,
-                djCount: event.participants.length + 1, // owner + participants
+          // Filter out attendees who have already been notified or dismissed
+          const attendeesToNotify: string[] = [];
+          for (const attendee of attendees) {
+            const existing = await tx.reviewNotificationTracking.findUnique({
+              where: {
+                userId_targetType_targetId: {
+                  userId: attendee.userId,
+                  targetType: "EVENT",
+                  targetId: event.id,
+                },
               },
-            })),
-          });
+            });
+
+            // Only notify if not previously notified or if dismissed
+            if (!existing || !existing.dismissedAt) {
+              attendeesToNotify.push(attendee.userId);
+            }
+
+            // Track notification to prevent spam
+            await tx.reviewNotificationTracking.upsert({
+              where: {
+                userId_targetType_targetId: {
+                  userId: attendee.userId,
+                  targetType: "EVENT",
+                  targetId: event.id,
+                },
+              },
+              create: {
+                userId: attendee.userId,
+                targetType: "EVENT",
+                targetId: event.id,
+                notifiedAt: new Date(),
+              },
+              update: {
+                notifiedAt: new Date(),
+              },
+            });
+          }
+
+          if (attendeesToNotify.length > 0) {
+            await tx.notification.createMany({
+              data: attendeesToNotify.map((userId) => ({
+                type: "EVENT_COMPLETED" as const,
+                recipientId: userId,
+                data: {
+                  eventId: event.id,
+                  eventSlug: event.slug,
+                  eventTitle: event.title,
+                  djCount: event.participants.length + 1, // owner + participants
+                  djNames: [
+                    event.ownerDj.stageName,
+                    ...event.participants.map((p) => p.djProfile.stageName),
+                  ].join(", "),
+                },
+              })),
+            });
+          }
         }
       });
     }
