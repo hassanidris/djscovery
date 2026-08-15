@@ -206,8 +206,8 @@ export function formatNotification(
       const gigSlug = typeof d.gigSlug === "string" ? d.gigSlug : null;
       return {
         icon: "🎉",
-        message: `Your gig "${gigTitle}" was marked complete. Leave a review for ${djName}.`,
-        link: gigSlug ? `/gigs/${gigSlug}/review` : null,
+        message: `Your gig "${gigTitle}" is complete. Leave a review for ${djName}.`,
+        link: gigSlug ? `/gigs/${gigSlug}/dj-review` : null,
       };
     }
     case "GIG_CANCELLED": {
@@ -236,10 +236,14 @@ export function formatNotification(
       const eventTitle =
         typeof d.eventTitle === "string" ? d.eventTitle : "The event";
       const eventSlug = typeof d.eventSlug === "string" ? d.eventSlug : null;
+      const djNames = typeof d.djNames === "string" ? d.djNames : null;
+      const djMessage = djNames
+        ? ` Leave a review for ${djNames}.`
+        : " Leave a review for the DJs.";
       return {
         icon: "🎉",
-        message: `Event "${eventTitle}" is over. Review the DJs you saw.`,
-        link: eventSlug ? `/events/${eventSlug}` : null,
+        message: `You attended "${eventTitle}".${djMessage}`,
+        link: eventSlug ? `/events/${eventSlug}/dj-review` : null,
       };
     }
     case "REVIEW_REMINDER": {
@@ -251,9 +255,9 @@ export function formatNotification(
         icon: "⏰",
         message: `Reminder: You have ${daysLeft} days left to review ${djName}.`,
         link: gigSlug
-          ? `/gigs/${gigSlug}/review`
+          ? `/gigs/${gigSlug}/dj-review`
           : eventSlug
-            ? `/events/${eventSlug}`
+            ? `/events/${eventSlug}/dj-review`
             : null,
       };
     }
@@ -266,9 +270,9 @@ export function formatNotification(
         icon: "⏰",
         message: `Your review window for ${djName} expires in ${daysLeft} days.`,
         link: gigSlug
-          ? `/gigs/${gigSlug}/review`
+          ? `/gigs/${gigSlug}/dj-review`
           : eventSlug
-            ? `/events/${eventSlug}`
+            ? `/events/${eventSlug}/dj-review`
             : null,
       };
     }

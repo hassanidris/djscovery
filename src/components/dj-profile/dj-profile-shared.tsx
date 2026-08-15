@@ -37,6 +37,14 @@ export type ReviewItem = {
     slug: string | null;
     title: string;
   } | null;
+  // Helpfulness voting
+  helpfulCount?: number;
+  helpfulVoted?: boolean;
+  // DJ response
+  response?: string | null;
+  respondedAt?: string | null;
+  djProfileId?: number;
+  djName?: string;
 };
 
 export type VenueItem = {

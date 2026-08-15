@@ -6,6 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { getNotificationMeta } from "@/lib/notifications/meta";
 import { markNotificationRead } from "@/lib/actions/notifications";
+import { ReviewNotificationActions } from "./ReviewNotificationActions";
 import type { NotificationType } from "@prisma/client";
 
 type Props = {
@@ -34,6 +35,18 @@ export default function NotificationItem({
       });
     }
   }
+
+  const isReviewNotification =
+    type === "EVENT_COMPLETED" || type === "GIG_COMPLETED";
+
+  const d = (data ?? {}) as Record<string, unknown>;
+  const reviewTargetType = type === "EVENT_COMPLETED" ? "EVENT" : "GIG";
+  const reviewTargetId =
+    typeof d.eventId === "number"
+      ? d.eventId
+      : typeof d.gigId === "number"
+        ? d.gigId
+        : 0;
 
   const content = (
     <>
@@ -67,6 +80,15 @@ export default function NotificationItem({
             {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
           </span>
         </div>
+
+        {isReviewNotification && reviewTargetId > 0 && (
+          <div className="mt-3">
+            <ReviewNotificationActions
+              targetType={reviewTargetType}
+              targetId={reviewTargetId}
+            />
+          </div>
+        )}
       </div>
 
       {!read && (
