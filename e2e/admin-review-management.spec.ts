@@ -75,6 +75,17 @@ async function ensureAdminAuth(
 
 test.describe.configure({ mode: "serial" });
 
+// This suite exercises the full admin review-management surface (dashboard
+// widgets, moderation, analytics, response tracking, advanced features) and
+// requires a real ADMIN-role Supabase Auth account. It's intended for local,
+// manual verification against a fully-seeded dev database rather than CI,
+// where the shared test fixtures/environment make it flaky. Run locally with:
+//   npm run e2e -- admin-review-management.spec.ts
+test.skip(
+  !!process.env.CI,
+  "Admin review management E2E suite is local-only — see comment above.",
+);
+
 test.describe("admin review management", () => {
   let adminAuthState: Awaited<
     ReturnType<BrowserContext["storageState"]>
