@@ -5,7 +5,7 @@ import prisma from "@/lib/client";
 import { Star, Calendar, User, Filter, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DjRatingHelpfulButton } from "@/components/reputation/DjRatingHelpfulButton";
-import { DjRatingResponse } from "@/components/reputation/DjRatingResponse";
+import { DjRatingResponseDisplay } from "@/components/reputation/DjRatingResponseDisplay";
 import JsonLd from "@/components/seo/JsonLd";
 import { ReviewFilters } from "./ReviewFilters";
 import { Suspense } from "react";
@@ -301,9 +301,9 @@ export default async function ReviewsPage({
                         initialHelpfulCount={review.helpfulCount}
                       />
                       {review.response && (
-                        <DjRatingResponse
+                        <DjRatingResponseDisplay
                           response={review.response}
-                          respondedAt={review.respondedAt!}
+                          respondedAt={review.respondedAt}
                         />
                       )}
                     </div>

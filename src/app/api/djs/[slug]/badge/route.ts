@@ -5,25 +5,16 @@ export const dynamic = "force-dynamic";
 
 interface BadgeParams {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{
-    theme?: "light" | "dark";
-    size?: "small" | "medium" | "large";
-    showRating?: "true" | "false";
-    showCount?: "true" | "false";
-  }>;
 }
 
-export async function GET(
-  request: NextRequest,
-  { params, searchParams }: BadgeParams
-) {
+export async function GET(request: NextRequest, { params }: BadgeParams) {
   const { slug } = await params;
-  const {
-    theme = "dark",
-    size = "medium",
-    showRating = "true",
-    showCount = "true",
-  } = await searchParams;
+  const { searchParams } = new URL(request.url);
+  const theme = (searchParams.get("theme") as "light" | "dark") || "dark";
+  const size =
+    (searchParams.get("size") as "small" | "medium" | "large") || "medium";
+  const showRating = searchParams.get("showRating") !== "false";
+  const showCount = searchParams.get("showCount") !== "false";
 
   try {
     const djProfile = await prisma.djProfile.findUnique({
@@ -66,8 +57,8 @@ export async function GET(
       config: {
         theme,
         size,
-        showRating: showRating === "true",
-        showCount: showCount === "true",
+        showRating,
+        showCount,
       },
       profileUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://djscovery.com"}/djs/${slug}`,
     };
@@ -77,7 +68,7 @@ export async function GET(
     console.error("Error fetching badge data:", error);
     return NextResponse.json(
       { error: "Failed to fetch badge data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
