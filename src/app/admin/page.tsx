@@ -22,6 +22,8 @@ import {
   CheckCircle,
   MessageSquare,
   AlertTriangle,
+  Star,
+  Shield,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -34,6 +36,7 @@ import {
 import { getPendingDjApprovals } from "@/lib/actions/admin/djs";
 import { getRecentUsers } from "@/lib/actions/admin/users";
 import { getRecentReports } from "@/lib/actions/admin/reports";
+import { getDashboardReviewStats } from "@/lib/actions/admin/dashboard-review-stats";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -109,6 +112,12 @@ function AdminDashboardSkeleton() {
       </div>
 
       {/* Recent Reports */}
+      <div>
+        <Skeleton className="mb-4 h-8 w-48 rounded" />
+        <Skeleton className="h-32 rounded" />
+      </div>
+
+      {/* Review Management */}
       <div>
         <Skeleton className="mb-4 h-8 w-48 rounded" />
         <Skeleton className="h-32 rounded" />
@@ -358,6 +367,15 @@ async function DashboardContent({ range }: { range: DashboardRange }) {
         <DashboardRecentReports />
       </Suspense>
 
+      {/* Review Management */}
+      <Suspense
+        fallback={
+          <div className="h-40 rounded-lg border border-white/10 bg-white/5" />
+        }
+      >
+        <DashboardReviewManagement />
+      </Suspense>
+
       {/* Recent Activity */}
       <Suspense
         fallback={
@@ -403,11 +421,14 @@ async function DashboardContent({ range }: { range: DashboardRange }) {
 
 async function DashboardAlerts({ range }: { range: DashboardRange }) {
   const stats = await CachedDashboardStats({ range });
+  const reviewStats = await getDashboardReviewStats();
 
   if (
     stats.pendingDjApprovals === 0 &&
     stats.openReports === 0 &&
-    stats.overdueHires === 0
+    stats.overdueHires === 0 &&
+    reviewStats.pendingModeration === 0 &&
+    reviewStats.suspiciousReviews === 0
   ) {
     return null;
   }
@@ -422,6 +443,28 @@ async function DashboardAlerts({ range }: { range: DashboardRange }) {
           <Clock className="h-4 w-4" />
           {stats.pendingDjApprovals} DJ profile
           {stats.pendingDjApprovals !== 1 ? "s" : ""} awaiting approval
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
+      {reviewStats.pendingModeration > 0 && (
+        <Link
+          href="/admin/reviews?moderationStatus=PENDING"
+          className="flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/10 px-4 py-2.5 text-sm font-medium text-blue-400 transition-colors hover:bg-blue-500/20"
+        >
+          <Shield className="h-4 w-4" />
+          {reviewStats.pendingModeration} review
+          {reviewStats.pendingModeration !== 1 ? "s" : ""} pending moderation
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
+      {reviewStats.suspiciousReviews > 0 && (
+        <Link
+          href="/admin/reviews/moderation"
+          className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+        >
+          <AlertTriangle className="h-4 w-4" />
+          {reviewStats.suspiciousReviews} suspicious review
+          {reviewStats.suspiciousReviews !== 1 ? "s" : ""} detected
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       )}
@@ -749,6 +792,133 @@ async function DashboardRecentReports() {
           ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+async function DashboardReviewManagement() {
+  const reviewStats = await getDashboardReviewStats();
+
+  return (
+    <section className="space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-white">
+            Review Management
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Moderation status and response tracking.
+          </p>
+        </div>
+        <Link
+          href="/admin/reviews"
+          className="text-sm text-gray-400 transition-colors hover:text-white"
+        >
+          View all reviews
+        </Link>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Pending Moderation"
+          value={reviewStats.pendingModeration}
+          icon={<Shield className="h-5 w-5 text-amber-400" />}
+          href="/admin/reviews?moderationStatus=PENDING"
+          accent={reviewStats.pendingModeration > 0}
+          badge={reviewStats.pendingModeration > 0 ? "Action" : undefined}
+        />
+        <StatCard
+          label="Suspicious Reviews"
+          value={reviewStats.suspiciousReviews}
+          icon={<AlertTriangle className="h-5 w-5 text-red-400" />}
+          href="/admin/reviews/moderation"
+          accent={reviewStats.suspiciousReviews > 0}
+          badge={reviewStats.suspiciousReviews > 0 ? "Review" : undefined}
+        />
+        <StatCard
+          label="Unresponded Reviews"
+          value={reviewStats.unrespondedReviews}
+          icon={<MessageSquare className="h-5 w-5 text-blue-400" />}
+          href="/admin/reviews/responses"
+          accent={reviewStats.unrespondedReviews > 0}
+          badge={reviewStats.unrespondedReviews > 0 ? "Remind" : undefined}
+        />
+        <StatCard
+          label="Avg Rating (30d)"
+          value={reviewStats.averageRating}
+          icon={<Star className="h-5 w-5 text-yellow-400" />}
+          href="/admin/reviews/analytics"
+        />
+      </div>
+
+      {reviewStats.recentReviews.length > 0 && (
+        <div className="overflow-hidden rounded-xl border border-white/8 bg-white/3">
+          <div className="p-4">
+            <h3 className="mb-3 text-sm font-medium text-white">
+              Recent Reviews
+            </h3>
+            <div className="space-y-3">
+              {reviewStats.recentReviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="flex items-start justify-between gap-3 rounded-lg border border-white/5 bg-white/2 p-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className="text-sm font-medium text-white">
+                        {review.djProfile.stageName}
+                      </span>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-3 w-3 ${
+                              star <= review.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-600"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {review.review && (
+                      <p className="line-clamp-2 text-xs text-gray-400">
+                        {review.review}
+                      </p>
+                    )}
+                    <div className="mt-2 flex items-center gap-2">
+                      <Badge
+                        className={`text-[10px] ${
+                          review.moderationStatus === "APPROVED"
+                            ? "border-green-500/30 bg-green-500/10 text-green-400"
+                            : review.moderationStatus === "FLAGGED"
+                              ? "border-red-500/30 bg-red-500/10 text-red-400"
+                              : review.moderationStatus === "HIDDEN"
+                                ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                                : "border-gray-500/30 bg-gray-500/10 text-gray-400"
+                        }`}
+                      >
+                        {review.moderationStatus}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
+                        {formatDistanceToNow(new Date(review.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/admin/reviews/${review.id}`}
+                    className="text-xs text-gray-400 transition-colors hover:text-white"
+                  >
+                    View
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
