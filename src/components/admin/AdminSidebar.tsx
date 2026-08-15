@@ -19,6 +19,7 @@ import {
   BarChart3,
   Shield,
   Bell,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +62,12 @@ const NAV_ITEMS = [
     href: "/admin/reviews/responses",
     label: "Response Management",
     icon: Bell,
+    exact: false,
+  },
+  {
+    href: "/admin/reviews/advanced",
+    label: "Advanced Features",
+    icon: Zap,
     exact: false,
   },
   { href: "/admin/reports", label: "Reports", icon: Flag, exact: false },
