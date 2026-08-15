@@ -426,11 +426,12 @@ model User {
   adminActionLogs  AdminActionLog[]
   eventModerations EventModeration[] @relation("EventModerationAdmin")
 
-  gigReviews       GigReview[]
-  eventReviews     EventReview[]
-  bookingInquiries BookingInquiry[]
-  venueReviews     VenueReview[]
-  djGigReviews     DjGigReview[]
+  gigReviews           GigReview[]
+  eventReviews         EventReview[]
+  bookingInquiries     BookingInquiry[]
+  venueReviews         VenueReview[]
+  djGigReviews         DjGigReview[]
+  djRatingHelpfulVotes DjRatingHelpfulVote[]
 
   @@index([status])
   @@index([deletedAt])
@@ -914,6 +915,14 @@ model DjRating {
   event      Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
   reviewType DjRatingType? // DIRECT, EVENT_ATTENDEE, EVENT_ORGANIZER
 
+  // Review helpfulness
+  helpfulCount Int                   @default(0)
+  helpfulVotes DjRatingHelpfulVote[]
+
+  // DJ response to review
+  response    String?
+  respondedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -921,6 +930,22 @@ model DjRating {
   @@index([djProfileId, createdAt])
   @@index([eventId])
   @@index([reviewType])
+  @@index([helpfulCount])
+  @@index([respondedAt])
+}
+
+// Review helpfulness votes
+model DjRatingHelpfulVote {
+  id        Int      @id @default(autoincrement())
+  ratingId  Int
+  rating    DjRating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([ratingId, userId])
+  @@index([ratingId])
+  @@index([userId])
 }
 
 // ------ DJ PROFILE COMMENTS ------
