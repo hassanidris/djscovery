@@ -1,11 +1,24 @@
 # Event-Anchored Reviews Phase 5: Notification Flow
 
 ## Overview
+
 Phase 5 implements notification triggers for completed events and gigs, with deep links to dedicated review pages and spam prevention through notification tracking.
 
 ## Implementation Summary
 
+### ESLint Fix
+
+**Issue**: `react-hooks/purity` rule flagged `Date.now()` usage in server component render as impure function.
+
+**Solution**: Moved time-sensitive logic (review window calculation, days remaining) to a client component `ReviewWindowClient.tsx`. This:
+
+- Eliminates `Date.now()` usage in server component
+- Follows React best practices for time-dependent UI
+- Allows dynamic countdown on client side
+- Passes serializable props (ISO date strings) from server to client
+
 ### 5.1 Event Review Notifications
+
 **Status**: ✅ Complete
 
 - **Created dedicated review page**: `/events/[slug]/dj-review/page.tsx`
@@ -26,6 +39,7 @@ Phase 5 implements notification triggers for completed events and gigs, with dee
   - Added DJ names to notification data for personalization
 
 ### 5.2 Gig Review Notifications
+
 **Status**: ✅ Complete
 
 - **Updated gig completion logic**: `src/lib/actions/gigs.ts`
@@ -38,6 +52,7 @@ Phase 5 implements notification triggers for completed events and gigs, with dee
   - Updated deep link to point to `/gigs/[slug]/dj-review` (existing page)
 
 ### 5.3 Notification Tracking
+
 **Status**: ✅ Complete
 
 - **Database schema**: Added `ReviewNotificationTracking` model
@@ -66,13 +81,16 @@ Phase 5 implements notification triggers for completed events and gigs, with dee
 ## Files Created/Modified
 
 ### New Files
+
 - `src/app/events/[slug]/dj-review/page.tsx` - Event DJ review page
 - `src/app/events/[slug]/dj-review/loading.tsx` - Loading state
+- `src/components/reviews/ReviewWindowClient.tsx` - Client component for time-sensitive UI
 - `src/lib/actions/review-notification-tracking.ts` - Notification tracking actions
 - `src/components/notifications/ReviewNotificationActions.tsx` - Action buttons
 - `prisma/migrations/manual_add_review_notification_tracking.sql` - DB migration
 
 ### Modified Files
+
 - `prisma/schema.prisma` - Added ReviewNotificationTracking model
 - `src/app/api/cron/complete-events/route.ts` - Event completion with tracking
 - `src/lib/actions/gigs.ts` - Gig completion with tracking
@@ -83,6 +101,7 @@ Phase 5 implements notification triggers for completed events and gigs, with dee
 ## Database Changes
 
 ### New Table: ReviewNotificationTracking
+
 ```sql
 CREATE TABLE "ReviewNotificationTracking" (
     "id" SERIAL PRIMARY KEY,
@@ -98,12 +117,14 @@ CREATE TABLE "ReviewNotificationTracking" (
 ```
 
 ### Indexes
+
 - `ReviewNotificationTracking_userId_idx` on `userId`
 - `ReviewNotificationTracking_targetType_targetId_idx` on `targetType, targetId`
 
 ## Notification Flow
 
 ### Event Completion Flow
+
 1. Cron job marks event as COMPLETED
 2. Auto-transitions GOING → ATTENDED for attendees
 3. For each ATTENDED attendee:
@@ -117,6 +138,7 @@ CREATE TABLE "ReviewNotificationTracking" (
    - Click "Dismiss" to prevent future notifications
 
 ### Gig Completion Flow
+
 1. Organizer marks gig as COMPLETED
 2. Check if organizer previously dismissed (skip if dismissed)
 3. Create/update ReviewNotificationTracking record
@@ -130,6 +152,7 @@ CREATE TABLE "ReviewNotificationTracking" (
 ## Testing Recommendations
 
 ### Manual Testing
+
 1. **Event Review Notifications**
    - Create an event with attendees
    - Wait for event to complete (or manually set status)
@@ -147,6 +170,7 @@ CREATE TABLE "ReviewNotificationTracking" (
    - Verify dismissed organizers don't receive new notifications
 
 ### Automated Testing
+
 - Add tests for notification tracking actions
 - Add tests for notification filtering logic
 - Add tests for review page authentication and authorization
@@ -155,6 +179,7 @@ CREATE TABLE "ReviewNotificationTracking" (
 ## Deployment Notes
 
 ### Pre-deployment Checklist
+
 - [x] Database schema updated
 - [x] Prisma client regenerated
 - [x] Type checking passes
@@ -163,6 +188,7 @@ CREATE TABLE "ReviewNotificationTracking" (
 - [ ] Verify cron job configuration
 
 ### Migration Steps
+
 1. Run `npx prisma db push` to sync schema
 2. Run manual migration SQL if needed:
    ```bash
@@ -173,7 +199,9 @@ CREATE TABLE "ReviewNotificationTracking" (
 5. Monitor notification delivery
 
 ### Rollback Plan
+
 If issues arise:
+
 1. Revert code changes
 2. Remove ReviewNotificationTracking table (cascade deletes to User)
 3. Remove notification tracking logic from completion flows
@@ -182,6 +210,7 @@ If issues arise:
 ## Next Steps
 
 ### Phase 6 Potential Enhancements
+
 - Email notifications for review reminders
 - Scheduled reminder cron jobs (e.g., 7 days before deadline)
 - Analytics on notification conversion rates
@@ -189,6 +218,7 @@ If issues arise:
 - Bulk dismissal for multiple notifications
 
 ### Monitoring
+
 - Track notification delivery rates
 - Monitor review page conversion from notifications
 - Track "remind me later" vs "dismiss" ratios
