@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { sendEmail } from "@/lib/email/sendEmail";
 import { rateLimit, rateLimitMessage } from "@/lib/rate-limit";
+import { cacheDelete } from "@/lib/cache";
 import {
   bookingInquiryReceivedHtml,
   bookingInquiryReceivedSubject,
@@ -527,6 +528,9 @@ export async function submitBookingInquiry(
 
   await revalidateInquirySurfaces();
 
+  // Invalidate DJ profile stats cache (booking inquiry created)
+  await cacheDelete(`dj_profile_stats:${payload.djProfileId}`).catch(() => {});
+
   return { success: true, data: { inquiryId: createdInquiry!.id } };
 }
 
@@ -658,6 +662,9 @@ export async function respondToBookingInquiry(
   });
 
   await revalidateInquirySurfaces();
+
+  // Invalidate DJ profile stats cache (booking inquiry status changed)
+  await cacheDelete(`dj_profile_stats:${inquiry.djProfileId}`).catch(() => {});
 
   return { success: true, data: { status: newStatus } };
 }
