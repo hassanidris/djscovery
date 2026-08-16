@@ -51,6 +51,7 @@ export async function toggleFollowDj(
       revalidatePath("/organizer/followed-djs");
       revalidatePath("/account/followed-djs");
       revalidatePath("/fan/followed-djs");
+      await cacheDelete(`dj_profile_stats:${djProfileId}`).catch(() => {});
       return { following: false };
     }
 
@@ -66,6 +67,7 @@ export async function toggleFollowDj(
     revalidatePath("/organizer/followed-djs");
     revalidatePath("/account/followed-djs");
     revalidatePath("/fan/followed-djs");
+    await cacheDelete(`dj_profile_stats:${djProfileId}`).catch(() => {});
 
     // Send email notification to DJ
     try {

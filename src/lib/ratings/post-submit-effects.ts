@@ -48,6 +48,11 @@ export async function runPostSubmitEffects(input: PostSubmitEffectsInput) {
     );
   }
 
+  // Invalidate DJ rating analytics cache (new review added)
+  await cacheDelete(`dj_rating_analytics:${djProfileId}`).catch(() => {});
+  // Invalidate DJ profile stats cache (new review added)
+  await cacheDelete(`dj_profile_stats:${djProfileId}`).catch(() => {});
+
   if (input.created) {
     try {
       await prisma.notification.create({
