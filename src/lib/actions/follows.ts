@@ -5,10 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { sendEmail } from "@/lib/email/send";
 import type { DjFollowData } from "@/lib/email/types";
+import { cacheGet, cacheSet, cacheDelete } from "@/lib/cache";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 const FOLLOWS_LIMIT = 200;
 const SAVES_LIMIT = 50;
+const SAVED_EVENTS_TTL = 300;
 
 // -------------------------------------------------------
 // Auth helper
@@ -49,6 +51,7 @@ export async function toggleFollowDj(
       revalidatePath("/organizer/followed-djs");
       revalidatePath("/account/followed-djs");
       revalidatePath("/fan/followed-djs");
+      await cacheDelete(`dj_profile_stats:${djProfileId}`).catch(() => {});
       return { following: false };
     }
 
@@ -64,6 +67,7 @@ export async function toggleFollowDj(
     revalidatePath("/organizer/followed-djs");
     revalidatePath("/account/followed-djs");
     revalidatePath("/fan/followed-djs");
+    await cacheDelete(`dj_profile_stats:${djProfileId}`).catch(() => {});
 
     // Send email notification to DJ
     try {
@@ -233,6 +237,7 @@ export async function toggleSaveEvent(
       revalidatePath("/account");
       revalidatePath("/organizer/saved-events");
       revalidatePath("/fan/saved-events");
+      await cacheDelete(`saved_events:user:${userId}`).catch(() => {});
       return { saved: false };
     }
 
@@ -249,6 +254,7 @@ export async function toggleSaveEvent(
     revalidatePath("/account");
     revalidatePath("/organizer/saved-events");
     revalidatePath("/fan/saved-events");
+    await cacheDelete(`saved_events:user:${userId}`).catch(() => {});
     return { saved: true };
   } catch {
     return { saved: false, error: "Something went wrong. Please try again." };
@@ -277,12 +283,19 @@ export async function getSavedEventIds(): Promise<number[]> {
     return [];
   }
 
+  const cacheKey = `saved_events:user:${userId}`;
+  const cached = await cacheGet<number[]>(cacheKey);
+  if (cached) return cached;
+
   const rows = await prisma.savedEvent.findMany({
     where: { userId },
     select: { eventId: true },
     orderBy: { createdAt: "desc" },
   });
-  return rows.map((r) => r.eventId);
+  const result = rows.map((r) => r.eventId);
+
+  await cacheSet(cacheKey, result, SAVED_EVENTS_TTL);
+  return result;
 }
 
 export async function getSavedEvents() {
@@ -346,6 +359,7 @@ export async function removeSavedEvent(
     revalidatePath("/account");
     revalidatePath("/organizer/saved-events");
     revalidatePath("/fan/saved-events");
+    await cacheDelete(`saved_events:user:${userId}`).catch(() => {});
     return {};
   } catch {
     return { error: "Something went wrong. Please try again." };

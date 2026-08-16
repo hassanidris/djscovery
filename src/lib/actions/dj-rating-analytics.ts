@@ -3,6 +3,9 @@
 import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import { ActionResult, actionError, actionSuccess } from "./action-result";
+import { cacheGet, cacheSet, cacheDelete } from "@/lib/cache";
+
+const DJ_RATING_ANALYTICS_TTL = 300;
 
 export interface ReviewAnalyticsData {
   totalReviews: number;
@@ -43,6 +46,10 @@ export async function getDjRatingAnalytics(
   if (djProfile.userId !== user.id) {
     return actionError("You can only view analytics for your own profile");
   }
+
+  const cacheKey = `dj_rating_analytics:${djProfileId}`;
+  const cached = await cacheGet<ReviewAnalyticsData>(cacheKey);
+  if (cached) return actionSuccess(cached);
 
   // Fetch all ratings for this DJ
   const ratings = await prisma.djRating.findMany({
@@ -131,7 +138,7 @@ export async function getDjRatingAnalytics(
     recentTrend = "down";
   }
 
-  return actionSuccess({
+  const result = {
     totalReviews,
     averageRating: parseFloat(averageRating),
     directCount,
@@ -141,5 +148,8 @@ export async function getDjRatingAnalytics(
     recentTrend,
     helpfulCount,
     reviewTypeBreakdown,
-  });
+  };
+
+  await cacheSet(cacheKey, result, DJ_RATING_ANALYTICS_TTL);
+  return actionSuccess(result);
 }

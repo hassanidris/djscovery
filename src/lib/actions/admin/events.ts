@@ -3,6 +3,7 @@
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { revalidatePath } from "next/cache";
+import { cacheDelete } from "@/lib/cache";
 
 type ActionResult = { success: true } | { error: string };
 
@@ -33,6 +34,11 @@ export async function hideEvent(formData: FormData): Promise<ActionResult> {
 
     revalidatePath("/admin/events");
     revalidatePath(`/events/${event.slug}`);
+
+    // Invalidate homepage event caches
+    await cacheDelete("trending_events:homepage:6").catch(() => {});
+    await cacheDelete("new_events:homepage:6").catch(() => {});
+
     return { success: true };
   } catch {
     return { error: "Failed to hide event" };
@@ -66,6 +72,11 @@ export async function unhideEvent(formData: FormData): Promise<ActionResult> {
 
     revalidatePath("/admin/events");
     revalidatePath(`/events/${event.slug}`);
+
+    // Invalidate homepage event caches
+    await cacheDelete("trending_events:homepage:6").catch(() => {});
+    await cacheDelete("new_events:homepage:6").catch(() => {});
+
     return { success: true };
   } catch {
     return { error: "Failed to unhide event" };

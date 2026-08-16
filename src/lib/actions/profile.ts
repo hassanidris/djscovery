@@ -17,6 +17,7 @@ import {
   adminDjRegistrationHtml,
 } from "@/lib/email/templates/adminDjRegistration";
 import { updateReputationScore } from "@/lib/reputation/update";
+import { cacheDelete } from "@/lib/cache";
 
 function makeSlugBase(stageName: string) {
   return stageName
@@ -754,6 +755,10 @@ export async function updateDjProfile(
     // Revalidate cached pages
     revalidatePath(`/djs/${existing.slug}`);
     revalidatePath("/directory");
+
+    // Invalidate homepage DJ caches (profile update can affect featured/trending status)
+    await cacheDelete("featured_djs:homepage").catch(() => {});
+    await cacheDelete("trending_djs:homepage").catch(() => {});
 
     return { success: true as const, ...(slugChanged && { newSlug }) };
   } catch {

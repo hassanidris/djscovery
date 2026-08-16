@@ -2,6 +2,10 @@
 
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const SENTIMENT_STATS_TTL = 180;
+const SENTIMENT_TRENDS_TTL = 180;
 
 export interface SentimentAnalysisResult {
   reviewId: number;
@@ -206,8 +210,8 @@ export async function analyzeReviewSentiment(
       review.rating >= 4
         ? "positive"
         : review.rating <= 2
-        ? "negative"
-        : "neutral";
+          ? "negative"
+          : "neutral";
     const score = (review.rating - 3) / 2; // Convert 1-5 to -1 to 1
 
     return {
@@ -267,17 +271,32 @@ export async function batchAnalyzeSentiment(
   return results;
 }
 
-export async function getSentimentStats(
-  timeRangeDays = 30,
-): Promise<{
+export async function getSentimentStats(timeRangeDays = 30): Promise<{
   totalReviews: number;
   positiveCount: number;
   negativeCount: number;
   neutralCount: number;
   avgScore: number;
-  sentimentByRating: Record<number, { positive: number; negative: number; neutral: number }>;
+  sentimentByRating: Record<
+    number,
+    { positive: number; negative: number; neutral: number }
+  >;
 }> {
   await requireAdmin();
+
+  const cacheKey = `admin_sentiment_stats:${timeRangeDays}`;
+  const cached = await cacheGet<{
+    totalReviews: number;
+    positiveCount: number;
+    negativeCount: number;
+    neutralCount: number;
+    avgScore: number;
+    sentimentByRating: Record<
+      number,
+      { positive: number; negative: number; neutral: number }
+    >;
+  }>(cacheKey);
+  if (cached) return cached;
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - timeRangeDays);
@@ -288,14 +307,23 @@ export async function getSentimentStats(
     take: 1000,
   });
 
-  const sentimentResults = await batchAnalyzeSentiment(reviews.map((r) => r.id));
+  const sentimentResults = await batchAnalyzeSentiment(
+    reviews.map((r) => r.id),
+  );
 
-  const positiveCount = sentimentResults.filter((r) => r.sentiment === "positive").length;
-  const negativeCount = sentimentResults.filter((r) => r.sentiment === "negative").length;
-  const neutralCount = sentimentResults.filter((r) => r.sentiment === "neutral").length;
+  const positiveCount = sentimentResults.filter(
+    (r) => r.sentiment === "positive",
+  ).length;
+  const negativeCount = sentimentResults.filter(
+    (r) => r.sentiment === "negative",
+  ).length;
+  const neutralCount = sentimentResults.filter(
+    (r) => r.sentiment === "neutral",
+  ).length;
 
   const totalScore = sentimentResults.reduce((sum, r) => sum + r.score, 0);
-  const avgScore = sentimentResults.length > 0 ? totalScore / sentimentResults.length : 0;
+  const avgScore =
+    sentimentResults.length > 0 ? totalScore / sentimentResults.length : 0;
 
   // Sentiment by rating
   const sentimentByRating: Record<
@@ -314,7 +342,7 @@ export async function getSentimentStats(
     sentimentByRating[rating][sentiment]++;
   }
 
-  return {
+  const result = {
     totalReviews: reviews.length,
     positiveCount,
     negativeCount,
@@ -322,11 +350,12 @@ export async function getSentimentStats(
     avgScore,
     sentimentByRating,
   };
+
+  await cacheSet(cacheKey, result, SENTIMENT_STATS_TTL);
+  return result;
 }
 
-export async function getSentimentTrends(
-  timeRangeDays = 30,
-): Promise<{
+export async function getSentimentTrends(timeRangeDays = 30): Promise<{
   daily: {
     date: string;
     positive: number;
@@ -336,6 +365,18 @@ export async function getSentimentTrends(
   }[];
 }> {
   await requireAdmin();
+
+  const cacheKey = `admin_sentiment_trends:${timeRangeDays}`;
+  const cached = await cacheGet<{
+    daily: {
+      date: string;
+      positive: number;
+      negative: number;
+      neutral: number;
+      avgScore: number;
+    }[];
+  }>(cacheKey);
+  if (cached) return cached;
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - timeRangeDays);
@@ -347,7 +388,9 @@ export async function getSentimentTrends(
     take: 1000,
   });
 
-  const sentimentResults = await batchAnalyzeSentiment(reviews.map((r) => r.id));
+  const sentimentResults = await batchAnalyzeSentiment(
+    reviews.map((r) => r.id),
+  );
 
   // Group by day
   const dailyMap = new Map<
@@ -380,5 +423,7 @@ export async function getSentimentTrends(
         : 0,
   }));
 
-  return { daily };
+  const result = { daily };
+  await cacheSet(cacheKey, result, SENTIMENT_TRENDS_TTL);
+  return result;
 }

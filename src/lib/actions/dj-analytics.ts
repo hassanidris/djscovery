@@ -2,6 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import { cacheGet, cacheSet, cacheDelete } from "@/lib/cache";
+
+const DJ_PROFILE_STATS_TTL = 300;
 
 export async function trackProfileView(
   djProfileId: number,
@@ -34,6 +37,11 @@ export async function trackProfileView(
     where: { id: djProfileId },
     data: { monthlyViews: { increment: 1 } },
   });
+
+  // Invalidate homepage trending DJs cache (monthlyViews change)
+  await cacheDelete("trending_djs:homepage").catch(() => {});
+  // Invalidate DJ profile stats cache (profile views change)
+  await cacheDelete(`dj_profile_stats:${djProfileId}`).catch(() => {});
 }
 
 export async function getProfileStats(djProfileId: number) {
@@ -49,6 +57,17 @@ export async function getProfileStats(djProfileId: number) {
   });
   if (!profile || profile.userId !== user.id) return null;
   if (profile.plan !== "PREMIUM") return null;
+
+  const cacheKey = `dj_profile_stats:${djProfileId}`;
+  const cached = await cacheGet<{
+    profileViews: { value: number; growth: number };
+    bookingRequests: { value: number; growth: number };
+    newFollowers: { value: number; growth: number };
+    bookingRate: number;
+    topCities: any[];
+    trafficSources: any[];
+  }>(cacheKey);
+  if (cached) return cached;
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -116,7 +135,7 @@ export async function getProfileStats(djProfileId: number) {
       ? Math.round((acceptedBookings / totalBookings) * 100)
       : 0;
 
-  return {
+  const result = {
     profileViews: { value: totalViews, growth: viewGrowth },
     bookingRequests: { value: totalBookings, growth: bookingGrowth },
     newFollowers: { value: totalFollowers, growth: followerGrowth },
@@ -124,4 +143,7 @@ export async function getProfileStats(djProfileId: number) {
     topCities: [],
     trafficSources: [],
   };
+
+  await cacheSet(cacheKey, result, DJ_PROFILE_STATS_TTL);
+  return result;
 }

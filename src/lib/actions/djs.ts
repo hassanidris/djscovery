@@ -2,6 +2,10 @@
 
 import prisma from "@/lib/client";
 import { PREMIUM_DEMO_DJS } from "@/data/djs";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const FEATURED_DJS_TTL = 900;
+const TRENDING_DJS_TTL = 900;
 
 export type FeaturedDj = {
   id: number;
@@ -50,6 +54,10 @@ export async function getFeaturedDJs(): Promise<FeaturedDj[]> {
     return demoDJs;
   }
 
+  const cacheKey = "featured_djs:homepage";
+  const cached = await cacheGet<FeaturedDj[]>(cacheKey);
+  if (cached) return cached;
+
   const featuredDJs = await prisma.djProfile.findMany({
     where: {
       OR: [
@@ -87,6 +95,7 @@ export async function getFeaturedDJs(): Promise<FeaturedDj[]> {
     }),
   );
 
+  await cacheSet(cacheKey, djsWithAvg, FEATURED_DJS_TTL);
   return djsWithAvg;
 }
 
@@ -131,6 +140,10 @@ export async function getTrendingDJs(): Promise<TrendingDj[]> {
     return demoDJs;
   }
 
+  const cacheKey = "trending_djs:homepage";
+  const cached = await cacheGet<TrendingDj[]>(cacheKey);
+  if (cached) return cached;
+
   const trendingDJs = await prisma.djProfile.findMany({
     where: {
       status: "APPROVED",
@@ -164,5 +177,6 @@ export async function getTrendingDJs(): Promise<TrendingDj[]> {
     }),
   );
 
+  await cacheSet(cacheKey, djsWithAvg, TRENDING_DJS_TTL);
   return djsWithAvg;
 }

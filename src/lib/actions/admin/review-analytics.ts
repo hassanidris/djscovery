@@ -2,6 +2,9 @@
 
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const REVIEW_ANALYTICS_TTL = 120;
 
 export interface ReviewAnalyticsData {
   overview: {
@@ -59,6 +62,10 @@ export async function getReviewAnalytics(
   timeRange: "7d" | "30d" | "90d" = "30d",
 ): Promise<ReviewAnalyticsData> {
   await requireAdmin();
+
+  const cacheKey = `admin_review_analytics:${timeRange}`;
+  const cached = await cacheGet<ReviewAnalyticsData>(cacheKey);
+  if (cached) return cached;
 
   const now = new Date();
   const startDate = new Date();
@@ -369,7 +376,7 @@ export async function getReviewAnalytics(
     count: action._count,
   }));
 
-  return {
+  const result: ReviewAnalyticsData = {
     overview: {
       totalReviews,
       averageRating,
@@ -414,4 +421,7 @@ export async function getReviewAnalytics(
       moderationActions,
     },
   };
+
+  await cacheSet(cacheKey, result, REVIEW_ANALYTICS_TTL);
+  return result;
 }

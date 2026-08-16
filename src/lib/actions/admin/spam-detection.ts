@@ -2,6 +2,9 @@
 
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const SPAM_STATS_TTL = 180;
 
 export interface SpamDetectionResult {
   reviewId: number;
@@ -256,6 +259,15 @@ export async function getSpamStats(): Promise<{
 }> {
   await requireAdmin();
 
+  const cacheKey = "admin_spam_stats";
+  const cached = await cacheGet<{
+    totalReviews: number;
+    detectedSpam: number;
+    spamByType: Record<string, number>;
+    avgConfidence: number;
+  }>(cacheKey);
+  if (cached) return cached;
+
   const totalReviews = await prisma.djRating.count();
 
   // Get all reviews and analyze them
@@ -279,12 +291,15 @@ export async function getSpamStats(): Promise<{
 
   const avgConfidence = detectedSpam > 0 ? totalConfidence / detectedSpam : 0;
 
-  return {
+  const result = {
     totalReviews,
     detectedSpam,
     spamByType,
     avgConfidence,
   };
+
+  await cacheSet(cacheKey, result, SPAM_STATS_TTL);
+  return result;
 }
 
 export async function markAsSpam(

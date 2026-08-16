@@ -2,6 +2,9 @@
 
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const DASHBOARD_STATS_TTL = 60;
 
 export interface DashboardReviewStats {
   pendingModeration: number;
@@ -28,6 +31,10 @@ export interface DashboardReviewStats {
 
 export async function getDashboardReviewStats(): Promise<DashboardReviewStats> {
   await requireAdmin();
+
+  const cacheKey = "admin_dashboard_review_stats";
+  const cached = await cacheGet<DashboardReviewStats>(cacheKey);
+  if (cached) return cached;
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -95,7 +102,7 @@ export async function getDashboardReviewStats(): Promise<DashboardReviewStats> {
     }),
   ]);
 
-  return {
+  const result = {
     pendingModeration,
     suspiciousReviews,
     unrespondedReviews,
@@ -103,4 +110,7 @@ export async function getDashboardReviewStats(): Promise<DashboardReviewStats> {
     averageRating: averageRatingResult._avg.rating || 0,
     recentReviews,
   };
+
+  await cacheSet(cacheKey, result, DASHBOARD_STATS_TTL);
+  return result;
 }
