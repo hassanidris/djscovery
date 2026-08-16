@@ -2,6 +2,7 @@ import prisma from "@/lib/client";
 import { createClient } from "@supabase/supabase-js";
 import { calculateReputationScore } from "./calculate";
 import { updateSearchScore } from "@/lib/search/composite-score";
+import { cacheDelete } from "@/lib/cache";
 
 export async function updateReputationScore(
   djProfileId: number,
@@ -104,4 +105,8 @@ export async function updateReputationScore(
   }
 
   await updateSearchScore(djProfileId);
+
+  // Invalidate homepage DJ caches (reputation score changes can affect featured/trending status)
+  await cacheDelete("featured_djs:homepage").catch(() => {});
+  await cacheDelete("trending_djs:homepage").catch(() => {});
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import { cacheDelete } from "@/lib/cache";
 
 export async function POST(req: NextRequest) {
   try {
@@ -86,6 +87,9 @@ export async function POST(req: NextRequest) {
       where: { id: djProfileId },
       data: { monthlyViews: { increment: 1 } },
     });
+
+    // Invalidate homepage trending DJs cache (monthlyViews change)
+    await cacheDelete("trending_djs:homepage").catch(() => {});
 
     // Set cookie to prevent duplicate tracking for 1 hour
     const response = NextResponse.json({ success: true });

@@ -1,4 +1,24 @@
 import prisma from "@/lib/client";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const TRENDING_EVENTS_TTL = 300;
+const NEW_EVENTS_TTL = 300;
+
+export type TrendingEvent = {
+  id: number;
+  slug: string;
+  title: string;
+  eventType: string;
+  category: string;
+  startDate: Date;
+  posterUrl: string | null;
+  location: string;
+  djName: string;
+  djSlug: string;
+  isDemo: boolean;
+};
+
+export type NewEvent = TrendingEvent;
 
 // ============================================================
 // FAN — ATTENDED EVENTS WITH PENDING DJ REVIEWS
@@ -98,7 +118,7 @@ export type AttendedEventWithPendingReview = Awaited<
 // Upcoming events sorted by popularity (views + attendance)
 // ============================================================
 
-export async function getTrendingEvents(limit = 6) {
+export async function getTrendingEvents(limit = 6): Promise<TrendingEvent[]> {
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
 
   if (isStaging) {
@@ -112,8 +132,8 @@ export async function getTrendingEvents(limit = 6) {
         id: 0,
         slug: e.slug,
         title: e.title,
-        eventType: e.eventType,
-        category: e.category,
+        eventType: e.eventType ?? "",
+        category: e.category ?? "",
         startDate: e.eventDate,
         posterUrl: e.posterUrl ?? null,
         location: [e.city, e.country].filter(Boolean).join(", "),
@@ -129,6 +149,10 @@ export async function getTrendingEvents(limit = 6) {
   }
 
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const cacheKey = `trending_events:homepage:${limit}`;
+  const cached = await cacheGet<TrendingEvent[]>(cacheKey);
+  if (cached) return cached;
 
   const events = await prisma.event.findMany({
     where: {
@@ -160,12 +184,12 @@ export async function getTrendingEvents(limit = 6) {
     take: limit,
   });
 
-  return events.map((e) => ({
+  const result = events.map((e) => ({
     id: e.id,
     slug: e.slug,
     title: e.title,
-    eventType: e.eventType,
-    category: e.category,
+    eventType: e.eventType ?? "",
+    category: e.category ?? "",
     startDate: e.startDate,
     posterUrl: e.posterUrl,
     location: [e.city?.name, e.country?.name].filter(Boolean).join(", "),
@@ -173,18 +197,17 @@ export async function getTrendingEvents(limit = 6) {
     djSlug: e.ownerDj.slug,
     isDemo: false,
   }));
-}
 
-export type TrendingEvent = Awaited<
-  ReturnType<typeof getTrendingEvents>
->[number];
+  await cacheSet(cacheKey, result, TRENDING_EVENTS_TTL);
+  return result;
+}
 
 // ============================================================
 // HOMEPAGE — NEW EVENTS
 // Recently published upcoming events
 // ============================================================
 
-export async function getNewEvents(limit = 6) {
+export async function getNewEvents(limit = 6): Promise<NewEvent[]> {
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
 
   if (isStaging) {
@@ -198,8 +221,8 @@ export async function getNewEvents(limit = 6) {
         id: 0,
         slug: e.slug,
         title: e.title,
-        eventType: e.eventType,
-        category: e.category,
+        eventType: e.eventType ?? "",
+        category: e.category ?? "",
         startDate: e.eventDate,
         posterUrl: e.posterUrl ?? null,
         location: [e.city, e.country].filter(Boolean).join(", "),
@@ -215,6 +238,10 @@ export async function getNewEvents(limit = 6) {
   }
 
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const cacheKey = `new_events:homepage:${limit}`;
+  const cached = await cacheGet<NewEvent[]>(cacheKey);
+  if (cached) return cached;
 
   const events = await prisma.event.findMany({
     where: {
@@ -241,12 +268,12 @@ export async function getNewEvents(limit = 6) {
     take: limit,
   });
 
-  return events.map((e) => ({
+  const result = events.map((e) => ({
     id: e.id,
     slug: e.slug,
     title: e.title,
-    eventType: e.eventType,
-    category: e.category,
+    eventType: e.eventType ?? "",
+    category: e.category ?? "",
     startDate: e.startDate,
     posterUrl: e.posterUrl,
     location: [e.city?.name, e.country?.name].filter(Boolean).join(", "),
@@ -254,9 +281,10 @@ export async function getNewEvents(limit = 6) {
     djSlug: e.ownerDj.slug,
     isDemo: false,
   }));
-}
 
-export type NewEvent = Awaited<ReturnType<typeof getNewEvents>>[number];
+  await cacheSet(cacheKey, result, NEW_EVENTS_TTL);
+  return result;
+}
 
 // ============================================================
 // DJ PROFILE — DJ'S EVENTS

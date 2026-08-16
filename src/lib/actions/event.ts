@@ -9,6 +9,7 @@ import { requireEventOwner } from "@/lib/auth/require-owner";
 import { sendEmail } from "@/lib/email/send";
 import type { NewEventData } from "@/lib/email/types";
 import { revalidatePath } from "next/cache";
+import { cacheDelete } from "@/lib/cache";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 
@@ -216,6 +217,10 @@ export async function createEvent(
   revalidatePath("/");
   revalidatePath(`/djs/${djProfile.slug}`);
 
+  // Invalidate homepage event caches
+  await cacheDelete("trending_events:homepage:6").catch(() => {});
+  await cacheDelete("new_events:homepage:6").catch(() => {});
+
   return { success: true, id: event.id, slug: event.slug };
 }
 
@@ -312,6 +317,10 @@ export async function updateEvent(
   revalidatePath(`/events/${updated.slug}`);
   revalidatePath("/events");
   revalidatePath("/");
+
+  // Invalidate homepage event caches
+  await cacheDelete("trending_events:homepage:6").catch(() => {});
+  await cacheDelete("new_events:homepage:6").catch(() => {});
 
   return { success: true, slug: updated.slug };
 }
@@ -422,6 +431,10 @@ export async function publishEvent(
   revalidatePath("/");
   revalidatePath("/sitemap");
 
+  // Invalidate homepage event caches
+  await cacheDelete("trending_events:homepage:6").catch(() => {});
+  await cacheDelete("new_events:homepage:6").catch(() => {});
+
   return { success: true, slug: updated.slug };
 }
 
@@ -440,6 +453,10 @@ export async function unpublishEvent(
     where: { id: eventId },
     data: { status: "DRAFT" },
   });
+
+  // Invalidate homepage event caches
+  await cacheDelete("trending_events:homepage:6").catch(() => {});
+  await cacheDelete("new_events:homepage:6").catch(() => {});
 
   return { success: true };
 }
@@ -470,6 +487,10 @@ export async function cancelEvent(
     where: { id: eventId },
     data: { status: "CANCELLED" },
   });
+
+  // Invalidate homepage event caches
+  await cacheDelete("trending_events:homepage:6").catch(() => {});
+  await cacheDelete("new_events:homepage:6").catch(() => {});
 
   return { success: true };
 }

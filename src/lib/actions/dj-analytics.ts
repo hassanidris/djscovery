@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
+import { cacheDelete } from "@/lib/cache";
 
 export async function trackProfileView(
   djProfileId: number,
@@ -34,6 +35,9 @@ export async function trackProfileView(
     where: { id: djProfileId },
     data: { monthlyViews: { increment: 1 } },
   });
+
+  // Invalidate homepage trending DJs cache (monthlyViews change)
+  await cacheDelete("trending_djs:homepage").catch(() => {});
 }
 
 export async function getProfileStats(djProfileId: number) {
