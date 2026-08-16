@@ -10,6 +10,7 @@ import {
   SuspendDjAccountSchema,
 } from "@/lib/validations/admin";
 import { revalidatePath } from "next/cache";
+import { cacheDelete } from "@/lib/cache";
 import { sendEmail } from "@/lib/email/sendEmail";
 import {
   profileApprovedSubject,
@@ -356,6 +357,11 @@ export async function toggleDjFeatured(
     revalidatePath("/admin/djs");
     revalidatePath("/");
     revalidatePath(`/djs/${profile.slug}`);
+
+    // Invalidate homepage DJ caches (featured status change)
+    await cacheDelete("featured_djs:homepage").catch(() => {});
+    await cacheDelete("trending_djs:homepage").catch(() => {});
+
     return { success: true };
   } catch {
     return { error: "Failed to toggle featured status" };

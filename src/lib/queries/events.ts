@@ -1,4 +1,8 @@
 import prisma from "@/lib/client";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const TRENDING_EVENTS_TTL = 300;
+const NEW_EVENTS_TTL = 300;
 
 // ============================================================
 // FAN — ATTENDED EVENTS WITH PENDING DJ REVIEWS
@@ -130,6 +134,11 @@ export async function getTrendingEvents(limit = 6) {
 
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
+  const cacheKey = `trending_events:homepage:${limit}`;
+  const cached =
+    await cacheGet<Awaited<ReturnType<typeof getTrendingEvents>>>(cacheKey);
+  if (cached) return cached;
+
   const events = await prisma.event.findMany({
     where: {
       status: "PUBLISHED",
@@ -160,7 +169,7 @@ export async function getTrendingEvents(limit = 6) {
     take: limit,
   });
 
-  return events.map((e) => ({
+  const result = events.map((e) => ({
     id: e.id,
     slug: e.slug,
     title: e.title,
@@ -173,6 +182,9 @@ export async function getTrendingEvents(limit = 6) {
     djSlug: e.ownerDj.slug,
     isDemo: false,
   }));
+
+  await cacheSet(cacheKey, result, TRENDING_EVENTS_TTL);
+  return result;
 }
 
 export type TrendingEvent = Awaited<
@@ -216,6 +228,11 @@ export async function getNewEvents(limit = 6) {
 
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
+  const cacheKey = `new_events:homepage:${limit}`;
+  const cached =
+    await cacheGet<Awaited<ReturnType<typeof getNewEvents>>>(cacheKey);
+  if (cached) return cached;
+
   const events = await prisma.event.findMany({
     where: {
       status: "PUBLISHED",
@@ -241,7 +258,7 @@ export async function getNewEvents(limit = 6) {
     take: limit,
   });
 
-  return events.map((e) => ({
+  const result = events.map((e) => ({
     id: e.id,
     slug: e.slug,
     title: e.title,
@@ -254,6 +271,9 @@ export async function getNewEvents(limit = 6) {
     djSlug: e.ownerDj.slug,
     isDemo: false,
   }));
+
+  await cacheSet(cacheKey, result, NEW_EVENTS_TTL);
+  return result;
 }
 
 export type NewEvent = Awaited<ReturnType<typeof getNewEvents>>[number];
