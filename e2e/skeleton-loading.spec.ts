@@ -177,6 +177,31 @@ async function unthrottleNetwork(client: any, handler: any, page: Page) {
  * catches the skeleton the instant it appears, no matter how quickly it is
  * later removed, and works reliably across all browsers.
  */
+async function getPeakCounts(
+  skeletonLocator: ReturnType<Page["locator"]>,
+  pulseLocator: ReturnType<Page["locator"]>,
+  sampleMs = 400,
+  intervalMs = 50,
+): Promise<[number, number]> {
+  const iterations = Math.max(1, Math.floor(sampleMs / intervalMs));
+  let maxSkeleton = 0;
+  let maxPulse = 0;
+  for (let i = 0; i < iterations; i++) {
+    try {
+      const [sCount, pCount] = await Promise.all([
+        skeletonLocator.count(),
+        pulseLocator.count(),
+      ]);
+      if (sCount > maxSkeleton) maxSkeleton = sCount;
+      if (pCount > maxPulse) maxPulse = pCount;
+    } catch {
+      // ignore count errors transiently
+    }
+    if (i < iterations - 1) await new Promise((r) => setTimeout(r, intervalMs));
+  }
+  return [maxSkeleton, maxPulse];
+}
+
 async function waitForSkeletonAppearance(
   page: Page,
   timeout = 8000,
@@ -222,13 +247,13 @@ async function waitForSkeletonAppearance(
     skeletonVisible = false;
   }
 
-  // Capture counts immediately after detection (or timeout) — as close to
-  // the moment of detection as possible to minimize the window in which the
-  // real content could have already replaced the skeleton.
-  [skeletonCount, pulseCount] = await Promise.all([
-    skeletonLocator.count(),
-    pulseLocator.count(),
-  ]);
+  // Poll for a short stabilization window and capture the peak counts observed.
+  // This guards against very short-lived attach/remove races where skeletons
+  // appear momentarily but are swapped into content before we snapshot counts.
+  [skeletonCount, pulseCount] = await getPeakCounts(
+    skeletonLocator,
+    pulseLocator,
+  );
 
   // If we detected an appearance but the counts have already dropped to
   // zero (content swapped in right after detection), still honor the
