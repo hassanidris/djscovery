@@ -139,11 +139,15 @@ async function unthrottleNetwork(client: any, handler: any, page: Page) {
       await page.unroute("**/*", handler);
     } catch (err: any) {
       // Some runtime states may remove the route already; ignore that case.
+      // Also ignore "Target page, context or browser has been closed" errors
+      // that occur when the page/browser is closed before cleanup completes.
       const msg = String(err?.message ?? err);
       if (
         !/No route/.test(msg) &&
         !/handler/.test(msg) &&
-        !/not found/.test(msg)
+        !/not found/.test(msg) &&
+        !/Target page/.test(msg) &&
+        !/closed/.test(msg)
       ) {
         throw err;
       }
