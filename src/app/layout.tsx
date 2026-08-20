@@ -50,8 +50,8 @@ export const metadata: Metadata = {
       "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
   },
   icons: {
-    icon: "/dj-logo.svg",
-    apple: "/dj-logo.svg",
+    icon: "/dj_logo_new.svg",
+    apple: "/dj_logo_new.svg",
   },
 
   // the below for no-indexing

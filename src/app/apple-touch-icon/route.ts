@@ -4,9 +4,9 @@ import path from "path";
 
 export async function GET() {
   try {
-    const svgPath = path.join(process.cwd(), "public", "dj-logo.svg");
+    const svgPath = path.join(process.cwd(), "public", "dj_logo_new.svg");
     const svgContent = await readFile(svgPath, "utf-8");
-    
+
     return new NextResponse(svgContent, {
       headers: {
         "Content-Type": "image/svg+xml",
