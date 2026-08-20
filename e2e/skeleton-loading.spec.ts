@@ -81,6 +81,17 @@ const PULSE_SELECTOR = ".animate-pulse";
  * which is the reliable way to catch Next.js streaming loading states.
  */
 async function throttleNetwork(page: Page) {
+  const browserName = page.context().browser()?.browserType().name();
+
+  // CDP is only available in Chromium
+  if (browserName !== "chromium") {
+    // For non-Chromium browsers, use Playwright's built-in network throttling
+    await page.route("**/*", (route) => {
+      setTimeout(() => route.continue(), 100);
+    });
+    return null; // Return null to indicate no CDP client
+  }
+
   const client = await page.context().newCDPSession(page);
   await client.send("Network.enable");
   await client.send("Network.emulateNetworkConditions", {
@@ -94,6 +105,7 @@ async function throttleNetwork(page: Page) {
 }
 
 async function unthrottleNetwork(client: any) {
+  if (client === null) return; // No-op for non-Chromium
   await client.send("Network.emulateNetworkConditions", {
     offline: false,
     downloadThroughput: -1,
@@ -137,7 +149,9 @@ async function navigateAndCheckSkeleton(
 
     return { skeletonVisible, skeletonCount, pulseCount };
   } finally {
-    await unthrottleNetwork(client);
+    if (client !== null) {
+      await unthrottleNetwork(client);
+    }
   }
 }
 
@@ -214,7 +228,9 @@ test.describe("admin table skeletons", () => {
       expect(skeletonVisible).toBe(true);
       expect(skeletonCount).toBeGreaterThan(0);
     } finally {
-      await unthrottleNetwork(client);
+      if (client !== null) {
+        await unthrottleNetwork(client);
+      }
     }
   });
 
@@ -231,7 +247,9 @@ test.describe("admin table skeletons", () => {
       const count = await h1s.count();
       expect(count).toBeLessThanOrEqual(1);
     } finally {
-      await unthrottleNetwork(client);
+      if (client !== null) {
+        await unthrottleNetwork(client);
+      }
     }
   });
 
@@ -841,7 +859,9 @@ test.describe("admin card skeletons", () => {
         await expect(pulse).toBeVisible();
       }
     } finally {
-      await unthrottleNetwork(client);
+      if (client !== null) {
+        await unthrottleNetwork(client);
+      }
     }
   });
 
@@ -869,7 +889,9 @@ test.describe("admin card skeletons", () => {
         expect(className).toMatch(/bg-(muted|white\/)/);
       }
     } finally {
-      await unthrottleNetwork(client);
+      if (client !== null) {
+        await unthrottleNetwork(client);
+      }
     }
   });
 
@@ -885,7 +907,9 @@ test.describe("admin card skeletons", () => {
       const count = await h1s.count();
       expect(count).toBeLessThanOrEqual(1);
     } finally {
-      await unthrottleNetwork(client);
+      if (client !== null) {
+        await unthrottleNetwork(client);
+      }
     }
   });
 
@@ -911,7 +935,9 @@ test.describe("admin card skeletons", () => {
       expect(total).toBeGreaterThan(5);
       expect(total).toBeLessThan(200);
     } finally {
-      await unthrottleNetwork(client);
+      if (client !== null) {
+        await unthrottleNetwork(client);
+      }
     }
   });
 });

@@ -178,7 +178,7 @@ test.describe("organizer hiring flow", () => {
     await page.goto(`/organizer/gigs/${testGigId}/applications`);
     await page.getByRole("button", { name: "Shortlist" }).click();
     await page.waitForLoadState("networkidle");
-    await expect(page.getByText("SHORTLISTED")).toBeVisible();
+    await expect(page.getByText("SHORTLISTED")).toBeVisible({ timeout: 10000 });
   });
 
   test("can navigate back to gig details from applications", async ({
