@@ -85,11 +85,23 @@ async function throttleNetwork(page: Page) {
 
   // CDP is only available in Chromium
   if (browserName !== "chromium") {
-    // For non-Chromium browsers, use Playwright's built-in network throttling
-    await page.route("**/*", (route) => {
-      setTimeout(() => route.continue(), 100);
-    });
-    return null; // Return null to indicate no CDP client
+    // For non-Chromium browsers, use Playwright's route interception and
+    // await delays before continuing requests. We delay navigation requests
+    // (document) more strongly so server-streaming skeletons have time to render.
+    const handler = async (route: any) => {
+      const req = route.request();
+      // Strong delay for the main navigation/document so skeleton appears
+      if (req.isNavigationRequest()) {
+        await new Promise((res) => setTimeout(res, 2000)); // match CDP latency
+        await route.continue();
+        return;
+      }
+      // Small delay for other resources (scripts, XHR, images)
+      await new Promise((res) => setTimeout(res, 100));
+      await route.continue();
+    };
+    await page.route("**/*", handler);
+    return { client: null, handler }; // Return handler for cleanup
   }
 
   const client = await page.context().newCDPSession(page);
@@ -101,10 +113,15 @@ async function throttleNetwork(page: Page) {
     uploadThroughput: 10 * 1024,
     latency: 2000,
   });
-  return client;
+  return { client, handler: null };
 }
 
-async function unthrottleNetwork(client: any) {
+async function unthrottleNetwork(client: any, handler: any, page: Page) {
+  if (client === null && handler !== null) {
+    // For non-Chromium, remove the route handler
+    await page.unroute("**/*", handler);
+    return;
+  }
   if (client === null) return; // No-op for non-Chromium
   await client.send("Network.emulateNetworkConditions", {
     offline: false,
@@ -132,7 +149,7 @@ async function navigateAndCheckSkeleton(
     await restoreAuthState(page, authState);
   }
 
-  const client = await throttleNetwork(page);
+  const { client, handler } = await throttleNetwork(page);
 
   try {
     // "commit" returns as soon as the response starts — the loading.tsx
@@ -140,7 +157,7 @@ async function navigateAndCheckSkeleton(
     await page.goto(url, { waitUntil: "commit", timeout: 60000 });
 
     // Give the browser a moment to parse the initial HTML chunk
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(700);
 
     // Check for skeleton elements
     const skeletonCount = await page.locator(SKELETON_SELECTOR).count();
@@ -149,9 +166,7 @@ async function navigateAndCheckSkeleton(
 
     return { skeletonVisible, skeletonCount, pulseCount };
   } finally {
-    if (client !== null) {
-      await unthrottleNetwork(client);
-    }
+    await unthrottleNetwork(client, handler, page);
   }
 }
 
@@ -168,20 +183,21 @@ async function navigateAndInspectSkeleton(
   skeletonCount: number;
   pulseCount: number;
   client: any;
+  handler: any;
 }> {
   if (authState) {
     await restoreAuthState(page, authState);
   }
 
-  const client = await throttleNetwork(page);
+  const { client, handler } = await throttleNetwork(page);
   await page.goto(url, { waitUntil: "commit", timeout: 30000 });
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(700);
 
   const skeletonCount = await page.locator(SKELETON_SELECTOR).count();
   const pulseCount = await page.locator(PULSE_SELECTOR).count();
   const skeletonVisible = skeletonCount > 0 || pulseCount > 0;
 
-  return { skeletonVisible, skeletonCount, pulseCount, client };
+  return { skeletonVisible, skeletonCount, pulseCount, client, handler };
 }
 
 /**
@@ -222,20 +238,18 @@ test.describe("admin table skeletons", () => {
   }, 120000);
 
   test("hires page shows table skeleton while loading", async ({ page }) => {
-    const { skeletonVisible, skeletonCount, client } =
+    const { skeletonVisible, skeletonCount, client, handler } =
       await navigateAndInspectSkeleton(page, "/admin/hires", adminAuthState!);
     try {
       expect(skeletonVisible).toBe(true);
       expect(skeletonCount).toBeGreaterThan(0);
     } finally {
-      if (client !== null) {
-        await unthrottleNetwork(client);
-      }
+      await unthrottleNetwork(client, handler, page);
     }
   });
 
   test("hires skeleton has no duplicate headers", async ({ page }) => {
-    const { client } = await navigateAndInspectSkeleton(
+    const { client, handler } = await navigateAndInspectSkeleton(
       page,
       "/admin/hires",
       adminAuthState!,
@@ -247,9 +261,7 @@ test.describe("admin table skeletons", () => {
       const count = await h1s.count();
       expect(count).toBeLessThanOrEqual(1);
     } finally {
-      if (client !== null) {
-        await unthrottleNetwork(client);
-      }
+      await unthrottleNetwork(client, handler, page);
     }
   });
 
@@ -844,7 +856,7 @@ test.describe("admin card skeletons", () => {
   }, 120000);
 
   test("skeleton elements have pulse animation", async ({ page }) => {
-    const { skeletonVisible, skeletonCount, client } =
+    const { skeletonVisible, skeletonCount, client, handler } =
       await navigateAndInspectSkeleton(page, "/admin", adminAuthState!);
     expect(skeletonVisible).toBe(true);
     try {
@@ -859,9 +871,7 @@ test.describe("admin card skeletons", () => {
         await expect(pulse).toBeVisible();
       }
     } finally {
-      if (client !== null) {
-        await unthrottleNetwork(client);
-      }
+      await unthrottleNetwork(client, handler, page);
     }
   });
 
@@ -878,7 +888,7 @@ test.describe("admin card skeletons", () => {
   });
 
   test("skeleton uses dark theme colors", async ({ page }) => {
-    const { skeletonVisible, skeletonCount, client } =
+    const { skeletonVisible, skeletonCount, client, handler } =
       await navigateAndInspectSkeleton(page, "/admin/hires", adminAuthState!);
     expect(skeletonVisible).toBe(true);
     try {
@@ -889,14 +899,12 @@ test.describe("admin card skeletons", () => {
         expect(className).toMatch(/bg-(muted|white\/)/);
       }
     } finally {
-      if (client !== null) {
-        await unthrottleNetwork(client);
-      }
+      await unthrottleNetwork(client, handler, page);
     }
   });
 
   test("no flash of duplicate headers on admin hires", async ({ page }) => {
-    const { client } = await navigateAndInspectSkeleton(
+    const { client, handler } = await navigateAndInspectSkeleton(
       page,
       "/admin/hires",
       adminAuthState!,
@@ -907,9 +915,7 @@ test.describe("admin card skeletons", () => {
       const count = await h1s.count();
       expect(count).toBeLessThanOrEqual(1);
     } finally {
-      if (client !== null) {
-        await unthrottleNetwork(client);
-      }
+      await unthrottleNetwork(client, handler, page);
     }
   });
 
@@ -925,7 +931,7 @@ test.describe("admin card skeletons", () => {
   });
 
   test("skeleton count is reasonable (not too many)", async ({ page }) => {
-    const { skeletonVisible, skeletonCount, pulseCount, client } =
+    const { skeletonVisible, skeletonCount, pulseCount, client, handler } =
       await navigateAndInspectSkeleton(page, "/admin/hires", adminAuthState!);
     try {
       expect(skeletonVisible).toBe(true);
@@ -935,9 +941,7 @@ test.describe("admin card skeletons", () => {
       expect(total).toBeGreaterThan(5);
       expect(total).toBeLessThan(200);
     } finally {
-      if (client !== null) {
-        await unthrottleNetwork(client);
-      }
+      await unthrottleNetwork(client, handler, page);
     }
   });
 });
