@@ -164,6 +164,73 @@ async function unthrottleNetwork(client: any, handler: any, page: Page) {
 }
 
 /**
+ * Reactively wait for a skeleton/pulse element to appear in the DOM, instead
+ * of a fixed delay followed by a single snapshot. This is critical for
+ * non-Chromium browsers: Playwright's route interception can only delay
+ * *when* a request is dispatched, not the speed at which the response body
+ * arrives (unlike Chromium's CDP `Network.emulateNetworkConditions`, which
+ * throttles bandwidth). That means once a (possibly very fast) server
+ * response arrives, the loading skeleton can be swapped for real content in
+ * well under a second — a fixed "wait N ms then snapshot" check can easily
+ * land either before the skeleton has rendered or after it has already been
+ * replaced. Racing `waitFor({ state: "attached" })` against both selectors
+ * catches the skeleton the instant it appears, no matter how quickly it is
+ * later removed, and works reliably across all browsers.
+ */
+async function waitForSkeletonAppearance(
+  page: Page,
+  timeout = 8000,
+): Promise<{
+  skeletonVisible: boolean;
+  skeletonCount: number;
+  pulseCount: number;
+}> {
+  const skeletonLocator = page.locator(SKELETON_SELECTOR);
+  const pulseLocator = page.locator(PULSE_SELECTOR);
+
+  let skeletonVisible = false;
+  let skeletonCount = 0;
+  let pulseCount = 0;
+
+  try {
+    await Promise.race([
+      skeletonLocator
+        .first()
+        .waitFor({ state: "attached", timeout })
+        .then(() => {
+          skeletonVisible = true;
+        }),
+      pulseLocator
+        .first()
+        .waitFor({ state: "attached", timeout })
+        .then(() => {
+          skeletonVisible = true;
+        }),
+    ]);
+  } catch {
+    // Neither selector appeared within the timeout window.
+    skeletonVisible = false;
+  }
+
+  // Capture counts immediately after detection (or timeout) — as close to
+  // the moment of detection as possible to minimize the window in which the
+  // real content could have already replaced the skeleton.
+  [skeletonCount, pulseCount] = await Promise.all([
+    skeletonLocator.count(),
+    pulseLocator.count(),
+  ]);
+
+  // If we detected an appearance but the counts have already dropped to
+  // zero (content swapped in right after detection), still honor the
+  // detected visibility — we know for a fact the skeleton was rendered.
+  return {
+    skeletonVisible: skeletonVisible || skeletonCount > 0 || pulseCount > 0,
+    skeletonCount,
+    pulseCount,
+  };
+}
+
+/**
  * Navigate to a page with network throttled so the skeleton loading state
  * stays visible. Checks for skeleton elements (data-slot="skeleton" or
  * animate-pulse class). The throttle is REMOVED before returning.
@@ -188,15 +255,7 @@ async function navigateAndCheckSkeleton(
     // skeleton should be in the initial HTML
     await page.goto(url, { waitUntil: "commit", timeout: 60000 });
 
-    // Give the browser a moment to parse the initial HTML chunk
-    await page.waitForTimeout(1000);
-
-    // Check for skeleton elements
-    const skeletonCount = await page.locator(SKELETON_SELECTOR).count();
-    const pulseCount = await page.locator(PULSE_SELECTOR).count();
-    const skeletonVisible = skeletonCount > 0 || pulseCount > 0;
-
-    return { skeletonVisible, skeletonCount, pulseCount };
+    return await waitForSkeletonAppearance(page);
   } finally {
     await unthrottleNetwork(client, handler, page);
   }
@@ -223,11 +282,9 @@ async function navigateAndInspectSkeleton(
 
   const { client, handler } = await throttleNetwork(page);
   await page.goto(url, { waitUntil: "commit", timeout: 30000 });
-  await page.waitForTimeout(1000);
 
-  const skeletonCount = await page.locator(SKELETON_SELECTOR).count();
-  const pulseCount = await page.locator(PULSE_SELECTOR).count();
-  const skeletonVisible = skeletonCount > 0 || pulseCount > 0;
+  const { skeletonVisible, skeletonCount, pulseCount } =
+    await waitForSkeletonAppearance(page);
 
   return { skeletonVisible, skeletonCount, pulseCount, client, handler };
 }

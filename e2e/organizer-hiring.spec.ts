@@ -176,9 +176,23 @@ test.describe("organizer hiring flow", () => {
   test("can shortlist an applicant", async ({ page }) => {
     await restoreAuthState(page, organizerAuthState!);
     await page.goto(`/organizer/gigs/${testGigId}/applications`);
-    await page.getByRole("button", { name: "Shortlist" }).click();
-    await page.waitForLoadState("networkidle");
-    await expect(page.getByText("SHORTLISTED")).toBeVisible({ timeout: 20000 });
+
+    // Wait for the actual server action response rather than relying on the
+    // "networkidle" heuristic, which can resolve either too early (before the
+    // mutation's follow-up RSC refetch begins) or too late (if unrelated
+    // background requests, e.g. analytics, keep the network from going idle).
+    // The POST response is the deterministic signal that the mutation (and
+    // the resulting page re-render) has completed.
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        (res) => res.request().method() === "POST" && res.ok(),
+        { timeout: 20000 },
+      ),
+      page.getByRole("button", { name: "Shortlist" }).click(),
+    ]);
+    expect(response.ok()).toBe(true);
+
+    await expect(page.getByText("SHORTLISTED")).toBeVisible({ timeout: 10000 });
   });
 
   test("can navigate back to gig details from applications", async ({
