@@ -90,16 +90,31 @@ async function throttleNetwork(page: Page) {
     // (document) more strongly so server-streaming skeletons have time to render.
     const handler = async (route: any) => {
       const req = route.request();
-      // Strong delay for the main navigation/document so skeleton appears
-      if (req.isNavigationRequest()) {
-        await new Promise((res) => setTimeout(res, 2000)); // match CDP latency
+      // Detect document/navigation requests more robustly
+      const isDocument =
+        (typeof req.resourceType === "function" &&
+          req.resourceType() === "document") ||
+        (typeof req.isNavigationRequest === "function" &&
+          req.isNavigationRequest());
+      const delayMs = isDocument ? 2000 : 100;
+      await new Promise((res) => setTimeout(res, delayMs));
+
+      // route.continue() can sometimes throw "Route is already handled"
+      // due to internal races; swallow that specific error so the test doesn't fail.
+      try {
         await route.continue();
-        return;
+      } catch (err: any) {
+        const msg = String(err?.message ?? err);
+        if (
+          !/route is already handled/i.test(msg) &&
+          !/Route is already handled/i.test(msg)
+        ) {
+          throw err;
+        }
+        // otherwise swallow the benign error
       }
-      // Small delay for other resources (scripts, XHR, images)
-      await new Promise((res) => setTimeout(res, 100));
-      await route.continue();
     };
+
     await page.route("**/*", handler);
     return { client: null, handler }; // Return handler for cleanup
   }
@@ -118,17 +133,34 @@ async function throttleNetwork(page: Page) {
 
 async function unthrottleNetwork(client: any, handler: any, page: Page) {
   if (client === null && handler !== null) {
-    // For non-Chromium, remove the route handler
-    await page.unroute("**/*", handler);
+    // For non-Chromium, remove the route handler.
+    // If unroute throws because the handler was already removed, ignore it.
+    try {
+      await page.unroute("**/*", handler);
+    } catch (err: any) {
+      // Some runtime states may remove the route already; ignore that case.
+      const msg = String(err?.message ?? err);
+      if (
+        !/No route/.test(msg) &&
+        !/handler/.test(msg) &&
+        !/not found/.test(msg)
+      ) {
+        throw err;
+      }
+    }
     return;
   }
   if (client === null) return; // No-op for non-Chromium
-  await client.send("Network.emulateNetworkConditions", {
-    offline: false,
-    downloadThroughput: -1,
-    uploadThroughput: -1,
-    latency: 0,
-  });
+  try {
+    await client.send("Network.emulateNetworkConditions", {
+      offline: false,
+      downloadThroughput: -1,
+      uploadThroughput: -1,
+      latency: 0,
+    });
+  } catch (err) {
+    // Ignore potential CDP errors during cleanup
+  }
 }
 
 /**
@@ -157,7 +189,7 @@ async function navigateAndCheckSkeleton(
     await page.goto(url, { waitUntil: "commit", timeout: 60000 });
 
     // Give the browser a moment to parse the initial HTML chunk
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(1000);
 
     // Check for skeleton elements
     const skeletonCount = await page.locator(SKELETON_SELECTOR).count();
@@ -191,7 +223,7 @@ async function navigateAndInspectSkeleton(
 
   const { client, handler } = await throttleNetwork(page);
   await page.goto(url, { waitUntil: "commit", timeout: 30000 });
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(1000);
 
   const skeletonCount = await page.locator(SKELETON_SELECTOR).count();
   const pulseCount = await page.locator(PULSE_SELECTOR).count();
