@@ -12,6 +12,7 @@ import {
 } from "@/lib/actions/dj-rating-response";
 import { useUser } from "@/lib/supabase/useUser";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils/date";
 
 interface DjRatingResponseProps {
   ratingId: number;
@@ -163,7 +164,7 @@ export function DjRatingResponse({
           <p className="text-sm text-gray-300">{response}</p>
           {respondedAt && (
             <p className="mt-2 text-xs text-gray-500">
-              Responded {new Date(respondedAt).toLocaleDateString()}
+              Responded {formatDate(respondedAt)}
             </p>
           )}
         </div>

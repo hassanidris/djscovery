@@ -6,6 +6,8 @@ import { DjUser } from "@/lib/data";
 import SaveDjButton from "@/components/dj-profile/FollowDjButton";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
 import { formatNumber } from "@/lib/utils/currency";
+import { useMemo } from "react";
+import React from "react";
 
 const DjCard = ({
   username,
@@ -27,19 +29,22 @@ const DjCard = ({
   ratings = [],
 }: DjUser & { isFollowed?: boolean }) => {
   const profileHref = slug ? `/djs/${slug}` : `/profile/${username}`;
-  const genreList = genres
-    ? genres
-        .split(",")
-        .map((g) => g.trim())
-        .filter(Boolean)
-    : [];
 
-  const formatDjName = (name: string) => {
-    const normalized = name.trim();
+  const genreList = useMemo(() => {
+    return genres
+      ? genres
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean)
+      : [];
+  }, [genres]);
+
+  const formattedName = useMemo(() => {
+    const normalized = (stageName || username).trim();
     return /^[Dd][Jj]\.?\s/i.test(normalized)
       ? normalized
       : `Dj. ${normalized}`;
-  };
+  }, [stageName, username]);
 
   return (
     <div className="bg-h_blackLight/50 hover:ring-h_red hover:shadow-h_red/5 group relative flex flex-col gap-3 rounded-xl p-4 transition-all duration-200 hover:scale-[1.015] hover:shadow-lg hover:ring-1">
@@ -73,7 +78,7 @@ const DjCard = ({
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <h3 className="text-h_white truncate text-sm font-semibold">
-              {formatDjName(stageName || username)}
+              {formattedName}
             </h3>
             {status === "APPROVED" && (
               <span title="Admin approved">
@@ -137,4 +142,31 @@ const DjCard = ({
   );
 };
 
-export default DjCard;
+function areDjCardPropsEqual(
+  prevProps: DjUser & { isFollowed?: boolean },
+  nextProps: DjUser & { isFollowed?: boolean },
+): boolean {
+  return (
+    prevProps.username === nextProps.username &&
+    prevProps.stageName === nextProps.stageName &&
+    prevProps.avatar === nextProps.avatar &&
+    prevProps.genres === nextProps.genres &&
+    prevProps.country === nextProps.country &&
+    prevProps.city === nextProps.city &&
+    prevProps.slug === nextProps.slug &&
+    prevProps.isPremium === nextProps.isPremium &&
+    prevProps.isFeatured === nextProps.isFeatured &&
+    prevProps.status === nextProps.status &&
+    prevProps.djProfileId === nextProps.djProfileId &&
+    prevProps.isFollowed === nextProps.isFollowed &&
+    prevProps.reputationScore === nextProps.reputationScore &&
+    prevProps._count?.followers === nextProps._count?.followers &&
+    (prevProps.gigReviews?.length ?? 0) ===
+      (nextProps.gigReviews?.length ?? 0) &&
+    (prevProps.eventReviews?.length ?? 0) ===
+      (nextProps.eventReviews?.length ?? 0) &&
+    (prevProps.ratings?.length ?? 0) === (nextProps.ratings?.length ?? 0)
+  );
+}
+
+export default React.memo(DjCard, areDjCardPropsEqual);

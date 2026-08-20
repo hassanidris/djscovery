@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { DjUser } from "@/lib/data";
 import { useFollowedDjIds } from "@/hooks/useFollowedDjIds";
 import DjCard from "./DjCard";
@@ -15,14 +15,25 @@ const DjGrid = ({ djs }: DjGridProps) => {
   // Fetched client-side so the parent /directory page stays a static,
   // ISR-cached shell with no auth/cookie reads.
   const followedDjIds = useFollowedDjIds();
-  const followedSet = new Set(followedDjIds);
+  const followedSet = useMemo(() => new Set(followedDjIds), [followedDjIds]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [prevDjs, setPrevDjs] = useState(djs);
 
+  // Reset pagination when djs array changes
   if (prevDjs !== djs) {
     setPrevDjs(djs);
     setVisibleCount(PAGE_SIZE);
   }
+
+  const visible = useMemo(
+    () => djs.slice(0, visibleCount),
+    [djs, visibleCount],
+  );
+  const hasMore = visibleCount < djs.length;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((c) => c + PAGE_SIZE);
+  }, []);
 
   if (djs.length === 0) {
     return (
@@ -32,9 +43,6 @@ const DjGrid = ({ djs }: DjGridProps) => {
       </div>
     );
   }
-
-  const visible = djs.slice(0, visibleCount);
-  const hasMore = visibleCount < djs.length;
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,7 +61,7 @@ const DjGrid = ({ djs }: DjGridProps) => {
       {hasMore && (
         <div className="flex justify-center pt-2 pb-4">
           <button
-            onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            onClick={loadMore}
             className="bg-h_blackLight/60 hover:ring-h_red cursor-pointer rounded-full px-8 py-2.5 text-sm text-gray-300 ring-1 ring-gray-700 transition-all hover:text-white"
           >
             Load more ({djs.length - visibleCount} remaining)

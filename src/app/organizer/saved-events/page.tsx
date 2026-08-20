@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CalendarHeart, MapPin, CalendarDays } from "lucide-react";
 import { getSavedEvents } from "@/lib/actions/follows";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils/date";
 
 export const metadata: Metadata = { title: "Saved Events" };
 
@@ -72,11 +73,7 @@ export default async function OrganizerSavedEventsPage() {
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                 <span className="flex items-center gap-1">
                   <CalendarDays className="h-3 w-3" />
-                  {new Date(event.startDate).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {formatDate(event.startDate)}
                 </span>
                 {(event.city || event.country) && (
                   <span className="flex items-center gap-1">

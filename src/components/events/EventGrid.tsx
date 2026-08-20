@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { EventCard, type EventCardItem } from "./EventCard";
 
 const PAGE_SIZE = 12;
@@ -12,17 +12,25 @@ export function EventGrid({
   events: EventCardItem[];
   savedEventIds?: number[];
 }) {
-  const savedSet = new Set(savedEventIds);
+  const savedSet = useMemo(() => new Set(savedEventIds), [savedEventIds]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [prevEvents, setPrevEvents] = useState(events);
 
+  // Reset pagination when events array changes
   if (prevEvents !== events) {
     setPrevEvents(events);
     setVisibleCount(PAGE_SIZE);
   }
 
-  const visible = events.slice(0, visibleCount);
+  const visible = useMemo(
+    () => events.slice(0, visibleCount),
+    [events, visibleCount],
+  );
   const hasMore = visibleCount < events.length;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((c) => c + PAGE_SIZE);
+  }, []);
 
   return (
     <div className="flex flex-col gap-6">
@@ -39,7 +47,7 @@ export function EventGrid({
       {hasMore && (
         <div className="flex justify-center pt-2 pb-4">
           <button
-            onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            onClick={loadMore}
             className="bg-h_blackLight/60 hover:ring-h_red cursor-pointer rounded-full px-8 py-2.5 text-sm text-gray-300 ring-1 ring-gray-700 transition-all hover:text-white"
           >
             Load more ({events.length - visibleCount} remaining)

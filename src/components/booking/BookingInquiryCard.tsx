@@ -11,6 +11,7 @@ import {
   sendBookingInquiryMessage,
 } from "@/lib/actions/booking-inquiry";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/utils/date";
 
 export type BookingInquiryStatus =
   "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
@@ -81,7 +82,7 @@ export function BookingInquiryCard({
   const formattedEventMeta = useMemo(() => {
     const parts: string[] = [];
     if (inquiry.eventDate) {
-      parts.push(new Date(inquiry.eventDate).toLocaleDateString());
+      parts.push(formatDate(inquiry.eventDate));
     }
     if (inquiry.venue) {
       parts.push(inquiry.venue);

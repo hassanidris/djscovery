@@ -8,6 +8,7 @@ import { Stars } from "@/components/dj-profile/dj-profile-shared";
 import { Calendar, Star, ArrowUpDown } from "lucide-react";
 import { ReportButton } from "@/components/reporting/ReportButton";
 import { DjRatingHelpfulButton } from "@/components/reputation/DjRatingHelpfulButton";
+import { formatDate } from "@/lib/utils/date";
 import {
   Select,
   SelectContent,
@@ -233,11 +234,7 @@ export function EventDjReviews({
                   </div>
                 </div>
                 <span className="mt-1 block text-xs text-gray-400">
-                  {new Date(r.createdAt).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                  {formatDate(r.createdAt)}
                 </span>
                 {r.review && (
                   <p className="mt-2 text-sm leading-relaxed text-gray-300">

@@ -3,6 +3,7 @@
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import type { StepProps, GigFormData } from "./GigForm";
 import type { GigType } from "@prisma/client";
+import { formatDateWithWeekday } from "@/lib/utils/date";
 
 type Step4Props = StepProps & { onSubmit: () => void };
 
@@ -34,12 +35,7 @@ function ReviewSummary({ data }: { data: GigFormData }) {
             : "Budget TBA";
 
   const eventDateStr = data.eventDate
-    ? new Date(data.eventDate).toLocaleDateString("en-US", {
-        weekday: "short",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
+    ? formatDateWithWeekday(data.eventDate)
     : "";
 
   return (

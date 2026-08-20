@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send } from "lucide-react";
 import Link from "next/link";
 import { useOptimistic, useRef, useState } from "react";
+import { formatShortDate } from "@/lib/utils/date";
 
 type DjSnippet = {
   avatar: string | null;
@@ -179,10 +180,7 @@ const CommentsList = ({
                   <div className="mt-1 flex items-center gap-4 px-1 text-xs text-gray-400">
                     <span className="text-[11px]">
                       {comment.createdAt
-                        ? new Date(comment.createdAt).toLocaleDateString(
-                            "en-US",
-                            { month: "short", day: "numeric" },
-                          )
+                        ? formatShortDate(comment.createdAt)
                         : ""}
                     </span>
                   </div>

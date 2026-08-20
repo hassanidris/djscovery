@@ -394,7 +394,7 @@ export async function publishEvent(
         select: { id: true, email: true, name: true },
       });
 
-      const eventDate = full.startDate.toLocaleDateString("en-GB", {
+      const eventDate = full.startDate.toLocaleDateString("en-US", {
         weekday: "long",
         day: "numeric",
         month: "long",

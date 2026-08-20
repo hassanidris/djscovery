@@ -5,6 +5,7 @@ import { List, Map, Plus } from "lucide-react";
 import { SectionHeading } from "./dj-profile-shared";
 import VenueMap from "./VenueMap";
 import { Button } from "@/components/ui/button";
+import { formatVenueDate } from "@/lib/utils/date";
 
 type Venue = {
   id: number;
@@ -56,27 +57,7 @@ function WhereIvePlayed({ venues, isOwner, onAddVenue }: Props) {
 
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return null;
-    // Try to parse as full date or month-only
-    if (dateString.includes("-")) {
-      const parts = dateString.split("-");
-      if (parts.length === 3) {
-        // Full date: YYYY-MM-DD
-        const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
-          month: "short",
-          year: "numeric",
-          timeZone: "UTC",
-        });
-      } else if (parts.length === 2) {
-        // Month only: YYYY-MM
-        const date = new Date(`${dateString}-01`);
-        return date.toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        });
-      }
-    }
-    return dateString;
+    return formatVenueDate(dateString);
   };
 
   // Filter venues with coordinates for map view

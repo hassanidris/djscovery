@@ -5,7 +5,7 @@ import { Plus, Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { getOrganizerGigs } from "@/lib/queries/gigs";
-import { OrganizerGigCard } from "@/components/gigs/GigCard";
+import { MemoizedOrganizerGigCard } from "@/components/gigs/GigCard";
 
 export const metadata: Metadata = { title: "My Gigs" };
 
@@ -78,7 +78,7 @@ export default async function OrganizerGigsPage() {
           </h3>
           <div className="flex flex-col gap-3">
             {active.map((gig) => (
-              <OrganizerGigCard key={gig.id} gig={gig} />
+              <MemoizedOrganizerGigCard key={gig.id} gig={gig} />
             ))}
           </div>
         </section>
@@ -92,7 +92,7 @@ export default async function OrganizerGigsPage() {
           </h3>
           <div className="flex flex-col gap-3">
             {drafts.map((gig) => (
-              <OrganizerGigCard key={gig.id} gig={gig} />
+              <MemoizedOrganizerGigCard key={gig.id} gig={gig} />
             ))}
           </div>
         </section>
@@ -106,7 +106,7 @@ export default async function OrganizerGigsPage() {
           </h3>
           <div className="flex flex-col gap-3">
             {closed.map((gig) => (
-              <OrganizerGigCard key={gig.id} gig={gig} />
+              <MemoizedOrganizerGigCard key={gig.id} gig={gig} />
             ))}
           </div>
         </section>

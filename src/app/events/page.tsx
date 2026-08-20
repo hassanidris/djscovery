@@ -10,15 +10,62 @@ import type { EventCardItem } from "@/components/events/EventCard";
 import { EventGrid } from "@/components/events/EventGrid";
 import { EventFilters } from "@/components/events/EventFilters";
 
-export const metadata = { title: "Events — DJcovery" };
-export const revalidate = 60;
-
+// Extracted helper functions for better performance and testability
 function slugToName(slug: string): string {
   return slug
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
+
+function toCardItem(event: any): EventCardItem {
+  return {
+    eventId: event.id,
+    slug: event.slug,
+    title: event.title,
+    eventType: event.eventType,
+    category: event.category,
+    startDate: event.startDate,
+    posterUrl: event.posterUrl ?? null,
+    location: [event.city?.name, event.country?.name]
+      .filter(Boolean)
+      .join(", "),
+    djName: event.ownerDj?.stageName || event.djName,
+    djSlug: event.ownerDj?.slug || event.djSlug,
+  };
+}
+
+function filterAndMapDemoEvents(
+  demoEvents: any[],
+  dbSlugs: Set<string>,
+  activeTab: "upcoming" | "past",
+  categoryFilter: string,
+): EventCardItem[] {
+  return demoEvents
+    .filter((e) => {
+      if (dbSlugs.has(e.slug)) return false;
+      if (activeTab === "upcoming" && e.daysOffset <= 0) return false;
+      if (activeTab === "past" && e.daysOffset > 0) return false;
+      if (categoryFilter !== "all" && e.category !== categoryFilter)
+        return false;
+      return true;
+    })
+    .map((e): EventCardItem => ({
+      slug: e.slug,
+      title: e.title,
+      eventType: e.eventType,
+      category: e.category,
+      startDate: e.eventDate,
+      posterUrl: e.posterUrl ?? null,
+      location: [e.city, e.country].filter(Boolean).join(", "),
+      djName: slugToName(e.djSlug),
+      djSlug: e.djSlug,
+      isDemo: true,
+    }));
+}
+
+export const metadata = { title: "Events — DJcovery" };
+export const revalidate = 60;
 
 // ── Tab config ────────────────────────────────────────────────────────────────
 
@@ -68,47 +115,19 @@ export default async function EventsPage({
     },
   });
 
-  const toCard = (e: (typeof dbEvents)[number]): EventCardItem => ({
-    eventId: e.id,
-    slug: e.slug,
-    title: e.title,
-    eventType: e.eventType,
-    category: e.category,
-    startDate: e.startDate,
-    posterUrl: e.posterUrl ?? null,
-    location: [e.city?.name, e.country?.name].filter(Boolean).join(", "),
-    djName: e.ownerDj.stageName,
-    djSlug: e.ownerDj.slug,
-  });
-
   const savedEventIds = await getSavedEventIds();
-  let events: EventCardItem[] = dbEvents.map(toCard);
+  let events: EventCardItem[] = dbEvents.map(toCardItem);
 
   // ── Staging: merge demo events ─────────────────────────────────────────────
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   if (isStaging) {
     const dbSlugs = new Set(dbEvents.map((e) => e.slug));
-    const demoFiltered = getDemoEvents()
-      .filter((e) => {
-        if (dbSlugs.has(e.slug)) return false;
-        if (activeTab === "upcoming" && e.daysOffset <= 0) return false;
-        if (activeTab === "past" && e.daysOffset > 0) return false;
-        if (categoryFilter !== "all" && e.category !== categoryFilter)
-          return false;
-        return true;
-      })
-      .map((e): EventCardItem => ({
-        slug: e.slug,
-        title: e.title,
-        eventType: e.eventType,
-        category: e.category,
-        startDate: e.eventDate,
-        posterUrl: e.posterUrl ?? null,
-        location: [e.city, e.country].filter(Boolean).join(", "),
-        djName: slugToName(e.djSlug),
-        djSlug: e.djSlug,
-        isDemo: true,
-      }));
+    const demoFiltered = filterAndMapDemoEvents(
+      getDemoEvents(),
+      dbSlugs,
+      activeTab,
+      categoryFilter,
+    );
 
     events = [...events, ...demoFiltered];
 
