@@ -7,6 +7,7 @@ import {
   createTestApplication,
   createTestHire,
   cleanupHiringTestData,
+  resetApplicationStatus,
   disconnectTestPrisma,
 } from "./test-setup";
 
@@ -174,24 +175,16 @@ test.describe("organizer hiring flow", () => {
   });
 
   test("can shortlist an applicant", async ({ page }) => {
+    // Reset application status to APPLIED before each run
+    await resetApplicationStatus(testGigId, TEST_USERS.FREE_DJ.email);
+
     await restoreAuthState(page, organizerAuthState!);
     await page.goto(`/organizer/gigs/${testGigId}/applications`);
 
-    // Wait for the actual server action response rather than relying on the
-    // "networkidle" heuristic, which can resolve either too early (before the
-    // mutation's follow-up RSC refetch begins) or too late (if unrelated
-    // background requests, e.g. analytics, keep the network from going idle).
-    // The POST response is the deterministic signal that the mutation (and
-    // the resulting page re-render) has completed.
-    const [response] = await Promise.all([
-      page.waitForResponse(
-        (res) => res.request().method() === "POST" && res.ok(),
-        { timeout: 20000 },
-      ),
-      page.getByRole("button", { name: "Shortlist" }).click(),
-    ]);
-    expect(response.ok()).toBe(true);
-
+    // Server actions trigger form submissions that cause page navigation/re-render.
+    // Wait for the navigation to complete and the SHORTLISTED badge to appear.
+    await page.getByRole("button", { name: "Shortlist" }).click();
+    await page.waitForLoadState("networkidle", { timeout: 10000 });
     await expect(page.getByText("SHORTLISTED")).toBeVisible({ timeout: 10000 });
   });
 

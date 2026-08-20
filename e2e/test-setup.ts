@@ -133,6 +133,31 @@ export async function createTestApplication(gigId: number, djEmail: string) {
 }
 
 /**
+ * Helper function to reset application status to APPLIED
+ */
+export async function resetApplicationStatus(
+  gigId: number,
+  djEmail: string,
+): Promise<void> {
+  const db = getPrisma();
+  const dj = await db.djProfile.findFirst({
+    where: { user: { email: djEmail } },
+    select: { id: true },
+  });
+  if (!dj) throw new Error("DJ not found");
+
+  await db.gigApplication.updateMany({
+    where: {
+      gigId,
+      djProfileId: dj.id,
+    },
+    data: {
+      status: "APPLIED",
+    },
+  });
+}
+
+/**
  * Helper function to create test hire
  */
 export async function createTestHire(

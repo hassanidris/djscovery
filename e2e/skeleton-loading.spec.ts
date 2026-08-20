@@ -180,6 +180,7 @@ async function unthrottleNetwork(client: any, handler: any, page: Page) {
 async function waitForSkeletonAppearance(
   page: Page,
   timeout = 8000,
+  minPulseCount?: number,
 ): Promise<{
   skeletonVisible: boolean;
   skeletonCount: number;
@@ -193,20 +194,29 @@ async function waitForSkeletonAppearance(
   let pulseCount = 0;
 
   try {
-    await Promise.race([
-      skeletonLocator
-        .first()
-        .waitFor({ state: "attached", timeout })
-        .then(() => {
-          skeletonVisible = true;
-        }),
-      pulseLocator
-        .first()
-        .waitFor({ state: "attached", timeout })
-        .then(() => {
-          skeletonVisible = true;
-        }),
-    ]);
+    if (minPulseCount) {
+      // Wait for at least minPulseCount elements to appear (for grid skeletons)
+      await pulseLocator
+        .nth(minPulseCount - 1)
+        .waitFor({ state: "attached", timeout });
+      skeletonVisible = true;
+    } else {
+      // Race to detect the first appearance of either selector
+      await Promise.race([
+        skeletonLocator
+          .first()
+          .waitFor({ state: "attached", timeout })
+          .then(() => {
+            skeletonVisible = true;
+          }),
+        pulseLocator
+          .first()
+          .waitFor({ state: "attached", timeout })
+          .then(() => {
+            skeletonVisible = true;
+          }),
+      ]);
+    }
   } catch {
     // Neither selector appeared within the timeout window.
     skeletonVisible = false;
@@ -239,6 +249,7 @@ async function navigateAndCheckSkeleton(
   page: Page,
   url: string,
   authState?: Awaited<ReturnType<BrowserContext["storageState"]>>,
+  minPulseCount?: number,
 ): Promise<{
   skeletonVisible: boolean;
   skeletonCount: number;
@@ -255,7 +266,7 @@ async function navigateAndCheckSkeleton(
     // skeleton should be in the initial HTML
     await page.goto(url, { waitUntil: "commit", timeout: 60000 });
 
-    return await waitForSkeletonAppearance(page);
+    return await waitForSkeletonAppearance(page, 8000, minPulseCount);
   } finally {
     await unthrottleNetwork(client, handler, page);
   }
@@ -474,6 +485,8 @@ test.describe("gig skeletons", () => {
     const { skeletonVisible, pulseCount } = await navigateAndCheckSkeleton(
       page,
       "/gigs",
+      undefined,
+      6,
     );
     // GigGridSkeleton uses raw divs with animate-pulse, not Skeleton component
     expect(skeletonVisible).toBe(true);
@@ -486,6 +499,8 @@ test.describe("gig skeletons", () => {
     const { skeletonVisible, pulseCount } = await navigateAndCheckSkeleton(
       page,
       "/gigs",
+      undefined,
+      6,
     );
     expect(skeletonVisible).toBe(true);
     // Should have multiple skeleton elements (title bar, genre badges, organizer)
