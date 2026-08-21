@@ -585,7 +585,9 @@ test.describe("homepage skeletons", () => {
       await navigateAndCheckSkeleton(page, "/");
     // Multiple Suspense boundaries should all render skeletons
     expect(skeletonVisible).toBe(true);
-    expect(skeletonCount + pulseCount).toBeGreaterThan(3);
+    // Use max (not sum) because Skeleton components have both data-slot="skeleton"
+    // AND animate-pulse, so skeletonCount and pulseCount count the same elements.
+    expect(Math.max(skeletonCount, pulseCount)).toBeGreaterThan(3);
   });
 
   test("homepage transitions from skeleton to real content", async ({
@@ -989,7 +991,7 @@ test.describe("admin card skeletons", () => {
   }, 120000);
 
   test("skeleton elements have pulse animation", async ({ page }) => {
-    const { skeletonVisible, skeletonCount, client, handler } =
+    const { skeletonVisible, skeletonCount, pulseCount, client, handler } =
       await navigateAndInspectSkeleton(page, "/admin", adminAuthState!);
     expect(skeletonVisible).toBe(true);
     try {
@@ -998,10 +1000,13 @@ test.describe("admin card skeletons", () => {
         const skeleton = page.locator(SKELETON_SELECTOR).first();
         const className = await skeleton.getAttribute("class");
         expect(className).toContain("animate-pulse");
-      } else {
+      } else if (pulseCount > 0) {
         // Check pulse element instead (some skeletons use raw divs)
         const pulse = page.locator(PULSE_SELECTOR).first();
         await expect(pulse).toBeVisible();
+      } else {
+        // If neither skeleton nor pulse elements found, the test setup needs review
+        throw new Error("No skeleton or pulse elements found during loading");
       }
     } finally {
       await unthrottleNetwork(client, handler, page);
@@ -1070,7 +1075,11 @@ test.describe("admin card skeletons", () => {
       expect(skeletonVisible).toBe(true);
       // AdminTableSkeleton with 8 cols × 8 rows = 64 cell skeletons + 8 header = 72
       // Plus filter skeletons. Should be reasonable, not thousands.
-      const total = skeletonCount + pulseCount;
+      // Use max (not sum) because every Skeleton has both data-slot="skeleton"
+      // AND animate-pulse, so skeletonCount and pulseCount count the same elements.
+      // During polling, peak counts may catch both loading.tsx and Suspense
+      // fallback skeletons simultaneously, so allow headroom for that.
+      const total = Math.max(skeletonCount, pulseCount);
       expect(total).toBeGreaterThan(5);
       expect(total).toBeLessThan(200);
     } finally {
