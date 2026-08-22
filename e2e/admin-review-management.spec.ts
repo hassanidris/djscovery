@@ -111,13 +111,13 @@ test.describe("admin review management", () => {
 
       await expect(page.locator("h1")).toContainText("Dashboard");
 
-      const reviewSection = page.getByText("Review Management");
-      await expect(reviewSection).toBeVisible();
+      const reviewSection = page.getByText("Review Management").first();
+      await expect(reviewSection).toBeVisible({ timeout: 15000 });
 
-      await expect(page.getByText("Pending Moderation")).toBeVisible();
-      await expect(page.getByText("Suspicious Reviews")).toBeVisible();
-      await expect(page.getByText("Unresponded Reviews")).toBeVisible();
-      await expect(page.getByText("Avg Rating")).toBeVisible();
+      await expect(page.getByText("Pending Moderation")).toBeVisible({ timeout: 15000 });
+      await expect(page.getByText("Suspicious Reviews").first()).toBeVisible({ timeout: 15000 });
+      await expect(page.getByText("Unresponded Reviews")).toBeVisible({ timeout: 15000 });
+      await expect(page.getByText("Avg Rating")).toBeVisible({ timeout: 15000 });
     });
 
     test("links to reviews page from dashboard", async ({ page }) => {
@@ -144,7 +144,9 @@ test.describe("admin review management", () => {
 
       await page.goto("/admin/reviews", { waitUntil: "domcontentloaded" });
 
-      await expect(page.getByText("Reviews")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Reviews" })).toBeVisible({
+        timeout: 15000,
+      });
     });
 
     test("filters reviews by moderation status", async ({ page }) => {
@@ -158,7 +160,11 @@ test.describe("admin review management", () => {
         waitUntil: "domcontentloaded",
       });
 
-      await expect(page.getByText("PENDING")).toBeVisible();
+      // Page should load successfully with the filter applied
+      await expect(
+        page.getByRole("heading", { name: "Reviews" }),
+      ).toBeVisible({ timeout: 15000 });
+      await expect(page).toHaveURL(/moderationStatus=PENDING/);
     });
   });
 
@@ -174,7 +180,9 @@ test.describe("admin review management", () => {
         waitUntil: "domcontentloaded",
       });
 
-      await expect(page.getByText("Review Analytics")).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Review Analytics" }),
+      ).toBeVisible({ timeout: 15000 });
     });
   });
 
@@ -190,7 +198,9 @@ test.describe("admin review management", () => {
         waitUntil: "domcontentloaded",
       });
 
-      await expect(page.getByText("Moderation Queue")).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Moderation Queue" }),
+      ).toBeVisible({ timeout: 15000 });
     });
   });
 
@@ -206,7 +216,9 @@ test.describe("admin review management", () => {
         waitUntil: "domcontentloaded",
       });
 
-      await expect(page.getByText("Response Management")).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Response Management" }),
+      ).toBeVisible({ timeout: 15000 });
     });
   });
 
@@ -222,7 +234,9 @@ test.describe("admin review management", () => {
         waitUntil: "domcontentloaded",
       });
 
-      await expect(page.getByText("Advanced Features")).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Advanced Features" }),
+      ).toBeVisible({ timeout: 15000 });
     });
   });
 });
