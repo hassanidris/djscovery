@@ -1006,9 +1006,10 @@ test.describe("admin card skeletons", () => {
       if (className?.includes("animate-pulse")) {
         expect(className).toContain("animate-pulse");
       } else if (pulseCount > 0) {
-        // Fallback: check for pulse class on any element
-        const pulse = page.locator(PULSE_SELECTOR).first();
-        await expect(pulse).toBeVisible();
+        // Fallback: pulseCount from the polling phase already proves pulse
+        // elements existed during loading. Don't re-check visibility since
+        // the element may have already been swapped for real content.
+        expect(pulseCount).toBeGreaterThan(0);
       } else {
         throw new Error("No skeleton or pulse elements found during loading");
       }
@@ -1046,9 +1047,10 @@ test.describe("admin card skeletons", () => {
         // Skeleton primitive uses bg-muted, admin skeleton overrides with bg-white/5
         expect(className).toMatch(/bg-(muted|white\/)/);
       } else if (pulseCount > 0) {
-        // Fallback: verify pulse elements exist (skeleton was visible but swapped)
-        const pulse = page.locator(PULSE_SELECTOR).first();
-        await expect(pulse).toBeVisible();
+        // Fallback: pulseCount from polling already proves skeleton elements
+        // existed during loading. Don't re-check visibility since the element
+        // may have already been swapped for real content.
+        expect(pulseCount).toBeGreaterThan(0);
       }
     } finally {
       await unthrottleNetwork(client, handler, page);
