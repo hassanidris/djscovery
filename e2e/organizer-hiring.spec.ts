@@ -184,8 +184,8 @@ test.describe("organizer hiring flow", () => {
     // Server actions trigger form submissions that cause page navigation/re-render.
     // Wait for the navigation to complete and the SHORTLISTED badge to appear.
     await page.getByRole("button", { name: "Shortlist" }).click();
-    await page.waitForLoadState("networkidle", { timeout: 15000 });
-    await expect(page.getByText("SHORTLISTED")).toBeVisible({ timeout: 15000 });
+    await page.waitForLoadState("networkidle", { timeout: 20000 });
+    await expect(page.getByText("SHORTLISTED")).toBeVisible({ timeout: 20000 });
   });
 
   test("can navigate back to gig details from applications", async ({

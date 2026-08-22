@@ -96,7 +96,7 @@ async function throttleNetwork(page: Page) {
           req.resourceType() === "document") ||
         (typeof req.isNavigationRequest === "function" &&
           req.isNavigationRequest());
-      const delayMs = isDocument ? 2000 : 100;
+      const delayMs = isDocument ? 3000 : 200;
       await new Promise((res) => setTimeout(res, delayMs));
 
       // route.continue() can sometimes throw "Route is already handled"
@@ -321,7 +321,11 @@ async function navigateAndInspectSkeleton(
   }
 
   const { client, handler } = await throttleNetwork(page);
-  await page.goto(url, { waitUntil: "commit", timeout: 30000 });
+  // Increase timeout for non-Chromium browsers which use route interception
+  // with longer delays that slow down the initial document response.
+  const browserName = page.context().browser()?.browserType().name();
+  const navTimeout = browserName === "chromium" ? 30000 : 90000;
+  await page.goto(url, { waitUntil: "commit", timeout: navTimeout });
 
   const { skeletonVisible, skeletonCount, pulseCount } =
     await waitForSkeletonAppearance(page);
