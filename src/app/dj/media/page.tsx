@@ -42,23 +42,32 @@ export default function DjMediaPage() {
   // Initial fetch on mount
   useEffect(() => {
     async function load() {
-      const [mediaResult, slugResult] = await Promise.all([
-        getDjMedia(),
-        getCurrentDjSlug(),
-      ]);
-      if ("media" in mediaResult) {
-        const items = mediaResult.media;
-        setMedia(items);
-        // Default to first non-empty tab
-        const firstType = TABS.find((t) =>
-          items.some((i) => i.type === t.value),
-        )?.value;
-        setActiveTab(firstType ?? "AUDIO");
+      try {
+        const [mediaResult, slugResult] = await Promise.all([
+          getDjMedia(),
+          getCurrentDjSlug(),
+        ]);
+        if ("media" in mediaResult) {
+          const items = mediaResult.media;
+          setMedia(items);
+          // Default to first non-empty tab
+          const firstType = TABS.find((t) =>
+            items.some((i) => i.type === t.value),
+          )?.value;
+          setActiveTab(firstType ?? "AUDIO");
+        } else if ("error" in mediaResult) {
+          console.error("Failed to load media:", mediaResult.error);
+        }
+        if ("slug" in slugResult) {
+          setDjSlug(slugResult.slug);
+        } else if ("error" in slugResult) {
+          console.error("Failed to get DJ slug:", slugResult.error);
+        }
+      } catch (error) {
+        console.error("Error loading media data:", error);
+      } finally {
+        setIsLoading(false);
       }
-      if ("slug" in slugResult) {
-        setDjSlug(slugResult.slug);
-      }
-      setIsLoading(false);
     }
     load();
   }, []);

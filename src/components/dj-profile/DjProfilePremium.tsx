@@ -63,6 +63,10 @@ const PackageModal = dynamic(
   () => import("@/components/dj-profile/PackageModal"),
   { ssr: false, loading: () => null },
 );
+const MediaForm = dynamic(() => import("@/components/dj/MediaForm"), {
+  ssr: false,
+  loading: () => null,
+});
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
 import ProfessionalTeamSidebar from "@/components/dj-profile/ProfessionalTeamSidebar";
 import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
@@ -287,6 +291,7 @@ export default function DjProfilePremium({
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
   const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
   const [isPressModalOpen, setIsPressModalOpen] = useState(false);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [pressItems, setPressItems] = useState<
     Array<{
       id: number;
@@ -462,6 +467,7 @@ export default function DjProfilePremium({
   const filteredMedia = fetchedMedia.filter((m) => m.type !== "AUDIO");
   const totalNonAudioCount =
     (mediaTypeCounts?.IMAGE || 0) + (mediaTypeCounts?.VIDEO || 0);
+  const hasRealMedia = fetchedMedia.length > 0;
   const transformedMedia: PremiumMediaItem[] = filteredMedia.map((m) => {
     if (m.type === "IMAGE") {
       return {
@@ -948,6 +954,12 @@ export default function DjProfilePremium({
     }
   }
 
+  async function handleMediaSave() {
+    setIsMediaModalOpen(false);
+    // Refresh the page to show updated media
+    window.location.reload();
+  }
+
   const isStaging = process.env.NEXT_PUBLIC_APP_ENV === "staging";
   const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
 
@@ -977,13 +989,13 @@ export default function DjProfilePremium({
         ? PREMIUM_DEFAULT_REVIEWS
         : []
   ) as ReviewItem[];
-  const MEDIA = djData
-    ? transformedMedia.length > 0
-      ? transformedMedia
-      : mapPremiumMediaFromData(djData) || []
-    : isStaging
-      ? PREMIUM_DEFAULT_MEDIA
-      : [];
+  const MEDIA = hasRealMedia
+    ? transformedMedia
+    : djData
+      ? mapPremiumMediaFromData(djData) || []
+      : isStaging
+        ? PREMIUM_DEFAULT_MEDIA
+        : [];
   const ENDORSEMENTS =
     endorsementsHasLoaded && lazyEndorsements
       ? lazyEndorsements
@@ -1139,7 +1151,7 @@ export default function DjProfilePremium({
           {/* ── MAIN COLUMN ── */}
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── STICKY SUB-NAVIGATION ── */}
-            <div className="bg-h_blackLight/30 sticky top-[4.125rem] z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
+            <div className="bg-h_blackLight/30 sticky top-16.5 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
               <DjProfileSubNav />
             </div>
             {/* ── MOBILE BOOK CTA ── */}
@@ -1197,9 +1209,22 @@ export default function DjProfilePremium({
 
             {/* ── EXTENDED MEDIA LIBRARY ── */}
             <section id="media">
-              <SectionHeading sub="Full media library · Unlimited with Premium">
-                Media
-              </SectionHeading>
+              <div className="mb-5 flex items-center justify-between">
+                <SectionHeading sub="Full media library · Unlimited with Premium">
+                  Media
+                </SectionHeading>
+                {isOwner && (
+                  <Button
+                    onClick={() => setIsMediaModalOpen(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Media
+                  </Button>
+                )}
+              </div>
 
               {/* ── SPOTLIGHT (nested inside Media) ── */}
               {safeSPOTLIGHT &&
@@ -1938,6 +1963,15 @@ export default function DjProfilePremium({
               onClose={() => setIsPressModalOpen(false)}
               pressItems={pressItems}
               onSave={handlePressSave}
+            />
+          )}
+          {isMediaModalOpen && (
+            <MediaForm
+              key={isMediaModalOpen ? "media-modal-open" : "media-modal-closed"}
+              open={isMediaModalOpen}
+              onClose={() => setIsMediaModalOpen(false)}
+              mode={{ mode: "create" }}
+              onSuccess={handleMediaSave}
             />
           )}
         </>

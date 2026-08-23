@@ -494,16 +494,21 @@ export async function updateDjMediaItem(
 export async function getCurrentDjSlug(): Promise<
   { slug: string } | { error: string }
 > {
-  const session = await getCurrentUserDjProfile();
-  if (!session) return { error: "Not authenticated or DJ profile not found" };
+  try {
+    const session = await getCurrentUserDjProfile();
+    if (!session) return { error: "Not authenticated or DJ profile not found" };
 
-  const profile = await prisma.djProfile.findUnique({
-    where: { id: session.profile.id },
-    select: { slug: true },
-  });
+    const profile = await prisma.djProfile.findUnique({
+      where: { id: session.profile.id },
+      select: { slug: true },
+    });
 
-  if (!profile?.slug) return { error: "DJ profile not found" };
-  return { slug: profile.slug };
+    if (!profile?.slug) return { error: "DJ profile not found" };
+    return { slug: profile.slug };
+  } catch (error) {
+    console.error("Error in getCurrentDjSlug:", error);
+    return { error: "Failed to get DJ profile slug. Please try again." };
+  }
 }
 
 // ── getDjMedia ──────────────────────────────────────────────────────────────
@@ -512,15 +517,20 @@ export async function getCurrentDjSlug(): Promise<
 export async function getDjMedia(): Promise<
   { media: MediaItem[] } | { error: string }
 > {
-  const session = await getCurrentUserDjProfile();
-  if (!session) return { error: "Not authenticated or DJ profile not found" };
+  try {
+    const session = await getCurrentUserDjProfile();
+    if (!session) return { error: "Not authenticated or DJ profile not found" };
 
-  const media = await prisma.media.findMany({
-    where: { djProfileId: session.profile.id },
-    orderBy: { sortOrder: "asc" },
-  });
+    const media = await prisma.media.findMany({
+      where: { djProfileId: session.profile.id },
+      orderBy: { sortOrder: "asc" },
+    });
 
-  return { media };
+    return { media };
+  } catch (error) {
+    console.error("Error in getDjMedia:", error);
+    return { error: "Failed to load media. Please try again." };
+  }
 }
 
 // ── getDjSpotlightMedia ───────────────────────────────────────────────────
