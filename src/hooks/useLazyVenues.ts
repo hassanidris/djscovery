@@ -22,28 +22,31 @@ export function useLazyVenues(slug: string) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const targetRef = useRef<HTMLDivElement>(null);
 
-  const fetchVenues = useCallback(async () => {
-    if (hasLoaded || !slug) return;
+  const fetchVenues = useCallback(
+    async (force = false) => {
+      if (!force && (hasLoaded || !slug)) return;
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await fetch(`/api/djs/${slug}/venues`);
+      try {
+        const response = await fetch(`/api/djs/${slug}/venues`);
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch venues");
+        if (!response.ok) {
+          throw new Error("Failed to fetch venues");
+        }
+
+        const data: Venue[] = await response.json();
+        setVenues(data);
+        setHasLoaded(true);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setIsLoading(false);
       }
-
-      const data: Venue[] = await response.json();
-      setVenues(data);
-      setHasLoaded(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [slug, hasLoaded]);
+    },
+    [slug, hasLoaded],
+  );
 
   useEffect(() => {
     const target = targetRef.current;
@@ -72,5 +75,6 @@ export function useLazyVenues(slug: string) {
     error,
     hasLoaded,
     targetRef,
+    refetch: () => fetchVenues(true),
   };
 }

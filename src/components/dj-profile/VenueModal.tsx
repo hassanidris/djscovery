@@ -211,6 +211,29 @@ export default function VenueModal({
     updateVenue(index, "latitude", suggestion.latitude ?? null);
     updateVenue(index, "longitude", suggestion.longitude ?? null);
 
+    // Mapbox /suggest returns POI suggestions without coordinates.
+    // If the suggestion has a mapbox_id but no lat/lng, retrieve the
+    // full feature to get coordinates before saving.
+    if (
+      suggestion.externalId &&
+      (suggestion.latitude == null || suggestion.longitude == null)
+    ) {
+      try {
+        const response = await fetch(
+          `/api/venues/retrieve?mapbox_id=${encodeURIComponent(suggestion.externalId)}`,
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.latitude != null && data.longitude != null) {
+            updateVenue(index, "latitude", data.latitude);
+            updateVenue(index, "longitude", data.longitude);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to retrieve venue coordinates:", error);
+      }
+    }
+
     if (!countryId) {
       updateVenue(index, "cityId", 0);
       updateVenue(index, "cityName", suggestion.cityName);

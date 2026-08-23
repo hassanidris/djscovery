@@ -18,6 +18,7 @@ import {
 } from "@/lib/email/templates/adminDjRegistration";
 import { updateReputationScore } from "@/lib/reputation/update";
 import { cacheDelete } from "@/lib/cache";
+import { geocodeCity } from "@/lib/actions/geocoding";
 
 function makeSlugBase(stageName: string) {
   return stageName
@@ -1206,7 +1207,7 @@ export async function addVenue(input: {
 
   const djProfile = await prisma.djProfile.findUnique({
     where: { id: input.djProfileId },
-    select: { userId: true },
+    select: { userId: true, slug: true },
   });
   if (!djProfile || djProfile.userId !== user.id) {
     return { error: "Not authorized." };
@@ -1224,6 +1225,29 @@ export async function addVenue(input: {
   }
 
   try {
+    // If no coordinates were provided (e.g. manual entry without autocomplete),
+    // fall back to geocoding the city so the venue at least appears on the map
+    // at city level.
+    let latitude = input.latitude ?? null;
+    let longitude = input.longitude ?? null;
+
+    if (latitude == null || longitude == null) {
+      const cityRecord = await prisma.city.findUnique({
+        where: { id: input.cityId },
+        include: { country: { select: { name: true } } },
+      });
+      if (cityRecord) {
+        const coords = await geocodeCity(
+          cityRecord.name,
+          cityRecord.country.name,
+        );
+        if (coords) {
+          latitude = coords.lat;
+          longitude = coords.lng;
+        }
+      }
+    }
+
     const venue = await prisma.djVenue.create({
       data: {
         djProfileId: input.djProfileId,
@@ -1232,14 +1256,15 @@ export async function addVenue(input: {
         description: input.description,
         countryId: input.countryId,
         cityId: input.cityId,
-        latitude: input.latitude ?? null,
-        longitude: input.longitude ?? null,
+        latitude,
+        longitude,
       },
       select: { id: true },
     });
 
     revalidatePath(`/djs`);
-    revalidatePath(`/djs/[slug]`);
+    revalidatePath(`/djs/${djProfile.slug}`);
+    await cacheDelete(`dj_venues:${djProfile.slug}`).catch(() => {});
     return { success: true, venue };
   } catch (error) {
     console.error("Failed to add venue:", error);
@@ -1275,7 +1300,7 @@ export async function updateVenue(input: {
 
   const venue = await prisma.djVenue.findUnique({
     where: { id: input.id },
-    select: { djProfile: { select: { userId: true } } },
+    select: { djProfile: { select: { userId: true, slug: true } } },
   });
   if (!venue || venue.djProfile.userId !== user.id) {
     return { error: "Not authorized." };
@@ -1293,6 +1318,27 @@ export async function updateVenue(input: {
   }
 
   try {
+    // If no coordinates were provided, fall back to geocoding the city.
+    let latitude = input.latitude ?? null;
+    let longitude = input.longitude ?? null;
+
+    if (latitude == null || longitude == null) {
+      const cityRecord = await prisma.city.findUnique({
+        where: { id: input.cityId },
+        include: { country: { select: { name: true } } },
+      });
+      if (cityRecord) {
+        const coords = await geocodeCity(
+          cityRecord.name,
+          cityRecord.country.name,
+        );
+        if (coords) {
+          latitude = coords.lat;
+          longitude = coords.lng;
+        }
+      }
+    }
+
     await prisma.djVenue.update({
       where: { id: input.id },
       data: {
@@ -1301,13 +1347,14 @@ export async function updateVenue(input: {
         description: input.description,
         countryId: input.countryId,
         cityId: input.cityId,
-        latitude: input.latitude ?? null,
-        longitude: input.longitude ?? null,
+        latitude,
+        longitude,
       },
     });
 
     revalidatePath(`/djs`);
-    revalidatePath(`/djs/[slug]`);
+    revalidatePath(`/djs/${venue.djProfile.slug}`);
+    await cacheDelete(`dj_venues:${venue.djProfile.slug}`).catch(() => {});
     return { success: true };
   } catch (error) {
     console.error("Failed to update venue:", error);
@@ -1326,7 +1373,7 @@ export async function deleteVenue(
 
   const venue = await prisma.djVenue.findUnique({
     where: { id: venueId },
-    select: { djProfile: { select: { userId: true } } },
+    select: { djProfile: { select: { userId: true, slug: true } } },
   });
   if (!venue || venue.djProfile.userId !== user.id) {
     return { error: "Not authorized." };
@@ -1338,7 +1385,8 @@ export async function deleteVenue(
     });
 
     revalidatePath(`/djs`);
-    revalidatePath(`/djs/[slug]`);
+    revalidatePath(`/djs/${venue.djProfile.slug}`);
+    await cacheDelete(`dj_venues:${venue.djProfile.slug}`).catch(() => {});
     return { success: true };
   } catch (error) {
     console.error("Failed to delete venue:", error);

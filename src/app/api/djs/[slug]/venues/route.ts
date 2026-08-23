@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/client";
 import { notFound } from "next/navigation";
 import { cacheGet, cacheSet } from "@/lib/cache";
-import { batchGeocodeVenues } from "@/lib/actions/geocoding";
 import { createTimer } from "@/lib/utils/performance";
 
 export const revalidate = 300; // Cache for 5 minutes
