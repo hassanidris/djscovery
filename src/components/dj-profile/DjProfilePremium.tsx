@@ -349,6 +349,14 @@ export default function DjProfilePremium({
       ? clientBookingOptions
       : bookingOptions;
 
+  // Countries for the VenueModal — prefer client-fetched (from booking options),
+  // fall back to server-passed prop. The page is an ISR shell that doesn't pass
+  // countries, so without this the venue country/city dropdowns would be empty.
+  const venueCountries =
+    clientBookingOptions.countries.length > 0
+      ? clientBookingOptions.countries
+      : countries || [];
+
   // Track which review tab is active so we can fetch with the right filter
   const [ratingsFilter, setRatingsFilter] = useState<
     "all" | "direct" | "event" | "gig"
@@ -388,6 +396,7 @@ export default function DjProfilePremium({
     isLoading: venuesIsLoading,
     hasLoaded: venuesHasLoaded,
     targetRef: venuesTargetRef,
+    refetch: refetchVenues,
   } = useLazyVenues(slug);
 
   // Lazy-load endorsements when scrolled into view
@@ -656,8 +665,9 @@ export default function DjProfilePremium({
       });
       setVenues(updatedVenues);
 
-      // Trigger page refresh to show updated data
-      window.location.reload();
+      // Refetch lazy venues to pick up the new data from the server
+      // (since we're using lazy-loading via useLazyVenues)
+      refetchVenues();
     } catch (error) {
       console.error("Failed to save venues:", error);
       toast.error("Failed to save venues. Please try again.", { id: toastId });
@@ -1430,6 +1440,7 @@ export default function DjProfilePremium({
                         country: { name: v.countryName },
                         latitude: v.latitude,
                         longitude: v.longitude,
+                        geocodingStatus: v.geocodingStatus,
                       }))
                     : (
                         (djData as any)?.venues ||
@@ -1444,6 +1455,10 @@ export default function DjProfilePremium({
                         country: { name: v.country?.name || v.country || "" },
                         latitude: v.latitude,
                         longitude: v.longitude,
+                        geocodingStatus:
+                          v.latitude != null && v.longitude != null
+                            ? ("SUCCESS" as const)
+                            : ("PENDING" as const),
                       }))
                 }
                 isOwner={isOwner}
@@ -1885,7 +1900,7 @@ export default function DjProfilePremium({
               onClose={() => setIsVenueModalOpen(false)}
               venues={venues}
               onSave={handleVenueSave}
-              countries={countries || []}
+              countries={venueCountries}
               djProfileId={djProfileId}
             />
           )}

@@ -53,7 +53,7 @@ async function suggestMapbox(
   return data.suggestions || [];
 }
 
-async function retrieveMapbox(
+export async function retrieveMapbox(
   mapboxId: string,
   token: string,
   sessionToken: string,
