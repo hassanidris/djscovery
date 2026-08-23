@@ -25,7 +25,9 @@ import {
   ImageIcon,
   MapPin,
   Zap,
+  Plus,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import type { DjDemoData, ViewMode } from "@/types/dj-demo";
 import { DjProfileHero } from "@/components/dj-profile/DjProfileHero";
 import { BookCTA } from "@/components/dj-profile/BookCTA";
@@ -40,6 +42,11 @@ import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
+
+const MediaForm = dynamic(() => import("@/components/dj/MediaForm"), {
+  ssr: false,
+  loading: () => null,
+});
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
   SOCIAL_ICONS,
@@ -189,6 +196,7 @@ export default function DjProfileFree({
   const djProfileId = djData ? parseInt(djData.id) : NaN;
   const slug = djData?.slug || "";
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [mediaTab, setMediaTab] = useState<"photos" | "videos" | "mixes">(
     "photos",
   );
@@ -330,6 +338,9 @@ export default function DjProfileFree({
       views: m.viewCount ?? 0,
     }));
 
+  // Use real media data if available, otherwise fall back to demo data
+  const hasRealMedia = fetchedMedia.length > 0;
+
   // In staging: use real data if available, supplement with demo data
   // In production: only use real data
   // Merge client-side analytics into djData for hero stats
@@ -368,13 +379,13 @@ export default function DjProfileFree({
     : isStaging
       ? FREE_DEFAULT_REVIEWS
       : [];
-  const MEDIA = djData
-    ? transformedMedia.length > 0
-      ? transformedMedia
-      : mapFreeMediaFromData(djData)
-    : isStaging
-      ? FREE_DEFAULT_MEDIA
-      : [];
+  const MEDIA = hasRealMedia
+    ? transformedMedia
+    : djData
+      ? mapFreeMediaFromData(djData)
+      : isStaging
+        ? FREE_DEFAULT_MEDIA
+        : [];
   const FEATURED_MIX = djData
     ? mapFreeFeaturedMix(djData)
     : isStaging
@@ -571,9 +582,22 @@ export default function DjProfileFree({
               hasSpotlight ||
               isOwner) && (
               <section id="media">
-                <SectionHeading sub="2 video/audio uploads included in free plan">
-                  Media
-                </SectionHeading>
+                <div className="mb-5 flex items-center justify-between">
+                  <SectionHeading sub="2 video/audio uploads included in free plan">
+                    Media
+                  </SectionHeading>
+                  {isOwner && (
+                    <Button
+                      onClick={() => setIsMediaModalOpen(true)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Media
+                    </Button>
+                  )}
+                </div>
 
                 {/* ── SPOTLIGHT (nested inside Media) ── */}
                 {hasSpotlight && (
@@ -1039,6 +1063,20 @@ export default function DjProfileFree({
         onBookClick={() => {}}
         isOwner={isOwner}
       />
+
+      {/* ── OWNER-ONLY MODALS ── */}
+      {isOwner && isMediaModalOpen && (
+        <MediaForm
+          key={isMediaModalOpen ? "media-modal-open" : "media-modal-closed"}
+          open={isMediaModalOpen}
+          onClose={() => setIsMediaModalOpen(false)}
+          mode={{ mode: "create" }}
+          onSuccess={() => {
+            setIsMediaModalOpen(false);
+            window.location.reload();
+          }}
+        />
+      )}
     </div>
   );
 }
