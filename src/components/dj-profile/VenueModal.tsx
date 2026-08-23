@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
 import { getCitiesByCountry, findOrCreateCity } from "@/lib/actions/profile";
 import { type VenueSuggestion } from "@/lib/actions/venueAutocomplete";
 
@@ -437,13 +438,11 @@ export default function VenueModal({
                   <Label className="mb-1.5 block text-xs text-gray-300">
                     Event Date (optional)
                   </Label>
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={venue.eventDate}
-                    onChange={(e) =>
-                      updateVenue(index, "eventDate", e.target.value)
-                    }
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white scheme-dark placeholder:text-gray-400 [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:transition-opacity [&::-webkit-calendar-picker-indicator]:hover:opacity-100"
+                    onChange={(v) => updateVenue(index, "eventDate", v)}
+                    placeholder="Select date"
+                    className="focus:border-h_red/50 border-white/10 bg-white/5"
                   />
                 </div>
                 <div>

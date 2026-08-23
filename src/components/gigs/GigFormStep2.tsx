@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { isFieldVisible } from "@/config/gig-type-fields";
 import { getGenres } from "@/lib/actions/genre";
+import { TimePicker } from "@/components/ui/time-picker";
 import type { StepProps } from "./GigForm";
 import type { ExperienceLevel, GigType } from "@prisma/client";
 import type { GigFieldKey } from "@/config/gig-type-fields";
@@ -255,11 +256,9 @@ export function GigFormStep2({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="mb-1 text-xs text-gray-400">Start Time</p>
-                    <input
-                      type="time"
+                    <TimePicker
                       value={data.setStartTime}
-                      onChange={(e) => {
-                        const val = e.target.value;
+                      onChange={(val) => {
                         onChange("setStartTime", val);
                         if (val && data.setEndTime) {
                           const diff = calcDiff(val, data.setEndTime);
@@ -271,16 +270,15 @@ export function GigFormStep2({
                           onChange("setDurationMinutes", "");
                         }
                       }}
-                      className={inputCls}
+                      placeholder="Start"
+                      className="border-white/10 bg-white/5"
                     />
                   </div>
                   <div>
                     <p className="mb-1 text-xs text-gray-400">End Time</p>
-                    <input
-                      type="time"
+                    <TimePicker
                       value={data.setEndTime}
-                      onChange={(e) => {
-                        const val = e.target.value;
+                      onChange={(val) => {
                         onChange("setEndTime", val);
                         if (data.setStartTime && val) {
                           const diff = calcDiff(data.setStartTime, val);
@@ -292,7 +290,8 @@ export function GigFormStep2({
                           onChange("setDurationMinutes", "");
                         }
                       }}
-                      className={inputCls}
+                      placeholder="End"
+                      className="border-white/10 bg-white/5"
                     />
                   </div>
                 </div>

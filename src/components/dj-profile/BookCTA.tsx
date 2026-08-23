@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -714,18 +715,16 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="eventDate">Event date</Label>
-                    <Input
+                    <DatePicker
                       id="eventDate"
-                      type="date"
                       value={form.eventDate}
-                      onChange={(event) =>
+                      onChange={(v) =>
                         setForm((prev) => ({
                           ...prev,
-                          eventDate: event.target.value,
+                          eventDate: v,
                         }))
                       }
-                      required
-                      className="scheme-dark"
+                      placeholder="Select date"
                     />
                   </div>
                 </div>

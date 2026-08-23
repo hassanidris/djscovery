@@ -1,6 +1,7 @@
 "use client";
 
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
+import { DatePicker } from "@/components/ui/date-picker";
 import type { StepProps, GigFormData } from "./GigForm";
 import type { GigType } from "@prisma/client";
 import { formatDateWithWeekday } from "@/lib/utils/date";
@@ -85,11 +86,11 @@ export function GigFormStep4({
           Application Deadline{" "}
           <span className="font-normal text-gray-400">(optional)</span>
         </label>
-        <input
-          type="date"
+        <DatePicker
           value={data.applicationDeadline}
-          onChange={(e) => onChange("applicationDeadline", e.target.value)}
-          className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white scheme-dark focus:border-white/25 focus:outline-none"
+          onChange={(v) => onChange("applicationDeadline", v)}
+          placeholder="No deadline"
+          className="border-white/10 bg-black"
         />
       </div>
 
