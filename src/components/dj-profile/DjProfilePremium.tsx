@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -39,13 +40,29 @@ import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
 import CareerHighlights from "@/components/dj-profile/CareerHighlights";
 import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
-import VenueModal from "@/components/dj-profile/VenueModal";
-import HighlightModal from "@/components/dj-profile/HighlightModal";
-import PressModal from "@/components/dj-profile/PressModal";
 import { HIGHLIGHT_ICONS, PRESS_ICON_MAP } from "@/data/dj-profile-defaults";
 import BookingPackages from "@/components/dj-profile/BookingPackages";
-import PackageModal from "@/components/dj-profile/PackageModal";
 import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+
+// Lazy-load owner-only modals so their JS (1400+ lines combined) only ships
+// when a profile owner opens them. These are never needed for anonymous
+// visitors or fans viewing a DJ profile.
+const VenueModal = dynamic(() => import("@/components/dj-profile/VenueModal"), {
+  ssr: false,
+  loading: () => null,
+});
+const HighlightModal = dynamic(
+  () => import("@/components/dj-profile/HighlightModal"),
+  { ssr: false, loading: () => null },
+);
+const PressModal = dynamic(() => import("@/components/dj-profile/PressModal"), {
+  ssr: false,
+  loading: () => null,
+});
+const PackageModal = dynamic(
+  () => import("@/components/dj-profile/PackageModal"),
+  { ssr: false, loading: () => null },
+);
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
 import ProfessionalTeamSidebar from "@/components/dj-profile/ProfessionalTeamSidebar";
 import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
@@ -1861,43 +1878,53 @@ export default function DjProfilePremium({
 
       {isOwner && (
         <>
-          <VenueModal
-            key={isVenueModalOpen ? "venue-modal-open" : "venue-modal-closed"}
-            isOpen={isVenueModalOpen}
-            onClose={() => setIsVenueModalOpen(false)}
-            venues={venues}
-            onSave={handleVenueSave}
-            countries={countries || []}
-            djProfileId={djProfileId}
-          />
-          <PackageModal
-            key={
-              isPackageModalOpen ? "package-modal-open" : "package-modal-closed"
-            }
-            isOpen={isPackageModalOpen}
-            onClose={() => setIsPackageModalOpen(false)}
-            packages={packages}
-            onSave={handlePackageSave}
-            djProfileId={djProfileId}
-          />
-          <HighlightModal
-            key={
-              isHighlightModalOpen
-                ? "highlight-modal-open"
-                : "highlight-modal-closed"
-            }
-            isOpen={isHighlightModalOpen}
-            onClose={() => setIsHighlightModalOpen(false)}
-            highlights={highlights}
-            onSave={handleHighlightSave}
-          />
-          <PressModal
-            key={isPressModalOpen ? "press-modal-open" : "press-modal-closed"}
-            isOpen={isPressModalOpen}
-            onClose={() => setIsPressModalOpen(false)}
-            pressItems={pressItems}
-            onSave={handlePressSave}
-          />
+          {isVenueModalOpen && (
+            <VenueModal
+              key={isVenueModalOpen ? "venue-modal-open" : "venue-modal-closed"}
+              isOpen={isVenueModalOpen}
+              onClose={() => setIsVenueModalOpen(false)}
+              venues={venues}
+              onSave={handleVenueSave}
+              countries={countries || []}
+              djProfileId={djProfileId}
+            />
+          )}
+          {isPackageModalOpen && (
+            <PackageModal
+              key={
+                isPackageModalOpen
+                  ? "package-modal-open"
+                  : "package-modal-closed"
+              }
+              isOpen={isPackageModalOpen}
+              onClose={() => setIsPackageModalOpen(false)}
+              packages={packages}
+              onSave={handlePackageSave}
+              djProfileId={djProfileId}
+            />
+          )}
+          {isHighlightModalOpen && (
+            <HighlightModal
+              key={
+                isHighlightModalOpen
+                  ? "highlight-modal-open"
+                  : "highlight-modal-closed"
+              }
+              isOpen={isHighlightModalOpen}
+              onClose={() => setIsHighlightModalOpen(false)}
+              highlights={highlights}
+              onSave={handleHighlightSave}
+            />
+          )}
+          {isPressModalOpen && (
+            <PressModal
+              key={isPressModalOpen ? "press-modal-open" : "press-modal-closed"}
+              isOpen={isPressModalOpen}
+              onClose={() => setIsPressModalOpen(false)}
+              pressItems={pressItems}
+              onSave={handlePressSave}
+            />
+          )}
         </>
       )}
 
