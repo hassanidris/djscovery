@@ -6,13 +6,10 @@ import Link from "next/link";
 import React from "react";
 import UserInfoCardInteraction from "./UserInfoCardInteraction";
 import UpdateUser from "./UpdateUser";
+import { formatLongDate } from "@/lib/utils/date";
 
 const UserInfoCard = async ({ user }: { user: User }) => {
-  const formattedDate = new Date(user.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedDate = formatLongDate(user.createdAt);
 
   const supabase = await createClient();
   const {

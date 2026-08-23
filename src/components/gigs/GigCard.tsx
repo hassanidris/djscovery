@@ -7,6 +7,9 @@ import type { OrganizerGigListItem } from "@/lib/queries/gigs";
 import type { DjGigListItem } from "@/lib/queries/gigs";
 import type { BudgetType } from "@prisma/client";
 import { formatNumber } from "@/lib/utils/currency";
+import { formatDateWithWeekday } from "@/lib/utils/date";
+import { useMemo } from "react";
+import React from "react";
 
 // ─── Budget formatter ─────────────────────────────────────────────────────────
 
@@ -36,12 +39,7 @@ function isDeadlineSoon(deadline: Date | string | null): boolean {
 // ─── Date formatter ───────────────────────────────────────────────────────────
 
 function formatEventDate(date: Date): string {
-  return new Date(date).toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return formatDateWithWeekday(date);
 }
 
 // ============================================================
@@ -50,10 +48,14 @@ function formatEventDate(date: Date): string {
 // ============================================================
 
 export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
-  const typeLabel = GIG_TYPE_FIELDS[gig.gigType].label;
-  const location = [gig.city?.name, gig.country?.name]
-    .filter(Boolean)
-    .join(", ");
+  const typeLabel = useMemo(
+    () => GIG_TYPE_FIELDS[gig.gigType].label,
+    [gig.gigType],
+  );
+  const location = useMemo(
+    () => [gig.city?.name, gig.country?.name].filter(Boolean).join(", "),
+    [gig.city?.name, gig.country?.name],
+  );
 
   return (
     <div className="group flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:border-white/20 hover:bg-white/8 sm:flex-row sm:items-center sm:justify-between">
@@ -111,6 +113,27 @@ export function OrganizerGigCard({ gig }: { gig: OrganizerGigListItem }) {
   );
 }
 
+function areOrganizerGigCardPropsEqual(
+  prevProps: { gig: OrganizerGigListItem },
+  nextProps: { gig: OrganizerGigListItem },
+): boolean {
+  return (
+    prevProps.gig.id === nextProps.gig.id &&
+    prevProps.gig.title === nextProps.gig.title &&
+    prevProps.gig.gigType === nextProps.gig.gigType &&
+    prevProps.gig.status === nextProps.gig.status &&
+    prevProps.gig.eventDate.getTime() === nextProps.gig.eventDate.getTime() &&
+    prevProps.gig.city?.name === nextProps.gig.city?.name &&
+    prevProps.gig.country?.name === nextProps.gig.country?.name &&
+    prevProps.gig._count.applications === nextProps.gig._count.applications
+  );
+}
+
+export const MemoizedOrganizerGigCard = React.memo(
+  OrganizerGigCard,
+  areOrganizerGigCardPropsEqual,
+);
+
 // ============================================================
 // DJ GIG CARD
 // Used in the /gigs marketplace.
@@ -123,18 +146,24 @@ export function DjGigCard({
   gig: DjGigListItem;
   isDemo?: boolean;
 }) {
-  const typeLabel = GIG_TYPE_FIELDS[gig.gigType].label;
-  const location = [gig.city?.name, gig.country?.name]
-    .filter(Boolean)
-    .join(", ");
-  const budgetLabel = formatBudget(
-    gig.budgetType,
-    gig.budgetMin,
-    gig.budgetMax,
-    gig.currency,
+  const typeLabel = useMemo(
+    () => GIG_TYPE_FIELDS[gig.gigType].label,
+    [gig.gigType],
+  );
+  const location = useMemo(
+    () => [gig.city?.name, gig.country?.name].filter(Boolean).join(", "),
+    [gig.city?.name, gig.country?.name],
+  );
+  const budgetLabel = useMemo(
+    () =>
+      formatBudget(gig.budgetType, gig.budgetMin, gig.budgetMax, gig.currency),
+    [gig.budgetType, gig.budgetMin, gig.budgetMax, gig.currency],
   );
 
-  const deadlineWarning = isDeadlineSoon(gig.applicationDeadline);
+  const deadlineWarning = useMemo(
+    () => isDeadlineSoon(gig.applicationDeadline),
+    [gig.applicationDeadline],
+  );
 
   const cardClass =
     "group flex flex-col gap-4 rounded-xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-white/20 hover:bg-white/8";
@@ -249,3 +278,37 @@ export function DjGigCard({
     </Link>
   );
 }
+
+function areDjGigCardPropsEqual(
+  prevProps: { gig: DjGigListItem; isDemo?: boolean },
+  nextProps: { gig: DjGigListItem; isDemo?: boolean },
+): boolean {
+  const prevDeadline = prevProps.gig.applicationDeadline?.getTime() ?? null;
+  const nextDeadline = nextProps.gig.applicationDeadline?.getTime() ?? null;
+
+  return (
+    prevProps.gig.slug === nextProps.gig.slug &&
+    prevProps.gig.title === nextProps.gig.title &&
+    prevProps.gig.gigType === nextProps.gig.gigType &&
+    prevProps.gig.status === nextProps.gig.status &&
+    prevProps.gig.eventDate.getTime() === nextProps.gig.eventDate.getTime() &&
+    prevDeadline === nextDeadline &&
+    prevProps.gig.budgetType === nextProps.gig.budgetType &&
+    prevProps.gig.budgetMin === nextProps.gig.budgetMin &&
+    prevProps.gig.budgetMax === nextProps.gig.budgetMax &&
+    prevProps.gig.currency === nextProps.gig.currency &&
+    prevProps.gig.city?.name === nextProps.gig.city?.name &&
+    prevProps.gig.country?.name === nextProps.gig.country?.name &&
+    prevProps.gig._count.applications === nextProps.gig._count.applications &&
+    prevProps.gig.requiredGenres.length ===
+      nextProps.gig.requiredGenres.length &&
+    prevProps.gig.djMustBring.length === nextProps.gig.djMustBring.length &&
+    prevProps.gig.organizerProfile.displayName ===
+      nextProps.gig.organizerProfile.displayName &&
+    prevProps.gig.organizerProfile.logoUrl ===
+      nextProps.gig.organizerProfile.logoUrl &&
+    prevProps.isDemo === nextProps.isDemo
+  );
+}
+
+export const MemoizedDjGigCard = React.memo(DjGigCard, areDjGigCardPropsEqual);

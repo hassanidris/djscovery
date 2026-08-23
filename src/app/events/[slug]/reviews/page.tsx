@@ -9,6 +9,7 @@ import { DjRatingResponseDisplay } from "@/components/reputation/DjRatingRespons
 import JsonLd from "@/components/seo/JsonLd";
 import { ReviewFilters } from "./ReviewFilters";
 import { Suspense } from "react";
+import { formatDate } from "@/lib/utils/date";
 
 export const dynamic = "force-dynamic";
 
@@ -320,7 +321,7 @@ export default async function EventReviewsPage({
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-400">
                             <Calendar className="h-3 w-3" />
-                            {new Date(review.createdAt).toLocaleDateString()}
+                            {formatDate(review.createdAt)}
                           </div>
                         </div>
                       </div>

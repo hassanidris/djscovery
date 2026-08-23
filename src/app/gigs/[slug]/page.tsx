@@ -18,9 +18,19 @@ import { GigReviewForm } from "@/components/reputation/GigReviewForm";
 import { DjGigReviewDisplay } from "@/components/reputation/DjGigReviewDisplay";
 import { getGigWithDjReviews } from "@/lib/queries/gigs";
 import { Button } from "@/components/ui/button";
+
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 import { formatDuration } from "@/lib/utils/duration";
 import { formatNumber } from "@/lib/utils/currency";
 import { ReportButton } from "@/components/reporting/ReportButton";
+import { formatLongDate } from "@/lib/utils/date";
 
 export async function generateMetadata({
   params,
@@ -121,15 +131,6 @@ export default async function GigDetailPage({
   const location = [gig.city?.name, gig.country?.name]
     .filter(Boolean)
     .join(", ");
-
-  function formatDate(d: Date) {
-    return new Date(d).toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  }
 
   const budgetLabel =
     gig.budgetType === "TBA"

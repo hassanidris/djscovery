@@ -13,6 +13,7 @@ import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { Button } from "@/components/ui/button";
 import PendingDjGigReviews from "./PendingDjigReviews";
 import { REVIEW_WINDOW_DAYS } from "@/lib/validation/dj-gig-review-validation";
+import { formatDate } from "@/lib/utils/date";
 
 export const metadata = { title: "My Applications — DJcovery" };
 
@@ -216,11 +217,7 @@ function ApplicationRow({ app }: { app: AppItem }) {
           <span>{typeLabel}</span>
           <span className="flex items-center gap-1">
             <CalendarDays className="h-3 w-3" />
-            {new Date(app.gig.eventDate).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
+            {formatDate(app.gig.eventDate)}
           </span>
           {location && (
             <span className="flex items-center gap-1">

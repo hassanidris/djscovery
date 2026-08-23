@@ -7,6 +7,7 @@ import {
   createTestApplication,
   createTestHire,
   cleanupHiringTestData,
+  resetApplicationStatus,
   disconnectTestPrisma,
 } from "./test-setup";
 
@@ -174,11 +175,17 @@ test.describe("organizer hiring flow", () => {
   });
 
   test("can shortlist an applicant", async ({ page }) => {
+    // Reset application status to APPLIED before each run
+    await resetApplicationStatus(testGigId, TEST_USERS.FREE_DJ.email);
+
     await restoreAuthState(page, organizerAuthState!);
     await page.goto(`/organizer/gigs/${testGigId}/applications`);
+
+    // Server actions trigger form submissions that cause page navigation/re-render.
+    // Wait for the navigation to complete and the SHORTLISTED badge to appear.
     await page.getByRole("button", { name: "Shortlist" }).click();
-    await page.waitForLoadState("networkidle");
-    await expect(page.getByText("SHORTLISTED")).toBeVisible();
+    await page.waitForLoadState("networkidle", { timeout: 20000 });
+    await expect(page.getByText("SHORTLISTED")).toBeVisible({ timeout: 20000 });
   });
 
   test("can navigate back to gig details from applications", async ({

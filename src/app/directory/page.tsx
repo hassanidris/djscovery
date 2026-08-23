@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import prisma from "@/lib/client";
 import { DjType } from "@prisma/client";
 import { demoDJsAsDjUsers, DjUser } from "@/lib/data";
@@ -20,6 +20,95 @@ type SearchParams = {
 };
 
 export const revalidate = 300; // Cache for 5 minutes
+
+// Extracted helper functions for better performance and testability
+function filterDemoDjs(
+  list: DjUser[],
+  filters: {
+    genreList: string[];
+    country?: string;
+    city?: string;
+    q?: string;
+    djTypeList: DjType[];
+  },
+): DjUser[] {
+  const { genreList, country, city, q, djTypeList } = filters;
+
+  return list.filter((dj) => {
+    const genreOk =
+      genreList.length > 0
+        ? genreList.some((g) =>
+            (dj.genres ?? "").toLowerCase().includes(g.toLowerCase()),
+          )
+        : true;
+    const countryOk = country
+      ? (dj.country ?? "").toLowerCase().includes(country.toLowerCase())
+      : true;
+    const cityOk = city
+      ? (dj.city ?? "").toLowerCase().includes(city.toLowerCase())
+      : true;
+    const qOk = q
+      ? [
+          dj.stageName ?? dj.username,
+          dj.genres ?? "",
+          dj.country ?? "",
+          dj.city ?? "",
+        ].some((field) => field.toLowerCase().includes(q.toLowerCase()))
+      : true;
+    const djTypeOk =
+      djTypeList.length > 0
+        ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
+        : true;
+    return genreOk && countryOk && cityOk && qOk && djTypeOk;
+  });
+}
+
+function sortDjs(list: DjUser[], sort?: string): DjUser[] {
+  if (sort === "a-z")
+    return [...list].sort((a, b) =>
+      (a.stageName ?? a.username).localeCompare(b.stageName ?? b.username),
+    );
+  if (sort === "z-a")
+    return [...list].sort((a, b) =>
+      (b.stageName ?? b.username).localeCompare(a.stageName ?? a.username),
+    );
+  if (sort === "most-followed")
+    return [...list].sort(
+      (a, b) => (b._count?.followers ?? 0) - (a._count?.followers ?? 0),
+    );
+  if (sort === "new")
+    return [...list].sort((a, b) => {
+      // For demo data, use a stable order since they don't have createdAt
+      if (!a.djProfileId) return 1;
+      if (!b.djProfileId) return -1;
+      return b.djProfileId - a.djProfileId;
+    });
+  if (sort === "trending")
+    return [...list].sort((a, b) => {
+      // For demo data, use followers as proxy for monthlyViews
+      return (b._count?.followers ?? 0) - (a._count?.followers ?? 0);
+    });
+  if (sort === "top-rated")
+    return [...list].sort((a, b) => {
+      // Calculate average rating from ratings array
+      const avgRatingA =
+        a.ratings && a.ratings.length > 0
+          ? a.ratings.reduce(
+              (sum: number, r: any) => sum + (r.rating || 0),
+              0,
+            ) / a.ratings.length
+          : 0;
+      const avgRatingB =
+        b.ratings && b.ratings.length > 0
+          ? b.ratings.reduce(
+              (sum: number, r: any) => sum + (r.rating || 0),
+              0,
+            ) / b.ratings.length
+          : 0;
+      return avgRatingB - avgRatingA;
+    });
+  return list;
+}
 
 const DirectoryPage = async ({
   searchParams,
@@ -131,90 +220,21 @@ const DirectoryPage = async ({
 
   const demoDjs = demoDJsAsDjUsers();
 
-  const filterDemoDjs = (list: DjUser[]) =>
-    list.filter((dj) => {
-      const genreOk =
-        genreList.length > 0
-          ? genreList.some((g) =>
-              (dj.genres ?? "").toLowerCase().includes(g.toLowerCase()),
-            )
-          : true;
-      const countryOk = country
-        ? (dj.country ?? "").toLowerCase().includes(country.toLowerCase())
-        : true;
-      const cityOk = city
-        ? (dj.city ?? "").toLowerCase().includes(city.toLowerCase())
-        : true;
-      const qOk = q
-        ? [
-            dj.stageName ?? dj.username,
-            dj.genres ?? "",
-            dj.country ?? "",
-            dj.city ?? "",
-          ].some((field) => field.toLowerCase().includes(q.toLowerCase()))
-        : true;
-      const djTypeOk =
-        djTypeList.length > 0
-          ? (dj.djTypes ?? []).some((t) => djTypeList.includes(t as DjType))
-          : true;
-      return genreOk && countryOk && cityOk && qOk && djTypeOk;
-    });
-
-  const sortDjs = (list: DjUser[]) => {
-    if (sort === "a-z")
-      return [...list].sort((a, b) =>
-        (a.stageName ?? a.username).localeCompare(b.stageName ?? b.username),
-      );
-    if (sort === "z-a")
-      return [...list].sort((a, b) =>
-        (b.stageName ?? b.username).localeCompare(a.stageName ?? a.username),
-      );
-    if (sort === "most-followed")
-      return [...list].sort(
-        (a, b) => (b._count?.followers ?? 0) - (a._count?.followers ?? 0),
-      );
-    if (sort === "new")
-      return [...list].sort((a, b) => {
-        // For demo data, use a stable order since they don't have createdAt
-        if (!a.djProfileId) return 1;
-        if (!b.djProfileId) return -1;
-        return b.djProfileId - a.djProfileId;
-      });
-    if (sort === "trending")
-      return [...list].sort((a, b) => {
-        // For demo data, use followers as proxy for monthlyViews
-        return (b._count?.followers ?? 0) - (a._count?.followers ?? 0);
-      });
-    if (sort === "top-rated")
-      return [...list].sort((a, b) => {
-        // Calculate average rating from ratings array
-        const avgRatingA =
-          a.ratings && a.ratings.length > 0
-            ? a.ratings.reduce(
-                (sum: number, r: any) => sum + (r.rating || 0),
-                0,
-              ) / a.ratings.length
-            : 0;
-        const avgRatingB =
-          b.ratings && b.ratings.length > 0
-            ? b.ratings.reduce(
-                (sum: number, r: any) => sum + (r.rating || 0),
-                0,
-              ) / b.ratings.length
-            : 0;
-        return avgRatingB - avgRatingA;
-      });
-    return list;
-  };
-
   // NOTE: followedDjIds is fetched client-side (see DjGrid -> useFollowedDjIds)
   // so this page can stay a static, ISR-cached shell with no auth/cookie reads.
-  const filteredDemoDjs = filterDemoDjs(demoDjs);
+  const filteredDemoDjs = filterDemoDjs(demoDjs, {
+    genreList,
+    country,
+    city,
+    q,
+    djTypeList,
+  });
   const dbIds = new Set(djs.map((d) => d.id));
   const displayDjs = sortDjs(
     isStaging
       ? [...djs, ...filteredDemoDjs.filter((d) => !dbIds.has(d.id))]
       : djs,
+    sort,
   );
 
   let availableGenres: string[] = [];

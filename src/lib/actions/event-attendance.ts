@@ -6,6 +6,7 @@ import { ActionResult, actionError, actionSuccess } from "./action-result";
 import { revalidatePath } from "next/cache";
 import { sendEmail } from "@/lib/email/send";
 import type { EventAttendanceData } from "@/lib/email/types";
+import { formatLongDate } from "@/lib/utils/date";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://djscovery.com";
 
@@ -101,12 +102,7 @@ export async function toggleEventAttendance(
     });
 
     if (userData?.email && event) {
-      const eventDate = new Date(event.startDate).toLocaleDateString("en-GB", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
+      const eventDate = formatLongDate(event.startDate);
 
       const emailData: EventAttendanceData = {
         userName: userData.name || "There",

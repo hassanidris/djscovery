@@ -7,6 +7,7 @@ import { getDemoGigs } from "@/data/gigs-demo";
 import { getDemoOrganizerBySlug } from "@/data/organizers";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import type { GigType } from "@prisma/client";
+import { formatDateWithWeekday } from "@/lib/utils/date";
 
 type HomeGigItem = {
   id: string;
@@ -47,11 +48,7 @@ function formatBudget(
 }
 
 function formatEventDate(date: Date): string {
-  return new Date(date).toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
+  return formatDateWithWeekday(date);
 }
 
 export default async function HomeOpenGigsSection({

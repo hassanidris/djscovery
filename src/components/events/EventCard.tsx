@@ -4,6 +4,9 @@ import { Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import SaveEventButton from "@/components/events/SaveEventButton";
+import { useMemo } from "react";
+import React from "react";
+import { formatDate } from "@/lib/utils/date";
 
 // ── Type ──────────────────────────────────────────────────────────────────────
 
@@ -38,14 +41,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   OTHER: "Other",
 };
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function EventCard({
@@ -57,8 +52,14 @@ export function EventCard({
   isSaved?: boolean;
   priority?: boolean;
 }) {
-  const isPrivate = event.eventType === "PRIVATE";
-  const categoryLabel = CATEGORY_LABELS[event.category] ?? event.category;
+  const isPrivate = useMemo(
+    () => event.eventType === "PRIVATE",
+    [event.eventType],
+  );
+  const categoryLabel = useMemo(
+    () => CATEGORY_LABELS[event.category] ?? event.category,
+    [event.category],
+  );
 
   return (
     <Link href={`/events/${event.slug}`}>
@@ -130,3 +131,27 @@ export function EventCard({
     </Link>
   );
 }
+
+function areEventCardPropsEqual(
+  prevProps: { event: EventCardItem; isSaved?: boolean; priority?: boolean },
+  nextProps: { event: EventCardItem; isSaved?: boolean; priority?: boolean },
+): boolean {
+  return (
+    prevProps.event.slug === nextProps.event.slug &&
+    prevProps.event.title === nextProps.event.title &&
+    prevProps.event.eventType === nextProps.event.eventType &&
+    prevProps.event.category === nextProps.event.category &&
+    prevProps.event.startDate.getTime() ===
+      nextProps.event.startDate.getTime() &&
+    prevProps.event.posterUrl === nextProps.event.posterUrl &&
+    prevProps.event.location === nextProps.event.location &&
+    prevProps.event.djName === nextProps.event.djName &&
+    prevProps.event.djSlug === nextProps.event.djSlug &&
+    prevProps.event.isDemo === nextProps.event.isDemo &&
+    prevProps.event.eventId === nextProps.event.eventId &&
+    prevProps.isSaved === nextProps.isSaved &&
+    prevProps.priority === nextProps.priority
+  );
+}
+
+export default React.memo(EventCard, areEventCardPropsEqual);

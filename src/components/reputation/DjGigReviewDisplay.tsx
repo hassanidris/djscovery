@@ -1,6 +1,7 @@
 import { Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { formatDate } from "@/lib/utils/date";
 
 interface DjGigReview {
   id: number;
@@ -81,7 +82,7 @@ export function DjGigReviewDisplay({
                     </Link>
                   )}
                   <p className="text-xs text-gray-400">
-                    {new Date(review.createdAt).toLocaleDateString()}
+                    {formatDate(review.createdAt)}
                   </p>
                 </div>
               </div>
