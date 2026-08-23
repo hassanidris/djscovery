@@ -58,6 +58,14 @@ export async function retrieveMapbox(
   token: string,
   sessionToken: string,
 ): Promise<any | null> {
+  // Validate mapboxId to prevent SSRF attacks
+  // Mapbox IDs are typically UUIDs or alphanumeric strings with dots
+  // Reject any input that could be used for path traversal or URL manipulation
+  if (!/^[a-zA-Z0-9.-]+$/.test(mapboxId)) {
+    console.error("Invalid mapboxId format:", mapboxId);
+    return null;
+  }
+
   const params = new URLSearchParams({
     access_token: token,
     session_token: sessionToken,

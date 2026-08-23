@@ -40,8 +40,7 @@ function checkRateLimit(ip: string): boolean {
 export async function GET(request: NextRequest) {
   try {
     const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
-      "unknown";
+      request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
 
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
@@ -60,6 +59,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Validate mapboxId to prevent SSRF attacks
+    // Mapbox IDs are typically UUIDs or alphanumeric strings with dots
+    if (!/^[a-zA-Z0-9.-]+$/.test(mapboxId)) {
+      return NextResponse.json(
+        { error: "Invalid mapbox_id format" },
+        { status: 400 },
+      );
+    }
+
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     if (!token) {
       return NextResponse.json(
@@ -72,10 +80,7 @@ export async function GET(request: NextRequest) {
     const feature = await retrieveMapbox(mapboxId, token, sessionToken);
 
     if (!feature) {
-      return NextResponse.json(
-        { error: "Venue not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Venue not found" }, { status: 404 });
     }
 
     const coordinates = feature.geometry?.coordinates;
