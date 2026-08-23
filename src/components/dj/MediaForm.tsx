@@ -130,9 +130,14 @@ export default function MediaForm({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="bg-h_black max-h-[90vh] max-w-lg overflow-y-auto border-white/10 text-white">
+      <DialogContent
+        className="bg-h_black max-h-[90vh] max-w-lg overflow-y-auto border-white/10 text-white"
+        data-testid="media-form-dialog"
+      >
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Media" : "Add Media"}</DialogTitle>
+          <DialogTitle data-testid="media-form-title">
+            {isEdit ? "Edit Media" : "Add Media"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">

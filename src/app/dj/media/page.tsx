@@ -85,11 +85,16 @@ export default function DjMediaPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" data-testid="media-page">
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">Media</h1>
+          <h1
+            className="text-2xl font-bold text-white"
+            data-testid="media-page-title"
+          >
+            Media
+          </h1>
           <p className="text-sm text-gray-400">
             Manage your mixes, videos, and press photos in one place.
           </p>
@@ -100,6 +105,7 @@ export default function DjMediaPage() {
             setEditingMedia(null);
             setFormOpen(true);
           }}
+          data-testid="add-media-button"
         >
           <Plus className="mr-1 h-4 w-4" />
           Add Media

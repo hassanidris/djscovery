@@ -1,46 +1,44 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
 }
 
-// ------ BOOKING INQUIRIES ------
+datasource db {
+  provider = "postgresql"
+}
 
 model BookingInquiry {
-  id                Int                  @id @default(autoincrement())
-  status            BookingInquiryStatus @default(PENDING)
+  id                Int                     @id @default(autoincrement())
+  status            BookingInquiryStatus    @default(PENDING)
   eventName         String
   eventDate         DateTime?
   venue             String?
   countryName       String?
   cityName          String?
   crowdSize         Int?
-  budgetType        BudgetType           @default(NEGOTIABLE)
+  budgetType        BudgetType              @default(NEGOTIABLE)
   budgetMin         Int?
   budgetMax         Int?
-  budgetCurrency    String?              @db.VarChar(10)
+  budgetCurrency    String?                 @db.VarChar(10)
   message           String
   contactReleasedAt DateTime?
   lastRespondedAt   DateTime?
   packageName       String?
   packagePrice      Int?
   packagePriceTo    Int?
-
-  countryId Int?
-  country   Country? @relation("BookingInquiryCountry", fields: [countryId], references: [id])
-  cityId    Int?
-  city      City?    @relation("BookingInquiryCity", fields: [cityId, countryId], references: [id, countryId])
-
-  djProfileId Int
-  djProfile   DjProfile @relation("DjProfileBookingInquiries", fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  organizerId String
-  organizer   User   @relation("OrganizerBookingInquiries", fields: [organizerId], references: [id], onDelete: Cascade)
-
-  messages BookingInquiryMessage[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User?    @relation(fields: [userId], references: [id])
-  userId    String?
+  countryId         Int?
+  cityId            Int?
+  djProfileId       Int
+  organizerId       String
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  userId            String?
+  city              City?                   @relation("BookingInquiryCity", fields: [cityId, countryId], references: [id, countryId])
+  country           Country?                @relation("BookingInquiryCountry", fields: [countryId], references: [id])
+  djProfile         DjProfile               @relation("DjProfileBookingInquiries", fields: [djProfileId], references: [id], onDelete: Cascade)
+  organizer         User                    @relation("OrganizerBookingInquiries", fields: [organizerId], references: [id], onDelete: Cascade)
+  user              User?                   @relation(fields: [userId], references: [id])
+  messages          BookingInquiryMessage[]
 
   @@index([djProfileId, status])
   @@index([organizerId, status])
@@ -53,25 +51,1208 @@ model BookingInquiryMessage {
   body       String
   senderRole BookingInquiryParticipantRole
   readAt     DateTime?
-
-  inquiryId Int
-  inquiry   BookingInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
-
-  senderId String
-  sender   User   @relation("BookingInquiryMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
+  inquiryId  Int
+  senderId   String
+  createdAt  DateTime                      @default(now())
+  inquiry    BookingInquiry                @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  sender     User                          @relation("BookingInquiryMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([inquiryId, createdAt])
 }
 
-datasource db {
-  provider = "postgresql"
+model Country {
+  id                Int                @id @default(autoincrement())
+  name              String             @unique
+  code              String             @unique
+  bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCountry")
+  cities            City[]
+  djProfiles        DjProfile[]
+  djVenues          DjVenue[]
+  events            Event[]
+  fanProfiles       FanProfile[]
+  gigs              Gig[]
+  organizerProfiles OrganizerProfile[]
+  users             User[]
+  venues            Venue[]
+
+  @@index([name])
 }
 
-// ============================================================
-// ENUMS
-// ============================================================
+model City {
+  id                Int                @id @default(autoincrement())
+  name              String
+  countryId         Int
+  bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCity")
+  country           Country            @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  djProfiles        DjProfile[]
+  djVenues          DjVenue[]
+  events            Event[]
+  fanProfiles       FanProfile[]
+  gigs              Gig[]
+  organizerProfiles OrganizerProfile[]
+  users             User[]
+  venues            Venue[]
+
+  @@unique([name, countryId])
+  @@unique([id, countryId])
+  @@index([countryId])
+}
+
+model User {
+  id                         String                       @id
+  username                   String                       @unique
+  createdAt                  DateTime                     @default(now())
+  cityId                     Int?
+  countryId                  Int?
+  deletedAt                  DateTime?
+  email                      String                       @unique
+  image                      String?
+  imagePath                  String?
+  lastLoginAt                DateTime?
+  name                       String?
+  onboardingComplete         Boolean                      @default(false)
+  status                     UserStatus                   @default(ACTIVE)
+  updatedAt                  DateTime                     @updatedAt
+  adminActionLogs            AdminActionLog[]
+  bookingInquiriesOrganized  BookingInquiry[]             @relation("OrganizerBookingInquiries")
+  bookingInquiries           BookingInquiry[]
+  bookingInquiryMessages     BookingInquiryMessage[]      @relation("BookingInquiryMessageSender")
+  contactSubmissions         ContactSubmission[]
+  djComments                 DjComment[]
+  djCommentLikes             DjCommentLike[]
+  followedDjs                DjFollow[]
+  djGigReviews               DjGigReview[]
+  djProfile                  DjProfile?
+  moderatedDjRatings         DjRating[]                   @relation("DjRatingModerator")
+  djRatings                  DjRating[]                   @relation("DjRatingAuthor")
+  djRatingHelpfulVotes       DjRatingHelpfulVote[]
+  emailLogs                  EmailLog[]
+  emailPreference            EmailPreference?
+  eventModerations           EventModeration[]            @relation("EventModerationAdmin")
+  eventReviews               EventReview[]
+  fanProfile                 FanProfile?
+  followers                  Follower[]                   @relation("UserFollowers")
+  followings                 Follower[]                   @relation("UserFollowings")
+  gigReviews                 GigReview[]
+  notificationsReceived      Notification[]               @relation("NotificationRecipient")
+  notificationsSent          Notification[]               @relation("NotificationSender")
+  organizerProfile           OrganizerProfile?
+  posts                      Post[]
+  postComments               PostComment[]
+  postCommentLikes           PostCommentLike[]
+  postLikes                  PostLike[]
+  reportsSubmitted           Report[]                     @relation("ReportSubmitter")
+  reportsReviewed            Report[]                     @relation("ReportReviewer")
+  reviewNotificationTracking ReviewNotificationTracking[] @relation("ReviewNotificationTracking")
+  savedEvents                SavedEvent[]
+  city                       City?                        @relation(fields: [cityId], references: [id])
+  country                    Country?                     @relation(fields: [countryId], references: [id])
+  roles                      UserRole[]
+  venueReviews               VenueReview[]
+
+  @@index([status])
+  @@index([deletedAt])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+model UserRole {
+  id     Int    @id @default(autoincrement())
+  userId String
+  role   Role
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
+}
+
+model DjProfile {
+  id                         Int                 @id @default(autoincrement())
+  userId                     String              @unique
+  stageName                  String
+  slug                       String              @unique
+  avatar                     String?
+  avatarPath                 String?
+  coverImage                 String?
+  coverImagePath             String?
+  bio                        String?
+  experienceYears            Int?
+  experienceLevel            ExperienceLevel?
+  status                     DjProfileStatus     @default(PENDING_APPROVAL)
+  countryId                  Int
+  cityId                     Int
+  plan                       DjPlan              @default(FREE)
+  featured                   Boolean             @default(false)
+  hidden                     Boolean             @default(false)
+  searchScore                Float               @default(0)
+  bookingEmail               String?
+  bookingPhone               String?
+  feeMin                     Int?
+  feeMax                     Int?
+  feeCurrency                String?
+  reputationScore            Int                 @default(0)
+  managerName                String?
+  managerEmail               String?
+  managerPhone               String?
+  agentName                  String?
+  agentAgency                String?
+  agentEmail                 String?
+  availabilityTimezone       String?
+  availabilityMonth          String?
+  availabilityDays           Json?
+  featuredPerformanceUrl     String?
+  featuredPerformanceContext String?
+  monthlyViews               Int                 @default(0)
+  createdAt                  DateTime            @default(now())
+  updatedAt                  DateTime            @updatedAt
+  deletedAt                  DateTime?
+  bookingInquiries           BookingInquiry[]    @relation("DjProfileBookingInquiries")
+  highlights                 DjCareerHighlight[]
+  comments                   DjComment[]
+  endorsements               DjEndorsement[]
+  followers                  DjFollow[]
+  genres                     DjGenre[]
+  djGigReviews               DjGigReview[]
+  packages                   DjPackage[]
+  pressItems                 DjPress[]
+  city                       City                @relation(fields: [cityId], references: [id])
+  country                    Country             @relation(fields: [countryId], references: [id])
+  user                       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  djTypes                    DjProfileType[]
+  ratings                    DjRating[]
+  venues                     DjVenue[]
+  eventsOwned                Event[]             @relation("EventOwner")
+  events                     EventDj[]
+  eventReviews               EventReview[]
+  gigApplications            GigApplication[]
+  gigReviews                 GigReview[]
+  media                      Media[]
+  organizerReviews           OrganizerReview[]
+  profileViews               ProfileView[]
+  reputationDetail           ReputationScore?
+  socialLinks                SocialLink[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([hidden])
+  @@index([plan])
+  @@index([featured])
+  @@index([searchScore])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+model DjPackage {
+  id          Int       @id @default(autoincrement())
+  name        String
+  priceFrom   Int
+  priceTo     Int?
+  currency    String    @default("USD")
+  duration    String?
+  features    String[]
+  popular     Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  djProfileId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@index([djProfileId])
+  @@index([djProfileId, sortOrder])
+  @@index([sortOrder])
+}
+
+model DjCareerHighlight {
+  id          Int       @id @default(autoincrement())
+  year        String
+  title       String
+  description String?
+  djProfileId Int
+  createdAt   DateTime  @default(now())
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@index([djProfileId])
+  @@index([djProfileId, year])
+}
+
+model DjEndorsement {
+  id          Int       @id @default(autoincrement())
+  name        String
+  role        String
+  company     String?
+  quote       String
+  avatar      String?
+  djProfileId Int
+  createdAt   DateTime  @default(now())
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@index([djProfileId])
+  @@index([djProfileId, createdAt])
+}
+
+model DjPress {
+  id          Int       @id @default(autoincrement())
+  source      String
+  type        String
+  title       String
+  date        String?
+  url         String?
+  djProfileId Int
+  createdAt   DateTime  @default(now())
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@index([djProfileId])
+  @@index([djProfileId, createdAt])
+}
+
+model DjVenue {
+  id          Int       @id @default(autoincrement())
+  venueName   String
+  eventDate   String?
+  description String?
+  countryId   Int
+  cityId      Int
+  djProfileId Int
+  latitude    Float?
+  longitude   Float?
+  geocodedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  city        City      @relation(fields: [cityId, countryId], references: [id, countryId])
+  country     Country   @relation(fields: [countryId], references: [id])
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@index([djProfileId])
+  @@index([djProfileId, eventDate])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+model Venue {
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  address              String?
+  countryId            Int
+  cityId               Int
+  latitude             Float?
+  longitude            Float?
+  source               String?
+  externalId           String?
+  popularity           Int                   @default(0)
+  createdAt            DateTime              @default(now())
+  city                 City                  @relation(fields: [cityId, countryId], references: [id, countryId])
+  country              Country               @relation(fields: [countryId], references: [id])
+  venueReputationScore VenueReputationScore?
+  venueReviews         VenueReview[]
+
+  @@unique([name, cityId])
+  @@index([name])
+  @@index([countryId])
+}
+
+model VenueReview {
+  id            Int      @id @default(autoincrement())
+  soundSystem   Int
+  atmosphere    Int
+  location      Int
+  accessibility Int
+  rating        Int
+  review        String?
+  venueId       Int
+  eventId       Int
+  userId        String
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venue         Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, venueId, userId])
+  @@index([venueId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ProfileView {
+  id          Int       @id @default(autoincrement())
+  viewerId    String?
+  viewerIp    String?
+  source      String?
+  city        String?
+  country     String?
+  djProfileId Int
+  createdAt   DateTime  @default(now())
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@index([djProfileId])
+  @@index([createdAt])
+  @@index([viewerId])
+}
+
+model OrganizerProfile {
+  id               Int                       @id @default(autoincrement())
+  userId           String                    @unique
+  displayName      String
+  slug             String                    @unique
+  organizerType    OrganizerType             @default(INDIVIDUAL)
+  status           OrganizerStatus           @default(ACTIVE)
+  bio              String?
+  logoUrl          String?
+  logoPath         String?
+  coverImageUrl    String?
+  coverImagePath   String?
+  website          String?
+  contactEmail     String?
+  phone            String?
+  hidden           Boolean                   @default(false)
+  countryId        Int
+  cityId           Int
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  deletedAt        DateTime?
+  gigs             Gig[]
+  city             City                      @relation(fields: [cityId], references: [id])
+  country          Country                   @relation(fields: [countryId], references: [id])
+  user             User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reputationDetail OrganizerReputationScore?
+  organizerReviews OrganizerReview[]
+  socialLinks      OrganizerSocialLink[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([hidden])
+  @@index([organizerType])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+model OrganizerSocialLink {
+  id                 Int              @id @default(autoincrement())
+  organizerProfileId Int
+  platform           String
+  url                String
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([organizerProfileId, platform])
+  @@index([organizerProfileId])
+}
+
+model FanProfile {
+  id         Int       @id @default(autoincrement())
+  userId     String    @unique
+  name       String
+  avatar     String?
+  avatarPath String?
+  bio        String?
+  countryId  Int?
+  cityId     Int?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  city       City?     @relation(fields: [cityId], references: [id])
+  country    Country?  @relation(fields: [countryId], references: [id])
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+model Genre {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  djGenres DjGenre[]
+
+  @@index([name])
+}
+
+model DjGenre {
+  djProfileId Int
+  genreId     Int
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  genre       Genre     @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([djProfileId, genreId])
+}
+
+model DjProfileType {
+  djProfileId Int
+  type        DjType
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@id([djProfileId, type])
+}
+
+model SocialLink {
+  id          Int       @id @default(autoincrement())
+  djProfileId Int
+  platform    String
+  url         String
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([djProfileId, platform])
+  @@index([djProfileId])
+}
+
+model Media {
+  id          Int        @id @default(autoincrement())
+  type        MediaType  @default(IMAGE)
+  url         String
+  bucket      String
+  path        String
+  sortOrder   Int        @default(0)
+  isSpotlight Boolean    @default(false)
+  title       String?
+  duration    String?
+  thumbnail   String?
+  playCount   Int        @default(0)
+  viewCount   Int        @default(0)
+  djProfileId Int?
+  postId      Int?
+  createdAt   DateTime   @default(now())
+  djProfile   DjProfile? @relation(fields: [djProfileId], references: [id])
+  post        Post?      @relation(fields: [postId], references: [id])
+
+  @@index([djProfileId])
+  @@index([djProfileId, type])
+  @@index([djProfileId, isSpotlight])
+  @@index([postId])
+  @@index([type])
+  @@index([isSpotlight])
+  @@index([sortOrder])
+}
+
+model DjRating {
+  id               Int                    @id @default(autoincrement())
+  rating           Int
+  review           String?
+  userId           String
+  djProfileId      Int
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  eventId          Int?
+  reviewType       DjRatingType?
+  helpfulCount     Int                    @default(0)
+  respondedAt      DateTime?
+  response         String?
+  moderatedAt      DateTime?
+  moderatedById    String?
+  moderationStatus ReviewModerationStatus @default(APPROVED)
+  moderatorNote    String?
+  djProfile        DjProfile              @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  event            Event?                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  moderator        User?                  @relation("DjRatingModerator", fields: [moderatedById], references: [id])
+  user             User                   @relation("DjRatingAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  helpfulVotes     DjRatingHelpfulVote[]
+
+  @@unique([userId, djProfileId], map: "DjRating_userId_djProfileId_direct_unique", where: raw("(\"eventId\" IS NULL)"))
+  @@unique([userId, djProfileId, eventId], map: "DjRating_userId_djProfileId_eventId_event_unique", where: raw("(\"eventId\" IS NOT NULL)"))
+  @@index([djProfileId])
+  @@index([djProfileId, createdAt])
+  @@index([eventId])
+  @@index([reviewType])
+  @@index([helpfulCount])
+  @@index([respondedAt])
+  @@index([moderationStatus])
+  @@index([moderatedById])
+}
+
+model DjRatingHelpfulVote {
+  id        Int      @id @default(autoincrement())
+  ratingId  Int
+  userId    String
+  createdAt DateTime @default(now())
+  rating    DjRating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([ratingId, userId])
+  @@index([ratingId])
+  @@index([userId])
+}
+
+model DjComment {
+  id          Int             @id @default(autoincrement())
+  content     String
+  deletedAt   DateTime?
+  userId      String
+  djProfileId Int
+  parentId    Int?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  djProfile   DjProfile       @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  parent      DjComment?      @relation("DjCommentReplies", fields: [parentId], references: [id])
+  replies     DjComment[]     @relation("DjCommentReplies")
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes       DjCommentLike[]
+
+  @@index([djProfileId])
+  @@index([parentId])
+  @@index([userId])
+}
+
+model DjCommentLike {
+  userId    String
+  commentId Int
+  comment   DjComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, commentId])
+}
+
+model Post {
+  id        Int           @id @default(autoincrement())
+  type      PostType      @default(TEXT)
+  content   String?
+  deletedAt DateTime?
+  userId    String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  media     Media[]
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  PostComment[]
+  likes     PostLike[]
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model PostComment {
+  id        Int               @id @default(autoincrement())
+  content   String
+  deletedAt DateTime?
+  userId    String
+  postId    Int
+  parentId  Int?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  parent    PostComment?      @relation("PostCommentReplies", fields: [parentId], references: [id])
+  replies   PostComment[]     @relation("PostCommentReplies")
+  post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     PostCommentLike[]
+
+  @@index([postId])
+  @@index([parentId])
+}
+
+model PostLike {
+  userId String
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+}
+
+model PostCommentLike {
+  userId    String
+  commentId Int
+  comment   PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, commentId])
+}
+
+model Event {
+  title            String
+  createdAt        DateTime          @default(now())
+  audioLink        String?
+  category         String            @default("OTHER")
+  cityId           Int?
+  countryId        Int?
+  deletedAt        DateTime?
+  description      String?
+  endDate          DateTime?
+  endTime          String?
+  eventType        EventType         @default(PUBLIC)
+  featured         Boolean           @default(false)
+  genres           String[]
+  hidden           Boolean           @default(false)
+  ownerDjId        Int
+  posterPath       String?
+  posterUrl        String?
+  recap            String?
+  slug             String            @unique
+  startDate        DateTime
+  startTime        String?
+  status           EventStatus       @default(DRAFT)
+  ticketUrl        String?
+  timezone         String?
+  updatedAt        DateTime          @updatedAt
+  venue            String?
+  videoLink        String?
+  viewCount        Int               @default(0)
+  id               Int               @id @default(autoincrement())
+  djRatings        DjRating[]
+  city             City?             @relation(fields: [cityId], references: [id])
+  country          Country?          @relation(fields: [countryId], references: [id])
+  ownerDj          DjProfile         @relation("EventOwner", fields: [ownerDjId], references: [id])
+  participants     EventDj[]
+  gallery          EventMedia[]
+  eventModerations EventModeration[]
+  eventReviews     EventReview[]
+  savedBy          SavedEvent[]
+  venueReviews     VenueReview[]
+
+  @@index([ownerDjId])
+  @@index([ownerDjId, status])
+  @@index([ownerDjId, status, deletedAt])
+  @@index([status])
+  @@index([startDate])
+  @@index([featured])
+  @@index([hidden])
+  @@index([countryId])
+  @@index([cityId])
+}
+
+model EventDj {
+  eventId     Int
+  djProfileId Int
+  role        String?
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, djProfileId])
+  @@index([djProfileId])
+}
+
+model EventMedia {
+  id        Int      @id @default(autoincrement())
+  eventId   Int
+  url       String
+  path      String
+  caption   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+model EventModeration {
+  id             Int                   @id @default(autoincrement())
+  status         EventModerationStatus @default(PENDING)
+  adminComment   String
+  eventUpdatedAt DateTime
+  adminId        String
+  eventId        Int
+  resolvedAt     DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  admin          User                  @relation("EventModerationAdmin", fields: [adminId], references: [id])
+  event          Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([status])
+  @@index([adminId])
+}
+
+model Gig {
+  id                      Int               @id @default(autoincrement())
+  slug                    String            @unique
+  organizerProfileId      Int
+  title                   String
+  gigType                 GigType
+  description             String?
+  status                  GigStatus         @default(DRAFT)
+  eventDate               DateTime
+  applicationDeadline     DateTime?
+  countryId               Int?
+  cityId                  Int?
+  venueName               String?
+  hideVenueName           Boolean           @default(false)
+  venueAddress            String?
+  venuePostalCode         String?
+  budgetType              BudgetType        @default(TBA)
+  budgetMin               Int?
+  budgetMax               Int?
+  currency                String            @default("SEK")
+  requiredGenres          String[]
+  requiredExperienceLevel ExperienceLevel   @default(OPEN)
+  setDurationMinutes      Int?
+  guestCount              Int?
+  dressCode               String?
+  mcRequired              Boolean           @default(false)
+  micRequired             Boolean           @default(false)
+  languagesSpoken         String[]
+  venueProvides           String[]
+  djMustBring             String[]
+  arrivalInstructions     String?
+  setupNotes              String?
+  organizerContactName    String?
+  organizerContactPhone   String?
+  organizerContactEmail   String?
+  viewCount               Int               @default(0)
+  hidden                  Boolean           @default(false)
+  deletedAt               DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  djGigReviews            DjGigReview[]
+  city                    City?             @relation(fields: [cityId], references: [id])
+  country                 Country?          @relation(fields: [countryId], references: [id])
+  organizerProfile        OrganizerProfile  @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+  applications            GigApplication[]
+  gigReviews              GigReview[]
+  organizerReviews        OrganizerReview[]
+
+  @@index([status])
+  @@index([gigType])
+  @@index([organizerProfileId])
+  @@index([eventDate])
+  @@index([cityId])
+  @@index([countryId])
+  @@index([applicationDeadline])
+  @@index([hidden])
+  @@index([slug])
+}
+
+model GigApplication {
+  id            Int                  @id @default(autoincrement())
+  status        GigApplicationStatus @default(APPLIED)
+  message       String?
+  gigId         Int
+  djProfileId   Int
+  shortlistedAt DateTime?
+  acceptedAt    DateTime?
+  rejectedAt    DateTime?
+  withdrawnAt   DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  djProfile     DjProfile            @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  gig           Gig                  @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  hire          Hire?
+
+  @@unique([gigId, djProfileId])
+  @@index([gigId])
+  @@index([djProfileId])
+  @@index([status])
+}
+
+model GigReview {
+  id          Int       @id @default(autoincrement())
+  rating      Int
+  review      String?
+  gigId       Int
+  djProfileId Int
+  organizerId String
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  gig         Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  organizer   User      @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@unique([gigId, djProfileId])
+  @@index([djProfileId])
+  @@index([organizerId])
+  @@index([gigId])
+  @@index([createdAt])
+}
+
+/// DJ review of an organizer/gig they have completed.
+/// djProfileId is the reviewer (the DJ who performed the gig).
+/// organizerId is the review subject (the organizer who hired the DJ).
+model DjGigReview {
+  id          Int       @id @default(autoincrement())
+  rating      Int
+  review      String?
+  gigId       Int
+  djProfileId Int
+  organizerId String
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  gig         Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  organizer   User      @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@unique([gigId, djProfileId])
+  @@index([djProfileId])
+  @@index([organizerId])
+  @@index([gigId])
+  @@index([createdAt])
+}
+
+model EventReview {
+  id          Int       @id @default(autoincrement())
+  rating      Int
+  review      String?
+  reviewType  String?
+  userId      String
+  eventId     Int
+  djProfileId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId, djProfileId])
+  @@index([eventId])
+  @@index([djProfileId])
+  @@index([userId])
+  @@index([reviewType])
+}
+
+model OrganizerReview {
+  id                 Int              @id @default(autoincrement())
+  communication      Int
+  payment            Int
+  professionalism    Int
+  venueQuality       Int
+  rating             Int
+  review             String?
+  gigId              Int
+  djProfileId        Int
+  organizerProfileId Int
+  ipAddress          String?
+  userAgent          String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  djProfile          DjProfile        @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  gig                Gig              @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([gigId, djProfileId])
+  @@index([djProfileId])
+  @@index([organizerProfileId])
+  @@index([gigId])
+  @@index([createdAt])
+}
+
+model ResponseTemplate {
+  id         String                   @id @default(cuid())
+  name       String
+  category   ResponseTemplateCategory
+  content    String
+  variables  String[]
+  isDefault  Boolean                  @default(false)
+  usageCount Int                      @default(0)
+  createdAt  DateTime                 @default(now())
+  updatedAt  DateTime                 @updatedAt
+
+  @@index([category])
+  @@index([isDefault])
+}
+
+model ReputationScore {
+  id                  Int                 @id @default(autoincrement())
+  djProfileId         Int                 @unique
+  totalScore          Int                 @default(0)
+  profileQualityScore Int                 @default(0)
+  verificationScore   Int                 @default(0)
+  reviewScore         Int                 @default(0)
+  reliabilityScore    Int                 @default(0)
+  activityScore       Int                 @default(0)
+  newTalentBoost      Int                 @default(0)
+  confidenceLevel     Float               @default(0)
+  trendDirection      String              @default("STABLE")
+  calculatedAt        DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  reputationHistories ReputationHistory[]
+  djProfile           DjProfile           @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+
+  @@index([totalScore])
+  @@index([djProfileId])
+}
+
+model OrganizerReputationScore {
+  id                  Int                          @id @default(autoincrement())
+  organizerProfileId  Int                          @unique
+  totalScore          Int                          @default(0)
+  profileQualityScore Int                          @default(0)
+  verificationScore   Int                          @default(0)
+  reviewScore         Int                          @default(0)
+  reliabilityScore    Int                          @default(0)
+  activityScore       Int                          @default(0)
+  confidenceLevel     Float                        @default(0)
+  trendDirection      String                       @default("STABLE")
+  calculatedAt        DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  reputationHistories OrganizerReputationHistory[]
+  organizerProfile    OrganizerProfile             @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([totalScore])
+  @@index([organizerProfileId])
+}
+
+model ReputationHistory {
+  id                Int                    @id @default(autoincrement())
+  reputationScoreId Int
+  previousTotal     Int
+  newTotal          Int
+  createdAt         DateTime               @default(now())
+  changeReason      ReputationChangeReason
+  reputationScore   ReputationScore        @relation(fields: [reputationScoreId], references: [id], onDelete: Cascade)
+
+  @@index([reputationScoreId])
+  @@index([createdAt])
+}
+
+model OrganizerReputationHistory {
+  id                         Int                      @id @default(autoincrement())
+  organizerReputationScoreId Int
+  previousTotal              Int
+  newTotal                   Int
+  createdAt                  DateTime                 @default(now())
+  changeReason               ReputationChangeReason
+  organizerReputationScore   OrganizerReputationScore @relation(fields: [organizerReputationScoreId], references: [id], onDelete: Cascade)
+
+  @@index([organizerReputationScoreId])
+  @@index([createdAt])
+}
+
+model VenueReputationScore {
+  id                  Int                      @id @default(autoincrement())
+  venueId             Int                      @unique
+  totalScore          Int                      @default(0)
+  profileQualityScore Int                      @default(0)
+  verificationScore   Int                      @default(0)
+  reviewScore         Int                      @default(0)
+  reliabilityScore    Int                      @default(0)
+  activityScore       Int                      @default(0)
+  confidenceLevel     Float                    @default(0)
+  trendDirection      String                   @default("STABLE")
+  calculatedAt        DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  reputationHistories VenueReputationHistory[]
+  venue               Venue                    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@index([totalScore])
+  @@index([venueId])
+}
+
+model VenueReputationHistory {
+  id                     Int                    @id @default(autoincrement())
+  venueReputationScoreId Int
+  previousTotal          Int
+  newTotal               Int
+  changeReason           ReputationChangeReason
+  createdAt              DateTime               @default(now())
+  venueReputationScore   VenueReputationScore   @relation(fields: [venueReputationScoreId], references: [id], onDelete: Cascade)
+
+  @@index([venueReputationScoreId])
+  @@index([createdAt])
+}
+
+model Follower {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowings", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}
+
+model DjFollow {
+  userId      String
+  djProfileId Int
+  createdAt   DateTime  @default(now())
+  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, djProfileId])
+  @@index([userId])
+  @@index([djProfileId])
+}
+
+model SavedEvent {
+  userId    String
+  eventId   Int
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId])
+  @@index([userId])
+  @@index([eventId])
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  type        NotificationType
+  read        Boolean          @default(false)
+  data        Json?
+  emailSentAt DateTime?
+  recipientId String
+  senderId    String?
+  createdAt   DateTime         @default(now())
+  recipient   User             @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender      User?            @relation("NotificationSender", fields: [senderId], references: [id])
+
+  @@index([recipientId, read])
+  @@index([recipientId, createdAt])
+}
+
+model ReviewNotificationTracking {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  targetType  String
+  targetId    Int
+  notifiedAt  DateTime  @default(now())
+  remindedAt  DateTime?
+  dismissedAt DateTime?
+  user        User      @relation("ReviewNotificationTracking", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetType, targetId])
+  @@index([userId])
+  @@index([targetType, targetId])
+}
+
+model EmailPreference {
+  id                  Int     @id @default(autoincrement())
+  userId              String  @unique
+  bookingEmails       Boolean @default(true)
+  gigEmails           Boolean @default(true)
+  applicationEmails   Boolean @default(true)
+  profileReviewEmails Boolean @default(true)
+  platformUpdates     Boolean @default(true)
+  marketingEmails     Boolean @default(false)
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailLog {
+  id                Int            @id @default(autoincrement())
+  userId            String?
+  recipientEmail    String
+  emailType         EmailType
+  provider          String         @default("resend")
+  status            EmailLogStatus @default(PENDING)
+  providerMessageId String?
+  errorMessage      String?
+  retryCount        Int            @default(0)
+  lastAttemptAt     DateTime       @default(now())
+  createdAt         DateTime       @default(now())
+  user              User?          @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([emailType])
+  @@index([createdAt])
+}
+
+model ContactSubmission {
+  id        Int             @id @default(autoincrement())
+  name      String
+  email     String
+  category  ContactCategory
+  message   String
+  userId    String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User?           @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([email])
+  @@index([category])
+  @@index([createdAt])
+}
+
+model Report {
+  id           Int              @id @default(autoincrement())
+  targetType   ReportTargetType
+  targetId     String
+  reason       ReportReason
+  description  String?
+  status       ReportStatus     @default(OPEN)
+  adminNote    String?
+  reporterId   String
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  reporter     User             @relation("ReportSubmitter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reviewedBy   User?            @relation("ReportReviewer", fields: [reviewedById], references: [id])
+
+  @@index([status])
+  @@index([targetType, targetId])
+  @@index([reporterId])
+  @@index([reviewedById])
+}
+
+model AdminActionLog {
+  id         Int      @id @default(autoincrement())
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  adminId    String?
+  createdAt  DateTime @default(now())
+  admin      User?    @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+model Conversation {
+  id           Int                       @id @default(autoincrement())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  conversationId Int
+  userId         String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  content        String
+  readAt         DateTime?
+  conversationId Int
+  senderId       String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model EventAttendance {
+  eventId Int
+  userId  String
+  status  AttendanceStatus
+
+  @@id([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+model Hire {
+  id                 Int            @id @default(autoincrement())
+  applicationId      Int            @unique
+  agreedRate         Decimal?
+  notes              String?
+  status             HireStatus     @default(ACTIVE)
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  noShow             Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  application        GigApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
 
 enum Role {
   ADMIN
@@ -133,7 +1314,6 @@ enum GigStatus {
   EXPIRED
 }
 
-// Add HireStatus enum
 enum HireStatus {
   ACTIVE
   COMPLETED
@@ -184,7 +1364,7 @@ enum NotificationType {
   NEW_COMMENT
   NEW_REPLY
   NEW_RATING
-  DJ_REGISTRATION // Admin receives this when a DJ registers
+  DJ_REGISTRATION
   GIG_PUBLISHED
   GIG_APPLICATION_RECEIVED
   GIG_APPLICATION_SHORTLISTED
@@ -208,9 +1388,9 @@ enum NotificationType {
   BOOKING_INQUIRY_RESPONSE
   BOOKING_INQUIRY_MESSAGE
   ACCOUNT_SUSPENDED
-  REPORT_SUBMITTED // Admin receives this when a user submits a report
-  EVENT_EDIT_REQUESTED // DJ receives this when admin requests edits
-  EVENT_EDIT_RESUBMITTED // Admin receives this when DJ resubmits for review
+  REPORT_SUBMITTED
+  EVENT_EDIT_REQUESTED
+  EVENT_EDIT_RESUBMITTED
 }
 
 enum DjType {
@@ -335,1079 +1515,6 @@ enum ReputationChangeReason {
   ORGANIZER_REVIEW_ADDED
 }
 
-// ============================================================
-// SECTION 1: MVP MODELS
-// ============================================================
-
-// ------ GEOGRAPHY ------
-
-model Country {
-  id                Int                @id @default(autoincrement())
-  name              String             @unique
-  code              String             @unique // ISO 3166-1 alpha-2, e.g. "SE"
-  cities            City[]
-  users             User[]
-  djProfiles        DjProfile[]
-  organizerProfiles OrganizerProfile[]
-  events            Event[]
-  gigs              Gig[]
-  fanProfiles       FanProfile[]
-  bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCountry")
-  djVenues          DjVenue[]
-  venues            Venue[]
-
-  @@index([name])
-}
-
-model City {
-  id                Int                @id @default(autoincrement())
-  name              String
-  countryId         Int
-  country           Country            @relation(fields: [countryId], references: [id], onDelete: Cascade)
-  users             User[]
-  djProfiles        DjProfile[]
-  organizerProfiles OrganizerProfile[]
-  events            Event[]
-  gigs              Gig[]
-  fanProfiles       FanProfile[]
-  bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCity")
-  djVenues          DjVenue[]
-  venues            Venue[]
-
-  @@unique([name, countryId])
-  @@unique([id, countryId])
-  @@index([countryId])
-}
-
-// ------ USER ------
-
-model User {
-  id                 String     @id // Must match Supabase Auth user id
-  email              String     @unique
-  username           String     @unique
-  name               String?
-  image              String?
-  imagePath          String?
-  status             UserStatus @default(ACTIVE)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  deletedAt          DateTime?
-  onboardingComplete Boolean    @default(false)
-  lastLoginAt        DateTime?
-
-  countryId Int?
-  country   Country? @relation(fields: [countryId], references: [id])
-  cityId    Int?
-  city      City?    @relation(fields: [cityId], references: [id])
-
-  roles                     UserRole[]
-  djProfile                 DjProfile?
-  organizerProfile          OrganizerProfile?
-  fanProfile                FanProfile?
-  emailPreference           EmailPreference?
-  emailLogs                 EmailLog[]
-  contactSubmissions        ContactSubmission[]
-  bookingInquiriesOrganized BookingInquiry[]        @relation("OrganizerBookingInquiries")
-  bookingInquiryMessages    BookingInquiryMessage[] @relation("BookingInquiryMessageSender")
-
-  posts            Post[]
-  postComments     PostComment[]
-  postLikes        PostLike[]
-  postCommentLikes PostCommentLike[]
-
-  djComments     DjComment[]
-  djCommentLikes DjCommentLike[]
-
-  notificationsReceived Notification[] @relation("NotificationRecipient")
-  notificationsSent     Notification[] @relation("NotificationSender")
-
-  reviewNotificationTracking ReviewNotificationTracking[] @relation("ReviewNotificationTracking")
-
-  followers  Follower[] @relation("UserFollowers")
-  followings Follower[] @relation("UserFollowings")
-
-  followedDjs DjFollow[]
-  savedEvents SavedEvent[]
-
-  reportsSubmitted Report[]          @relation("ReportSubmitter")
-  reportsReviewed  Report[]          @relation("ReportReviewer")
-  adminActionLogs  AdminActionLog[]
-  eventModerations EventModeration[] @relation("EventModerationAdmin")
-
-  gigReviews           GigReview[]
-  eventReviews         EventReview[]
-  bookingInquiries     BookingInquiry[]
-  venueReviews         VenueReview[]
-  djGigReviews         DjGigReview[]
-  djRatingHelpfulVotes DjRatingHelpfulVote[]
-  djRatings            DjRating[]            @relation("DjRatingAuthor")
-  moderatedDjRatings   DjRating[]            @relation("DjRatingModerator")
-
-  @@index([status])
-  @@index([deletedAt])
-  @@index([countryId])
-  @@index([cityId])
-}
-
-model UserRole {
-  id     Int    @id @default(autoincrement())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role   Role
-
-  @@unique([userId, role])
-  @@index([userId])
-  @@index([role])
-}
-
-// ------ DJ PROFILE ------
-
-// Admin must approve before profile is publicly visible.
-// DJs can still edit while PENDING_APPROVAL.
-model DjProfile {
-  id     Int    @id @default(autoincrement())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  stageName       String
-  slug            String           @unique // URL-friendly: /djs/[slug]
-  avatar          String? // Supabase Storage public URL
-  avatarPath      String? // Supabase Storage path (for deletion on re-upload)
-  coverImage      String? // Supabase Storage public URL
-  coverImagePath  String? // Supabase Storage path (for deletion on re-upload)
-  bio             String?
-  experienceYears Int?
-  experienceLevel ExperienceLevel?
-  status          DjProfileStatus  @default(PENDING_APPROVAL)
-
-  countryId Int
-  country   Country @relation(fields: [countryId], references: [id])
-  cityId    Int
-  city      City    @relation(fields: [cityId], references: [id])
-
-  plan         DjPlan  @default(FREE)
-  featured     Boolean @default(false)
-  hidden       Boolean @default(false) // Admin can hide without changing approval status
-  searchScore  Float   @default(0)
-  bookingEmail String?
-  bookingPhone String?
-  feeMin       Int?
-  feeMax       Int?
-  feeCurrency  String?
-
-  reputationScore Int @default(0) // 0-1000, denormalized for fast search
-
-  // Premium: Team contacts
-  managerName  String?
-  managerEmail String?
-  managerPhone String?
-  agentName    String?
-  agentAgency  String?
-  agentEmail   String?
-
-  // Premium: Availability calendar
-  availabilityTimezone String?
-  availabilityMonth    String? // e.g. "2025-09"
-  availabilityDays     Json? // [{day: 1, status: "available"}, ...]
-
-  // Premium: Featured performance (YouTube only)
-  featuredPerformanceUrl     String?
-  featuredPerformanceContext String?
-
-  // Premium: Analytics (denormalized)
-  monthlyViews Int @default(0)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  genres           DjGenre[]
-  djTypes          DjProfileType[]
-  socialLinks      SocialLink[]
-  ratings          DjRating[]
-  comments         DjComment[]
-  media            Media[]
-  events           EventDj[]
-  eventsOwned      Event[]             @relation("EventOwner")
-  gigApplications  GigApplication[]
-  followers        DjFollow[]
-  gigReviews       GigReview[]
-  eventReviews     EventReview[]
-  reputationDetail ReputationScore?
-  bookingInquiries BookingInquiry[]    @relation("DjProfileBookingInquiries")
-  packages         DjPackage[]
-  highlights       DjCareerHighlight[]
-  endorsements     DjEndorsement[]
-  pressItems       DjPress[]
-  profileViews     ProfileView[]
-  venues           DjVenue[]
-  organizerReviews OrganizerReview[]
-  djGigReviews     DjGigReview[]
-
-  @@index([slug])
-  @@index([status])
-  @@index([hidden])
-  @@index([plan])
-  @@index([featured])
-  @@index([searchScore])
-  @@index([countryId])
-  @@index([cityId])
-}
-
-// ------ DJ PREMIUM: PACKAGES ------
-
-model DjPackage {
-  id        Int      @id @default(autoincrement())
-  name      String
-  priceFrom Int
-  priceTo   Int?
-  currency  String   @default("USD")
-  duration  String?
-  features  String[]
-  popular   Boolean  @default(false)
-  sortOrder Int      @default(0)
-
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([djProfileId])
-  @@index([djProfileId, sortOrder])
-  @@index([sortOrder])
-}
-
-// ------ DJ PREMIUM: CAREER HIGHLIGHTS ------
-
-model DjCareerHighlight {
-  id          Int     @id @default(autoincrement())
-  year        String
-  title       String
-  description String?
-
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@index([djProfileId])
-  @@index([djProfileId, year])
-}
-
-// ------ DJ PREMIUM: ENDORSEMENTS ------
-
-model DjEndorsement {
-  id      Int     @id @default(autoincrement())
-  name    String
-  role    String
-  company String?
-  quote   String
-  avatar  String?
-
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@index([djProfileId])
-  @@index([djProfileId, createdAt])
-}
-
-// ------ DJ PREMIUM: PRESS & MEDIA ------
-
-model DjPress {
-  id     Int     @id @default(autoincrement())
-  source String
-  type   String // Feature, Interview, Podcast
-  title  String
-  date   String?
-  url    String?
-
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@index([djProfileId])
-  @@index([djProfileId, createdAt])
-}
-
-// ------ DJ PREMIUM: WHERE I'VE PLAYED (VENUES) ------
-
-model DjVenue {
-  id          Int     @id @default(autoincrement())
-  venueName   String
-  eventDate   String? // YYYY-MM format or full date
-  description String?
-
-  countryId Int
-  country   Country @relation(fields: [countryId], references: [id])
-  cityId    Int
-  city      City    @relation(fields: [cityId, countryId], references: [id, countryId])
-
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  latitude   Float?
-  longitude  Float?
-  geocodedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([djProfileId])
-  @@index([djProfileId, eventDate])
-  @@index([countryId])
-  @@index([cityId])
-}
-
-// ------ VENUE DATABASE (FOR AUTOCOMPLETE) ------
-
-model Venue {
-  id         Int      @id @default(autoincrement())
-  name       String
-  address    String?
-  countryId  Int
-  country    Country  @relation(fields: [countryId], references: [id])
-  cityId     Int
-  city       City     @relation(fields: [cityId, countryId], references: [id, countryId])
-  latitude   Float?
-  longitude  Float?
-  source     String? // 'manual', 'mapbox', 'osm'
-  externalId String? // Mapbox/OSM place ID
-  popularity Int      @default(0) // Track usage for ranking
-  createdAt  DateTime @default(now())
-
-  venueReviews         VenueReview[]
-  venueReputationScore VenueReputationScore?
-
-  @@unique([name, cityId])
-  @@index([name])
-  @@index([countryId])
-}
-
-model VenueReview {
-  id Int @id @default(autoincrement())
-
-  // Category ratings (1-5)
-  soundSystem   Int
-  atmosphere    Int
-  location      Int
-  accessibility Int
-
-  // Overall rating (1-5) - calculated from categories
-  rating Int
-
-  review String?
-
-  venueId Int
-  venue   Venue  @relation(fields: [venueId], references: [id], onDelete: Cascade)
-  eventId Int
-  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  userId  String
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Anti-gaming audit
-  ipAddress String?
-  userAgent String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([eventId, venueId, userId]) // one review per event per venue per user
-  @@index([venueId])
-  @@index([eventId])
-  @@index([userId])
-  @@index([createdAt])
-}
-
-// ------ DJ ANALYTICS: PROFILE VIEWS ------
-
-model ProfileView {
-  id       Int     @id @default(autoincrement())
-  viewerId String? // user id if logged in
-  viewerIp String?
-  source   String? // direct, search, social, referral
-  city     String?
-  country  String?
-
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@index([djProfileId])
-  @@index([createdAt])
-  @@index([viewerId])
-}
-
-// ------ ORGANIZER PROFILE ------
-
-model OrganizerProfile {
-  id     Int    @id @default(autoincrement())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  displayName String
-
-  slug          String          @unique // /organizers/[slug]
-  organizerType OrganizerType   @default(INDIVIDUAL)
-  status        OrganizerStatus @default(ACTIVE)
-
-  bio            String?
-  logoUrl        String? // Supabase Storage: org-avatar bucket public URL
-  logoPath       String? // Supabase Storage: org-avatar bucket object path (for deletion)
-  coverImageUrl  String? // Supabase Storage: org-cover bucket public URL
-  coverImagePath String? // Supabase Storage: org-cover bucket object path (for deletion)
-  website        String?
-  contactEmail   String? // PRIVATE — never rendered publicly
-  phone          String?
-  hidden         Boolean @default(false) // Admin can hide without suspending
-
-  countryId Int
-  country   Country @relation(fields: [countryId], references: [id])
-  cityId    Int
-  city      City    @relation(fields: [cityId], references: [id])
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  socialLinks      OrganizerSocialLink[]
-  gigs             Gig[]
-  organizerReviews OrganizerReview[]
-  reputationDetail OrganizerReputationScore?
-
-  @@index([slug])
-  @@index([status])
-  @@index([hidden])
-  @@index([organizerType])
-  @@index([countryId])
-  @@index([cityId])
-}
-
-// ------ ORGANIZER SOCIAL LINKS ------
-
-// platform values: "instagram" | "linkedin" | "facebook" | "tiktok" | "youtube" | "website"
-model OrganizerSocialLink {
-  id                 Int              @id @default(autoincrement())
-  organizerProfileId Int
-  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
-  platform           String
-  url                String
-
-  @@unique([organizerProfileId, platform])
-  @@index([organizerProfileId])
-}
-
-// ------ FAN PROFILE ------
-
-model FanProfile {
-  id     Int    @id @default(autoincrement())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  name       String
-  avatar     String? // Supabase Storage public URL
-  avatarPath String? // Supabase Storage path (for deletion on re-upload)
-  bio        String?
-
-  countryId Int?
-  country   Country? @relation(fields: [countryId], references: [id])
-  cityId    Int?
-  city      City?    @relation(fields: [cityId], references: [id])
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  @@index([userId])
-  @@index([countryId])
-  @@index([cityId])
-}
-
-// ------ GENRES ------
-
-// Admin-managed list of genres
-model Genre {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique // e.g. "Afrobeat", "House", "Amapiano"
-  djGenres DjGenre[]
-
-  @@index([name])
-}
-
-model DjGenre {
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  genreId     Int
-  genre       Genre     @relation(fields: [genreId], references: [id], onDelete: Cascade)
-
-  @@id([djProfileId, genreId])
-}
-
-model DjProfileType {
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  type        DjType
-
-  @@id([djProfileId, type])
-}
-
-// ------ SOCIAL LINKS ------
-
-// platform values: "instagram" | "tiktok" | "youtube" | "spotify" | "soundcloud" | "mixcloud" | "website"
-// UI renders icon based on platform string
-model SocialLink {
-  id          Int       @id @default(autoincrement())
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  platform    String
-  url         String
-
-  @@unique([djProfileId, platform])
-  @@index([djProfileId])
-}
-
-// ------ MEDIA ------
-
-// Supports IMAGE (file upload), VIDEO (external URL), AUDIO (external URL)
-// Supabase Storage bucket: "djscovery-media"
-model Media {
-  id          Int       @id @default(autoincrement())
-  type        MediaType @default(IMAGE)
-  url         String // Supabase Storage public URL or external URL
-  bucket      String // Supabase Storage bucket name or "external"
-  path        String // Supabase Storage path within bucket or original URL
-  sortOrder   Int       @default(0) // For reordering in gallery
-  isSpotlight Boolean   @default(false) // Marked for spotlight section (max 2)
-  title       String? // Auto-fetched from oEmbed for video/audio
-  duration    String? // Auto-fetched from oEmbed (e.g. "3:45")
-  thumbnail   String? // Auto-fetched from oEmbed for video/audio
-  playCount   Int       @default(0) // AUDIO: unique plays (deduped per viewer per day)
-  viewCount   Int       @default(0) // VIDEO: unique views (deduped per viewer per day)
-
-  djProfileId Int?
-  djProfile   DjProfile? @relation(fields: [djProfileId], references: [id], onDelete: SetNull)
-
-  postId Int?
-  post   Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now())
-
-  @@index([djProfileId])
-  @@index([djProfileId, type])
-  @@index([djProfileId, isSpotlight])
-  @@index([postId])
-  @@index([type])
-  @@index([isSpotlight])
-  @@index([sortOrder])
-}
-
-// ------ DJ RATINGS ------
-
-// Supports both direct reviews (eventId = null) and event-anchored reviews (eventId != null)
-// One direct review per user per DJ, one event review per user per event per DJ
-// Partial unique indexes are created via raw SQL migration to handle NULL eventId correctly
-model DjRating {
-  id     Int     @id @default(autoincrement())
-  rating Int // 1-5
-  review String?
-
-  userId      String
-  user        User      @relation("DjRatingAuthor", fields: [userId], references: [id], onDelete: Cascade)
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  // Event-anchored review support
-  eventId    Int?
-  event      Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  reviewType DjRatingType? // DIRECT, EVENT_ATTENDEE, EVENT_ORGANIZER
-
-  // Review helpfulness
-  helpfulCount Int                   @default(0)
-  helpfulVotes DjRatingHelpfulVote[]
-
-  // DJ response to review
-  response    String?
-  respondedAt DateTime?
-
-  // Moderation
-  moderationStatus ReviewModerationStatus @default(APPROVED)
-  moderatedAt      DateTime?
-  moderatedById    String?
-  moderator        User?                  @relation("DjRatingModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
-  moderatorNote    String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([djProfileId])
-  @@index([djProfileId, createdAt])
-  @@index([eventId])
-  @@index([reviewType])
-  @@index([helpfulCount])
-  @@index([respondedAt])
-  @@index([moderationStatus])
-  @@index([moderatedById])
-}
-
-// Review helpfulness votes
-model DjRatingHelpfulVote {
-  id        Int      @id @default(autoincrement())
-  ratingId  Int
-  rating    DjRating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@unique([ratingId, userId])
-  @@index([ratingId])
-  @@index([userId])
-}
-
-// ------ DJ PROFILE COMMENTS ------
-
-// Allowed roles: FAN, DJ, ORGANIZER
-// Self-referencing for replies (parentId)
-model DjComment {
-  id        Int       @id @default(autoincrement())
-  content   String
-  deletedAt DateTime?
-
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  parentId Int?
-  parent   DjComment?  @relation("DjCommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
-  replies  DjComment[] @relation("DjCommentReplies")
-
-  likes DjCommentLike[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([djProfileId])
-  @@index([parentId])
-  @@index([userId])
-}
-
-model DjCommentLike {
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  commentId Int
-  comment   DjComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-
-  @@id([userId, commentId])
-}
-
-// ------ COMMUNITY FEED ------
-
-// Only DJs can create posts (enforce in app layer)
-model Post {
-  id        Int       @id @default(autoincrement())
-  type      PostType  @default(TEXT)
-  content   String?
-  deletedAt DateTime?
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  comments PostComment[]
-  likes    PostLike[]
-  media    Media[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([createdAt])
-}
-
-// Self-referencing for replies
-model PostComment {
-  id        Int       @id @default(autoincrement())
-  content   String
-  deletedAt DateTime?
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  postId Int
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  parentId Int?
-  parent   PostComment?  @relation("PostCommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
-  replies  PostComment[] @relation("PostCommentReplies")
-
-  likes PostCommentLike[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([postId])
-  @@index([parentId])
-}
-
-model PostLike {
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  postId Int
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@id([userId, postId])
-}
-
-model PostCommentLike {
-  userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  commentId Int
-  comment   PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-
-  @@id([userId, commentId])
-}
-
-// ------ EVENTS ------
-
-// Only DJs create events. Owner DJ controls the event.
-model Event {
-  id          Int         @id @default(autoincrement())
-  slug        String      @unique // URL-friendly: /events/[slug]
-  title       String
-  description String?
-  eventType   EventType   @default(PUBLIC)
-  category    String      @default("OTHER") // App-layer validated against VALID_EVENT_CATEGORIES
-  posterUrl   String? // Supabase Storage public URL (renamed from image)
-  posterPath  String? // Supabase Storage path (for deletion on re-upload)
-  venue       String?
-  startDate   DateTime
-  endDate     DateTime?
-  startTime   String? // e.g. "22:00" — local to event timezone
-  endTime     String? // e.g. "05:00"
-  timezone    String? // e.g. "Europe/Stockholm"
-  ticketUrl   String? // PUBLIC events only
-  recap       String? // Post-event write-up (unlocked after COMPLETED)
-  audioLink   String? // External URL: SoundCloud / Mixcloud
-  videoLink   String? // External URL: YouTube / Vimeo (Premium only)
-  featured    Boolean     @default(false) // DJ pins as Featured Performance (max 3)
-  viewCount   Int         @default(0)
-  genres      String[] // e.g. ["Afro House", "Melodic Techno"]
-  status      EventStatus @default(DRAFT)
-  hidden      Boolean     @default(false) // Admin can hide without changing status
-  deletedAt   DateTime?
-
-  ownerDjId Int
-  ownerDj   DjProfile @relation("EventOwner", fields: [ownerDjId], references: [id])
-  countryId Int?
-  country   Country?  @relation(fields: [countryId], references: [id])
-  cityId    Int?
-  city      City?     @relation(fields: [cityId], references: [id])
-
-  participants EventDj[]
-  gallery      EventMedia[]
-  savedBy      SavedEvent[]
-
-  eventReviews     EventReview[]
-  eventModerations EventModeration[]
-
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  venueReviews VenueReview[]
-  djRatings    DjRating[]
-
-  @@index([ownerDjId])
-  @@index([ownerDjId, status])
-  @@index([ownerDjId, status, deletedAt])
-  @@index([status])
-  @@index([startDate])
-  @@index([featured])
-  @@index([hidden])
-  @@index([countryId])
-  @@index([cityId])
-}
-
-// Junction: multiple DJs per event (co-performers)
-model EventDj {
-  eventId     Int
-  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  role        String? // e.g. "Headliner", "Support", "B2B"
-
-  @@id([eventId, djProfileId])
-  @@index([djProfileId])
-}
-
-// Gallery photos uploaded after event is COMPLETED
-model EventMedia {
-  id        Int     @id @default(autoincrement())
-  eventId   Int
-  event     Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  url       String // Supabase Storage public URL
-  path      String // Supabase Storage path (for deletion)
-  caption   String?
-  sortOrder Int     @default(0)
-
-  createdAt DateTime @default(now())
-
-  @@index([eventId])
-}
-
-// Admin moderation requests for events
-model EventModeration {
-  id             Int                   @id @default(autoincrement())
-  status         EventModerationStatus @default(PENDING)
-  adminComment   String // Admin's feedback on what needs editing
-  eventUpdatedAt DateTime // Event's updatedAt when moderation was created (to verify edits)
-
-  adminId String
-  admin   User   @relation("EventModerationAdmin", fields: [adminId], references: [id])
-
-  eventId Int
-  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-  resolvedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@index([eventId])
-  @@index([status])
-  @@index([adminId])
-}
-
-// ------ GIGS MARKETPLACE ------
-
-model Gig {
-  id   Int    @id @default(autoincrement())
-  slug String @unique
-
-  organizerProfileId Int
-  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
-
-  title               String
-  gigType             GigType
-  description         String?
-  status              GigStatus @default(DRAFT)
-  eventDate           DateTime
-  applicationDeadline DateTime?
-
-  // Location (city/country always visible; address/venue revealed only after acceptance)
-  countryId       Int?
-  country         Country? @relation(fields: [countryId], references: [id])
-  cityId          Int?
-  city            City?    @relation(fields: [cityId], references: [id])
-  venueName       String?
-  hideVenueName   Boolean  @default(false)
-  venueAddress    String? // PRIVATE — revealed to accepted DJ only
-  venuePostalCode String? // PRIVATE — revealed to accepted DJ only
-
-  // Budget
-  budgetType BudgetType @default(TBA)
-  budgetMin  Int?
-  budgetMax  Int?
-  currency   String     @default("SEK")
-
-  // Requirements
-  requiredGenres          String[]
-  requiredExperienceLevel ExperienceLevel @default(OPEN)
-  setDurationMinutes      Int?
-  guestCount              Int?
-  dressCode               String?
-  mcRequired              Boolean         @default(false)
-  micRequired             Boolean         @default(false)
-  languagesSpoken         String[]
-
-  // Equipment (bounded multi-select; values enforced by app layer)
-  venueProvides String[]
-  djMustBring   String[]
-
-  // Logistics (PRIVATE — revealed to accepted DJ only)
-  arrivalInstructions   String?
-  setupNotes            String?
-  organizerContactName  String?
-  organizerContactPhone String?
-  organizerContactEmail String?
-
-  viewCount Int       @default(0)
-  hidden    Boolean   @default(false) // Admin can hide without cancelling
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  applications     GigApplication[]
-  gigReviews       GigReview[]
-  djGigReviews     DjGigReview[]
-  organizerReviews OrganizerReview[]
-
-  @@index([status])
-  @@index([gigType])
-  @@index([organizerProfileId])
-  @@index([eventDate])
-  @@index([cityId])
-  @@index([countryId])
-  @@index([applicationDeadline])
-  @@index([hidden])
-  @@index([slug])
-}
-
-model GigApplication {
-  id      Int                  @id @default(autoincrement())
-  status  GigApplicationStatus @default(APPLIED)
-  message String?
-
-  gigId Int
-  gig   Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
-
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  hire Hire?
-
-  shortlistedAt DateTime?
-  acceptedAt    DateTime?
-  rejectedAt    DateTime?
-  withdrawnAt   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([gigId, djProfileId])
-  @@index([gigId])
-  @@index([djProfileId])
-  @@index([status])
-}
-
-model GigReview {
-  id     Int     @id @default(autoincrement())
-  rating Int // 1-5
-  review String?
-
-  gigId       Int
-  gig         Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  organizerId String
-  organizer   User      @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-
-  // Anti-gaming audit
-  ipAddress String?
-  userAgent String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([gigId, djProfileId]) // one review per gig per DJ
-  @@index([djProfileId])
-  @@index([organizerId])
-  @@index([gigId])
-  @@index([createdAt])
-}
-
-/// DJ review of an organizer/gig they have completed.
-/// djProfileId is the reviewer (the DJ who performed the gig).
-/// organizerId is the review subject (the organizer who hired the DJ).
-model DjGigReview {
-  id     Int     @id @default(autoincrement())
-  rating Int // 1-5
-  review String?
-
-  gigId       Int
-  gig         Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  organizerId String
-  organizer   User      @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-
-  // Anti-gaming audit
-  ipAddress String?
-  userAgent String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([gigId, djProfileId]) // one review per gig per DJ
-  @@index([djProfileId])
-  @@index([organizerId])
-  @@index([gigId])
-  @@index([createdAt])
-}
-
-model EventReview {
-  id         Int     @id @default(autoincrement())
-  rating     Int // 1-5
-  review     String?
-  reviewType String? // "ATTENDEE" or "GIG_OWNER"
-
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  eventId     Int
-  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, eventId, djProfileId])
-  @@index([eventId])
-  @@index([djProfileId])
-  @@index([userId])
-  @@index([reviewType])
-}
-
-model OrganizerReview {
-  id Int @id @default(autoincrement())
-
-  // Category ratings (1-5)
-  communication   Int
-  payment         Int
-  professionalism Int
-  venueQuality    Int
-
-  // Overall rating (1-5) - calculated from categories
-  rating Int
-
-  review String?
-
-  gigId              Int
-  gig                Gig              @relation(fields: [gigId], references: [id], onDelete: Cascade)
-  djProfileId        Int
-  djProfile          DjProfile        @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  organizerProfileId Int
-  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
-
-  // Anti-gaming audit
-  ipAddress String?
-  userAgent String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([gigId, djProfileId]) // one review per gig per DJ
-  @@index([djProfileId])
-  @@index([organizerProfileId])
-  @@index([gigId])
-  @@index([createdAt])
-}
-
-// Response templates for DJ review responses
-model ResponseTemplate {
-  id         String                   @id @default(cuid())
-  name       String
-  category   ResponseTemplateCategory
-  content    String
-  variables  String[] // e.g., ["{reviewer_name}", "{event_name}"]
-  isDefault  Boolean                  @default(false)
-  usageCount Int                      @default(0)
-  createdAt  DateTime                 @default(now())
-  updatedAt  DateTime                 @updatedAt
-
-  @@index([category])
-  @@index([isDefault])
-}
-
 enum ResponseTemplateCategory {
   POSITIVE
   NEUTRAL
@@ -1416,408 +1523,8 @@ enum ResponseTemplateCategory {
   FRIENDLY
 }
 
-model ReputationScore {
-  id          Int       @id @default(autoincrement())
-  djProfileId Int       @unique
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-
-  totalScore          Int @default(0) // 0-1000
-  profileQualityScore Int @default(0) // 0-150
-  verificationScore   Int @default(0) // 0-50
-  reviewScore         Int @default(0) // 0-550
-  reliabilityScore    Int @default(0) // 0-150
-  activityScore       Int @default(0) // 0-100
-  newTalentBoost      Int @default(0) // 0-50
-
-  confidenceLevel Float  @default(0) // 0.0-1.0
-  trendDirection  String @default("STABLE") // RISING, STABLE, FALLING
-
-  calculatedAt        DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  reputationHistories ReputationHistory[]
-
-  @@index([totalScore])
-  @@index([djProfileId])
-}
-
-model OrganizerReputationScore {
-  id                 Int              @id @default(autoincrement())
-  organizerProfileId Int              @unique
-  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
-
-  totalScore          Int @default(0) // 0-1000
-  profileQualityScore Int @default(0) // 0-150
-  verificationScore   Int @default(0) // 0-50
-  reviewScore         Int @default(0) // 0-550
-  reliabilityScore    Int @default(0) // 0-150
-  activityScore       Int @default(0) // 0-100
-
-  confidenceLevel Float  @default(0) // 0.0-1.0
-  trendDirection  String @default("STABLE") // RISING, STABLE, FALLING
-
-  calculatedAt        DateTime                     @default(now())
-  updatedAt           DateTime                     @updatedAt
-  reputationHistories OrganizerReputationHistory[]
-
-  @@index([totalScore])
-  @@index([organizerProfileId])
-}
-
-model ReputationHistory {
-  id                Int             @id @default(autoincrement())
-  reputationScoreId Int
-  reputationScore   ReputationScore @relation(fields: [reputationScoreId], references: [id], onDelete: Cascade)
-
-  previousTotal Int
-  newTotal      Int
-  changeReason  ReputationChangeReason
-
-  createdAt DateTime @default(now())
-
-  @@index([reputationScoreId])
-  @@index([createdAt])
-}
-
-model OrganizerReputationHistory {
-  id                         Int                      @id @default(autoincrement())
-  organizerReputationScoreId Int
-  organizerReputationScore   OrganizerReputationScore @relation(fields: [organizerReputationScoreId], references: [id], onDelete: Cascade)
-
-  previousTotal Int
-  newTotal      Int
-  changeReason  ReputationChangeReason
-
-  createdAt DateTime @default(now())
-
-  @@index([organizerReputationScoreId])
-  @@index([createdAt])
-}
-
-model VenueReputationScore {
-  id      Int   @id @default(autoincrement())
-  venueId Int   @unique
-  venue   Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
-
-  totalScore          Int @default(0) // 0-1000
-  profileQualityScore Int @default(0) // 0-150
-  verificationScore   Int @default(0) // 0-50
-  reviewScore         Int @default(0) // 0-550
-  reliabilityScore    Int @default(0) // 0-150
-  activityScore       Int @default(0) // 0-100
-
-  confidenceLevel Float  @default(0) // 0.0-1.0
-  trendDirection  String @default("STABLE") // RISING, STABLE, FALLING
-
-  calculatedAt        DateTime                 @default(now())
-  updatedAt           DateTime                 @updatedAt
-  reputationHistories VenueReputationHistory[]
-
-  @@index([totalScore])
-  @@index([venueId])
-}
-
-model VenueReputationHistory {
-  id                     Int                  @id @default(autoincrement())
-  venueReputationScoreId Int
-  venueReputationScore   VenueReputationScore @relation(fields: [venueReputationScoreId], references: [id], onDelete: Cascade)
-
-  previousTotal Int
-  newTotal      Int
-  changeReason  ReputationChangeReason
-
-  createdAt DateTime @default(now())
-
-  @@index([venueReputationScoreId])
-  @@index([createdAt])
-}
-
-// ------ FOLLOWERS ------
-
-model Follower {
-  followerId  String
-  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
-  followingId String
-  following   User     @relation("UserFollowings", fields: [followingId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-
-  @@id([followerId, followingId])
-}
-
-// ------ DJ FOLLOWS ------
-
-model DjFollow {
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  djProfileId Int
-  djProfile   DjProfile @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-
-  @@id([userId, djProfileId])
-  @@index([userId])
-  @@index([djProfileId])
-}
-
-// ------ SAVED EVENTS ------
-
-model SavedEvent {
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@id([userId, eventId])
-  @@index([userId])
-  @@index([eventId])
-}
-
-// ------ NOTIFICATIONS ------
-
-model Notification {
-  id          Int              @id @default(autoincrement())
-  type        NotificationType
-  read        Boolean          @default(false)
-  data        Json? // flexible payload (postId, djProfileId, gigId, etc.)
-  emailSentAt DateTime?
-
-  recipientId String
-  recipient   User   @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
-
-  // senderId is null for system-generated notifications
-  senderId String?
-  sender   User?   @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now())
-
-  @@index([recipientId, read])
-  @@index([recipientId, createdAt])
-}
-
-// ------ REVIEW NOTIFICATION TRACKING ------
-
-model ReviewNotificationTracking {
-  id          Int       @id @default(autoincrement())
-  userId      String
-  targetType  String // "EVENT" or "GIG"
-  targetId    Int // eventId or gigId
-  notifiedAt  DateTime  @default(now())
-  remindedAt  DateTime?
-  dismissedAt DateTime?
-
-  user User @relation("ReviewNotificationTracking", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, targetType, targetId])
-  @@index([userId])
-  @@index([targetType, targetId])
-}
-
-// ------ EMAIL PREFERENCES ------
-
-model EmailPreference {
-  id     Int    @id @default(autoincrement())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  bookingEmails       Boolean @default(true)
-  gigEmails           Boolean @default(true)
-  applicationEmails   Boolean @default(true)
-  profileReviewEmails Boolean @default(true)
-  platformUpdates     Boolean @default(true)
-  marketingEmails     Boolean @default(false)
-  // verificationEmails, passwordReset, securityAlerts cannot be disabled (enforced app-layer)
-
-  @@index([userId])
-}
-
-// ------ EMAIL LOG ------
-
-model EmailLog {
-  id                Int            @id @default(autoincrement())
-  userId            String? // null = system email (no user associated)
-  user              User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
-  recipientEmail    String
-  emailType         EmailType
-  provider          String         @default("resend")
-  status            EmailLogStatus @default(PENDING)
-  providerMessageId String?
-  errorMessage      String?
-  retryCount        Int            @default(0)
-  lastAttemptAt     DateTime       @default(now())
-  createdAt         DateTime       @default(now())
-
-  @@index([userId])
-  @@index([status])
-  @@index([emailType])
-  @@index([createdAt])
-}
-
-// ------ CONTACT SUBMISSIONS ------
-
-model ContactSubmission {
-  id        Int             @id @default(autoincrement())
-  name      String
-  email     String
-  category  ContactCategory
-  message   String
-  userId    String?
-  user      User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-
-  @@index([userId])
-  @@index([email])
-  @@index([category])
-  @@index([createdAt])
-}
-
-// ------ REPORTS ------
-
-model Report {
-  id          Int              @id @default(autoincrement())
-  targetType  ReportTargetType
-  targetId    String // Stringified — works for Int and String PKs
-  reason      ReportReason
-  description String?
-  status      ReportStatus     @default(OPEN)
-  adminNote   String?
-
-  reporterId String
-  reporter   User   @relation("ReportSubmitter", fields: [reporterId], references: [id], onDelete: Cascade)
-
-  reviewedById String?
-  reviewedBy   User?     @relation("ReportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
-  reviewedAt   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([status])
-  @@index([targetType, targetId])
-  @@index([reporterId])
-  @@index([reviewedById])
-}
-
-// ------ ADMIN ACTION LOG ------
-
-// Audit trail — every admin mutation writes one row here.
-model AdminActionLog {
-  id         Int    @id @default(autoincrement())
-  action     String // e.g. "SUSPEND_USER", "APPROVE_DJ", "HIDE_GIG"
-  targetType String // e.g. "User", "DjProfile", "Gig"
-  targetId   String // Stringified PK of the affected record
-  metadata   Json? // Extra context: reason, note, previous status
-
-  adminId String?
-  admin   User?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now())
-
-  @@index([adminId])
-  @@index([action])
-  @@index([targetType, targetId])
-  @@index([createdAt])
-}
-
-// ============================================================
-// SECTION 2: PHASE 2 MODELS
-// (Schema defined, development deferred)
-// ============================================================
-
-// ------ DIRECT MESSAGING ------
-
 enum AttendanceStatus {
   INTERESTED
   GOING
   ATTENDED
 }
-
-// Supports DJ <-> Organizer, Fan <-> DJ, DJ <-> DJ
-model Conversation {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  participants ConversationParticipant[]
-  messages     Message[]
-}
-
-model ConversationParticipant {
-  conversationId Int
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  userId         String
-
-  @@id([conversationId, userId])
-  @@index([userId])
-}
-
-model Message {
-  id      Int       @id @default(autoincrement())
-  content String
-  readAt  DateTime?
-
-  conversationId Int
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  senderId       String
-
-  createdAt DateTime @default(now())
-
-  @@index([conversationId])
-  @@index([senderId])
-}
-
-// ------ EVENT ATTENDANCE ------
-
-model EventAttendance {
-  eventId Int
-  userId  String
-  status  AttendanceStatus
-
-  @@id([eventId, userId])
-  @@index([eventId])
-  @@index([userId])
-}
-
-// ------ HIRE RECORDS ------
-
-// Created automatically when a GigApplication is ACCEPTED
-model Hire {
-  id                 Int            @id @default(autoincrement())
-  applicationId      Int            @unique
-  application        GigApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  agreedRate         Decimal?
-  notes              String?
-  status             HireStatus     @default(ACTIVE)
-  completedAt        DateTime?
-  cancelledAt        DateTime?
-  cancellationReason String?
-  noShow             Boolean        @default(false)
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-
-  @@index([applicationId])
-}
-
-// ============================================================
-// SECTION 3: FUTURE PREMIUM FEATURES
-// (Commented placeholders — do NOT implement yet)
-// ============================================================
-
-// ✅ DjPlan enum implemented (FREE | PREMIUM). Extend with PRO | AGENCY | ENTERPRISE as needed.
-// ✅ plan, verified, featured, searchScore, bookingEmail, bookingPhone, feeMin, feeMax, feeCurrency added to DjProfile.
-// Feature gating lives in src/lib/plan-features.ts.
-// Profile completion lives in src/lib/profile-completion.ts.
-
-// -- Future: FeaturedDj (paid time-boxed slots) --
-// Fields: djProfileId, startsAt DateTime, endsAt DateTime, position Int
-// @@index([startsAt, endsAt]) for efficient expiry queries.
-// Use alongside featured Boolean for granular control.
-
-// -- Future: FeaturedGig --
-// Organizer pays to boost gig listing visibility.
-// Fields: gigId, startsAt, endsAt
-
-// -- Future: OrganizerPlan --
-// Mirror of DjPlan for organizer subscriptions.
-// Tiers: FREE | PREMIUM | AGENCY
