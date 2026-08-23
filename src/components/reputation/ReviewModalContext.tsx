@@ -9,7 +9,15 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { ReviewModal } from "./ReviewModal";
+import dynamic from "next/dynamic";
+
+// Lazy-load the review modal so its JS only ships when a user actually opens
+// a review form. This component lives in the root layout, so a static import
+// would otherwise bundle it on every page.
+const ReviewModal = dynamic(
+  () => import("./ReviewModal").then((mod) => mod.ReviewModal),
+  { ssr: false, loading: () => null },
+);
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
