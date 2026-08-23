@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { getCitiesForCountry } from "@/lib/actions/locations";
 import { GIG_TYPE_OPTIONS } from "@/config/gig-type-fields";
+import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 import type { StepProps, CityOption } from "./GigForm";
 
 export function GigFormStep1({
@@ -113,12 +115,10 @@ export function GigFormStep1({
             >
               Date
             </label>
-            <input
+            <DatePicker
               id="event-date"
-              type="date"
               value={data.eventDate ? data.eventDate.split("T")[0] : ""}
-              onChange={(e) => {
-                const datePart = e.target.value;
+              onChange={(datePart) => {
                 const timePart = data.eventDate
                   ? (data.eventDate.split("T")[1] ?? "00:00")
                   : "00:00";
@@ -127,7 +127,8 @@ export function GigFormStep1({
                   datePart ? `${datePart}T${timePart}` : "",
                 );
               }}
-              className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white focus:border-white/25 focus:outline-none"
+              placeholder="Select date…"
+              className="border-white/10 bg-black"
             />
           </div>
           <div>
@@ -137,22 +138,21 @@ export function GigFormStep1({
             >
               Time
             </label>
-            <input
+            <TimePicker
               id="event-time"
-              type="time"
               value={
                 data.eventDate && data.eventDate.includes("T")
                   ? data.eventDate.split("T")[1]
                   : ""
               }
-              onChange={(e) => {
-                const timePart = e.target.value;
+              onChange={(timePart) => {
                 const datePart = data.eventDate
                   ? data.eventDate.split("T")[0]
                   : "";
                 if (datePart) onChange("eventDate", `${datePart}T${timePart}`);
               }}
-              className="w-full rounded-lg border border-white/10 bg-black px-3 py-2.5 text-sm text-white focus:border-white/25 focus:outline-none"
+              placeholder="Select time…"
+              className="border-white/10 bg-black"
             />
           </div>
         </div>
