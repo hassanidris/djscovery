@@ -36,17 +36,30 @@ import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
-import ProfileReviews from "@/components/dj-profile/ProfileReviews";
-import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
 import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import DjEventsModule from "@/components/dj-profile/DjEventsModule";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
+import {
+  ReviewsSkeleton,
+  EventsSidebarSkeleton,
+} from "@/components/dj-profile/ProfileSectionSkeletons";
 
 const MediaForm = dynamic(() => import("@/components/dj/MediaForm"), {
   ssr: false,
   loading: () => null,
 });
+
+// Below-the-fold sections are dynamically imported so their JS only ships
+// when the user scrolls toward them. Hero + About stay eager for fast LCP.
+const ProfileReviews = dynamic(
+  () => import("@/components/dj-profile/ProfileReviews"),
+  { loading: () => <ReviewsSkeleton /> },
+);
+const ProfileEventsSidebar = dynamic(
+  () => import("@/components/dj-profile/ProfileEventsSidebar"),
+  { loading: () => <EventsSidebarSkeleton /> },
+);
 import { ScoreBreakdown } from "@/components/dj-profile/ScoreBreakdown";
 import {
   SOCIAL_ICONS,
@@ -524,7 +537,7 @@ export default function DjProfileFree({
           {/* Main Column */}
           <div className="flex flex-col gap-12 lg:col-span-2">
             {/* ── STICKY SUB-NAVIGATION ── */}
-            <div className="bg-h_blackLight/30 sticky top-[4.125rem] z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
+            <div className="bg-h_blackLight/30 sticky top-16.5 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
               <DjProfileSubNav showPremiumTabs={false} />
             </div>
             {/* ── MOBILE BOOK CTA ── */}
@@ -984,7 +997,7 @@ export default function DjProfileFree({
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="sticky top-[4.125rem] hidden h-fit flex-col gap-5 lg:flex">
+          <aside className="sticky top-16.5 hidden h-fit flex-col gap-5 lg:flex">
             {/* Book CTA — desktop only; mobile version is inline above */}
             <BookCTA
               stageName={`Dj. ${safeDJ.stageName}`}

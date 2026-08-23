@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useRef, useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -159,23 +160,19 @@ export default function AdminFilters({
       ))}
       {dateRange && (
         <>
-          <Input
-            type="date"
-            placeholder="Start Date"
+          <DatePicker
             value={currentValues[dateRange.startDateKey] || ""}
-            onChange={(e) =>
-              handleDateChange(dateRange.startDateKey, e.target.value)
-            }
-            className="h-9 w-36 border-white/10 bg-white/5 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
+            onChange={(v) => handleDateChange(dateRange.startDateKey, v)}
+            placeholder="Start Date"
+            compact
+            className="w-36 border-white/10 bg-white/5"
           />
-          <Input
-            type="date"
-            placeholder="End Date"
+          <DatePicker
             value={currentValues[dateRange.endDateKey] || ""}
-            onChange={(e) =>
-              handleDateChange(dateRange.endDateKey, e.target.value)
-            }
-            className="h-9 w-36 border-white/10 bg-white/5 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
+            onChange={(v) => handleDateChange(dateRange.endDateKey, v)}
+            placeholder="End Date"
+            compact
+            className="w-36 border-white/10 bg-white/5"
           />
         </>
       )}

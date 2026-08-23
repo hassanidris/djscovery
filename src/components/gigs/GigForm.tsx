@@ -2,13 +2,28 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { createGig, updateGig } from "@/lib/actions/gigs";
-import { GigFormStep1 } from "./GigFormStep1";
-import { GigFormStep2 } from "./GigFormStep2";
-import { GigFormStep3 } from "./GigFormStep3";
-import { GigFormStep4 } from "./GigFormStep4";
 import type { GigType, BudgetType, ExperienceLevel } from "@prisma/client";
+
+// Lazy-load each wizard step so only the active step's JS ships to the client.
+const GigFormStep1 = dynamic(
+  () => import("./GigFormStep1").then((m) => m.GigFormStep1),
+  { loading: () => null },
+);
+const GigFormStep2 = dynamic(
+  () => import("./GigFormStep2").then((m) => m.GigFormStep2),
+  { loading: () => null },
+);
+const GigFormStep3 = dynamic(
+  () => import("./GigFormStep3").then((m) => m.GigFormStep3),
+  { loading: () => null },
+);
+const GigFormStep4 = dynamic(
+  () => import("./GigFormStep4").then((m) => m.GigFormStep4),
+  { loading: () => null },
+);
 
 // ============================================================
 // SHARED TYPES

@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 import {
   Select,
   SelectContent,
@@ -696,12 +698,12 @@ export function EventForm(props: EventFormProps) {
             <Label htmlFor="startDate" className="text-zinc-300">
               Start Date <span className="text-red-500">*</span>
             </Label>
-            <Input
+            <DatePicker
               id="startDate"
-              type="date"
               value={data.startDate}
-              onChange={(e) => set("startDate", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
+              onChange={(v) => set("startDate", v)}
+              placeholder="Select start date"
+              className="border-zinc-700 bg-zinc-900 focus:border-zinc-500"
             />
             {errors.startDate && (
               <p className="text-xs text-red-400">{errors.startDate}</p>
@@ -712,12 +714,12 @@ export function EventForm(props: EventFormProps) {
             <Label htmlFor="endDate" className="text-zinc-300">
               End Date
             </Label>
-            <Input
+            <DatePicker
               id="endDate"
-              type="date"
               value={data.endDate}
-              onChange={(e) => set("endDate", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
+              onChange={(v) => set("endDate", v)}
+              placeholder="Select end date"
+              className="border-zinc-700 bg-zinc-900 focus:border-zinc-500"
             />
           </div>
         </div>
@@ -730,12 +732,12 @@ export function EventForm(props: EventFormProps) {
             >
               <Clock className="h-3.5 w-3.5" /> Start Time
             </Label>
-            <Input
+            <TimePicker
               id="startTime"
-              type="time"
               value={data.startTime}
-              onChange={(e) => set("startTime", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
+              onChange={(v) => set("startTime", v)}
+              placeholder="Select start time"
+              className="border-zinc-700 bg-zinc-900 focus:border-zinc-500"
             />
             {errors.startTime && (
               <p className="text-xs text-red-400">{errors.startTime}</p>
@@ -749,12 +751,12 @@ export function EventForm(props: EventFormProps) {
             >
               <Clock className="h-3.5 w-3.5" /> End Time
             </Label>
-            <Input
+            <TimePicker
               id="endTime"
-              type="time"
               value={data.endTime}
-              onChange={(e) => set("endTime", e.target.value)}
-              className="border-zinc-700 bg-zinc-900 text-white scheme-dark focus:border-zinc-500"
+              onChange={(v) => set("endTime", v)}
+              placeholder="Select end time"
+              className="border-zinc-700 bg-zinc-900 focus:border-zinc-500"
             />
             {errors.endTime && (
               <p className="text-xs text-red-400">{errors.endTime}</p>

@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -18,7 +17,6 @@ import {
   CircleCheck,
   ChartLine,
   Headphones,
-  Landmark,
   BriefcaseBusiness,
   MapPin,
   Star,
@@ -35,14 +33,20 @@ import MediaAudioPlayer from "@/components/dj-profile/MediaAudioPlayer";
 import MediaVideoModal from "@/components/dj-profile/MediaVideoModal";
 import MediaGalleryLightbox from "@/components/dj-profile/MediaGalleryLightbox";
 import ProfileAbout from "@/components/dj-profile/ProfileAbout";
-import ProfileReviews from "@/components/dj-profile/ProfileReviews";
 import WhereIvePlayed from "@/components/dj-profile/WhereIvePlayed";
 import CareerHighlights from "@/components/dj-profile/CareerHighlights";
 import DjProfileSubNav from "@/components/dj-profile/DjProfileSubNav";
 import DjProfileMobileBottomBar from "@/components/dj-profile/DjProfileMobileBottomBar";
 import { HIGHLIGHT_ICONS, PRESS_ICON_MAP } from "@/data/dj-profile-defaults";
-import BookingPackages from "@/components/dj-profile/BookingPackages";
-import ProfileEventsSidebar from "@/components/dj-profile/ProfileEventsSidebar";
+import DjEventsModule from "@/components/dj-profile/DjEventsModule";
+import {
+  EndorsementsSkeleton,
+  PressSkeleton,
+  ReviewsSkeleton,
+  PackagesSkeleton,
+  EventsSidebarSkeleton,
+  TeamSidebarSkeleton,
+} from "@/components/dj-profile/ProfileSectionSkeletons";
 
 // Lazy-load owner-only modals so their JS (1400+ lines combined) only ships
 // when a profile owner opens them. These are never needed for anonymous
@@ -67,8 +71,33 @@ const MediaForm = dynamic(() => import("@/components/dj/MediaForm"), {
   ssr: false,
   loading: () => null,
 });
-import DjEventsModule from "@/components/dj-profile/DjEventsModule";
-import ProfessionalTeamSidebar from "@/components/dj-profile/ProfessionalTeamSidebar";
+
+// Below-the-fold sections are dynamically imported so their JS only ships
+// when the user scrolls toward them. Hero + About stay eager for fast LCP.
+const EndorsementsSection = dynamic(
+  () => import("@/components/dj-profile/EndorsementsSection"),
+  { loading: () => <EndorsementsSkeleton /> },
+);
+const PressSection = dynamic(
+  () => import("@/components/dj-profile/PressSection"),
+  { loading: () => <PressSkeleton /> },
+);
+const ProfileReviews = dynamic(
+  () => import("@/components/dj-profile/ProfileReviews"),
+  { loading: () => <ReviewsSkeleton /> },
+);
+const BookingPackages = dynamic(
+  () => import("@/components/dj-profile/BookingPackages"),
+  { loading: () => <PackagesSkeleton /> },
+);
+const ProfileEventsSidebar = dynamic(
+  () => import("@/components/dj-profile/ProfileEventsSidebar"),
+  { loading: () => <EventsSidebarSkeleton /> },
+);
+const ProfessionalTeamSidebar = dynamic(
+  () => import("@/components/dj-profile/ProfessionalTeamSidebar"),
+  { loading: () => <TeamSidebarSkeleton /> },
+);
 import { addVenue, updateVenue, deleteVenue } from "@/lib/actions/profile";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { useViewerContext } from "@/hooks/useViewerContext";
@@ -1496,56 +1525,12 @@ export default function DjProfilePremium({
                 <Separator className="bg-white/8" />
 
                 {/* ── INDUSTRY ENDORSEMENTS ── */}
-                <section ref={endorsementsTargetRef}>
-                  <SectionHeading sub="What industry professionals say">
-                    Industry Endorsements
-                  </SectionHeading>
-                  {endorsementsIsLoading && !endorsementsHasLoaded ? (
-                    <div className="space-y-4">
-                      {[...Array(2)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-24 animate-pulse rounded-lg bg-white/5"
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-4">
-                      {ENDORSEMENTS.map((e: any) => (
-                        <Card
-                          key={e.name}
-                          className="bg-h_blackLight/30 gap-0 border-white/8 p-5"
-                        >
-                          <div className="flex items-start gap-3">
-                            <Avatar className="size-11 shrink-0 ring-1 ring-white/10">
-                              <AvatarImage src={e.avatar} />
-                              <AvatarFallback className="bg-h_blackLight text-xs text-white">
-                                {e.name.slice(0, 2)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0 flex-1">
-                              <div className="mb-2 flex items-center gap-2">
-                                <span className="text-sm font-semibold text-white">
-                                  {e.name}
-                                </span>
-                                <Badge className="border-blue-500/20 bg-blue-500/10 text-[11px] text-blue-400">
-                                  <Landmark className="mr-1 h-2 w-2" />
-                                  Venue
-                                </Badge>
-                              </div>
-                              <p className="mb-2 text-xs text-gray-400">
-                                {e.role}
-                              </p>
-                              <p className="text-sm leading-relaxed text-gray-300 italic">
-                                &ldquo;{e.quote}&rdquo;
-                              </p>
-                            </div>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </section>
+                <EndorsementsSection
+                  ref={endorsementsTargetRef}
+                  endorsements={ENDORSEMENTS}
+                  isLoading={endorsementsIsLoading}
+                  hasLoaded={endorsementsHasLoaded}
+                />
               </>
             )}
 
@@ -1554,90 +1539,13 @@ export default function DjProfilePremium({
                 <Separator className="bg-white/8" />
 
                 {/* ── PRESS & MEDIA ── */}
-                <section id="press" ref={pressTargetRef}>
-                  <div className="mb-5 flex items-center justify-between">
-                    <SectionHeading sub="Interviews, features, and podcasts">
-                      Press &amp; Media
-                    </SectionHeading>
-                    {isOwner && PRESS.length > 0 && (
-                      <Button
-                        onClick={() => setIsPressModalOpen(true)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-gray-400 hover:text-white"
-                      >
-                        <Pencil className="mr-1.5 h-3 w-3" />
-                        Edit
-                      </Button>
-                    )}
-                  </div>
-                  {pressIsLoading && PRESS.length === 0 ? (
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {[...Array(4)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-20 animate-pulse rounded-lg bg-white/5"
-                        />
-                      ))}
-                    </div>
-                  ) : PRESS.length > 0 ? (
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {PRESS.map((p: any) => {
-                        const PressIcon = p.icon;
-                        const cardContent = (
-                          <div className="flex items-start gap-3">
-                            <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-white/8 bg-white/5">
-                              <PressIcon className="h-3.5 w-3.5 text-gray-400 transition-colors group-hover:text-white" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="mb-0.5 flex items-center gap-2">
-                                <span className="text-h_redLight text-xs font-bold">
-                                  {p.outlet}
-                                </span>
-                                <Badge className="border-white/8 bg-white/5 text-[11px] text-gray-400">
-                                  {p.type}
-                                </Badge>
-                              </div>
-                              <p className="line-clamp-2 text-sm font-medium text-white">
-                                {p.title}
-                              </p>
-                              <p className="mt-1 text-xs text-gray-400">
-                                {p.date}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                        return p.url ? (
-                          <a
-                            key={p.id}
-                            href={p.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Card className="bg-h_blackLight/30 group h-full cursor-pointer gap-0 border-white/8 p-4 transition-colors hover:border-white/15">
-                              {cardContent}
-                            </Card>
-                          </a>
-                        ) : (
-                          <Card
-                            key={p.id}
-                            className="bg-h_blackLight/30 group gap-0 border-white/8 p-4"
-                          >
-                            {cardContent}
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <EmptySectionState
-                      icon={Newspaper}
-                      title="No press items yet"
-                      description="Add interviews, features, and podcast appearances"
-                      actionLabel="Add Press"
-                      onAction={() => setIsPressModalOpen(true)}
-                    />
-                  )}
-                </section>
+                <PressSection
+                  ref={pressTargetRef}
+                  press={PRESS}
+                  isLoading={pressIsLoading}
+                  isOwner={isOwner}
+                  onAddPress={() => setIsPressModalOpen(true)}
+                />
               </>
             )}
 
