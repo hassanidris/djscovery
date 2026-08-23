@@ -71,7 +71,10 @@ export default function MediaCard({
     (media.type === "IMAGE" ? "Gallery photo" : "Untitled media");
 
   return (
-    <Card className="group flex flex-col overflow-hidden border-white/10 bg-white/5 transition-colors hover:border-white/20">
+    <Card
+      className="group flex flex-col overflow-hidden border-white/10 bg-white/5 transition-colors hover:border-white/20"
+      data-testid="media-card"
+    >
       <div className="relative aspect-video overflow-hidden bg-black">
         {thumbnailUrl && !imageError ? (
           <Image
@@ -109,6 +112,7 @@ export default function MediaCard({
             className="h-7 w-7 bg-black/60 text-white backdrop-blur-sm hover:bg-black/80"
             onClick={() => onEdit(media)}
             aria-label="Edit media"
+            data-testid="edit-media-button"
           >
             <Pencil className="h-3.5 w-3.5" />
           </Button>
@@ -118,6 +122,7 @@ export default function MediaCard({
             className="h-7 w-7 bg-black/60 backdrop-blur-sm hover:bg-red-600/80"
             onClick={() => onDelete(media)}
             aria-label="Delete media"
+            data-testid="delete-media-button"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>

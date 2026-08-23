@@ -245,3 +245,88 @@ export async function cleanupHiringTestData(
     where: { id: { in: gigIds } },
   });
 }
+
+/**
+ * Helper function to reset media items for a DJ (by email).
+ * Use this in beforeAll/beforeEach hooks to reset shared test-user state.
+ */
+export async function resetDjMedia(email: string): Promise<void> {
+  const db = getPrisma();
+  const profile = await db.djProfile.findFirst({
+    where: { user: { email } },
+    select: { id: true },
+  });
+  if (!profile) return;
+  await db.media.deleteMany({
+    where: { djProfileId: profile.id },
+  });
+}
+
+/**
+ * Helper function to create test media item for a DJ
+ */
+export async function createTestMedia(
+  djEmail: string,
+  type: "IMAGE" | "VIDEO" | "AUDIO",
+  options?: {
+    url?: string;
+    title?: string;
+    isSpotlight?: boolean;
+  },
+) {
+  const db = getPrisma();
+  const profile = await db.djProfile.findFirst({
+    where: { user: { email: djEmail } },
+    select: { id: true },
+  });
+  if (!profile) throw new Error("DJ profile not found");
+
+  // Get the next sort order
+  const maxOrder = await db.media.findFirst({
+    where: { djProfileId: profile.id },
+    orderBy: { sortOrder: "desc" },
+    select: { sortOrder: true },
+  });
+  const nextSortOrder = (maxOrder?.sortOrder ?? 0) + 1;
+
+  const media = await db.media.create({
+    data: {
+      type,
+      url:
+        options?.url ||
+        `https://example.com/test-${type.toLowerCase()}-${Date.now()}`,
+      bucket: "external",
+      path:
+        options?.url ||
+        `https://example.com/test-${type.toLowerCase()}-${Date.now()}`,
+      title: options?.title || `Test ${type} Item`,
+      isSpotlight: options?.isSpotlight || false,
+      sortOrder: nextSortOrder,
+      djProfileId: profile.id,
+    },
+  });
+
+  return media;
+}
+
+/**
+ * Helper function to get media count for a DJ by type
+ */
+export async function getDjMediaCount(
+  djEmail: string,
+  type?: "IMAGE" | "VIDEO" | "AUDIO",
+): Promise<number> {
+  const db = getPrisma();
+  const profile = await db.djProfile.findFirst({
+    where: { user: { email: djEmail } },
+    select: { id: true },
+  });
+  if (!profile) return 0;
+
+  return await db.media.count({
+    where: {
+      djProfileId: profile.id,
+      ...(type && { type }),
+    },
+  });
+}

@@ -136,6 +136,20 @@ DJ gig reviews allow DJs to review organizers and gigs they've completed:
 - Validation in `src/lib/validation/dj-gig-review-validation.ts`
 - Post-submit effects in `src/lib/gig-reviews/dj-gig-review-post-effects.ts`
 
+### Media Management System
+
+DJ media management allows DJs to upload and manage their mixes, videos, and press photos:
+
+- `/dj/media` — Media management interface
+- `MediaForm.tsx` — Add/edit media modal
+- `MediaCard.tsx` — Media display card component
+- `MediaLibrary.tsx` — Legacy media library component
+- Server actions in `src/lib/actions/dj-media.ts`
+- API endpoint: `/api/djs/[slug]/media` — Paginated media fetching
+- Storage: Supabase Storage bucket `djscovery-media`
+- E2E tests: `e2e/media-flow.spec.ts` (basic) and `e2e/media-flow-detailed.spec.ts` (comprehensive)
+- Test helpers in `e2e/test-setup.ts`: `resetDjMedia()`, `createTestMedia()`, `getDjMediaCount()`
+
 ## Database Notes
 
 - Partial unique indexes (e.g., `WHERE "eventId" IS NULL`) are created via raw SQL, not Prisma schema
