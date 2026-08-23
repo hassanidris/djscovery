@@ -8,6 +8,38 @@ import { GigGrid } from "@/components/gigs/GigGrid";
 import { GigFilters } from "@/components/gigs/GigFilters";
 import { GigGridSkeleton } from "@/components/gigs/GigSkeleton";
 
+// Extracted helper functions for better performance and testability
+function normalizeParam(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return value[0] || "";
+  return value || "";
+}
+
+function filterGigs(
+  gigs: (DjGigListItem & { isDemo?: true })[],
+  typeFilter: string,
+  searchQuery: string,
+): (DjGigListItem & { isDemo?: true })[] {
+  return gigs.filter((gig) => {
+    // Type filter
+    if (typeFilter && gig.gigType !== typeFilter) return false;
+
+    // Search query filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const titleMatch = gig.title.toLowerCase().includes(query);
+      const genreMatch = gig.requiredGenres.some((g) =>
+        g.toLowerCase().includes(query),
+      );
+      const locationMatch =
+        gig.city?.name?.toLowerCase().includes(query) ||
+        gig.country?.name?.toLowerCase().includes(query);
+      if (!titleMatch && !genreMatch && !locationMatch) return false;
+    }
+
+    return true;
+  });
+}
+
 export const metadata = { title: "Gigs — DJcovery" };
 export const revalidate = 60;
 
@@ -85,27 +117,7 @@ async function GigsContent({
       : demoGigsAll;
 
   // Apply filters
-  const filteredGigs = allGigs.filter((gig) => {
-    // Type filter
-    if (typeFilter && gig.gigType !== typeFilter) return false;
-
-    // Search query filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const titleMatch = gig.title.toLowerCase().includes(query);
-      const genreMatch = gig.requiredGenres.some((g) =>
-        g.toLowerCase().includes(query),
-      );
-      const locationMatch =
-        gig.city?.name?.toLowerCase().includes(query) ||
-        gig.country?.name?.toLowerCase().includes(query);
-      if (!titleMatch && !genreMatch && !locationMatch) return false;
-    }
-
-    return true;
-  });
-
-  const gigs = filteredGigs;
+  const gigs = filterGigs(allGigs, typeFilter, searchQuery);
 
   return (
     <>
@@ -132,12 +144,6 @@ export default async function GigsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-
-  // Normalize query parameters to handle string arrays
-  const normalizeParam = (value: string | string[] | undefined): string => {
-    if (Array.isArray(value)) return value[0] || "";
-    return value || "";
-  };
 
   const typeFilter = normalizeParam(sp.type);
   const searchQuery = normalizeParam(sp.q);

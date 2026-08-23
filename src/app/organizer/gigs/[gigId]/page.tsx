@@ -17,6 +17,7 @@ import { GigActions } from "@/components/gigs/GigActions";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { formatDuration } from "@/lib/utils/duration";
 import { formatNumber } from "@/lib/utils/currency";
+import { formatLongDate } from "@/lib/utils/date";
 
 export default async function OrganizerGigDetailPage({
   params,
@@ -51,15 +52,6 @@ export default async function OrganizerGigDetailPage({
   const location = [gig.city?.name, gig.country?.name]
     .filter(Boolean)
     .join(", ");
-
-  function formatDate(d: Date) {
-    return new Date(d).toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  }
 
   const budgetLabel =
     gig.budgetType === "TBA"
@@ -114,7 +106,7 @@ export default async function OrganizerGigDetailPage({
             {
               icon: CalendarDays,
               label: "Event Date",
-              value: formatDate(gig.eventDate),
+              value: formatLongDate(gig.eventDate),
             },
             { icon: MapPin, label: "Location", value: location || "Not set" },
             { icon: DollarSign, label: "Budget", value: budgetLabel },

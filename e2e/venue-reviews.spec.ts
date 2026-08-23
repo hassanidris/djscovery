@@ -8,7 +8,7 @@ async function signInAsFan(page: Page) {
     name: /accept all|accept cookies|agree/i,
   });
   if (await consentButton.isVisible().catch(() => false)) {
-    await consentButton.click();
+    await consentButton.click({ force: true });
   }
 
   await page.locator('input[name="email"]').fill(TEST_USERS.FAN.email);

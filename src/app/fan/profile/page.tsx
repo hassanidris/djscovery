@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getAttendedEventsWithPendingReviews } from "@/lib/queries/events";
+import { formatDate } from "@/lib/utils/date";
 
 export const metadata = { title: "My Profile" };
 
@@ -168,11 +169,7 @@ export default async function FanProfilePage() {
                         {event.title}
                       </p>
                       <p className="text-xs text-gray-400">
-                        {new Date(event.startDate).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        {formatDate(event.startDate)}
                         {event.cityName && ` • ${event.cityName}`}
                       </p>
                       <p className="mt-1 text-xs text-zinc-400">

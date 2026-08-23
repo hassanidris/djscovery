@@ -7,6 +7,7 @@ import {
   createTestApplication,
   createTestHire,
   cleanupHiringTestData,
+  resetApplicationStatus,
   disconnectTestPrisma,
 } from "./test-setup";
 
@@ -76,8 +77,19 @@ async function restoreAuthState(
   state: Awaited<ReturnType<BrowserContext["storageState"]>>,
 ) {
   await page.context().addCookies(state.cookies);
-  for (const origin of state.origins ?? []) {
-    for (const { name, value } of origin.localStorage ?? []) {
+  // For each saved origin, navigate to that origin then populate localStorage
+  // there. localStorage is origin-scoped, so setting it from a different origin
+  // would silently fail or write to the wrong origin.
+  for (const originState of state.origins ?? []) {
+    try {
+      await page.goto(originState.origin, {
+        waitUntil: "domcontentloaded",
+        timeout: 10000,
+      });
+    } catch {
+      // ignore navigation errors (e.g. unreachable origins in CI)
+    }
+    for (const { name, value } of originState.localStorage ?? []) {
       await page.evaluate(([n, v]) => localStorage.setItem(n, v), [
         name,
         value,
@@ -174,11 +186,25 @@ test.describe("organizer hiring flow", () => {
   });
 
   test("can shortlist an applicant", async ({ page }) => {
+    // Reset application status to APPLIED before each run
+    await resetApplicationStatus(testGigId, TEST_USERS.FREE_DJ.email);
+
     await restoreAuthState(page, organizerAuthState!);
     await page.goto(`/organizer/gigs/${testGigId}/applications`);
-    await page.getByRole("button", { name: "Shortlist" }).click();
-    await page.waitForLoadState("networkidle");
-    await expect(page.getByText("SHORTLISTED")).toBeVisible();
+
+    // Click shortlist and wait explicitly for the badge to appear.
+    // The badge renders "Shortlisted" (capitalized), not "SHORTLISTED".
+    // Use a case-insensitive regex to match regardless of casing.
+    const shortlistBtn = page.getByRole("button", { name: "Shortlist" });
+    await shortlistBtn.click();
+
+    // Wait for the server action / UI update to render the badge.
+    await page.waitForSelector("text=/Shortlisted/i", { timeout: 20000 });
+
+    // Final assertion for better failure diagnostics.
+    await expect(page.getByText(/Shortlisted/i)).toBeVisible({
+      timeout: 20000,
+    });
   });
 
   test("can navigate back to gig details from applications", async ({

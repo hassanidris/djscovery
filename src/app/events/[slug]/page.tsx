@@ -17,6 +17,7 @@ import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
 import JsonLd from "@/components/seo/JsonLd";
 import { EventViewTracker } from "@/components/events/EventViewTracker";
+import { formatDate, formatLongDate } from "@/lib/utils/date";
 import {
   EventViewerProvider,
   EditEventLink,
@@ -59,15 +60,6 @@ const STATUS_STYLES: Record<string, string> = {
   CANCELLED: "bg-red-950 text-red-400",
   DRAFT: "bg-zinc-800 text-zinc-400",
 };
-
-function formatDate(date: Date) {
-  return date.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 

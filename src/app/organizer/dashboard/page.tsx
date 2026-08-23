@@ -23,6 +23,7 @@ import {
   getPendingGigReviewsForOrganizer,
   getRecentDjReviewsForOrganizer,
 } from "@/lib/queries/gigs";
+import { formatDate } from "@/lib/utils/date";
 
 type CompletedGigNotificationData = {
   gigId?: number;
@@ -328,7 +329,7 @@ export default async function OrganizerDashboardPage() {
                       ))}
                     </div>
                     <p className="text-xs text-gray-400">
-                      {new Date(review.createdAt).toLocaleDateString()}
+                      {formatDate(review.createdAt)}
                     </p>
                   </div>
                 </CardContent>

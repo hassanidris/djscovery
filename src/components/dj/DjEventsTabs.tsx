@@ -166,7 +166,7 @@ function EventCard({ event, djSlug }: { event: DjEventItem; djSlug: string }) {
   const isPrivate = event.eventType === "PRIVATE";
   const isOwnEvent = event.ownerSlug === djSlug;
 
-  const dateDisplay = new Date(event.startDate).toLocaleDateString("en-GB", {
+  const dateDisplay = new Date(event.startDate).toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",

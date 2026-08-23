@@ -2,6 +2,7 @@ import { Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils/date";
 
 interface VenueReview {
   id: number;
@@ -157,11 +158,7 @@ export function VenueReviews({
                       {review.user.username || "Anonymous"}
                     </p>
                     <p className="text-xs text-gray-400">
-                      {new Date(review.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {formatDate(review.createdAt)}
                       {review.event && (
                         <>
                           {" · "}

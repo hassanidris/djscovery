@@ -1,5 +1,6 @@
 import { MessageSquare } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { formatDate } from "@/lib/utils/date";
 
 interface DjRatingResponseDisplayProps {
   response: string;
@@ -10,9 +11,7 @@ export function DjRatingResponseDisplay({
   response,
   respondedAt,
 }: DjRatingResponseDisplayProps) {
-  const dateString = respondedAt
-    ? new Date(respondedAt).toLocaleDateString()
-    : null;
+  const dateString = respondedAt ? formatDate(respondedAt) : null;
 
   return (
     <Card className="bg-h_blackLight/30 mt-3 border-white/5 p-4">
@@ -22,9 +21,7 @@ export function DjRatingResponseDisplay({
           <p className="mb-2 text-xs font-medium text-white">DJ Response</p>
           <p className="text-sm text-gray-300">{response}</p>
           {dateString && (
-            <p className="mt-2 text-xs text-gray-500">
-              Responded {dateString}
-            </p>
+            <p className="mt-2 text-xs text-gray-500">Responded {dateString}</p>
           )}
         </div>
       </div>

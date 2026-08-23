@@ -15,6 +15,11 @@
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "e2e:report": "playwright show-report",
+    "e2e:chrome": "playwright test --project=chromium",
+    "e2e:firefox": "playwright test --project=firefox",
+    "e2e:safari": "playwright test --project=webkit",
+    "e2e:cross-browser": "playwright test --project=chromium --project=firefox --project=webkit",
+    "e2e:cross-browser:prod": "PLAYWRIGHT_BASE_URL=http://localhost:3000 CI=true playwright test --project=chromium --project=firefox --project=webkit",
     "seed": "tsx prisma/seed.ts",
     "seed:test-users": "tsx prisma/seed-test-users.ts",
     "seed:simple-venue-reviews": "tsx prisma/seed-simple-venue-reviews.ts",
@@ -139,6 +144,8 @@
     "sharp": "^0.35.3",
     "tmp": "^0.2.6",
     "uuid": "^11.1.1",
-    "nanoid": "^3.3.17"
+    "nanoid": "^3.3.17",
+    "deepmerge-ts": "^8.0.1",
+    "@puppeteer/browsers": "^3.2.1"
   }
 }
