@@ -3,12 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Search } from "lucide-react";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import { useIsDesktop } from "@/lib/hooks/useIsDesktop";
 import BurgerMenu from "@/components/navbar/BurgerMenu";
-import SearchModal from "@/components/navbar/SearchModal";
 import type { NavUserData } from "@/lib/auth/getNavUser";
+
+// Lazy-load the search modal so its JS only ships when a user opens search.
+const SearchModal = dynamic(() => import("@/components/navbar/SearchModal"), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function NavMobileTop(props: NavUserData) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -53,7 +59,9 @@ export default function NavMobileTop(props: NavUserData) {
         {props.isLoggedIn && !isDesktop && <NotificationBell />}
       </div>
 
-      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      {searchOpen && (
+        <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      )}
     </div>
   );
 }
