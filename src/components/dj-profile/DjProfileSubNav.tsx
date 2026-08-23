@@ -12,8 +12,8 @@ const ALL_TABS: Tab[] = [
   { id: "about", label: "About" },
   { id: "events", label: "Events" },
   { id: "media", label: "Media" },
-  { id: "reviews", label: "Reviews" },
   { id: "press", label: "Press" },
+  { id: "reviews", label: "Reviews" },
   { id: "packages", label: "Packages" },
 ];
 
