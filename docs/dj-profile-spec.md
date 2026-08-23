@@ -872,7 +872,7 @@ Demo data defined in `src/data/djscovery_seed_1.json` and loaded via `src/data/d
 - Description (optional)
 - Location (country/city)
 
-**Display:** List of venues with dates and locations.
+**Display:** List/map toggle (map is the default view when venues have coordinates). Map shows branded red markers with popups (venue name, city/country, formatted date). List shows venue cards with name, location, date, and optional description. Venues without coordinates are excluded from the map and shown only in the list; owners see a hint banner for venues pending geocoding.
 
 **Management:** Add/edit/delete via VenueModal component.
 
@@ -1573,8 +1573,8 @@ Policies defined in `prisma/rls-policies.sql`:
 - `ProfileAbout` — About section with bio, experience, genres, DJ types
 - `ProfileReviews` — Reviews section with rating summary and list
 - `ProfileEventsSidebar` — Events sidebar (upcoming/past)
-- `ProfileVenues` — Where I've played section (Premium)
-- `WhereIvePlayed` — Venue list component
+- `WhereIvePlayed` — Where I've played section with list/map toggle (map default)
+- `VenueMap` — Leaflet-based map view for venues with coordinates
 - `ProfileViewTracker` — Analytics tracking component
 
 **Free Profile:**
