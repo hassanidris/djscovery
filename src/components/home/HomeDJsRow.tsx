@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { formatNumber } from "@/lib/utils/currency";
 
@@ -92,12 +93,13 @@ export default function HomeDJsRow({
 
                   <div className="flex justify-center gap-1">
                     {dj.genres.slice(0, 2).map((g) => (
-                      <Badge
+                      <GenreBadge
                         key={g}
-                        className="bg-h_redDark/60 border-0 whitespace-nowrap text-red-100"
+                        variant="red"
+                        className="whitespace-nowrap text-red-100"
                       >
                         {g.length > 11 ? `${g.slice(0, 10)}…` : g}
-                      </Badge>
+                      </GenreBadge>
                     ))}
                   </div>
 

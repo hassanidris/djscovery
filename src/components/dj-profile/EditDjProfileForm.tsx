@@ -2,22 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { toast } from "sonner";
-import { X, Plus, Loader2, Camera, ArrowLeft, Crown } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import { updateDjProfile, getCitiesByCountry } from "@/lib/actions/profile";
 import { getGenres } from "@/lib/actions/genre";
-import { uploadDjAvatar, uploadDjCover } from "@/lib/actions/dj-upload";
 import { getMediaLimit, normalisePlan } from "@/lib/plan-features";
-import MediaLibrary from "@/components/dj-profile/MediaLibrary";
-import type { MediaItem } from "@/lib/actions/dj-media";
+import { COUNTRY_CURRENCIES } from "@/config/country-currencies";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,168 +19,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { CURRENCIES } from "@/config/currencies";
 
-type Country = { id: number; name: string };
-type City = { id: number; name: string };
-
-const COUNTRY_CURRENCIES: Record<string, string> = {
-  Sweden: "SEK",
-  "United Kingdom": "GBP",
-  "United States": "USD",
-  Germany: "EUR",
-  France: "EUR",
-  Spain: "EUR",
-  Italy: "EUR",
-  Netherlands: "EUR",
-  Belgium: "EUR",
-  Portugal: "EUR",
-  Austria: "EUR",
-  Switzerland: "CHF",
-  Norway: "NOK",
-  Denmark: "DKK",
-  Finland: "EUR",
-  Poland: "PLN",
-  "Czech Republic": "CZK",
-  Hungary: "HUF",
-  Romania: "RON",
-  Turkey: "TRY",
-  Russia: "RUB",
-  Ukraine: "UAH",
-  Australia: "AUD",
-  "New Zealand": "NZD",
-  Canada: "CAD",
-  Mexico: "MXN",
-  Brazil: "BRL",
-  Argentina: "ARS",
-  Colombia: "COP",
-  Chile: "CLP",
-  "South Africa": "ZAR",
-  Nigeria: "NGN",
-  Kenya: "KES",
-  Ghana: "GHS",
-  Egypt: "EGP",
-  Morocco: "MAD",
-  "Saudi Arabia": "SAR",
-  "United Arab Emirates": "AED",
-  Qatar: "QAR",
-  Kuwait: "KWD",
-  Bahrain: "BHD",
-  Israel: "ILS",
-  India: "INR",
-  Pakistan: "PKR",
-  Bangladesh: "BDT",
-  Japan: "JPY",
-  China: "CNY",
-  "South Korea": "KRW",
-  Singapore: "SGD",
-  Malaysia: "MYR",
-  Indonesia: "IDR",
-  Thailand: "THB",
-  Philippines: "PHP",
-  Vietnam: "VND",
-  Lebanon: "LBP",
-  Jordan: "JOD",
-  Iraq: "IQD",
-  Somalia: "SOS",
-};
-
-const SOCIAL_PLATFORMS = [
-  "instagram",
-  "tiktok",
-  "youtube",
-  "soundcloud",
-  "spotify",
-  "apple",
-  "website",
-  "anghami",
-] as const;
-
-const DJ_TYPE_LABELS: Record<string, string> = {
-  CLUB: "Club Night",
-  WEDDING: "Wedding",
-  FESTIVAL: "Festival",
-  CORPORATE: "Corporate Event",
-  BAR_LOUNGE: "Bar / Lounge",
-  PRIVATE_PARTY: "Private Party",
-  BIRTHDAY: "Birthday",
-  CULTURAL_EVENT: "Cultural Event",
-};
-
-type AvailabilityDay = { day: number; status: string };
-
-interface ProfileData {
-  id: number;
-  stageName: string;
-  bio: string;
-  experienceYears: number | null;
-  avatar: string;
-  coverImage: string;
-  countryId: number | null;
-  cityId: number | null;
-  countryName: string;
-  cityName: string;
-  genres: string[];
-  djTypes: string[];
-  socialLinks: { platform: string; url: string }[];
-  bookingEmail: string;
-  bookingPhone: string;
-  feeMin: number | null;
-  feeMax: number | null;
-  feeCurrency: string;
-  slug: string;
-  plan: "FREE" | "PREMIUM";
-  // Team
-  managerName: string;
-  managerEmail: string;
-  managerPhone: string;
-  agentName: string;
-  agentAgency: string;
-  agentEmail: string;
-  // Availability
-  availabilityTimezone: string;
-  availabilityMonth: string;
-  availabilityDays: AvailabilityDay[];
-  // Featured performance
-  featuredPerformanceUrl: string;
-  featuredPerformanceContext: string;
-}
-
-interface Props {
-  profile: ProfileData;
-  countries: Country[];
-  initialCities: City[];
-  userId: string;
-  allMedia: MediaItem[];
-}
-
-function SectionCard({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card className="bg-h_blackLight/40 gap-0 overflow-visible border-white/8 p-6">
-      <div className="mb-5">
-        <h2 className="text-sm font-semibold text-white">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-xs text-gray-400">{subtitle}</p>}
-      </div>
-      <Separator className="mb-5 bg-white/8" />
-      {children}
-    </Card>
-  );
-}
+import { ProfileImagesSection } from "./edit-form/ProfileImagesSection";
+import { BasicInfoSection } from "./edit-form/BasicInfoSection";
+import { ExperienceSection } from "./edit-form/ExperienceSection";
+import { LocationSection } from "./edit-form/LocationSection";
+import { GenresSpecialtiesSection } from "./edit-form/GenresSpecialtiesSection";
+import { SocialLinksSection } from "./edit-form/SocialLinksSection";
+import { BookingFeesSection } from "./edit-form/BookingFeesSection";
+import { MediaLibrarySection } from "./edit-form/MediaLibrarySection";
+import { FeaturedPerformanceSection } from "./edit-form/FeaturedPerformanceSection";
+import { TeamContactsSection } from "./edit-form/TeamContactsSection";
+import { AvailabilityCalendarSection } from "./edit-form/AvailabilityCalendarSection";
+import type {
+  City,
+  AvailabilityDay,
+  EditDjProfileFormProps as Props,
+} from "./edit-form/types";
 
 export default function EditDjProfileForm({
   profile,
@@ -214,28 +60,13 @@ export default function EditDjProfileForm({
   const [cityId, setCityId] = useState<number | null>(profile.cityId);
   const [cities, setCities] = useState<City[]>(initialCities);
   const [genreNames, setGenreNames] = useState<string[]>(profile.genres);
-  const [genreInput, setGenreInput] = useState("");
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
-  const [showGenreDropdown, setShowGenreDropdown] = useState(false);
 
   // Fetch genres on mount
   useEffect(() => {
     getGenres().then(setAvailableGenres);
   }, []);
 
-  // Filter genres for dropdown
-  const filteredGenres = availableGenres
-    .filter((g) => {
-      if (!genreInput.trim()) return true;
-      const norm = g.toLowerCase().replace(/[^a-z0-9]/g, "");
-      const inputNorm = genreInput.toLowerCase().replace(/[^a-z0-9]/g, "");
-      return (
-        norm.includes(inputNorm) ||
-        g.toLowerCase().includes(genreInput.toLowerCase())
-      );
-    })
-    .filter((g) => !genreNames.includes(g))
-    .slice(0, 10);
   const [djTypes, setDjTypes] = useState<string[]>(profile.djTypes);
   const [socialLinks, setSocialLinks] = useState<
     { platform: string; url: string }[]
@@ -288,9 +119,6 @@ export default function EditDjProfileForm({
   const [featuredPerformanceContext, setFeaturedPerformanceContext] = useState(
     profile.featuredPerformanceContext,
   );
-
-  const avatarInputRef = useRef<HTMLInputElement>(null);
-  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const isDirty =
     stageName !== profile.stageName ||
@@ -380,111 +208,10 @@ export default function EditDjProfileForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryId]);
 
-  function addGenre() {
-    const trimmed = genreInput.trim();
-    if (genreNames.length >= 5) return;
-    if (trimmed && !genreNames.includes(trimmed)) {
-      setGenreNames((prev) => [...prev, trimmed]);
-    }
-    setGenreInput("");
-  }
-
-  function removeGenre(name: string) {
-    setGenreNames((prev) => prev.filter((g) => g !== name));
-  }
-
   function toggleDjType(type: string) {
     setDjTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
-  }
-
-  function addSocialLink() {
-    setSocialLinks((prev) => [...prev, { platform: "instagram", url: "" }]);
-  }
-
-  function removeSocialLink(index: number) {
-    setSocialLinks((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function updateSocialLink(
-    index: number,
-    field: "platform" | "url",
-    value: string,
-  ) {
-    setSocialLinks((prev) =>
-      prev.map((link, i) => (i === index ? { ...link, [field]: value } : link)),
-    );
-  }
-
-  async function handleAvatarChange(file: File | undefined) {
-    if (!file) return;
-    setIsUploadingAvatar(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const result = await uploadDjAvatar(fd);
-      if ("error" in result) throw new Error(result.error);
-      setAvatarUrl(result.url);
-      toast.success("Avatar updated");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  }
-
-  async function handleCoverChange(file: File | undefined) {
-    if (!file) return;
-    setIsUploadingCover(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const result = await uploadDjCover(fd);
-      if ("error" in result) throw new Error(result.error);
-      setCoverImageUrl(result.url);
-      toast.success("Cover image updated");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setIsUploadingCover(false);
-    }
-  }
-
-  function isValidMonthFormat(monthStr: string): boolean {
-    if (!monthStr || !monthStr.includes("-")) return false;
-    const [y, m] = monthStr.split("-").map(Number);
-    if (!y || !m || Number.isNaN(y) || Number.isNaN(m)) return false;
-    return m >= 1 && m <= 12 && y >= 2000 && y <= 2100;
-  }
-
-  function daysInMonth(monthStr: string): number | null {
-    if (!isValidMonthFormat(monthStr)) return null;
-    const [y, m] = monthStr.split("-").map(Number);
-    return new Date(y, m, 0).getDate();
-  }
-
-  function firstDayOffset(monthStr: string): number | null {
-    if (!isValidMonthFormat(monthStr)) return null;
-    const [y, m] = monthStr.split("-").map(Number);
-    const dow = new Date(y, m - 1, 1).getDay(); // 0=Sun, 1=Mon
-    return dow === 0 ? 6 : dow - 1; // shift so Mon=0
-  }
-
-  function getDayStatus(day: number): string {
-    const found = availabilityDays.find((d) => d.day === day);
-    return found?.status ?? "free";
-  }
-
-  function cycleDayStatus(day: number) {
-    const order = ["free", "available", "booked", "tentative"];
-    const current = getDayStatus(day);
-    const next = order[(order.indexOf(current) + 1) % order.length];
-    setAvailabilityDays((prev) => {
-      const filtered = prev.filter((d) => d.day !== day);
-      if (next === "free") return filtered;
-      return [...filtered, { day, status: next }];
-    });
   }
 
   const isPremium = profile.plan === "PREMIUM";
@@ -581,791 +308,112 @@ export default function EditDjProfileForm({
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        {/* Profile Images */}
-        <SectionCard
-          title="Profile Images"
-          subtitle="Your avatar and cover photo"
-        >
-          <div className="flex flex-col gap-5">
-            {/* Avatar */}
-            <div className="flex items-center gap-4">
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white/5 ring-2 ring-white/10">
-                {avatarUrl ? (
-                  <Image
-                    src={avatarUrl}
-                    alt="avatar"
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Camera className="h-6 w-6 text-gray-400" />
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="mb-0.5 text-xs font-medium text-white">
-                  Profile Photo
-                </p>
-                <p className="mb-2 text-xs text-gray-400">
-                  Shown on your profile and directory card
-                </p>
-                <input
-                  ref={avatarInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={(e) => {
-                    handleAvatarChange(e.target.files?.[0]);
-                    e.target.value = "";
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={isUploadingAvatar}
-                  onClick={() => avatarInputRef.current?.click()}
-                  className="border-white/15 text-gray-300 hover:bg-white/5"
-                >
-                  {isUploadingAvatar ? (
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Camera className="mr-1.5 h-3.5 w-3.5" />
-                  )}
-                  {avatarUrl ? "Change Avatar" : "Upload Avatar"}
-                </Button>
-              </div>
-            </div>
+        <ProfileImagesSection
+          avatarUrl={avatarUrl}
+          coverImageUrl={coverImageUrl}
+          onAvatarChange={setAvatarUrl}
+          onCoverChange={setCoverImageUrl}
+          onUploadingChange={(avatar, cover) => {
+            setIsUploadingAvatar(avatar);
+            setIsUploadingCover(cover);
+          }}
+        />
 
-            <Separator className="bg-white/8" />
+        <BasicInfoSection
+          stageName={stageName}
+          setStageName={setStageName}
+          bio={bio}
+          setBio={setBio}
+          submitted={submitted}
+          stageNameError={stageNameError}
+        />
 
-            {/* Cover Image */}
-            <div>
-              <p className="mb-0.5 text-xs font-medium text-white">
-                Cover Image
-              </p>
-              <p className="mb-3 text-xs text-gray-400">
-                The banner shown at the top of your profile
-              </p>
-              {coverImageUrl && (
-                <div className="relative mb-3 h-24 w-full overflow-hidden rounded-lg bg-white/5">
-                  <Image
-                    src={coverImageUrl}
-                    alt="cover"
-                    fill
-                    className="object-cover opacity-70"
-                  />
-                </div>
-              )}
-              <input
-                ref={coverInputRef}
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={(e) => {
-                  handleCoverChange(e.target.files?.[0]);
-                  e.target.value = "";
-                }}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isUploadingCover}
-                onClick={() => coverInputRef.current?.click()}
-                className="border-white/15 text-gray-300 hover:bg-white/5"
-              >
-                {isUploadingCover ? (
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Camera className="mr-1.5 h-3.5 w-3.5" />
-                )}
-                {coverImageUrl ? "Change Cover" : "Upload Cover"}
-              </Button>
-            </div>
-          </div>
-        </SectionCard>
+        <ExperienceSection
+          experienceYears={experienceYears}
+          setExperienceYears={setExperienceYears}
+        />
 
-        {/* Basic Info */}
-        <SectionCard
-          title="Basic Information"
-          subtitle="Your stage name and biography"
-        >
-          <div className="flex flex-col gap-4">
-            <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <Label className="text-xs text-gray-300">
-                  Stage Name <span className="text-h_redLight">*</span>
-                </Label>
-                <span className="text-[11px] text-gray-400">
-                  Displays as{" "}
-                  <span className="font-medium text-gray-400">
-                    Dj {stageName.trim() || "Your Name"}
-                  </span>{" "}
-                  — no &ldquo;DJ&rdquo; needed
-                </span>
-              </div>
-              <Input
-                value={stageName}
-                onChange={(e) => setStageName(e.target.value)}
-                placeholder="e.g. Hassan, Tiësto, Carl Cox"
-                className={`focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400 ${
-                  submitted && stageNameError ? "border-red-500/60" : ""
-                }`}
-                maxLength={60}
-              />
-              {submitted && stageNameError && (
-                <p className="mt-1 text-[11px] text-red-400">
-                  Stage name is required (min 2 characters)
-                </p>
-              )}
-            </div>
-            <div>
-              <Label className="mb-1.5 block text-xs text-gray-300">
-                Biography
-              </Label>
-              <Textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell bookers and fans about your sound and story..."
-                className="focus:border-h_red/50 min-h-28 resize-none border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                maxLength={800}
-              />
-              <div className="mt-1 flex items-center justify-between">
-                {bio.trim().length === 0 ? (
-                  <p className="text-[11px] text-amber-400/70">
-                    ⚠ A bio increases your booking chances
-                  </p>
-                ) : bio.trim().length < 50 ? (
-                  <p className="text-[11px] text-amber-400/70">
-                    ⚠ Short bio — aim for 50+ characters
-                  </p>
-                ) : (
-                  <span />
-                )}
-                <p className="text-[11px] text-gray-400">{bio.length}/800</p>
-              </div>
-            </div>
-          </div>
-        </SectionCard>
+        <LocationSection
+          countries={countries}
+          cities={cities}
+          countryId={countryId}
+          cityId={cityId}
+          setCountryId={setCountryId}
+          setCityId={setCityId}
+          submitted={submitted}
+          countryError={countryError}
+        />
 
-        {/* Experience */}
-        <SectionCard
-          title="Experience"
-          subtitle="Your background and skill level"
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label className="mb-1.5 block text-xs text-gray-300">
-                Years of Experience
-              </Label>
-              <Input
-                type="number"
-                min="0"
-                max="50"
-                value={experienceYears}
-                onChange={(e) => setExperienceYears(e.target.value)}
-                placeholder="e.g. 5"
-                className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-              />
-              <p className="mt-1 text-[11px] text-gray-400">
-                Total years as a DJ
-              </p>
-            </div>
-          </div>
-        </SectionCard>
+        <GenresSpecialtiesSection
+          genreNames={genreNames}
+          setGenreNames={setGenreNames}
+          availableGenres={availableGenres}
+          djTypes={djTypes}
+          toggleDjType={toggleDjType}
+          submitted={submitted}
+          genresError={genresError}
+          djTypesError={djTypesError}
+        />
 
-        {/* Location */}
-        <SectionCard title="Location" subtitle="Where you are based">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <Label className="text-xs text-gray-300">
-                  Country <span className="text-h_redLight">*</span>
-                </Label>
-                {submitted && countryError && (
-                  <span className="text-[11px] text-red-400">
-                    Country is required
-                  </span>
-                )}
-              </div>
-              <select
-                value={countryId ?? ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setCountryId(val ? Number(val) : null);
-                  setCityId(null);
-                }}
-                className={`focus:border-h_red/50 w-full rounded-md border bg-white/5 px-3 py-2 text-sm text-white focus:outline-none ${
-                  submitted && countryError
-                    ? "border-red-500/60"
-                    : "border-white/10"
-                }`}
-              >
-                <option value="" className="bg-zinc-900">
-                  Select country
-                </option>
-                {countries.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-zinc-900">
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <Label className="mb-1.5 block text-xs text-gray-300">City</Label>
-              <select
-                value={cityId ?? ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setCityId(val ? Number(val) : null);
-                }}
-                disabled={!countryId || cities.length === 0}
-                className="focus:border-h_red/50 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none disabled:opacity-40"
-              >
-                <option value="" className="bg-zinc-900">
-                  {cities.length === 0 ? "Select country first" : "Select city"}
-                </option>
-                {cities.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-zinc-900">
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-1 text-[11px] text-gray-400">
-                Helps bookers find local DJs
-              </p>
-            </div>
-          </div>
-        </SectionCard>
+        <SocialLinksSection
+          socialLinks={socialLinks}
+          setSocialLinks={setSocialLinks}
+        />
 
-        {/* Genres & DJ Types */}
-        <SectionCard
-          title="Genres & Specialties"
-          subtitle="What you play and where you perform"
-        >
-          <div className="flex flex-col gap-5">
-            <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <Label className="text-xs text-gray-300">
-                  Genres <span className="text-h_redLight">*</span>
-                </Label>
-                <span
-                  className={`text-[11px] ${genreNames.length >= 5 ? "text-amber-400" : "text-gray-400"}`}
-                >
-                  {submitted && genresError ? (
-                    <span className="text-red-400">Add at least one genre</span>
-                  ) : (
-                    `${genreNames.length}/5`
-                  )}
-                </span>
-              </div>
-              <div className="mb-2 flex flex-wrap gap-1.5">
-                {genreNames.map((g) => (
-                  <span
-                    key={g}
-                    className="bg-h_redDark/50 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs text-red-200"
-                  >
-                    {g}
-                    <button
-                      type="button"
-                      onClick={() => removeGenre(g)}
-                      className="ml-0.5 text-red-400 hover:text-red-200"
-                      aria-label={`Remove ${g}`}
-                    >
-                      <X className="h-2.5 w-2.5" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="relative">
-                <Input
-                  value={genreInput}
-                  onChange={(e) => {
-                    setGenreInput(e.target.value);
-                    setShowGenreDropdown(e.target.value.length > 0);
-                  }}
-                  onFocus={() => setShowGenreDropdown(genreInput.length > 0)}
-                  onBlur={() =>
-                    setTimeout(() => setShowGenreDropdown(false), 200)
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addGenre();
-                    }
-                  }}
-                  placeholder={
-                    genreNames.length >= 5
-                      ? "Max 5 genres reached"
-                      : "Add a genre..."
-                  }
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400 disabled:opacity-40"
-                  maxLength={50}
-                  disabled={genreNames.length >= 5}
-                />
-                {showGenreDropdown && filteredGenres.length > 0 && (
-                  <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-white/10 bg-[#1a1a1a] shadow-lg">
-                    {filteredGenres.map((genre) => (
-                      <button
-                        key={genre}
-                        type="button"
-                        onClick={() => {
-                          setGenreNames((prev) => [...prev, genre]);
-                          setGenreInput("");
-                          setShowGenreDropdown(false);
-                        }}
-                        className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 hover:text-white"
-                      >
-                        {genre}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+        <BookingFeesSection
+          bookingEmail={bookingEmail}
+          setBookingEmail={setBookingEmail}
+          bookingPhone={bookingPhone}
+          setBookingPhone={setBookingPhone}
+          feeMin={feeMin}
+          setFeeMin={setFeeMin}
+          feeMax={feeMax}
+          setFeeMax={setFeeMax}
+          feeCurrency={feeCurrency}
+          setFeeCurrency={setFeeCurrency}
+          currencyAutoSet={currencyAutoSet}
+          setCurrencyAutoSet={setCurrencyAutoSet}
+        />
 
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <Label className="text-xs text-gray-300">
-                  DJ Type <span className="text-h_redLight">*</span>
-                </Label>
-                {submitted && djTypesError && (
-                  <span className="text-[11px] text-red-400">
-                    Select at least one
-                  </span>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {Object.entries(DJ_TYPE_LABELS).map(([value, label]) => (
-                  <label
-                    key={value}
-                    className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white/3"
-                  >
-                    <Checkbox
-                      checked={djTypes.includes(value)}
-                      onCheckedChange={() => toggleDjType(value)}
-                      className="data-[state=checked]:bg-h_red data-[state=checked]:border-h_red border-white/20"
-                    />
-                    <span className="text-xs text-gray-300">{label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        </SectionCard>
+        <MediaLibrarySection
+          profileId={profile.id}
+          plan={plan}
+          initialMedia={allMedia}
+          onMediaChange={setMediaChanged}
+        />
 
-        {/* Social Links */}
-        <SectionCard
-          title="Social & Music Links"
-          subtitle="Connect your platforms to boost discovery"
-        >
-          <div className="flex flex-col gap-3">
-            {socialLinks.map((link, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <select
-                  value={link.platform}
-                  onChange={(e) =>
-                    updateSocialLink(i, "platform", e.target.value)
-                  }
-                  className="focus:border-h_red/50 w-32 shrink-0 rounded-md border border-white/10 bg-white/5 px-2 py-2 text-xs text-white focus:outline-none"
-                >
-                  {SOCIAL_PLATFORMS.map((p) => (
-                    <option
-                      key={p}
-                      value={p}
-                      className="bg-zinc-900 capitalize"
-                    >
-                      {p}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  value={link.url}
-                  onChange={(e) => updateSocialLink(i, "url", e.target.value)}
-                  placeholder="https://..."
-                  type="url"
-                  className="focus:border-h_red/50 flex-1 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeSocialLink(i)}
-                  className="shrink-0 text-gray-400 hover:text-red-400"
-                  aria-label="Remove link"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addSocialLink}
-              className="w-fit border-white/15 text-gray-400 hover:bg-white/5"
-            >
-              <Plus className="mr-1.5 h-3.5 w-3.5" />
-              Add Link
-            </Button>
-          </div>
-        </SectionCard>
+        <FeaturedPerformanceSection
+          featuredPerformanceUrl={featuredPerformanceUrl}
+          setFeaturedPerformanceUrl={setFeaturedPerformanceUrl}
+          featuredPerformanceContext={featuredPerformanceContext}
+          setFeaturedPerformanceContext={setFeaturedPerformanceContext}
+        />
 
-        {/* Booking & Fees */}
-        <SectionCard
-          title="Booking Contact & Fees"
-          subtitle="How bookers can reach you and your rate range"
-        >
-          <div className="flex flex-col gap-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label className="mb-1.5 block text-xs text-gray-300">
-                  Booking Email
-                </Label>
-                <Input
-                  type="email"
-                  value={bookingEmail}
-                  onChange={(e) => setBookingEmail(e.target.value)}
-                  placeholder="bookings@yourname.com"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                />
-              </div>
-              <div>
-                <Label className="mb-1.5 block text-xs text-gray-300">
-                  Booking Phone
-                </Label>
-                <Input
-                  type="tel"
-                  value={bookingPhone}
-                  onChange={(e) => setBookingPhone(e.target.value)}
-                  placeholder="+44 7700 900123"
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <Label className="mb-1.5 block text-xs text-gray-300">
-                  Min Fee
-                </Label>
-                <Input
-                  type="number"
-                  value={feeMin}
-                  onChange={(e) => setFeeMin(e.target.value)}
-                  placeholder="500"
-                  min={0}
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                />
-              </div>
-              <div>
-                <Label className="mb-1.5 block text-xs text-gray-300">
-                  Max Fee
-                </Label>
-                <Input
-                  type="number"
-                  value={feeMax}
-                  onChange={(e) => setFeeMax(e.target.value)}
-                  placeholder="5000"
-                  min={0}
-                  className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                />
-              </div>
-              <div>
-                <div className="mb-1.5 flex items-center justify-between">
-                  <Label className="text-xs text-gray-300">Currency</Label>
-                  {currencyAutoSet && (
-                    <span className="text-[11px] text-gray-400">auto</span>
-                  )}
-                </div>
-                <Select
-                  value={feeCurrency}
-                  onValueChange={(value) => {
-                    setFeeCurrency(value);
-                    setCurrencyAutoSet(false);
-                  }}
-                >
-                  <SelectTrigger className="focus:border-h_red/50 border-white/10 bg-white/5 text-white">
-                    <SelectValue placeholder="Select currency" />
-                  </SelectTrigger>
-                  <SelectContent className="border-white/10 bg-black text-white">
-                    {CURRENCIES.map((currency) => (
-                      <SelectItem key={currency.code} value={currency.code}>
-                        {currency.code} ({currency.symbol})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        </SectionCard>
+        <TeamContactsSection
+          isPremium={isPremium}
+          managerName={managerName}
+          setManagerName={setManagerName}
+          managerEmail={managerEmail}
+          setManagerEmail={setManagerEmail}
+          managerPhone={managerPhone}
+          setManagerPhone={setManagerPhone}
+          agentName={agentName}
+          setAgentName={setAgentName}
+          agentAgency={agentAgency}
+          setAgentAgency={setAgentAgency}
+          agentEmail={agentEmail}
+          setAgentEmail={setAgentEmail}
+        />
 
-        {/* Media Library */}
-        <SectionCard
-          title="Media Library"
-          subtitle="Manage your photos, videos, and audio"
-        >
-          <MediaLibrary
-            profileId={profile.id}
-            plan={plan}
-            initialMedia={allMedia}
-            onMediaChange={setMediaChanged}
-          />
-        </SectionCard>
-
-        {/* Featured Performance */}
-        <SectionCard
-          title="Featured Performance"
-          subtitle="Highlight one video that shows you at your best"
-        >
-          <div className="grid gap-4">
-            <div className="grid gap-1.5">
-              <Label className="text-xs text-gray-300">
-                YouTube / Vimeo URL
-              </Label>
-              <Input
-                type="url"
-                value={featuredPerformanceUrl}
-                onChange={(e) => setFeaturedPerformanceUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
-                className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-              />
-              <p className="text-[11px] text-gray-400">
-                Paste a link to a performance video. Leave empty to hide the
-                section on your profile.
-              </p>
-            </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs text-gray-300">Context</Label>
-              <Input
-                type="text"
-                value={featuredPerformanceContext}
-                onChange={(e) => setFeaturedPerformanceContext(e.target.value)}
-                placeholder="e.g. Live at Afro Nation 2025"
-                maxLength={200}
-                className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-              />
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Team Contacts */}
-        {isPremium ? (
-          <SectionCard
-            title="Professional Team"
-            subtitle="Manager and booking agent details"
-          >
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                  Manager
-                </p>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Name
-                    </Label>
-                    <Input
-                      value={managerName}
-                      onChange={(e) => setManagerName(e.target.value)}
-                      placeholder="Marcus Osei"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Email
-                    </Label>
-                    <Input
-                      type="email"
-                      value={managerEmail}
-                      onChange={(e) => setManagerEmail(e.target.value)}
-                      placeholder="manager@email.com"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Phone
-                    </Label>
-                    <Input
-                      type="tel"
-                      value={managerPhone}
-                      onChange={(e) => setManagerPhone(e.target.value)}
-                      placeholder="+44 7700 900123"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-              </div>
-              <Separator className="bg-white/8" />
-              <div>
-                <p className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                  Booking Agent
-                </p>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Name
-                    </Label>
-                    <Input
-                      value={agentName}
-                      onChange={(e) => setAgentName(e.target.value)}
-                      placeholder="Sophie Laurent"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Agency
-                    </Label>
-                    <Input
-                      value={agentAgency}
-                      onChange={(e) => setAgentAgency(e.target.value)}
-                      placeholder="Rhythm Agency"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5 block text-xs text-gray-300">
-                      Email
-                    </Label>
-                    <Input
-                      type="email"
-                      value={agentEmail}
-                      onChange={(e) => setAgentEmail(e.target.value)}
-                      placeholder="agent@email.com"
-                      className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </SectionCard>
-        ) : (
-          <SectionCard
-            title="Professional Team"
-            subtitle="Manager and booking agent details — Premium only"
-          >
-            <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <Crown className="h-6 w-6 text-amber-500" />
-              <p className="text-sm text-gray-400">
-                Upgrade to Premium to add your manager and booking agent
-                details.
-              </p>
-            </div>
-          </SectionCard>
-        )}
-
-        {/* Availability Calendar */}
-        {isPremium ? (
-          <SectionCard
-            title="Availability Calendar"
-            subtitle="Click days to set your schedule"
-          >
-            <div className="flex flex-col gap-4">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Month (YYYY-MM)
-                  </Label>
-                  <Input
-                    value={availabilityMonth}
-                    onChange={(e) => setAvailabilityMonth(e.target.value)}
-                    placeholder="2025-09"
-                    maxLength={7}
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                  />
-                </div>
-                <div>
-                  <Label className="mb-1.5 block text-xs text-gray-300">
-                    Timezone
-                  </Label>
-                  <Input
-                    value={availabilityTimezone}
-                    onChange={(e) => setAvailabilityTimezone(e.target.value)}
-                    placeholder="Europe/London"
-                    className="focus:border-h_red/50 border-white/10 bg-white/5 text-white placeholder:text-gray-400"
-                  />
-                </div>
-              </div>
-
-              {availabilityMonth && isValidMonthFormat(availabilityMonth) && (
-                <div>
-                  <div className="mb-2 flex items-center gap-4">
-                    {[
-                      { color: "bg-emerald-500", label: "Available" },
-                      { color: "bg-h_red", label: "Booked" },
-                      { color: "bg-amber-500", label: "Tentative" },
-                      { color: "bg-white/10", label: "Free" },
-                    ].map((l) => (
-                      <div key={l.label} className="flex items-center gap-1.5">
-                        <div className={`size-2.5 rounded-full ${l.color}`} />
-                        <span className="text-xs text-gray-400">{l.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-7 gap-1">
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                      (d) => (
-                        <div
-                          key={d}
-                          className="pb-1 text-center text-[11px] font-semibold text-gray-400"
-                        >
-                          {d}
-                        </div>
-                      ),
-                    )}
-                    {Array.from({
-                      length: firstDayOffset(availabilityMonth) ?? 0,
-                    }).map((_, i) => (
-                      <div key={`e${i}`} />
-                    ))}
-                    {Array.from({
-                      length: daysInMonth(availabilityMonth) ?? 0,
-                    }).map((_, i) => {
-                      const day = i + 1;
-                      const status = getDayStatus(day);
-                      return (
-                        <button
-                          key={day}
-                          type="button"
-                          onClick={() => cycleDayStatus(day)}
-                          className={`flex h-9 items-center justify-center rounded-md text-xs font-medium transition-all ${
-                            status === "booked"
-                              ? "bg-h_red/20 text-h_redLight border-h_red/30 border"
-                              : status === "tentative"
-                                ? "border border-amber-500/30 bg-amber-500/20 text-amber-400"
-                                : status === "available"
-                                  ? "border border-emerald-500/25 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
-                                  : "text-gray-400 hover:bg-white/5"
-                          }`}
-                        >
-                          {day}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </SectionCard>
-        ) : (
-          <SectionCard
-            title="Availability Calendar"
-            subtitle="Click days to set your schedule — Premium only"
-          >
-            <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <Crown className="h-6 w-6 text-amber-500" />
-              <p className="text-sm text-gray-400">
-                Upgrade to Premium to set your availability calendar and let
-                organizers know when you are free.
-              </p>
-            </div>
-          </SectionCard>
-        )}
+        <AvailabilityCalendarSection
+          isPremium={isPremium}
+          availabilityMonth={availabilityMonth}
+          setAvailabilityMonth={setAvailabilityMonth}
+          availabilityTimezone={availabilityTimezone}
+          setAvailabilityTimezone={setAvailabilityTimezone}
+          availabilityDays={availabilityDays}
+          setAvailabilityDays={setAvailabilityDays}
+        />
 
         {/* Submit */}
         <div className="flex items-center justify-between pt-2">

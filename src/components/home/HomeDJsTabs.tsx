@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ScrollableCarousel from "@/components/ScrollableCarousel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { formatNumber } from "@/lib/utils/currency";
 import { Card } from "@/components/ui/card";
 import type { DemoDJ } from "./HomeDJsRow";
@@ -168,12 +169,9 @@ function DJCard({
 
         <div className="flex justify-center gap-1">
           {dj.genres.slice(0, 2).map((g) => (
-            <Badge
-              key={g}
-              className="bg-h_redDark/60 border-0 whitespace-nowrap text-red-300"
-            >
+            <GenreBadge key={g} variant="red" className="whitespace-nowrap">
               {g.length > 11 ? `${g.slice(0, 10)}…` : g}
-            </Badge>
+            </GenreBadge>
           ))}
         </div>
 

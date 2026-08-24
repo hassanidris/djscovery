@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, MapPin, Users } from "lucide-react";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { getPublishedGigsForDj } from "@/lib/queries/gigs";
 import { getDemoGigs } from "@/data/gigs-demo";
 import { getDemoOrganizerBySlug } from "@/data/organizers";
@@ -183,12 +184,9 @@ export default async function HomeOpenGigsSection({
                   {gig.requiredGenres.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {gig.requiredGenres.slice(0, 3).map((g) => (
-                        <Badge
-                          key={g}
-                          className="bg-h_redDark/60 border-0 text-red-300"
-                        >
+                        <GenreBadge key={g} variant="red">
                           {g}
-                        </Badge>
+                        </GenreBadge>
                       ))}
                       {gig.requiredGenres.length > 3 && (
                         <span className="text-xs text-gray-400">

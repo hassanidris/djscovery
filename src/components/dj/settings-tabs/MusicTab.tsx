@@ -12,7 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { GenreSelector } from "@/components/forms/GenreSelector";
 import { updateDjProfile } from "@/lib/actions/profile";
+import { createGenre } from "@/lib/actions/genre";
 import type { ProfileData, SocialLink } from "./types";
 
 const DJ_TYPES = [
@@ -48,8 +50,8 @@ export default function MusicTab({
   const [selectedGenres, setSelectedGenres] = useState<string[]>(
     profile.genres,
   );
+  const [availableGenres, setAvailableGenres] = useState<string[]>(allGenres);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(profile.djTypes);
-  const [customGenre, setCustomGenre] = useState("");
 
   const [links, setLinks] = useState<SocialLink[]>(
     profile.socialLinks.length > 0
@@ -57,34 +59,10 @@ export default function MusicTab({
       : [{ platform: "instagram", url: "" }],
   );
 
-  function toggleGenre(genre: string) {
-    setSelectedGenres((prev) =>
-      prev.includes(genre)
-        ? prev.filter((g) => g !== genre)
-        : [...prev, genre].slice(0, 5),
-    );
-  }
-
   function toggleType(type: string) {
     setSelectedTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
-  }
-
-  async function handleAddCustomGenre() {
-    const trimmed = customGenre.trim();
-    if (!trimmed) return;
-    if (selectedGenres.includes(trimmed)) {
-      setCustomGenre("");
-      return;
-    }
-    const { createGenre } = await import("@/lib/actions/genre");
-    const result = await createGenre(trimmed);
-    if ("error" in result) toast.error(result.error);
-    else {
-      setSelectedGenres((prev) => [...prev, result.name].slice(0, 5));
-      setCustomGenre("");
-    }
   }
 
   function addLink() {
@@ -123,49 +101,20 @@ export default function MusicTab({
   return (
     <div className="flex flex-col gap-10">
       {/* Genres */}
-      <section className="flex flex-col gap-6">
-        <div>
-          <h3 className="text-sm font-semibold text-white">Genres</h3>
-          <p className="text-xs text-gray-400">
-            Select up to 5 genres that describe your sound.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {allGenres.map((genre) => (
-            <label
-              key={genre}
-              className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                selectedGenres.includes(genre)
-                  ? "border-h_red bg-h_redDark text-white"
-                  : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10"
-              }`}
-            >
-              <input
-                type="checkbox"
-                className="sr-only"
-                checked={selectedGenres.includes(genre)}
-                onChange={() => toggleGenre(genre)}
-              />
-              {genre}
-            </label>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <Input
-            value={customGenre}
-            onChange={(e) => setCustomGenre(e.target.value)}
-            placeholder="Add a custom genre"
-            className="max-w-xs"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleAddCustomGenre}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+      <section>
+        <GenreSelector
+          selectedGenres={selectedGenres}
+          onChange={setSelectedGenres}
+          availableGenres={availableGenres}
+          onAvailableGenresChange={setAvailableGenres}
+          maxGenres={5}
+          allowCreate
+          createGenreFn={createGenre}
+          showSimilaritySuggestion
+          variant="dark"
+          label="Genres"
+          subtitle="Select up to 5 genres that describe your sound."
+        />
       </section>
 
       {/* DJ Types */}

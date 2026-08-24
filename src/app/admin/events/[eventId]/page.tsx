@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import {
   ArrowLeft,
   MapPin,
@@ -195,12 +196,9 @@ export default async function AdminEventDetailPage({
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {event.genres.map((genre) => (
-                    <Badge
-                      key={genre}
-                      className="border border-white/10 bg-white/5 text-gray-300"
-                    >
+                    <GenreBadge key={genre} variant="zinc">
                       {genre}
-                    </Badge>
+                    </GenreBadge>
                   ))}
                 </div>
               </div>

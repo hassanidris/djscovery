@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CircleCheck, MapPin } from "lucide-react";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import UnfollowDjButton from "@/components/account/RemoveSavedDjButton";
 
 type Dj = {
@@ -61,12 +62,9 @@ export default function FollowedDjListItem({ dj }: { dj: Dj }) {
         {dj.genres.length > 0 && (
           <div className="mt-1.5 flex flex-wrap gap-1">
             {dj.genres.slice(0, 3).map((genre) => (
-              <span
-                key={genre}
-                className="rounded-full bg-red-950/60 px-2 py-0.5 text-xs text-red-200"
-              >
+              <GenreBadge key={genre} variant="dark-red">
                 {genre}
-              </span>
+              </GenreBadge>
             ))}
           </div>
         )}

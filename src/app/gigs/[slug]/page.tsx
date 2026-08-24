@@ -13,6 +13,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { GigReviewForm } from "@/components/reputation/GigReviewForm";
 import { DjGigReviewDisplay } from "@/components/reputation/DjGigReviewDisplay";
@@ -400,12 +401,9 @@ export default async function GigDetailPage({
               <dt className="mb-2 text-xs text-gray-400">Required genres</dt>
               <div className="flex flex-wrap gap-1.5">
                 {gig.requiredGenres.map((g) => (
-                  <span
-                    key={g}
-                    className="rounded-full bg-white/8 px-2.5 py-0.5 text-xs text-gray-300"
-                  >
+                  <GenreBadge key={g} variant="gray" size="md">
                     {g}
-                  </span>
+                  </GenreBadge>
                 ))}
               </div>
             </div>
