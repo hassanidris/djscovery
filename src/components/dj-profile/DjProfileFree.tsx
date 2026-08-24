@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import {
   CalendarDays,
   Play,
@@ -659,12 +660,9 @@ export default function DjProfileFree({
                               </p>
                               <div className="mt-2 flex items-center gap-1">
                                 {(safeFEATURED_MIX.genres ?? []).map((t) => (
-                                  <Badge
-                                    key={t}
-                                    className="h-4 border-white/10 bg-white/5 text-[11px] text-gray-400"
-                                  >
+                                  <GenreBadge key={t} variant="gray" size="xs">
                                     {t}
-                                  </Badge>
+                                  </GenreBadge>
                                 ))}
                               </div>
                             </div>

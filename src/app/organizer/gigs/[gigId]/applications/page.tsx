@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/client";
 import { getGigApplicants } from "@/lib/queries/gigs";
 import { GigApplicationStatusBadge } from "@/components/gigs/GigStatusBadge";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { updateApplicationStatus } from "@/lib/actions/gigs";
 
 export default async function GigApplicantsPage({
@@ -128,12 +129,9 @@ export default async function GigApplicantsPage({
                       {app.djProfile.genres.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {app.djProfile.genres.slice(0, 4).map((g) => (
-                            <span
-                              key={g.genre.name}
-                              className="rounded-full bg-white/8 px-2 py-0.5 text-xs text-gray-400"
-                            >
+                            <GenreBadge key={g.genre.name} variant="gray">
                               {g.genre.name}
-                            </span>
+                            </GenreBadge>
                           ))}
                         </div>
                       )}

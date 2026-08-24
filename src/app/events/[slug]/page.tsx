@@ -17,6 +17,7 @@ import { getDemodjBySlug } from "@/data/djs";
 import type { DemoEventWithDate } from "@/types/event-demo";
 import JsonLd from "@/components/seo/JsonLd";
 import { EventViewTracker } from "@/components/events/EventViewTracker";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { formatDate, formatLongDate } from "@/lib/utils/date";
 import {
   EventViewerProvider,
@@ -582,12 +583,9 @@ function EventDetailView(props: {
                   </h2>
                   <div className="flex flex-wrap gap-1.5">
                     {genres.map((g) => (
-                      <span
-                        key={g}
-                        className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-zinc-300"
-                      >
+                      <GenreBadge key={g} variant="zinc" size="md">
                         {g}
-                      </span>
+                      </GenreBadge>
                     ))}
                   </div>
                 </div>

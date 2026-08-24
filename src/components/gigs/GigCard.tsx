@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, CalendarDays, Users, Wrench } from "lucide-react";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import type { OrganizerGigListItem } from "@/lib/queries/gigs";
 import type { DjGigListItem } from "@/lib/queries/gigs";
@@ -220,17 +221,14 @@ export function DjGigCard({
       {gig.requiredGenres.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {gig.requiredGenres.slice(0, 4).map((g) => (
-            <span
-              key={g}
-              className="rounded-full bg-white/8 px-2 py-0.5 text-xs text-gray-400"
-            >
+            <GenreBadge key={g} variant="gray">
               {g}
-            </span>
+            </GenreBadge>
           ))}
           {gig.requiredGenres.length > 4 && (
-            <span className="rounded-full bg-white/8 px-2 py-0.5 text-xs text-gray-400">
-              +{gig.requiredGenres.length - 4} more
-            </span>
+            <GenreBadge variant="gray">
+              {"+" + (gig.requiredGenres.length - 4) + " more"}
+            </GenreBadge>
           )}
         </div>
       )}

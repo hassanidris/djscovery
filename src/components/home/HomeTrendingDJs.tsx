@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp } from "lucide-react";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { getTrendingDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
 import ScrollableCarousel from "@/components/ScrollableCarousel";
@@ -75,12 +76,9 @@ export default async function HomeTrendingDJs() {
 
                   <div className="flex flex-wrap gap-1.5">
                     {dj.genres.slice(0, 2).map((g) => (
-                      <Badge
-                        key={g.genre.name}
-                        className="bg-h_redDark/60 border-0 text-sm text-red-300"
-                      >
+                      <GenreBadge key={g.genre.name} variant="red" size="sm">
                         {g.genre.name}
-                      </Badge>
+                      </GenreBadge>
                     ))}
                     {dj.genres.length > 2 && (
                       <span className="text-muted-foreground text-sm">

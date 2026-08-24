@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import {
   getAdminDjs,
   approveDjProfile,
@@ -131,12 +132,9 @@ export default async function AdminDjsPage({
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-1">
                             {dj.genres.slice(0, 3).map((g) => (
-                              <Badge
-                                key={g.genre.name}
-                                className="border border-white/10 bg-white/5 text-xs text-gray-300"
-                              >
+                              <GenreBadge key={g.genre.name} variant="zinc">
                                 {g.genre.name}
-                              </Badge>
+                              </GenreBadge>
                             ))}
                             {dj.genres.length > 3 && (
                               <span className="text-muted-foreground text-xs">
