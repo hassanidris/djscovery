@@ -5,6 +5,7 @@ import { CircleCheck } from "lucide-react";
 import { DjUser } from "@/lib/data";
 import SaveDjButton from "@/components/dj-profile/FollowDjButton";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { formatNumber } from "@/lib/utils/currency";
 import { useMemo } from "react";
 import React from "react";
@@ -105,17 +106,14 @@ const DjCard = ({
       {genreList.length > 0 && (
         <div className="mt-1 flex flex-wrap gap-1">
           {genreList.slice(0, 2).map((genre) => (
-            <span
-              key={genre}
-              className="bg-h_redDark/60 rounded-full px-2 py-0.5 text-xs text-red-200"
-            >
+            <GenreBadge key={genre} variant="red">
               {genre}
-            </span>
+            </GenreBadge>
           ))}
           {genreList.length > 2 && (
-            <span className="bg-h_redDark/60 rounded-full px-2 py-0.5 text-xs text-red-200">
-              +{genreList.length - 2}
-            </span>
+            <GenreBadge variant="red">
+              {"+" + (genreList.length - 2)}
+            </GenreBadge>
           )}
         </div>
       )}

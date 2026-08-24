@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/utils/currency";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -258,12 +259,14 @@ function DjProfileHero({
         {/* Genres */}
         <div className="mb-4 flex flex-wrap gap-2">
           {DJ.genres.map((g) => (
-            <Badge
+            <GenreBadge
               key={g}
-              className="bg-h_redDark/50 h-6 border-0 text-red-100"
+              variant="red"
+              className="h-6 text-red-100"
+              size="sm"
             >
               {g}
-            </Badge>
+            </GenreBadge>
           ))}
         </div>
 

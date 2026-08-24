@@ -14,6 +14,7 @@ import prisma from "@/lib/client";
 import { getOrganizerGigDetail } from "@/lib/queries/gigs";
 import { GigStatusBadge } from "@/components/gigs/GigStatusBadge";
 import { GigActions } from "@/components/gigs/GigActions";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { GIG_TYPE_FIELDS } from "@/config/gig-type-fields";
 import { formatDuration } from "@/lib/utils/duration";
 import { formatNumber } from "@/lib/utils/currency";
@@ -191,12 +192,9 @@ export default async function OrganizerGigDetailPage({
               <dt className="mb-2 text-xs text-gray-400">Required genres</dt>
               <div className="flex flex-wrap gap-1.5">
                 {gig.requiredGenres.map((g) => (
-                  <span
-                    key={g}
-                    className="rounded-full bg-white/8 px-2.5 py-0.5 text-xs text-gray-300"
-                  >
+                  <GenreBadge key={g} variant="gray" size="md">
                     {g}
-                  </span>
+                  </GenreBadge>
                 ))}
               </div>
             </div>

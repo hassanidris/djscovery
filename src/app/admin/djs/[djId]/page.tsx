@@ -5,6 +5,7 @@ import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import {
   ArrowLeft,
   Star,
@@ -217,12 +218,9 @@ export default async function AdminDjReviewPage({
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {dj.genres.map((g) => (
-                    <Badge
-                      key={g.genre.id}
-                      className="border border-white/10 bg-white/5 text-gray-300"
-                    >
+                    <GenreBadge key={g.genre.id} variant="zinc">
                       {g.genre.name}
-                    </Badge>
+                    </GenreBadge>
                   ))}
                 </div>
               </div>

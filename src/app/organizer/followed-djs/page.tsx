@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Users, CircleCheck, MapPin } from "lucide-react";
 import { getFollowedDjs } from "@/lib/actions/follows";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import UnfollowDjButton from "@/components/account/RemoveSavedDjButton";
 
 export const metadata: Metadata = { title: "Followed DJs" };
@@ -85,12 +86,9 @@ export default async function OrganizerFollowedDjsPage() {
               {dj.genres.length > 0 && (
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {dj.genres.slice(0, 3).map((genre) => (
-                    <span
-                      key={genre}
-                      className="rounded-full bg-red-950/60 px-2 py-0.5 text-xs text-red-200"
-                    >
+                    <GenreBadge key={genre} variant="dark-red">
                       {genre}
-                    </span>
+                    </GenreBadge>
                   ))}
                 </div>
               )}

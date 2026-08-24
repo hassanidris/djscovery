@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Crown } from "lucide-react";
+import { GenreBadge } from "@/components/forms/GenreBadge";
 import { getFeaturedDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
 
@@ -82,12 +83,9 @@ export default async function HomeFeaturedDJs() {
 
                   <div className="flex flex-wrap gap-1">
                     {dj.genres.map((g) => (
-                      <Badge
-                        key={g.genre.name}
-                        className="bg-h_redDark/60 border-0 text-red-300"
-                      >
+                      <GenreBadge key={g.genre.name} variant="red">
                         {g.genre.name}
-                      </Badge>
+                      </GenreBadge>
                     ))}
                   </div>
 

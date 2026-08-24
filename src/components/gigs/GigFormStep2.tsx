@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { isFieldVisible } from "@/config/gig-type-fields";
 import { getGenres } from "@/lib/actions/genre";
 import { TimePicker } from "@/components/ui/time-picker";
+import { GenreSelector } from "@/components/forms/GenreSelector";
 import type { StepProps } from "./GigForm";
 import type { ExperienceLevel, GigType } from "@prisma/client";
 import type { GigFieldKey } from "@/config/gig-type-fields";
@@ -27,40 +28,12 @@ export function GigFormStep2({
   onBack,
 }: StepProps) {
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
-  const [genreInput, setGenreInput] = useState("");
-  const [showGenreDropdown, setShowGenreDropdown] = useState(false);
   const [langInput, setLangInput] = useState("");
 
   // Fetch genres on mount
   useEffect(() => {
     getGenres().then(setAvailableGenres);
   }, []);
-
-  // Filter genres for dropdown
-  const filteredGenres = availableGenres
-    .filter((g) => {
-      if (!genreInput.trim()) return true;
-      const norm = g.toLowerCase().replace(/[^a-z0-9]/g, "");
-      const inputNorm = genreInput.toLowerCase().replace(/[^a-z0-9]/g, "");
-      return (
-        norm.includes(inputNorm) ||
-        g.toLowerCase().includes(genreInput.toLowerCase())
-      );
-    })
-    .filter((g) => !data.requiredGenres.includes(g))
-    .slice(0, 10);
-
-  function toggleGenre(name: string) {
-    const current = data.requiredGenres;
-    if (current.includes(name)) {
-      onChange(
-        "requiredGenres",
-        current.filter((g) => g !== name),
-      );
-    } else if (current.length < MAX_GENRES) {
-      onChange("requiredGenres", [...current, name]);
-    }
-  }
 
   const gigType = data.gigType as GigType | "";
   const show = (field: GigFieldKey) =>
@@ -110,96 +83,17 @@ export function GigFormStep2({
 
       {/* Genres */}
       {show("genres") && (
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-white">
-            Required Genres{" "}
-            <span className="font-normal text-gray-400">
-              (optional, up to {MAX_GENRES})
-            </span>
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={genreInput}
-              onChange={(e) => {
-                setGenreInput(e.target.value);
-                setShowGenreDropdown(e.target.value.length > 0);
-              }}
-              onFocus={() => setShowGenreDropdown(genreInput.length > 0)}
-              onBlur={() => setTimeout(() => setShowGenreDropdown(false), 200)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  const trimmed = genreInput.trim();
-                  if (
-                    trimmed &&
-                    !data.requiredGenres.includes(trimmed) &&
-                    data.requiredGenres.length < MAX_GENRES
-                  ) {
-                    onChange("requiredGenres", [
-                      ...data.requiredGenres,
-                      trimmed,
-                    ]);
-                  }
-                  setGenreInput("");
-                }
-              }}
-              placeholder={
-                data.requiredGenres.length >= MAX_GENRES
-                  ? "Max 5 genres reached"
-                  : "Add a genre..."
-              }
-              maxLength={50}
-              disabled={data.requiredGenres.length >= MAX_GENRES}
-              className={`${inputCls} disabled:opacity-40`}
-            />
-            {showGenreDropdown && filteredGenres.length > 0 && (
-              <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-zinc-950 py-1 shadow-xl">
-                {filteredGenres.map((genre) => (
-                  <button
-                    key={genre}
-                    type="button"
-                    onClick={() => {
-                      toggleGenre(genre);
-                      setGenreInput("");
-                      setShowGenreDropdown(false);
-                    }}
-                    className="w-full px-3 py-2 text-left text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
-                  >
-                    {genre}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {data.requiredGenres.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {data.requiredGenres.map((g) => (
-                <span
-                  key={g}
-                  className="flex items-center gap-1 rounded-full bg-white/10 py-0.5 pr-1.5 pl-2.5 text-xs text-white"
-                >
-                  {g}
-                  <button
-                    type="button"
-                    onClick={() => toggleGenre(g)}
-                    aria-label={`Remove genre ${g}`}
-                    className="hover:text-red-400"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
-          {data.requiredGenres.length >= MAX_GENRES && (
-            <p className="mt-1.5 text-xs text-gray-400">
-              Maximum of {MAX_GENRES} genres reached.
-            </p>
-          )}
-        </div>
+        <GenreSelector
+          selectedGenres={data.requiredGenres}
+          onChange={(genres) => onChange("requiredGenres", genres)}
+          availableGenres={availableGenres}
+          maxGenres={MAX_GENRES}
+          allowCreate
+          showSimilaritySuggestion={false}
+          variant="dark"
+          label="Required Genres"
+          subtitle={`Optional — select up to ${MAX_GENRES} genres organizers should play.`}
+        />
       )}
 
       {/* Experience Level */}
