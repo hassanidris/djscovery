@@ -257,8 +257,7 @@ jobs:
 
       - name: Run npm audit
         run: |
-          npm audit fix --omit=dev || true
-          npm audit --audit-level=moderate --omit=dev
+          npm audit fix --omit=dev || npm audit --audit-level=moderate --omit=dev
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
