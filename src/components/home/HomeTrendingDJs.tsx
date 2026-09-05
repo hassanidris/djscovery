@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, MapPin, Star } from "lucide-react";
 import { GenreBadge } from "@/components/forms/GenreBadge";
 import { getTrendingDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
@@ -69,8 +69,9 @@ export default async function HomeTrendingDJs() {
                     <p className="truncate text-base font-bold text-white">
                       Dj. {dj.stageName}
                     </p>
-                    <p className="mt-1 truncate text-sm text-gray-400">
-                      📍 {dj.city?.name}, {dj.country?.name}
+                    <p className="mt-1 flex items-center gap-1 truncate text-sm text-gray-400">
+                      <MapPin className="text-h_redLight h-3.5 w-3.5" />
+                      {dj.city?.name}, {dj.country?.name}
                     </p>
                   </div>
 

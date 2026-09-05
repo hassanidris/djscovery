@@ -37,6 +37,10 @@
   --color-h_red: #d30101;
   --color-h_redDark: #a80000;
   --color-h_redLight: #ff4444;
+  --color-h_redSubtle: rgba(211, 1, 1, 0.08);
+  --color-h_redMuted: rgba(211, 1, 1, 0.15);
+  --color-h_charcoal: #1a1a1a;
+  --color-h_charcoalLight: #2d2d2d;
   --color-h_cyan: #06b6d4;
   --color-h_cyanDark: #0e7490;
   --font-sans: var(--font-inter);
@@ -48,6 +52,19 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* 8px Grid System - Spacing Tokens */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
 }
 
 body {
@@ -131,7 +148,9 @@ body {
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.453 0.237 27); /* h_red: #d30101 */
+    --primary: oklch(
+      0.453 0.237 27
+    ); /* h_red: #d30101 - strategic brand accent */
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
@@ -156,6 +175,13 @@ body {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+    /* Strategic secondary neutral for sophisticated brand feel */
+    --charcoal: oklch(0.25 0 0);
+    --charcoal-light: oklch(0.3 0 0);
+    /* Strategic red usage - for primary CTAs and key brand moments only */
+    --brand-red: oklch(0.453 0.237 27);
+    --brand-red-subtle: oklch(0.453 0.237 27 / 0.08);
+    --brand-red-muted: oklch(0.453 0.237 27 / 0.15);
   }
   * {
     @apply border-border;
@@ -170,19 +196,33 @@ body {
   h1 {
     font-family: var(--font-heading);
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     line-height: 1.1;
   }
   h2 {
     font-family: var(--font-heading);
     font-weight: 700;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.025em;
     line-height: 1.2;
   }
   h3 {
     font-family: var(--font-heading);
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     line-height: 1.3;
+  }
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.4;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 }

@@ -2,14 +2,15 @@
 
 import { useFormStatus } from "react-dom";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function SignInSubmitBtn() {
   const { pending } = useFormStatus();
   return (
-    <button
+    <Button
       type="submit"
       disabled={pending}
-      className="bg-h_red hover:bg-h_redDark active:scale-[0.98] text-white font-semibold py-3 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+      className="bg-h_red hover:bg-h_redDark w-full font-semibold text-white shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? (
         <>
@@ -19,6 +20,6 @@ export function SignInSubmitBtn() {
       ) : (
         "Sign In"
       )}
-    </button>
+    </Button>
   );
 }

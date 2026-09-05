@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Crown } from "lucide-react";
+import { Crown, MapPin, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ScrollableCarousel from "@/components/ScrollableCarousel";
@@ -161,8 +161,9 @@ function DJCard({
             <p className="mx-auto w-40 truncate text-sm leading-tight font-semibold text-white">
               Dj. {dj.stageName}
             </p>
-            <p className="mt-0.5 text-xs text-gray-400">
-              📍 {dj.city}, {dj.country}
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
+              <MapPin className="text-h_redLight h-3 w-3" />
+              {dj.city}, {dj.country}
             </p>
           </div>
         </div>
@@ -176,7 +177,10 @@ function DJCard({
         </div>
 
         <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-2 text-xs text-gray-400">
-          <span>⭐ {dj.rating}</span>
+          <span className="flex items-center gap-1">
+            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+            {dj.rating}
+          </span>
           <span>{formatNumber(dj.followers)} followers</span>
         </div>
       </Card>

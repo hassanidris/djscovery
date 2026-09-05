@@ -201,7 +201,10 @@ function DjProfileHero({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:pb-2">
+          <div
+            className="flex items-center gap-2 sm:pb-2"
+            style={{ gap: "var(--space-2)" }}
+          >
             {isOwner && djData?.slug ? (
               <>
                 <Button

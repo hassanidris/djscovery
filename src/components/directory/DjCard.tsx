@@ -48,9 +48,15 @@ const DjCard = ({
   }, [stageName, username]);
 
   return (
-    <div className="bg-h_blackLight/50 hover:ring-h_red hover:shadow-h_red/5 group relative flex flex-col gap-3 rounded-xl p-4 transition-all duration-200 hover:scale-[1.015] hover:shadow-lg hover:ring-1">
+    <div
+      className="bg-h_blackLight/50 hover:ring-h_red hover:shadow-h_red/5 group relative flex flex-col gap-3 rounded-xl p-4 transition-all duration-200 hover:ring-1"
+      style={{ padding: "var(--space-4)", gap: "var(--space-3)" }}
+    >
       {djProfileId !== undefined && (
-        <div className="absolute top-3 right-3 z-10">
+        <div
+          className="absolute top-3 right-3 z-10"
+          style={{ top: "var(--space-3)", right: "var(--space-3)" }}
+        >
           <SaveDjButton
             djProfileId={djProfileId}
             isFollowed={isFollowed}
@@ -77,7 +83,10 @@ const DjCard = ({
           )}
         </div>
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5">
+          <div
+            className="flex items-center gap-1.5"
+            style={{ gap: "var(--space-1)" }}
+          >
             <h3 className="text-h_white truncate text-sm font-semibold">
               {formattedName}
             </h3>
@@ -92,7 +101,10 @@ const DjCard = ({
               {[city, country].filter(Boolean).join(", ")}
             </p>
           )}
-          <div className="mt-1 flex items-center gap-2">
+          <div
+            className="mt-1 flex items-center gap-2"
+            style={{ marginTop: "var(--space-1)", gap: "var(--space-2)" }}
+          >
             <ReputationBadge
               score={reputationScore}
               variant="subtle"
@@ -104,7 +116,10 @@ const DjCard = ({
       </Link>
 
       {genreList.length > 0 && (
-        <div className="mt-1 flex flex-wrap gap-1">
+        <div
+          className="mt-1 flex flex-wrap gap-1"
+          style={{ marginTop: "var(--space-1)", gap: "var(--space-1)" }}
+        >
           {genreList.slice(0, 2).map((genre) => (
             <GenreBadge key={genre} variant="red">
               {genre}
@@ -118,7 +133,10 @@ const DjCard = ({
         </div>
       )}
 
-      <div className="my-2 border-t border-gray-700/50" />
+      <div
+        className="my-2 border-t border-gray-700/50"
+        style={{ margin: "var(--space-2) 0" }}
+      />
 
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs text-gray-400">
