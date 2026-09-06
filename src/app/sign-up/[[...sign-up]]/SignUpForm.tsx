@@ -4,7 +4,9 @@ import { signUp, signInWithGoogle } from "@/lib/actions/auth";
 import Link from "next/link";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, Headphones, Sliders, PartyPopper } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 function getPasswordStrength(password: string): {
   score: 0 | 1 | 2;
@@ -37,7 +39,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
   const { label, color, width } = getPasswordStrength(password);
   if (!password) return null;
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1" style={{ gap: "var(--space-1)" }}>
       <div className="h-1.5 w-full rounded-full bg-white/10">
         <div
           className={`h-1.5 rounded-full transition-all duration-300 ${color} ${width}`}
@@ -51,10 +53,10 @@ function PasswordStrengthMeter({ password }: { password: string }) {
 function SignUpSubmitBtn({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
-    <button
+    <Button
       type="submit"
       disabled={pending}
-      className="bg-h_red hover:bg-h_redDark flex cursor-pointer items-center justify-center gap-2 rounded-lg py-3 font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+      className="bg-h_red hover:bg-h_redDark w-full font-semibold text-white shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? (
         <>
@@ -64,34 +66,34 @@ function SignUpSubmitBtn({ label }: { label: string }) {
       ) : (
         label
       )}
-    </button>
+    </Button>
   );
 }
 
-type Role = "" | "dj" | "organizer";
+type Role = "fan" | "dj" | "organizer";
 
-const ROLES: {
+const ROLES: Array<{
   value: Role;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   description: string;
-}[] = [
+}> = [
   {
-    value: "",
+    value: "fan",
     label: "Fan",
-    icon: "🎧",
+    icon: <Headphones className="h-5 w-5" />,
     description: "Browse DJs, follow artists & attend events",
   },
   {
     value: "dj",
     label: "DJ",
-    icon: "🎛️",
+    icon: <Sliders className="h-5 w-5" />,
     description: "Create a profile, get discovered & booked",
   },
   {
     value: "organizer",
     label: "Organizer",
-    icon: "🎪",
+    icon: <PartyPopper className="h-5 w-5" />,
     description: "Post gigs, hire DJs & manage events",
   },
 ];
@@ -103,49 +105,71 @@ export default function SignUpForm({
   error?: string;
   defaultRole?: Role;
 }) {
-  const [selected, setSelected] = useState<Role>(defaultRole ?? "");
+  const [selected, setSelected] = useState<Role | null>(null);
   const [password, setPassword] = useState("");
+  const [showRoleError, setShowRoleError] = useState(false);
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-white/20 bg-white/5 p-8">
-      <h1 className="text-center text-2xl font-bold text-white">
+    <div
+      className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-white/20 bg-white/5 p-8"
+      style={{ gap: "var(--space-5)", padding: "var(--space-8)" }}
+    >
+      <h1
+        className="font-heading text-center text-2xl font-bold text-white"
+        style={{ letterSpacing: "-0.025em" }}
+      >
         Create Account
       </h1>
 
       {error && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-400">
+        <div
+          className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-400"
+          style={{ padding: "var(--space-3) var(--space-4)" }}
+        >
           {error}
         </div>
       )}
 
       {/* Role selector */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2" style={{ gap: "var(--space-2)" }}>
         <p className="text-center text-xs text-gray-400">
           I&apos;m joining as a…
         </p>
-        <div className="grid grid-cols-3 gap-2">
+        <div
+          className="grid grid-cols-3 gap-2"
+          style={{ gap: "var(--space-2)" }}
+        >
           {ROLES.map((r) => (
             <button
               key={r.value}
               type="button"
-              onClick={() => setSelected(r.value)}
-              className={`flex flex-col items-center gap-1 rounded-lg border p-3 text-center transition-all ${
+              onClick={() => {
+                setSelected(r.value);
+                setShowRoleError(false);
+              }}
+              className={`flex flex-col items-center gap-1 rounded-lg border p-3 text-center transition-all duration-200 ${
                 selected === r.value
                   ? "border-h_red bg-h_red/10 text-white"
                   : "border-white/10 bg-white/5 text-gray-400 hover:border-white/30"
               }`}
+              style={{ gap: "var(--space-1)", padding: "var(--space-3)" }}
             >
-              <span className="text-xl">{r.icon}</span>
+              {r.icon}
               <span className="text-xs font-semibold">{r.label}</span>
             </button>
           ))}
         </div>
+        {showRoleError && (
+          <p className="text-center text-xs text-red-400">
+            Please select a role to continue
+          </p>
+        )}
         {selected && (
           <p className="text-center text-xs text-gray-400">
             {ROLES.find((r) => r.value === selected)?.description}
           </p>
         )}
-        {!selected && (
+        {!selected && !showRoleError && (
           <p className="text-center text-xs text-gray-400">
             Browse DJs, follow artists &amp; attend events
           </p>
@@ -153,27 +177,54 @@ export default function SignUpForm({
       </div>
 
       {/* Google OAuth */}
-      <form action={signInWithGoogle}>
-        <input type="hidden" name="role" value={selected} />
-        <button
+      <form
+        action={signInWithGoogle}
+        onSubmit={(e) => {
+          if (!selected) {
+            e.preventDefault();
+            setShowRoleError(true);
+          }
+        }}
+      >
+        <input type="hidden" name="role" value={selected || ""} />
+        <Button
           type="submit"
-          className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg bg-white py-3 font-semibold text-gray-900 transition-all hover:bg-gray-100 active:scale-[0.98]"
+          variant="outline"
+          className="w-full gap-3 border-white/20 transition-all duration-200 hover:border-white/30 hover:bg-white/90 hover:text-gray-900"
+          style={{
+            gap: "var(--space-3)",
+            backgroundColor: "white",
+            color: "#111827",
+          }}
         >
           <GoogleIcon />
           Continue with Google
-        </button>
+        </Button>
       </form>
 
-      <div className="flex items-center gap-3">
+      <div
+        className="flex items-center gap-3"
+        style={{ gap: "var(--space-3)" }}
+      >
         <div className="h-px flex-1 bg-white/10" />
         <span className="text-xs text-gray-400">or</span>
         <div className="h-px flex-1 bg-white/10" />
       </div>
 
       {/* Email signup */}
-      <form action={signUp} className="flex flex-col gap-4">
-        <input type="hidden" name="role" value={selected} />
-        <input
+      <form
+        action={signUp}
+        onSubmit={(e) => {
+          if (!selected) {
+            e.preventDefault();
+            setShowRoleError(true);
+          }
+        }}
+        className="flex flex-col gap-4"
+        style={{ gap: "var(--space-4)" }}
+      >
+        <input type="hidden" name="role" value={selected || ""} />
+        <Input
           type="text"
           name="displayName"
           placeholder={
@@ -182,17 +233,17 @@ export default function SignUpForm({
               : "Your name (e.g. John Doe)"
           }
           maxLength={50}
-          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
+          className="bg-white/10 text-white ring-1 ring-white/20 placeholder:text-gray-400"
         />
-        <input
+        <Input
           type="email"
           name="email"
           placeholder="Email"
           required
-          className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
+          className="bg-white/10 text-white ring-1 ring-white/20 placeholder:text-gray-400"
         />
-        <div className="flex flex-col gap-2">
-          <input
+        <div className="flex flex-col gap-2" style={{ gap: "var(--space-2)" }}>
+          <Input
             type="password"
             name="password"
             placeholder="Password (min 12 chars)"
@@ -200,7 +251,7 @@ export default function SignUpForm({
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 transition-all outline-none"
+            className="bg-white/10 text-white ring-1 ring-white/20 placeholder:text-gray-400"
           />
           <PasswordStrengthMeter password={password} />
         </div>

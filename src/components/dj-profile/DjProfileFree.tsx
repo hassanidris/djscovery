@@ -533,10 +533,19 @@ export default function DjProfileFree({
       />
 
       {/* ── PAGE BODY ── */}
-      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
+      <div
+        className="mx-auto max-w-6xl px-4 py-10 md:px-8"
+        style={{ padding: "var(--space-10) var(--space-4)" }}
+      >
+        <div
+          className="grid grid-cols-1 gap-10 lg:grid-cols-3"
+          style={{ gap: "var(--space-10)" }}
+        >
           {/* Main Column */}
-          <div className="flex flex-col gap-12 lg:col-span-2">
+          <div
+            className="flex flex-col gap-12 lg:col-span-2"
+            style={{ gap: "var(--space-12)" }}
+          >
             {/* ── STICKY SUB-NAVIGATION ── */}
             <div className="bg-h_blackLight/30 sticky top-16.5 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
               <DjProfileSubNav showPremiumTabs={false} />
@@ -995,7 +1004,10 @@ export default function DjProfileFree({
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="sticky top-16.5 hidden h-fit flex-col gap-5 lg:flex">
+          <aside
+            className="sticky top-16.5 hidden h-fit flex-col gap-5 lg:flex"
+            style={{ gap: "var(--space-5)" }}
+          >
             {/* Book CTA — desktop only; mobile version is inline above */}
             <BookCTA
               stageName={`Dj. ${safeDJ.stageName}`}

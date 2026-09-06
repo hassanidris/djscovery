@@ -39,9 +39,14 @@ export default function NavMobileBottom({
             return (
               <span
                 key={item.id}
-                className="flex flex-1 cursor-not-allowed flex-col items-center justify-center gap-1 py-3 text-gray-700 select-none"
+                className="flex flex-1 cursor-not-allowed flex-col items-center justify-center gap-1 py-3 text-gray-600 opacity-60 select-none"
                 aria-disabled="true"
                 aria-label={`${item.label} — Coming Soon`}
+                style={{
+                  gap: "var(--space-1)",
+                  padding: "var(--space-3)",
+                  opacity: 0.6,
+                }}
               >
                 <Icon className="h-5.5 w-5.5 shrink-0" aria-hidden />
                 <span className="text-[11px] leading-none font-medium">
@@ -69,18 +74,21 @@ export default function NavMobileBottom({
                 key={item.id}
                 href={href}
                 className={cn(
-                  "flex flex-1 flex-col items-center justify-center gap-1 py-3 transition-colors",
+                  "flex flex-1 flex-col items-center justify-center gap-1 py-3 transition-all duration-200",
                   isActive
                     ? "text-white"
                     : "text-gray-400 hover:text-gray-300 active:text-gray-200",
                 )}
+                style={{ gap: "var(--space-1)", padding: "var(--space-3)" }}
                 aria-label="You"
                 aria-current={isActive ? "page" : undefined}
               >
                 <div
                   className={cn(
-                    "h-5.5 w-5.5 shrink-0 overflow-hidden rounded-full",
-                    isActive ? "ring-h_red ring-1" : "ring-1 ring-white/25",
+                    "h-5.5 w-5.5 shrink-0 overflow-hidden rounded-full transition-all duration-200",
+                    isActive
+                      ? "ring-h_red ring-2 ring-offset-2 ring-offset-black"
+                      : "ring-1 ring-white/25",
                   )}
                 >
                   {avatarSrc ? (
@@ -116,18 +124,19 @@ export default function NavMobileBottom({
               key={item.id}
               href={item.href!}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 py-3 transition-colors",
+                "flex flex-1 flex-col items-center justify-center gap-1 py-3 transition-all duration-200",
                 isActive
                   ? "text-white"
                   : "text-gray-400 hover:text-gray-300 active:text-gray-200",
               )}
+              style={{ gap: "var(--space-1)", padding: "var(--space-3)" }}
               aria-label={item.label}
               aria-current={isActive ? "page" : undefined}
             >
               <Icon
                 className={cn(
-                  "h-5.5 w-5.5 shrink-0 transition-colors",
-                  isActive ? "text-h_redLight" : "",
+                  "h-5.5 w-5.5 shrink-0 transition-all duration-200",
+                  isActive ? "text-h_redLight scale-110" : "",
                 )}
                 aria-hidden
               />

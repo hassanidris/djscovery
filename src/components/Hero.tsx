@@ -40,36 +40,53 @@ const Hero = async () => {
           <source src="/bnr.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video> */}
-        {/* Overlay for for video was opacity text readability */}
-        <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70"></div>
+        {/* Simplified overlay for text readability */}
+        <div className="absolute top-0 left-0 z-10 h-full w-full bg-black/60"></div>
         <div className="absolute top-0 left-0 z-10 flex h-full w-full items-center">
-          <div className="mx-auto flex w-full max-w-7xl flex-col items-start px-4 text-white md:px-8">
-            <h1 className="max-w-xl text-2xl leading-9 font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-3xl md:max-w-2xl md:text-4xl md:leading-16 lg:max-w-3xl lg:text-5xl xl:text-6xl">
+          <div
+            className="mx-auto flex w-full max-w-7xl flex-col items-start px-4 text-white md:px-8"
+            style={{ padding: "var(--space-4)" }}
+          >
+            <h1
+              className="font-heading max-w-xl text-2xl leading-9 font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-3xl md:max-w-2xl md:text-4xl md:leading-16 lg:max-w-3xl lg:text-5xl xl:text-6xl"
+              style={{ letterSpacing: "-0.03em" }}
+            >
               Get Discovered. <br />
               Get Booked.
               <br />
-              <span className="text-h_redLight font-bold">
+              <span
+                className="text-h_redLight font-bold"
+                style={{ letterSpacing: "-0.02em" }}
+              >
                 Build Your Reputation.{" "}
               </span>
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base">
+            <p
+              className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base"
+              style={{ marginTop: "var(--space-3)" }}
+            >
               Join a growing network of DJs and organizers, showcase your
               talent, and unlock new opportunities.
             </p>
 
-            <div className="mt-6 flex gap-4">
+            <div
+              className="mt-6 flex gap-4"
+              style={{ marginTop: "var(--space-6)", gap: "var(--space-4)" }}
+            >
               {userRole?.role === "DJ" ? (
                 <>
                   <Button
                     asChild
-                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white shadow-lg md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/dj/settings">Complete Your Profile</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
+                    className="h-auto border-white/20 px-6 py-3 text-sm font-semibold text-gray-300 hover:bg-white/5 hover:text-white md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/gigs">Browse Gigs</Link>
                   </Button>
@@ -78,14 +95,16 @@ const Hero = async () => {
                 <>
                   <Button
                     asChild
-                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white shadow-lg md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/organizer/gigs/new">Post a Gig</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
+                    className="h-auto border-white/20 px-6 py-3 text-sm font-semibold text-gray-300 hover:bg-white/5 hover:text-white md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/directory">Find DJs</Link>
                   </Button>
@@ -94,14 +113,16 @@ const Hero = async () => {
                 <>
                   <Button
                     asChild
-                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white shadow-lg md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/directory">Explore DJs</Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
+                    className="h-auto border-white/20 px-6 py-3 text-sm font-semibold text-gray-300 hover:bg-white/5 hover:text-white md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/events">Explore Events</Link>
                   </Button>
@@ -110,7 +131,8 @@ const Hero = async () => {
                 <>
                   <Button
                     asChild
-                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white md:text-base"
+                    className="bg-h_red hover:bg-h_redDark h-auto px-6 py-3 text-sm font-semibold text-white shadow-lg md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/directory">Discover DJs</Link>
                     {/* <Link href={djHref}>Join as DJ</Link> */}
@@ -118,7 +140,8 @@ const Hero = async () => {
                   <Button
                     asChild
                     variant="outline"
-                    className="border-h_red hover:bg-h_red h-auto px-6 py-3 text-sm font-semibold text-red-300 hover:text-white md:text-base"
+                    className="h-auto border-white/20 px-6 py-3 text-sm font-semibold text-gray-300 hover:bg-white/5 hover:text-white md:text-base"
+                    style={{ padding: "var(--space-3) var(--space-6)" }}
                   >
                     <Link href="/events">Upcoming Events</Link>
                     {/* <Link href={organizerHref}>Join as Organizer</Link> */}
