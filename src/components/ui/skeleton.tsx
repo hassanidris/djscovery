@@ -8,7 +8,6 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
         "bg-muted/50 animate-pulse rounded-md",
         "bg-linear-to-r from-gray-800 via-gray-700 to-gray-800",
         "bg-size-[200%_100%]",
-        "animate-[shimmer_1.5s_infinite]",
         className,
       )}
       style={{
