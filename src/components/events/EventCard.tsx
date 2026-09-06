@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Lock } from "lucide-react";
+import { Lock, Calendar, MapPin, Headphones } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import SaveEventButton from "@/components/events/SaveEventButton";
@@ -65,7 +65,10 @@ export function EventCard({
     <Link href={`/events/${event.slug}`}>
       <Card className="bg-h_blackLight/50 hover:ring-h_red cursor-pointer gap-0 overflow-hidden p-0 ring-white/5 transition-all hover:ring-1">
         {/* ── Header with poster / gradient + title ── */}
-        <div className="relative flex h-36 items-end overflow-hidden p-4">
+        <div
+          className="relative flex h-36 items-end overflow-hidden p-4"
+          style={{ padding: "var(--space-4)" }}
+        >
           {event.posterUrl ? (
             <Image
               src={event.posterUrl}
@@ -79,26 +82,41 @@ export function EventCard({
             <div className="bg-h_redDark/20 absolute inset-0" />
           )}
 
-          {/* Gradient overlay */}
-          <div className="from-h_redDark/40 absolute inset-0 bg-linear-to-br to-transparent" />
+          {/* Simplified gradient overlay */}
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
 
           {/* Save button — top right, DB events only */}
           {event.eventId !== undefined && (
-            <div className="absolute top-2 right-2 z-10">
+            <div
+              className="absolute top-2 right-2 z-10"
+              style={{ top: "var(--space-2)", right: "var(--space-2)" }}
+            >
               <SaveEventButton eventId={event.eventId} isSaved={isSaved} />
             </div>
           )}
 
-          {/* Top badges */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+          {/* Simplified badges */}
+          <div
+            className="absolute top-3 left-3 flex flex-wrap gap-1.5"
+            style={{
+              top: "var(--space-3)",
+              left: "var(--space-3)",
+              gap: "var(--space-1)",
+            }}
+          >
             {isPrivate && (
-              <span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-zinc-400 backdrop-blur-sm">
+              <span
+                className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-zinc-400 backdrop-blur-sm"
+                style={{ gap: "var(--space-1)", padding: "0 var(--space-2)" }}
+              >
                 <Lock className="h-2.5 w-2.5" />
                 Private
               </span>
             )}
-            <span className="rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-zinc-300 backdrop-blur-sm">
+            <span
+              className="rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-zinc-300 backdrop-blur-sm"
+              style={{ padding: "0 var(--space-2)" }}
+            >
               {categoryLabel}
             </span>
           </div>
@@ -110,20 +128,33 @@ export function EventCard({
         </div>
 
         {/* ── Body ── */}
-        <div className="flex flex-col gap-2 p-4">
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <span>📅</span>
+        <div
+          className="flex flex-col gap-2 p-4"
+          style={{ gap: "var(--space-2)", padding: "var(--space-4)" }}
+        >
+          <div
+            className="flex items-center gap-2 text-sm text-gray-300"
+            style={{ gap: "var(--space-2)" }}
+          >
+            <Calendar className="text-h_redLight h-4 w-4" />
             <span>{formatDate(event.startDate)}</span>
           </div>
           {event.location && (
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <span>📍</span>
+            <div
+              className="flex items-center gap-2 text-sm text-gray-300"
+              style={{ gap: "var(--space-2)" }}
+            >
+              <MapPin className="text-h_redLight h-4 w-4" />
               <span className="truncate">{event.location}</span>
             </div>
           )}
           {event.djName && (
-            <Badge className="bg-h_redDark/60 mt-1 w-fit border-0 text-red-300">
-              🎧 Dj. {event.djName}
+            <Badge
+              className="bg-h_redDark/60 mt-1 w-fit border-0 text-red-300"
+              style={{ marginTop: "var(--space-1)" }}
+            >
+              <Headphones className="mr-1 h-3 w-3" />
+              Dj. {event.djName}
             </Badge>
           )}
         </div>

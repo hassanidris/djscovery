@@ -1175,10 +1175,19 @@ export default function DjProfilePremium({
       />
 
       {/* ── PAGE BODY ── */}
-      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
+      <div
+        className="mx-auto max-w-6xl px-4 py-10 md:px-8"
+        style={{ padding: "var(--space-10) var(--space-4)" }}
+      >
+        <div
+          className="grid grid-cols-1 gap-10 lg:grid-cols-3"
+          style={{ gap: "var(--space-10)" }}
+        >
           {/* ── MAIN COLUMN ── */}
-          <div className="flex flex-col gap-12 lg:col-span-2">
+          <div
+            className="flex flex-col gap-12 lg:col-span-2"
+            style={{ gap: "var(--space-12)" }}
+          >
             {/* ── STICKY SUB-NAVIGATION ── */}
             <div className="bg-h_blackLight/30 sticky top-16.5 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
               <DjProfileSubNav />
@@ -1215,6 +1224,15 @@ export default function DjProfilePremium({
 
             <Separator className="bg-white/8" />
 
+            {/* ── CAREER HIGHLIGHTS ── */}
+            <CareerHighlights
+              highlights={HIGHLIGHTS}
+              isOwner={isOwner}
+              onAddHighlight={() => setIsHighlightModalOpen(true)}
+            />
+
+            <Separator className="bg-white/8" />
+
             {/* ── EVENTS MODULE ── */}
             <div id="events">
               <DjEventsModule
@@ -1235,6 +1253,8 @@ export default function DjProfilePremium({
                 }
               />
             </div>
+
+            <Separator className="bg-white/8" />
 
             {/* ── EXTENDED MEDIA LIBRARY ── */}
             <section id="media">
@@ -1469,16 +1489,87 @@ export default function DjProfilePremium({
               )}
             </section>
 
-            <Separator className="bg-white/8" />
-
-            {/* ── CAREER HIGHLIGHTS ── */}
-            <CareerHighlights
-              highlights={HIGHLIGHTS}
-              isOwner={isOwner}
-              onAddHighlight={() => setIsHighlightModalOpen(true)}
-            />
-
-            <Separator className="bg-white/8" />
+            {/* ── BOOKING PACKAGES ── */}
+            {(packages.length > 0 || isOwner) && (
+              <>
+                <Separator className="bg-white/8" />
+                <section id="packages" ref={packagesTargetRef}>
+                  <div className="mb-5 flex items-center justify-between">
+                    <SectionHeading sub="Tailored options for every event type">
+                      Booking Packages
+                    </SectionHeading>
+                    {isOwner && packages.length > 0 && (
+                      <Button
+                        onClick={() => setIsPackageModalOpen(true)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-gray-400 hover:text-white"
+                      >
+                        <Pencil className="mr-1.5 h-3 w-3" />
+                        Edit
+                      </Button>
+                    )}
+                  </div>
+                  {packagesIsLoading && PACKAGES.length === 0 ? (
+                    <div className="space-y-4">
+                      {[...Array(2)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-32 animate-pulse rounded-lg bg-white/5"
+                        />
+                      ))}
+                    </div>
+                  ) : PACKAGES.length > 0 ? (
+                    <BookingPackages
+                      packages={[...PACKAGES]
+                        .sort((a, b) => {
+                          // Popular packages first
+                          if (a.popular && !b.popular) return -1;
+                          if (!a.popular && b.popular) return 1;
+                          // Then by sortOrder
+                          return a.sortOrder - b.sortOrder;
+                        })
+                        .map((p) => ({
+                          id: p.id,
+                          name: p.name,
+                          priceFrom: p.priceFrom,
+                          priceTo: p.priceTo,
+                          currency: p.currency,
+                          duration: p.duration,
+                          features: p.features || [],
+                          popular: p.popular,
+                        }))}
+                      viewerRole={bookingContext.role}
+                      openBookingModal={(
+                        packageName,
+                        packagePrice,
+                        packagePriceTo,
+                      ) => {
+                        bookCTARefMobile.current?.openBookingModal(
+                          packageName,
+                          packagePrice,
+                          packagePriceTo,
+                        );
+                        bookCTARefDesktop.current?.openBookingModal(
+                          packageName,
+                          packagePrice,
+                          packagePriceTo,
+                        );
+                      }}
+                    />
+                  ) : (
+                    <EmptySectionState
+                      icon={BriefcaseBusiness}
+                      title="No packages added yet"
+                      description="Create packages to help organizers understand your offerings"
+                      actionLabel="Add Packages"
+                      onAction={() => setIsPackageModalOpen(true)}
+                    />
+                  )}
+                </section>
+                <Separator className="bg-white/8" />
+              </>
+            )}
 
             {/* ── WHERE I'VE PLAYED ── */}
             <div ref={venuesTargetRef}>
@@ -1601,92 +1692,13 @@ export default function DjProfilePremium({
                 />
               )}
             </section>
-
-            {/* ── BOOKING PACKAGES ── */}
-            {(packages.length > 0 || isOwner) && (
-              <>
-                <Separator className="bg-white/8" />
-                <section id="packages" ref={packagesTargetRef}>
-                  <div className="mb-5 flex items-center justify-between">
-                    <SectionHeading sub="Tailored options for every event type">
-                      Booking Packages
-                    </SectionHeading>
-                    {isOwner && packages.length > 0 && (
-                      <Button
-                        onClick={() => setIsPackageModalOpen(true)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-gray-400 hover:text-white"
-                      >
-                        <Pencil className="mr-1.5 h-3 w-3" />
-                        Edit
-                      </Button>
-                    )}
-                  </div>
-                  {packagesIsLoading && PACKAGES.length === 0 ? (
-                    <div className="space-y-4">
-                      {[...Array(2)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-32 animate-pulse rounded-lg bg-white/5"
-                        />
-                      ))}
-                    </div>
-                  ) : PACKAGES.length > 0 ? (
-                    <BookingPackages
-                      packages={[...PACKAGES]
-                        .sort((a, b) => {
-                          // Popular packages first
-                          if (a.popular && !b.popular) return -1;
-                          if (!a.popular && b.popular) return 1;
-                          // Then by sortOrder
-                          return a.sortOrder - b.sortOrder;
-                        })
-                        .map((p) => ({
-                          id: p.id,
-                          name: p.name,
-                          priceFrom: p.priceFrom,
-                          priceTo: p.priceTo,
-                          currency: p.currency,
-                          duration: p.duration,
-                          features: p.features || [],
-                          popular: p.popular,
-                        }))}
-                      viewerRole={bookingContext.role}
-                      openBookingModal={(
-                        packageName,
-                        packagePrice,
-                        packagePriceTo,
-                      ) => {
-                        bookCTARefMobile.current?.openBookingModal(
-                          packageName,
-                          packagePrice,
-                          packagePriceTo,
-                        );
-                        bookCTARefDesktop.current?.openBookingModal(
-                          packageName,
-                          packagePrice,
-                          packagePriceTo,
-                        );
-                      }}
-                    />
-                  ) : (
-                    <EmptySectionState
-                      icon={BriefcaseBusiness}
-                      title="No packages added yet"
-                      description="Create packages to help organizers understand your offerings"
-                      actionLabel="Add Packages"
-                      onAction={() => setIsPackageModalOpen(true)}
-                    />
-                  )}
-                </section>
-                <Separator className="bg-white/8" />
-              </>
-            )}
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="sticky top-[4.125rem] hidden h-fit flex-col gap-5 lg:flex">
+          <aside
+            className="sticky top-[4.125rem] hidden h-fit flex-col gap-5 lg:flex"
+            style={{ gap: "var(--space-5)" }}
+          >
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
               ref={bookCTARefDesktop}

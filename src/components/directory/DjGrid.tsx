@@ -4,6 +4,9 @@ import { useState, useMemo, useCallback } from "react";
 import { DjUser } from "@/lib/data";
 import { useFollowedDjIds } from "@/hooks/useFollowedDjIds";
 import DjCard from "./DjCard";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const PAGE_SIZE = 12;
 
@@ -37,9 +40,39 @@ const DjGrid = ({ djs }: DjGridProps) => {
 
   if (djs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-        <p className="text-lg">No DJs found</p>
-        <p className="mt-1 text-sm">Try adjusting your filters</p>
+      <div
+        className="flex flex-col items-center justify-center py-20"
+        style={{ padding: "var(--space-20)" }}
+      >
+        <div
+          className="bg-h_blackLight/30 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10"
+          style={{
+            backgroundColor: "var(--charcoal-light)",
+            padding: "var(--space-4)",
+          }}
+        >
+          <Search className="h-8 w-8 text-gray-400" />
+        </div>
+        <h3
+          className="mt-6 text-xl font-semibold text-white"
+          style={{ marginTop: "var(--space-6)" }}
+        >
+          No DJs found
+        </h3>
+        <p
+          className="mt-2 max-w-md text-center text-sm text-gray-400"
+          style={{ marginTop: "var(--space-2)" }}
+        >
+          Try adjusting your filters or browse all DJs to discover talent
+        </p>
+        <Button
+          variant="outline"
+          className="mt-6 border-white/20 hover:bg-white/5"
+          asChild
+          style={{ marginTop: "var(--space-6)" }}
+        >
+          <Link href="/directory">View All DJs</Link>
+        </Button>
       </div>
     );
   }

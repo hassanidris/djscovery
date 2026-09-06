@@ -533,10 +533,11 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
           )}
 
           <Button
-            className="bg-h_red hover:bg-h_redDark w-full font-semibold text-white"
+            className="bg-h_red hover:bg-h_redDark w-full font-semibold text-white shadow-lg"
+            size="lg"
             onClick={handlePrimaryClick}
           >
-            <CalendarCheck2 className="mr-1.5 h-3.5 w-3.5" />
+            <CalendarCheck2 className="mr-1.5 h-4 w-4" />
             Book / Hire DJ
           </Button>
 
@@ -608,3 +609,5 @@ export const BookCTA = forwardRef<BookCTARef, Props>(
 );
 
 BookCTA.displayName = "BookCTA";
+
+export default BookCTA;

@@ -6,7 +6,6 @@ import { getDemoGigs } from "@/data/gigs-demo";
 import type { DjGigListItem } from "@/lib/queries/gigs";
 import { GigGrid } from "@/components/gigs/GigGrid";
 import { GigFilters } from "@/components/gigs/GigFilters";
-import { GigGridSkeleton } from "@/components/gigs/GigSkeleton";
 
 // Extracted helper functions for better performance and testability
 function normalizeParam(value: string | string[] | undefined): string {
@@ -182,10 +181,10 @@ export default async function GigsPage({
           </Suspense>
         </div>
 
-        {/* Gigs Content with Suspense for loading state */}
-        <Suspense fallback={<GigGridSkeleton />}>
-          <GigsContent typeFilter={typeFilter} searchQuery={searchQuery} />
-        </Suspense>
+        {/* Gigs Content — no inner Suspense; the page itself suspends
+            while GigsContent renders, so the route-level loading.tsx
+            (which renders GigGridSkeleton) is shown during navigation. */}
+        <GigsContent typeFilter={typeFilter} searchQuery={searchQuery} />
       </div>
     </div>
   );

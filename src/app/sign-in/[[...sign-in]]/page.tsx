@@ -1,6 +1,8 @@
 import { signIn, signInWithGoogle } from "@/lib/actions/auth";
 import Link from "next/link";
 import { SignInSubmitBtn } from "./SignInSubmitBtn";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
   auth_callback_failed:
@@ -23,8 +25,16 @@ export default async function Page({
 
   return (
     <div className="flex h-[calc(100vh-136px)] flex-col items-center justify-center">
-      <div className="flex w-full max-w-sm flex-col gap-4 rounded-xl border border-white/20 bg-white/5 p-8">
-        <h1 className="text-center text-2xl font-bold text-white">Sign In</h1>
+      <div
+        className="flex w-full max-w-sm flex-col gap-4 rounded-xl border border-white/20 bg-white/5 p-8"
+        style={{ gap: "var(--space-4)", padding: "var(--space-8)" }}
+      >
+        <h1
+          className="font-heading text-center text-2xl font-bold text-white"
+          style={{ letterSpacing: "-0.025em" }}
+        >
+          Sign In
+        </h1>
 
         {message && (
           <div
@@ -32,6 +42,7 @@ export default async function Page({
             aria-live="polite"
             aria-atomic="true"
             className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-center text-sm text-green-400"
+            style={{ padding: "var(--space-3) var(--space-4)" }}
           >
             {message}
           </div>
@@ -42,6 +53,7 @@ export default async function Page({
             aria-live="assertive"
             aria-atomic="true"
             className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-400"
+            style={{ padding: "var(--space-3) var(--space-4)" }}
           >
             {error}
           </div>
@@ -50,36 +62,49 @@ export default async function Page({
         {/* Google OAuth */}
         <form action={signInWithGoogle}>
           <input type="hidden" name="role" value="" />
-          <button
+          <Button
             type="submit"
-            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg bg-white py-3 font-semibold text-gray-900 transition-all hover:bg-gray-100 active:scale-[0.98]"
+            variant="outline"
+            className="w-full gap-3 border-white/20 transition-all duration-200 hover:border-white/30 hover:bg-white/90 hover:text-gray-900"
+            style={{
+              gap: "var(--space-3)",
+              backgroundColor: "white",
+              color: "#111827",
+            }}
           >
             <GoogleIcon />
             Continue with Google
-          </button>
+          </Button>
         </form>
 
-        <div className="flex items-center gap-3">
+        <div
+          className="flex items-center gap-3"
+          style={{ gap: "var(--space-3)" }}
+        >
           <div className="h-px flex-1 bg-white/10" />
           <span className="text-xs text-gray-400">or</span>
           <div className="h-px flex-1 bg-white/10" />
         </div>
 
         {/* Email / Password */}
-        <form action={signIn} className="flex flex-col gap-4">
-          <input
+        <form
+          action={signIn}
+          className="flex flex-col gap-4"
+          style={{ gap: "var(--space-4)" }}
+        >
+          <Input
             type="email"
             name="email"
             placeholder="Email"
             required
-            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 outline-none"
+            className="bg-white/10 text-white ring-1 ring-white/20 placeholder:text-gray-400"
           />
-          <input
+          <Input
             type="password"
             name="password"
             placeholder="Password"
             required
-            className="focus:ring-h_red rounded-lg bg-white/10 px-4 py-3 text-white placeholder-gray-400 ring-1 ring-white/20 outline-none"
+            className="bg-white/10 text-white ring-1 ring-white/20 placeholder:text-gray-400"
           />
           <div className="flex justify-end">
             <Link

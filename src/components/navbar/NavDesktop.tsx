@@ -74,9 +74,14 @@ export default function NavDesktop({
             return (
               <span
                 key={item.id}
-                className="relative flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-400 select-none"
+                className="relative flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 opacity-60 select-none"
                 aria-disabled="true"
                 title={`${item.label} — Coming Soon`}
+                style={{
+                  gap: "var(--space-2)",
+                  padding: "var(--space-2) var(--space-3)",
+                  opacity: 0.6,
+                }}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden />
                 <span>{item.label}</span>
@@ -92,11 +97,15 @@ export default function NavDesktop({
               key={item.id}
               href={item.href}
               className={cn(
-                "focus-visible:ring-h_red relative flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition-all duration-150 focus-visible:ring-2 focus-visible:outline-none",
+                "focus-visible:ring-h_red relative flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none",
                 isActive
                   ? "text-white"
                   : "text-gray-400 hover:bg-white/5 hover:text-white",
               )}
+              style={{
+                gap: "var(--space-1)",
+                padding: "var(--space-2) var(--space-3)",
+              }}
               aria-current={isActive ? "page" : undefined}
             >
               <Icon
@@ -109,7 +118,12 @@ export default function NavDesktop({
               <span>{item.label}</span>
               {isActive && (
                 <span
-                  className="bg-h_red absolute right-3 bottom-0 left-3 h-0.5 rounded-full"
+                  className="bg-h_red absolute right-3 bottom-0 left-3 h-0.5 rounded-full transition-all duration-200"
+                  style={{
+                    bottom: "var(--space-2)",
+                    left: "var(--space-3)",
+                    right: "var(--space-3)",
+                  }}
                   aria-hidden
                 />
               )}
@@ -125,7 +139,11 @@ export default function NavDesktop({
           onSubmit={handleDesktopSearch}
           role="search"
           aria-label="Search DJcovery"
-          className="focus-within:ring-h_red/50 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 ring-1 ring-white/8 transition-all"
+          className="focus-within:ring-h_red/50 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 ring-1 ring-white/8 transition-all duration-200"
+          style={{
+            gap: "var(--space-2)",
+            padding: "var(--space-1) var(--space-3)",
+          }}
         >
           <Search className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
           <input
@@ -163,19 +181,22 @@ export default function NavDesktop({
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-2"
+            style={{ gap: "var(--space-2)" }}
+          >
             <Button
               asChild
               variant="outline"
               size="sm"
-              className="border-h_red/60 text-h_redLight hover:bg-h_red/15 hover:text-h_redLight hover:border-h_red transition-all"
+              className="border-white/20 text-gray-300 transition-all duration-200 hover:bg-white/5 hover:text-white"
             >
               <Link href="/sign-in">Sign In</Link>
             </Button>
             <Button
               asChild
               size="sm"
-              className="bg-h_red hover:bg-h_redDark font-semibold text-white transition-all"
+              className="bg-h_red hover:bg-h_redDark font-semibold text-white shadow-md transition-all duration-200"
             >
               <Link href="/sign-up">Sign Up</Link>
             </Button>
