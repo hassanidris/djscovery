@@ -60,6 +60,19 @@ async function capturePage(
   await expect(page.locator("body")).toBeVisible();
 
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
+
+  // Wait for every <img> (including Next/Image-rendered ones, e.g. remote
+  // event posters) to finish loading before capturing. Without this, slow
+  // or in-flight network image loads cause large, consistent pixel diffs in
+  // CI that have nothing to do with real visual regressions. Bounded so a
+  // genuinely broken image (network down) can't hang the test forever.
+  await page
+    .waitForFunction(
+      () => Array.from(document.images).every((img) => img.complete),
+      { timeout: 15000 },
+    )
+    .catch(() => undefined);
+
   await page.waitForTimeout(1000);
 
   await page.addStyleTag({
