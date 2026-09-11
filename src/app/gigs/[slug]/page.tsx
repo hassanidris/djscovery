@@ -162,7 +162,7 @@ export default async function GigDetailPage({
         <div className="mb-6">
           <Link
             href={isOrganizer ? "/organizer/gigs" : "/gigs"}
-            className="flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-white"
+            className="flex items-center gap-1.5 text-sm text-zinc-400 transition-colors duration-200 hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {isOrganizer ? "My Gigs" : "Gigs"}
@@ -174,7 +174,7 @@ export default async function GigDetailPage({
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <GigStatusBadge status={gig.status} />
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
+              <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-zinc-400">
                 {typeLabel}
               </span>
             </div>
@@ -184,11 +184,13 @@ export default async function GigDetailPage({
                 targetId={String(gig.id)}
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white"
+                className="text-zinc-400 hover:text-white"
               />
             )}
           </div>
-          <h1 className="text-2xl font-bold text-white">{gig.title}</h1>
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-white">
+            {gig.title}
+          </h1>
         </div>
 
         {/* Organizer review prompt */}
@@ -217,7 +219,7 @@ export default async function GigDetailPage({
             <div className="mb-8">
               <Link
                 href={`/gigs/${gig.slug}/organizer-review`}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300 transition-colors hover:border-white/20 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/8 bg-white/5 px-4 py-3 text-sm text-zinc-300 transition-colors duration-200 hover:border-white/15 hover:text-white"
               >
                 <Star className="h-4 w-4" />
                 Review {gig.organizerProfile.displayName}
@@ -235,7 +237,7 @@ export default async function GigDetailPage({
             <div className="mb-8">
               <Link
                 href={`/gigs/${gig.slug}/dj-review`}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300 transition-colors hover:border-white/20 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/8 bg-white/5 px-4 py-3 text-sm text-zinc-300 transition-colors duration-200 hover:border-white/15 hover:text-white"
               >
                 <Star className="h-4 w-4" />
                 Review this gig
@@ -298,10 +300,10 @@ export default async function GigDetailPage({
           ].map(({ icon: Icon, label, value }) => (
             <div
               key={label}
-              className="flex flex-col gap-1 rounded-xl border border-white/8 bg-white/3 p-4"
+              className="bg-h_blackLight flex flex-col gap-1 rounded-xl border border-white/8 p-4"
             >
-              <Icon className="mb-1 h-4 w-4 text-gray-400" />
-              <p className="text-xs text-gray-400">{label}</p>
+              <Icon className="mb-1 h-4 w-4 text-zinc-400" />
+              <p className="text-xs text-zinc-400">{label}</p>
               <p className="text-sm font-medium text-white">{value}</p>
             </div>
           ))}
@@ -310,7 +312,7 @@ export default async function GigDetailPage({
         {/* Organizer card */}
         <Link
           href={`/organizers/${gig.organizerProfile.slug}`}
-          className="mb-8 flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 p-4 transition-colors hover:border-white/15"
+          className="bg-h_blackLight mb-8 flex items-center gap-3 rounded-xl border border-white/8 p-4 transition-colors duration-200 hover:border-white/15"
         >
           <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white/5">
             {gig.organizerProfile.logoUrl ? (
@@ -322,7 +324,7 @@ export default async function GigDetailPage({
                 className="object-cover"
               />
             ) : (
-              <span className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-400">
+              <span className="flex h-full w-full items-center justify-center text-xs font-bold text-zinc-400">
                 {(gig.organizerProfile.displayName ?? "O")
                   .slice(0, 2)
                   .toUpperCase()}
@@ -330,7 +332,7 @@ export default async function GigDetailPage({
             )}
           </div>
           <div>
-            <p className="text-xs text-gray-400">Organizer</p>
+            <p className="text-xs text-zinc-400">Organizer</p>
             <p className="text-sm font-medium text-white">
               {gig.organizerProfile.displayName ?? "Organizer"}
             </p>
@@ -343,21 +345,21 @@ export default async function GigDetailPage({
             <h2 className="mb-2 text-sm font-semibold text-white">
               Description
             </h2>
-            <p className="text-sm leading-relaxed whitespace-pre-line text-gray-400">
+            <p className="text-sm leading-relaxed whitespace-pre-line text-zinc-300">
               {gig.description}
             </p>
           </section>
         )}
 
         {/* Requirements */}
-        <section className="mb-6 rounded-xl border border-white/8 bg-white/3 p-5">
+        <section className="bg-h_blackLight mb-6 rounded-xl border border-white/8 p-5">
           <h2 className="mb-4 text-sm font-semibold text-white">
             Requirements
           </h2>
           <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             {gig.requiredExperienceLevel !== "OPEN" && (
               <div>
-                <dt className="text-xs text-gray-400">Experience</dt>
+                <dt className="text-xs text-zinc-400">Experience</dt>
                 <dd className="text-white capitalize">
                   {gig.requiredExperienceLevel.toLowerCase()}
                 </dd>
@@ -365,7 +367,7 @@ export default async function GigDetailPage({
             )}
             {gig.setDurationMinutes && (
               <div>
-                <dt className="text-xs text-gray-400">Set duration</dt>
+                <dt className="text-xs text-zinc-400">Set duration</dt>
                 <dd className="text-white">
                   {formatDuration(gig.setDurationMinutes)}
                 </dd>
@@ -373,32 +375,32 @@ export default async function GigDetailPage({
             )}
             {gig.guestCount && (
               <div>
-                <dt className="text-xs text-gray-400">Guest count</dt>
+                <dt className="text-xs text-zinc-400">Guest count</dt>
                 <dd className="text-white">~{gig.guestCount}</dd>
               </div>
             )}
             {gig.dressCode && (
               <div>
-                <dt className="text-xs text-gray-400">Dress code</dt>
+                <dt className="text-xs text-zinc-400">Dress code</dt>
                 <dd className="text-white">{gig.dressCode}</dd>
               </div>
             )}
             {gig.mcRequired && (
               <div>
-                <dt className="text-xs text-gray-400">MC</dt>
+                <dt className="text-xs text-zinc-400">MC</dt>
                 <dd className="text-white">Required</dd>
               </div>
             )}
             {gig.micRequired && (
               <div>
-                <dt className="text-xs text-gray-400">Microphone</dt>
+                <dt className="text-xs text-zinc-400">Microphone</dt>
                 <dd className="text-white">Required</dd>
               </div>
             )}
           </dl>
           {gig.requiredGenres.length > 0 && (
             <div className="mt-4">
-              <dt className="mb-2 text-xs text-gray-400">Required genres</dt>
+              <dt className="mb-2 text-xs text-zinc-400">Required genres</dt>
               <div className="flex flex-wrap gap-1.5">
                 {gig.requiredGenres.map((g) => (
                   <GenreBadge key={g} variant="gray" size="md">
@@ -412,11 +414,11 @@ export default async function GigDetailPage({
 
         {/* Equipment */}
         {(gig.venueProvides.length > 0 || gig.djMustBring.length > 0) && (
-          <section className="mb-6 rounded-xl border border-white/8 bg-white/3 p-5">
+          <section className="bg-h_blackLight mb-6 rounded-xl border border-white/8 p-5">
             <h2 className="mb-4 text-sm font-semibold text-white">Equipment</h2>
             {gig.venueProvides.length > 0 && (
               <div className="mb-3">
-                <p className="mb-2 text-xs text-gray-400">Venue provides</p>
+                <p className="mb-2 text-xs text-zinc-400">Venue provides</p>
                 <div className="flex flex-wrap gap-1.5">
                   {gig.venueProvides.map((e) => (
                     <span
@@ -431,7 +433,7 @@ export default async function GigDetailPage({
             )}
             {gig.djMustBring.length > 0 && (
               <div>
-                <p className="mb-2 text-xs text-gray-400">DJ must bring</p>
+                <p className="mb-2 text-xs text-zinc-400">DJ must bring</p>
                 <div className="flex flex-wrap gap-1.5">
                   {gig.djMustBring.map((e) => (
                     <span
@@ -503,9 +505,9 @@ export default async function GigDetailPage({
 
         {/* CTA for organizer to edit */}
         {isOrganizer && (
-          <div className="mt-2 flex items-center justify-between rounded-xl border border-white/10 px-5 py-4">
+          <div className="bg-h_blackLight mt-2 flex items-center justify-between rounded-xl border border-white/8 px-5 py-4">
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-400" />
+              <Users className="h-4 w-4 text-zinc-400" />
               <span className="text-sm text-white">View Applicants</span>
             </div>
             <Button variant="outline" size="sm" asChild>

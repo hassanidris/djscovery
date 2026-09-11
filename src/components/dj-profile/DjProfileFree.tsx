@@ -534,17 +534,17 @@ export default function DjProfileFree({
 
       {/* ── PAGE BODY ── */}
       <div
-        className="mx-auto max-w-6xl px-4 py-10 md:px-8"
+        className="mx-auto max-w-7xl px-4 py-10 md:px-8"
         style={{ padding: "var(--space-10) var(--space-4)" }}
       >
         <div
-          className="grid grid-cols-1 gap-10 lg:grid-cols-3"
-          style={{ gap: "var(--space-10)" }}
+          className="grid grid-cols-1 gap-8 lg:grid-cols-3"
+          style={{ gap: "var(--space-8)" }}
         >
           {/* Main Column */}
           <div
-            className="flex flex-col gap-12 lg:col-span-2"
-            style={{ gap: "var(--space-12)" }}
+            className="flex flex-col gap-8 lg:col-span-2"
+            style={{ gap: "var(--space-8)" }}
           >
             {/* ── STICKY SUB-NAVIGATION ── */}
             <div className="bg-h_blackLight/30 sticky top-16.5 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">

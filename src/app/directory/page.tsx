@@ -360,14 +360,17 @@ const DirectoryPage = async ({
   return (
     <>
       {/* Hero Banner */}
-      <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+      <section className="bg-h_blackLight/30 border-b border-white/8 px-4 py-10 md:px-8">
         <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
           <div className="flex items-center gap-4">
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
               <AudioLines className="text-h_redLight h-6 w-6" />
             </div>
             <div className="flex flex-col gap-1">
-              <h1 className="text-h_white text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+              <h1
+                className="text-h_white font-heading text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl"
+                style={{ letterSpacing: "-0.025em" }}
+              >
                 DJ <span className="text-h_redLight/80">Directory</span>
               </h1>
               <p className="text-sm leading-relaxed text-gray-400">
@@ -386,8 +389,8 @@ const DirectoryPage = async ({
       </section>
 
       {/* 3-Column Layout */}
-      <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
-        <div className="flex flex-col gap-6 py-6 xl:flex-row">
+      <div className="mx-auto w-full max-w-7xl px-4 py-10 md:px-8">
+        <div className="flex flex-col gap-6 xl:flex-row">
           {/* Left — Filters (desktop sidebar only) */}
           <div className="hidden xl:block xl:w-[20%] xl:shrink-0">
             <Suspense

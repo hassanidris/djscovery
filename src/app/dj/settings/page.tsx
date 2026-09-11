@@ -4,6 +4,7 @@ import prisma from "@/lib/client";
 import { createClient } from "@/lib/supabase/server";
 import DjSettingsTabs from "@/components/dj/DjSettingsTabs";
 import { getGenres } from "@/lib/actions/genre";
+import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Profile Settings",
@@ -120,19 +121,36 @@ export default async function DjSettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Profile Settings</h1>
-        <p className="text-sm text-gray-400">
-          Manage your public DJ profile information.
-        </p>
+    <div className="min-h-screen bg-black">
+      <div
+        className="mx-auto max-w-7xl px-4 py-10 md:px-8"
+        style={{ padding: "var(--space-10) var(--space-4)" }}
+      >
+        <div className="flex flex-col gap-6" style={{ gap: "var(--space-6)" }}>
+          <div>
+            <h1
+              className="font-heading text-2xl font-bold text-white"
+              style={{ letterSpacing: "-0.025em" }}
+            >
+              Profile Settings
+            </h1>
+            <p className="text-sm text-gray-400">
+              Manage your public DJ profile information.
+            </p>
+          </div>
+          <Card
+            className="bg-h_blackLight/30 border-white/8 p-6"
+            style={{ padding: "var(--space-6)" }}
+          >
+            <DjSettingsTabs
+              profile={profileData}
+              countries={countries}
+              initialCities={initialCities}
+              allGenres={allGenres}
+            />
+          </Card>
+        </div>
       </div>
-      <DjSettingsTabs
-        profile={profileData}
-        countries={countries}
-        initialCities={initialCities}
-        allGenres={allGenres}
-      />
     </div>
   );
 }

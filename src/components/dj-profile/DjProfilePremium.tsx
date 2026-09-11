@@ -1176,17 +1176,17 @@ export default function DjProfilePremium({
 
       {/* ── PAGE BODY ── */}
       <div
-        className="mx-auto max-w-6xl px-4 py-10 md:px-8"
+        className="mx-auto max-w-7xl px-4 py-10 md:px-8"
         style={{ padding: "var(--space-10) var(--space-4)" }}
       >
         <div
-          className="grid grid-cols-1 gap-10 lg:grid-cols-3"
-          style={{ gap: "var(--space-10)" }}
+          className="grid grid-cols-1 gap-8 lg:grid-cols-3"
+          style={{ gap: "var(--space-8)" }}
         >
           {/* ── MAIN COLUMN ── */}
           <div
-            className="flex flex-col gap-12 lg:col-span-2"
-            style={{ gap: "var(--space-12)" }}
+            className="flex flex-col gap-8 lg:col-span-2"
+            style={{ gap: "var(--space-8)" }}
           >
             {/* ── STICKY SUB-NAVIGATION ── */}
             <div className="bg-h_blackLight/30 sticky top-16.5 z-40 rounded-lg border border-white/8 px-4 py-2 shadow-md shadow-black/20 backdrop-blur-sm">
@@ -1206,35 +1206,45 @@ export default function DjProfilePremium({
             />
 
             <div id="about">
-              <ProfileAbout
-                bio={safeDJ.bio}
-                djTypes={safeDJ.djTypes}
-                bioExpanded={bioExpanded}
-                onToggleBio={() => setBioExpanded(!bioExpanded)}
-                experienceYears={djData?.experienceYears}
-                experienceLevel={djData?.experienceLevel}
-                feeMin={djData?.booking?.feeRange?.min}
-                feeMax={djData?.booking?.feeRange?.max}
-                feeCurrency={djData?.booking?.feeRange?.currency}
-                bookingEmail={djData?.booking?.email}
-                bookingPhone={djData?.booking?.phone}
-                isOwner={isOwner}
-              />
+              <Card
+                className="bg-h_blackLight/30 border-white/8 p-6"
+                style={{ padding: "var(--space-6)" }}
+              >
+                <ProfileAbout
+                  bio={safeDJ.bio}
+                  djTypes={safeDJ.djTypes}
+                  bioExpanded={bioExpanded}
+                  onToggleBio={() => setBioExpanded(!bioExpanded)}
+                  experienceYears={djData?.experienceYears}
+                  experienceLevel={djData?.experienceLevel}
+                  feeMin={djData?.booking?.feeRange?.min}
+                  feeMax={djData?.booking?.feeRange?.max}
+                  feeCurrency={djData?.booking?.feeRange?.currency}
+                  bookingEmail={djData?.booking?.email}
+                  bookingPhone={djData?.booking?.phone}
+                  isOwner={isOwner}
+                />
+              </Card>
             </div>
 
-            <Separator className="bg-white/8" />
-
             {/* ── CAREER HIGHLIGHTS ── */}
-            <CareerHighlights
-              highlights={HIGHLIGHTS}
-              isOwner={isOwner}
-              onAddHighlight={() => setIsHighlightModalOpen(true)}
-            />
-
-            <Separator className="bg-white/8" />
+            <Card
+              className="bg-h_blackLight/30 border-white/8 p-6"
+              style={{ padding: "var(--space-6)" }}
+            >
+              <CareerHighlights
+                highlights={HIGHLIGHTS}
+                isOwner={isOwner}
+                onAddHighlight={() => setIsHighlightModalOpen(true)}
+              />
+            </Card>
 
             {/* ── EVENTS MODULE ── */}
-            <div id="events">
+            <Card
+              className="bg-h_blackLight/30 border-white/8 p-6"
+              style={{ padding: "var(--space-6)" }}
+              id="events"
+            >
               <DjEventsModule
                 events={EVENTS}
                 calendarDays={
@@ -1252,12 +1262,14 @@ export default function DjProfilePremium({
                   djData?.featuredPerformanceThumbnailUrl
                 }
               />
-            </div>
-
-            <Separator className="bg-white/8" />
+            </Card>
 
             {/* ── EXTENDED MEDIA LIBRARY ── */}
-            <section id="media">
+            <Card
+              className="bg-h_blackLight/30 border-white/8 p-6"
+              style={{ padding: "var(--space-6)" }}
+              id="media"
+            >
               <div className="mb-5 flex items-center justify-between">
                 <SectionHeading sub="Full media library · Unlimited with Premium">
                   Media
@@ -1487,92 +1499,97 @@ export default function DjProfilePremium({
                   </Button>
                 </div>
               )}
-            </section>
+            </Card>
 
             {/* ── BOOKING PACKAGES ── */}
             {(packages.length > 0 || isOwner) && (
-              <>
-                <Separator className="bg-white/8" />
-                <section id="packages" ref={packagesTargetRef}>
-                  <div className="mb-5 flex items-center justify-between">
-                    <SectionHeading sub="Tailored options for every event type">
-                      Booking Packages
-                    </SectionHeading>
-                    {isOwner && packages.length > 0 && (
-                      <Button
-                        onClick={() => setIsPackageModalOpen(true)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-gray-400 hover:text-white"
-                      >
-                        <Pencil className="mr-1.5 h-3 w-3" />
-                        Edit
-                      </Button>
-                    )}
+              <Card
+                className="bg-h_blackLight/30 border-white/8 p-6"
+                style={{ padding: "var(--space-6)" }}
+                id="packages"
+                ref={packagesTargetRef}
+              >
+                <div className="mb-5 flex items-center justify-between">
+                  <SectionHeading sub="Tailored options for every event type">
+                    Booking Packages
+                  </SectionHeading>
+                  {isOwner && packages.length > 0 && (
+                    <Button
+                      onClick={() => setIsPackageModalOpen(true)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-gray-400 hover:text-white"
+                    >
+                      <Pencil className="mr-1.5 h-3 w-3" />
+                      Edit
+                    </Button>
+                  )}
+                </div>
+                {packagesIsLoading && PACKAGES.length === 0 ? (
+                  <div className="space-y-4">
+                    {[...Array(2)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-32 animate-pulse rounded-lg bg-white/5"
+                      />
+                    ))}
                   </div>
-                  {packagesIsLoading && PACKAGES.length === 0 ? (
-                    <div className="space-y-4">
-                      {[...Array(2)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-32 animate-pulse rounded-lg bg-white/5"
-                        />
-                      ))}
-                    </div>
-                  ) : PACKAGES.length > 0 ? (
-                    <BookingPackages
-                      packages={[...PACKAGES]
-                        .sort((a, b) => {
-                          // Popular packages first
-                          if (a.popular && !b.popular) return -1;
-                          if (!a.popular && b.popular) return 1;
-                          // Then by sortOrder
-                          return a.sortOrder - b.sortOrder;
-                        })
-                        .map((p) => ({
-                          id: p.id,
-                          name: p.name,
-                          priceFrom: p.priceFrom,
-                          priceTo: p.priceTo,
-                          currency: p.currency,
-                          duration: p.duration,
-                          features: p.features || [],
-                          popular: p.popular,
-                        }))}
-                      viewerRole={bookingContext.role}
-                      openBookingModal={(
+                ) : PACKAGES.length > 0 ? (
+                  <BookingPackages
+                    packages={[...PACKAGES]
+                      .sort((a, b) => {
+                        // Popular packages first
+                        if (a.popular && !b.popular) return -1;
+                        if (!a.popular && b.popular) return 1;
+                        // Then by sortOrder
+                        return a.sortOrder - b.sortOrder;
+                      })
+                      .map((p) => ({
+                        id: p.id,
+                        name: p.name,
+                        priceFrom: p.priceFrom,
+                        priceTo: p.priceTo,
+                        currency: p.currency,
+                        duration: p.duration,
+                        features: p.features || [],
+                        popular: p.popular,
+                      }))}
+                    viewerRole={bookingContext.role}
+                    openBookingModal={(
+                      packageName,
+                      packagePrice,
+                      packagePriceTo,
+                    ) => {
+                      bookCTARefMobile.current?.openBookingModal(
                         packageName,
                         packagePrice,
                         packagePriceTo,
-                      ) => {
-                        bookCTARefMobile.current?.openBookingModal(
-                          packageName,
-                          packagePrice,
-                          packagePriceTo,
-                        );
-                        bookCTARefDesktop.current?.openBookingModal(
-                          packageName,
-                          packagePrice,
-                          packagePriceTo,
-                        );
-                      }}
-                    />
-                  ) : (
-                    <EmptySectionState
-                      icon={BriefcaseBusiness}
-                      title="No packages added yet"
-                      description="Create packages to help organizers understand your offerings"
-                      actionLabel="Add Packages"
-                      onAction={() => setIsPackageModalOpen(true)}
-                    />
-                  )}
-                </section>
-                <Separator className="bg-white/8" />
-              </>
+                      );
+                      bookCTARefDesktop.current?.openBookingModal(
+                        packageName,
+                        packagePrice,
+                        packagePriceTo,
+                      );
+                    }}
+                  />
+                ) : (
+                  <EmptySectionState
+                    icon={BriefcaseBusiness}
+                    title="No packages added yet"
+                    description="Create packages to help organizers understand your offerings"
+                    actionLabel="Add Packages"
+                    onAction={() => setIsPackageModalOpen(true)}
+                  />
+                )}
+              </Card>
             )}
 
             {/* ── WHERE I'VE PLAYED ── */}
-            <div ref={venuesTargetRef}>
+            <Card
+              className="bg-h_blackLight/30 border-white/8 p-6"
+              style={{ padding: "var(--space-6)" }}
+              ref={venuesTargetRef}
+            >
               <WhereIvePlayed
                 venues={
                   venuesHasLoaded && lazyVenues.length > 0
@@ -1609,27 +1626,27 @@ export default function DjProfilePremium({
                 isOwner={isOwner}
                 onAddVenue={() => setIsVenueModalOpen(true)}
               />
-            </div>
+            </Card>
 
             {ENDORSEMENTS.length > 0 && (
-              <>
-                <Separator className="bg-white/8" />
-
-                {/* ── INDUSTRY ENDORSEMENTS ── */}
+              <Card
+                className="bg-h_blackLight/30 border-white/8 p-6"
+                style={{ padding: "var(--space-6)" }}
+              >
                 <EndorsementsSection
                   ref={endorsementsTargetRef}
                   endorsements={ENDORSEMENTS}
                   isLoading={endorsementsIsLoading}
                   hasLoaded={endorsementsHasLoaded}
                 />
-              </>
+              </Card>
             )}
 
             {(PRESS.length > 0 || isOwner) && (
-              <>
-                <Separator className="bg-white/8" />
-
-                {/* ── PRESS & MEDIA ── */}
+              <Card
+                className="bg-h_blackLight/30 border-white/8 p-6"
+                style={{ padding: "var(--space-6)" }}
+              >
                 <PressSection
                   ref={pressTargetRef}
                   press={PRESS}
@@ -1637,12 +1654,14 @@ export default function DjProfilePremium({
                   isOwner={isOwner}
                   onAddPress={() => setIsPressModalOpen(true)}
                 />
-              </>
+              </Card>
             )}
 
-            <Separator className="bg-white/8" />
-
-            <section id="reviews">
+            <Card
+              className="bg-h_blackLight/30 border-white/8 p-6"
+              style={{ padding: "var(--space-6)" }}
+              id="reviews"
+            >
               <SectionHeading sub="What people say about this DJ">
                 Reviews
               </SectionHeading>
@@ -1691,13 +1710,13 @@ export default function DjProfilePremium({
                   actionHref={isOwner ? editHref : undefined}
                 />
               )}
-            </section>
+            </Card>
           </div>
 
           {/* ── SIDEBAR ── */}
           <aside
-            className="sticky top-[4.125rem] hidden h-fit flex-col gap-5 lg:flex"
-            style={{ gap: "var(--space-5)" }}
+            className="sticky top-[4.125rem] hidden h-fit flex-col gap-6 lg:flex"
+            style={{ gap: "var(--space-6)" }}
           >
             {/* Priority Booking CTA — desktop only; mobile version is inline above */}
             <BookCTA
@@ -1713,7 +1732,10 @@ export default function DjProfilePremium({
             />
 
             {/* Trust & Social Proof Strip */}
-            <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+            <Card
+              className="bg-h_blackLight/30 gap-0 border-white/8 p-4"
+              style={{ padding: "var(--space-4)" }}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
@@ -1741,29 +1763,36 @@ export default function DjProfilePremium({
             </Card>
 
             {/* Events — desktop only; mobile version is inline above */}
-            <div className="hidden lg:block">
+            <Card
+              className="bg-h_blackLight/30 hidden border-white/8 p-4 lg:block"
+              style={{ padding: "var(--space-4)" }}
+            >
               <ProfileEventsSidebar
                 events={EVENTS}
                 isOwner={isOwner}
                 djName={safeDJ.stageName}
               />
-            </div>
-
-            <Separator className="bg-white/8" />
+            </Card>
 
             {/* Professional Team */}
-            <ProfessionalTeamSidebar
-              managerName={safeDJ.manager.name}
-              managerEmail={safeDJ.manager.email}
-              agentName={safeDJ.agent.name}
-              agentAgency={safeDJ.agent.agency}
-              agentEmail={safeDJ.agent.email}
-            />
-
-            <Separator className="bg-white/8" />
+            <Card
+              className="bg-h_blackLight/30 border-white/8 p-4"
+              style={{ padding: "var(--space-4)" }}
+            >
+              <ProfessionalTeamSidebar
+                managerName={safeDJ.manager.name}
+                managerEmail={safeDJ.manager.email}
+                agentName={safeDJ.agent.name}
+                agentAgency={safeDJ.agent.agency}
+                agentEmail={safeDJ.agent.email}
+              />
+            </Card>
 
             {/* Fee Range */}
-            <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+            <Card
+              className="bg-h_blackLight/30 gap-0 border-white/8 p-4"
+              style={{ padding: "var(--space-4)" }}
+            >
               <h3 className="mb-3 text-sm font-semibold text-white">
                 Fee Range
               </h3>
@@ -1782,7 +1811,10 @@ export default function DjProfilePremium({
 
             {/* Analytics snapshot (owner-only in fan view) */}
             <OwnerOnlySection viewMode={viewMode}>
-              <Card className="bg-h_blackLight/30 gap-0 border-white/8 p-4">
+              <Card
+                className="bg-h_blackLight/30 gap-0 border-white/8 p-4"
+                style={{ padding: "var(--space-4)" }}
+              >
                 <div className="mb-3 flex items-center gap-2">
                   <ChartLine className="h-3.5 w-3.5 text-emerald-400" />
                   <h3 className="text-xs font-semibold text-white">
