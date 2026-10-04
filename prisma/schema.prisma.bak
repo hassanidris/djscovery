@@ -151,6 +151,7 @@ model User {
   venueReviews                  VenueReview[]
   foundingApplications          FoundingApplication[]          @relation("FoundingApplicationReviewer")
   foundingApplicationStatusLogs FoundingApplicationStatusLog[] @relation("FoundingApplicationStatusLogChanger")
+  foundingApplicationStatusLogs FoundingApplicationStatusLog[]
 
   @@index([status])
   @@index([deletedAt])
@@ -240,10 +241,9 @@ model DjProfile {
   profileViews               ProfileView[]
   reputationDetail           ReputationScore?
   socialLinks                SocialLink[]
-  foundingApplication        FoundingApplication? @relation(fields: [foundingApplicationId], references: [id])
+  foundingApplication        FoundingApplication?
   invitationTokens           InvitationToken[]
   foundingMember             FoundingMember?
-  foundingApplicationId      Int?
 
   @@index([slug])
   @@index([status])
@@ -1286,9 +1286,10 @@ model FoundingApplication {
   notes                      String?
   createdAt                  DateTime                       @default(now())
   updatedAt                  DateTime                       @updatedAt
+  djProfile                  DjProfile?                     @relation(fields: [djProfileId], references: [id])
   reviewer                   User?                          @relation("FoundingApplicationReviewer", fields: [reviewedBy], references: [id])
   statusLogs                 FoundingApplicationStatusLog[]
-  djProfiles                 DjProfile[]
+  foundingMember             FoundingMember?
 
   @@index([email])
   @@index([status])
@@ -1307,6 +1308,8 @@ model FoundingApplicationStatusLog {
   createdAt             DateTime                   @default(now())
   foundingApplication   FoundingApplication        @relation(fields: [foundingApplicationId], references: [id], onDelete: Cascade)
   changer               User?                      @relation("FoundingApplicationStatusLogChanger", fields: [changedBy], references: [id])
+  user                  User?                      @relation(fields: [userId], references: [id])
+  userId                String?
 
   @@index([foundingApplicationId])
   @@index([createdAt])
@@ -1347,6 +1350,7 @@ model FoundingMember {
   notes                 String?
   createdAt             DateTime             @default(now())
   updatedAt             DateTime             @updatedAt
+  foundingApplication   FoundingApplication  @relation(fields: [djProfileId], references: [id])
   djProfile             DjProfile            @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
 
   @@index([status])
