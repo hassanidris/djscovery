@@ -1,8 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { indexingEnabled } from "./lib/seo/indexing";
+import prisma from "./lib/client";
 
-const PRE_LAUNCH_MODE = process.env.PRE_LAUNCH_MODE === "true";
+type SiteMode = "PRE_LAUNCH" | "BETA" | "LIVE";
+
+const SITE_MODE = (process.env.SITE_MODE || "PRE_LAUNCH") as SiteMode;
 
 const isProduction =
   process.env.VERCEL_ENV === "production" ||
@@ -18,12 +20,28 @@ const ALWAYS_PUBLIC_PATHS = [
   "/forgot-password",
   "/update-password",
   "/auth/callback",
+  "/founding-djs",
 ];
+
+// Paths that remain accessible in BETA mode (in addition to ALWAYS_PUBLIC_PATHS)
+const BETA_PUBLIC_PATHS = ["/djs", "/events", "/gigs", "/venues"];
 
 function isAlwaysPublic(pathname: string): boolean {
   if (ALWAYS_PUBLIC_PATHS.includes(pathname)) return true;
   if (pathname.startsWith("/admin")) return true;
   if (pathname.startsWith("/api")) return true;
+  if (pathname.startsWith("/founding-djs")) return true;
+  return false;
+}
+
+function isBetaPublic(pathname: string): boolean {
+  if (isAlwaysPublic(pathname)) return true;
+  if (
+    BETA_PUBLIC_PATHS.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    )
+  )
+    return true;
   return false;
 }
 
@@ -63,20 +81,6 @@ function setSecurityHeaders(response: NextResponse): void {
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
-  // ── Pre-launch gate: mask the platform in production ──────────────────
-  if (
-    PRE_LAUNCH_MODE &&
-    isProduction &&
-    !isAlwaysPublic(request.nextUrl.pathname)
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/coming-soon";
-    const response = NextResponse.rewrite(url);
-    response.headers.set("x-is-coming-soon", "true");
-    setSecurityHeaders(response);
-    return response;
-  }
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -102,6 +106,61 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // ── Site mode gate: control access based on SITE_MODE ──────────────────
+  if (isProduction) {
+    let isBetaExempt = false;
+
+    // Check for beta exemption (founding members with ACTIVE status)
+    if (SITE_MODE === "BETA" && user) {
+      try {
+        const userProfile = await prisma.user.findUnique({
+          where: { id: user.id },
+          include: {
+            djProfile: true,
+          },
+        });
+
+        if (userProfile?.djProfile) {
+          const foundingMember = await prisma.foundingMember.findUnique({
+            where: { djProfileId: userProfile.djProfile.id },
+          });
+
+          if (foundingMember?.status === "ACTIVE") {
+            isBetaExempt = true;
+          }
+        }
+      } catch (error) {
+        // If DB check fails, don't exempt (fail secure)
+        console.error("Error checking beta exemption:", error);
+      }
+    }
+
+    if (
+      SITE_MODE === "PRE_LAUNCH" &&
+      !isAlwaysPublic(request.nextUrl.pathname)
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/coming-soon";
+      const response = NextResponse.rewrite(url);
+      response.headers.set("x-is-coming-soon", "true");
+      setSecurityHeaders(response);
+      return response;
+    }
+
+    if (
+      SITE_MODE === "BETA" &&
+      !isBetaExempt &&
+      !isBetaPublic(request.nextUrl.pathname)
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/coming-soon";
+      const response = NextResponse.rewrite(url);
+      response.headers.set("x-is-coming-soon", "true");
+      setSecurityHeaders(response);
+      return response;
+    }
+  }
 
   // Protected routes — redirect to /sign-in if not authenticated
   const protectedPaths = [
@@ -131,7 +190,8 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Add X-Robots-Tag header when indexing is disabled
+  // Add X-Robots-Tag header when indexing is disabled (PRE_LAUNCH or BETA mode)
+  const indexingEnabled = SITE_MODE === "LIVE";
 
   if (!indexingEnabled) {
     supabaseResponse.headers.set(
@@ -139,7 +199,6 @@ export async function proxy(request: NextRequest) {
       "noindex, nofollow, noarchive, nosnippet",
     );
   }
-  // noindexing code end here
 
   // Mark the placeholder page so the root layout hides the public shell.
   if (request.nextUrl.pathname === "/coming-soon") {
