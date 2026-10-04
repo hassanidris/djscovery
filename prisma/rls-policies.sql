@@ -692,3 +692,36 @@ CREATE POLICY "Admin can read event moderations" ON "EventModeration" FOR SELECT
 );
 DROP POLICY IF EXISTS "No user write to event moderations" ON "EventModeration";
 CREATE POLICY "No user write to event moderations" ON "EventModeration" FOR ALL TO public USING (false) WITH CHECK (false);
+
+-- ============================================================
+-- FOUNDING DJ PROGRAM RLS POLICIES
+-- ============================================================
+
+-- FoundingApplication: server-side only via Prisma. Deny all client access to protect sensitive data.
+ALTER TABLE "FoundingApplication" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "No user access to founding applications" ON "FoundingApplication";
+CREATE POLICY "No user access to founding applications" ON "FoundingApplication" FOR ALL TO public USING (false) WITH CHECK (false);
+
+-- FoundingApplicationStatusLog: server-side only audit trail. Deny all user access.
+ALTER TABLE "FoundingApplicationStatusLog" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "No user access to founding application status logs" ON "FoundingApplicationStatusLog";
+CREATE POLICY "No user access to founding application status logs" ON "FoundingApplicationStatusLog" FOR ALL TO public USING (false) WITH CHECK (false);
+
+-- InvitationToken: server-side only via Prisma. Deny all client access to protect token hashes.
+ALTER TABLE "InvitationToken" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "No user access to invitation tokens" ON "InvitationToken";
+CREATE POLICY "No user access to invitation tokens" ON "InvitationToken" FOR ALL TO public USING (false) WITH CHECK (false);
+
+-- FoundingMember: public read for ACTIVE members; server-side writes via Prisma.
+ALTER TABLE "FoundingMember" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read active founding members" ON "FoundingMember";
+CREATE POLICY "Public read active founding members" ON "FoundingMember" FOR SELECT TO public USING (status = 'ACTIVE');
+DROP POLICY IF EXISTS "No user write to founding members" ON "FoundingMember";
+CREATE POLICY "No user write to founding members" ON "FoundingMember" FOR ALL TO public USING (false) WITH CHECK (false);
+
+-- WaitlistEntry: public insert, no public read (GDPR compliance).
+ALTER TABLE "WaitlistEntry" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public can join waitlist" ON "WaitlistEntry";
+CREATE POLICY "Public can join waitlist" ON "WaitlistEntry" FOR INSERT TO public WITH CHECK (true);
+DROP POLICY IF EXISTS "No public read waitlist entries" ON "WaitlistEntry";
+CREATE POLICY "No public read waitlist entries" ON "WaitlistEntry" FOR SELECT TO public USING (false);
