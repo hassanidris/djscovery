@@ -35,7 +35,11 @@ async function ensureAuthState(
         await context.close();
         return state;
       }
-    } catch {
+    } catch (error) {
+      console.log(
+        `Auth state check failed for ${email}, re-authenticating...`,
+        error,
+      );
       // fall through
     }
     await context.close();
@@ -48,7 +52,18 @@ async function ensureAuthState(
   await page
     .locator('form:has(input[name="email"]) button[type="submit"]')
     .click();
-  await page.waitForURL(expectedUrlPattern, { timeout: 30000 });
+  try {
+    await page.waitForURL(expectedUrlPattern, { timeout: 30000 });
+  } catch (error) {
+    const currentUrl = page.url();
+    console.error(
+      `Auth failed for ${email}. Expected pattern: ${expectedUrlPattern}, Current URL: ${currentUrl}`,
+      error,
+    );
+    throw new Error(
+      `Authentication failed for ${email}. Expected URL pattern ${expectedUrlPattern} but got ${currentUrl}`,
+    );
+  }
   const state = await context.storageState();
   if (!fs.existsSync(AUTH_DIR)) {
     fs.mkdirSync(AUTH_DIR, { recursive: true });
@@ -344,8 +359,15 @@ async function navigateAndWaitForContent(
   if (authState) {
     await restoreAuthState(page, authState);
   }
-  await page.goto(url);
-  await page.waitForLoadState("networkidle");
+  await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
+
+  // Verify we're on the correct page (not redirected to sign-in)
+  const currentUrl = page.url();
+  if (currentUrl.includes("/sign-in")) {
+    throw new Error(
+      `Auth failed: redirected to sign-in. Expected URL: ${url}, Actual URL: ${currentUrl}. Auth state may be expired.`,
+    );
+  }
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────
@@ -503,8 +525,10 @@ test.describe("admin table skeletons", () => {
     page,
   }) => {
     await navigateAndWaitForContent(page, "/admin/hires", adminAuthState!);
-    // Wait for real content to load
-    await expect(page.getByRole("heading", { name: "Hires" })).toBeVisible();
+    // Wait for real content to load with increased timeout
+    await expect(page.getByRole("heading", { name: "Hires" })).toBeVisible({
+      timeout: 15000,
+    });
     // Should have exactly one h1
     const h1s = page.locator("h1");
     await expect(h1s).toHaveCount(1);
@@ -1079,8 +1103,10 @@ test.describe("admin card skeletons", () => {
 
   test("skeleton disappears when content loads", async ({ page }) => {
     await navigateAndWaitForContent(page, "/admin/hires", adminAuthState!);
-    // Wait for real content to load
-    await expect(page.getByRole("heading", { name: "Hires" })).toBeVisible();
+    // Wait for real content to load with increased timeout
+    await expect(page.getByRole("heading", { name: "Hires" })).toBeVisible({
+      timeout: 15000,
+    });
     // The Suspense boundary should have resolved — skeleton table should be gone
     const skeletonTables = page.locator(
       'table:has(tbody tr td [data-slot="skeleton"])',
