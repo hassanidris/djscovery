@@ -9,7 +9,7 @@ import {
   welcomeEmailHtml,
 } from "@/lib/email/templates/welcome";
 import { generateWelcomeCta } from "@/lib/supabase/admin";
-import { roleSchema } from "@/lib/validations/auth";
+import { roleSchema } from "@/lib/validation/auth";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);

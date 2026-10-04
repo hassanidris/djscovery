@@ -6,9 +6,9 @@ Djscovery is a Next.js 15 platform connecting DJs, organizers, and fans. Feature
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router, React 19, Server Components)
+- **Framework**: Next.js 16.3.5 (App Router, React 19, Server Components)
 - **Language**: TypeScript (strict mode)
-- **Database**: PostgreSQL (Supabase) + Prisma ORM
+- **Database**: PostgreSQL (Supabase) + Prisma 7.9.0 ORM
 - **Auth**: Supabase Auth
 - **Cache**: Upstash Redis
 - **Email**: Custom email service (`src/lib/email/`)

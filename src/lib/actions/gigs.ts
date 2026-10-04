@@ -13,7 +13,7 @@ import {
   completeGigSchema,
   cancelHireSchema,
   reportNoShowSchema,
-} from "@/lib/validations/gig";
+} from "@/lib/validation/gig";
 import { isPrivateEventType } from "@/config/gig-type-fields";
 import { sendEmail } from "@/lib/email/sendEmail";
 import {

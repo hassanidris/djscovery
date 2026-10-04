@@ -1,7 +1,7 @@
 "use client";
 
 import { UseFormRegister } from "react-hook-form";
-import type { CreateDjProfileInput } from "@/lib/validations/dj-profile";
+import type { CreateDjProfileInput } from "@/lib/validation/dj-profile";
 import { inputCls, labelCls, sectionCls, sectionTitleCls } from "./constants";
 
 export function ContactInfoSection({
