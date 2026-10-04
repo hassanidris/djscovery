@@ -7,7 +7,7 @@ import {
   MarkHireNoShowSchema,
   CancelHireSchema,
   UpdateHireNotesSchema,
-} from "@/lib/validations/admin";
+} from "@/lib/validation/admin";
 import { revalidatePath } from "next/cache";
 
 type ActionResult = { success: true } | { error: string };

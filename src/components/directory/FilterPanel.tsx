@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { DJ_TYPES } from "./FilterBottomSheet";
 
 const GENRES = [
@@ -30,6 +31,57 @@ type FilterPanelProps = {
   availableCountries?: string[];
   countryCities?: Record<string, string[]>;
 };
+
+// Renders dropdown content in a portal attached to document.body so it can
+// never be trapped inside a sibling's stacking context (which happens when
+// multiple `position: relative` + `z-index` wrappers sit next to each other).
+function DropdownPortal({
+  anchorRef,
+  open,
+  contentRef,
+  children,
+}: {
+  anchorRef: React.RefObject<HTMLElement | null>;
+  open: boolean;
+  contentRef: React.RefObject<HTMLDivElement | null>;
+  children: React.ReactNode;
+}) {
+  const [rect, setRect] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const updateRect = () => {
+      if (anchorRef.current) {
+        const r = anchorRef.current.getBoundingClientRect();
+        setRect({ top: r.bottom + 4, left: r.left, width: r.width });
+      }
+    };
+    updateRect();
+    window.addEventListener("scroll", updateRect, true);
+    window.addEventListener("resize", updateRect);
+    return () => {
+      window.removeEventListener("scroll", updateRect, true);
+      window.removeEventListener("resize", updateRect);
+    };
+  }, [open, anchorRef]);
+
+  if (!open || !rect || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      ref={contentRef}
+      className="bg-h_blackLight fixed z-9999 max-h-52 overflow-y-auto rounded-md border border-gray-700 shadow-lg"
+      style={{ top: rect.top, left: rect.left, width: rect.width }}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}
 
 const FilterPanel = ({
   genres = GENRES,
@@ -103,17 +155,49 @@ const FilterPanel = ({
 
   const [genreOpen, setGenreOpen] = useState(false);
   const genreRef = useRef<HTMLDivElement>(null);
+  const genreContentRef = useRef<HTMLDivElement>(null);
   const [djTypeOpen, setDjTypeOpen] = useState(false);
   const djTypeRef = useRef<HTMLDivElement>(null);
+  const djTypeContentRef = useRef<HTMLDivElement>(null);
+  const [countryOpen, setCountryOpen] = useState(false);
+  const countryRef = useRef<HTMLDivElement>(null);
+  const countryContentRef = useRef<HTMLDivElement>(null);
+  const [cityOpen, setCityOpen] = useState(false);
+  const cityRef = useRef<HTMLDivElement>(null);
+  const cityContentRef = useRef<HTMLDivElement>(null);
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef<HTMLDivElement>(null);
+  const sortContentRef = useRef<HTMLDivElement>(null);
+
+  const closeAllExcept = (
+    keep?: "genre" | "country" | "city" | "djType" | "sort",
+  ) => {
+    if (keep !== "genre") setGenreOpen(false);
+    if (keep !== "country") setCountryOpen(false);
+    if (keep !== "city") setCityOpen(false);
+    if (keep !== "djType") setDjTypeOpen(false);
+    if (keep !== "sort") setSortOpen(false);
+  };
 
   useEffect(() => {
+    const isOutside = (
+      triggerRef: React.RefObject<HTMLElement | null>,
+      contentRef: React.RefObject<HTMLElement | null>,
+      target: Node,
+    ) => {
+      const inTrigger = triggerRef.current?.contains(target) ?? false;
+      const inContent = contentRef.current?.contains(target) ?? false;
+      return !inTrigger && !inContent;
+    };
+
     const handleOutside = (e: MouseEvent) => {
-      if (genreRef.current && !genreRef.current.contains(e.target as Node)) {
-        setGenreOpen(false);
-      }
-      if (djTypeRef.current && !djTypeRef.current.contains(e.target as Node)) {
-        setDjTypeOpen(false);
-      }
+      const target = e.target as Node;
+      if (isOutside(genreRef, genreContentRef, target)) setGenreOpen(false);
+      if (isOutside(djTypeRef, djTypeContentRef, target)) setDjTypeOpen(false);
+      if (isOutside(countryRef, countryContentRef, target))
+        setCountryOpen(false);
+      if (isOutside(cityRef, cityContentRef, target)) setCityOpen(false);
+      if (isOutside(sortRef, sortContentRef, target)) setSortOpen(false);
     };
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
@@ -128,10 +212,13 @@ const FilterPanel = ({
           <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
             Genre
           </p>
-          <div ref={genreRef} className="relative z-50">
+          <div ref={genreRef} className="relative">
             <button
               type="button"
-              onClick={() => setGenreOpen((o) => !o)}
+              onClick={() => {
+                setGenreOpen((o) => !o);
+                closeAllExcept("genre");
+              }}
               className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
             >
               <span
@@ -156,33 +243,35 @@ const FilterPanel = ({
               </svg>
             </button>
 
-            {genreOpen && (
-              <div className="bg-h_blackLight absolute top-full z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-md border border-gray-700 shadow-lg">
-                <label className="flex cursor-pointer items-center gap-2 border-b border-gray-800 px-3 py-2 hover:bg-white/5">
+            <DropdownPortal
+              anchorRef={genreRef}
+              open={genreOpen}
+              contentRef={genreContentRef}
+            >
+              <label className="flex cursor-pointer items-center gap-2 border-b border-gray-800 px-3 py-2 hover:bg-white/5">
+                <input
+                  type="checkbox"
+                  checked={selectedGenres.length === 0}
+                  onChange={() => updateParam("genre", "")}
+                  className="accent-h_red"
+                />
+                <span className="text-xs text-gray-300">All genres</span>
+              </label>
+              {genres.map((genre) => (
+                <label
+                  key={genre}
+                  className="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-white/5"
+                >
                   <input
                     type="checkbox"
-                    checked={selectedGenres.length === 0}
-                    onChange={() => updateParam("genre", "")}
+                    checked={selectedGenres.includes(genre)}
+                    onChange={() => toggleGenre(genre)}
                     className="accent-h_red"
                   />
-                  <span className="text-xs text-gray-300">All genres</span>
+                  <span className="text-xs text-gray-300">{genre}</span>
                 </label>
-                {genres.map((genre) => (
-                  <label
-                    key={genre}
-                    className="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-white/5"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedGenres.includes(genre)}
-                      onChange={() => toggleGenre(genre)}
-                      className="accent-h_red"
-                    />
-                    <span className="text-xs text-gray-300">{genre}</span>
-                  </label>
-                ))}
-              </div>
-            )}
+              ))}
+            </DropdownPortal>
           </div>
         </div>
 
@@ -191,25 +280,63 @@ const FilterPanel = ({
           <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
             Country
           </p>
-          <select
-            value={currentCountry}
-            onChange={(e) => updateCountry(e.target.value)}
-            aria-label="Select country"
-            className="bg-h_black/50 focus:ring-h_red rounded-md px-3 py-2 text-xs text-gray-300 ring-1 ring-gray-700 outline-none"
-          >
-            <option value="" className="bg-h_blackLight hover:bg-white/5">
-              All countries
-            </option>
-            {availableCountries.map((c) => (
-              <option
-                key={c}
-                value={c}
-                className="bg-h_blackLight hover:bg-white/5"
+          <div ref={countryRef} className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setCountryOpen((o) => !o);
+                closeAllExcept("country");
+              }}
+              className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
+            >
+              <span
+                className={currentCountry ? "text-h_white" : "text-gray-300"}
               >
-                {c}
-              </option>
-            ))}
-          </select>
+                {currentCountry || "All countries"}
+              </span>
+              <svg
+                className={`h-3 w-3 text-gray-400 transition-transform ${countryOpen ? "rotate-180" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <DropdownPortal
+              anchorRef={countryRef}
+              open={countryOpen}
+              contentRef={countryContentRef}
+            >
+              <div
+                className="cursor-pointer border-b border-gray-800 px-3 py-2 hover:bg-white/5"
+                onClick={() => {
+                  updateCountry("");
+                  setCountryOpen(false);
+                }}
+              >
+                <span className="text-xs text-gray-300">All countries</span>
+              </div>
+              {availableCountries.map((c) => (
+                <div
+                  key={c}
+                  className="cursor-pointer px-3 py-2 hover:bg-white/5"
+                  onClick={() => {
+                    updateCountry(c);
+                    setCountryOpen(false);
+                  }}
+                >
+                  <span className="text-xs text-gray-300">{c}</span>
+                </div>
+              ))}
+            </DropdownPortal>
+          </div>
         </div>
 
         {/* City — appears after country is selected */}
@@ -218,25 +345,63 @@ const FilterPanel = ({
             <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
               City
             </p>
-            <select
-              value={currentCity}
-              onChange={(e) => updateParam("city", e.target.value)}
-              aria-label="Select city"
-              className="bg-h_black/50 focus:ring-h_red rounded-md px-3 py-2 text-xs text-gray-300 ring-1 ring-gray-700 outline-none"
-            >
-              <option value="" className="bg-h_blackLight hover:bg-white/5">
-                All cities
-              </option>
-              {citiesForCountry.map((c) => (
-                <option
-                  key={c}
-                  value={c}
-                  className="bg-h_blackLight hover:bg-white/5"
+            <div ref={cityRef} className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setCityOpen((o) => !o);
+                  closeAllExcept("city");
+                }}
+                className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
+              >
+                <span
+                  className={currentCity ? "text-h_white" : "text-gray-300"}
                 >
-                  {c}
-                </option>
-              ))}
-            </select>
+                  {currentCity || "All cities"}
+                </span>
+                <svg
+                  className={`h-3 w-3 text-gray-400 transition-transform ${cityOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              <DropdownPortal
+                anchorRef={cityRef}
+                open={cityOpen}
+                contentRef={cityContentRef}
+              >
+                <div
+                  className="cursor-pointer border-b border-gray-800 px-3 py-2 hover:bg-white/5"
+                  onClick={() => {
+                    updateParam("city", "");
+                    setCityOpen(false);
+                  }}
+                >
+                  <span className="text-xs text-gray-300">All cities</span>
+                </div>
+                {citiesForCountry.map((c) => (
+                  <div
+                    key={c}
+                    className="cursor-pointer px-3 py-2 hover:bg-white/5"
+                    onClick={() => {
+                      updateParam("city", c);
+                      setCityOpen(false);
+                    }}
+                  >
+                    <span className="text-xs text-gray-300">{c}</span>
+                  </div>
+                ))}
+              </DropdownPortal>
+            </div>
           </div>
         )}
 
@@ -245,10 +410,13 @@ const FilterPanel = ({
           <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
             DJ Type
           </p>
-          <div ref={djTypeRef} className="relative z-40">
+          <div ref={djTypeRef} className="relative">
             <button
               type="button"
-              onClick={() => setDjTypeOpen((o) => !o)}
+              onClick={() => {
+                setDjTypeOpen((o) => !o);
+                closeAllExcept("djType");
+              }}
               className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
             >
               <span
@@ -278,33 +446,35 @@ const FilterPanel = ({
               </svg>
             </button>
 
-            {djTypeOpen && (
-              <div className="bg-h_blackLight absolute top-full z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-md border border-gray-700 shadow-lg">
-                <label className="flex cursor-pointer items-center gap-2 border-b border-gray-800 px-3 py-2 hover:bg-white/5">
+            <DropdownPortal
+              anchorRef={djTypeRef}
+              open={djTypeOpen}
+              contentRef={djTypeContentRef}
+            >
+              <label className="flex cursor-pointer items-center gap-2 border-b border-gray-800 px-3 py-2 hover:bg-white/5">
+                <input
+                  type="checkbox"
+                  checked={selectedDjTypes.length === 0}
+                  onChange={() => updateParam("djType", "")}
+                  className="accent-h_red"
+                />
+                <span className="text-xs text-gray-300">All types</span>
+              </label>
+              {DJ_TYPES.map((t) => (
+                <label
+                  key={t.value}
+                  className="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-white/5"
+                >
                   <input
                     type="checkbox"
-                    checked={selectedDjTypes.length === 0}
-                    onChange={() => updateParam("djType", "")}
+                    checked={selectedDjTypes.includes(t.value)}
+                    onChange={() => toggleDjType(t.value)}
                     className="accent-h_red"
                   />
-                  <span className="text-xs text-gray-300">All types</span>
+                  <span className="text-xs text-gray-300">{t.label}</span>
                 </label>
-                {DJ_TYPES.map((t) => (
-                  <label
-                    key={t.value}
-                    className="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-white/5"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedDjTypes.includes(t.value)}
-                      onChange={() => toggleDjType(t.value)}
-                      className="accent-h_red"
-                    />
-                    <span className="text-xs text-gray-300">{t.label}</span>
-                  </label>
-                ))}
-              </div>
-            )}
+              ))}
+            </DropdownPortal>
           </div>
         </div>
 
@@ -313,22 +483,53 @@ const FilterPanel = ({
           <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
             Sort By
           </p>
-          <select
-            value={currentSort}
-            onChange={(e) => updateParam("sort", e.target.value)}
-            aria-label="Sort by"
-            className="bg-h_black/50 focus:ring-h_red rounded-md px-3 py-2 text-xs text-gray-300 ring-1 ring-gray-700 outline-none"
-          >
-            {SORT_OPTIONS.map((o) => (
-              <option
-                key={o.value}
-                value={o.value}
-                className="bg-h_blackLight hover:bg-white/5"
+          <div ref={sortRef} className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setSortOpen((o) => !o);
+                closeAllExcept("sort");
+              }}
+              className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
+            >
+              <span className={currentSort ? "text-h_white" : "text-gray-300"}>
+                {SORT_OPTIONS.find((o) => o.value === currentSort)?.label ||
+                  "Recommended"}
+              </span>
+              <svg
+                className={`h-3 w-3 text-gray-400 transition-transform ${sortOpen ? "rotate-180" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
               >
-                {o.label}
-              </option>
-            ))}
-          </select>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <DropdownPortal
+              anchorRef={sortRef}
+              open={sortOpen}
+              contentRef={sortContentRef}
+            >
+              {SORT_OPTIONS.map((o) => (
+                <div
+                  key={o.value}
+                  className="cursor-pointer px-3 py-2 hover:bg-white/5"
+                  onClick={() => {
+                    updateParam("sort", o.value);
+                    setSortOpen(false);
+                  }}
+                >
+                  <span className="text-xs text-gray-300">{o.label}</span>
+                </div>
+              ))}
+            </DropdownPortal>
+          </div>
         </div>
       </div>
     </div>

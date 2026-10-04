@@ -2,7 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { UseFormRegister } from "react-hook-form";
-import type { CreateDjProfileInput } from "@/lib/validations/dj-profile";
+import type { CreateDjProfileInput } from "@/lib/validation/dj-profile";
 import { inputCls, labelCls, sectionCls, sectionTitleCls } from "./constants";
 
 export type Country = { id: number; name: string; code: string };
@@ -45,11 +45,7 @@ export function LocationSection({
         >
           <option value="0">Select a country...</option>
           {countries.map((c) => (
-            <option
-              key={c.id}
-              value={c.id}
-              className="bg-[#1a1a1a] text-white"
-            >
+            <option key={c.id} value={c.id} className="bg-[#1a1a1a] text-white">
               {c.name}
             </option>
           ))}
@@ -88,9 +84,7 @@ export function LocationSection({
             </select>
           )}
           {errors.cityId && (
-            <p className="mt-1 text-xs text-red-400">
-              {errors.cityId.message}
-            </p>
+            <p className="mt-1 text-xs text-red-400">{errors.cityId.message}</p>
           )}
         </div>
       )}

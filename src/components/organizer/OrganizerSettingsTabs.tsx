@@ -52,19 +52,25 @@ export default function OrganizerSettingsTabs({
       </TabsList>
 
       <TabsContent value="profile">
-        <ProfileTab
-          profile={profile}
-          countries={countries}
-          initialCities={initialCities}
-        />
+        <div className="p-6">
+          <ProfileTab
+            profile={profile}
+            countries={countries}
+            initialCities={initialCities}
+          />
+        </div>
       </TabsContent>
 
       <TabsContent value="contact">
-        <ContactTab profile={profile} />
+        <div className="p-6">
+          <ContactTab profile={profile} />
+        </div>
       </TabsContent>
 
       <TabsContent value="social">
-        <SocialTab profile={profile} />
+        <div className="p-6">
+          <SocialTab profile={profile} />
+        </div>
       </TabsContent>
     </Tabs>
   );

@@ -378,11 +378,11 @@ function EventDetailView(props: {
         <JsonLd data={jsonLd} />
         <EventViewTracker eventId={eventId} />
         {/* Top nav bar */}
-        <div className="sticky top-0 z-10 border-b border-zinc-800/60 bg-black/80 backdrop-blur-sm">
+        <div className="sticky top-0 z-10 border-b border-white/8 bg-black/80 backdrop-blur-sm">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
             <Link
               href="/events"
-              className="flex items-center gap-1.5 text-xs text-zinc-400 transition-colors hover:text-white"
+              className="flex items-center gap-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:text-white"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Back to Events
@@ -395,7 +395,7 @@ function EventDetailView(props: {
           <div className="flex flex-col gap-8 md:flex-row md:items-start">
             {/* ── Left column: Poster ── */}
             <div className="w-full shrink-0 md:sticky md:top-20 md:w-70 lg:w-80">
-              <div className="aspect-2/3 w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl">
+              <div className="bg-h_blackLight aspect-2/3 w-full overflow-hidden rounded-2xl shadow-2xl">
                 {posterUrl ? (
                   <Image
                     src={posterUrl}
@@ -405,7 +405,7 @@ function EventDetailView(props: {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-linear-to-br from-zinc-800 via-zinc-900 to-black">
+                  <div className="from-h_blackLight flex h-full w-full flex-col items-center justify-center gap-3 bg-linear-to-br via-black to-black">
                     <Music className="h-14 w-14 text-zinc-700" />
                     <p className="text-xs text-zinc-600">No poster</p>
                   </div>
@@ -427,26 +427,26 @@ function EventDetailView(props: {
                       : status.charAt(0) + status.slice(1).toLowerCase()}
                 </span>
                 {isPrivate && (
-                  <span className="flex items-center gap-1 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
+                  <span className="flex items-center gap-1 rounded-full border border-white/10 px-2.5 py-0.5 text-xs text-zinc-400">
                     <Lock className="h-3 w-3" /> Private
                   </span>
                 )}
                 {category && (
-                  <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-400">
+                  <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-xs text-zinc-400">
                     {CATEGORY_LABELS[category] ?? category}
                   </span>
                 )}
               </div>
 
               {/* Title */}
-              <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+              <h1 className="font-heading mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl">
                 {title}
               </h1>
 
               {/* DJ Attribution */}
               <Link
                 href={`/djs/${ownerDj.slug}`}
-                className="mb-6 flex items-center gap-3"
+                className="mb-6 flex items-center gap-3 transition-opacity duration-200 hover:opacity-80"
               >
                 <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                   {ownerDj.avatar ? (
@@ -458,7 +458,7 @@ function EventDetailView(props: {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
+                    <div className="bg-h_blackLight flex h-full w-full items-center justify-center text-xs font-bold text-zinc-400">
                       {ownerDj.stageName.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -473,7 +473,7 @@ function EventDetailView(props: {
 
               {/* Stats Card Grid */}
               <div className="mb-8 grid grid-cols-3 gap-3">
-                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                <div className="bg-h_blackLight rounded-lg border border-white/8 px-4 py-3">
                   <p className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                     Views
                   </p>
@@ -481,7 +481,7 @@ function EventDetailView(props: {
                     {viewCount > 0 ? viewCount.toLocaleString() : "—"}
                   </p>
                 </div>
-                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                <div className="bg-h_blackLight rounded-lg border border-white/8 px-4 py-3">
                   <p className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                     Going
                   </p>
@@ -489,7 +489,7 @@ function EventDetailView(props: {
                     {goingCount > 0 ? goingCount.toLocaleString() : "—"}
                   </p>
                 </div>
-                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3">
+                <div className="bg-h_blackLight rounded-lg border border-white/8 px-4 py-3">
                   <p className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                     Interested
                   </p>
@@ -519,7 +519,7 @@ function EventDetailView(props: {
               {/* Date/Time and Venue Cards - side by side */}
               <div className="mb-8 grid gap-4 sm:grid-cols-2">
                 {/* Date/Time Card */}
-                <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
+                <div className="bg-h_blackLight rounded-lg border border-white/8 px-4 py-4">
                   <div className="mb-3 flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-zinc-400" />
                     <h3 className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
@@ -550,7 +550,7 @@ function EventDetailView(props: {
 
                 {/* Venue Card */}
                 {(location || venue || isPrivate) && (
-                  <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-4">
+                  <div className="bg-h_blackLight rounded-lg border border-white/8 px-4 py-4">
                     <div className="mb-3 flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-zinc-400" />
                       <h3 className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
@@ -602,7 +602,7 @@ function EventDetailView(props: {
                       <Link
                         key={dj.slug}
                         href={`/djs/${dj.slug}`}
-                        className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 transition-colors hover:border-zinc-700"
+                        className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/5 px-4 py-3 transition-colors duration-200 hover:border-white/15"
                       >
                         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                           {dj.avatar ? (
@@ -614,7 +614,7 @@ function EventDetailView(props: {
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-zinc-400">
+                            <div className="bg-h_blackLight flex h-full w-full items-center justify-center text-xs font-bold text-zinc-400">
                               {dj.stageName.charAt(0).toUpperCase()}
                             </div>
                           )}
@@ -640,7 +640,7 @@ function EventDetailView(props: {
                   href={ticketUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-h_red hover:bg-h_redDark shadow-h_red/20 mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-semibold text-white shadow-lg transition-colors"
+                  className="bg-h_red hover:bg-h_redDark shadow-h_red/20 mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-semibold text-white shadow-lg transition-colors duration-200"
                 >
                   <Ticket className="h-4 w-4" />
                   Get Tickets
@@ -702,7 +702,7 @@ function EventDetailView(props: {
 
               {/* Post-event recap */}
               {recap && (
-                <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+                <div className="mb-8 rounded-xl border border-white/8 bg-white/5 p-5">
                   <h2 className="mb-3 text-xs font-semibold tracking-widest text-zinc-400 uppercase">
                     Event Recap
                   </h2>
@@ -714,7 +714,7 @@ function EventDetailView(props: {
                       href={audioLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
+                      className="mt-4 flex items-center gap-2 text-sm text-blue-400 transition-colors duration-200 hover:text-blue-300"
                     >
                       <Music className="h-4 w-4" />
                       Listen to the set
@@ -741,7 +741,7 @@ function EventDetailView(props: {
                           alt={img.caption ?? title}
                           width={200}
                           height={200}
-                          className="h-full w-full object-cover transition-transform hover:scale-105"
+                          className="h-full w-full object-cover transition-transform duration-200 hover:scale-105"
                         />
                       </div>
                     ))}

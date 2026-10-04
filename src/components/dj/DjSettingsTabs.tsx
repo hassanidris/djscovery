@@ -43,14 +43,21 @@ export default function DjSettingsTabs({
 }) {
   return (
     <Tabs defaultValue="profile" className="w-full">
-      <TabsList className="mb-6 w-full flex-wrap justify-start gap-1 bg-white/5 sm:w-fit">
+      <TabsList
+        className="mb-6 w-full flex-wrap justify-start gap-1 bg-white/5 sm:w-fit"
+        style={{ marginBottom: "var(--space-6)", gap: "var(--space-1)" }}
+      >
         {TABS.map((tab) => {
           const Icon = tab.icon;
           return (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="data-active:bg-h_redDark flex-1 gap-1 px-3 py-1.5 data-active:text-white sm:flex-initial"
+              className="data-active:bg-h_redDark flex-1 gap-1 px-3 py-1.5 transition-all duration-200 data-active:text-white sm:flex-initial"
+              style={{
+                gap: "var(--space-1)",
+                padding: "var(--space-1) var(--space-3)",
+              }}
             >
               <Icon className="h-4 w-4" />
               <span className="hidden sm:inline">{tab.label}</span>
@@ -60,23 +67,33 @@ export default function DjSettingsTabs({
       </TabsList>
 
       <TabsContent value="profile">
-        <ProfileTab
-          profile={profile}
-          countries={countries}
-          initialCities={initialCities}
-        />
+        <div className="p-6" style={{ padding: "var(--space-6)" }}>
+          <ProfileTab
+            profile={profile}
+            countries={countries}
+            initialCities={initialCities}
+          />
+        </div>
       </TabsContent>
       <TabsContent value="music">
-        <MusicTab profile={profile} allGenres={allGenres} />
+        <div className="p-6" style={{ padding: "var(--space-6)" }}>
+          <MusicTab profile={profile} allGenres={allGenres} />
+        </div>
       </TabsContent>
       <TabsContent value="pricing">
-        <PricingTab profile={profile} />
+        <div className="p-6" style={{ padding: "var(--space-6)" }}>
+          <PricingTab profile={profile} />
+        </div>
       </TabsContent>
       <TabsContent value="highlights">
-        <HighlightsTab profile={profile} />
+        <div className="p-6" style={{ padding: "var(--space-6)" }}>
+          <HighlightsTab profile={profile} />
+        </div>
       </TabsContent>
       <TabsContent value="team">
-        <TeamTab profile={profile} />
+        <div className="p-6" style={{ padding: "var(--space-6)" }}>
+          <TeamTab profile={profile} />
+        </div>
       </TabsContent>
     </Tabs>
   );

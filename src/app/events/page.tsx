@@ -141,14 +141,29 @@ export default async function EventsPage({
   return (
     <div className="min-h-screen bg-black">
       {/* Hero Banner */}
-      <section className="bg-h_blackLight/30 border-b border-gray-800 px-4 py-10 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8">
-          <div className="flex items-center gap-4">
+      <section
+        className="bg-h_blackLight/30 border-b border-white/8 px-4 py-10 md:px-8"
+        style={{ padding: "var(--space-10) var(--space-4)" }}
+      >
+        <div
+          className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center md:px-8"
+          style={{ gap: "var(--space-4)" }}
+        >
+          <div
+            className="flex items-center gap-4"
+            style={{ gap: "var(--space-4)" }}
+          >
             <div className="bg-h_red/10 border-h_red/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
               <CalendarDays className="text-h_redLight h-6 w-6" />
             </div>
-            <div className="flex flex-col gap-1">
-              <h1 className="text-h_white text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+            <div
+              className="flex flex-col gap-1"
+              style={{ gap: "var(--space-1)" }}
+            >
+              <h1
+                className="text-h_white font-heading text-2xl font-bold tracking-tight md:text-4xl lg:text-5xl"
+                style={{ letterSpacing: "-0.025em" }}
+              >
                 DJ <span className="text-h_redLight/80">Events</span>
               </h1>
               <p className="text-sm leading-relaxed text-gray-400">
@@ -156,7 +171,10 @@ export default async function EventsPage({
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="flex flex-wrap items-center gap-2"
+            style={{ gap: "var(--space-2)" }}
+          >
             <Badge className="bg-h_red/10 text-h_redLight border-h_red/20 gap-1.5 border px-3 py-1">
               <CalendarDays className="h-3 w-3" /> {events.length} event
               {events.length !== 1 ? "s" : ""}
@@ -165,9 +183,15 @@ export default async function EventsPage({
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
+      <div
+        className="mx-auto max-w-7xl px-4 py-10 md:px-8"
+        style={{ padding: "var(--space-10) var(--space-4)" }}
+      >
         {/* Tabs and Filters */}
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          style={{ marginBottom: "var(--space-8)", gap: "var(--space-4)" }}
+        >
           <div className="flex gap-1 border-b border-zinc-800">
             {(["upcoming", "past"] as const).map((tab) => (
               <Link
@@ -198,14 +222,25 @@ export default async function EventsPage({
 
         {/* Empty state */}
         {events.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 py-24 text-center">
-            <Music2 className="mb-4 h-10 w-10 text-zinc-700" />
+          <div
+            className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 py-24 text-center"
+            style={{ padding: "var(--space-24)" }}
+          >
+            <div
+              className="mb-4 flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/5"
+              style={{ marginBottom: "var(--space-4)" }}
+            >
+              <Music2 className="h-5 w-5 text-gray-400" />
+            </div>
             <p className="font-semibold text-white">
               {activeTab === "upcoming"
                 ? "No upcoming events"
                 : "No past events"}
             </p>
-            <p className="text-muted-foreground mt-1 text-sm">
+            <p
+              className="text-muted-foreground mt-1 text-sm"
+              style={{ marginTop: "var(--space-1)" }}
+            >
               {activeTab === "upcoming"
                 ? "Check back soon — events are added regularly."
                 : "Past events will appear here once they've happened."}
