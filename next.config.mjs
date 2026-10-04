@@ -1,4 +1,5 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import pkg from "@sentry/nextjs";
+const { withSentryConfig } = pkg;
 import bundleAnalyzer from "@next/bundle-analyzer";
 
 const withBundleAnalyzer = bundleAnalyzer({

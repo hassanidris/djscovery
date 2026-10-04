@@ -97,6 +97,7 @@ export default async function RootLayout({
               navbar={<Navbar />}
               footer={<Footer />}
               mobileNav={<MobileBottomNavServer />}
+              skipNavForPaths={["/founding-djs"]}
             >
               <ReviewModalProvider>{children}</ReviewModalProvider>
             </PublicShell>
