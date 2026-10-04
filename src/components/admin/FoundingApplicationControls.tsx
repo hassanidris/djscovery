@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   changeFoundingApplicationStatus,
+  regenerateFoundingApplicationInvitation,
   saveFoundingApplicationNotes,
 } from "@/lib/actions/admin/founding-applications";
 import type { FoundingApplicationStatus } from "@prisma/client";
@@ -14,6 +15,16 @@ const ACTIVE_STATUSES: FoundingApplicationStatus[] = [
   "EMAIL_VERIFIED",
   "UNDER_REVIEW",
 ];
+
+function isNextRedirect(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof error.digest === "string" &&
+    error.digest.startsWith("NEXT_REDIRECT;")
+  );
+}
 
 export default function FoundingApplicationControls({
   applicationId,
@@ -35,9 +46,17 @@ export default function FoundingApplicationControls({
       const formData = new FormData();
       formData.set("applicationId", String(applicationId));
       formData.set("notes", notes);
-      const result = await saveFoundingApplicationNotes(formData);
-      if ("error" in result) toast.error(result.error);
-      else toast.success("Admin notes saved");
+      try {
+        const result = await saveFoundingApplicationNotes(formData);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        toast.success("Admin notes saved");
+      } catch (error) {
+        if (isNextRedirect(error)) throw error;
+        toast.error("Failed to save admin notes. Please try again.");
+      }
     });
   }
 
@@ -61,19 +80,51 @@ export default function FoundingApplicationControls({
       formData.set("status", nextStatus);
       formData.set("note", decisionNote);
       formData.set("reason", rejectionReason);
-      const result = await changeFoundingApplicationStatus(formData);
-      if ("error" in result) {
-        toast.error(result.error);
-        return;
+      try {
+        const result = await changeFoundingApplicationStatus(formData);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        if (result.data.warning) toast.warning(result.data.warning);
+        else
+          toast.success(
+            nextStatus === "UNDER_REVIEW"
+              ? "Review started"
+              : `Application ${nextStatus.toLowerCase()}`,
+          );
+        window.location.reload();
+      } catch (error) {
+        if (isNextRedirect(error)) throw error;
+        toast.error("Failed to update application status. Please try again.");
       }
-      if (result.warning) toast.warning(result.warning);
-      else
-        toast.success(
-          nextStatus === "UNDER_REVIEW"
-            ? "Review started"
-            : `Application ${nextStatus.toLowerCase()}`,
-        );
-      window.location.reload();
+    });
+  }
+
+  function regenerateInvitation() {
+    if (
+      !window.confirm(
+        "Revoke the current pending invitation and send a new one?",
+      )
+    )
+      return;
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("applicationId", String(applicationId));
+      try {
+        const result = await regenerateFoundingApplicationInvitation(formData);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        if (result.data.warning) toast.warning(result.data.warning);
+        else toast.success("A new invitation was sent");
+        window.location.reload();
+      } catch (error) {
+        if (isNextRedirect(error)) throw error;
+        toast.error("Failed to regenerate invitation. Please try again.");
+      }
     });
   }
 
@@ -181,6 +232,22 @@ export default function FoundingApplicationControls({
               {isPending ? "Saving…" : "Approve & send invitation"}
             </Button>
           </div>
+        </div>
+      ) : status === "APPROVED" ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+          <p className="text-sm text-gray-400">
+            Application approved. You can revoke the pending invitation and send
+            a replacement.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isPending}
+            onClick={regenerateInvitation}
+          >
+            {isPending ? "Sending…" : "Regenerate invitation"}
+          </Button>
         </div>
       ) : (
         <p className="border-t border-white/10 pt-4 text-sm text-gray-400">

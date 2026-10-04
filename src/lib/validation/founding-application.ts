@@ -159,7 +159,7 @@ export async function validateBusinessRules(input: {
   const recentApplication = await prisma.foundingApplication.findFirst({
     where: {
       email,
-      status: { in: ["PENDING", "UNDER_REVIEW"] },
+      status: { in: ["PENDING", "EMAIL_VERIFIED", "UNDER_REVIEW"] },
       submittedAt: { gte: thirtyDaysAgo },
       deletedAt: { equals: null },
     },
