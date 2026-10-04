@@ -5,6 +5,7 @@ import prisma from "@/lib/client";
 import { ActionResult, actionError, actionSuccess } from "./action-result";
 import {
   validateFields,
+  validateLocationFields,
   validateBusinessRules,
   validateEmailVerification,
   validateResumeToken,
@@ -19,6 +20,8 @@ export interface CreateFoundingApplicationInput {
   email: string;
   name: string;
   stageName: string;
+  countryId: number;
+  cityId: number;
   portfolioLinks: string[];
   utmSource?: string;
   utmMedium?: string;
@@ -49,9 +52,16 @@ export async function createFoundingApplication(
     return actionError(fieldResult.error!);
   }
 
+  const locationResult = validateLocationFields(input.countryId, input.cityId);
+  if (!locationResult.ok) {
+    return actionError(locationResult.error!);
+  }
+
   // --- Business-rule validation (DB access) ---
   const ruleResult = await validateBusinessRules({
     email: input.email,
+    countryId: input.countryId,
+    cityId: input.cityId,
   });
   if (!ruleResult.ok) {
     return actionError(ruleResult.error!);
@@ -95,6 +105,8 @@ export async function createFoundingApplication(
       email,
       name,
       stageName,
+      countryId: input.countryId,
+      cityId: input.cityId,
       portfolioLinks,
       status: "PENDING",
       utmSource: input.utmSource,
@@ -106,6 +118,14 @@ export async function createFoundingApplication(
       resumeTokenExpiresAt,
       experienceYears: 0,
       experienceLevel: "OPEN",
+      statusLogs: {
+        create: {
+          newStatus: "PENDING",
+          reason: input.saveOnly
+            ? "Partial application saved"
+            : "Application submitted",
+        },
+      },
     },
     select: { id: true },
   });
@@ -136,12 +156,46 @@ export async function verifyFoundingApplicationEmail(
 
   const applicationId = validationResult.applicationId!;
 
-  await prisma.foundingApplication.update({
-    where: { id: applicationId },
-    data: {
-      emailVerifiedAt: new Date(),
-      status: "EMAIL_VERIFIED",
-    },
+  await prisma.$transaction(async (tx) => {
+    const application = await tx.foundingApplication.findUnique({
+      where: { id: applicationId },
+      select: { status: true, deletedAt: true, emailVerifiedAt: true },
+    });
+    if (!application || application.deletedAt) {
+      throw new Error("Application not found");
+    }
+    if (application.emailVerifiedAt) {
+      throw new Error("Email already verified");
+    }
+
+    const nextStatus =
+      application.status === "PENDING" ? "EMAIL_VERIFIED" : application.status;
+    const update = await tx.foundingApplication.updateMany({
+      where: {
+        id: applicationId,
+        status: application.status,
+        emailVerifiedAt: null,
+        deletedAt: null,
+      },
+      data: {
+        emailVerifiedAt: new Date(),
+        ...(nextStatus !== application.status ? { status: nextStatus } : {}),
+      },
+    });
+    if (!update.count) {
+      throw new Error("Application changed during email verification");
+    }
+
+    if (nextStatus !== application.status) {
+      await tx.foundingApplicationStatusLog.create({
+        data: {
+          foundingApplicationId: applicationId,
+          previousStatus: application.status,
+          newStatus: nextStatus,
+          reason: "Applicant verified email ownership",
+        },
+      });
+    }
   });
 
   const application = await prisma.foundingApplication.findUnique({
@@ -161,7 +215,7 @@ export async function verifyFoundingApplicationEmail(
     const resend = process.env.RESEND_API_KEY
       ? (await import("resend")).Resend
       : null;
-    const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djscovery.com";
+    const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djcovery.com";
 
     if (resend) {
       const client = new resend(process.env.RESEND_API_KEY);
@@ -268,7 +322,7 @@ async function sendVerificationEmail(
   const resend = process.env.RESEND_API_KEY
     ? (await import("resend")).Resend
     : null;
-  const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djscovery.com";
+  const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djcovery.com";
 
   if (resend) {
     const client = new resend(process.env.RESEND_API_KEY);
@@ -299,7 +353,7 @@ async function sendResumeEmail(email: string, token: string, name: string) {
   const resend = process.env.RESEND_API_KEY
     ? (await import("resend")).Resend
     : null;
-  const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djscovery.com";
+  const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djcovery.com";
 
   if (resend) {
     const client = new resend(process.env.RESEND_API_KEY);

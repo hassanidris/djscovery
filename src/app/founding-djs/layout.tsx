@@ -42,7 +42,7 @@ export default function FoundingDJsLayout({
           Check Status
         </Link>
         <a
-          href="mailto:support@djscovery.com"
+          href="mailto:support@djcovery.com"
           className="transition-colors hover:text-white"
         >
           Support

@@ -21,6 +21,24 @@ export interface FieldValidationResult {
   error?: string;
 }
 
+export function validateLocationFields(
+  countryId: unknown,
+  cityId: unknown,
+): FieldValidationResult {
+  if (
+    typeof countryId !== "number" ||
+    !Number.isInteger(countryId) ||
+    countryId <= 0 ||
+    typeof cityId !== "number" ||
+    !Number.isInteger(cityId) ||
+    cityId <= 0
+  ) {
+    return { ok: false, error: "Please select a valid country and city" };
+  }
+
+  return { ok: true };
+}
+
 /**
  * Validate the basic input fields (email, name, stageName, portfolioLink).
  * Does NOT touch the database — use `validateBusinessRules` for that.
@@ -104,8 +122,21 @@ export function validateFields(input: {
  */
 export async function validateBusinessRules(input: {
   email: string;
+  countryId: number;
+  cityId: number;
 }): Promise<{ ok: boolean; error?: string; existingApplicationId?: number }> {
   const email = input.email.trim().toLowerCase();
+
+  const city = await prisma.city.findFirst({
+    where: { id: input.cityId, countryId: input.countryId },
+    select: { id: true },
+  });
+  if (!city) {
+    return {
+      ok: false,
+      error: "Please select a valid city for the chosen country",
+    };
+  }
 
   // Check for existing DJ profile
   const existingDjProfile = await prisma.djProfile.findFirst({
@@ -117,7 +148,7 @@ export async function validateBusinessRules(input: {
     return {
       ok: false,
       error:
-        "You already have a DJ profile on Djscovery. Founding status is for new DJs only.",
+        "You already have a DJ profile on DJcovery. Founding status is for new DJs only.",
     };
   }
 
@@ -130,7 +161,7 @@ export async function validateBusinessRules(input: {
       email,
       status: { in: ["PENDING", "UNDER_REVIEW"] },
       submittedAt: { gte: thirtyDaysAgo },
-      deletedAt: null,
+      deletedAt: { equals: null },
     },
     select: { id: true, status: true, submittedAt: true },
   });
@@ -145,6 +176,34 @@ export async function validateBusinessRules(input: {
       ok: false,
       error: `You already have an active application. You can reapply in ${daysRemaining} days.`,
       existingApplicationId: recentApplication.id,
+    };
+  }
+
+  const recentRejection = await prisma.foundingApplication.findFirst({
+    where: {
+      email,
+      status: "REJECTED",
+      reviewedAt: { gte: thirtyDaysAgo },
+      deletedAt: { equals: null },
+    },
+    select: { reviewedAt: true },
+    orderBy: { reviewedAt: "desc" },
+  });
+
+  if (recentRejection?.reviewedAt) {
+    const cooldownEndsAt = new Date(recentRejection.reviewedAt);
+    cooldownEndsAt.setDate(
+      cooldownEndsAt.getDate() + APPLICATION_COOLDOWN_DAYS,
+    );
+    const daysRemaining = Math.max(
+      1,
+      Math.ceil(
+        (cooldownEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+      ),
+    );
+    return {
+      ok: false,
+      error: `Your last application was not approved. You can reapply in ${daysRemaining} days.`,
     };
   }
 

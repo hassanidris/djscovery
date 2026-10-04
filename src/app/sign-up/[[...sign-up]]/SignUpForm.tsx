@@ -105,7 +105,7 @@ export default function SignUpForm({
   error?: string;
   defaultRole?: Role;
 }) {
-  const [selected, setSelected] = useState<Role | null>(null);
+  const [selected, setSelected] = useState<Role | null>(defaultRole ?? null);
   const [password, setPassword] = useState("");
   const [showRoleError, setShowRoleError] = useState(false);
 

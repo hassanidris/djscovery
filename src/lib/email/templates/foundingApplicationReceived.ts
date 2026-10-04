@@ -10,7 +10,7 @@ export function foundingApplicationReceivedEmail(data: {
       Hi ${data.name},
     </p>
     <p style="color:#9ca3af;font-size:16px;margin:0 0 24px 0;line-height:1.6;">
-      Thank you for applying to become a founding DJ on Djscovery! We've received your application and are excited to review it.
+      Thank you for applying to become a founding DJ on DJcovery! We've received your application and are excited to review it.
     </p>
     <p style="color:#9ca3af;font-size:16px;margin:0 0 24px 0;line-height:1.6;">
       To complete your application, please verify your email address by clicking the button below:
@@ -32,7 +32,7 @@ export function foundingApplicationReceivedEmail(data: {
     </p>
     <p style="color:#9ca3af;font-size:16px;margin:0 0 8px 0;line-height:1.6;">
       Best regards,<br />
-      The Djscovery Team
+      The DJcovery Team
     </p>
   `;
 
