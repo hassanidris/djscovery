@@ -61,19 +61,20 @@ model BookingInquiryMessage {
 }
 
 model Country {
-  id                Int                @id @default(autoincrement())
-  name              String             @unique
-  code              String             @unique
-  bookingInquiries  BookingInquiry[]   @relation("BookingInquiryCountry")
-  cities            City[]
-  djProfiles        DjProfile[]
-  djVenues          DjVenue[]
-  events            Event[]
-  fanProfiles       FanProfile[]
-  gigs              Gig[]
-  organizerProfiles OrganizerProfile[]
-  users             User[]
-  venues            Venue[]
+  id                   Int                   @id @default(autoincrement())
+  name                 String                @unique
+  code                 String                @unique
+  bookingInquiries     BookingInquiry[]      @relation("BookingInquiryCountry")
+  cities               City[]
+  djProfiles           DjProfile[]
+  djVenues             DjVenue[]
+  events               Event[]
+  fanProfiles          FanProfile[]
+  gigs                 Gig[]
+  organizerProfiles    OrganizerProfile[]
+  users                User[]
+  venues               Venue[]
+  foundingApplications FoundingApplication[]
 
   @@index([name])
 }
@@ -1271,6 +1272,16 @@ model FoundingApplication {
   email                      String
   name                       String
   stageName                  String?
+  phone                      String?
+  countryId                  Int?
+  cityId                     Int?
+  experienceYears            Int?
+  genres                     String[]                       @default([])
+  experienceLevel            ExperienceLevel?
+  socialLinks                Json?
+  portfolioLinks             String[]
+  bio                        String?
+  referralCode               String?
   djProfileId                Int?
   status                     FoundingApplicationStatus      @default(PENDING)
   deletedAt                  DateTime?
@@ -1278,7 +1289,10 @@ model FoundingApplication {
   utmMedium                  String?
   utmCampaign                String?
   emailVerificationTokenHash String?
+  emailVerificationExpiresAt DateTime?
   emailVerifiedAt            DateTime?
+  resumeTokenHash            String?
+  resumeTokenExpiresAt       DateTime?
   submittedAt                DateTime                       @default(now())
   reviewedAt                 DateTime?
   reviewedBy                 String?
@@ -1289,6 +1303,7 @@ model FoundingApplication {
   reviewer                   User?                          @relation("FoundingApplicationReviewer", fields: [reviewedBy], references: [id])
   statusLogs                 FoundingApplicationStatusLog[]
   djProfiles                 DjProfile[]
+  country                    Country?                       @relation(fields: [countryId], references: [id])
 
   @@index([email])
   @@index([status])
@@ -1648,6 +1663,7 @@ enum AttendanceStatus {
 
 enum FoundingApplicationStatus {
   PENDING
+  EMAIL_VERIFIED
   UNDER_REVIEW
   APPROVED
   REJECTED
