@@ -57,7 +57,7 @@ export default function WaitlistForm() {
           </svg>
         </div>
         <p className="text-sm text-gray-400">
-          You're on the waitlist! We'll notify you when we launch.
+          You&apos;re on the waitlist! We&apos;ll notify you when we launch.
         </p>
       </div>
     );

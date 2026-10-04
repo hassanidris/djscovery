@@ -318,8 +318,8 @@ export default function FoundingDJsPage() {
                   How many founding DJs will there be?
                 </h3>
                 <p className="text-sm text-gray-400">
-                  We're capping at 100 DJs to maintain exclusivity and badge
-                  value.
+                  We&apos;re capping at 100 DJs to maintain exclusivity and
+                  badge value.
                 </p>
               </div>
 
@@ -338,8 +338,8 @@ export default function FoundingDJsPage() {
                   Can I apply without a DJ profile?
                 </h3>
                 <p className="text-sm text-gray-400">
-                  Yes! Most founding DJs will be new. You'll create your profile
-                  after approval.
+                  Yes! Most founding DJs will be new. You&apos;ll create your
+                  profile after approval.
                 </p>
               </div>
 
@@ -348,8 +348,8 @@ export default function FoundingDJsPage() {
                   Is there a cost to apply?
                 </h3>
                 <p className="text-sm text-gray-400">
-                  No. Applying is free, and there's no cost to become a founding
-                  DJ.
+                  No. Applying is free, and there&apos;s no cost to become a
+                  founding DJ.
                 </p>
               </div>
             </div>

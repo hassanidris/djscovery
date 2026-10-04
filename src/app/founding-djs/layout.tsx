@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -17,7 +18,7 @@ export default function FoundingDJsLayout({
     <>
       <div className="mb-8 flex items-center justify-center py-8">
         <Link href="/founding-djs">
-          <img
+          <Image
             src="/dj_logo-new.svg"
             alt="DJcovery"
             width={120}

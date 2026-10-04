@@ -54,13 +54,14 @@ export default function FoundingDJsSuccessPage() {
             Application Submitted!
           </h1>
           <p className="text-gray-400">
-            Thank you for applying to become a founding DJ. We've received your
-            application and are excited to review it.
+            Thank you for applying to become a founding DJ. We&apos;ve received
+            your application and are excited to review it.
           </p>
           <div className="rounded-xl border border-white/5 bg-white/2 p-4">
             <p className="text-sm text-gray-400">
-              We aim to review all applications within 2 weeks. You'll receive
-              an email verification link shortly to confirm your identity.
+              We aim to review all applications within 2 weeks. You&apos;ll
+              receive an email verification link shortly to confirm your
+              identity.
             </p>
           </div>
         </div>

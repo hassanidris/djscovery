@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createFoundingApplication } from "@/lib/actions/founding-applications";
 import { Button } from "@/components/ui/button";
@@ -10,36 +10,24 @@ import { Label } from "@/components/ui/label";
 export default function FoundingDJsApplyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const resumeEmail = searchParams.get("email");
+  const resumeToken = searchParams.get("resume_token");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: "",
+    email: resumeEmail && resumeToken ? resumeEmail : "",
     name: "",
     stageName: "",
     portfolioLinks: ["", "", ""], // 3 slots for portfolio/social links
   });
 
-  const [utmParams, setUtmParams] = useState({
-    utmSource: "",
-    utmMedium: "",
-    utmCampaign: "",
-  });
-
-  useEffect(() => {
-    setUtmParams({
-      utmSource: searchParams.get("utm_source") || "",
-      utmMedium: searchParams.get("utm_medium") || "",
-      utmCampaign: searchParams.get("utm_campaign") || "",
-    });
-
-    const email = searchParams.get("email");
-    const resumeToken = searchParams.get("resume_token");
-    if (email && resumeToken) {
-      setFormData((prev) => ({ ...prev, email }));
-    }
-  }, [searchParams]);
+  const utmParams = {
+    utmSource: searchParams.get("utm_source") || "",
+    utmMedium: searchParams.get("utm_medium") || "",
+    utmCampaign: searchParams.get("utm_campaign") || "",
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -135,7 +123,7 @@ export default function FoundingDJsApplyPage() {
                 Application Saved
               </h2>
               <p className="max-w-sm text-sm leading-relaxed text-gray-400">
-                We've sent a resume link to your email. You can use it to
+                We&apos;ve sent a resume link to your email. You can use it to
                 continue your application anytime within the next 48 hours.
               </p>
             </div>
@@ -255,7 +243,7 @@ export default function FoundingDJsApplyPage() {
 
           <div className="rounded-xl border border-white/5 bg-white/2 p-4">
             <p className="text-sm text-gray-400">
-              If approved, you'll complete your full profile with genres,
+              If approved, you&apos;ll complete your full profile with genres,
               experience, location, and media uploads.
             </p>
           </div>

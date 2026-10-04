@@ -12,15 +12,6 @@ export default function FoundingDJsVerifyEmailPage() {
   const [error, setError] = useState<string | null>(null);
   const [verified, setVerified] = useState(false);
 
-  useEffect(() => {
-    const token = searchParams.get("token");
-    const email = searchParams.get("email");
-
-    if (token && email) {
-      handleVerify(token, email);
-    }
-  }, [searchParams]);
-
   const handleVerify = async (token: string, email: string) => {
     setLoading(true);
     setError(null);
@@ -38,6 +29,24 @@ export default function FoundingDJsVerifyEmailPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const token = searchParams.get("token");
+    const email = searchParams.get("email");
+    let isCurrent = true;
+
+    if (token && email) {
+      queueMicrotask(() => {
+        if (isCurrent) {
+          handleVerify(token, email);
+        }
+      });
+    }
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [searchParams]);
 
   if (loading) {
     return (
@@ -77,8 +86,8 @@ export default function FoundingDJsVerifyEmailPage() {
             </p>
             <div className="rounded-xl border border-white/5 bg-white/2 p-4">
               <p className="text-sm text-gray-400">
-                We'll review your application within 2 weeks. You'll receive an
-                email once a decision has been made.
+                We&apos;ll review your application within 2 weeks. You&apos;ll
+                receive an email once a decision has been made.
               </p>
             </div>
             <Button onClick={() => router.push("/founding-djs/status")}>

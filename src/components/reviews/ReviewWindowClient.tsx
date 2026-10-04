@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 import { Clock, CheckCircle2 } from "lucide-react";
 import { DjRatingForm } from "@/components/reputation/DjRatingForm";
 
@@ -102,9 +103,11 @@ export default function ReviewWindowClient({
                 <div className="mb-4 flex items-center gap-3">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
                     {dj.avatar ? (
-                      <img
+                      <Image
                         src={dj.avatar}
                         alt={dj.stageName}
+                        width={48}
+                        height={48}
                         className="h-full w-full object-cover"
                       />
                     ) : (
@@ -157,9 +160,11 @@ export default function ReviewWindowClient({
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
                         {dj.avatar ? (
-                          <img
+                          <Image
                             src={dj.avatar}
                             alt={dj.stageName}
+                            width={32}
+                            height={32}
                             className="h-full w-full object-cover"
                           />
                         ) : (
