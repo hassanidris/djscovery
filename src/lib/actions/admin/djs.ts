@@ -8,7 +8,7 @@ import {
   HideDjSchema,
   UnhideDjSchema,
   SuspendDjAccountSchema,
-} from "@/lib/validations/admin";
+} from "@/lib/validation/admin";
 import { revalidatePath } from "next/cache";
 import { cacheDelete } from "@/lib/cache";
 import { sendEmail } from "@/lib/email/sendEmail";

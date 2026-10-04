@@ -9,7 +9,7 @@ import {
   forgotPasswordSchema,
   updatePasswordSchema,
   roleSchema,
-} from "@/lib/validations/auth";
+} from "@/lib/validation/auth";
 import { cookies } from "next/headers";
 import { sendEmail } from "@/lib/email/sendEmail";
 import { rateLimit, rateLimitMessage } from "@/lib/rate-limit";

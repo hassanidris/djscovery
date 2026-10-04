@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
-import { SuspendUserSchema, ActivateUserSchema } from "@/lib/validations/admin";
+import { SuspendUserSchema, ActivateUserSchema } from "@/lib/validation/admin";
 import { revalidatePath } from "next/cache";
 import { sendEmail } from "@/lib/email/sendEmail";
 import {

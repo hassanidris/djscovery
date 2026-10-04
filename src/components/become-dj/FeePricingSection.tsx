@@ -1,7 +1,7 @@
 "use client";
 
 import { UseFormRegister } from "react-hook-form";
-import type { CreateDjProfileInput } from "@/lib/validations/dj-profile";
+import type { CreateDjProfileInput } from "@/lib/validation/dj-profile";
 import { CURRENCIES } from "@/config/currencies";
 import { inputCls, labelCls, sectionCls, sectionTitleCls } from "./constants";
 
@@ -79,9 +79,7 @@ export function FeePricingSection({
             ))}
           </select>
           {errors.feeCurrency && (
-            <p className="text-xs text-red-400">
-              {errors.feeCurrency.message}
-            </p>
+            <p className="text-xs text-red-400">{errors.feeCurrency.message}</p>
           )}
         </div>
       </div>

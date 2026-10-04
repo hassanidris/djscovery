@@ -6,7 +6,7 @@ import {
   HideOrganizerSchema,
   UnhideOrganizerSchema,
   SuspendOrganizerSchema,
-} from "@/lib/validations/admin";
+} from "@/lib/validation/admin";
 import { revalidatePath } from "next/cache";
 
 type ActionResult = { success: true } | { error: string };
@@ -192,11 +192,7 @@ export async function getAdminOrganizers({
       ...(type
         ? {
             organizerType: type as
-              | "INDIVIDUAL"
-              | "COMPANY"
-              | "VENUE"
-              | "AGENCY"
-              | "FESTIVAL",
+              "INDIVIDUAL" | "COMPANY" | "VENUE" | "AGENCY" | "FESTIVAL",
           }
         : {}),
       ...(country

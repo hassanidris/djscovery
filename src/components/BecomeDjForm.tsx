@@ -14,7 +14,7 @@ import { resolveCurrencyForCountry } from "@/config/country-currencies";
 import {
   CreateDjProfileSchema,
   CreateDjProfileInput,
-} from "@/lib/validations/dj-profile";
+} from "@/lib/validation/dj-profile";
 
 import { AvatarSection } from "./become-dj/AvatarSection";
 import { CoverImageSection } from "./become-dj/CoverImageSection";

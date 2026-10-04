@@ -7,7 +7,7 @@ import {
   MarkReportUnderReviewSchema,
   ResolveReportSchema,
   DismissReportSchema,
-} from "@/lib/validations/admin";
+} from "@/lib/validation/admin";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
