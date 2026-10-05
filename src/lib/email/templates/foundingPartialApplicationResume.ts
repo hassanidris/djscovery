@@ -10,7 +10,7 @@ export function foundingPartialApplicationResumeEmail(data: {
       Hi ${data.name},
     </p>
     <p style="color:#9ca3af;font-size:16px;margin:0 0 24px 0;line-height:1.6;">
-      You started an application to become a founding DJ on Djscovery but didn't complete it. No worries—your progress has been saved!
+      You started an application to become a founding DJ on DJcovery but didn't complete it. No worries—your progress has been saved!
     </p>
     <p style="color:#9ca3af;font-size:16px;margin:0 0 24px 0;line-height:1.6;">
       Click the button below to continue where you left off:
@@ -29,7 +29,7 @@ export function foundingPartialApplicationResumeEmail(data: {
     </p>
     <p style="color:#9ca3af;font-size:16px;margin:0 0 8px 0;line-height:1.6;">
       Best regards,<br />
-      The Djscovery Team
+      The DJcovery Team
     </p>
   `;
 

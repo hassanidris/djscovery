@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createFoundingApplication } from "@/lib/actions/founding-applications";
+import { getCitiesForCountry, getCountries } from "@/lib/actions/locations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Plus } from "lucide-react";
 
 export default function FoundingDJsApplyPage() {
   const router = useRouter();
@@ -15,13 +17,63 @@ export default function FoundingDJsApplyPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [countries, setCountries] = useState<
+    Array<{ id: number; name: string; code: string }>
+  >([]);
+  const [cities, setCities] = useState<Array<{ id: number; name: string }>>([]);
+  const [loadingCountries, setLoadingCountries] = useState(true);
+  const [loadingCities, setLoadingCities] = useState(false);
 
   const [formData, setFormData] = useState({
     email: resumeEmail && resumeToken ? resumeEmail : "",
     name: "",
     stageName: "",
-    portfolioLinks: ["", "", ""], // 3 slots for portfolio/social links
+    countryId: "",
+    cityId: "",
+    portfolioLinks: [""],
   });
+
+  useEffect(() => {
+    let active = true;
+    getCountries()
+      .then((items) => {
+        if (active) setCountries(items);
+      })
+      .catch(() => {
+        if (active)
+          setError("Unable to load countries. Please refresh and try again.");
+      })
+      .finally(() => {
+        if (active) setLoadingCountries(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (!formData.countryId) {
+      return () => {
+        active = false;
+      };
+    }
+
+    getCitiesForCountry(Number(formData.countryId))
+      .then((items) => {
+        if (active) setCities(items);
+      })
+      .catch(() => {
+        if (active)
+          setError("Unable to load cities for this country. Please try again.");
+      })
+      .finally(() => {
+        if (active) setLoadingCities(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [formData.countryId]);
 
   const utmParams = {
     utmSource: searchParams.get("utm_source") || "",
@@ -34,6 +86,12 @@ export default function FoundingDJsApplyPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCountryChange = (countryId: string) => {
+    setFormData((prev) => ({ ...prev, countryId, cityId: "" }));
+    setCities([]);
+    setLoadingCities(Boolean(countryId));
+  };
+
   const handlePortfolioLinkChange = (index: number, value: string) => {
     setFormData((prev) => {
       const newLinks = [...prev.portfolioLinks];
@@ -43,6 +101,10 @@ export default function FoundingDJsApplyPage() {
   };
 
   const handleSaveAndResume = async () => {
+    if (!formData.countryId || !formData.cityId) {
+      setError("Please select your country and city.");
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -51,6 +113,8 @@ export default function FoundingDJsApplyPage() {
         email: formData.email,
         name: formData.name,
         stageName: formData.stageName,
+        countryId: Number(formData.countryId),
+        cityId: Number(formData.cityId),
         portfolioLinks: formData.portfolioLinks.filter(
           (link) => link.trim() !== "",
         ),
@@ -71,6 +135,10 @@ export default function FoundingDJsApplyPage() {
   };
 
   const handleSubmit = async () => {
+    if (!formData.countryId || !formData.cityId) {
+      setError("Please select your country and city.");
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -79,6 +147,8 @@ export default function FoundingDJsApplyPage() {
         email: formData.email,
         name: formData.name,
         stageName: formData.stageName,
+        countryId: Number(formData.countryId),
+        cityId: Number(formData.cityId),
         portfolioLinks: formData.portfolioLinks.filter(
           (link) => link.trim() !== "",
         ),
@@ -148,7 +218,7 @@ export default function FoundingDJsApplyPage() {
             Apply to Become a Founding DJ
           </h1>
           <p className="text-gray-400">
-            Join the first 100 founding DJs on Djscovery. Just a few details to
+            Join the first 100 founding DJs on DJcovery. Just a few details to
             get started.
           </p>
         </div>
@@ -159,7 +229,13 @@ export default function FoundingDJsApplyPage() {
           </div>
         )}
 
-        <div className="flex flex-col gap-6 rounded-2xl border border-white/5 bg-white/2 p-8">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleSubmit();
+          }}
+          className="flex flex-col gap-6 rounded-2xl border border-white/5 bg-white/2 p-8"
+        >
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">
               Email Address <span className="text-h_redLight">*</span>
@@ -208,33 +284,107 @@ export default function FoundingDJsApplyPage() {
             />
           </div>
 
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="countryId">
+                Country <span className="text-h_redLight">*</span>
+              </Label>
+              <select
+                id="countryId"
+                name="countryId"
+                value={formData.countryId}
+                onChange={(event) => handleCountryChange(event.target.value)}
+                required
+                disabled={loadingCountries || countries.length === 0}
+                className="focus:border-h_red/50 h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-white outline-none disabled:opacity-60"
+              >
+                <option value="">
+                  {loadingCountries ? "Loading countries…" : "Select a country"}
+                </option>
+                {countries.map((country) => (
+                  <option key={country.id} value={country.id}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="cityId">
+                City <span className="text-h_redLight">*</span>
+              </Label>
+              <select
+                id="cityId"
+                name="cityId"
+                value={formData.cityId}
+                onChange={(event) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    cityId: event.target.value,
+                  }))
+                }
+                required
+                disabled={
+                  !formData.countryId || loadingCities || cities.length === 0
+                }
+                className="focus:border-h_red/50 h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-white outline-none disabled:opacity-60"
+              >
+                <option value="">
+                  {!formData.countryId
+                    ? "Select a country first"
+                    : loadingCities
+                      ? "Loading cities…"
+                      : cities.length === 0
+                        ? "No cities available"
+                        : "Select a city"}
+                </option>
+                {cities.map((city) => (
+                  <option key={city.id} value={city.id}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-2">
-            <Label>
+            <Label htmlFor="portfolioLink-0">
               Portfolio & Social Links{" "}
               <span className="text-h_redLight">*</span>
             </Label>
-            <Input
-              type="url"
-              value={formData.portfolioLinks[0]}
-              onChange={(e) => handlePortfolioLinkChange(0, e.target.value)}
-              placeholder="https://soundcloud.com/your-mix (required)"
-              className="focus-visible:border-h_red/50 focus-visible:ring-h_red/20 h-10 border-white/10 bg-white/5 text-white placeholder:text-white/30"
-              required
-            />
-            <Input
-              type="url"
-              value={formData.portfolioLinks[1]}
-              onChange={(e) => handlePortfolioLinkChange(1, e.target.value)}
-              placeholder="https://instagram.com/your-dj (optional)"
-              className="focus-visible:border-h_red/50 focus-visible:ring-h_red/20 h-10 border-white/10 bg-white/5 text-white placeholder:text-white/30"
-            />
-            <Input
-              type="url"
-              value={formData.portfolioLinks[2]}
-              onChange={(e) => handlePortfolioLinkChange(2, e.target.value)}
-              placeholder="https://mixcloud.com/your-dj (optional)"
-              className="focus-visible:border-h_red/50 focus-visible:ring-h_red/20 h-10 border-white/10 bg-white/5 text-white placeholder:text-white/30"
-            />
+            {formData.portfolioLinks.map((link, index) => (
+              <Input
+                key={index}
+                id={`portfolioLink-${index}`}
+                aria-label={`Portfolio or social link ${index + 1}`}
+                type="url"
+                value={link}
+                onChange={(e) =>
+                  handlePortfolioLinkChange(index, e.target.value)
+                }
+                placeholder={
+                  index === 0
+                    ? "https://soundcloud.com/your-mix (required)"
+                    : "Add a portfolio or social link (optional)"
+                }
+                className="focus-visible:border-h_red/50 focus-visible:ring-h_red/20 h-10 border-white/10 bg-white/5 text-white placeholder:text-white/30"
+                required={index === 0}
+              />
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  portfolioLinks: [...prev.portfolioLinks, ""],
+                }))
+              }
+              className="text-h_redLight w-fit"
+            >
+              <Plus className="h-4 w-4" aria-hidden />
+              Add another link
+            </Button>
             <p className="text-xs text-gray-500">
               Share your SoundCloud, Mixcloud, Instagram, or other
               portfolio/social links
@@ -244,12 +394,13 @@ export default function FoundingDJsApplyPage() {
           <div className="rounded-xl border border-white/5 bg-white/2 p-4">
             <p className="text-sm text-gray-400">
               If approved, you&apos;ll complete your full profile with genres,
-              experience, location, and media uploads.
+              experience, and media uploads.
             </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
             <Button
+              type="button"
               onClick={handleSaveAndResume}
               disabled={loading}
               variant="outline"
@@ -257,11 +408,11 @@ export default function FoundingDJsApplyPage() {
             >
               {loading ? "Saving..." : "Save & Resume Later"}
             </Button>
-            <Button onClick={handleSubmit} disabled={loading}>
+            <Button type="submit" disabled={loading}>
               {loading ? "Submitting..." : "Submit Application"}
             </Button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
