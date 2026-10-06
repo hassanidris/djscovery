@@ -10,6 +10,9 @@ import {
 } from "@/lib/email/templates/welcome";
 import { generateWelcomeCta } from "@/lib/supabase/admin";
 import { roleSchema } from "@/lib/validation/auth";
+import { acceptFoundingInvitation } from "@/lib/founding/invitations";
+
+const FOUNDING_INVITATION_COOKIE = "founding_invitation_token";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -158,6 +161,31 @@ export async function GET(request: Request) {
           ? encodeURIComponent(detail.slice(0, 150))
           : "db_error";
       return NextResponse.redirect(`${origin}/sign-in?error=${msg}`);
+    }
+
+    const invitationToken = cookieStore.get(FOUNDING_INVITATION_COOKIE)?.value;
+    if (invitationToken) {
+      const accepted = await acceptFoundingInvitation(
+        invitationToken,
+        userId,
+        email,
+      );
+      cookieStore.delete(FOUNDING_INVITATION_COOKIE);
+      if (!accepted.success) {
+        await supabase.auth.signOut();
+        const error =
+          accepted.reason === "email_mismatch"
+            ? "email_mismatch"
+            : accepted.reason === "already_linked"
+              ? "already_linked"
+              : "invalid_invitation";
+        return NextResponse.redirect(
+          `${origin}/founding-djs/invitation/${encodeURIComponent(invitationToken)}?error=${error}`,
+        );
+      }
+      return NextResponse.redirect(
+        `${origin}/become-dj?foundingApplicationId=${accepted.applicationId}`,
+      );
     }
 
     if (isNewUser) {

@@ -100,58 +100,59 @@ model City {
 }
 
 model User {
-  id                            String                         @id
-  username                      String                         @unique
-  createdAt                     DateTime                       @default(now())
-  cityId                        Int?
-  countryId                     Int?
-  deletedAt                     DateTime?
-  email                         String                         @unique
-  image                         String?
-  imagePath                     String?
-  lastLoginAt                   DateTime?
-  name                          String?
-  onboardingComplete            Boolean                        @default(false)
-  status                        UserStatus                     @default(ACTIVE)
-  updatedAt                     DateTime                       @updatedAt
-  adminActionLogs               AdminActionLog[]
-  bookingInquiriesOrganized     BookingInquiry[]               @relation("OrganizerBookingInquiries")
-  bookingInquiries              BookingInquiry[]
-  bookingInquiryMessages        BookingInquiryMessage[]        @relation("BookingInquiryMessageSender")
-  contactSubmissions            ContactSubmission[]
-  djComments                    DjComment[]
-  djCommentLikes                DjCommentLike[]
-  followedDjs                   DjFollow[]
-  djGigReviews                  DjGigReview[]
-  djProfile                     DjProfile?
-  moderatedDjRatings            DjRating[]                     @relation("DjRatingModerator")
-  djRatings                     DjRating[]                     @relation("DjRatingAuthor")
-  djRatingHelpfulVotes          DjRatingHelpfulVote[]
-  emailLogs                     EmailLog[]
-  emailPreference               EmailPreference?
-  eventModerations              EventModeration[]              @relation("EventModerationAdmin")
-  eventReviews                  EventReview[]
-  fanProfile                    FanProfile?
-  followers                     Follower[]                     @relation("UserFollowers")
-  followings                    Follower[]                     @relation("UserFollowings")
-  gigReviews                    GigReview[]
-  notificationsReceived         Notification[]                 @relation("NotificationRecipient")
-  notificationsSent             Notification[]                 @relation("NotificationSender")
-  organizerProfile              OrganizerProfile?
-  posts                         Post[]
-  postComments                  PostComment[]
-  postCommentLikes              PostCommentLike[]
-  postLikes                     PostLike[]
-  reportsSubmitted              Report[]                       @relation("ReportSubmitter")
-  reportsReviewed               Report[]                       @relation("ReportReviewer")
-  reviewNotificationTracking    ReviewNotificationTracking[]   @relation("ReviewNotificationTracking")
-  savedEvents                   SavedEvent[]
-  city                          City?                          @relation(fields: [cityId], references: [id])
-  country                       Country?                       @relation(fields: [countryId], references: [id])
-  roles                         UserRole[]
-  venueReviews                  VenueReview[]
-  foundingApplications          FoundingApplication[]          @relation("FoundingApplicationReviewer")
-  foundingApplicationStatusLogs FoundingApplicationStatusLog[] @relation("FoundingApplicationStatusLogChanger")
+  id                              String                         @id
+  username                        String                         @unique
+  createdAt                       DateTime                       @default(now())
+  cityId                          Int?
+  countryId                       Int?
+  deletedAt                       DateTime?
+  email                           String                         @unique
+  image                           String?
+  imagePath                       String?
+  lastLoginAt                     DateTime?
+  name                            String?
+  onboardingComplete              Boolean                        @default(false)
+  status                          UserStatus                     @default(ACTIVE)
+  updatedAt                       DateTime                       @updatedAt
+  adminActionLogs                 AdminActionLog[]
+  bookingInquiriesOrganized       BookingInquiry[]               @relation("OrganizerBookingInquiries")
+  bookingInquiries                BookingInquiry[]
+  bookingInquiryMessages          BookingInquiryMessage[]        @relation("BookingInquiryMessageSender")
+  contactSubmissions              ContactSubmission[]
+  djComments                      DjComment[]
+  djCommentLikes                  DjCommentLike[]
+  followedDjs                     DjFollow[]
+  djGigReviews                    DjGigReview[]
+  djProfile                       DjProfile?
+  moderatedDjRatings              DjRating[]                     @relation("DjRatingModerator")
+  djRatings                       DjRating[]                     @relation("DjRatingAuthor")
+  djRatingHelpfulVotes            DjRatingHelpfulVote[]
+  emailLogs                       EmailLog[]
+  emailPreference                 EmailPreference?
+  eventModerations                EventModeration[]              @relation("EventModerationAdmin")
+  eventReviews                    EventReview[]
+  fanProfile                      FanProfile?
+  followers                       Follower[]                     @relation("UserFollowers")
+  followings                      Follower[]                     @relation("UserFollowings")
+  gigReviews                      GigReview[]
+  notificationsReceived           Notification[]                 @relation("NotificationRecipient")
+  notificationsSent               Notification[]                 @relation("NotificationSender")
+  organizerProfile                OrganizerProfile?
+  posts                           Post[]
+  postComments                    PostComment[]
+  postCommentLikes                PostCommentLike[]
+  postLikes                       PostLike[]
+  reportsSubmitted                Report[]                       @relation("ReportSubmitter")
+  reportsReviewed                 Report[]                       @relation("ReportReviewer")
+  reviewNotificationTracking      ReviewNotificationTracking[]   @relation("ReviewNotificationTracking")
+  savedEvents                     SavedEvent[]
+  city                            City?                          @relation(fields: [cityId], references: [id])
+  country                         Country?                       @relation(fields: [countryId], references: [id])
+  roles                           UserRole[]
+  venueReviews                    VenueReview[]
+  foundingApplications            FoundingApplication[]          @relation("FoundingApplicationReviewer")
+  foundingApplicationsAsApplicant FoundingApplication[]          @relation("FoundingApplicationApplicant")
+  foundingApplicationStatusLogs   FoundingApplicationStatusLog[] @relation("FoundingApplicationStatusLogChanger")
 
   @@index([status])
   @@index([deletedAt])
@@ -1284,6 +1285,7 @@ model FoundingApplication {
   referralCode               String?
   djProfileId                Int?
   status                     FoundingApplicationStatus      @default(PENDING)
+  userId                     String?
   deletedAt                  DateTime?
   utmSource                  String?
   utmMedium                  String?
@@ -1301,7 +1303,9 @@ model FoundingApplication {
   createdAt                  DateTime                       @default(now())
   updatedAt                  DateTime                       @updatedAt
   reviewer                   User?                          @relation("FoundingApplicationReviewer", fields: [reviewedBy], references: [id])
+  applicant                  User?                          @relation("FoundingApplicationApplicant", fields: [userId], references: [id], onDelete: SetNull)
   statusLogs                 FoundingApplicationStatusLog[]
+  invitations                InvitationToken[]
   djProfiles                 DjProfile[]
   country                    Country?                       @relation(fields: [countryId], references: [id])
 
@@ -1310,6 +1314,7 @@ model FoundingApplication {
   @@index([djProfileId])
   @@index([deletedAt])
   @@index([submittedAt])
+  @@index([userId])
 }
 
 model FoundingApplicationStatusLog {
@@ -1328,23 +1333,29 @@ model FoundingApplicationStatusLog {
 }
 
 model InvitationToken {
-  id          Int              @id @default(autoincrement())
-  tokenHash   String           @unique
-  type        InvitationType
-  status      InvitationStatus @default(PENDING)
-  email       String?
-  djProfileId Int?
-  expiresAt   DateTime
-  acceptedAt  DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  djProfile   DjProfile?       @relation(fields: [djProfileId], references: [id])
+  id                    Int                  @id @default(autoincrement())
+  tokenHash             String               @unique
+  type                  InvitationType
+  status                InvitationStatus     @default(PENDING)
+  email                 String?
+  djProfileId           Int?
+  expiresAt             DateTime
+  acceptedAt            DateTime?
+  reminderSentAt        DateTime?
+  expiredEmailSentAt    DateTime?
+  foundingApplicationId Int?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  djProfile             DjProfile?           @relation(fields: [djProfileId], references: [id])
+  foundingApplication   FoundingApplication? @relation(fields: [foundingApplicationId], references: [id], onDelete: SetNull)
 
   @@index([tokenHash])
   @@index([status])
   @@index([email])
   @@index([djProfileId])
   @@index([expiresAt])
+  @@index([foundingApplicationId])
+  @@index([status, expiresAt])
 }
 
 model FoundingMember {
