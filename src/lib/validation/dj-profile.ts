@@ -100,6 +100,9 @@ export const CreateDjProfileSchema = z
         }),
       )
       .optional(),
+
+    // Founding application (optional)
+    foundingApplicationId: z.number().int().positive().optional(),
   })
   .refine(
     (data) => {

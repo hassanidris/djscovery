@@ -5,7 +5,12 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 import BecomeDjForm from "@/components/BecomeDjForm";
 
-export default async function BecomeDjPage() {
+export default async function BecomeDjPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ foundingApplicationId?: string }>;
+}) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,6 +27,33 @@ export default async function BecomeDjPage() {
     orderBy: { name: "asc" },
     select: { id: true, name: true, code: true },
   });
+
+  let foundingApplication = null;
+  if (params.foundingApplicationId) {
+    const applicationId = Number(params.foundingApplicationId);
+    if (!isNaN(applicationId)) {
+      foundingApplication = await prisma.foundingApplication.findFirst({
+        where: {
+          id: applicationId,
+          status: "APPROVED",
+          emailVerifiedAt: { not: null },
+          deletedAt: { equals: null },
+          userId: user.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          stageName: true,
+          bio: true,
+          experienceYears: true,
+          genres: true,
+          countryId: true,
+          cityId: true,
+          socialLinks: true,
+        },
+      });
+    }
+  }
 
   return (
     <>
@@ -67,7 +99,11 @@ export default async function BecomeDjPage() {
               </div>
             </div>
           ) : (
-            <BecomeDjForm countries={countries} userId={user.id} />
+            <BecomeDjForm
+              countries={countries}
+              userId={user.id}
+              foundingApplication={foundingApplication}
+            />
           )}
         </div>
       </div>

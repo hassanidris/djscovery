@@ -16,6 +16,7 @@ const STATUS_STYLES: Record<FoundingApplicationStatus, string> = {
   APPROVED: "border-green-500/30 bg-green-500/10 text-green-300",
   REJECTED: "border-red-500/30 bg-red-500/10 text-red-300",
   WITHDRAWN: "border-gray-500/30 bg-gray-500/10 text-gray-300",
+  COMPLETED: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
 };
 
 function displayStatus(status: FoundingApplicationStatus) {

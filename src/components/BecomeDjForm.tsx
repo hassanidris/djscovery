@@ -35,9 +35,24 @@ import { MediaSection } from "./become-dj/MediaSection";
 interface BecomeDjFormProps {
   countries: Country[];
   userId: string;
+  foundingApplication?: {
+    id: number;
+    name: string;
+    stageName: string | null;
+    bio: string | null;
+    experienceYears: number | null;
+    genres: string[];
+    countryId: number | null;
+    cityId: number | null;
+    socialLinks: unknown;
+  } | null;
 }
 
-export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
+export default function BecomeDjForm({
+  countries,
+  userId,
+  foundingApplication,
+}: BecomeDjFormProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -67,6 +82,51 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
       media: [],
     },
   });
+
+  // Prefill form from founding application
+  useEffect(() => {
+    if (foundingApplication) {
+      if (foundingApplication.stageName) {
+        setValue("stageName", foundingApplication.stageName);
+      }
+      if (foundingApplication.bio) {
+        setValue("bio", foundingApplication.bio);
+      }
+      if (foundingApplication.experienceYears !== null) {
+        setValue("experienceYears", foundingApplication.experienceYears);
+      }
+      if (foundingApplication.genres && foundingApplication.genres.length > 0) {
+        setValue("genreNames", foundingApplication.genres);
+      }
+      if (foundingApplication.countryId) {
+        const cityId = foundingApplication.cityId;
+        void handleCountryChange(foundingApplication.countryId).then(() => {
+          if (cityId) setValue("cityId", cityId);
+        });
+      }
+      if (foundingApplication.socialLinks) {
+        try {
+          const links = Array.isArray(foundingApplication.socialLinks)
+            ? foundingApplication.socialLinks
+            : [];
+          if (links.length > 0) {
+            setValue(
+              "socialLinks",
+              links.map((link: any) => ({
+                platform: link.platform || "instagram",
+                url: link.url || "",
+              })),
+            );
+          }
+        } catch (e) {
+          console.error("Failed to parse social links", e);
+        }
+      }
+      if (foundingApplication.id) {
+        setValue("foundingApplicationId", foundingApplication.id);
+      }
+    }
+  }, [foundingApplication, setValue]);
 
   // Watch values for derived state (useWatch is memoizable for React Compiler)
   const stageName = useWatch({ control, name: "stageName" });
@@ -271,6 +331,7 @@ export default function BecomeDjForm({ countries, userId }: BecomeDjFormProps) {
           djTypes: data.djTypes,
           socialLinks: data.socialLinks.filter((l) => l.url.trim()),
           media,
+          foundingApplicationId: data.foundingApplicationId,
         });
 
         if (result && "error" in result) {
