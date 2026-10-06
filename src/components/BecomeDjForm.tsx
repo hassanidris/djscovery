@@ -99,10 +99,10 @@ export default function BecomeDjForm({
         setValue("genreNames", foundingApplication.genres);
       }
       if (foundingApplication.countryId) {
-        setValue("countryId", foundingApplication.countryId);
-      }
-      if (foundingApplication.cityId) {
-        setValue("cityId", foundingApplication.cityId);
+        const cityId = foundingApplication.cityId;
+        void handleCountryChange(foundingApplication.countryId).then(() => {
+          if (cityId) setValue("cityId", cityId);
+        });
       }
       if (foundingApplication.socialLinks) {
         try {

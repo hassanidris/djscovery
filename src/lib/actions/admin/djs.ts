@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { EmailType } from "@prisma/client";
 import {
   ApproveDjSchema,
   RejectDjSchema,
@@ -71,18 +72,26 @@ export async function approveDjProfile(
     await prisma.$transaction(async (tx) => {
       if (isFoundingMember) {
         const maxFoundingNumber = await tx.foundingMember.findFirst({
+          where: { foundingNumber: { not: null } },
           orderBy: { foundingNumber: "desc" },
           select: { foundingNumber: true },
         });
         foundingNumber = (maxFoundingNumber?.foundingNumber ?? 0) + 1;
 
-        await tx.foundingMember.update({
-          where: { id: profile.foundingMember!.id },
+        const updated = await tx.foundingMember.updateMany({
+          where: {
+            id: profile.foundingMember!.id,
+            status: "PENDING_ONBOARDING",
+          },
           data: {
             status: "ACTIVE",
             foundingNumber,
           },
         });
+
+        if (updated.count === 0) {
+          throw new Error("Founding member already approved or status changed");
+        }
       }
 
       await tx.djProfile.update({
@@ -118,7 +127,7 @@ export async function approveDjProfile(
       await sendEmail({
         to: profile.user.email,
         userId: profile.userId,
-        emailType: "FOUNDING_WELCOME",
+        emailType: EmailType.FOUNDING_WELCOME,
         subject: foundingWelcomeSubject,
         html: foundingWelcomeHtml({
           name: profile.user.name ?? profile.stageName,

@@ -12,7 +12,7 @@ export function foundingWelcomeHtml({
   const displayName = escapeHtml(name);
   return baseLayout(`
     <h1 style="color:#ffffff;font-size:24px;font-weight:700;margin:0 0 12px;">
-      Welcome, Founding DJ #${foundingNumber}! 🎧
+      Welcome, ${displayName}! You're Founding DJ #${foundingNumber} 🎧
     </h1>
     <p style="color:#9ca3af;font-size:15px;line-height:1.7;margin:0 0 24px;">
       Your profile is now live and you're officially part of the DJcovery founding member family.
