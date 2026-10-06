@@ -20,6 +20,7 @@ import {
   Shield,
   Bell,
   Zap,
+  Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,12 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Fans", icon: Users, exact: false },
   { href: "/admin/djs", label: "DJs", icon: Disc3, exact: false },
+  {
+    href: "/admin/founding/applications",
+    label: "Founding Applications",
+    icon: Award,
+    exact: false,
+  },
   {
     href: "/admin/organizers",
     label: "Organizers",

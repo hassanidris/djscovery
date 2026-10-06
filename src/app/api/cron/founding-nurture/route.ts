@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const resend = process.env.RESEND_API_KEY
       ? (await import("resend")).Resend
       : null;
-    const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djscovery.com";
+    const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@djcovery.com";
 
     let emailsSent = 0;
 

@@ -3,9 +3,9 @@ import { Metadata } from "next";
 import WaitlistForm from "@/components/founding-djs/WaitlistForm";
 
 export const metadata: Metadata = {
-  title: "Founding DJs Program | Join the First Wave of Talent on Djscovery",
+  title: "Founding DJs Program | Join the First Wave of Talent on DJcovery",
   description:
-    "Be among the first 100 founding DJs on Djscovery. Get 12 months of premium, priority discovery, and a permanent founding badge. Apply now and shape the future of DJ discovery.",
+    "Be among the first 100 founding DJs on DJcovery. Get 12 months of premium, priority discovery, and a permanent founding badge. Apply now and shape the future of DJ discovery.",
   keywords: [
     "founding DJs",
     "DJ platform",
@@ -34,7 +34,7 @@ export default function FoundingDJsPage() {
               Shape the Future of DJ Discovery
             </h1>
             <p className="mb-10 max-w-2xl text-lg text-gray-400 sm:text-xl">
-              Join the first 100 founding DJs on Djscovery. Get exclusive
+              Join the first 100 founding DJs on DJcovery. Get exclusive
               benefits, early access, and a permanent badge that sets you apart.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">

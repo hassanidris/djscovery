@@ -9,8 +9,8 @@ export default function FoundingDJsSuccessPage() {
 
   const handleShare = async (platform: string) => {
     const text =
-      "I just applied to become a founding DJ on Djscovery! Join the first wave of talent shaping the future of DJ discovery.";
-    const url = "https://djscovery.com/founding-djs";
+      "I just applied to become a founding DJ on DJcovery! Join the first wave of talent shaping the future of DJ discovery.";
+    const url = "https://djcovery.com/founding-djs";
 
     let shareUrl = "";
     switch (platform) {
