@@ -16,9 +16,13 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; message?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    message?: string;
+    invitationToken?: string;
+  }>;
 }) {
-  const { error: rawError, message } = await searchParams;
+  const { error: rawError, message, invitationToken } = await searchParams;
   const error = rawError
     ? (AUTH_ERROR_MESSAGES[rawError] ?? rawError.replace(/_/g, " "))
     : undefined;
@@ -59,9 +63,18 @@ export default async function Page({
           </div>
         )}
 
+        {invitationToken && (
+          <p className="rounded-lg border border-sky-500/20 bg-sky-500/5 px-3 py-2 text-center text-sm text-sky-200">
+            Sign in with the email address that received your Founding DJ invitation.
+          </p>
+        )}
+
         {/* Google OAuth */}
         <form action={signInWithGoogle}>
           <input type="hidden" name="role" value="" />
+          {invitationToken && (
+            <input type="hidden" name="invitationToken" value={invitationToken} />
+          )}
           <Button
             type="submit"
             variant="outline"
@@ -92,6 +105,9 @@ export default async function Page({
           className="flex flex-col gap-4"
           style={{ gap: "var(--space-4)" }}
         >
+          {invitationToken && (
+            <input type="hidden" name="invitationToken" value={invitationToken} />
+          )}
           <Input
             type="email"
             name="email"
@@ -120,7 +136,7 @@ export default async function Page({
         <p className="text-center text-sm text-gray-400">
           No account?{" "}
           <Link
-            href="/sign-up"
+            href={invitationToken ? `/sign-up?role=dj&invitationToken=${encodeURIComponent(invitationToken)}` : "/sign-up"}
             className="text-h_redLight underline decoration-1 underline-offset-4 hover:decoration-2"
           >
             Sign up

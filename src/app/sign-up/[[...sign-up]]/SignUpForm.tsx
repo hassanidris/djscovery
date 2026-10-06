@@ -101,11 +101,15 @@ const ROLES: Array<{
 export default function SignUpForm({
   error,
   defaultRole,
+  invitationToken,
 }: {
   error?: string;
   defaultRole?: Role;
+  invitationToken?: string;
 }) {
-  const [selected, setSelected] = useState<Role | null>(defaultRole ?? null);
+  const [selected, setSelected] = useState<Role | null>(
+    invitationToken ? "dj" : (defaultRole ?? null),
+  );
   const [password, setPassword] = useState("");
   const [showRoleError, setShowRoleError] = useState(false);
 
@@ -130,8 +134,14 @@ export default function SignUpForm({
         </div>
       )}
 
+      {invitationToken && (
+        <p className="rounded-lg border border-green-500/20 bg-green-500/5 px-3 py-2 text-center text-sm text-green-200">
+          Create your DJ account using the email address that received your invitation.
+        </p>
+      )}
+
       {/* Role selector */}
-      <div className="flex flex-col gap-2" style={{ gap: "var(--space-2)" }}>
+      {!invitationToken && <div className="flex flex-col gap-2" style={{ gap: "var(--space-2)" }}>
         <p className="text-center text-xs text-gray-400">
           I&apos;m joining as a…
         </p>
@@ -174,7 +184,7 @@ export default function SignUpForm({
             Browse DJs, follow artists &amp; attend events
           </p>
         )}
-      </div>
+      </div>}
 
       {/* Google OAuth */}
       <form
@@ -187,6 +197,9 @@ export default function SignUpForm({
         }}
       >
         <input type="hidden" name="role" value={selected || ""} />
+        {invitationToken && (
+          <input type="hidden" name="invitationToken" value={invitationToken} />
+        )}
         <Button
           type="submit"
           variant="outline"
@@ -223,7 +236,10 @@ export default function SignUpForm({
         className="flex flex-col gap-4"
         style={{ gap: "var(--space-4)" }}
       >
-        <input type="hidden" name="role" value={selected || ""} />
+        <input type="hidden" name="role" value={invitationToken ? "dj" : selected || ""} />
+        {invitationToken && (
+          <input type="hidden" name="invitationToken" value={invitationToken} />
+        )}
         <Input
           type="text"
           name="displayName"
@@ -270,7 +286,7 @@ export default function SignUpForm({
       <p className="text-center text-sm text-gray-400">
         Already have an account?{" "}
         <Link
-          href="/sign-in"
+          href={invitationToken ? `/sign-in?invitationToken=${encodeURIComponent(invitationToken)}` : "/sign-in"}
           className="text-h_redLight underline decoration-1 underline-offset-4 hover:decoration-2"
         >
           Sign in

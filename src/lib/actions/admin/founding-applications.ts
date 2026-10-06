@@ -255,6 +255,7 @@ export async function getFoundingApplicationDetail(applicationId: number) {
           where: {
             email: application.email,
             type: "FOUNDING_MEMBER",
+            foundingApplicationId: application.id,
             createdAt: {
               gte: application.reviewedAt ?? application.submittedAt,
             },
@@ -322,16 +323,25 @@ export async function regenerateFoundingApplicationInvitation(
     application = await prisma.$transaction(async (tx) => {
       const current = await tx.foundingApplication.findFirst({
         where: { id: applicationId, deletedAt: { equals: null } },
-        select: { id: true, email: true, name: true, status: true },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          status: true,
+          emailVerifiedAt: true,
+        },
       });
       if (!current) throw new Error("APPLICATION_NOT_FOUND");
       if (current.status !== "APPROVED")
         throw new Error("APPLICATION_NOT_APPROVED");
+      if (!current.emailVerifiedAt)
+        throw new Error("APPLICATION_EMAIL_UNVERIFIED");
 
       await tx.invitationToken.updateMany({
         where: {
           email: current.email,
           type: "FOUNDING_MEMBER",
+          foundingApplicationId: current.id,
           status: "PENDING",
         },
         data: { status: "REVOKED" },
@@ -341,6 +351,7 @@ export async function regenerateFoundingApplicationInvitation(
           tokenHash,
           type: "FOUNDING_MEMBER",
           email: current.email,
+          foundingApplicationId: current.id,
           expiresAt,
         },
       });
@@ -353,6 +364,10 @@ export async function regenerateFoundingApplicationInvitation(
     if (message === "APPLICATION_NOT_APPROVED")
       return actionError(
         "Only approved applications can receive a new invitation",
+      );
+    if (message === "APPLICATION_EMAIL_UNVERIFIED")
+      return actionError(
+        "The applicant must verify their email before receiving an invitation",
       );
     console.error(
       "Failed to regenerate founding application invitation",
@@ -367,7 +382,7 @@ export async function regenerateFoundingApplicationInvitation(
       warning =
         "A new invitation was created, but it could not be emailed because email is not configured.";
     } else {
-      const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://djcovery.com"}/sign-up?role=dj&invitation=${encodeURIComponent(rawInvitationToken)}`;
+      const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://djcovery.com"}/founding-djs/invitation/${encodeURIComponent(rawInvitationToken)}`;
       const result = await resend.emails.send({
         from: process.env.EMAIL_FROM ?? "noreply@djcovery.com",
         to: application.email,
@@ -436,10 +451,14 @@ export async function changeFoundingApplicationStatus(
           name: true,
           status: true,
           resumeTokenHash: true,
+          emailVerifiedAt: true,
         },
       });
       if (!current) throw new Error("APPLICATION_NOT_FOUND");
       if (current.resumeTokenHash) throw new Error("APPLICATION_NOT_SUBMITTED");
+      if (status === "APPROVED" && !current.emailVerifiedAt) {
+        throw new Error("APPLICATION_EMAIL_UNVERIFIED");
+      }
       if (!ACTIVE_REVIEW_STATUSES.includes(current.status)) {
         throw new Error("APPLICATION_ALREADY_DECIDED");
       }
@@ -487,6 +506,7 @@ export async function changeFoundingApplicationStatus(
             tokenHash: invitationTokenHash,
             type: "FOUNDING_MEMBER",
             email: current.email,
+            foundingApplicationId: current.id,
             expiresAt,
           },
         });
@@ -500,6 +520,10 @@ export async function changeFoundingApplicationStatus(
     if (message === "APPLICATION_NOT_SUBMITTED")
       return actionError(
         "This application has not been submitted yet. Ask the applicant to complete and submit it before reviewing.",
+      );
+    if (message === "APPLICATION_EMAIL_UNVERIFIED")
+      return actionError(
+        "The applicant must verify their email before receiving an invitation",
       );
     if (message === "APPLICATION_ALREADY_DECIDED")
       return actionError("This application has already been decided");
@@ -523,7 +547,7 @@ export async function changeFoundingApplicationStatus(
         `[Founding application] Email service unavailable for application ${applicationId}`,
       );
     } else if (status === "APPROVED" && rawInvitationToken && resend) {
-      const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://djcovery.com"}/sign-up?role=dj&invitation=${encodeURIComponent(rawInvitationToken)}`;
+      const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://djcovery.com"}/founding-djs/invitation/${encodeURIComponent(rawInvitationToken)}`;
       const result = await resend!.emails.send({
         from: process.env.EMAIL_FROM ?? "noreply@djcovery.com",
         to: application.email,
