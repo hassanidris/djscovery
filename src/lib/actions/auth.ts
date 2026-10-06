@@ -22,17 +22,44 @@ import {
   securityAlertSubject,
   securityAlertEmailHtml,
 } from "@/lib/email/templates/securityAlert";
+import {
+  acceptFoundingInvitation,
+  getValidFoundingInvitation,
+} from "@/lib/founding/invitations";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://djcovery.com";
+const FOUNDING_INVITATION_COOKIE = "founding_invitation_token";
+
+function invitationErrorUrl(token: string, reason: string): string {
+  const error =
+    reason === "email_mismatch"
+      ? "email_mismatch"
+      : reason === "already_linked"
+        ? "already_linked"
+        : "invalid_invitation";
+  return `/founding-djs/invitation/${encodeURIComponent(token)}?error=${error}`;
+}
+
+function authErrorUrl(
+  path: "/sign-in" | "/sign-up",
+  token: string,
+  message: string,
+) {
+  const params = new URLSearchParams({ error: message });
+  if (token) params.set("invitationToken", token);
+  if (path === "/sign-up" && token) params.set("role", "dj");
+  return `${path}?${params.toString()}`;
+}
 
 export async function signIn(formData: FormData) {
+  const invitationToken = String(formData.get("invitationToken") ?? "");
   const parsed = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
   if (!parsed.success) {
     const message = parsed.error.errors[0]?.message ?? "Invalid input";
-    redirect(`/sign-in?error=${encodeURIComponent(message)}`);
+    redirect(authErrorUrl("/sign-in", invitationToken, message));
   }
 
   const { email } = parsed.data;
@@ -43,14 +70,21 @@ export async function signIn(formData: FormData) {
   );
   if (!rateLimitResult.success) {
     redirect(
-      `/sign-in?error=${encodeURIComponent(rateLimitMessage("sign-in", rateLimitResult.resetAt))}`,
+      authErrorUrl(
+        "/sign-in",
+        invitationToken,
+        rateLimitMessage("sign-in", rateLimitResult.resetAt),
+      ),
     );
   }
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
-  if (!data.user) redirect("/sign-in?error=Authentication+failed");
+  if (error) redirect(authErrorUrl("/sign-in", invitationToken, error.message));
+  if (!data.user)
+    redirect(
+      authErrorUrl("/sign-in", invitationToken, "Authentication failed"),
+    );
 
   const supabaseUser = data.user;
   const { roles, onboardingComplete } = await prisma.$transaction(
@@ -103,6 +137,20 @@ export async function signIn(formData: FormData) {
     },
   );
 
+  if (invitationToken) {
+    const result = await acceptFoundingInvitation(
+      invitationToken,
+      supabaseUser.id,
+      supabaseUser.email ?? "",
+    );
+    if (!result.success) {
+      await supabase.auth.signOut();
+      redirect(invitationErrorUrl(invitationToken, result.reason));
+    }
+    (await cookies()).delete(FOUNDING_INVITATION_COOKIE);
+    redirect(`/become-dj?foundingApplicationId=${result.applicationId}`);
+  }
+
   if (roles.includes("ADMIN")) redirect("/admin");
   const hasCompletedOnboarding =
     onboardingComplete || roles.includes("DJ") || roles.includes("ORGANIZER");
@@ -111,6 +159,7 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+  const invitationToken = String(formData.get("invitationToken") ?? "");
   const rawDisplayName =
     (formData.get("displayName") as string | null)?.trim() ?? "";
 
@@ -122,10 +171,18 @@ export async function signUp(formData: FormData) {
   });
   if (!parsed.success) {
     const message = parsed.error.errors[0]?.message ?? "Invalid input";
-    redirect(`/sign-up?error=${encodeURIComponent(message)}`);
+    redirect(authErrorUrl("/sign-up", invitationToken, message));
   }
 
   const { email, password, role, displayName } = parsed.data;
+  if (invitationToken) {
+    const invitation = await getValidFoundingInvitation(invitationToken);
+    if (!invitation) redirect(invitationErrorUrl(invitationToken, "invalid"));
+    if (invitation.email?.trim().toLowerCase() !== email.trim().toLowerCase()) {
+      redirect(invitationErrorUrl(invitationToken, "email_mismatch"));
+    }
+  }
+  const selectedRole = invitationToken ? "dj" : role;
   const signUpRateLimit = await rateLimit(
     `auth:sign-up:${email.toLowerCase()}`,
     3,
@@ -133,8 +190,22 @@ export async function signUp(formData: FormData) {
   );
   if (!signUpRateLimit.success) {
     redirect(
-      `/sign-up?error=${encodeURIComponent(rateLimitMessage("sign-up", signUpRateLimit.resetAt))}`,
+      authErrorUrl(
+        "/sign-up",
+        invitationToken,
+        rateLimitMessage("sign-up", signUpRateLimit.resetAt),
+      ),
     );
+  }
+
+  if (invitationToken) {
+    (await cookies()).set(FOUNDING_INVITATION_COOKIE, invitationToken, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
   }
 
   const supabase = await createClient();
@@ -143,13 +214,13 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
-      data: { role, displayName }, // stored in user_metadata — callback reads this
-      emailRedirectTo: role
-        ? `${BASE_URL}/auth/callback?pending_role=${encodeURIComponent(role)}`
+      data: { role: selectedRole, displayName }, // stored in user_metadata — callback reads this
+      emailRedirectTo: selectedRole
+        ? `${BASE_URL}/auth/callback?pending_role=${encodeURIComponent(selectedRole)}`
         : `${BASE_URL}/auth/callback`,
     },
   });
-  if (error) redirect(`/sign-up?error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(authErrorUrl("/sign-up", invitationToken, error.message));
 
   // Email confirmation disabled (dev/local) — session returned immediately
   if (data.session && data.user) {
@@ -171,7 +242,7 @@ export async function signUp(formData: FormData) {
           update: {},
           create: { userId },
         });
-        if (role === "") {
+        if (selectedRole === "") {
           const existing = await tx.fanProfile.findUnique({
             where: { userId },
           });
@@ -198,11 +269,28 @@ export async function signUp(formData: FormData) {
       });
     } catch {
       await supabase.auth.signOut();
-      redirect("/sign-up?error=account_setup_failed");
+      redirect(
+        authErrorUrl("/sign-up", invitationToken, "account_setup_failed"),
+      );
     }
 
-    if (role === "dj") redirect("/become-dj");
-    if (role === "organizer") redirect("/become-organizer");
+    if (invitationToken) {
+      const accepted = await acceptFoundingInvitation(
+        invitationToken,
+        userId,
+        userEmail,
+      );
+      if (!accepted.success) {
+        await supabase.auth.signOut();
+        (await cookies()).delete(FOUNDING_INVITATION_COOKIE);
+        redirect(invitationErrorUrl(invitationToken, accepted.reason));
+      }
+      (await cookies()).delete(FOUNDING_INVITATION_COOKIE);
+      redirect(`/become-dj?foundingApplicationId=${accepted.applicationId}`);
+    }
+
+    if (selectedRole === "dj") redirect("/become-dj");
+    if (selectedRole === "organizer") redirect("/become-organizer");
     redirect("/");
   }
 
@@ -290,7 +378,25 @@ export async function updatePassword(formData: FormData) {
 export async function signInWithGoogle(formData: FormData) {
   const rawRole = (formData.get("role") as string) ?? "";
   const roleParsed = roleSchema.safeParse(rawRole);
-  const role = roleParsed.success ? roleParsed.data : "";
+  const invitationToken = String(formData.get("invitationToken") ?? "");
+  const role = invitationToken
+    ? "dj"
+    : roleParsed.success
+      ? roleParsed.data
+      : "";
+
+  if (invitationToken) {
+    const invitation = await getValidFoundingInvitation(invitationToken);
+    if (!invitation) redirect(invitationErrorUrl(invitationToken, "invalid"));
+    const cookieStore = await cookies();
+    cookieStore.set(FOUNDING_INVITATION_COOKIE, invitationToken, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+  }
 
   const cookieStore = await cookies();
   cookieStore.set("pending_role", role, {
@@ -316,7 +422,11 @@ export async function signInWithGoogle(formData: FormData) {
 
   if (error || !data.url) {
     redirect(
-      `/sign-in?error=${encodeURIComponent(error?.message ?? "Google sign-in failed")}`,
+      authErrorUrl(
+        "/sign-in",
+        invitationToken,
+        error?.message ?? "Google sign-in failed",
+      ),
     );
   }
   redirect(data.url);

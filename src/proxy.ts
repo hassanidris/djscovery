@@ -21,6 +21,7 @@ const ALWAYS_PUBLIC_PATHS = [
   "/update-password",
   "/auth/callback",
   "/founding-djs",
+  "/become-dj",
 ];
 
 // Paths that remain accessible in BETA mode (in addition to ALWAYS_PUBLIC_PATHS)
@@ -206,6 +207,14 @@ export async function proxy(request: NextRequest) {
   }
 
   setSecurityHeaders(supabaseResponse);
+
+  if (request.nextUrl.pathname.startsWith("/founding-djs/invitation/")) {
+    supabaseResponse.headers.set(
+      "Cache-Control",
+      "private, no-store, max-age=0",
+    );
+    supabaseResponse.headers.set("Referrer-Policy", "no-referrer");
+  }
 
   return supabaseResponse;
 }

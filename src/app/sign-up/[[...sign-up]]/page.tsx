@@ -3,15 +3,30 @@ import SignUpForm from "./SignUpForm";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; role?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    role?: string;
+    invitationToken?: string;
+    invitation?: string;
+  }>;
 }) {
-  const { error, role } = await searchParams;
+  const {
+    error,
+    role,
+    invitationToken: rawInvitationToken,
+    invitation,
+  } = await searchParams;
+  const invitationToken = rawInvitationToken ?? invitation;
   const defaultRole =
     role === "dj" ? "dj" : role === "organizer" ? "organizer" : undefined;
 
   return (
     <div className="flex min-h-[calc(100vh-96px)] items-center justify-center px-4">
-      <SignUpForm error={error} defaultRole={defaultRole} />
+      <SignUpForm
+        error={error}
+        defaultRole={defaultRole}
+        invitationToken={invitationToken}
+      />
     </div>
   );
 }
