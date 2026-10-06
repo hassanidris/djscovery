@@ -1361,7 +1361,7 @@ model InvitationToken {
 model FoundingMember {
   id                    Int                  @id @default(autoincrement())
   djProfileId           Int                  @unique
-  foundingNumber        Int                  @unique
+  foundingNumber        Int?                 @unique
   status                FoundingMemberStatus @default(PENDING_ONBOARDING)
   priorityBoost         Int                  @default(0)
   homepageFeatured      Boolean              @default(false)
@@ -1679,6 +1679,7 @@ enum FoundingApplicationStatus {
   APPROVED
   REJECTED
   WITHDRAWN
+  COMPLETED
 }
 
 enum InvitationType {

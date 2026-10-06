@@ -24,6 +24,10 @@ import {
   accountSuspendedSubject,
   accountSuspendedHtml,
 } from "@/lib/email/templates/accountSuspended";
+import {
+  foundingWelcomeSubject,
+  foundingWelcomeHtml,
+} from "@/lib/email/templates/foundingWelcome";
 import { z } from "zod";
 
 type ActionResult = { success: true } | { error: string };
@@ -49,41 +53,89 @@ export async function approveDjProfile(
         slug: true,
         stageName: true,
         user: { select: { email: true, name: true } },
+        foundingMember: {
+          select: {
+            id: true,
+            status: true,
+          },
+        },
       },
     });
     if (!profile) return { error: "DJ profile not found" };
 
-    await prisma.$transaction([
-      prisma.djProfile.update({
+    const isFoundingMember =
+      profile.foundingMember?.status === "PENDING_ONBOARDING";
+
+    let foundingNumber: number | undefined;
+
+    await prisma.$transaction(async (tx) => {
+      if (isFoundingMember) {
+        const maxFoundingNumber = await tx.foundingMember.findFirst({
+          orderBy: { foundingNumber: "desc" },
+          select: { foundingNumber: true },
+        });
+        foundingNumber = (maxFoundingNumber?.foundingNumber ?? 0) + 1;
+
+        await tx.foundingMember.update({
+          where: { id: profile.foundingMember!.id },
+          data: {
+            status: "ACTIVE",
+            foundingNumber,
+          },
+        });
+      }
+
+      await tx.djProfile.update({
         where: { id: djProfileId },
-        data: { status: "APPROVED" },
-      }),
-      prisma.notification.create({
+        data: {
+          status: "APPROVED",
+          ...(isFoundingMember && {
+            isFoundingMember: true,
+            foundingNumber,
+          }),
+        },
+      });
+
+      await tx.notification.create({
         data: {
           type: "PROFILE_APPROVED",
           recipientId: profile.userId,
           data: { djProfileId },
         },
-      }),
-      prisma.adminActionLog.create({
+      });
+
+      await tx.adminActionLog.create({
         data: {
           adminId,
           action: "APPROVE_DJ",
           targetType: "DjProfile",
           targetId: String(djProfileId),
         },
-      }),
-    ]);
-
-    await sendEmail({
-      to: profile.user.email,
-      userId: profile.userId,
-      emailType: "PROFILE_APPROVED",
-      subject: profileApprovedSubject,
-      html: profileApprovedHtml({
-        name: profile.user.name ?? profile.stageName,
-      }),
+      });
     });
+
+    if (isFoundingMember && foundingNumber) {
+      await sendEmail({
+        to: profile.user.email,
+        userId: profile.userId,
+        emailType: "FOUNDING_WELCOME",
+        subject: foundingWelcomeSubject,
+        html: foundingWelcomeHtml({
+          name: profile.user.name ?? profile.stageName,
+          foundingNumber,
+        }),
+      });
+    } else {
+      await sendEmail({
+        to: profile.user.email,
+        userId: profile.userId,
+        emailType: "PROFILE_APPROVED",
+        subject: profileApprovedSubject,
+        html: profileApprovedHtml({
+          name: profile.user.name ?? profile.stageName,
+        }),
+      });
+    }
 
     revalidatePath("/admin/djs");
     revalidatePath(`/djs/${profile.slug}`);

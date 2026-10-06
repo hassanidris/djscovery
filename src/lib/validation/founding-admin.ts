@@ -7,6 +7,7 @@ export const FOUNDING_APPLICATION_STATUSES = [
   "APPROVED",
   "REJECTED",
   "WITHDRAWN",
+  "COMPLETED",
 ] as const;
 
 export const FoundingApplicationIdSchema = z.object({

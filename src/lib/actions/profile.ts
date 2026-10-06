@@ -183,6 +183,7 @@ const DjProfileInputSchema = z
       )
       .max(20, "Up to 20 venues allowed")
       .optional(),
+    foundingApplicationId: z.number().int().positive().optional(),
   })
   .refine(
     (data) => {
@@ -344,6 +345,7 @@ export async function createDjProfile(
       feeMax,
       feeCurrency,
       venues,
+      foundingApplicationId,
     } = parsed.data;
 
     const city = await prisma.city.findFirst({
@@ -354,6 +356,25 @@ export async function createDjProfile(
       return {
         error: "The selected city does not belong to the selected country.",
       };
+    }
+
+    let foundingApplication: { id: number; email: string } | null = null;
+    if (foundingApplicationId) {
+      foundingApplication = await prisma.foundingApplication.findFirst({
+        where: {
+          id: foundingApplicationId,
+          status: "APPROVED",
+          emailVerifiedAt: { not: null },
+          deletedAt: { equals: null },
+          userId: user.id,
+        },
+        select: { id: true, email: true },
+      });
+      if (!foundingApplication) {
+        return {
+          error: "Invalid or unauthorized founding application",
+        };
+      }
     }
 
     const slug = await makeUniqueSlug(stageName, user.id);
@@ -478,6 +499,20 @@ export async function createDjProfile(
         where: { id: user.id },
         data: { onboardingComplete: true },
       });
+
+      if (foundingApplication) {
+        await tx.foundingApplication.update({
+          where: { id: foundingApplication.id },
+          data: { status: "COMPLETED", djProfileId: profile.id },
+        });
+
+        await tx.foundingMember.create({
+          data: {
+            djProfileId: profile.id,
+            status: "PENDING_ONBOARDING",
+          },
+        });
+      }
 
       if (isNewProfile) {
         const admins = await tx.userRole.findMany({

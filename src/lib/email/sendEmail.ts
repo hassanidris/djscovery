@@ -12,7 +12,8 @@ type ExtendedEmailType =
   | EmailType
   | "BOOKING_INQUIRY"
   | "BOOKING_INQUIRY_RESPONSE"
-  | "BOOKING_INQUIRY_MESSAGE";
+  | "BOOKING_INQUIRY_MESSAGE"
+  | "FOUNDING_WELCOME";
 
 interface SendEmailParams {
   to: string;
