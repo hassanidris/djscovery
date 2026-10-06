@@ -48,7 +48,8 @@ export async function GET(request: NextRequest) {
     });
 
     for (const invitation of reminders) {
-      if (!resend || !invitation.email || !invitation.foundingApplication) continue;
+      if (!resend || !invitation.email || !invitation.foundingApplication)
+        continue;
       const result = await resend.emails.send({
         from: process.env.EMAIL_FROM ?? "noreply@djcovery.com",
         to: invitation.email,
@@ -76,7 +77,11 @@ export async function GET(request: NextRequest) {
     });
     for (const invitation of pendingExpired) {
       const updated = await prisma.invitationToken.updateMany({
-        where: { id: invitation.id, status: "PENDING", expiresAt: { lte: now } },
+        where: {
+          id: invitation.id,
+          status: "PENDING",
+          expiresAt: { lte: now },
+        },
         data: { status: "EXPIRED" },
       });
       invitationsExpired += updated.count;
@@ -97,7 +102,8 @@ export async function GET(request: NextRequest) {
       },
     });
     for (const invitation of expiredWithoutEmail) {
-      if (!resend || !invitation.email || !invitation.foundingApplication) continue;
+      if (!resend || !invitation.email || !invitation.foundingApplication)
+        continue;
       const result = await resend.emails.send({
         from: process.env.EMAIL_FROM ?? "noreply@djcovery.com",
         to: invitation.email,
@@ -108,7 +114,11 @@ export async function GET(request: NextRequest) {
       });
       if (result.error) continue;
       const updated = await prisma.invitationToken.updateMany({
-        where: { id: invitation.id, status: "EXPIRED", expiredEmailSentAt: null },
+        where: {
+          id: invitation.id,
+          status: "EXPIRED",
+          expiredEmailSentAt: null,
+        },
         data: { expiredEmailSentAt: new Date() },
       });
       expiredEmailsSent += updated.count;

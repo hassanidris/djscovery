@@ -40,7 +40,11 @@ function invitationErrorUrl(token: string, reason: string): string {
   return `/founding-djs/invitation/${encodeURIComponent(token)}?error=${error}`;
 }
 
-function authErrorUrl(path: "/sign-in" | "/sign-up", token: string, message: string) {
+function authErrorUrl(
+  path: "/sign-in" | "/sign-up",
+  token: string,
+  message: string,
+) {
   const params = new URLSearchParams({ error: message });
   if (token) params.set("invitationToken", token);
   if (path === "/sign-up" && token) params.set("role", "dj");
@@ -76,10 +80,11 @@ export async function signIn(formData: FormData) {
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error)
-    redirect(authErrorUrl("/sign-in", invitationToken, error.message));
+  if (error) redirect(authErrorUrl("/sign-in", invitationToken, error.message));
   if (!data.user)
-    redirect(authErrorUrl("/sign-in", invitationToken, "Authentication failed"));
+    redirect(
+      authErrorUrl("/sign-in", invitationToken, "Authentication failed"),
+    );
 
   const supabaseUser = data.user;
   const { roles, onboardingComplete } = await prisma.$transaction(
@@ -215,8 +220,7 @@ export async function signUp(formData: FormData) {
         : `${BASE_URL}/auth/callback`,
     },
   });
-  if (error)
-    redirect(authErrorUrl("/sign-up", invitationToken, error.message));
+  if (error) redirect(authErrorUrl("/sign-up", invitationToken, error.message));
 
   // Email confirmation disabled (dev/local) — session returned immediately
   if (data.session && data.user) {
@@ -265,7 +269,9 @@ export async function signUp(formData: FormData) {
       });
     } catch {
       await supabase.auth.signOut();
-      redirect(authErrorUrl("/sign-up", invitationToken, "account_setup_failed"));
+      redirect(
+        authErrorUrl("/sign-up", invitationToken, "account_setup_failed"),
+      );
     }
 
     if (invitationToken) {

@@ -136,55 +136,58 @@ export default function SignUpForm({
 
       {invitationToken && (
         <p className="rounded-lg border border-green-500/20 bg-green-500/5 px-3 py-2 text-center text-sm text-green-200">
-          Create your DJ account using the email address that received your invitation.
+          Create your DJ account using the email address that received your
+          invitation.
         </p>
       )}
 
       {/* Role selector */}
-      {!invitationToken && <div className="flex flex-col gap-2" style={{ gap: "var(--space-2)" }}>
-        <p className="text-center text-xs text-gray-400">
-          I&apos;m joining as a…
-        </p>
-        <div
-          className="grid grid-cols-3 gap-2"
-          style={{ gap: "var(--space-2)" }}
-        >
-          {ROLES.map((r) => (
-            <button
-              key={r.value}
-              type="button"
-              onClick={() => {
-                setSelected(r.value);
-                setShowRoleError(false);
-              }}
-              className={`flex flex-col items-center gap-1 rounded-lg border p-3 text-center transition-all duration-200 ${
-                selected === r.value
-                  ? "border-h_red bg-h_red/10 text-white"
-                  : "border-white/10 bg-white/5 text-gray-400 hover:border-white/30"
-              }`}
-              style={{ gap: "var(--space-1)", padding: "var(--space-3)" }}
-            >
-              {r.icon}
-              <span className="text-xs font-semibold">{r.label}</span>
-            </button>
-          ))}
+      {!invitationToken && (
+        <div className="flex flex-col gap-2" style={{ gap: "var(--space-2)" }}>
+          <p className="text-center text-xs text-gray-400">
+            I&apos;m joining as a…
+          </p>
+          <div
+            className="grid grid-cols-3 gap-2"
+            style={{ gap: "var(--space-2)" }}
+          >
+            {ROLES.map((r) => (
+              <button
+                key={r.value}
+                type="button"
+                onClick={() => {
+                  setSelected(r.value);
+                  setShowRoleError(false);
+                }}
+                className={`flex flex-col items-center gap-1 rounded-lg border p-3 text-center transition-all duration-200 ${
+                  selected === r.value
+                    ? "border-h_red bg-h_red/10 text-white"
+                    : "border-white/10 bg-white/5 text-gray-400 hover:border-white/30"
+                }`}
+                style={{ gap: "var(--space-1)", padding: "var(--space-3)" }}
+              >
+                {r.icon}
+                <span className="text-xs font-semibold">{r.label}</span>
+              </button>
+            ))}
+          </div>
+          {showRoleError && (
+            <p className="text-center text-xs text-red-400">
+              Please select a role to continue
+            </p>
+          )}
+          {selected && (
+            <p className="text-center text-xs text-gray-400">
+              {ROLES.find((r) => r.value === selected)?.description}
+            </p>
+          )}
+          {!selected && !showRoleError && (
+            <p className="text-center text-xs text-gray-400">
+              Browse DJs, follow artists &amp; attend events
+            </p>
+          )}
         </div>
-        {showRoleError && (
-          <p className="text-center text-xs text-red-400">
-            Please select a role to continue
-          </p>
-        )}
-        {selected && (
-          <p className="text-center text-xs text-gray-400">
-            {ROLES.find((r) => r.value === selected)?.description}
-          </p>
-        )}
-        {!selected && !showRoleError && (
-          <p className="text-center text-xs text-gray-400">
-            Browse DJs, follow artists &amp; attend events
-          </p>
-        )}
-      </div>}
+      )}
 
       {/* Google OAuth */}
       <form
@@ -236,7 +239,11 @@ export default function SignUpForm({
         className="flex flex-col gap-4"
         style={{ gap: "var(--space-4)" }}
       >
-        <input type="hidden" name="role" value={invitationToken ? "dj" : selected || ""} />
+        <input
+          type="hidden"
+          name="role"
+          value={invitationToken ? "dj" : selected || ""}
+        />
         {invitationToken && (
           <input type="hidden" name="invitationToken" value={invitationToken} />
         )}
@@ -286,7 +293,11 @@ export default function SignUpForm({
       <p className="text-center text-sm text-gray-400">
         Already have an account?{" "}
         <Link
-          href={invitationToken ? `/sign-in?invitationToken=${encodeURIComponent(invitationToken)}` : "/sign-in"}
+          href={
+            invitationToken
+              ? `/sign-in?invitationToken=${encodeURIComponent(invitationToken)}`
+              : "/sign-in"
+          }
           className="text-h_redLight underline decoration-1 underline-offset-4 hover:decoration-2"
         >
           Sign in

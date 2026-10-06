@@ -65,7 +65,8 @@ export default async function Page({
 
         {invitationToken && (
           <p className="rounded-lg border border-sky-500/20 bg-sky-500/5 px-3 py-2 text-center text-sm text-sky-200">
-            Sign in with the email address that received your Founding DJ invitation.
+            Sign in with the email address that received your Founding DJ
+            invitation.
           </p>
         )}
 
@@ -73,7 +74,11 @@ export default async function Page({
         <form action={signInWithGoogle}>
           <input type="hidden" name="role" value="" />
           {invitationToken && (
-            <input type="hidden" name="invitationToken" value={invitationToken} />
+            <input
+              type="hidden"
+              name="invitationToken"
+              value={invitationToken}
+            />
           )}
           <Button
             type="submit"
@@ -106,7 +111,11 @@ export default async function Page({
           style={{ gap: "var(--space-4)" }}
         >
           {invitationToken && (
-            <input type="hidden" name="invitationToken" value={invitationToken} />
+            <input
+              type="hidden"
+              name="invitationToken"
+              value={invitationToken}
+            />
           )}
           <Input
             type="email"
@@ -136,7 +145,11 @@ export default async function Page({
         <p className="text-center text-sm text-gray-400">
           No account?{" "}
           <Link
-            href={invitationToken ? `/sign-up?role=dj&invitationToken=${encodeURIComponent(invitationToken)}` : "/sign-up"}
+            href={
+              invitationToken
+                ? `/sign-up?role=dj&invitationToken=${encodeURIComponent(invitationToken)}`
+                : "/sign-up"
+            }
             className="text-h_redLight underline decoration-1 underline-offset-4 hover:decoration-2"
           >
             Sign up

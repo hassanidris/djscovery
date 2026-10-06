@@ -51,10 +51,7 @@ export default async function FoundingInvitationPage({
   const invitation = await getValidFoundingInvitation(token);
   if (!invitation?.email || !invitation.foundingApplication) {
     return (
-      <InvitationMessage
-        error={ERROR_MESSAGES.invalid_invitation}
-        helpLink
-      />
+      <InvitationMessage error={ERROR_MESSAGES.invalid_invitation} helpLink />
     );
   }
 
@@ -73,7 +70,7 @@ export default async function FoundingInvitationPage({
   return (
     <main className="from-h_charcoal min-h-[60vh] bg-linear-to-b to-black px-4 py-12">
       <div className="mx-auto max-w-xl rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-        <p className="text-xs font-semibold tracking-[0.18em] text-h_redLight uppercase">
+        <p className="text-h_redLight text-xs font-semibold tracking-[0.18em] uppercase">
           Founding DJ invitation
         </p>
         <h1 className="mt-3 text-3xl font-bold text-white">
@@ -92,7 +89,10 @@ export default async function FoundingInvitationPage({
         </p>
 
         {visibleError && (
-          <p role="alert" className="mt-5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+          <p
+            role="alert"
+            className="mt-5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200"
+          >
             {visibleError}
           </p>
         )}
@@ -151,14 +151,27 @@ export default async function FoundingInvitationPage({
   );
 }
 
-function InvitationMessage({ error, helpLink = false }: { error: string; helpLink?: boolean }) {
+function InvitationMessage({
+  error,
+  helpLink = false,
+}: {
+  error: string;
+  helpLink?: boolean;
+}) {
   return (
     <main className="from-h_charcoal flex min-h-[60vh] items-center justify-center bg-linear-to-b to-black px-4 py-12">
       <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-        <h1 className="text-2xl font-bold text-white">Invitation unavailable</h1>
-        <p role="alert" className="mt-4 text-gray-300">{error}</p>
+        <h1 className="text-2xl font-bold text-white">
+          Invitation unavailable
+        </h1>
+        <p role="alert" className="mt-4 text-gray-300">
+          {error}
+        </p>
         {helpLink && (
-          <a href="mailto:support@djcovery.com" className="mt-6 inline-block text-h_redLight underline">
+          <a
+            href="mailto:support@djcovery.com"
+            className="text-h_redLight mt-6 inline-block underline"
+          >
             Contact support
           </a>
         )}

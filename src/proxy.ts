@@ -209,7 +209,10 @@ export async function proxy(request: NextRequest) {
   setSecurityHeaders(supabaseResponse);
 
   if (request.nextUrl.pathname.startsWith("/founding-djs/invitation/")) {
-    supabaseResponse.headers.set("Cache-Control", "private, no-store, max-age=0");
+    supabaseResponse.headers.set(
+      "Cache-Control",
+      "private, no-store, max-age=0",
+    );
     supabaseResponse.headers.set("Referrer-Policy", "no-referrer");
   }
 

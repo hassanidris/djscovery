@@ -26,7 +26,9 @@ export async function getValidFoundingInvitation(token: string) {
       id: true,
       email: true,
       expiresAt: true,
-      foundingApplication: { select: { id: true, name: true, stageName: true } },
+      foundingApplication: {
+        select: { id: true, name: true, stageName: true },
+      },
     },
   });
 }
@@ -45,7 +47,9 @@ export async function acceptFoundingInvitation(
     return { success: false, reason: "invalid" };
   }
 
-  if (invitation.email.trim().toLowerCase() !== userEmail.trim().toLowerCase()) {
+  if (
+    invitation.email.trim().toLowerCase() !== userEmail.trim().toLowerCase()
+  ) {
     return { success: false, reason: "email_mismatch" };
   }
   const applicationId = invitation.foundingApplication.id;

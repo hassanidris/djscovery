@@ -10,8 +10,12 @@ export default async function Page({
     invitation?: string;
   }>;
 }) {
-  const { error, role, invitationToken: rawInvitationToken, invitation } =
-    await searchParams;
+  const {
+    error,
+    role,
+    invitationToken: rawInvitationToken,
+    invitation,
+  } = await searchParams;
   const invitationToken = rawInvitationToken ?? invitation;
   const defaultRole =
     role === "dj" ? "dj" : role === "organizer" ? "organizer" : undefined;
