@@ -51,6 +51,7 @@ const nextConfig = {
   },
   images: {
     unoptimized: isCI,
+    domains: ["localhost"],
     remotePatterns: [
       { protocol: "https", hostname: "images.pexels.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
