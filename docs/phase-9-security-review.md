@@ -15,7 +15,7 @@ This document summarizes the security review conducted for Phase 9 - Testing & L
    - Email verification tokens: `src/lib/actions/founding-applications.ts` - hashed with `crypto.createHash("sha256")`
    - Resume tokens: Hashed with SHA-256
 
-2. **Token Format Validation**: 
+2. **Token Format Validation**:
    - Founding invitation tokens validated with regex `/^[a-f0-9]{64}$/i` (64 hex characters)
    - Prevents injection attacks via malformed tokens
 
@@ -29,6 +29,7 @@ This document summarizes the security review conducted for Phase 9 - Testing & L
    - Uses transaction-based consumption with verification
 
 **Recommendations:**
+
 - Consider using bcrypt or argon2 for password hashing (if passwords are stored)
 - Current SHA-256 is appropriate for token hashing (not passwords)
 - Token brute-force protection is adequate due to:
@@ -73,6 +74,7 @@ RLS policies are defined in `prisma/rls-policies.sql` and cover:
    - `BookingInquiryMessage`: Participants can read, admin can read all
 
 **Recommendations:**
+
 - RLS policies are comprehensive and follow least-privilege principle
 - Server-side queries bypass RLS via Prisma service key (appropriate)
 - Audit fields (ipAddress, userAgent) protected by denying client access
@@ -106,6 +108,7 @@ Rate limiting is implemented in `src/lib/rate-limit.ts`:
    - Graceful degradation with console warnings
 
 **Recommendations:**
+
 - Rate limiting is well-implemented
 - Consider adding rate limiting to:
   - Review submission endpoints
@@ -141,6 +144,7 @@ Admin authorization is implemented in `src/lib/auth/require-admin.ts`:
    - Redirects to `/` if not admin
 
 **Recommendations:**
+
 - Authorization checks are robust
 - Database verification prevents role spoofing
 - No action required
@@ -153,14 +157,18 @@ Admin authorization is implemented in `src/lib/auth/require-admin.ts`:
 
 - No Turnstile or CAPTCHA integration found in the codebase
 - No references to Cloudflare Turnstile in source files
+- The public founding application flow (`/founding-djs/apply`) calls `createFoundingApplication` without Turnstile validation or a rate-limit check
+- This allows unauthenticated users to submit applications without protection against automated abuse
 
 **Recommendations:**
+
+- Turnstile is required for the public founding application flow until equivalent rate limiting protects the action, unless the flow is not public
 - Consider adding Turnstile to:
-  - Founding application form (prevent automated submissions)
+  - Founding application form (prevent automated submissions) - REQUIRED if flow remains public
   - Contact form (prevent spam)
   - Review submission (prevent bot reviews)
 - Turnstile is recommended for public-facing forms to prevent abuse
-- Not critical for launch if rate limiting is sufficient
+- Critical for launch if the founding application flow remains public without rate limiting
 
 ## 6. SSRF Validation
 
@@ -185,6 +193,7 @@ External HTTP requests are made in:
    - No external URL fetching
 
 **Recommendations:**
+
 - Add URL whitelist validation for oEmbed endpoints
 - Validate that URLs are from allowed domains (instagram.com, youtube.com, soundcloud.com)
 - Consider using a URL parsing library to validate URLs
@@ -194,39 +203,44 @@ External HTTP requests are made in:
 ## 7. Additional Security Considerations
 
 ### 7.1 Input Validation
+
 - Validation modules exist for: DjRating, DjGigReview, FoundingApplication
 - Field validation (type, range, length) separate from business rules
 - Shared between API routes and server actions
 
 ### 7.2 SQL Injection
+
 - All database queries use Prisma ORM (parameterized)
 - No raw SQL queries found (except in migrations)
 - Safe from SQL injection
 
 ### 7.3 XSS Protection
+
 - Next.js provides built-in XSS protection
 - User-generated content should be sanitized before rendering
 - Review: Check if review text is sanitized before display
 
 ### 7.4 CSRF Protection
+
 - Next.js App Router uses same-site cookies by default
 - Server Actions have built-in CSRF protection
 - No additional CSRF middleware needed
 
 ### 7.5 Authentication
+
 - Supabase Auth for authentication
 - Session management handled by Supabase
 - Secure cookie-based sessions
 
 ## Summary
 
-| Security Area | Status | Priority |
-|--------------|--------|----------|
-| Token Brute-Force Protection | IMPLEMENTED | Low |
-| RLS Policies | IMPLEMENTED | Low |
-| Rate Limiting | IMPLEMENTED | Low |
-| Admin Authorization | IMPLEMENTED | Low |
-| Turnstile Integration | NOT IMPLEMENTED | Medium |
-| SSRF Validation | NEEDS REVIEW | Medium |
+| Security Area                | Status          | Priority |
+| ---------------------------- | --------------- | -------- |
+| Token Brute-Force Protection | IMPLEMENTED     | Low      |
+| RLS Policies                 | IMPLEMENTED     | Low      |
+| Rate Limiting                | IMPLEMENTED     | Low      |
+| Admin Authorization          | IMPLEMENTED     | Low      |
+| Turnstile Integration        | NOT IMPLEMENTED | High     |
+| SSRF Validation              | NEEDS REVIEW    | Medium   |
 
-**Overall Assessment**: Security posture is strong for launch. Critical security controls are in place. Turnstile and SSRF validation are recommended improvements but not blockers for launch.
+**Overall Assessment**: Security posture is strong for launch with one exception. Critical security controls are in place. Turnstile integration is required for the public founding application flow unless equivalent rate limiting is added or the flow is made non-public. SSRF validation is recommended but not a blocker for launch.

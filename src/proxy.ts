@@ -128,17 +128,13 @@ export async function proxy(request: NextRequest) {
     let isBetaExempt = false;
     let user = null;
 
-    // Only fetch user if we need it for beta exemption or protected routes
-    const needsUserCheck = SITE_MODE === "BETA" || isProtected;
+    // Always refresh session for public pages that may render authenticated content
+    const {
+      data: { user: fetchedUser },
+    } = await supabase.auth.getUser();
+    user = fetchedUser;
 
-    if (needsUserCheck) {
-      const {
-        data: { user: fetchedUser },
-      } = await supabase.auth.getUser();
-      user = fetchedUser;
-    }
-
-    // Check for beta exemption (founding members with ACTIVE status)
+    // Only do expensive user lookup for beta exemption when in BETA mode
     if (SITE_MODE === "BETA" && user) {
       try {
         const userProfile = await prisma.user.findUnique({

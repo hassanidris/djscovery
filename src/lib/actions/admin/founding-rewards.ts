@@ -11,8 +11,12 @@ import {
   launchAnnouncementSubject,
   launchAnnouncementHtml,
 } from "@/lib/email/templates/launchAnnouncement";
-
-type ActionResult = { success: true; data?: any } | { error: string };
+import {
+  actionError,
+  actionSuccess,
+  type ActionResult,
+} from "@/lib/actions/action-result";
+import prisma from "@/lib/client";
 
 export async function activateLaunchRewards(
   formData: FormData,
@@ -23,19 +27,27 @@ export async function activateLaunchRewards(
 
   try {
     if (djProfileId) {
-      // Individual activation
-      const result = await activateFoundingRewards(
-        parseInt(djProfileId as string),
-      );
+      const parsedId = Number(djProfileId);
+      if (!Number.isInteger(parsedId) || parsedId <= 0) {
+        return actionError("Invalid profile ID");
+      }
+
+      const result = await activateFoundingRewards(parsedId);
 
       if (result.activatedCount === 0) {
-        return { error: "No founding member to activate" };
+        return actionError("No founding member to activate");
       }
 
       for (const member of result.members) {
+        const profile = await prisma.djProfile.findUnique({
+          where: { id: parsedId },
+          select: { userId: true },
+        });
+        if (!profile) continue;
+
         await sendEmail({
           to: member.email,
-          userId: adminId,
+          userId: profile.userId,
           emailType: "LAUNCH_ANNOUNCEMENT" as any,
           subject: launchAnnouncementSubject(),
           html: launchAnnouncementHtml({
@@ -48,22 +60,24 @@ export async function activateLaunchRewards(
       revalidatePath("/admin/founding/members");
       revalidatePath("/");
 
-      return {
-        success: true,
-        data: result,
-      };
+      return actionSuccess(result);
     } else {
-      // Bulk activation
       const result = await activateFoundingRewards();
 
       if (result.activatedCount === 0) {
-        return { error: "No founding members to activate" };
+        return actionError("No founding members to activate");
       }
 
       for (const member of result.members) {
+        const foundingMember = await prisma.foundingMember.findUnique({
+          where: { id: member.id },
+          select: { djProfile: { select: { userId: true } } },
+        });
+        if (!foundingMember) continue;
+
         await sendEmail({
           to: member.email,
-          userId: adminId,
+          userId: foundingMember.djProfile.userId,
           emailType: "LAUNCH_ANNOUNCEMENT" as any,
           subject: launchAnnouncementSubject(),
           html: launchAnnouncementHtml({
@@ -76,19 +90,15 @@ export async function activateLaunchRewards(
       revalidatePath("/admin/founding/members");
       revalidatePath("/");
 
-      return {
-        success: true,
-        data: result,
-      };
+      return actionSuccess(result);
     }
   } catch (error) {
     console.error("Failed to activate launch rewards:", error);
-    return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to activate launch rewards",
-    };
+    return actionError(
+      error instanceof Error
+        ? error.message
+        : "Failed to activate launch rewards",
+    );
   }
 }
 
@@ -101,37 +111,31 @@ export async function deactivateLaunchRewards(
 
   try {
     if (djProfileId) {
-      // Individual deactivation
-      const count = await deactivateFoundingRewards(
-        parseInt(djProfileId as string),
-      );
+      const parsedId = Number(djProfileId);
+      if (!Number.isInteger(parsedId) || parsedId <= 0) {
+        return actionError("Invalid profile ID");
+      }
+
+      const count = await deactivateFoundingRewards(parsedId);
 
       revalidatePath("/admin/founding/members");
       revalidatePath("/");
 
-      return {
-        success: true,
-        data: { deactivatedCount: count },
-      };
+      return actionSuccess({ deactivatedCount: count });
     } else {
-      // Bulk deactivation
       const count = await deactivateFoundingRewards();
 
       revalidatePath("/admin/founding/members");
       revalidatePath("/");
 
-      return {
-        success: true,
-        data: { deactivatedCount: count },
-      };
+      return actionSuccess({ deactivatedCount: count });
     }
   } catch (error) {
     console.error("Failed to deactivate launch rewards:", error);
-    return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to deactivate launch rewards",
-    };
+    return actionError(
+      error instanceof Error
+        ? error.message
+        : "Failed to deactivate launch rewards",
+    );
   }
 }

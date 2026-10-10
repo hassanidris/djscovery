@@ -1,5 +1,3 @@
-"use server";
-
 import { Prisma } from "@prisma/client";
 import prisma from "@/lib/client";
 import { requireAdmin } from "@/lib/auth/require-admin";
@@ -10,13 +8,12 @@ export type WaitlistListFilters = {
   page?: number;
 };
 
-export async function getWaitlistEntries(
-  filters: WaitlistListFilters = {},
-) {
+export async function getWaitlistEntries(filters: WaitlistListFilters = {}) {
   await requireAdmin();
 
   const query = filters.query?.trim().slice(0, 120) ?? "";
-  const isDj = filters.isDj === "yes" ? true : filters.isDj === "no" ? false : undefined;
+  const isDj =
+    filters.isDj === "yes" ? true : filters.isDj === "no" ? false : undefined;
   const page = Number.isInteger(filters.page)
     ? Math.max(1, filters.page ?? 1)
     : 1;

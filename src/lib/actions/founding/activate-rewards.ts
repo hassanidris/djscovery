@@ -1,4 +1,5 @@
 import prisma from "@/lib/client";
+import { updateSearchScore } from "@/lib/search/composite-score";
 
 export interface ActivationResult {
   activatedCount: number;
@@ -118,7 +119,7 @@ export async function deactivateFoundingRewards(
 
     const members = await tx.foundingMember.findMany({
       where: whereClause,
-      select: { id: true },
+      select: { id: true, djProfileId: true },
     });
 
     if (members.length === 0) {
@@ -149,8 +150,12 @@ export async function deactivateFoundingRewards(
       },
     });
 
-    return members.length;
+    return members;
   });
 
-  return result;
+  for (const member of result) {
+    await updateSearchScore(member.djProfileId);
+  }
+
+  return result.length;
 }

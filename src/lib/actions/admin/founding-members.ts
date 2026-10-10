@@ -9,6 +9,7 @@ import {
   type ActionResult,
 } from "@/lib/actions/action-result";
 import { revalidatePath } from "next/cache";
+import { updateSearchScore } from "@/lib/search/composite-score";
 
 export type FoundingMemberListFilters = {
   query?: string;
@@ -133,15 +134,33 @@ export async function suspendFoundingMember(
   }
 
   try {
-    await prisma.$transaction([
-      prisma.foundingMember.update({
+    const djProfileId = await prisma.$transaction(async (tx) => {
+      const member = await tx.foundingMember.findUnique({
+        where: { id: memberId },
+        select: { djProfileId: true },
+      });
+      if (!member) throw new Error("Member not found");
+
+      await tx.foundingMember.update({
         where: { id: memberId },
         data: {
           status: "SUSPENDED",
           notes: reason || undefined,
         },
-      }),
-      prisma.adminActionLog.create({
+      });
+
+      await tx.djProfile.update({
+        where: { id: member.djProfileId },
+        data: {
+          plan: "FOUNDING",
+          premiumUntil: null,
+          priorityBoost: 1,
+          homepageFeatured: false,
+          homepageFeaturedUntil: null,
+        },
+      });
+
+      await tx.adminActionLog.create({
         data: {
           adminId,
           action: "SUSPEND_FOUNDING_MEMBER",
@@ -149,8 +168,12 @@ export async function suspendFoundingMember(
           targetId: String(memberId),
           metadata: reason ? { reason } : undefined,
         },
-      }),
-    ]);
+      });
+
+      return member.djProfileId;
+    });
+
+    await updateSearchScore(djProfileId);
 
     revalidatePath("/admin/founding/members");
     return actionSuccess();
@@ -173,16 +196,36 @@ export async function revokeFoundingMember(
   }
 
   try {
-    await prisma.$transaction([
-      prisma.foundingMember.update({
+    const djProfileId = await prisma.$transaction(async (tx) => {
+      const member = await tx.foundingMember.findUnique({
+        where: { id: memberId },
+        select: { djProfileId: true },
+      });
+      if (!member) throw new Error("Member not found");
+
+      await tx.foundingMember.update({
         where: { id: memberId },
         data: {
           status: "REVOKED",
           revokedAt: new Date(),
           revocationReason: reason || undefined,
+          foundingNumber: null,
         },
-      }),
-      prisma.adminActionLog.create({
+      });
+
+      await tx.djProfile.update({
+        where: { id: member.djProfileId },
+        data: {
+          plan: "FREE",
+          premiumUntil: null,
+          priorityBoost: 0,
+          homepageFeatured: false,
+          homepageFeaturedUntil: null,
+          foundingNumber: null,
+        },
+      });
+
+      await tx.adminActionLog.create({
         data: {
           adminId,
           action: "REVOKE_FOUNDING_MEMBER",
@@ -190,8 +233,12 @@ export async function revokeFoundingMember(
           targetId: String(memberId),
           metadata: reason ? { reason } : undefined,
         },
-      }),
-    ]);
+      });
+
+      return member.djProfileId;
+    });
+
+    await updateSearchScore(djProfileId);
 
     revalidatePath("/admin/founding/members");
     return actionSuccess();
@@ -213,24 +260,53 @@ export async function activateFoundingMember(
   }
 
   try {
-    await prisma.$transaction([
-      prisma.foundingMember.update({
+    const djProfileId = await prisma.$transaction(async (tx) => {
+      const member = await tx.foundingMember.findUnique({
+        where: { id: memberId },
+        select: {
+          djProfileId: true,
+          status: true,
+          foundingNumber: true,
+        },
+      });
+      if (!member) throw new Error("Member not found");
+
+      const wasRevoked = member.status === "REVOKED";
+
+      await tx.foundingMember.update({
         where: { id: memberId },
         data: {
           status: "ACTIVE",
           revokedAt: null,
           revocationReason: null,
         },
-      }),
-      prisma.adminActionLog.create({
+      });
+
+      await tx.djProfile.update({
+        where: { id: member.djProfileId },
+        data: {
+          plan: "FOUNDING",
+          priorityBoost: 1,
+          homepageFeatured: false,
+          homepageFeaturedUntil: null,
+          premiumUntil: null,
+          foundingNumber: wasRevoked ? null : member.foundingNumber,
+        },
+      });
+
+      await tx.adminActionLog.create({
         data: {
           adminId,
           action: "ACTIVATE_FOUNDING_MEMBER",
           targetType: "FoundingMember",
           targetId: String(memberId),
         },
-      }),
-    ]);
+      });
+
+      return member.djProfileId;
+    });
+
+    await updateSearchScore(djProfileId);
 
     revalidatePath("/admin/founding/members");
     return actionSuccess();
@@ -334,20 +410,43 @@ export async function updateFoundingMemberRewards(
   try {
     const member = await prisma.foundingMember.findUnique({
       where: { id: memberId },
-      select: { djProfileId: true },
+      select: {
+        djProfileId: true,
+        status: true,
+      },
     });
     if (!member) return actionError("Member not found");
 
+    const currentProfile = await prisma.djProfile.findUnique({
+      where: { id: member.djProfileId },
+      select: {
+        homepageFeatured: true,
+        homepageFeaturedUntil: true,
+      },
+    });
+    if (!currentProfile) return actionError("Profile not found");
+
     const now = new Date();
-    const homepageFeaturedUntil = homepageFeatured
-      ? new Date(
-          now.getTime() + (homepageFeaturedDays || 30) * 24 * 60 * 60 * 1000,
-        )
-      : null;
+    const homepageFeaturedUntil =
+      homepageFeatured !== currentProfile.homepageFeatured ||
+      isNaN(homepageFeaturedDays)
+        ? homepageFeatured
+          ? new Date(
+              now.getTime() +
+                (homepageFeaturedDays || 30) * 24 * 60 * 60 * 1000,
+            )
+          : null
+        : currentProfile.homepageFeaturedUntil;
     const premiumUntil =
       premiumDays > 0
         ? new Date(now.getTime() + premiumDays * 24 * 60 * 60 * 1000)
         : null;
+
+    const plan = premiumUntil
+      ? "PREMIUM"
+      : member.status === "ACTIVE"
+        ? "FOUNDING"
+        : "FREE";
 
     await prisma.$transaction([
       prisma.djProfile.update({
@@ -357,6 +456,7 @@ export async function updateFoundingMemberRewards(
           homepageFeatured,
           homepageFeaturedUntil,
           premiumUntil,
+          plan,
         },
       }),
       prisma.adminActionLog.create({
@@ -374,6 +474,8 @@ export async function updateFoundingMemberRewards(
         },
       }),
     ]);
+
+    await updateSearchScore(member.djProfileId);
 
     revalidatePath("/admin/founding/members");
     revalidatePath(`/admin/founding/members/${memberId}`);

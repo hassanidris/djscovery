@@ -4,12 +4,13 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 
 interface BulkActionsFormProps {
+  id?: string;
   action: (
     formData: FormData,
   ) => Promise<{ success: true; data?: any } | { error: string }>;
 }
 
-export function BulkActionsForm({ action }: BulkActionsFormProps) {
+export function BulkActionsForm({ id, action }: BulkActionsFormProps) {
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +36,11 @@ export function BulkActionsForm({ action }: BulkActionsFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-3">
+    <form
+      id={id}
+      onSubmit={handleSubmit}
+      className="flex flex-wrap items-center gap-3"
+    >
       <select
         name="status"
         className="h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-white"

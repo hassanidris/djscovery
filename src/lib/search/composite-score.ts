@@ -12,7 +12,8 @@ export async function updateSearchScore(djProfileId: number) {
     dj.updatedAt > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) ? 50 : 0;
   const verifiedBoost = dj.status === "APPROVED" ? 30 : 0;
   const featuredBoost = dj.featured ? 100 : 0;
-  const priorityMultiplier = dj.priorityBoost || 1;
+
+  const priorityMultiplier = 1 + (dj.priorityBoost || 0) * 0.1;
 
   const searchScore = Math.min(
     1000,

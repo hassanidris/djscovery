@@ -28,6 +28,7 @@ Rollback should be considered when:
 ### Type 1: Code Rollback (Application Issues)
 
 #### When to Use
+
 - Broken deployment
 - Critical bugs in new release
 - Performance regression
@@ -36,6 +37,7 @@ Rollback should be considered when:
 #### Steps
 
 1. **Identify Target Version**
+
 ```bash
 # View recent commits
 git log --oneline -20
@@ -45,6 +47,7 @@ git log --oneline -20
 ```
 
 2. **Stop Current Deployment**
+
 ```bash
 # Stop the application
 pm2 stop djscovery
@@ -53,6 +56,7 @@ systemctl stop djscovery
 ```
 
 3. **Rollback Code**
+
 ```bash
 # Checkout the stable commit
 git checkout abc1234
@@ -66,6 +70,7 @@ npm run build
 ```
 
 4. **Restart Application**
+
 ```bash
 # Start the application
 pm2 start djscovery
@@ -79,12 +84,14 @@ systemctl status djscovery
 ```
 
 5. **Verify Rollback**
+
 - Check application health endpoint
 - Test critical user flows
 - Verify database connectivity
 - Check error logs
 
 6. **Communicate**
+
 - Notify stakeholders of successful rollback
 - Send communication to affected users
 - Update status page (if applicable)
@@ -92,6 +99,7 @@ systemctl status djscovery
 ### Type 2: Database Rollback (Data Issues)
 
 #### When to Use
+
 - Data corruption
 - Accidental data deletion
 - Incorrect data migration
@@ -100,10 +108,11 @@ systemctl status djscovery
 #### Steps
 
 1. **Assess Data Damage**
+
 ```sql
 -- Identify affected tables
-SELECT table_name, table_rows 
-FROM information_schema.tables 
+SELECT table_name, table_rows
+FROM information_schema.tables
 WHERE table_schema = 'public';
 
 -- Check for data integrity issues
@@ -111,30 +120,41 @@ WHERE table_schema = 'public';
 ```
 
 2. **Stop Application Writes**
-```bash
-# Put application in maintenance mode
-# Update environment variable
-MAINTENANCE_MODE=true
 
-# Or stop the application
+```bash
+# Stop the application to prevent writes during database restore
 pm2 stop djscovery
+# or if using systemd:
+systemctl stop djscovery
+
+# For Vercel deployments, use Vercel's maintenance mode:
+# vercel domains add <maintenance-domain> --yes
+# Then update DNS to point to maintenance page
 ```
 
 3. **Restore from Backup**
+
 ```bash
 # Identify the appropriate backup
 # Backups should be named with timestamps
 # Example: backup-2024-01-15-10-00.sql
 
-# Restore the database
-pg_restore -d $DATABASE_URL backup-2024-01-15-10-00.sql
+# Create a new empty database for restore
+createdb $DATABASE_URL_RESTORE
 
-# Or use psql
-psql $DATABASE_URL < backup-2024-01-15-10-00.sql
+# Restore the backup to the new database
+pg_restore -d $DATABASE_URL_RESTORE backup-2024-01-15-10-00.sql
+
+# Or use psql for plain SQL backups
+psql $DATABASE_URL_RESTORE < backup-2024-01-15-10-00.sql
 ```
 
-4. **Verify Data Integrity**
+4. **Verify Restored Database**
+
 ```sql
+-- Connect to the restored database
+psql $DATABASE_URL_RESTORE
+
 -- Check row counts
 SELECT COUNT(*) FROM "User";
 SELECT COUNT(*) FROM "DjProfile";
@@ -142,18 +162,37 @@ SELECT COUNT(*) FROM "Event";
 
 -- Verify critical data
 -- (Custom queries based on issue)
+
+-- Verify schema integrity
+SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
 ```
 
-5. **Restart Application**
-```bash
-# Disable maintenance mode
-MAINTENANCE_MODE=false
+5. **Switch Application to Restored Database**
 
+```bash
+# Only after validation succeeds, update the application to use the restored database
+# Update environment variable to point to restored database
+export DATABASE_URL=$DATABASE_URL_RESTORE
+
+# Or update the application configuration file
+# (e.g., .env.production, Vercel environment variables)
+```
+
+6. **Restart Application**
+
+```bash
 # Start the application
 pm2 start djscovery
+# or if using systemd:
+systemctl start djscovery
+
+# For Vercel deployments, disable maintenance mode:
+# vercel domains remove <maintenance-domain> --yes
+# Then restore DNS to point to production
 ```
 
-6. **Verify Functionality**
+7. **Verify Functionality**
+
 - Test authentication
 - Test data retrieval
 - Test data creation
@@ -162,6 +201,7 @@ pm2 start djscovery
 ### Type 3: Configuration Rollback (Config Issues)
 
 #### When to Use
+
 - Incorrect environment variables
 - Misconfigured services
 - API key issues
@@ -170,6 +210,7 @@ pm2 start djscovery
 #### Steps
 
 1. **Identify Problematic Configuration**
+
 ```bash
 # Review recent changes to .env files
 git diff .env.production
@@ -179,6 +220,7 @@ git diff .env.production
 ```
 
 2. **Restore Previous Configuration**
+
 ```bash
 # Restore from git
 git checkout HEAD~1 .env.production
@@ -188,12 +230,14 @@ nano .env.production
 ```
 
 3. **Restart Application**
+
 ```bash
 # Restart to apply new configuration
 pm2 restart djscovery
 ```
 
 4. **Verify Configuration**
+
 - Check application logs
 - Test affected features
 - Verify third-party service connections
@@ -201,6 +245,7 @@ pm2 restart djscovery
 ### Type 4: Full System Rollback (Complete Failure)
 
 #### When to Use
+
 - Complete system failure
 - Multiple concurrent issues
 - Cannot identify root cause quickly
@@ -209,35 +254,50 @@ pm2 restart djscovery
 #### Steps
 
 1. **Immediate Actions**
+
 ```bash
 # Stop all services
 pm2 stop all
 
-# Enable maintenance page
-# (Configure web server to show maintenance page)
+# For Vercel deployments, enable maintenance mode:
+# vercel domains add <maintenance-domain> --yes
+# Then update DNS to point to maintenance page
+
+# For other deployments, configure web server to show maintenance page
+# (e.g., Nginx: update location block to return 503 with maintenance page)
 ```
 
 2. **Assess Situation**
+
 - Review logs for errors
 - Check system metrics
 - Identify affected components
 - Determine rollback scope
 
 3. **Execute Rollback**
+
 - Follow Type 1 (Code) if code is the issue
 - Follow Type 2 (Database) if data is the issue
 - Follow Type 3 (Config) if config is the issue
 - Execute multiple types if needed
 
 4. **Verify System**
+
 - Test all critical paths
 - Check all integrations
 - Verify data integrity
 - Monitor system metrics
 
 5. **Restore Service**
+
 ```bash
-# Disable maintenance mode
+# For Vercel deployments, disable maintenance mode:
+# vercel domains remove <maintenance-domain> --yes
+# Then restore DNS to point to production
+
+# For other deployments, disable maintenance page
+# (e.g., Nginx: revert location block to normal configuration)
+
 # Restart services
 pm2 start all
 ```
@@ -245,30 +305,35 @@ pm2 start all
 ## Post-Rollback Actions
 
 ### 1. Investigation
+
 - Document the issue
 - Identify root cause
 - Review rollback process
 - Document lessons learned
 
 ### 2. Fix Development
+
 - Create fix in development
 - Test thoroughly in staging
 - Review with team
 - Plan deployment
 
 ### 3. Communication
+
 - Notify stakeholders of rollback
 - Communicate with affected users
 - Provide timeline for fix
 - Update status page
 
 ### 4. Monitoring
+
 - Increased monitoring for 24-48 hours
 - Check for recurring issues
 - Monitor system performance
 - Review error logs
 
 ### 5. Prevention
+
 - Update testing procedures
 - Add regression tests
 - Improve deployment process
@@ -277,12 +342,14 @@ pm2 start all
 ## Rollback Testing
 
 ### Test Rollback Regularly
+
 - Schedule quarterly rollback drills
 - Test rollback procedures in staging
 - Verify backup integrity
 - Train team on rollback process
 
 ### Test Checklist
+
 - [ ] Code rollback tested
 - [ ] Database rollback tested
 - [ ] Configuration rollback tested

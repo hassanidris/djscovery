@@ -198,7 +198,10 @@ export default async function AdminFoundingApplicationsPage({
       </form>
 
       {/* Bulk actions form */}
-      <BulkActionsForm action={bulkChangeFoundingApplicationStatus} />
+      <BulkActionsForm
+        id="bulk-actions-form"
+        action={bulkChangeFoundingApplicationStatus}
+      />
 
       {result.applications.length === 0 ? (
         <AdminEmptyState
@@ -246,6 +249,7 @@ export default async function AdminFoundingApplicationsPage({
                           type="checkbox"
                           name="applicationIds"
                           value={application.id}
+                          form="bulk-actions-form"
                           className="h-4 w-4 rounded border-white/10"
                         />
                       </td>

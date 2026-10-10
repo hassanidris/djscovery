@@ -32,7 +32,16 @@ export async function GET() {
   const csv = [
     headers.join(","),
     ...rows.map((row) =>
-      row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+      row
+        .map((cell) => {
+          const cellStr = String(cell);
+          // Prefix with apostrophe to neutralize CSV formula injection
+          const sanitized = /^[=+\-@\t\n\r]/.test(cellStr)
+            ? `'${cellStr}`
+            : cellStr;
+          return `"${sanitized.replace(/"/g, '""')}"`;
+        })
+        .join(","),
     ),
   ].join("\n");
 
