@@ -1,47 +1,45 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
+function DjLayoutHeaderSkeleton() {
+  return (
+    <div className="mb-8 flex items-center gap-4">
+      <Skeleton className="h-14 w-14 shrink-0 rounded-full" />
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-5 w-40 rounded" />
+          <Skeleton className="h-5 w-16 rounded" />
+        </div>
+        <Skeleton className="h-4 w-28 rounded" />
+      </div>
+    </div>
+  );
+}
+
+function DjNavSkeleton() {
+  return (
+    <div className="w-full shrink-0 md:w-48 lg:w-56">
+      <div className="flex flex-col gap-1">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-9 w-full rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function DjLoading() {
   return (
-    <div className="flex flex-col gap-6">
-      {/* Page header skeleton */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-7 w-48 rounded" />
-          <Skeleton className="h-4 w-72 rounded" />
-        </div>
-        <Skeleton className="mt-2 h-9 w-32 rounded sm:mt-0" />
-      </div>
+    <div className="min-h-screen bg-black">
+      <div className="mx-auto max-w-5xl px-4 py-10 md:px-8">
+        <DjLayoutHeaderSkeleton />
 
-      {/* Tabs skeleton */}
-      <div className="flex gap-1">
-        <Skeleton className="h-8 w-28 rounded-md" />
-        <Skeleton className="h-8 w-24 rounded-md" />
-        <Skeleton className="h-8 w-20 rounded-md" />
-      </div>
-
-      {/* Content skeleton */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="overflow-hidden rounded-xl border border-white/10 bg-white/5"
-          >
-            <Skeleton className="h-40 w-full rounded-none" />
-            <div className="flex flex-col gap-3 p-4">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-5 w-20 rounded" />
-                <Skeleton className="h-4 w-16 rounded" />
-              </div>
-              <Skeleton className="h-4 w-3/4 rounded" />
-              <Skeleton className="h-4 w-1/2 rounded" />
-              <div className="mt-2 flex gap-3 border-t border-white/5 pt-3">
-                <Skeleton className="h-3.5 w-16 rounded" />
-                <Skeleton className="h-3.5 w-16 rounded" />
-                <Skeleton className="h-3.5 w-16 rounded" />
-              </div>
-            </div>
+        {/* Sidebar + main content */}
+        <div className="flex flex-col gap-6 md:flex-row md:gap-12">
+          <DjNavSkeleton />
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-32 w-full rounded-xl" />
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
