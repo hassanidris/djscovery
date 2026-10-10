@@ -55,6 +55,16 @@ export default async function AdminFoundingMemberDetailPage({
 
   const dj = member.djProfile;
 
+  // Calculate premium days remaining (server-side only)
+  const premiumDaysRemaining = dj.premiumUntil
+    ? Math.max(
+        0,
+        Math.ceil(
+          (dj.premiumUntil.getTime() - Date.now()) / (24 * 60 * 60 * 1000),
+        ),
+      )
+    : 0;
+
   return (
     <div className="space-y-7">
       {/* Breadcrumb */}
@@ -73,9 +83,7 @@ export default async function AdminFoundingMemberDetailPage({
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-white">{dj.stageName}</h1>
-            <Badge
-              className={`border text-xs ${STATUS_STYLES[member.status]}`}
-            >
+            <Badge className={`border text-xs ${STATUS_STYLES[member.status]}`}>
               {displayStatus(member.status)}
             </Badge>
           </div>
@@ -246,9 +254,7 @@ export default async function AdminFoundingMemberDetailPage({
                 Premium Until
               </span>
               <span className="text-white">
-                {dj.premiumUntil
-                  ? format(dj.premiumUntil, "MMM d, yyyy")
-                  : "—"}
+                {dj.premiumUntil ? format(dj.premiumUntil, "MMM d, yyyy") : "—"}
               </span>
             </div>
             {member.launchedAt && (
@@ -303,14 +309,7 @@ export default async function AdminFoundingMemberDetailPage({
                 type="number"
                 min={0}
                 max={365}
-                defaultValue={
-                  dj.premiumUntil
-                    ? Math.ceil(
-                        (dj.premiumUntil.getTime() - Date.now()) /
-                          (24 * 60 * 60 * 1000),
-                      )
-                    : 0
-                }
+                defaultValue={premiumDaysRemaining}
                 className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 text-sm text-white"
               />
             </label>
