@@ -174,12 +174,14 @@ export async function getFoundingAnalytics() {
       avgTimeToOnboard: avgTimeToOnboard ? Math.round(avgTimeToOnboard) : null,
     },
     byCountry: countryGroups.map((g) => ({
-      name: countryMap.get(g.countryId) ?? "Unknown",
+      name: g.countryId
+        ? (countryMap.get(g.countryId) ?? "Unknown")
+        : "Unknown",
       count:
         typeof g._count === "number" ? g._count : (g._count as any).id || 0,
     })),
     byCity: cityGroups.map((g) => ({
-      name: cityMap.get(g.cityId) ?? "Unknown",
+      name: g.cityId ? (cityMap.get(g.cityId) ?? "Unknown") : "Unknown",
       count:
         typeof g._count === "number" ? g._count : (g._count as any).id || 0,
     })),
