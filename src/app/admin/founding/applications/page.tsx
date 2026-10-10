@@ -3,9 +3,14 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import AdminEmptyState from "@/components/admin/AdminEmptyState";
-import { getFoundingApplications } from "@/lib/actions/admin/founding-applications";
+import AdminActionButton from "@/components/admin/AdminActionButton";
+import {
+  getFoundingApplications,
+  bulkChangeFoundingApplicationStatus,
+} from "@/lib/actions/admin/founding-applications";
 import { FOUNDING_APPLICATION_STATUSES } from "@/lib/validation/founding-admin";
 import type { FoundingApplicationStatus } from "@prisma/client";
+import { CheckSquare, Square } from "lucide-react";
 
 export const metadata: Metadata = { title: "Founding Applications" };
 
@@ -191,6 +196,31 @@ export default async function AdminFoundingApplicationsPage({
         </button>
       </form>
 
+      {/* Bulk actions form */}
+      <form
+        action={bulkChangeFoundingApplicationStatus}
+        className="flex flex-wrap items-center gap-3"
+      >
+        <select
+          name="status"
+          className="h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-white"
+        >
+          <option value="">Bulk action...</option>
+          <option value="UNDER_REVIEW">Mark as Under Review</option>
+          <option value="APPROVED">Approve Selected</option>
+          <option value="REJECTED">Reject Selected</option>
+        </select>
+        <button
+          type="submit"
+          className="h-10 rounded-md bg-white/10 px-4 text-sm font-medium text-white hover:bg-white/15"
+        >
+          Apply
+        </button>
+        <span className="text-xs text-gray-500">
+          Select applications below to apply bulk actions
+        </span>
+      </form>
+
       {result.applications.length === 0 ? (
         <AdminEmptyState
           title="No applications found"
@@ -203,6 +233,12 @@ export default async function AdminFoundingApplicationsPage({
               <table className="w-full min-w-160 text-sm">
                 <thead>
                   <tr className="border-b border-white/8 bg-white/2">
+                    <th className="w-10 px-4 py-3 text-left font-medium text-gray-400">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-white/10"
+                      />
+                    </th>
                     <th className="px-4 py-3 text-left font-medium text-gray-400">
                       Applicant
                     </th>
@@ -226,6 +262,14 @@ export default async function AdminFoundingApplicationsPage({
                       key={application.id}
                       className="transition-colors hover:bg-white/2"
                     >
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          name="applicationIds"
+                          value={application.id}
+                          className="h-4 w-4 rounded border-white/10"
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/founding/applications/${application.id}`}

@@ -13,7 +13,10 @@ interface FoundingBadgeProps {
   className?: string;
 }
 
-export function FoundingBadge({ foundingNumber, className }: FoundingBadgeProps) {
+export function FoundingBadge({
+  foundingNumber,
+  className,
+}: FoundingBadgeProps) {
   const badgeId = `#FDJ-${String(foundingNumber).padStart(3, "0")}`;
 
   return (
@@ -22,7 +25,7 @@ export function FoundingBadge({ foundingNumber, className }: FoundingBadgeProps)
         <TooltipTrigger asChild>
           <div
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border-2 border-amber-400/30 bg-gradient-to-r from-amber-500/10 to-amber-600/10 px-3 py-1 text-xs font-semibold text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.15)] transition-all hover:border-amber-400/50 hover:shadow-[0_0_16px_rgba(251,191,36,0.25)]",
+              "inline-flex items-center gap-1.5 rounded-full border-2 border-amber-400/30 bg-linear-to-r from-amber-500/10 to-amber-600/10 px-3 py-1 text-xs font-semibold text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.15)] transition-all hover:border-amber-400/50 hover:shadow-[0_0_16px_rgba(251,191,36,0.25)]",
               className,
             )}
           >

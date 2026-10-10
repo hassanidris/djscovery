@@ -593,3 +593,140 @@ export async function changeFoundingApplicationStatus(
   revalidatePath(`/admin/founding/applications/${applicationId}`);
   return actionSuccess(emailWarning ? { warning: emailWarning } : {});
 }
+
+export async function bulkChangeFoundingApplicationStatus(
+  formData: FormData,
+): Promise<ActionResult<{ warning?: string; processed?: number }>> {
+  const { userId: adminId } = await requireAdmin();
+
+  const applicationIds = formData.getAll("applicationIds").map(Number);
+  const status = formData.get("status") as string;
+  const note = formData.get("note") as string | null;
+  const reason = formData.get("reason") as string | null;
+
+  if (!["UNDER_REVIEW", "APPROVED", "REJECTED"].includes(status)) {
+    return actionError("Invalid status");
+  }
+
+  if (applicationIds.length === 0) {
+    return actionError("No applications selected");
+  }
+
+  const rawInvitationTokens =
+    status === "APPROVED"
+      ? applicationIds.map(() => crypto.randomBytes(32).toString("hex"))
+      : [];
+  const invitationTokenHashes = rawInvitationTokens.map((token) =>
+    crypto.createHash("sha256").update(token).digest("hex"),
+  );
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + INVITATION_EXPIRY_DAYS);
+
+  let processed = 0;
+  let emailWarning: string | undefined;
+
+  try {
+    const applications = await prisma.foundingApplication.findMany({
+      where: {
+        id: { in: applicationIds },
+        deletedAt: { equals: null },
+        status: { in: ACTIVE_REVIEW_STATUSES },
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        status: true,
+        emailVerifiedAt: true,
+      },
+    });
+
+    for (const application of applications) {
+      if (status === "APPROVED" && !application.emailVerifiedAt) {
+        continue;
+      }
+
+      const tokenIndex = applications.indexOf(application);
+      const tokenHash =
+        status === "APPROVED" ? invitationTokenHashes[tokenIndex] : null;
+      const rawToken =
+        status === "APPROVED" ? rawInvitationTokens[tokenIndex] : null;
+
+      await prisma.$transaction(async (tx) => {
+        await tx.foundingApplication.update({
+          where: { id: application.id },
+          data: {
+            status: status as FoundingApplicationStatus,
+            reviewedAt:
+              status === "APPROVED" || status === "REJECTED"
+                ? new Date()
+                : undefined,
+            reviewedBy:
+              status === "APPROVED" || status === "REJECTED"
+                ? adminId
+                : undefined,
+            rejectionReason: status === "REJECTED" ? reason : null,
+          },
+        });
+
+        await tx.foundingApplicationStatusLog.create({
+          data: {
+            foundingApplicationId: application.id,
+            previousStatus: application.status,
+            newStatus: status as FoundingApplicationStatus,
+            changedBy: adminId,
+            reason:
+              status === "REJECTED"
+                ? reason
+                : note ||
+                  (status === "UNDER_REVIEW"
+                    ? "Application review started"
+                    : null),
+          },
+        });
+
+        if (tokenHash && rawToken) {
+          await tx.invitationToken.create({
+            data: {
+              tokenHash,
+              type: "FOUNDING_MEMBER",
+              email: application.email,
+              foundingApplicationId: application.id,
+              expiresAt,
+            },
+          });
+        }
+      });
+
+      processed++;
+
+      if (status === "APPROVED" && rawToken && resend) {
+        try {
+          const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://djcovery.com"}/founding-djs/invitation/${encodeURIComponent(rawToken)}`;
+          await resend.emails.send({
+            from: process.env.EMAIL_FROM ?? "noreply@djcovery.com",
+            to: application.email,
+            subject: foundingApplicationInvitationSubject,
+            html: foundingApplicationInvitationEmail({
+              name: application.name,
+              invitationUrl,
+              expiresAt,
+            }),
+          });
+        } catch {
+          emailWarning = "Some invitation emails failed to send.";
+        }
+      }
+    }
+
+    revalidatePath("/admin/founding");
+    revalidatePath("/admin/founding/applications");
+    return actionSuccess({
+      warning: emailWarning,
+      processed,
+    });
+  } catch (error) {
+    console.error("Failed to bulk update founding application status", error);
+    return actionError("Failed to update applications");
+  }
+}

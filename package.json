@@ -32,6 +32,7 @@
     "seed:dj-gig-review-test-data": "tsx scripts/seed-dj-gig-review-test-data.ts",
     "seed:rewards-test": "tsx scripts/seed-rewards-test-data.ts",
     "seed:founding-applications": "tsx scripts/seed-founding-applications.ts",
+    "seed:phase-7": "tsx scripts/seed-phase-7.ts",
     "cleanup:rewards-test": "tsx scripts/cleanup-rewards-test-data.ts",
     "cleanup:founding-applications": "tsx scripts/cleanup-founding-applications.ts",
     "migrate:event-reviews": "tsx scripts/migrate-event-reviews-to-dj-ratings.ts",
