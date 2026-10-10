@@ -23,7 +23,8 @@ export type FeaturedDj = {
 
 /**
  * Fetch featured DJs for homepage.
- * Hybrid approach: includes admin-featured DJs (featured=true) AND high-reputation DJs (reputationScore >= 800)
+ * Hybrid approach: includes admin-featured DJs (featured=true), homepageFeatured (with expiry),
+ * AND high-reputation DJs (reputationScore >= 800)
  * Falls back to demo data in non-production environments.
  */
 export async function getFeaturedDJs(): Promise<FeaturedDj[]> {
@@ -58,10 +59,18 @@ export async function getFeaturedDJs(): Promise<FeaturedDj[]> {
   const cached = await cacheGet<FeaturedDj[]>(cacheKey);
   if (cached) return cached;
 
+  const now = new Date();
+
   const featuredDJs = await prisma.djProfile.findMany({
     where: {
       OR: [
-        { featured: true }, // Admin-pinned
+        { featured: true }, // Admin-pinned (manual override)
+        {
+          AND: [
+            { homepageFeatured: true },
+            { homepageFeaturedUntil: { gt: now } }, // Active homepage feature
+          ],
+        },
         { reputationScore: { gte: 800 } }, // Auto-featured for high reputation
       ],
       status: "APPROVED",

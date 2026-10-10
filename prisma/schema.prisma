@@ -1359,26 +1359,22 @@ model InvitationToken {
 }
 
 model FoundingMember {
-  id                    Int                  @id @default(autoincrement())
-  djProfileId           Int                  @unique
-  foundingNumber        Int?                 @unique
-  status                FoundingMemberStatus @default(PENDING_ONBOARDING)
-  priorityBoost         Int                  @default(0)
-  homepageFeatured      Boolean              @default(false)
-  homepageFeaturedUntil DateTime?
-  premiumUntil          DateTime?
-  joinedAt              DateTime             @default(now())
-  revokedAt             DateTime?
-  revocationReason      String?
-  notes                 String?
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
-  djProfile             DjProfile            @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
+  id               Int                  @id @default(autoincrement())
+  djProfileId      Int                  @unique
+  foundingNumber   Int?                 @unique
+  status           FoundingMemberStatus @default(PENDING_ONBOARDING)
+  launchedAt       DateTime?
+  joinedAt         DateTime             @default(now())
+  revokedAt        DateTime?
+  revocationReason String?
+  notes            String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  djProfile        DjProfile            @relation(fields: [djProfileId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([foundingNumber])
-  @@index([homepageFeatured])
-  @@index([premiumUntil])
+  @@index([launchedAt])
 }
 
 model WaitlistEntry {
@@ -1549,6 +1545,7 @@ enum DjType {
 
 enum DjPlan {
   FREE
+  FOUNDING
   PREMIUM
 }
 

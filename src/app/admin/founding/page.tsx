@@ -12,12 +12,20 @@ export default function AdminFoundingPage() {
           Manage applications, decisions, and invitation status.
         </p>
       </div>
-      <Link
-        href="/admin/founding/applications"
-        className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
-      >
-        Open application management
-      </Link>
+      <div className="flex gap-3">
+        <Link
+          href="/admin/founding/applications"
+          className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
+        >
+          Open application management
+        </Link>
+        <Link
+          href="/admin/founding/members"
+          className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
+        >
+          Manage founding members
+        </Link>
+      </div>
     </div>
   );
 }

@@ -31,7 +31,7 @@ import { getMediaProvider } from "@/lib/media-utils";
 
 type Props = {
   profileId: number;
-  plan: "FREE" | "PREMIUM";
+  plan: "FREE" | "FOUNDING" | "PREMIUM";
   initialMedia: MediaItem[];
   onMediaChange?: (hasChanges: boolean) => void;
 };
