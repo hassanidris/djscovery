@@ -19,7 +19,7 @@ export type ProfileData = {
   feeMax: number | null;
   feeCurrency: string;
   slug: string;
-  plan: "FREE" | "PREMIUM";
+  plan: "FREE" | "FOUNDING" | "PREMIUM";
   managerName: string;
   managerEmail: string;
   managerPhone: string;

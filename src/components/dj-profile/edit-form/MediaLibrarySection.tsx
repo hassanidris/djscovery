@@ -11,7 +11,7 @@ export function MediaLibrarySection({
   onMediaChange,
 }: {
   profileId: number;
-  plan: "FREE" | "PREMIUM";
+  plan: "FREE" | "FOUNDING" | "PREMIUM";
   initialMedia: MediaItem[];
   onMediaChange: (changed: boolean) => void;
 }) {
