@@ -95,6 +95,7 @@ const DjGrid = ({ djs }: DjGridProps) => {
         <div className="flex justify-center pt-2 pb-4">
           <button
             onClick={loadMore}
+            aria-label={`Load more DJs (${djs.length - visibleCount} remaining)`}
             className="bg-h_blackLight/60 hover:ring-h_red cursor-pointer rounded-full px-8 py-2.5 text-sm text-gray-300 ring-1 ring-gray-700 transition-all hover:text-white"
           >
             Load more ({djs.length - visibleCount} remaining)

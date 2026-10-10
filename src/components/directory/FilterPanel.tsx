@@ -219,6 +219,8 @@ const FilterPanel = ({
                 setGenreOpen((o) => !o);
                 closeAllExcept("genre");
               }}
+              aria-label="Select genre"
+              aria-expanded={genreOpen}
               className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
             >
               <span
@@ -287,6 +289,8 @@ const FilterPanel = ({
                 setCountryOpen((o) => !o);
                 closeAllExcept("country");
               }}
+              aria-label="Select country"
+              aria-expanded={countryOpen}
               className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
             >
               <span
@@ -352,6 +356,8 @@ const FilterPanel = ({
                   setCityOpen((o) => !o);
                   closeAllExcept("city");
                 }}
+                aria-label="Select city"
+                aria-expanded={cityOpen}
                 className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
               >
                 <span
@@ -417,6 +423,8 @@ const FilterPanel = ({
                 setDjTypeOpen((o) => !o);
                 closeAllExcept("djType");
               }}
+              aria-label="Select DJ type"
+              aria-expanded={djTypeOpen}
               className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
             >
               <span
@@ -490,6 +498,8 @@ const FilterPanel = ({
                 setSortOpen((o) => !o);
                 closeAllExcept("sort");
               }}
+              aria-label="Sort by"
+              aria-expanded={sortOpen}
               className="bg-h_black/50 focus:ring-h_red flex w-full items-center justify-between rounded-md px-3 py-2 text-xs ring-1 ring-gray-700 outline-none"
             >
               <span className={currentSort ? "text-h_white" : "text-gray-300"}>

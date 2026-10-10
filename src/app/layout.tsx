@@ -42,12 +42,21 @@ export const metadata: Metadata = {
     title: "DJcovery — Where DJs Get Discovered",
     description:
       "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DJcovery - Where DJs Get Discovered",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "DJcovery — Where DJs Get Discovered",
     description:
       "The marketplace for DJ bookings and gig opportunities. Discover top DJs by genre and city, post open gigs, and connect with talent built for events that move people.",
+    images: ["/og-image.png"],
   },
   icons: {
     icon: "/dj_logo_new.svg",
