@@ -63,7 +63,7 @@ function DistributionList({
               </div>
               <div className="h-1.5 w-full rounded-full bg-white/5">
                 <div
-                  className="h-full rounded-full bg-h_red"
+                  className="bg-h_red h-full rounded-full"
                   style={{ width: `${(item.count / maxCount) * 100}%` }}
                 />
               </div>
@@ -190,12 +190,18 @@ export default async function AdminFoundingAnalyticsPage() {
       <section className="grid gap-3 md:grid-cols-2">
         <DistributionList
           title="UTM Sources"
-          items={analytics.utmSources}
+          items={analytics.utmSources.map((item) => ({
+            name: item.source,
+            count: Number(item.count),
+          }))}
           icon={<Target className="h-4 w-4" />}
         />
         <DistributionList
           title="UTM Campaigns"
-          items={analytics.utmCampaigns}
+          items={analytics.utmCampaigns.map((item) => ({
+            name: item.campaign,
+            count: Number(item.count),
+          }))}
           icon={<Target className="h-4 w-4" />}
         />
       </section>

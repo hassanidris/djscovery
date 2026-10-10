@@ -17,8 +17,6 @@ export async function getFoundingAnalytics() {
     cityGroups,
     utmSourceGroups,
     utmCampaignGroups,
-    timeToApproveStats,
-    timeToOnboardStats,
   ] = await prisma.$transaction([
     prisma.foundingApplication.count({
       where: { deletedAt: { equals: null } },
@@ -29,10 +27,12 @@ export async function getFoundingAnalytics() {
       by: ["status"],
       where: { deletedAt: { equals: null } },
       _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
     }),
     prisma.foundingMember.groupBy({
       by: ["status"],
       _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
     }),
     prisma.foundingApplication.groupBy({
       by: ["countryId"],
@@ -68,62 +68,94 @@ export async function getFoundingAnalytics() {
       orderBy: { _count: { utmCampaign: "desc" } },
       take: 10,
     }),
-    prisma.foundingApplication.aggregate({
-      where: {
-        deletedAt: { equals: null },
-        status: "APPROVED",
-        reviewedAt: { not: null },
-      },
-      _avg: {
-        reviewedAt: true,
-      },
-    }),
-    prisma.foundingMember.aggregate({
-      where: { launchedAt: { not: null } },
-      _avg: {
-        launchedAt: true,
-      },
-    }),
   ]);
 
-  const countryIds = countryGroups.map((g) => g.countryId);
-  const cityIds = cityGroups.map((g) => g.cityId);
+  const countryIds = countryGroups
+    .map((g) => g.countryId)
+    .filter((id): id is number => id !== null);
+  const cityIds = cityGroups
+    .map((g) => g.cityId)
+    .filter((id): id is number => id !== null);
 
-  const [countries, cities] = await prisma.$transaction([
-    prisma.country.findMany({
-      where: { id: { in: countryIds } },
-      select: { id: true, name: true },
-    }),
-    prisma.city.findMany({
-      where: { id: { in: cityIds } },
-      select: { id: true, name: true },
-    }),
-  ]);
+  const [countries, cities, approvedApplications, launchedMembers] =
+    await prisma.$transaction([
+      prisma.country.findMany({
+        where: { id: { in: countryIds } },
+        select: { id: true, name: true },
+      }),
+      prisma.city.findMany({
+        where: { id: { in: cityIds } },
+        select: { id: true, name: true },
+      }),
+      prisma.foundingApplication.findMany({
+        where: {
+          deletedAt: { equals: null },
+          status: "APPROVED",
+        },
+        select: { submittedAt: true, reviewedAt: true },
+      }),
+      prisma.foundingMember.findMany({
+        where: {
+          launchedAt: { not: undefined },
+        },
+        select: { joinedAt: true, launchedAt: true },
+      }),
+    ]);
 
   const countryMap = new Map(countries.map((c) => [c.id, c.name]));
   const cityMap = new Map(cities.map((c) => [c.id, c.name]));
 
-  const countsByStatus = Object.fromEntries(
-    applicationStatusGroups.map((g) => [g.status, g._count.id]),
-  );
+  const countsByStatus: Record<string, number> = {};
+  for (const group of applicationStatusGroups) {
+    const count =
+      typeof group._count === "number"
+        ? group._count
+        : (group._count as any).id || 0;
+    countsByStatus[group.status] = count;
+  }
 
   const approved = countsByStatus.APPROVED || 0;
   const reviewed = approved + (countsByStatus.REJECTED || 0);
   const acceptanceRate = reviewed > 0 ? (approved / reviewed) * 100 : 0;
 
-  const memberCounts = Object.fromEntries(
-    memberStatusGroups.map((g) => [g.status, g._count.id]),
-  );
+  const memberCounts: Record<string, number> = {};
+  for (const group of memberStatusGroups) {
+    const count =
+      typeof group._count === "number"
+        ? group._count
+        : (group._count as any).id || 0;
+    memberCounts[group.status] = count;
+  }
   const activeMembers = memberCounts.ACTIVE || 0;
-  const onboardingRate =
-    approved > 0 ? (activeMembers / approved) * 100 : 0;
+  const onboardingRate = approved > 0 ? (activeMembers / approved) * 100 : 0;
 
-  const avgTimeToApprove = timeToApproveStats._avg.reviewedAt
-    ? timeToApproveStats._avg.reviewedAt.getTime()
-    : null;
-  const avgTimeToOnboard = timeToOnboardStats._avg.launchedAt
-    ? timeToOnboardStats._avg.launchedAt.getTime()
-    : null;
+  // Calculate average time to approve
+  const validApprovedApps = approvedApplications.filter(
+    (app) => app.reviewedAt && app.submittedAt,
+  );
+  const avgTimeToApprove =
+    validApprovedApps.length > 0
+      ? validApprovedApps.reduce((sum, app) => {
+          const days =
+            (app.reviewedAt!.getTime() - app.submittedAt!.getTime()) /
+            (1000 * 60 * 60 * 24);
+          return sum + days;
+        }, 0) / validApprovedApps.length
+      : null;
+
+  // Calculate average time to onboard
+  const validLaunchedMembers = launchedMembers.filter(
+    (member) => member.launchedAt && member.joinedAt,
+  );
+  const avgTimeToOnboard =
+    validLaunchedMembers.length > 0
+      ? validLaunchedMembers.reduce((sum, member) => {
+          const days =
+            (member.launchedAt!.getTime() - member.joinedAt!.getTime()) /
+            (1000 * 60 * 60 * 24);
+          return sum + days;
+        }, 0) / validLaunchedMembers.length
+      : null;
 
   return {
     funnel: {
@@ -138,28 +170,28 @@ export async function getFoundingAnalytics() {
       onboardingRate: Math.round(onboardingRate * 10) / 10,
     },
     timing: {
-      avgTimeToApprove: avgTimeToApprove
-        ? Math.round(avgTimeToApprove / (1000 * 60 * 60 * 24))
-        : null,
-      avgTimeToOnboard: avgTimeToOnboard
-        ? Math.round(avgTimeToOnboard / (1000 * 60 * 60 * 24))
-        : null,
+      avgTimeToApprove: avgTimeToApprove ? Math.round(avgTimeToApprove) : null,
+      avgTimeToOnboard: avgTimeToOnboard ? Math.round(avgTimeToOnboard) : null,
     },
     byCountry: countryGroups.map((g) => ({
       name: countryMap.get(g.countryId) ?? "Unknown",
-      count: g._count.id,
+      count:
+        typeof g._count === "number" ? g._count : (g._count as any).id || 0,
     })),
     byCity: cityGroups.map((g) => ({
       name: cityMap.get(g.cityId) ?? "Unknown",
-      count: g._count.id,
+      count:
+        typeof g._count === "number" ? g._count : (g._count as any).id || 0,
     })),
     utmSources: utmSourceGroups.map((g) => ({
       source: g.utmSource ?? "Unknown",
-      count: g._count.id,
+      count:
+        typeof g._count === "number" ? g._count : (g._count as any).id || 0,
     })),
     utmCampaigns: utmCampaignGroups.map((g) => ({
       campaign: g.utmCampaign ?? "Unknown",
-      count: g._count.id,
+      count:
+        typeof g._count === "number" ? g._count : (g._count as any).id || 0,
     })),
   };
 }

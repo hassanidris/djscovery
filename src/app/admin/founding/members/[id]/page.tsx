@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { format, formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import AdminActionButton from "@/components/admin/AdminActionButton";
+import { RewardsForm } from "@/components/admin/RewardsForm";
+import { NotesForm } from "@/components/admin/NotesForm";
 import {
   getFoundingMemberDetail,
   suspendFoundingMember,
@@ -278,60 +280,14 @@ export default async function AdminFoundingMemberDetailPage({
         <h2 className="mb-4 text-sm font-semibold text-gray-200">
           Edit Rewards
         </h2>
-        <form action={updateFoundingMemberRewards} className="space-y-4">
-          <input type="hidden" name="memberId" value={member.id} />
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="text-xs font-medium text-gray-400">
-              Priority Boost (0-10)
-              <input
-                name="priorityBoost"
-                type="number"
-                min={0}
-                max={10}
-                defaultValue={dj.priorityBoost}
-                className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 text-sm text-white"
-              />
-            </label>
-            <label className="text-xs font-medium text-gray-400">
-              Homepage Featured Days
-              <input
-                name="homepageFeaturedDays"
-                type="number"
-                min={0}
-                max={365}
-                defaultValue={dj.homepageFeaturedUntil ? 30 : 0}
-                className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 text-sm text-white"
-              />
-            </label>
-            <label className="text-xs font-medium text-gray-400">
-              Premium Days (0 to clear)
-              <input
-                name="premiumDays"
-                type="number"
-                min={0}
-                max={365}
-                defaultValue={premiumDaysRemaining}
-                className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 text-sm text-white"
-              />
-            </label>
-            <label className="flex items-center gap-2 text-xs font-medium text-gray-400">
-              <input
-                name="homepageFeatured"
-                type="checkbox"
-                value="true"
-                defaultChecked={dj.homepageFeatured}
-                className="h-4 w-4 rounded border-white/10"
-              />
-              Homepage Featured
-            </label>
-          </div>
-          <button
-            type="submit"
-            className="h-10 rounded-md bg-white/10 px-4 text-sm font-medium text-white hover:bg-white/15"
-          >
-            Save rewards
-          </button>
-        </form>
+        <RewardsForm
+          memberId={String(member.id)}
+          action={updateFoundingMemberRewards}
+          defaultPriorityBoost={dj.priorityBoost}
+          defaultHomepageFeaturedDays={dj.homepageFeaturedUntil ? 30 : 0}
+          defaultPremiumDays={premiumDaysRemaining}
+          defaultHomepageFeatured={dj.homepageFeatured}
+        />
       </section>
 
       {/* Notes */}
@@ -339,22 +295,11 @@ export default async function AdminFoundingMemberDetailPage({
         <h2 className="mb-3 text-sm font-semibold text-gray-200">
           Admin Notes
         </h2>
-        <form action={updateFoundingMemberNotes} className="space-y-3">
-          <input type="hidden" name="memberId" value={member.id} />
-          <textarea
-            name="notes"
-            defaultValue={member.notes ?? ""}
-            rows={4}
-            placeholder="Internal notes about this member..."
-            className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-white placeholder:text-gray-500"
-          />
-          <button
-            type="submit"
-            className="h-9 rounded-md bg-white/10 px-4 text-sm font-medium text-white hover:bg-white/15"
-          >
-            Save notes
-          </button>
-        </form>
+        <NotesForm
+          memberId={String(member.id)}
+          action={updateFoundingMemberNotes}
+          defaultNotes={member.notes}
+        />
       </section>
 
       {/* Action log */}

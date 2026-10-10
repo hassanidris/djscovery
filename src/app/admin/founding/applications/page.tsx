@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import AdminActionButton from "@/components/admin/AdminActionButton";
+import { BulkActionsForm } from "@/components/admin/BulkActionsForm";
 import {
   getFoundingApplications,
   bulkChangeFoundingApplicationStatus,
@@ -197,29 +198,7 @@ export default async function AdminFoundingApplicationsPage({
       </form>
 
       {/* Bulk actions form */}
-      <form
-        action={bulkChangeFoundingApplicationStatus}
-        className="flex flex-wrap items-center gap-3"
-      >
-        <select
-          name="status"
-          className="h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-white"
-        >
-          <option value="">Bulk action...</option>
-          <option value="UNDER_REVIEW">Mark as Under Review</option>
-          <option value="APPROVED">Approve Selected</option>
-          <option value="REJECTED">Reject Selected</option>
-        </select>
-        <button
-          type="submit"
-          className="h-10 rounded-md bg-white/10 px-4 text-sm font-medium text-white hover:bg-white/15"
-        >
-          Apply
-        </button>
-        <span className="text-xs text-gray-500">
-          Select applications below to apply bulk actions
-        </span>
-      </form>
+      <BulkActionsForm action={bulkChangeFoundingApplicationStatus} />
 
       {result.applications.length === 0 ? (
         <AdminEmptyState
