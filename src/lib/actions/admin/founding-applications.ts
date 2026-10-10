@@ -37,7 +37,7 @@ const REAPPLICATION_COOLDOWN_DAYS = 30;
 interface ChangeApplicationStatusInput {
   applicationId: number;
   status: "UNDER_REVIEW" | "APPROVED" | "REJECTED";
-  adminId: number;
+  adminId: string;
   note?: string;
   reason?: string;
   invitationTokenHash?: string | null;
@@ -97,9 +97,7 @@ async function changeApplicationStatusInTransaction(
       reviewedAt:
         status === "APPROVED" || status === "REJECTED" ? now : undefined,
       reviewedBy:
-        status === "APPROVED" || status === "REJECTED"
-          ? (String(adminId) as any)
-          : undefined,
+        status === "APPROVED" || status === "REJECTED" ? adminId : undefined,
       rejectionReason: status === "REJECTED" ? reason : null,
     },
   });
@@ -110,7 +108,7 @@ async function changeApplicationStatusInTransaction(
       foundingApplicationId: applicationId,
       previousStatus: current.status,
       newStatus: status,
-      changedBy: String(adminId) as any,
+      changedBy: adminId,
       reason:
         status === "REJECTED"
           ? reason
@@ -542,7 +540,7 @@ export async function changeFoundingApplicationStatus(
       return changeApplicationStatusInTransaction(tx, {
         applicationId,
         status: status as "UNDER_REVIEW" | "APPROVED" | "REJECTED",
-        adminId,
+        adminId: String(adminId),
         note,
         reason,
         invitationTokenHash,
@@ -694,7 +692,7 @@ export async function bulkChangeFoundingApplicationStatus(
           return changeApplicationStatusInTransaction(tx, {
             applicationId: application.id,
             status: status as "UNDER_REVIEW" | "APPROVED" | "REJECTED",
-            adminId,
+            adminId: String(adminId),
             note: note ?? undefined,
             reason: reason ?? undefined,
             invitationTokenHash: tokenHash,

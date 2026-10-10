@@ -129,10 +129,21 @@ export async function proxy(request: NextRequest) {
     let user = null;
 
     // Always refresh session for public pages that may render authenticated content
-    const {
-      data: { user: fetchedUser },
-    } = await supabase.auth.getUser();
-    user = fetchedUser;
+    // Handle case where refresh token is invalid/expired
+    try {
+      const {
+        data: { user: fetchedUser },
+      } = await supabase.auth.getUser();
+      user = fetchedUser;
+    } catch (error) {
+      // If refresh token is invalid, treat as unauthenticated
+      // This can happen with expired sessions or cleared tokens
+      console.debug(
+        "Session refresh failed, treating as unauthenticated:",
+        error,
+      );
+      user = null;
+    }
 
     // Only do expensive user lookup for beta exemption when in BETA mode
     if (SITE_MODE === "BETA" && user) {
