@@ -17,6 +17,7 @@ import {
   HomeGigsSectionSkeleton,
   HomeFeaturedDJsSkeleton,
 } from "@/components/ui/skeletons";
+import StructuredData from "@/components/StructuredData";
 
 export const revalidate = 120; // Cache for 2 minutes
 
@@ -39,6 +40,7 @@ const Homepage = async () => {
 
   return (
     <div className="flex flex-col">
+      <StructuredData />
       {/* Video hero */}
       <Hero />
 

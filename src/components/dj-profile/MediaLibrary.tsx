@@ -257,6 +257,7 @@ export default function MediaLibrary({
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={imageLoading}
+                aria-label="Add photo"
                 className="flex w-28 shrink-0 items-center justify-center rounded-lg border border-dashed border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-500 hover:text-white sm:w-32"
               >
                 <div className="flex aspect-square items-center justify-center">
