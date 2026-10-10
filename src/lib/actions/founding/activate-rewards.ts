@@ -123,7 +123,7 @@ export async function deactivateFoundingRewards(
     });
 
     if (members.length === 0) {
-      return 0;
+      return { members: [] as const, count: 0 };
     }
 
     await tx.foundingMember.updateMany({
@@ -150,12 +150,12 @@ export async function deactivateFoundingRewards(
       },
     });
 
-    return members;
+    return { members, count: members.length };
   });
 
-  for (const member of result) {
+  for (const member of result.members) {
     await updateSearchScore(member.djProfileId);
   }
 
-  return result.length;
+  return result.count;
 }

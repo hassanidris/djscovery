@@ -97,7 +97,9 @@ async function changeApplicationStatusInTransaction(
       reviewedAt:
         status === "APPROVED" || status === "REJECTED" ? now : undefined,
       reviewedBy:
-        status === "APPROVED" || status === "REJECTED" ? adminId : undefined,
+        status === "APPROVED" || status === "REJECTED"
+          ? (String(adminId) as any)
+          : undefined,
       rejectionReason: status === "REJECTED" ? reason : null,
     },
   });
@@ -108,7 +110,7 @@ async function changeApplicationStatusInTransaction(
       foundingApplicationId: applicationId,
       previousStatus: current.status,
       newStatus: status,
-      changedBy: adminId,
+      changedBy: String(adminId) as any,
       reason:
         status === "REJECTED"
           ? reason
@@ -539,7 +541,7 @@ export async function changeFoundingApplicationStatus(
     application = await prisma.$transaction(async (tx) => {
       return changeApplicationStatusInTransaction(tx, {
         applicationId,
-        status,
+        status: status as "UNDER_REVIEW" | "APPROVED" | "REJECTED",
         adminId,
         note,
         reason,
@@ -695,7 +697,7 @@ export async function bulkChangeFoundingApplicationStatus(
             adminId,
             note: note ?? undefined,
             reason: reason ?? undefined,
-            invitationTokenHash,
+            invitationTokenHash: tokenHash,
             expiresAt,
           });
         });

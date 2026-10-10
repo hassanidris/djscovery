@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   activateFoundingRewards,
   deactivateFoundingRewards,
+  type ActivationResult,
 } from "@/lib/actions/founding/activate-rewards";
 import { sendEmail } from "@/lib/email/sendEmail";
 import {
@@ -20,7 +21,7 @@ import prisma from "@/lib/client";
 
 export async function activateLaunchRewards(
   formData: FormData,
-): Promise<ActionResult> {
+): Promise<ActionResult<ActivationResult | { deactivatedCount: number }>> {
   const { userId: adminId } = await requireAdmin();
 
   const djProfileId = formData.get("djProfileId");
@@ -104,7 +105,7 @@ export async function activateLaunchRewards(
 
 export async function deactivateLaunchRewards(
   formData: FormData,
-): Promise<ActionResult> {
+): Promise<ActionResult<{ deactivatedCount: number }>> {
   const { userId: adminId } = await requireAdmin();
 
   const djProfileId = formData.get("djProfileId");
