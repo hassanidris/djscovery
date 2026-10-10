@@ -25,6 +25,14 @@ import {
   Clock,
 } from "lucide-react";
 
+function calculatePremiumDaysRemaining(premiumUntil: Date | null): number {
+  if (!premiumUntil) return 0;
+  return Math.max(
+    0,
+    Math.ceil((premiumUntil.getTime() - Date.now()) / (24 * 60 * 60 * 1000)),
+  );
+}
+
 export const metadata: Metadata = { title: "Founding Member Detail" };
 
 const STATUS_STYLES: Record<FoundingMemberStatus, string> = {
@@ -56,14 +64,7 @@ export default async function AdminFoundingMemberDetailPage({
   const dj = member.djProfile;
 
   // Calculate premium days remaining (server-side only)
-  const premiumDaysRemaining = dj.premiumUntil
-    ? Math.max(
-        0,
-        Math.ceil(
-          (dj.premiumUntil.getTime() - Date.now()) / (24 * 60 * 60 * 1000),
-        ),
-      )
-    : 0;
+  const premiumDaysRemaining = calculatePremiumDaysRemaining(dj.premiumUntil);
 
   return (
     <div className="space-y-7">
