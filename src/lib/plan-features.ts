@@ -5,7 +5,7 @@
 // touching any component or action code.
 // ============================================================
 
-export const DJ_PLANS = ["FREE", "PREMIUM"] as const;
+export const DJ_PLANS = ["FREE", "FOUNDING", "PREMIUM"] as const;
 export type DjPlanTier = (typeof DJ_PLANS)[number];
 
 export interface PlanFeatures {
@@ -37,6 +37,22 @@ export const PLAN_FEATURES: Record<DjPlanTier, PlanFeatures> = {
     maxVideoAudio: 2, // Combined limit for videos + audio
     featuredPlacement: false,
     prioritySearchRanking: false,
+    verifiedBadge: false,
+    advancedProfileSections: false,
+    publicStatsAccess: true,
+    responseRateStats: false,
+    monthlyViews: true,
+    basicAnalyticsAccess: true,
+    advancedAnalyticsAccess: false,
+    bookingInquiries: true,
+    availabilityCalendar: false,
+    advancedBookingTools: false,
+  },
+  FOUNDING: {
+    maxPhotos: 6,
+    maxVideoAudio: 2, // Same limits as FREE (soft cap)
+    featuredPlacement: false,
+    prioritySearchRanking: true, // 1.5x boost
     verifiedBadge: false,
     advancedProfileSections: false,
     publicStatsAccess: true,
@@ -96,11 +112,12 @@ export function getMediaLimit(
 
 /**
  * Normalise a plan string coming from the DB or demo data to a DjPlanTier.
- * Accepts "free"/"FREE" and "premium"/"PREMIUM".
+ * Accepts "free"/"FREE", "founding"/"FOUNDING", and "premium"/"PREMIUM".
  * Falls back to "FREE" for any unknown value.
  */
 export function normalisePlan(raw: string | null | undefined): DjPlanTier {
   const upper = (raw ?? "").toUpperCase();
   if (upper === "PREMIUM") return "PREMIUM";
+  if (upper === "FOUNDING") return "FOUNDING";
   return "FREE";
 }

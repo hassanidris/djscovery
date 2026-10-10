@@ -103,16 +103,49 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Refresh session — do not remove this
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Protected routes — redirect to /sign-in if not authenticated
+  const protectedPaths = [
+    "/dashboard",
+    "/select-role",
+    "/become-dj",
+    "/become-organizer",
+    "/become-fan",
+    "/fan",
+    "/dj",
+    "/organizer",
+    "/profile/edit",
+    "/inbox",
+    "/admin",
+  ];
+  const isProtected = protectedPaths.some(
+    (path) =>
+      request.nextUrl.pathname === path ||
+      request.nextUrl.pathname.startsWith(`${path}/`),
+  );
 
   // ── Site mode gate: control access based on SITE_MODE ──────────────────
   if (isProduction) {
     let isBetaExempt = false;
+    let user = null;
 
-    // Check for beta exemption (founding members with ACTIVE status)
+    // Always refresh session for public pages that may render authenticated content
+    // Handle case where refresh token is invalid/expired
+    try {
+      const {
+        data: { user: fetchedUser },
+      } = await supabase.auth.getUser();
+      user = fetchedUser;
+    } catch (error) {
+      // If refresh token is invalid, treat as unauthenticated
+      // This can happen with expired sessions or cleared tokens
+      console.debug(
+        "Session refresh failed, treating as unauthenticated:",
+        error,
+      );
+      user = null;
+    }
+
+    // Only do expensive user lookup for beta exemption when in BETA mode
     if (SITE_MODE === "BETA" && user) {
       try {
         const userProfile = await prisma.user.findUnique({
@@ -161,34 +194,29 @@ export async function proxy(request: NextRequest) {
       setSecurityHeaders(response);
       return response;
     }
-  }
 
-  // Protected routes — redirect to /sign-in if not authenticated
-  const protectedPaths = [
-    "/dashboard",
-    "/select-role",
-    "/become-dj",
-    "/become-organizer",
-    "/become-fan",
-    "/fan",
-    "/dj",
-    "/organizer",
-    "/profile/edit",
-    "/inbox",
-    "/admin",
-  ];
-  const isProtected = protectedPaths.some(
-    (path) =>
-      request.nextUrl.pathname === path ||
-      request.nextUrl.pathname.startsWith(`${path}/`),
-  );
+    if (isProtected && !user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/sign-in";
+      const response = NextResponse.redirect(url);
+      setSecurityHeaders(response);
+      return response;
+    }
+  } else {
+    // In non-production, only check protected routes
+    if (isProtected) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-  if (isProtected && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/sign-in";
-    const response = NextResponse.redirect(url);
-    setSecurityHeaders(response);
-    return response;
+      if (!user) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/sign-in";
+        const response = NextResponse.redirect(url);
+        setSecurityHeaders(response);
+        return response;
+      }
+    }
   }
 
   // Add X-Robots-Tag header when indexing is disabled (PRE_LAUNCH or BETA mode)
