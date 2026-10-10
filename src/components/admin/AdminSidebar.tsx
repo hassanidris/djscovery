@@ -21,6 +21,9 @@ import {
   Bell,
   Zap,
   Award,
+  Crown,
+  Mail,
+  List,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +37,30 @@ const NAV_ITEMS = [
     href: "/admin/founding/applications",
     label: "Founding Applications",
     icon: Award,
+    exact: false,
+  },
+  {
+    href: "/admin/founding/members",
+    label: "Founding Members",
+    icon: Crown,
+    exact: false,
+  },
+  {
+    href: "/admin/founding/invitations",
+    label: "Founding Invitations",
+    icon: Mail,
+    exact: false,
+  },
+  {
+    href: "/admin/founding/waitlist",
+    label: "Founding Waitlist",
+    icon: List,
+    exact: false,
+  },
+  {
+    href: "/admin/founding/analytics",
+    label: "Founding Analytics",
+    icon: BarChart3,
     exact: false,
   },
   {
