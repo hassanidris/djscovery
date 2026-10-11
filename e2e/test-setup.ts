@@ -331,9 +331,6 @@ export async function getDjMediaCount(
   });
 }
 
-/**
- * Helper function to create a test founding application
- */
 export async function createTestFoundingApplication(options: {
   email: string;
   name: string;
@@ -384,9 +381,6 @@ export async function createTestFoundingApplication(options: {
   return { application, emailVerificationToken };
 }
 
-/**
- * Helper function to delete test founding applications
- */
 export async function cleanupFoundingApplications(email: string) {
   const db = getPrisma();
   await db.foundingApplication.deleteMany({
@@ -394,29 +388,27 @@ export async function cleanupFoundingApplications(email: string) {
   });
 }
 
-/**
- * Helper function to get a test country and city
- */
 export async function getTestLocation() {
   const db = getPrisma();
-  const country = await db.country.findFirst({
+  let country = await db.country.findFirst({
     where: { name: "United States" },
     select: { id: true },
   });
   if (!country) {
-    const anyCountry = await db.country.findFirst({ select: { id: true } });
-    if (!anyCountry) throw new Error("No country found in database");
-    country.id = anyCountry.id;
+    country = await db.country.findFirst({ select: { id: true } });
+    if (!country) throw new Error("No country found in database");
   }
 
-  const city = await db.city.findFirst({
+  let city = await db.city.findFirst({
     where: { countryId: country.id },
     select: { id: true },
   });
   if (!city) {
-    const anyCity = await db.city.findFirst({ select: { id: true } });
-    if (!anyCity) throw new Error("No city found in database");
-    city.id = anyCity.id;
+    city = await db.city.findFirst({
+      where: { countryId: country.id },
+      select: { id: true },
+    });
+    if (!city) throw new Error("No city found for the selected country");
   }
 
   return { countryId: country.id, cityId: city.id };

@@ -88,12 +88,13 @@ test.describe("Founding DJs Program - User Side", () => {
   });
 
   test("status check works with test application", async ({ page }) => {
+    const { countryId, cityId } = await getTestLocation();
     const { application } = await createTestFoundingApplication({
       email: testEmail,
       name: testName,
       stageName: testStageName,
-      countryId: 1,
-      cityId: 1,
+      countryId,
+      cityId,
       portfolioLinks: ["https://soundcloud.com/test"],
       status: "EMAIL_VERIFIED",
     });

@@ -1,36 +1,35 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   checkFoundingApplicationStatus,
   addToWaitlist,
 } from "@/lib/actions/founding-applications";
-
-vi.mock("@/lib/client", () => ({
-  default: {
-    foundingApplication: {
-      findFirst: vi.fn(),
-    },
-    waitlistEntry: {
-      findFirst: vi.fn(),
-      create: vi.fn(),
-    },
-  },
-}));
-
 import prisma from "@/lib/client";
+import { getTestLocation } from "../setup";
 
 describe("Founding Applications Integration Tests", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  const testEmail = `test-integration-${Date.now()}@example.com`;
+  const testEmail2 = `test-integration-2-${Date.now()}@example.com`;
+
+  beforeEach(async () => {
+    await prisma.foundingApplication.deleteMany({
+      where: { email: { in: [testEmail, testEmail2] } },
+    });
+    await prisma.waitlistEntry.deleteMany({
+      where: { email: { in: [testEmail, testEmail2] } },
+    });
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+  afterEach(async () => {
+    await prisma.foundingApplication.deleteMany({
+      where: { email: { in: [testEmail, testEmail2] } },
+    });
+    await prisma.waitlistEntry.deleteMany({
+      where: { email: { in: [testEmail, testEmail2] } },
+    });
   });
 
   describe("checkFoundingApplicationStatus", () => {
     it("returns error when no application found", async () => {
-      (prisma.foundingApplication.findFirst as any).mockResolvedValue(null);
-
       const result = await checkFoundingApplicationStatus(
         "nonexistent@example.com",
       );
@@ -42,38 +41,81 @@ describe("Founding Applications Integration Tests", () => {
     });
 
     it("returns application status when found", async () => {
+      const { countryId, cityId } = await getTestLocation();
       const submittedAt = new Date();
-      (prisma.foundingApplication.findFirst as any).mockResolvedValue({
-        status: "EMAIL_VERIFIED",
-        submittedAt,
+      await prisma.foundingApplication.create({
+        data: {
+          email: testEmail,
+          name: "Test User",
+          stageName: "Test DJ",
+          countryId,
+          cityId,
+          portfolioLinks: [],
+          status: "EMAIL_VERIFIED",
+          submittedAt,
+          emailVerificationTokenHash: "hash",
+          emailVerificationExpiresAt: new Date(),
+          emailVerifiedAt: new Date(),
+          experienceYears: 0,
+          experienceLevel: "OPEN",
+        },
       });
 
-      const result = await checkFoundingApplicationStatus("test@example.com");
+      const result = await checkFoundingApplicationStatus(testEmail);
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual({
-          status: "EMAIL_VERIFIED",
-          submittedAt,
-        });
+        expect(result.data.status).toBe("EMAIL_VERIFIED");
+        expect(result.data.submittedAt).toBeInstanceOf(Date);
       }
     });
 
     it("returns most recent application when multiple exist", async () => {
-      const submittedAt = new Date();
-      (prisma.foundingApplication.findFirst as any).mockResolvedValue({
-        status: "APPROVED",
-        submittedAt,
+      const { countryId, cityId } = await getTestLocation();
+      const submittedAt1 = new Date(Date.now() - 10000);
+      const submittedAt2 = new Date();
+
+      await prisma.foundingApplication.create({
+        data: {
+          email: testEmail,
+          name: "Test User",
+          stageName: "Test DJ",
+          countryId,
+          cityId,
+          portfolioLinks: [],
+          status: "PENDING",
+          submittedAt: submittedAt1,
+          emailVerificationTokenHash: "hash1",
+          emailVerificationExpiresAt: new Date(),
+          experienceYears: 0,
+          experienceLevel: "OPEN",
+        },
       });
 
-      const result = await checkFoundingApplicationStatus("test@example.com");
+      await prisma.foundingApplication.create({
+        data: {
+          email: testEmail,
+          name: "Test User",
+          stageName: "Test DJ",
+          countryId,
+          cityId,
+          portfolioLinks: [],
+          status: "APPROVED",
+          submittedAt: submittedAt2,
+          emailVerificationTokenHash: "hash2",
+          emailVerificationExpiresAt: new Date(),
+          emailVerifiedAt: new Date(),
+          experienceYears: 0,
+          experienceLevel: "OPEN",
+        },
+      });
+
+      const result = await checkFoundingApplicationStatus(testEmail);
 
       expect(result.success).toBe(true);
-      expect(prisma.foundingApplication.findFirst).toHaveBeenCalledWith(
-        expect.objectContaining({
-          orderBy: { submittedAt: "desc" },
-        }),
-      );
+      if (result.success) {
+        expect(result.data.status).toBe("APPROVED");
+      }
     });
   });
 
@@ -90,13 +132,15 @@ describe("Founding Applications Integration Tests", () => {
     });
 
     it("returns error when email already on waitlist", async () => {
-      (prisma.waitlistEntry.findFirst as any).mockResolvedValue({
-        id: 1,
-        email: "existing@example.com",
+      await prisma.waitlistEntry.create({
+        data: {
+          email: testEmail,
+          name: "Existing User",
+        },
       });
 
       const result = await addToWaitlist({
-        email: "existing@example.com",
+        email: testEmail,
       });
 
       expect(result.success).toBe(false);
@@ -106,13 +150,8 @@ describe("Founding Applications Integration Tests", () => {
     });
 
     it("adds to waitlist successfully", async () => {
-      (prisma.waitlistEntry.findFirst as any).mockResolvedValue(null);
-      (prisma.waitlistEntry.create as any).mockResolvedValue({
-        id: 456,
-      });
-
       const result = await addToWaitlist({
-        email: "new@example.com",
+        email: testEmail,
         name: "Waitlist User",
         isDj: true,
         utmSource: "twitter",
@@ -122,43 +161,35 @@ describe("Founding Applications Integration Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual({ id: 456 });
+        expect(result.data.id).toBeDefined();
       }
-      expect(prisma.waitlistEntry.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            email: "new@example.com",
-            name: "Waitlist User",
-            isDj: true,
-            utmSource: "twitter",
-            utmMedium: "social",
-            utmCampaign: "launch",
-          }),
-        }),
-      );
+
+      const entry = await prisma.waitlistEntry.findFirst({
+        where: { email: testEmail },
+      });
+      expect(entry).toBeDefined();
+      expect(entry?.name).toBe("Waitlist User");
+      expect(entry?.isDj).toBe(true);
+      expect(entry?.utmSource).toBe("twitter");
+      expect(entry?.utmMedium).toBe("social");
+      expect(entry?.utmCampaign).toBe("launch");
     });
 
     it("adds to waitlist with minimal data", async () => {
-      (prisma.waitlistEntry.findFirst as any).mockResolvedValue(null);
-      (prisma.waitlistEntry.create as any).mockResolvedValue({
-        id: 457,
-      });
-
       const result = await addToWaitlist({
-        email: "minimal@example.com",
+        email: testEmail2,
       });
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual({ id: 457 });
+        expect(result.data.id).toBeDefined();
       }
-      expect(prisma.waitlistEntry.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            email: "minimal@example.com",
-          }),
-        }),
-      );
+
+      const entry = await prisma.waitlistEntry.findFirst({
+        where: { email: testEmail2 },
+      });
+      expect(entry).toBeDefined();
+      expect(entry?.email).toBe(testEmail2);
     });
   });
 });
