@@ -34,7 +34,7 @@ export const TEST_USERS = {
 
 let prisma: PrismaClient | null = null;
 
-function getPrisma(): PrismaClient {
+export function getPrisma(): PrismaClient {
   if (!prisma) {
     if (!process.env.DATABASE_URL) {
       throw new Error(
@@ -329,4 +329,95 @@ export async function getDjMediaCount(
       ...(type && { type }),
     },
   });
+}
+
+/**
+ * Helper function to create a test founding application
+ */
+export async function createTestFoundingApplication(options: {
+  email: string;
+  name: string;
+  stageName: string;
+  countryId: number;
+  cityId: number;
+  portfolioLinks: string[];
+  status?:
+    "PENDING" | "EMAIL_VERIFIED" | "UNDER_REVIEW" | "APPROVED" | "REJECTED";
+}) {
+  const db = getPrisma();
+  const crypto = require("crypto");
+
+  const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+  const emailVerificationTokenHash = crypto
+    .createHash("sha256")
+    .update(emailVerificationToken)
+    .digest("hex");
+  const emailVerificationExpiresAt = new Date();
+  emailVerificationExpiresAt.setHours(
+    emailVerificationExpiresAt.getHours() + 24,
+  );
+
+  const application = await db.foundingApplication.create({
+    data: {
+      email: options.email.toLowerCase(),
+      name: options.name,
+      stageName: options.stageName,
+      countryId: options.countryId,
+      cityId: options.cityId,
+      portfolioLinks: options.portfolioLinks,
+      status: options.status || "PENDING",
+      emailVerificationTokenHash,
+      emailVerificationExpiresAt,
+      emailVerifiedAt: options.status === "EMAIL_VERIFIED" ? new Date() : null,
+      submittedAt: new Date(),
+      experienceYears: 0,
+      experienceLevel: "OPEN",
+      statusLogs: {
+        create: {
+          newStatus: options.status || "PENDING",
+          reason: "Test application created",
+        },
+      },
+    },
+  });
+
+  return { application, emailVerificationToken };
+}
+
+/**
+ * Helper function to delete test founding applications
+ */
+export async function cleanupFoundingApplications(email: string) {
+  const db = getPrisma();
+  await db.foundingApplication.deleteMany({
+    where: { email: email.toLowerCase() },
+  });
+}
+
+/**
+ * Helper function to get a test country and city
+ */
+export async function getTestLocation() {
+  const db = getPrisma();
+  const country = await db.country.findFirst({
+    where: { name: "United States" },
+    select: { id: true },
+  });
+  if (!country) {
+    const anyCountry = await db.country.findFirst({ select: { id: true } });
+    if (!anyCountry) throw new Error("No country found in database");
+    country.id = anyCountry.id;
+  }
+
+  const city = await db.city.findFirst({
+    where: { countryId: country.id },
+    select: { id: true },
+  });
+  if (!city) {
+    const anyCity = await db.city.findFirst({ select: { id: true } });
+    if (!anyCity) throw new Error("No city found in database");
+    city.id = anyCity.id;
+  }
+
+  return { countryId: country.id, cityId: city.id };
 }
