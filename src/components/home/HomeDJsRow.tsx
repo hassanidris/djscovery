@@ -111,7 +111,11 @@ export default function HomeDJsRow({
                       {dj.rating}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Users className="h-3 w-3 text-gray-500" />
+                      <Users
+                        className="h-3 w-3 text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="sr-only">Followers:</span>
                       {formatNumber(dj.followers)}
                     </span>
                   </div>
