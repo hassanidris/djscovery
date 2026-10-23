@@ -43,18 +43,12 @@ export default function HomeDJsTabs({ newDJs, trendingDJs }: Props) {
                     className="data-[state=active]:bg-h_red data-[state=active]:text-white"
                   >
                     Just Joined
-                    <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
-                      {newDJs.length}
-                    </span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="trending"
                     className="data-[state=active]:bg-h_red data-[state=active]:text-white"
                   >
                     Top Rated
-                    <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
-                      {trendingDJs.length}
-                    </span>
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -128,7 +122,7 @@ function DJCard({
       className="block h-full"
     >
       <Card className="bg-h_blackLight/50 hover:ring-h_red relative flex h-full w-56 shrink-0 cursor-pointer flex-col gap-3 overflow-visible p-4 ring-white/5 transition-all">
-        {rank !== undefined && (
+        {rank !== undefined && rank <= 3 && (
           <Badge className="bg-h_redDark/50 text-h_redLight absolute top-2 left-2 border-0">
             #{rank}
           </Badge>

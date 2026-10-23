@@ -57,10 +57,12 @@ export default async function HomeTrendingDJs() {
                         {dj.stageName[0]}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex items-center gap-1 text-sm text-amber-400">
-                      <TrendingUp className="h-4 w-4" />
-                      <span>#{index + 1}</span>
-                    </div>
+                    {index + 1 <= 3 && (
+                      <div className="flex items-center gap-1 text-sm text-amber-400">
+                        <TrendingUp className="h-4 w-4" />
+                        <span>#{index + 1}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

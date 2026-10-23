@@ -65,15 +65,15 @@ export default function HomeDJsRow({
                 className="block h-full"
               >
                 <Card className="bg-h_blackLight/50 hover:ring-h_red relative flex min-h-64 w-56 shrink-0 cursor-pointer flex-col gap-3 overflow-visible p-4 ring-white/5 transition-all">
-                  {variant === "trending" ? (
+                  {variant === "trending" && index + 1 <= 3 ? (
                     <Badge className="bg-h_redDark/50 text-h_redLight absolute top-2 left-2 border-0">
                       #{index + 1}
                     </Badge>
-                  ) : (
+                  ) : variant === "new" ? (
                     <Badge className="bg-h_red absolute top-2 right-2 border-0 text-white">
                       NEW
                     </Badge>
-                  )}
+                  ) : null}
 
                   <div className="flex flex-col items-center gap-2 pt-2 text-center">
                     <Avatar className="ring-h_red size-20 ring-2 ring-offset-2 ring-offset-black">
