@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, MapPin, Star } from "lucide-react";
+import { TrendingUp, MapPin, Star, Users } from "lucide-react";
 import { GenreBadge } from "@/components/forms/GenreBadge";
 import { getTrendingDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
@@ -57,10 +57,12 @@ export default async function HomeTrendingDJs() {
                         {dj.stageName[0]}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex items-center gap-1 text-sm text-amber-400">
-                      <TrendingUp className="h-4 w-4" />
-                      <span>#{index + 1}</span>
-                    </div>
+                    {index + 1 <= 3 && (
+                      <div className="flex items-center gap-1 text-sm text-amber-400">
+                        <TrendingUp className="h-4 w-4" />
+                        <span>#{index + 1}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -89,11 +91,14 @@ export default async function HomeTrendingDJs() {
                   </div>
 
                   <div className="mt-auto flex w-full items-center justify-between border-t border-white/5 pt-3 text-sm text-gray-400">
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-1.5 font-medium text-white">
                       <TrendingUp className="h-4 w-4 text-amber-400" />
                       {formatNumber(dj.monthlyViews)} views
                     </span>
-                    <span>{formatNumber(dj._count.followers)} followers</span>
+                    <span className="flex items-center gap-1.5">
+                      <Users className="h-4 w-4 text-gray-500" />
+                      {formatNumber(dj._count.followers)}
+                    </span>
                   </div>
                 </div>
               </Card>
