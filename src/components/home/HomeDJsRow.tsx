@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { GenreBadge } from "@/components/forms/GenreBadge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { formatNumber } from "@/lib/utils/currency";
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, Users } from "lucide-react";
 
 export type DemoDJ = {
   id: number | string;
@@ -110,7 +110,10 @@ export default function HomeDJsRow({
                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                       {dj.rating}
                     </span>
-                    <span>{formatNumber(dj.followers)} followers</span>
+                    <span className="flex items-center gap-1">
+                      <Users className="h-3 w-3 text-gray-500" />
+                      {formatNumber(dj.followers)}
+                    </span>
                   </div>
                 </Card>
               </Link>

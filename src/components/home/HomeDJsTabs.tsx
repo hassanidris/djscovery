@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Crown, MapPin, Star } from "lucide-react";
+import { Crown, MapPin, Star, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ScrollableCarousel from "@/components/ScrollableCarousel";
@@ -175,7 +175,10 @@ function DJCard({
             <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
             {dj.rating}
           </span>
-          <span>{formatNumber(dj.followers)} followers</span>
+          <span className="flex items-center gap-1">
+            <Users className="h-3 w-3 text-gray-500" />
+            {formatNumber(dj.followers)}
+          </span>
         </div>
       </Card>
     </Link>
