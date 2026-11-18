@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Crown } from "lucide-react";
 import { CircleCheck } from "lucide-react";
+import { Users } from "lucide-react";
 import { DjUser } from "@/lib/data";
 import SaveDjButton from "@/components/dj-profile/FollowDjButton";
 import { ReputationBadge } from "@/components/dj-profile/ReputationBadge";
@@ -148,9 +149,10 @@ const DjCard = ({
           })()}
         </span>
         {_count !== undefined && (
-          <span className="text-xs text-gray-400">
-            {formatNumber(_count.followers)} follower
-            {_count.followers === 1 ? "" : "s"}
+          <span className="flex items-center gap-1 text-xs text-gray-400">
+            <Users className="h-3 w-3 text-gray-500" aria-hidden="true" />
+            <span className="sr-only">Followers:</span>
+            {formatNumber(_count.followers)}
           </span>
         )}
       </div>

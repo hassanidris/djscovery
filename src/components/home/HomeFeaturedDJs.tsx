@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Crown, MapPin, Star } from "lucide-react";
+import { Crown, MapPin, Star, Users } from "lucide-react";
 import { GenreBadge } from "@/components/forms/GenreBadge";
 import { getFeaturedDJs } from "@/lib/actions/djs";
 import { formatNumber } from "@/lib/utils/currency";
@@ -121,7 +121,14 @@ export default async function HomeFeaturedDJs() {
                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                       {dj._avg?.rating?.toFixed(1) || "N/A"} rating
                     </span>
-                    <span>{formatNumber(dj._count.followers)} followers</span>
+                    <span className="flex items-center gap-1">
+                      <Users
+                        className="h-3 w-3 text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="sr-only">Followers:</span>
+                      {formatNumber(dj._count.followers)}
+                    </span>
                   </div>
                 </div>
               </Card>

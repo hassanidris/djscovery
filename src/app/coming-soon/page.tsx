@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   description:
     "DJcovery connects DJs with event organizers and music fans. Build your profile, showcase your work, and find opportunities in the music scene.",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
 };
 
