@@ -286,8 +286,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Fails on any moderate+ advisory except ones explicitly allowlisted in
+      # scripts/check-audit.mjs (currently just the zod v3 DoS advisory, which
+      # needs a breaking v3->v4 migration tracked as separate follow-up work).
       - name: Run npm audit
-        run: npm audit --audit-level=moderate --omit=dev
+        run: npm run audit-check
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2

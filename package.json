@@ -48,7 +48,8 @@
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
     "analyze": "ANALYZE=true next build",
-    "bundle-check": "node scripts/check-bundle-size.mjs"
+    "bundle-check": "node scripts/check-bundle-size.mjs",
+    "audit-check": "node scripts/check-audit.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
