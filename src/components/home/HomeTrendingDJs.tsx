@@ -96,7 +96,11 @@ export default async function HomeTrendingDJs() {
                       {formatNumber(dj.monthlyViews)} views
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Users className="h-4 w-4 text-gray-500" />
+                      <Users
+                        className="h-4 w-4 text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="sr-only">Followers:</span>
                       {formatNumber(dj._count.followers)}
                     </span>
                   </div>
